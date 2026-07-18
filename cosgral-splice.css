@@ -1,0 +1,41 @@
+#cosgral-playfight {
+  --theme: #f5f5f0;
+  padding: 4rem 0 6rem;
+  background: #0a0a0a;
+}
+#cosgral-playfight .featured_project_image img,
+#cosgral-playfight [data-gl-container] img {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+#cosgral-pf-trail,
+.image_trail,
+.cosgral-splice-label,
+#clone-preview-badge {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#cosgral-parhouse {
+  min-height: 80vh;
+  background: #0a0505;
+}
+#cosgral-parhouse .case-study-image-masonry-container {
+  min-height: 100vh;
+  padding: 4rem 2rem;
+}
+#cosgral-parhouse #swiper-case-studies-slider {
+  overflow: hidden;
+  padding: 2rem 0;
+}
+#cosgral-parhouse #swiper-case-studies-slider .swiper-slide {
+  width: min(78vw, 650px);
+  height: min(58vh, 560px);
+  overflow: hidden;
+}
+#cosgral-parhouse #swiper-case-studies-slider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

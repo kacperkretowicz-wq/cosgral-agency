@@ -1,0 +1,415 @@
+/* COSGRAL brand — nav, footer, palette */
+.navbar_logo .nav_logo {
+  display: none !important;
+}
+.navbar_logo {
+  display: flex !important;
+  align-items: center;
+  min-width: 8rem;
+}
+.navbar_logo::after {
+  content: "COSGRAL";
+  font-family: system-ui, sans-serif;
+  font-size: clamp(0.85rem, 2vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #f5f0eb;
+  line-height: 1;
+  mix-blend-mode: difference;
+}
+
+.footer_logo.difference,
+.footer_logo_wrapper > svg,
+.footer_logo.mobile,
+img.footer_logo {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.cosgral-footer-wordmark {
+  display: block !important;
+  margin-top: 1.5rem;
+  font-family: system-ui, sans-serif;
+  font-size: clamp(2.2rem, 9vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: #e82323;
+  line-height: 0.95;
+}
+
+/* Footer — jasne rozmyte tło zamiast ciemnego portretu */
+.section_footer {
+  position: relative;
+  background-color: #f5f0eb;
+}
+.section_footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("../../images/cosgral-agency/approved/cosgral-approved-footer.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px) brightness(1.08);
+  opacity: 0.92;
+}
+.section_footer .footer_container,
+.section_footer .footer_wrapper,
+.section_footer .footer_logo_wrapper {
+  position: relative;
+  z-index: 1;
+}
+.footer_form_bg.color_burn {
+  mix-blend-mode: soft-light !important;
+  opacity: 0.35 !important;
+}
+.footer_form_bg.difference {
+  mix-blend-mode: normal !important;
+  background: rgba(245, 240, 235, 0.55) !important;
+}
+
+/* Hero — stabilniejszy tekst przy obrocie maski */
+.hero_decor {
+  display: none !important;
+}
+.hero_wrapper,
+.hero_heading,
+[data-hero-heading="main"],
+.hero_heading_first,
+.hero_heading_second,
+.hero_heading_third,
+.hero_heading_bottom {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+.section_hero {
+  transform: translateZ(0);
+  background-color: #f5f0ee; /* Light beige revealed when image narrows */
+}
+
+/* Hero exit — korzeń (linia rysująca się w spiralę) zamiast obracającej się belki */
+.hero_root_line {
+  grid-area: 1 / 1;
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.hero_root_line svg {
+  /* Musi wypełniać kontener DOKŁADNIE 1:1 — JS liczy viewBox w realnych pikselach
+     kontenera (getBoundingClientRect), więc SVG nie może mieć własnej, węższej
+     szerokości ani być wyśrodkowany — inaczej cała ścieżka jest przeskalowana
+     i nie trafia w realną pozycję nagłówków. */
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.hero_root_line path {
+  fill: none;
+  stroke: #e82323;
+  stroke-width: 2.5;
+  /* butt, NIE round: przy strokeDashoffset === strokeDasharray okrągły linecap
+     renderuje kropkę na starcie każdego konturu → rozsiane czerwone kropki. */
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+}
+
+/* About — tile usunięty */
+.section_about .about_wrapper {
+  position: relative;
+  z-index: 2;
+}
+
+/* Tymczasowo ukryte — czekamy na Twoje zdjęcia (wizualizacje / parhouse) */
+#cosgral-playfight,
+#cosgral-parhouse {
+  display: none !important;
+}
+
+/* Parhouse overrides gdy wróci */
+#cosgral-parhouse {
+  --ph-accent: #e82323;
+  color: #f5f0eb;
+}
+
+/* Pillars — jedna kolumna, bez tła wideo */
+.pillars_bg {
+  display: none !important;
+}
+
+.pillars_wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.pillar.left,
+.pillar.right {
+  grid-column: auto;
+  width: 100%;
+}
+
+/* Team — dwie nakładające się karty portretowe (bez WebGL, bez scroll-pin) */
+.section_history {
+  background-color: #f5f0ee;
+  position: relative;
+}
+
+.section_history .history_container {
+  position: relative;
+}
+
+.history_head {
+  position: relative;
+  z-index: 2;
+}
+
+.history_steps_v1 {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+}
+
+.history_steps_wrapper {
+  position: relative;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: clamp(3rem, 8vw, 7rem) 0;
+  overflow: visible;
+}
+
+.history_steps_inner_v1,
+.history_step_v1,
+.history_steps_nav {
+  display: none !important;
+}
+
+.history_team {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 9vw, 6.5rem);
+}
+
+.history_team_card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.history_team_card.is-right {
+  justify-content: flex-start;
+}
+
+.history_team_media {
+  position: relative;
+  flex-shrink: 0;
+  width: min(320px, 62vw);
+  height: min(440px, 62vw);
+  overflow: hidden;
+}
+
+.history_team_card.is-right .history_team_media {
+  order: 1;
+}
+
+.history_team_media_shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(20, 16, 14, 0.28), transparent 55%);
+  pointer-events: none;
+}
+
+.history_team_placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e7dfd6;
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(26, 22, 20, 0.22);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.history_team_media:hover .history_team_placeholder {
+  transform: scale(1.05);
+}
+
+.history_team_info {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  width: min(360px, 52vw);
+  margin-left: -2rem;
+}
+
+.history_team_card.is-right .history_team_info {
+  margin-left: 0;
+  margin-right: -2rem;
+  align-items: flex-end;
+}
+
+.history_team_name {
+  margin: 0;
+  font-family: "Feature Display", Arial, sans-serif;
+  font-size: clamp(1.9rem, 4.2vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: rgb(238, 51, 53);
+}
+
+.history_team_name span {
+  font-weight: 400;
+}
+
+.history_team_row {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.history_team_card.is-right .history_team_row {
+  flex-direction: row-reverse;
+}
+
+.history_team_cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(26, 22, 20, 0.28);
+  color: rgba(26, 22, 20, 0.7);
+  transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.history_team_cta svg {
+  transition: transform 0.3s ease;
+}
+
+.history_team_card.is-right .history_team_cta svg {
+  transform: rotate(180deg);
+}
+
+.history_team_cta:hover {
+  transform: scale(1.1);
+  border-color: #e82323;
+  background-color: #e82323;
+  color: #f5f0ee;
+}
+
+.history_team_cta:hover svg {
+  transform: rotate(-45deg);
+}
+
+.history_team_card.is-right .history_team_cta:hover svg {
+  transform: rotate(225deg);
+}
+
+.history_team_bio {
+  margin: 0;
+  max-width: 20rem;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: rgba(26, 22, 20, 0.62);
+}
+
+.history_team_card.is-right .history_team_bio {
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .history_team_card,
+  .history_team_card.is-right {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .history_team_media,
+  .history_team_card.is-right .history_team_media {
+    order: 0;
+    width: min(280px, 70vw);
+    height: min(360px, 70vw);
+  }
+
+  .history_team_info,
+  .history_team_card.is-right .history_team_info {
+    margin: 0;
+    align-items: center;
+    width: 100%;
+  }
+
+  .history_team_row,
+  .history_team_card.is-right .history_team_row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .history_team_bio,
+  .history_team_card.is-right .history_team_bio {
+    text-align: center;
+  }
+}
+
+/* Team — desktop overrides (musi być PO regułach bazowych, żeby wygrać w kaskadzie) */
+@media (min-width: 1000px) {
+  .history_team {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(4rem, 11vw, 10rem);
+  }
+
+  .history_team_card {
+    flex: 0 0 auto;
+  }
+
+  .history_team_media {
+    width: clamp(180px, 24vw, 260px);
+    height: clamp(240px, 32vw, 340px);
+  }
+
+  .history_team_info {
+    width: clamp(190px, 22vw, 260px);
+    margin-left: -1.25rem;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  .history_team_card.is-right .history_team_info {
+    margin-left: 0;
+    margin-right: -1.25rem;
+  }
+
+  .history_team_name {
+    font-size: clamp(1.6rem, 2.4vw, 2.15rem);
+  }
+
+  .history_team_cta {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+}

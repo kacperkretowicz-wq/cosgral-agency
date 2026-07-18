@@ -1,0 +1,98 @@
+{
+  "reduced_motion_reduce_kinetic": {
+    "bodyClass": "u-body",
+    "scroll": 675,
+    "triggerProgress": 0.25000027777767486,
+    "h1Text": "COSGRAL",
+    "h1Opacity": "1",
+    "h1ClipPath": "inset(0px 0% 0px 0px)",
+    "charSpansCount": 7,
+    "charSpansStyles": [
+      {
+        "char": "C",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "O",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "S",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "G",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "R",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "A",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "L",
+        "opacity": "1",
+        "display": "inline-block"
+      }
+    ],
+    "bodyClassInitial": "u-body",
+    "screenshot": "C:\\Users\\Zdalny\\Downloads\\cosgral \u2014 kopia-20260717T165545Z-1-001\\cosgral \u2014 kopia\\cosgral-main\\designkopia\\cosgral-agency\\test-output\\hero-tests\\reduce_motion_reduce_kinetic.png"
+  },
+  "reduced_motion_no_preference_kinetic": {
+    "bodyClass": "u-body",
+    "scroll": 900,
+    "triggerProgress": 0.25000020833327546,
+    "h1Text": "COSGRAL",
+    "h1Opacity": "1",
+    "h1ClipPath": "inset(0px 100% 0px 0px)",
+    "charSpansCount": 7,
+    "charSpansStyles": [
+      {
+        "char": "C",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "O",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "S",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "G",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "R",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "A",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "L",
+        "opacity": "0",
+        "display": "inline-block"
+      }
+    ],
+    "bodyClassInitial": "u-body",
+    "screenshot": "C:\\Users\\Zdalny\\Downloads\\cosgral \u2014 kopia-20260717T165545Z-1-001\\cosgral \u2014 kopia\\cosgral-main\\designkopia\\cosgral-agency\\test-output\\hero-tests\\reduced_motion_no_preference_kinetic.png"
+  }
+}
