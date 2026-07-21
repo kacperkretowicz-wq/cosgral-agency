@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSGRAL — scroll mockup tła (kompilacja sekcji)</title>
+  <link rel="stylesheet" href="cosgral-v3.css" />
+  <style>
+    :root { --accent: #e82323; --border: rgba(245,240,235,0.12); }
+    body { margin: 0; }
+    .toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
+      padding: 0.85rem 1rem; background: rgba(10,10,10,0.94);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(8px);
+    }
+    .toolbar h1 { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; margin-right: auto; }
+    .toolbar button {
+      font: inherit; color: #f5f0eb; background: transparent;
+      border: 1px solid var(--border); padding: 0.4rem 0.75rem; cursor: pointer;
+    }
+    .toolbar button.is-active { border-color: var(--accent); color: var(--accent); }
+    .toolbar a { font-size: 0.8rem; color: #9a9a9a; text-decoration: none; }
+    .page {
+      margin-top: 52px;
+      background-color: #0a0a0a;
+      background-repeat: no-repeat;
+      background-size: 100% auto;
+      background-position: top center;
+    }
+    .page .scroll-sections-wrapper,
+    .page .act-wrapper,
+    .page .section,
+    .page .section_history,
+    .page .site-footer { background: transparent !important; }
+    .page .mesh-canvas,
+    .page .mesh-canvas--video { opacity: 0 !important; }
+    .page .faq::before,
+    .page .section_history::before { opacity: 0 !important; }
+    .zone-label {
+      position: absolute; top: 0.75rem; left: 1rem; z-index: 50;
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); background: rgba(10,10,10,0.55); padding: 0.25rem 0.5rem;
+    }
+    .hero-sim { min-height: 120vh; position: relative; display: flex; align-items: center; padding: 0 4rem; }
+    .preview-note {
+      position: fixed; bottom: 1rem; right: 1rem; z-index: 200;
+      max-width: 22rem; font-size: 0.75rem; color: #9a9a9a;
+      background: rgba(10,10,10,0.85); border: 1px solid var(--border); padding: 0.75rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>Scroll mockup — 1 zdjęcie / sekcje</h1>
+    <button type="button" class="is-active" data-bg="images/cosgral-agency/background-mockups/scroll-mockup-04-thread-red.jpg">04 Red Thread</button>
+    <button type="button" data-bg="images/cosgral-agency/background-mockups/scroll-mockup-05-chrome-ribbon.jpg">05 Chrome Ribbon</button>
+    <button type="button" data-bg="images/cosgral-agency/background-mockups/scroll-mockup-06-haze-flow.jpg">06 Haze Flow</button>
+    <a href="images/cosgral-agency/background-mockups/scroll-mockup-04-thread-red-preview.jpg" target="_blank" rel="noopener">mapa stref</a>
+  </div>
+
+  <div class="page" id="page" style="background-image:url('images/cosgral-agency/background-mockups/scroll-mockup-04-thread-red.jpg')">
+    <section class="hero-sim"><span class="zone-label">Hero · Akt 1–4</span><h1>COSGRAL</h1></section>
+    <section class="section services" style="min-height:90vh;position:relative"><span class="zone-label">Usługi</span><div class="container"><span class="section-eyebrow">Usługi</span><h2 class="section-title">Sprawdź, co może Cię zainteresować</h2></div></section>
+    <section class="section process" style="min-height:70vh;position:relative"><span class="zone-label">Proces</span><div class="container"><span class="section-eyebrow">Jak pracujemy?</span><h2 class="section-title">Transparentny proces</h2></div></section>
+    <section class="section faq" style="min-height:60vh;position:relative"><span class="zone-label">FAQ</span><div class="container"><span class="section-eyebrow">FAQ</span><h2 class="section-title">Pytania, które i tak zadasz</h2></div></section>
+    <section class="section_history" style="min-height:80vh;position:relative"><span class="zone-label">Zespół</span><div class="container"><h2 class="history_heading">Zespół cosgral.agency</h2></div></section>
+    <footer class="site-footer" style="min-height:40vh;position:relative"><span class="zone-label">Stopka</span><div class="container"><p class="cosgral-footer-wordmark">cosgral agency</p></div></footer>
+  </div>
+
+  <p class="preview-note">Designer scroll mockupy 04–06: jedna ciągła atmosfera + zblurowana linia przewodnia. Przewiń, żeby zobaczyć flow.</p>
+
+  <script>
+    const page = document.getElementById("page");
+    document.querySelectorAll(".toolbar button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".toolbar button").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        page.style.backgroundImage = "url('" + btn.dataset.bg + "')";
+      });
+    });
+  </script>
+</body>
+</html>

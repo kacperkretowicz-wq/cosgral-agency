@@ -1,0 +1,22 @@
+# Research lane — automotive / samochód / kampania
+
+lane_id: automotive_campaign
+search_targets:
+  web:
+    - type: automotive_campaign_site
+      look_for: [fullscreen hero, spec strip, color configurator, cinematic scroll]
+    - type: luxury_auto_editorial
+      look_for: [dark hero, rim light photography, minimal type]
+  typography:
+    - prefer: [wide sans display, tight mono specs, no serif luxury cliché unless audit proves]
+  visual_subject:
+    - folder: references/subject-lanes/automotive/
+      look_for: [vehicle profile, detail macro, motion blur, environment shot, interior]
+      note: user wrzuca referencje — researcher mapuje role
+  visual_style:
+    - folder: references/style-dna/lighting/
+      prefer: [cinematic_gel, hard_directional, bw]
+
+forbidden_subjects:
+  - skincare macro
+  - generic agency masonry clone without vehicle

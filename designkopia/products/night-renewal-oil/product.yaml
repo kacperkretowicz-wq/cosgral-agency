@@ -1,0 +1,22 @@
+name: Night Renewal Face Oil
+slug: night-renewal-oil
+brand: lumera
+description: Restorative face oil in matte black glass dropper bottle with minimalist white label — LUMÉRA red/black editorial campaign
+color: matte black or charcoal glass bottle, white matte label, subtle red studio accent (NOT navy, NOT gold foil wine aesthetic)
+material: glass bottle, paper label, black rubber dropper
+packaging: 30ml dropper bottle, rectangular white label, shot on red or black studio like Vitamin C line
+dimensions: "30ml, approx 10cm height"
+headline: "Restore while you rest"
+subheadline: "Botanical oil blend for overnight renewal"
+cta: "Shop now"
+price: "62 USD"
+job_palette: bold_monochrome
+product_visual_spec:
+  bottle: matte black glass dropper, same editorial family as amber Vitamin C serum
+  label: minimal white, no foreign brand names, no readable text in generated images
+  studio: red-on-red OR black background with red rim light — never navy/gold luxury wine
+  inspiration_ref: profiles/approved/01-bold-red-packshot.png
+benefits:
+  - "Rosehip & squalane complex"
+  - "Non-greasy, absorbs overnight"
+  - "Dermatologist tested"

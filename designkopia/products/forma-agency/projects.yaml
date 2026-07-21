@@ -1,0 +1,31 @@
+version: "1"
+brand: FORMA AGENCY
+slug: forma-agency
+
+projects:
+  - id: studio-arden
+    title: Studio Arden
+    year: 2026
+    disciplines: [Branding, Photoshoot]
+    category: Interior
+    featured: true
+
+  - id: veil-cosmetics
+    title: Veil Cosmetics
+    year: 2025
+    disciplines: [Product Shoot, Retouch]
+    category: Beauty
+
+  - id: north-circuit
+    title: North Circuit
+    year: 2026
+    disciplines: [Campaign, Motion Stills]
+    category: Fashion
+
+categories: [Beauty, Fashion, Interior, Beverage, Luxury]
+
+media:
+  hero_video:
+    src: ""
+    poster: ""
+    role: hero_loop

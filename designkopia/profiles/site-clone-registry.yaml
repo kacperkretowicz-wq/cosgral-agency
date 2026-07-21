@@ -1,0 +1,183 @@
+# ─────────────────────────────────────────────────────────────────────────
+# SITE-CLONE REGISTRY — „mózg" trybu KLONOWANIA / SPLICE / RE-SKIN.
+#
+# Obok generowania-od-zera (profiles/pipeline.yaml) system ma drugi tryb:
+# wyciągnij realną stronę-referencję → rozłóż jej technologie na nazwany słownik
+# → wsplice'uj moduły na nową markę → dostrój. Golden example: cosgral-agency/.
+#
+# Czytają: site-extractor, splice-composer, reskin-stylist, layout-doctor,
+#          framer-effects-researcher, motion-implementer.
+# Powiązane: profiles/effects-stack.yaml (arsenał technik w stacku React/Next).
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "1"
+updated_at: "2026-06-26"
+
+# ── GOLDEN EXAMPLE: jak wygląda gotowy klon ──────────────────────────────
+worked_example:
+  job: cosgral-agency
+  path: cosgral-agency/
+  plan: cosgral-agency/layout-plan.json
+  brand: COSGRAL
+  base_site: voyeurverite          # przechwycony szkielet (index.html, 117 KB)
+  spliced_sites: [letsplayfight, parhouse]
+  images_dir: images/cosgral-agency/{approved,library}/
+  layers:                          # KOLEJNOŚĆ ŁADOWANIA = kolejność tworzenia
+    - file: index.html             # przechwycona + zaadaptowana strona bazowa
+      role: base_capture
+    - file: styles.css             # bazowe style strony
+      role: base_styles
+    - file: cosgral-brand.css      # RE-SKIN: wordmark, paleta, footer
+      role: reskin                 # → reskin-stylist
+    - file: cosgral-splice.css     # style doklejonych modułów (#playfight, #parhouse)
+      role: splice_styles          # → splice-composer
+    - file: cosgral-splice.js      # init Swiper rails (parhouse), lazy-load
+      role: splice_behavior        # → splice-composer
+    - file: cosgral-layout-fix.css # FIX: object-position, siatki, ukrycie duplikatów
+      role: layout_fix             # → layout-doctor
+    - file: cosgral-hero-fix.js    # FIX zachowania: przelicz tweeny GSAP po podmianie labeli
+      role: behavior_fix           # → layout-doctor
+    - file: cosgral-film-blur-reveal.js  # re-implementacja efektu (clip-path scrub)
+      role: effect_reimpl          # → splice-composer / motion-implementer
+    - file: cosgral-tuning.js      # TUNING: kill laggy cursors, calm scroll, readable hero
+      role: tuning                 # → layout-doctor (ostatni)
+
+# ── WYKRYTY STACK BAZY (voyeurverite = eksport Webflow) ──────────────────
+detected_base_stack:
+  builder: Webflow
+  libs:
+    - gsap@3.15
+    - gsap/ScrollTrigger
+    - gsap/ScrollSmoother
+    - gsap/SplitText
+    - gsap/ScrollToPlugin
+    - gsap/MorphSVGPlugin
+    - swiper@11
+    - jquery@3.5.1
+    - three.js                      # webgl-bulge (playfight)
+  forensics_note: >
+    Wykrycie ze <script src> w index.html + markerów (gsap.*, ScrollTrigger.*,
+    swiper-slide). Pełna forensyka żywej strony: DevTools / Wappalyzer.
+
+# ── SŁOWNIK WYEKSTRAHOWANYCH TECHNIK (namespace = strona źródłowa) ────────
+# Każda technika: co robi, biblioteka, zaczepy DOM, gdzie wzór implementacji.
+# Te same id pojawiają się w layout-plan.json -> interactions[].
+techniques:
+
+  # ---- voyeurverite (lead: rytm redakcyjny, pin hero, maski) ----
+  voyeur-scroll-smoother:
+    what: globalny smooth scroll (inercja)
+    lib: gsap/ScrollSmoother
+    tune: "smoother.smooth(0.45) — patrz cosgral-tuning.js"
+  voyeur-preloader-001:
+    what: preloader z licznikiem przed odsłonięciem hero
+    lib: gsap timeline
+    dom: [".preloader", "[data-preloader]"]
+  voyeur-clip-path-hero-pin:
+    what: pin hero + scrub odsłaniający kadr przez animację clip-path inset()
+    lib: gsap/ScrollTrigger (pin, scrub, end "+=900%")
+    dom: [".hero_stack_wrapper", "[data-film]", ".film_img"]
+    impl_ref: cosgral-film-blur-reveal.js
+    react_equiv: web/lib/effects/MaskedReveal.tsx + HorizontalScrollPin.tsx
+  voyeur-split-text-reveals:
+    what: nagłówki dzielone na litery/słowa + stagger przy wejściu
+    lib: gsap/SplitText (+ ScrollTrigger)
+    react_equiv: web/lib/effects/SplitText.tsx
+  voyeur-mask-section-transition:
+    what: przejścia między sekcjami przez maskę/clip
+    lib: gsap/ScrollTrigger
+    react_equiv: web/lib/effects/MaskedReveal.tsx
+  voyeur-smooth-anchors:
+    what: płynne kotwice nav -> sekcja
+    lib: gsap/ScrollToPlugin
+
+  # ---- letsplayfight (playfight: WOW, fizyka, WebGL) ----
+  playfight-pin-scatter-flip:
+    what: pin sekcji + rozsypanie/obrót kafli przy scrollu
+    lib: gsap/ScrollTrigger (pin + scrub)
+  playfight-webgl-bulge:
+    what: dystorsja/bulge obrazu (WebGL) na hover/scroll
+    lib: three.js / shader
+    dom: ["[data-gl-container]"]
+    react_equiv: web/lib/effects/WebGLImageDistortion.tsx (OGL)
+  playfight-stacked-trail:
+    what: ślad obrazów za kursorem (image trail)
+    lib: gsap (canvas/dom trail)
+    dom: [".image_trail", "[data-stacked-trail-area]"]
+    caution: "laggy — domyślnie wyłączane w tuningu (kill w cosgral-tuning.js)"
+  playfight-nav-hide:
+    what: chowanie nav przy scrollu w dół
+    lib: gsap/ScrollTrigger
+  playfight-typewrite:
+    what: efekt maszyny do pisania
+    lib: gsap / JS
+  playfight-data-anim-para:
+    what: parallax akapitów sterowany data-anim
+    lib: gsap/ScrollTrigger (scrub)
+    react_equiv: web/lib/effects/ParallaxLayer.tsx
+
+  # ---- parhouse (rails, masonry, cursor) ----
+  parhouse-custom-cursor:
+    what: własny kursor
+    react_equiv: web/lib/effects/CustomCursor.tsx
+    caution: "często laggy — w cosgral wyłączony w tuningu"
+  parhouse-swiper-rails:
+    what: poziome szyny case studies (free-mode momentum)
+    lib: swiper@11
+    dom: ["#swiper-case-studies-slider", ".swiper-slide"]
+    impl_ref: cosgral-splice.js
+    react_equiv: "Embla Carousel (effects-stack.yaml: carousel)"
+  parhouse-masonry-pin:
+    what: pinowana siatka masonry case studies
+    lib: gsap/ScrollTrigger
+    dom: [".case-study-image-masonry-container"]
+  parhouse-show-on-scroll:
+    what: ujawnianie elementów przy wejściu w viewport
+    react_equiv: web/lib/effects/Reveal.tsx
+  parhouse-mix-blend-hero:
+    what: mix-blend-mode na warstwach hero/footer
+    lib: CSS (mix-blend-mode)
+    dom: [".footer_form_bg.color_burn", ".difference"]
+  parhouse-hero-scroll-btn:
+    what: przycisk „scroll" w hero z mikro-animacją
+    lib: gsap
+
+# ── LANE KLONOWANIA (przepływ; uruchamiany bezpośrednio, nie przez pipeline.yaml) ──
+clone_splice_lane:
+  when: "user wskazuje stronę-referencję do sklonowania/przerobienia (nie generacja od zera)"
+  steps:
+    - id: extract
+      agent: site-extractor
+      out: clone-source.json (+ przechwycony index.html/styles.css w katalogu joba)
+      do: "przechwyć stronę bazową, wykryj stack, rozłóż na techniques[] z tego rejestru"
+    - id: reskin
+      agent: reskin-stylist
+      out: <brand>-brand.css
+      do: "wordmark zamiast logo, paleta marki, footer, ukrycie decor bazy"
+    - id: splice
+      agent: splice-composer
+      out: [<brand>-splice.css, <brand>-splice.js]
+      do: "doklej moduły z innych stron jako #<brand>-<site> + init bibliotek (Swiper itd.)"
+    - id: fix
+      agent: layout-doctor
+      out: [<brand>-layout-fix.css, <brand>-hero-fix.js]
+      do: "object-position, siatki, ukryj duplikaty; przelicz tweeny GSAP po podmianie tekstu"
+    - id: tune
+      agent: layout-doctor
+      out: <brand>-tuning.js
+      do: "kill laggy cursors/trails, ScrollSmoother ~0.45, czytelny hero, usuń clone-preview-badge"
+  load_order: "base styles → brand → splice → layout-fix → effect reimpl → tuning (ostatni)"
+  layout_plan_fields:                # plan klonu MUSI nieść:
+    - base_site
+    - inspiration_mix {lead, secondary[]}
+    - interactions[]                 # technique ids z tego rejestru
+    - assets[] {file, role, object_position}
+
+# ── ZASADY (anti-AI + higiena klonu) ─────────────────────────────────────
+rules:
+  - "Klon ≠ kradzież treści: podmień copy, logo, paletę i zdjęcia na markę docelową."
+  - "Nazwij każdą wyekstrahowaną technikę w interactions[] — bez bezimiennej 'magii'."
+  - "Tuning jest OBOWIĄZKOWY na końcu: laggy custom-cursor/image-trail domyślnie OFF."
+  - "Każda technika ma mieć impl_ref (plik wzorcowy) lub react_equiv (komponent web/lib/effects)."
+  - "Docelowy stack produkcyjny = React/Next (effects-stack.yaml); warstwy *.js to most z bazy Webflow."
+  - "Obrazy klonu trzymaj w images/<job>/{approved,library}/ i odwołuj względnie."

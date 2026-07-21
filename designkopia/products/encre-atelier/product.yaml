@@ -1,0 +1,59 @@
+slug: encre-atelier
+brand: ENCRE
+tagline: "Nie na sezon. Zawsze wybrane."
+designer:
+  name: Léa Moreau
+  role: Projektantka mody · założycielka
+  bio: >
+    Projektuje w Paryżu. ENCRE to jej pierwsza linia — trzy formy, jedna paleta czerni i bieli.
+
+job_palette: bw_editorial
+palette_family: bw_editorial
+palette:
+  background: "#0A0A0A"
+  surface: "#141414"
+  text: "#F2F0EC"
+  muted: "#8A8680"
+  accent: "#FFFFFF"
+
+concept: >
+  Portfolio projektantki mody — strict B&W, motion blur na wybranych kadrach.
+  Copy: ton trovearchive — mało słów, spokojnie, bez poetyckiego cringe.
+
+collection:
+  name: "Drop 001 — Encre"
+  currency: PLN
+  pieces:
+    - id: veil-coat
+      name: "Płaszcz Veil"
+      price: 4200
+      description: "Oversize wełna, jedwabna podszewka, jeden guzik."
+    - id: ink-slip
+      name: "Suknia Ink"
+      price: 2800
+      description: "Bias-cut satyna, długość midi, surowe wykończenie."
+    - id: line-gloves
+      name: "Rękawiczki Line"
+      price: 890
+      description: "Skóra nappa, przeszycia jak linia rysunku."
+
+product_visual_spec: >
+  ENCRE fashion collection aesthetic: strict black and white editorial only.
+  Piece 1 Veil Coat — long oversized black wool coat, wide shoulders, single button,
+  matte texture, no visible brand text. SAME photographic treatment in every product shot:
+  high contrast B&W, graphic shadows, Pinterest editorial, not color.
+
+template_mix: [spector, kirk, portfolite, grid-editorial, luzia]
+layout_archetype: readymag-slides
+reference_pattern: mashachern.com
+
+narrative:
+  - hero motion blur portrait
+  - manifesto typographic
+  - shop three pieces index
+  - masonry lookbook pinterest
+  - piece coat editorial
+  - piece dress sensual B&W
+  - piece gloves macro
+  - designer portrait
+  - cta shop

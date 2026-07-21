@@ -1,0 +1,18 @@
+# Research lane — fashion / retail / lookbook
+
+lane_id: fashion_retail
+search_targets:
+  web:
+    - type: fashion_brand_site
+      look_for: [lookbook grid, editorial hero, shop grid, campaign full bleed]
+    - type: luxury_retail
+      look_for: [viewport sections, minimal nav, large imagery]
+  typography:
+    - prefer: [editorial display + neutral sans, mono size labels]
+    - caution: [Playfair/Cormorant — only if audit + user intent]
+  visual_subject:
+    - folder: references/subject-lanes/fashion/
+      look_for: [runway, on-model, flatlay apparel, detail texture, store interior]
+  visual_style:
+    - folder: references/style-dna/
+      prefer: [bw_editorial, bold_red, warm_orange]

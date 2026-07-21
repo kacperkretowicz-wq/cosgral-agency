@@ -1,0 +1,26 @@
+{
+  "job_slug": "lumera-landing",
+  "layout_archetype": "lumera-commercial",
+  "brand_lock": "lumera",
+  "rule": "each image once; NO warm_organic (asset-03*, 03-warm) on page",
+  "image_map": {
+    "asset-01-red-editorial-portrait.png": "hero",
+    "01-bold-red-packshot.png": "collection-serum",
+    "09-night-oil-upright-black-label.png": "collection-oil",
+    "02-bw-geometric-packshot.png": "gallery",
+    "05-cinematic-red-macro.png": "gallery",
+    "asset-01-red-abstract-light.png": "gallery",
+    "12-red-black-editorial-still.png": "gallery",
+    "10-am-pm-flatlay-black-red.png": "ritual",
+    "11-oil-droplet-face-editorial.png": "macro — selected winner from 11b (motion trail)",
+    "11a-oil-droplet-face-profile-v1.png": "candidate — profile + droplet",
+    "11b-oil-droplet-face-motion-v2.png": "candidate — selected winner",
+    "11c-oil-droplet-face-graphic-v3.png": "candidate — cheek close-up"
+  },
+  "forbidden_on_page": [
+    "03-warm-organic-lifestyle.png",
+    "asset-03-warm-editorial-portrait.png",
+    "asset-03-warm-stone-shadows.png"
+  ],
+  "generated_at": "2026-06-23"
+}

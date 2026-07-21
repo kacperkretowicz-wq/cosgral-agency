@@ -1,0 +1,318 @@
+{
+  "url": "https://www.letsplayfight.com",
+  "slug": "letsplayfight-com",
+  "captured_at": "2026-07-05",
+  "title": "Playfight | Independent Creative, Story &amp; Production Studio",
+  "meta_description": "",
+  "stack": {
+    "builder": [
+      "Webflow"
+    ],
+    "frameworks": [
+      "jQuery"
+    ],
+    "services": [
+      "Google Analytics / GTM",
+      "Vercel",
+      "Cloudflare",
+      "Typekit/Adobe Fonts",
+      "Google Fonts",
+      "hCaptcha/reCAPTCHA"
+    ]
+  },
+  "libs": {
+    "animation": [
+      "gsap",
+      "gsap/ScrollTrigger",
+      "gsap/ScrollSmoother",
+      "gsap/SplitText",
+      "gsap/MorphSVG",
+      "gsap/CustomEase",
+      "lenis",
+      "lottie"
+    ],
+    "webgl": [
+      "three.js"
+    ],
+    "ui": []
+  },
+  "fonts": {
+    "google": [],
+    "font_faces": [
+      "FKGrotesk",
+      "Newsreader",
+      "webflow-icons"
+    ],
+    "families_used": [
+      "FKGrotesk",
+      "Newsreader",
+      "Georgia",
+      "webflow-icons",
+      "webflow-icons!important",
+      "Arial",
+      "unset",
+      "Helvetica Neue"
+    ]
+  },
+  "colors_top": [
+    {
+      "hex": "#ffffff",
+      "count": 20
+    },
+    {
+      "hex": "#000000",
+      "count": 14
+    },
+    {
+      "hex": "#dddddd",
+      "count": 6
+    },
+    {
+      "hex": "#222222",
+      "count": 6
+    },
+    {
+      "hex": "#333333",
+      "count": 4
+    },
+    {
+      "hex": "#cccccc",
+      "count": 4
+    },
+    {
+      "hex": "#fafafa",
+      "count": 3
+    },
+    {
+      "hex": "#c8c8c8",
+      "count": 3
+    },
+    {
+      "hex": "#3898ec",
+      "count": 2
+    },
+    {
+      "hex": "#999999",
+      "count": 2
+    },
+    {
+      "hex": "#5d6c7b",
+      "count": 2
+    },
+    {
+      "hex": "#0082f3",
+      "count": 2
+    },
+    {
+      "hex": "#131313",
+      "count": 2
+    },
+    {
+      "hex": "#ffff00",
+      "count": 1
+    }
+  ],
+  "css_features": [
+    "mix-blend-mode",
+    "clip-path",
+    "backdrop-filter",
+    "mask-image",
+    "position-sticky",
+    "filter-blur",
+    "css-grid",
+    "aspect-ratio",
+    "custom-properties",
+    "keyframes"
+  ],
+  "dom": {
+    "counts": {
+      "section": 6,
+      "header": 0,
+      "footer": 0,
+      "nav": 2,
+      "canvas": 0,
+      "video": 5,
+      "svg": 9,
+      "iframe": 0,
+      "picture": 0,
+      "form": 4
+    },
+    "headings_h1_h2": [
+      "Different is Everything.",
+      "What we do",
+      "Recent work"
+    ],
+    "sections_order": [
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)"
+    ],
+    "nav_links": [
+      "Work",
+      "Originals",
+      "The Studio",
+      "Contact Us",
+      "Playground",
+      "LinkedIn",
+      "Instagram",
+      "Let’s chat. 801.673.8588Schedule a Call",
+      "Submit"
+    ],
+    "top_data_attrs": {
+      "data-service-hover": 55,
+      "data-anim-parallax": 25,
+      "data-gl-img": 25,
+      "data-wf--global-heading--settings-variant": 13,
+      "data-loader": 12,
+      "data-anim-link-hover": 12,
+      "data-name": 8,
+      "data-anim-hero-scroll": 8,
+      "data-typewrite": 7,
+      "data-anim-main-link-hover": 6,
+      "data-stacked-trail-item": 6,
+      "data-menu": 5,
+      "data-project-hover": 5,
+      "data-wf--button-main--style": 4,
+      "data-wf-page-id": 4
+    },
+    "top_class_tokens": [
+      "w-layout-vflex",
+      "w-dyn-item",
+      "u-visual-wrap",
+      "g_img",
+      "service_text_text",
+      "g_img_wrap",
+      "styleguide_guide_column",
+      "u-vflex-center-bottom",
+      "w-inline-block",
+      "u-cover-absolute",
+      "g_clickable_text",
+      "u-sr-only",
+      "u-text-style-h1",
+      "u-display-contents",
+      "w-embed",
+      "u-grid-main",
+      "g_heading",
+      "u-text-style-small",
+      "w-richtext",
+      "w-dyn-list",
+      "w-dyn-items",
+      "nav_small_link_item",
+      "service_item",
+      "service_visual_left",
+      "service_visual_image"
+    ]
+  },
+  "effects_detected": [
+    {
+      "technique_id": "smooth-scroll",
+      "react_equiv": "SmoothScroll.tsx",
+      "evidence": ".135, .15, .86);--gleasing: cubic-bezier(.4, 0, 0, 1)}html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-beha"
+    },
+    {
+      "technique_id": "pinned-scroll-sequence",
+      "react_equiv": "PinnedSequence.tsx / HorizontalScrollPin.tsx",
+      "evidence": "fsetWidth\":\"offsetHeight\",i=t.pin[e];t.revert(!0,1),t.adjustPinSpacing(t.pin[e]-i),t.refresh()}}),ia=1,Ao(!0),uo.forEach(function("
+    },
+    {
+      "technique_id": "scroll-scrub",
+      "react_equiv": "PinnedSequence.tsx (scrub)",
+      "evidence": "uper(t,{triggerStart:\"top bottom\",triggerEnd:\"bottom +=50%\",scrub:1,cleanup:!1})}createElements(){this.para=this.element.queryS"
+    },
+    {
+      "technique_id": "text-split-reveal",
+      "react_equiv": "SplitText.tsx",
+      "evidence": "ginalContent=this.element.innerHTML,this.isMobile=Cg(),this.splitText(),!this.isMobile){let t=window.innerWidth;window.addEventLi"
+    },
+    {
+      "technique_id": "masked-image-reveal",
+      "react_equiv": "MaskedReveal.tsx",
+      "evidence": "display:grid;position:absolute;inset:0%}.nav_menu{z-index:2;clip-path:inset(0 0 100%);width:100%;display:block;position:fixed;inset:0%}"
+    },
+    {
+      "technique_id": "parallax-layers",
+      "react_equiv": "ParallaxLayer.tsx",
+      "evidence": "a71be796e1f813084f_DSC05060.webp\" loading=\"eager\" data-anim-parallax=\"false\" data-gl-img=\"false\" alt=\"\" class=\"g_img\"/></figure>"
+    },
+    {
+      "technique_id": "webgl-image-distortion",
+      "react_equiv": "WebGLImageDistortion.tsx",
+      "evidence": "-(s+r)/(s-r),p=-2*s*r/(s-r);else{if(a!==AS)throw new Error(\"THREE.Matrix4.makePerspective(): Invalid coordinate system: \"+a);f"
+    },
+    {
+      "technique_id": "preloader-counter",
+      "react_equiv": "(GSAP timeline — wzor voyeur-preloader-001)",
+      "evidence": "e.visibility?(this._flipSetup=()=>this.setupFlip(),fl.once(\"preloader:complete\",this._flipSetup)):this.setupFlip()}setupFlip(){co"
+    },
+    {
+      "technique_id": "typewriter",
+      "react_equiv": "TextScramble.tsx (pokrewny)",
+      "evidence": "eateElements(){this.container=document.querySelector(\".hero_typewrite\"),this.container&&(this.text=this.container.querySelector("
+    },
+    {
+      "technique_id": "image-trail",
+      "react_equiv": "(playfight-stacked-trail — caution: laggy)",
+      "evidence": "} } </style></div></div></div></section><section class=\"image_trail u-theme-dark\"><figure class=\"g_img_wrap u-cover-absolute u-"
+    },
+    {
+      "technique_id": "horizontal-scroll",
+      "react_equiv": "HorizontalScrollPin.tsx",
+      "evidence": "ation:.3,stagger:.1,ease:\"power3.in\"}),t.set(this.lines[0],{xPercent:-100,scaleX:.8,transformOrigin:\"left center\"}),t.set(this.lin"
+    },
+    {
+      "technique_id": "scroll-reveal-stagger",
+      "react_equiv": "Reveal.tsx",
+      "evidence": "=function(t,e,i){return Re(this,Hi.delayedCall(0,t,e),i)},i.staggerTo=function(t,e,i,n,r,s,a){return i.duration=e,i.stagger=i.s"
+    },
+    {
+      "technique_id": "sticky-collapse-nav",
+      "react_equiv": "(CSS sticky + ScrollTrigger)",
+      "evidence": "l_text\">Made in SLC.</div></div></div></div></div><div data-nav-hide=\"component\" class=\"nav_component\"><div class=\"w-layout-vfle"
+    }
+  ],
+  "npm_install": [
+    "gsap",
+    "@gsap/react",
+    "split-type  # SplitText (Club GSAP) -> split-type",
+    "lenis",
+    "lottie-react",
+    "three",
+    "@react-three/fiber",
+    "@react-three/drei"
+  ],
+  "assets": {
+    "css_urls": [
+      "https://cdn.prod.website-files.com/697fef4d1b1e73b328ad49cd/css/playfight-staging.webflow.shared.bb9cccddf.min.css"
+    ],
+    "js_urls": [
+      "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js",
+      "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=697fef4d1b1e73b328ad49cd",
+      "https://cdn.prod.website-files.com/697fef4d1b1e73b328ad49cd/js/webflow.schunk.7c514c4b18297836.js",
+      "https://cdn.prod.website-files.com/697fef4d1b1e73b328ad49cd/js/webflow.a0aa6ca1.1176730d49a681da.js",
+      "https://playfight-site.vercel.app/main.js",
+      "https://playfight-2k26.vercel.app/main.js",
+      "https://challenges.cloudflare.com/turnstile/v0/api.js"
+    ],
+    "css_total_found": 1,
+    "js_total_found": 7
+  },
+  "files_captured": [
+    "capture/index.html",
+    "capture/00-playfight-staging.webflow.shared.bb9cccddf.min.css",
+    "capture/00-webfont.js",
+    "capture/01-jquery-3.5.1.min.dc5e7f18c8.js",
+    "capture/02-webflow.schunk.7c514c4b18297836.js",
+    "capture/03-webflow.a0aa6ca1.1176730d49a681da.js",
+    "capture/dyn00-main.js",
+    "capture/dyn01-main.js",
+    "capture/dyn02-api.js"
+  ],
+  "next_steps": [
+    "Claude: przeczytaj capture/ i poglebij analize (choreografia, layout).",
+    "Claude: napisz REBUILD-BLUEPRINT.md wg .claude/skills/site-dna/SKILL.md.",
+    "Claude: dopisz nowe techniki do references/site-dna/effects-library.yaml."
+  ]
+}

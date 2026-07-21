@@ -1,0 +1,300 @@
+{
+  "url": "https://www.jackandai.com",
+  "slug": "jackandai-com",
+  "captured_at": "2026-07-05",
+  "title": "AI Content Engine for Smarter Social Workflows",
+  "meta_description": "Discover how the AI Content Engine drives faster content production and smarter workflows for leading brands in social marketing.",
+  "stack": {
+    "builder": [
+      "WordPress",
+      "Elementor"
+    ],
+    "frameworks": [],
+    "services": [
+      "Google Analytics / GTM"
+    ]
+  },
+  "libs": {
+    "animation": [
+      "gsap",
+      "gsap/ScrollTrigger",
+      "gsap/ScrollSmoother",
+      "gsap/SplitText",
+      "gsap/ScrollTo",
+      "lenis",
+      "swup"
+    ],
+    "webgl": [],
+    "ui": [
+      "swiper",
+      "tailwindcss"
+    ]
+  },
+  "fonts": {
+    "google": [],
+    "font_faces": [
+      "Andale",
+      "Benzin",
+      "TTHovesPro",
+      "swiper-icons"
+    ],
+    "families_used": [
+      "Benzin",
+      "TTHovesPro",
+      "Andale",
+      "TT Hoves Pro",
+      "swiper-icons"
+    ]
+  },
+  "colors_top": [
+    {
+      "hex": "#ff1300",
+      "count": 13
+    },
+    {
+      "hex": "#ffffff",
+      "count": 11
+    },
+    {
+      "hex": "#fffdf3",
+      "count": 11
+    },
+    {
+      "hex": "#000000",
+      "count": 7
+    },
+    {
+      "hex": "#9ca3af",
+      "count": 2
+    },
+    {
+      "hex": "#ca8a04",
+      "count": 1
+    },
+    {
+      "hex": "#abb8c3",
+      "count": 1
+    },
+    {
+      "hex": "#f78da7",
+      "count": 1
+    },
+    {
+      "hex": "#cf2e2e",
+      "count": 1
+    },
+    {
+      "hex": "#ff6900",
+      "count": 1
+    },
+    {
+      "hex": "#fcb900",
+      "count": 1
+    },
+    {
+      "hex": "#7bdcb5",
+      "count": 1
+    },
+    {
+      "hex": "#00d084",
+      "count": 1
+    },
+    {
+      "hex": "#8ed1fc",
+      "count": 1
+    }
+  ],
+  "css_features": [
+    "mix-blend-mode",
+    "scroll-snap",
+    "filter-blur",
+    "css-grid",
+    "aspect-ratio",
+    "custom-properties",
+    "keyframes"
+  ],
+  "dom": {
+    "counts": {
+      "section": 7,
+      "header": 1,
+      "footer": 1,
+      "nav": 1,
+      "canvas": 0,
+      "video": 0,
+      "svg": 36,
+      "iframe": 0,
+      "picture": 0,
+      "form": 0
+    },
+    "headings_h1_h2": [
+      "YOUR AI CONTENT ENGINE FOR SOCIAL.",
+      "Built Around Your Brand.",
+      "HOW WE CREATE YOUR AI ENGINE.",
+      "CREATING THE AI ENGINE",
+      "Alpro",
+      "fritz kola",
+      "Lotus Group",
+      "Jagermeister",
+      "Action"
+    ],
+    "sections_order": [
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)"
+    ],
+    "nav_links": [
+      "Home",
+      "About",
+      "Services",
+      "Careers",
+      "Contact",
+      "Book your brand intake →",
+      "instagram",
+      "linkedin",
+      "info@jackandai.com",
+      "020 722 0074",
+      "Cookie Policy",
+      "Terms &#038; Conditions",
+      "FAQ",
+      "Manage options",
+      "Manage services",
+      "Manage {vendor_count} vendors",
+      "Read more about these purposes",
+      "View preferences",
+      "{title}"
+    ],
+    "top_data_attrs": {
+      "data-component": 96,
+      "data-isolated": 29,
+      "data-interaction": 19,
+      "data-text": 12,
+      "data-start": 10,
+      "data-end": 10,
+      "data-social": 7,
+      "data-index": 7,
+      "data-relative_url": 7,
+      "data-open": 4,
+      "data-category": 4,
+      "data-cfasync": 3,
+      "data-cursor-color": 2,
+      "data-turn-id-container": 2,
+      "data-nosnippet": 2
+    },
+    "top_class_tokens": [
+      "js-scroll-line",
+      "h-1.5",
+      "w-0.5",
+      "bg-[#871818]",
+      "rotate-[30deg]",
+      "flex",
+      "col-start-1",
+      "row-start-1",
+      "absolute",
+      "relative",
+      "invisible",
+      "js-glitch",
+      "items-center",
+      "overflow-hidden",
+      "flex-col",
+      "justify-center",
+      "w-full",
+      "ll-part--img",
+      "ll-font-tag",
+      "right-full",
+      "ll-font-typewriter",
+      "w-[24em]",
+      "transform-gpu",
+      "ll-part--typewriter",
+      "js-wrapper"
+    ]
+  },
+  "effects_detected": [
+    {
+      "technique_id": "smooth-scroll",
+      "react_equiv": "SmoothScroll.tsx",
+      "evidence": "on(i){if(K.slice(0).forEach(function(s){return s.vars.id!==\"ScrollSmoother\"&&s.kill()}),i!==!0){var r=pr.killAll||[];pr={},r.forEach(f"
+    },
+    {
+      "technique_id": "pinned-scroll-sequence",
+      "react_equiv": "PinnedSequence.tsx / HorizontalScrollPin.tsx",
+      "evidence": "fsetWidth\":\"offsetHeight\",o=r.pin[s];r.revert(!0,1),r.adjustPinSpacing(r.pin[s]-o),r.refresh()}}),Bo=1,bl(!0),K.forEach(function(r"
+    },
+    {
+      "technique_id": "text-split-reveal",
+      "react_equiv": "SplitText.tsx",
+      "evidence": "ef:function(){return tt}}};Hu()&&V.registerPlugin(Z);/*! * SplitText 3.13.0 * https://gsap.com * * @license Copyright 2025, G"
+    },
+    {
+      "technique_id": "masked-image-reveal",
+      "react_equiv": "MaskedReveal.tsx",
+      "evidence": "et e=0;e<5;e++){const t=this.AiIcon.cloneNode(!0);pt.set(t,{clipPath:`inset(${rr[e]}% 0 ${100-rr[e+1]}% 0)`}),this.AiIcon.parentN"
+    },
+    {
+      "technique_id": "parallax-layers",
+      "react_equiv": "ParallaxLayer.tsx",
+      "evidence": "ata-component=\"sections/hero\" ><div class=\"ll-container js-parallax relative min-h-svh flex w-full h-full py-section-sm\"> <d"
+    },
+    {
+      "technique_id": "marquee-logos",
+      "react_equiv": "Marquee.tsx",
+      "evidence": "</div></section><section class=\"ll-section ll-section--scan_marquee ll-theme-light text-textPrimary bg-bgPrimary !py-section-xl"
+    },
+    {
+      "technique_id": "page-transition",
+      "react_equiv": "(Framer AnimatePresence / next-view-transitions)",
+      "evidence": "t t=je({url:n=n||gr({hash:!0}),random:Math.random(),source:\"swup\"},e);window.history.pushState(t,\"\",n)},Tn=(n=null,e={})=>{n"
+    },
+    {
+      "technique_id": "preloader-counter",
+      "react_equiv": "(GSAP timeline — wzor voyeur-preloader-001)",
+      "evidence": "age:linear-gradient(to bottom,#00000080,#0000)}.swiper-lazy-preloader{width:42px;height:42px;position:absolute;left:50%;top:50%;m"
+    },
+    {
+      "technique_id": "typewriter",
+      "react_equiv": "TextScramble.tsx (pokrewny)",
+      "evidence": "{min:32,max:40},\"3xl\":{min:40,max:48},\"4xl\":{min:40,max:56},typewriter:{min:55,max:95}},section:{sm:{min:32,max:60},md:{min:40,m"
+    },
+    {
+      "technique_id": "scroll-reveal-stagger",
+      "react_equiv": "Reveal.tsx",
+      "evidence": "=function(r,s,o){return ri(this,$e.delayedCall(0,r,s),o)},t.staggerTo=function(r,s,o,a,l,c,u){return o.duration=s,o.stagger=o.s"
+    }
+  ],
+  "npm_install": [
+    "gsap",
+    "@gsap/react",
+    "split-type  # SplitText (Club GSAP) -> split-type",
+    "lenis",
+    "embla-carousel-react  # swiper -> Embla w stacku docelowym"
+  ],
+  "assets": {
+    "css_urls": [
+      "https://jackandai.com/wp-content/plugins/complianz-gdpr/assets/css/cookieblocker.min.css?ver=1778538048",
+      "https://jackandai.com/wp-content/themes/jackandai/dist/assets/main-B5wS7YFZ.css?ver=7.0"
+    ],
+    "js_urls": [
+      "https://jackandai.com/wp-content/themes/jackandai/dist/assets/main-CAJ7IzUC.js",
+      "https://jackandai.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js",
+      "https://app.cal.com/embed/embed.js"
+    ],
+    "css_total_found": 2,
+    "js_total_found": 3
+  },
+  "files_captured": [
+    "capture/index.html",
+    "capture/00-cookieblocker.min.css",
+    "capture/01-main-B5wS7YFZ.css",
+    "capture/00-main-CAJ7IzUC.js",
+    "capture/01-complianz.min.js",
+    "capture/dyn00-embed.js"
+  ],
+  "next_steps": [
+    "Claude: przeczytaj capture/ i poglebij analize (choreografia, layout).",
+    "Claude: napisz REBUILD-BLUEPRINT.md wg .claude/skills/site-dna/SKILL.md.",
+    "Claude: dopisz nowe techniki do references/site-dna/effects-library.yaml."
+  ]
+}

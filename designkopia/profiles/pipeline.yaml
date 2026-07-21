@@ -1,0 +1,141 @@
+# ─────────────────────────────────────────────────────────────────────────
+# EXECUTABLE PIPELINE CONTRACT — single source of truth for flow ENFORCEMENT
+# Read by: scripts/run-pipeline.py  (the referee/driver)
+#
+# To NIE jest kolejny opis w prozie. Ten plik jest interpretowany przez kod.
+# run-pipeline.py egzekwuje: kolejność faz, obecność artefaktów (requires/produces),
+# bramki (gates) oraz pętlę sprzężenia zwrotnego (on_fail -> retry_to + licznik iteracji).
+#
+# Zasada: faza NIE może się domknąć, dopóki jej `produces` nie istnieją i wszystkie
+# `gates` nie zwrócą sukcesu. Dzięki temu "sztywny podział + accept" jest realny,
+# a nie zależny od dobrej woli modelu w sesji.
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "4-exec"
+updated_at: "2026-06-26"
+canonical: true   # to jest kanon przepływu; agent-pipeline.yaml (v2) i opisowy v3 -> referencja
+
+max_iterations: 2   # po tylu nieudanych retry tej samej fazy -> twardy STOP (interwencja człowieka)
+
+# Kolejność faz per rodzina jobów. Faza spoza listy danego pipeline jest pomijana.
+pipelines:
+  standard_full_v3:
+    [intake, research, strategy, structure, design_tokens, layout_assembly, media, coherence, build, qa]
+  product_brand:
+    [intake, research, strategy, structure, design_tokens, layout_assembly, media, coherence, build, qa]
+  agency_portfolio:
+    [intake, research, strategy, structure, design_tokens, layout_assembly, media, coherence, build, qa]
+
+# Mapowanie job_type -> pipeline (fallback: standard_full_v3)
+job_type_pipeline:
+  product_brand: product_brand
+  food_beverage: product_brand
+  agency_portfolio: agency_portfolio
+  fashion_retail: standard_full_v3
+  ecommerce_shop: standard_full_v3
+  automotive_campaign: standard_full_v3
+  saas_tech: standard_full_v3
+  photographer_portfolio: standard_full_v3
+
+# ─────────────────────────────────────────────────────────────────────────
+# DEFINICJE FAZ
+#   agents     — kto produkuje artefakty tej fazy (do komunikatu "next")
+#   requires   — artefakty (w katalogu joba) które MUSZĄ istnieć przed startem fazy
+#   produces   — artefakty które ta faza MUSI utworzyć (bramka istnienia)
+#   gates      — walidacje po `produces`; każdy gate musi przejść (exit 0 / pass)
+#   on_fail    — faza do której wracamy gdy gate FAIL (pętla retry)
+#   optional   — true => brak `produces`/obrazów nie blokuje (faza może być pominięta)
+#
+# Typy gate:
+#   {script: scripts/x.py, args: [...], when_job_type: [...]}  -> uruchom, sprawdź exit code
+#   {json_pass: plik.json}                                     -> wczytaj, FAIL gdy .pass == false
+#   {images_min: N}                                            -> >= N plików .png w outputs/images/<job>/
+# ─────────────────────────────────────────────────────────────────────────
+phases:
+
+  intake:
+    agents: [design-orchestrator]
+    requires: []
+    produces: [job-type-lock.json]
+    gates: []
+    on_fail: intake
+
+  research:
+    agents: [layout-screenshot-analyst, web-researcher, typography-researcher, visual-researcher, style-sense-agent, inspiration-curator]
+    requires: [job-type-lock.json]
+    produces: [research-manifest.json, style-brief.json]
+    gates: []
+    on_fail: research
+
+  strategy:
+    agents: [domain-strategist]          # agency-strategist gdy job_type=agency_portfolio
+    requires: [research-manifest.json]
+    produces: [domain-brief.json]
+    gates: []
+    on_fail: strategy
+
+  structure:
+    agents: [structure-planner, copy-writer]
+    requires: [domain-brief.json]
+    produces: [copy-draft.json]          # structure-plan.json LUB concept-options.json akceptowane przez OR-group
+    produces_any: [structure-plan.json, concept-options.json]
+    gates: []
+    on_fail: structure
+
+  design_tokens:
+    agents: [motion-director, color-palette-guardian, palette-extractor, typography-selector]
+    requires: [copy-draft.json]
+    produces: [palette-lock.json, typography-lock.json, motion-plan.json]
+    gates: []
+    on_fail: design_tokens
+
+  layout_assembly:
+    agents: [template-mixer, layout-assembler]
+    requires: [palette-lock.json, typography-lock.json]
+    produces: [layout-plan.json]
+    gates:
+      - {script: scripts/validate-job.py}
+      - {script: scripts/check-variability.py}
+    on_fail: layout_assembly
+
+  media:
+    agents: [shot-planner, media-producer, image-generator]
+    requires: [layout-plan.json]
+    produces: []
+    optional: true                       # job czysto-tekstowy/portfolio bez nowych zdjęć nie jest blokowany
+    gates:
+      - {images_min: 1}
+      - {script: scripts/check-image-variability.py}
+      - {script: scripts/plan-brand-shots.py, args: ["--job", "<job>", "--write-shot-plan"], when_job_type: [product_brand, food_beverage]}
+      - {script: scripts/check-brand-shots.py, when_job_type: [product_brand, food_beverage]}
+    on_fail: media
+
+  coherence:
+    agents: [coherence-reviewer]
+    requires: [layout-plan.json]
+    produces: [coherence-report.json]
+    gates:
+      - {json_pass: coherence-report.json}
+    on_fail: coherence              # retry_agent z raportu nadpisuje (patrz run-pipeline.py)
+
+    # Build na stacku docelowym: html-assembler odpala scripts/build-page.py <job> →
+    # web/generated/<job>.json (page-spec) + web/public/g/<job>/ + outputs/pages/<job>/build.json.
+    # Podgląd: cd web && npm run dev → http://localhost:3000/g/<job>. (index.html = legacy vanilla.)
+  build:
+    agents: [html-assembler, snippet-integrator, motion-implementer]
+    requires: [layout-plan.json, coherence-report.json]
+    produces: []
+    produces_any: [build.json, index.html]
+    gates:
+      - {script: scripts/validate-job.py}   # plan musi pozostać spójny po buildzie
+    on_fail: build
+
+    # Kanon QA = bogate agenty (process-validator/vision-scorer to aliasy):
+    # style-qa (proces) + concept-guardian (wizja/Gate C) + variability-guardian (między jobami).
+  qa:
+    agents: [style-qa, concept-guardian, variability-guardian]
+    requires: [index.html]
+    produces: [variability-report.json, concept-guardian-report.md]
+    gates:
+      - {script: scripts/check-guardian-reports.py}   # HARD GATE — bez exit 0 brak delivery
+    on_fail: qa

@@ -1,0 +1,193 @@
+# ⚠️ REFERENCJA HISTORYCZNA (v2). KANON PRZEPŁYWU = profiles/pipeline.yaml (wykonywalny).
+# Przy konflikcie kolejności/bramek/agentów wygrywa pipeline.yaml. Aktywni agenci: AGENT-MAP.md.
+# Multi-agent pipeline — design + photoshoot (2026-06-24)
+# Orchestrator: design-orchestrator
+# Każdy agent czyta swój input artifact i zapisuje output — nie pomija kolejki.
+
+version: "2"
+updated_at: "2026-06-24"
+
+philosophy: >
+  Rozdzielamy WIEDZĘ (co to ma być), STRUKTURĘ (szkielet), RUCH (efekty),
+  KOLOR (z obrazów), MEDIA (generacja), SPÓJNOŚĆ (czy się klei) i ZMIENNOŚĆ (czy nie powtarzamy).
+  Jeden agent = jedna odpowiedzialność. Handoff przez pliki JSON/YAML w outputs/pages/<job>/.
+
+job_types:
+  agency_portfolio:
+    pipeline: agency_full
+  product_brand:
+    pipeline: product_full
+
+pipelines:
+  agency_full:
+    description: Strona agencji marketingowej — pełny łańcuch
+    steps:
+      - id: gate0_concepts
+        agent: concept-ideation
+        optional: true
+        when: user nie wybrał jeszcze kierunku A/B/C
+        output: outputs/pages/<job>/concepts/
+        user_gate: true
+
+      - id: agency_brief
+        agent: agency-strategist
+        input: [products/<slug>/product.yaml, profiles/job-types/agency-portfolio.yaml]
+        output: outputs/pages/<job>/agency-brief.json
+        blocks: [structure-planner]
+
+      - id: reference_audit
+        agent: reference-auditor
+        input: [agency-brief.json reference_urls]
+        output: outputs/pages/<job>/reference-audit.json
+        script: scripts/audit-site.py
+        parallel_with: null
+
+      - id: structure
+        agent: structure-planner
+        input: [agency-brief.json, reference-audit.json, profiles/layout-archetypes.yaml]
+        output: outputs/pages/<job>/structure-plan.json
+        note: sekcje, copy slots, image slots — BEZ snippetów i BEZ kolorów hex
+
+      - id: motion
+        agent: motion-director
+        input: [structure-plan.json, agency-brief.json, references/interactions/manifest.yaml]
+        output: outputs/pages/<job>/motion-plan.json
+        note: GSAP / vanilla / R3F / Spline — wybór i uzasadnienie, nie implementacja
+
+      - id: palette
+        agent: palette-extractor
+        input: [agency-brief.json style_refs, structure-plan.json, references/style-dna/]
+        output: outputs/pages/<job>/palette-lock.json
+        script: scripts/extract-palette.py
+        note: kolory WYŁĄCZNIE z obrazów grade/palette + opcjonalnie audytu URL
+
+      - id: layout_merge
+        agent: layout-planner
+        input: [structure-plan.json, motion-plan.json, palette-lock.json, reference-audit.json]
+        output: outputs/pages/<job>/layout-plan.json
+        scripts:
+          - scripts/pick-template-mix.py
+        gates:
+          - scripts/validate-job.py
+          - scripts/check-variability.py
+          - agent: variability-guardian
+
+      - id: media
+        agent: media-producer
+        input: [layout-plan.json, palette-lock.json, products/<slug>/product.yaml]
+        output: outputs/images/<job>/manifest.json
+        gates:
+          - scripts/check-agency-shots.py
+        sub_agent: image-generator
+        phases: [hero_campaign_anchor, remaining_shots]
+
+      - id: coherence
+        agent: coherence-reviewer
+        input: [agency-brief.json, layout-plan.json, manifest.json, palette-lock.json]
+        output: outputs/pages/<job>/coherence-report.json
+        can_block: [page-exporter]
+        on_fail: return to media-producer or structure-planner
+
+      - id: export
+        agent: page-exporter
+        input: [layout-plan.json, manifest.json, palette-lock.json]
+        output: outputs/pages/<job>/index.html
+
+      - id: interactions_impl
+        agent: interaction-composer
+        input: [motion-plan.json, layout-plan.json]
+        script: scripts/compose-interactions.py
+        output: [snippets.css, snippets.js]
+
+      - id: final_qa
+        agents: [style-qa, concept-guardian]
+        gate: C
+        can_loop_to: [media-producer, motion-director, structure-planner]
+
+  product_full:
+    description: Produkt / e-commerce — bez agency-strategist
+    steps:
+      - id: structure
+        agent: structure-planner
+      - id: motion
+        agent: motion-director
+      - id: palette
+        agent: palette-extractor
+      - id: layout_merge
+        agent: layout-planner
+      - id: media
+        agent: media-producer
+        product_lock: true
+      - id: coherence
+        agent: coherence-reviewer
+      - id: export
+        agent: page-exporter
+      - id: interactions_impl
+        agent: interaction-composer
+      - id: final_qa
+        agents: [style-qa, concept-guardian]
+
+artifacts:
+  agency-brief.json:
+    owner: agency-strategist
+    fields: [job_type, positioning, reference_urls, content_must_have, content_forbidden, industry_tone, audit_lanes]
+  structure-plan.json:
+    owner: structure-planner
+    fields: [sections, copy_map, image_slots, scroll_mode_hint, archetype_recommendation]
+  motion-plan.json:
+    owner: motion-director
+    fields: [stack, effects, snippet_ids, r3f_scenes, gsap_timelines, banned_effects, rationale]
+  palette-lock.json:
+    owner: palette-extractor
+    fields: [source_images, extracted_hex, css_vars, palette_family, ui_neutrals, accent_rules]
+  layout-plan.json:
+    owner: layout-planner
+    merges: [structure-plan, motion-plan, palette-lock]
+  coherence-report.json:
+    owner: coherence-reviewer
+    fields: [pass, score, mismatches, retry_agent]
+
+agent_registry:
+  new_v2:
+    - agency-strategist
+    - structure-planner
+    - motion-director
+    - palette-extractor
+    - media-producer
+    - coherence-reviewer
+    - variability-guardian
+  existing:
+    - design-orchestrator
+    - concept-ideation
+    - reference-auditor
+    - layout-planner
+    - image-generator
+    - page-exporter
+    - interaction-composer
+    - style-qa
+    - concept-guardian
+
+motion_stacks:
+  vanilla_snippets:
+    when: lekki portfolio, masonry, minimal motion
+    sources: references/interactions/snippets/
+  gsap:
+    when: sekwencje scroll, timeline hero, stagger reveals — gdy motion-plan wymaga timeline
+    note: snippet lub custom w interactions.js; nie domyślnie na każdym jobie
+  framer_motion:
+    when: tylko gdy stack projektu = React — NIE w vanilla HTML exporter bez explicite
+  r3f:
+    when: 3D hero, product spin, abstract scene — max 1 scena na job
+    sources: references/interactions/snippets/ + custom
+  spline:
+    when: user ma export .splinecode lub URL — embed, nie generuj od zera bez assetu
+
+palette_extraction:
+  primary_sources:
+    - references/style-dna/grade/
+    - references/style-dna/palette/
+    - approved hero z manifest joba (po anchor)
+  script: scripts/extract-palette.py
+  rule: >
+    Hex w CSS pochodzi z palette-lock.json — layout-planner NIE wymyśla kolorów z głowy.
+    UI neutrals (bg, text, muted) mogą być derived z dominanta + contrast fix.

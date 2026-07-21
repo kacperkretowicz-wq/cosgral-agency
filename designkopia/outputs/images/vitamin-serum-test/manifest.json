@@ -1,0 +1,35 @@
+{
+  "job_slug": "vitamin-serum-test",
+  "product": "products/vitamin-serum/product.yaml",
+  "style_profile": "profiles/style-profile.yaml",
+  "templates_used": ["hero-minimal", "grid-editorial", "cta-minimal"],
+  "generated_at": "2026-06-22",
+  "images": [
+    {
+      "type": "packshot",
+      "file": "packshot.svg",
+      "prompt": "Professional product photography, beauty and skincare commercial shoot, Vitamin C Serum amber glass dropper bottle white label, clean isolated product on seamless background e-commerce ready, studio quality, soft natural shadows, no text, no watermark, photorealistic, 8k detail"
+    },
+    {
+      "type": "hero",
+      "file": "hero.svg",
+      "prompt": "Professional product photography, beauty and skincare commercial shoot, Vitamin C Serum editorial framing with space for headline on left third, studio quality, soft natural shadows, no text, no watermark, photorealistic, 8k detail"
+    },
+    {
+      "type": "lifestyle",
+      "file": "lifestyle.svg",
+      "prompt": "Professional product photography, beauty and skincare commercial shoot, Vitamin C Serum in authentic bathroom vanity context natural window light, studio quality, soft natural shadows, no text, no watermark, photorealistic, 8k detail"
+    },
+    {
+      "type": "macro",
+      "file": "macro.svg",
+      "prompt": "Professional product photography, beauty and skincare commercial shoot, extreme close-up serum droplet amber glass texture detail, studio quality, soft natural shadows, no text, no watermark, photorealistic, 8k detail"
+    },
+    {
+      "type": "flatlay",
+      "file": "flatlay.svg",
+      "prompt": "Professional product photography, beauty and skincare commercial shoot, top-down flat lay Vitamin C Serum with minimal props balanced composition, studio quality, soft natural shadows, no text, no watermark, photorealistic, 8k detail"
+    }
+  ],
+  "note": "MVP test placeholders (SVG). Run /design-generate with GenerateImage for photorealistic PNG output."
+}

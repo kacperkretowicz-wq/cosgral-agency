@@ -1,0 +1,66 @@
+id: luzia
+name: Luzia — Designer Portfolio
+preview_url: https://luzia.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/luzia/
+source_image: references/templates/luzia.md
+tags:
+  - hero
+  - nav
+  - portfolio
+  - personal-brand
+  - services
+  - testimonials
+  - faq
+  - light
+  - minimal
+
+sections:
+  - id: hero
+    type: hero
+    notes: "Name + availability badge"
+  - id: works
+    type: portfolio
+    layout: grid
+  - id: stats
+    type: features
+  - id: services
+    type: services
+  - id: process
+    type: process
+    layout: numbered
+  - id: faq
+    type: faq
+  - id: cta
+    type: cta
+
+typography:
+  heading_font: "Instrument Sans"
+  body_font: "Instrument Sans"
+  heading_sizes:
+    h1: "3.5rem"
+  body_size: "1rem"
+  weights:
+    heading: 700
+    body: 400
+
+spacing:
+  page_max_width: "1200px"
+  section_padding_y: "88px"
+  section_padding_x: "32px"
+  grid_columns: 12
+  gap: "28px"
+
+color_tokens:
+  background: "#FFFFFF"
+  accent: "#7430F7"
+  accent_secondary: "#EFCE03"
+  text: "#111111"
+  muted: "#666666"
+
+mixable_with:
+  - majd
+  - daniel
+  - portfolite
+  - taylor
+
+notes: "Friendly freelancer portfolio — white canvas, accent pops, book-a-call."

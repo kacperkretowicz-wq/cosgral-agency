@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Voyeur Vérité — The Art of Observation</title>
+<meta name="description" content="Voyeur Vérité — an independent, artist-founded creative studio. Human-centered storytelling across feature, short-form and micro-series." />
+<link rel="preconnect" href="https://cdn.prod.website-files.com" crossorigin />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  :root{
+    --bg:#0a0908; --ink:#ECE7DE; --muted:#8b837a; --line:rgba(236,231,222,.14);
+    --accent:#E8412A; --film:#06f5;
+    --display:"Bebas Neue",sans-serif; --body:"Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  html.lenis,html.lenis body{height:auto}
+  .lenis.lenis-smooth{scroll-behavior:auto!important}
+  body{overflow-x:hidden}
+  img,video{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+  .wrap{padding:0 clamp(1.25rem,4vw,4rem)}
+  .reveal{opacity:0;transform:translateY(28px)}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+
+  /* NAV */
+  nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+      padding:1.1rem clamp(1.25rem,4vw,4rem);mix-blend-mode:difference;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+  nav.hide{transform:translateY(-110%)}
+  nav .logo{font-family:var(--display);font-size:1.5rem;letter-spacing:.12em}
+  nav ul{display:flex;gap:clamp(1rem,2.2vw,2.2rem);list-style:none}
+  nav ul a{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+  nav ul a:hover{opacity:1}
+  @media(max-width:760px){nav ul{display:none}}
+
+  /* CURSOR */
+  .cursor{position:fixed;top:0;left:0;width:9px;height:9px;border-radius:50%;background:var(--ink);
+    pointer-events:none;z-index:99;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .25s,height .25s}
+  .cursor.big{width:64px;height:64px;background:transparent;border:1px solid var(--ink)}
+  @media(max-width:760px){.cursor{display:none}}
+
+  /* HERO */
+  .hero{position:relative;height:100vh;overflow:hidden}
+  .hero .bg{position:absolute;inset:0;width:100%;height:120%;object-fit:cover;will-change:transform}
+  .hero .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,9,8,.55) 0%,rgba(10,9,8,.1) 35%,rgba(10,9,8,.85) 100%)}
+  .hero .inner{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:clamp(3rem,9vh,7rem)}
+  .hero h1{font-family:var(--display);font-weight:400;line-height:.86;letter-spacing:.01em;
+    font-size:clamp(3.4rem,15.5vw,15rem);text-transform:uppercase}
+  .hero h1 .ln{display:block;overflow:hidden}
+  .hero h1 .ln span{display:block;transform:translateY(105%)}
+  .hero .sub{display:flex;justify-content:space-between;align-items:flex-end;margin-top:1.4rem;gap:1rem;flex-wrap:wrap}
+  .hero .sub p{max-width:30ch;color:var(--muted);font-size:.95rem}
+  .scrollcue{position:absolute;left:50%;bottom:1.4rem;transform:translateX(-50%);font-family:var(--mono);font-size:.62rem;letter-spacing:.3em;color:var(--muted);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+  /* DEFINITION */
+  .def{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,6vw,7rem);padding:clamp(5rem,14vh,11rem) 0;border-bottom:1px solid var(--line)}
+  @media(max-width:760px){.def{grid-template-columns:1fr;gap:3rem}}
+  .def .term{font-family:var(--display);font-size:clamp(2.6rem,7vw,5.5rem);line-height:.9}
+  .def .term em{color:var(--accent);font-style:normal}
+  .def p{margin-top:1.1rem;color:var(--muted);font-size:1.05rem;line-height:1.5;max-width:40ch}
+
+  /* FILMS */
+  .films{padding:clamp(4rem,10vh,8rem) 0}
+  .films .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2.5rem}
+  .films .head h2{font-family:var(--display);font-size:clamp(2rem,5vw,3.5rem)}
+  .filmgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1rem,2.5vw,2rem)}
+  @media(max-width:760px){.filmgrid{grid-template-columns:1fr}}
+  .film{position:relative;aspect-ratio:4/3;overflow:hidden;background:#111}
+  .film img{width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.16,1,.3,1);transform:scale(1.02)}
+  .film:hover img{transform:scale(1.08)}
+  .film .meta{position:absolute;inset:auto 0 0 0;display:flex;justify-content:space-between;align-items:flex-end;
+    padding:1.2rem 1.4rem;background:linear-gradient(0deg,rgba(0,0,0,.75),transparent)}
+  .film .meta h3{font-family:var(--display);font-size:clamp(1.6rem,3.2vw,2.6rem);line-height:1}
+  .film .meta .no{font-family:var(--mono);font-size:.7rem;color:var(--accent);letter-spacing:.2em}
+
+  /* STUDIO */
+  .studio{position:relative;height:120vh;display:flex;align-items:center;overflow:hidden}
+  .studio .bg{position:absolute;inset:0;width:100%;height:130%;object-fit:cover;opacity:.5;will-change:transform}
+  .studio .copy{position:relative;max-width:24ch;font-family:var(--display);font-size:clamp(2.2rem,5.5vw,4.6rem);line-height:.96}
+  .studio .copy span{color:var(--muted)}
+
+  /* PILLARS — pinned video sequence (the signature) */
+  .pillars{position:relative}
+  .pillars .sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+  .pillars video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease}
+  .pillars video.on{opacity:1}
+  .pillars .vscrim{position:absolute;inset:0;background:rgba(10,9,8,.42)}
+  .pillars .label{position:absolute;left:0;right:0;bottom:clamp(2rem,8vh,5rem);padding:0 clamp(1.25rem,4vw,4rem);
+    display:flex;align-items:flex-end;justify-content:space-between;gap:1rem}
+  .pillars .label .no{font-family:var(--mono);color:var(--accent);font-size:.8rem;letter-spacing:.3em}
+  .pillars .label h3{font-family:var(--display);font-size:clamp(3rem,11vw,9rem);line-height:.82;text-transform:uppercase}
+  .pillars .label p{max-width:34ch;color:#cfc9c0;font-size:.98rem;line-height:1.45}
+  .pillars .panels .panel{height:100vh}
+  .pillars .progress{position:absolute;top:0;left:0;height:2px;background:var(--accent);width:0}
+
+  /* LINEAGE */
+  .lineage{padding:clamp(5rem,12vh,9rem) 0;border-top:1px solid var(--line)}
+  .lineage .intro{font-family:var(--display);font-size:clamp(1.8rem,4.5vw,3.2rem);max-width:18ch;margin-bottom:3rem;line-height:.96}
+  .names{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+  @media(max-width:760px){.names{grid-template-columns:1fr}}
+  .names .n{display:flex;align-items:center;gap:1rem;padding:1.1rem .4rem;border-bottom:1px solid var(--line)}
+  .names .n .i{font-family:var(--mono);font-size:.65rem;color:var(--muted);width:2.2rem}
+  .names .n h4{font-family:var(--display);font-size:clamp(1.3rem,2.6vw,2rem);font-weight:400;letter-spacing:.02em}
+  .names .n:hover{color:var(--accent)}
+  .lineage .close{margin-top:2.5rem;max-width:52ch;color:var(--muted);line-height:1.55}
+
+  /* COLLECTION */
+  .collection{padding:clamp(5rem,12vh,9rem) 0;text-align:center;border-top:1px solid var(--line)}
+  .collection .k{color:var(--accent)}
+  .collection h2{font-family:var(--display);font-size:clamp(3rem,12vw,9rem);line-height:.85;margin:.6rem 0 1.4rem}
+  .btn{display:inline-block;font-family:var(--mono);font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;
+    border:1px solid var(--ink);border-radius:40px;padding:.95rem 2rem;transition:.3s}
+  .btn:hover{background:var(--ink);color:var(--bg)}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--line);padding:clamp(3rem,8vh,5rem) 0 2rem}
+  footer .grid{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;align-items:flex-end}
+  footer h2{font-family:var(--display);font-size:clamp(2.6rem,8vw,6rem);line-height:.85}
+  footer .links{display:flex;gap:1.5rem;flex-wrap:wrap}
+  footer .links a{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  footer .links a:hover{color:var(--ink)}
+  footer .base{display:flex;justify-content:space-between;margin-top:3rem;color:var(--muted);font-family:var(--mono);font-size:.66rem;letter-spacing:.18em}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+
+<nav id="nav">
+  <a class="logo" href="#top">VV</a>
+  <ul>
+    <li><a href="#def">About</a></li>
+    <li><a href="#pillars">Pillars</a></li>
+    <li><a href="#lineage">Lineage</a></li>
+    <li><a href="#collection">Shop</a></li>
+    <li><a href="#films">Films</a></li>
+    <li><a href="#footer">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="hero" id="top">
+  <img class="bg" id="heroBg" src="https://cdn.prod.website-files.com/69e215f9fedabd75baf3721f/6a0ebfa74143161a4b4d4dfc_Hero_VV.webp" alt="Voyeur Vérité" />
+  <div class="scrim"></div>
+  <div class="inner wrap">
+    <h1>
+      <span class="ln"><span>The Art</span></span>
+      <span class="ln"><span>of Observation</span></span>
+    </h1>
+    <div class="sub">
+      <span class="mono">Voyeur Vérité — Creative Studio</span>
+      <p>Human-centered storytelling across feature, short-form, and micro-series formats.</p>
+    </div>
+  </div>
+  <span class="scrollcue">Scroll ↓</span>
+</header>
+
+<main class="wrap">
+  <section class="def" id="def">
+    <div class="reveal">
+      <div class="term"><em>Voyeur</em></div>
+      <p>To evoke a sense of curiosity, fascination, or desire to understand and explore the lives of others.</p>
+    </div>
+    <div class="reveal">
+      <div class="term">Vérité</div>
+      <p>To provide an unfiltered and genuine portrayal of reality, allowing viewers to connect with the raw emotions and experiences of our subjects.</p>
+    </div>
+  </section>
+
+  <section class="films" id="films">
+    <div class="head reveal">
+      <h2>Selected Films</h2>
+      <span class="mono">Index — 002</span>
+    </div>
+    <div class="filmgrid">
+      <a class="film reveal" href="#">
+        <img src="https://cdn.prod.website-files.com/69e215f9fedabd75baf3721f/69ef6be2e539a317bf7bb2d4_The%20Symphony.webp" alt="The Symphony of Dance" />
+        <div class="meta"><h3>The Symphony of Dance</h3><span class="no">Film 002</span></div>
+      </a>
+      <a class="film reveal" href="#">
+        <img src="https://cdn.prod.website-files.com/69e215f9fedabd75baf3721f/69ef6c84f9fb310b323dc4ca_Screenshot%202026-04-22%20at%208.53.42%E2%80%AFPM.webp" alt="Stand Up" />
+        <div class="meta"><h3>Stand Up</h3><span class="no">Film 001</span></div>
+      </a>
+    </div>
+  </section>
+</main>
+
+<section class="studio">
+  <img class="bg" id="studioBg" src="https://cdn.prod.website-files.com/69e215f9fedabd75baf3721f/69e5e57742e962ae6611e65d_892862e140476a08332a11d6144c4c84_studio_section.webp" alt="Studio" />
+  <div class="wrap"><p class="copy reveal">Voyeur Vérité is an independent, <span>artist-founded creative studio.</span></p></div>
+</section>
+
+<!-- PILLARS — pinned video sequence (signature) -->
+<section class="pillars" id="pillars">
+  <div class="sticky">
+    <div class="progress" id="pprog"></div>
+    <video id="pv0" data-i="0" muted loop playsinline preload="auto" class="on" src="https://voyeur-verite.s3.us-east-1.amazonaws.com/PILLARS+LANDING.mp4"></video>
+    <video id="pv1" data-i="1" muted loop playsinline preload="none" src="https://voyeur-verite.s3.us-east-1.amazonaws.com/TRUTH+%281%29.mp4"></video>
+    <video id="pv2" data-i="2" muted loop playsinline preload="none" src="https://voyeur-verite.s3.us-east-1.amazonaws.com/HUMILITY.mp4"></video>
+    <video id="pv3" data-i="3" muted loop playsinline preload="none" src="https://voyeur-verite.s3.us-east-1.amazonaws.com/GRIT+%281%29.mp4"></video>
+    <video id="pv4" data-i="4" muted loop playsinline preload="none" src="https://voyeur-verite.s3.us-east-1.amazonaws.com/EVOLVE.mp4"></video>
+    <div class="vscrim"></div>
+    <div class="label wrap">
+      <div><span class="no" id="pno">00</span><h3 id="ptitle">Four Pillars</h3></div>
+      <p id="pbody">The principles beneath every frame we make.</p>
+    </div>
+  </div>
+  <div class="panels">
+    <div class="panel" data-i="1" data-no="01" data-title="Truth" data-body="We move toward what's real, not what's easy."></div>
+    <div class="panel" data-i="2" data-no="02" data-title="Humility" data-body="We arrive open. Listening before shaping."></div>
+    <div class="panel" data-i="3" data-no="03" data-title="Grit" data-body="We don't look away. Not when it cracks."></div>
+    <div class="panel" data-i="4" data-no="04" data-title="Evolve" data-body="The world keeps shifting, so we keep moving."></div>
+  </div>
+</section>
+
+<section class="lineage wrap" id="lineage">
+  <p class="intro reveal">A lineage of observers.</p>
+  <div class="names">
+    <div class="n reveal"><span class="i">01</span><h4>Agnès Varda</h4></div>
+    <div class="n reveal"><span class="i">02</span><h4>Charles Burnett</h4></div>
+    <div class="n reveal"><span class="i">03</span><h4>Chris Hegedus</h4></div>
+    <div class="n reveal"><span class="i">04</span><h4>Dziga Vertov</h4></div>
+    <div class="n reveal"><span class="i">05</span><h4>Jean Rouch</h4></div>
+    <div class="n reveal"><span class="i">06</span><h4>Les Blank</h4></div>
+    <div class="n reveal"><span class="i">07</span><h4>Marlon Riggs</h4></div>
+    <div class="n reveal"><span class="i">08</span><h4>D.A. Pennebaker</h4></div>
+    <div class="n reveal"><span class="i">09</span><h4>Safi Faye</h4></div>
+    <div class="n reveal"><span class="i">10</span><h4>Shirley Clarke</h4></div>
+    <div class="n reveal"><span class="i">11</span><h4>The Maysles Brothers</h4></div>
+    <div class="n reveal"><span class="i">12</span><h4>William Greaves</h4></div>
+  </div>
+  <p class="close reveal">Together these filmmakers established a language rooted in intimacy, patience and respect.</p>
+</section>
+
+<section class="collection wrap" id="collection">
+  <span class="mono k">Limited drop</span>
+  <h2>VV Collection 001</h2>
+  <a class="btn" href="#">Enter the shop</a>
+</section>
+
+<footer class="wrap" id="footer">
+  <div class="grid">
+    <h2>Let's observe<br/>together.</h2>
+    <div class="links">
+      <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+      <a href="#def">About</a>
+      <a href="#pillars">Pillars</a>
+      <a href="#lineage">Lineage</a>
+    </div>
+  </div>
+  <div class="base"><span>Voyeur Vérité®</span><span>© 2026</span><span>Site by Bl/s®</span></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Custom cursor
+  var cur = document.getElementById("cursor");
+  addEventListener("pointermove", function(e){ if(cur){ cur.style.left=e.clientX+"px"; cur.style.top=e.clientY+"px"; } });
+  document.querySelectorAll("a,.film,.btn,.n").forEach(function(el){
+    el.addEventListener("pointerenter",function(){cur&&cur.classList.add("big")});
+    el.addEventListener("pointerleave",function(){cur&&cur.classList.remove("big")});
+  });
+
+  // Nav hide on scroll down
+  var nav=document.getElementById("nav"),last=0;
+  addEventListener("scroll",function(){
+    var y=scrollY; if(y>last&&y>200)nav.classList.add("hide"); else nav.classList.remove("hide"); last=y;
+  },{passive:true});
+
+  if(reduce || !window.gsap){ document.querySelectorAll(".reveal").forEach(function(e){e.style.opacity=1;e.style.transform="none"}); return; }
+
+  // Lenis smooth scroll wired to GSAP
+  if(window.Lenis){
+    var lenis=new Lenis({lerp:.09,smoothWheel:true});
+    function raf(t){lenis.raf(t);requestAnimationFrame(raf)} requestAnimationFrame(raf);
+    if(window.ScrollTrigger){ lenis.on("scroll",ScrollTrigger.update); }
+    document.documentElement.classList.add("lenis","lenis-smooth");
+  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero — mask-up title lines + parallax bg
+  gsap.to(".hero h1 .ln span",{y:0,duration:1.1,ease:"expo.out",stagger:.12,delay:.15});
+  gsap.to("#heroBg",{yPercent:18,ease:"none",scrollTrigger:{trigger:".hero",start:"top top",end:"bottom top",scrub:true}});
+  gsap.fromTo("#heroBg",{scale:1.12},{scale:1,duration:1.6,ease:"expo.out"});
+
+  // Generic reveals
+  gsap.utils.toArray(".reveal").forEach(function(el){
+    gsap.to(el,{opacity:1,y:0,duration:.9,ease:"expo.out",scrollTrigger:{trigger:el,start:"top 85%"}});
+  });
+
+  // Studio parallax
+  gsap.to("#studioBg",{yPercent:-16,ease:"none",scrollTrigger:{trigger:".studio",start:"top bottom",end:"bottom top",scrub:true}});
+
+  // PILLARS — pinned video sequence driven by scroll
+  var vids=[].slice.call(document.querySelectorAll(".pillars video"));
+  var panels=[].slice.call(document.querySelectorAll(".pillars .panel"));
+  var pno=document.getElementById("pno"),pt=document.getElementById("ptitle"),pb=document.getElementById("pbody"),prog=document.getElementById("pprog");
+  function show(i){
+    vids.forEach(function(v){ if(+v.dataset.i===i){ v.classList.add("on"); if(v.preload==="none")v.preload="auto"; v.play&&v.play().catch(function(){}); } else { v.classList.remove("on"); v.pause&&v.pause(); } });
+  }
+  vids[0]&&vids[0].play&&vids[0].play().catch(function(){});
+  panels.forEach(function(p){
+    ScrollTrigger.create({
+      trigger:p,start:"top center",end:"bottom center",
+      onToggle:function(self){ if(self.isActive){ var i=+p.dataset.i; show(i); pno.textContent=p.dataset.no; pt.textContent=p.dataset.title; pb.textContent=p.dataset.body; } }
+    });
+  });
+  ScrollTrigger.create({
+    trigger:".pillars",start:"top top",end:"bottom bottom",
+    onUpdate:function(s){ prog.style.width=(s.progress*100).toFixed(1)+"%"; },
+    onLeaveBack:function(){ show(0); pno.textContent="00"; pt.textContent="Four Pillars"; pb.textContent="The principles beneath every frame we make."; }
+  });
+
+  // Play/pause active video by viewport (perf)
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){var v=e.target;if(e.isIntersecting&&v.classList.contains("on"))v.play&&v.play().catch(function(){});else v.pause&&v.pause();})},{threshold:.1});
+  vids.forEach(function(v){io.observe(v)});
+})();
+</script>
+</body>
+</html>

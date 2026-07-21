@@ -1,0 +1,34 @@
+# Profil osoby — referencje do generacji portretów (nie publiczne w output)
+
+id: krecik
+name: Krecik
+reference_dir: references/person/krecik
+
+likeness_notes: >
+  Mężczyzna, ok. 25-30 lat. Ciemne kręcone/falowane włosy, zadbany wąs + lekki zarost.
+  Ciemnobrązowe oczy, owalna twarz, jasna cera. Zachowaj wąs i fryzurę — to kluczowe rozpoznawalne cechy.
+
+reference_photos:
+  - references/person/krecik/01-headshot-professional.png
+  - references/person/krecik/02-front-selfie.png
+  - references/person/krecik/03-profile-side.png
+  - references/person/krecik/04-beach-selfie.png
+
+use_for:
+  - portfolio avatars
+  - linkedin headshots
+  - about section on personal landing
+  - creative director / designer editorial portraits
+
+prompt_identity: >
+  Same man as reference: young man late twenties, dark curly wavy hair, groomed mustache
+  and light stubble beard, dark brown eyes, oval face, fair skin.
+
+approved_portraits:
+  - profiles/approved/krecik-01-blue-studio-front.png
+  - profiles/approved/krecik-02-bw-profile-side.png
+
+user_preferences:
+  best: "niebieskie tło studio + B&W profil z boku twarzy"
+  avoid: "cream linkedin, red studio, sage sunlight, orange gel, desk lifestyle, stone terracotta, front-facing unless blue studio"
+  direction: "designerskie, różne pozycje profilu, gra światła, rim light, split light, cienie geometryczne"

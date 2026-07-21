@@ -1,0 +1,114 @@
+{
+  "job": "wisnia-parfum",
+  "brand": "WIŚNIA",
+  "tier": "editorial_motion",
+  "tokens": {
+    "bg": "#FDF6F6",
+    "fg": "#1A1A1A",
+    "muted": "#9A8588",
+    "accent": "#8B5A6B",
+    "surface": "#F5E8EA",
+    "fontHeading": "\"Space Grotesk\", system-ui, sans-serif",
+    "fontBody": "\"Manrope\", system-ui, sans-serif",
+    "fontMono": "\"JetBrains Mono\", ui-monospace, monospace",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "eyebrow": "(01) Niche fragrance",
+      "title": "Wiśnia. Bez kompromisów.",
+      "lead": "Jedna nuta — dzika wiśnia, czarny liść, czyste szkło.",
+      "cta": "Kup WIŚNIA",
+      "bg": "image",
+      "image": "/g/wisnia-parfum/00-anchor-packshot-v2.png"
+    },
+    {
+      "type": "faq",
+      "tag": "(02) Notes",
+      "heading": "Piramida",
+      "items": [
+        {
+          "q": "Top",
+          "a": "wild cherry, bitter almond"
+        },
+        {
+          "q": "Heart",
+          "a": "cherry blossom, iris"
+        },
+        {
+          "q": "Base",
+          "a": "black tea, soft wood"
+        }
+      ]
+    },
+    {
+      "type": "gallery",
+      "tag": null,
+      "heading": "Kadry",
+      "images": [
+        "/g/wisnia-parfum/00-anchor-packshot-v3.png",
+        "/g/wisnia-parfum/00-anchor-packshot-v4.png",
+        "/g/wisnia-parfum/00-anchor-packshot.png",
+        "/g/wisnia-parfum/01-hero-still-v4.png"
+      ]
+    },
+    {
+      "type": "split",
+      "tag": "(03) Still life",
+      "heading": "Kadry",
+      "body": "",
+      "image": "/g/wisnia-parfum/01-hero-still-v4.png",
+      "reverse": true
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "",
+      "body": "",
+      "image": "/g/wisnia-parfum/01-hero-still.png",
+      "reverse": true
+    },
+    {
+      "type": "split",
+      "tag": "(04) About",
+      "heading": "Mniej znaczy więcej.",
+      "body": "WIŚNIA to perfumy dla ludzi, którzy wolą jeden wyrazisty akord niż cały słownik.",
+      "image": "/g/wisnia-parfum/02-macro-glass-v4.png",
+      "reverse": false
+    },
+    {
+      "type": "faq",
+      "tag": null,
+      "heading": "",
+      "items": [
+        {
+          "q": "Szczegóły",
+          "a": ""
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "tag": null,
+      "heading": "",
+      "items": [
+        {
+          "q": "Szczegóły",
+          "a": ""
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "title": "50 ml — eau de parfum",
+      "cta": "Kup WIŚNIA",
+      "meta": "(05) Shop"
+    },
+    {
+      "type": "footer",
+      "brand": "WIŚNIA",
+      "credit": "cosgral.design"
+    }
+  ]
+}

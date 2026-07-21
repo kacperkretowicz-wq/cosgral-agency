@@ -1,0 +1,39 @@
+# Mapowanie inspiracji — obowiązkowe per ujęcie (image-generator + style-qa)
+
+version: "1"
+
+how_to_use:
+  1: "layout-planner tworzy inspiration_map w layout-plan.json"
+  2: "image-generator kopiuje do manifest.json per file"
+  3: "style-qa FAIL gdy brak inspiration_ref lub shot_rationale"
+
+folders:
+  references/style/: "DNA stylu onboarding (11 refów)"
+  references/inspiration/: "User batch 2026-06-23, pogrupowane tematycznie"
+  references/web-audits/: "Zachowanie scroll/interakcji (nie obrazy)"
+
+palette_to_folder:
+  japan_warm_light: [beauty-skincare-macro, minimal-product-interior, moodboards]
+  warm_organic: [beauty-skincare-macro, warm-orange-terracotta]
+  purple_magenta: [moodboards, bold-red-editorial]
+  bw_editorial: [bw-editorial-portrait]
+
+shot_type_defaults:
+  anchor_packshot: references/inspiration/minimal-product-interior/skincare-bottles-grey-flatlay.png
+  macro_lip: references/inspiration/beauty-skincare-macro/lip-gloss-macro-peach.png
+  lifestyle_portrait: references/inspiration/beauty-skincare-macro/skincare-bathroom-marble.png
+  japan_still: references/inspiration/moodboards/moodboard-purple-magenta-strip.png
+  flatlay_shades: references/inspiration/minimal-product-interior/skincare-bottles-grey-flatlay.png
+
+lippier_retroactive_note: >
+  Job lippier (v1) NIE miał inspiration_ref w manifest — obrazy generowane
+  niezależnie bez mapowania. v2 musi użyć tego pliku + product lock.
+
+manifest_required_fields:
+  - file
+  - role
+  - inspiration_ref
+  - shot_rationale
+  - object_position
+  - derived_from_anchor
+  - palette_family

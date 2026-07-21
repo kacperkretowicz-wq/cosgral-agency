@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── TOKENY PER JOB ──────────────────────────────────────────────
+   Build-phase nadpisuje te zmienne z palette-lock.json + typography-lock.json.
+   Domyślne = neutralny editorial. */
+:root {
+  --bg: #0b0b0c;
+  --fg: #f2f0ec;
+  --muted: #9a978f;
+  --accent: #e8482a;
+  --surface: #141416;
+
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+}
+
+/* Lenis: wymagane by smooth-scroll działał poprawnie */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Ukryj natywny kursor gdy aktywny custom-cursor (desktop) */
+@media (hover: hover) and (pointer: fine) {
+  body[data-custom-cursor="on"] { cursor: none; }
+}
+
+/* Reduced motion: wyłącz ciężki ruch */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,46 @@
+version: "1"
+brand: ÉLAN
+slug: elan-serum
+type: product_brand
+job_type: product_brand
+
+tagline: For the sake of hair.
+positioning: >
+  Minimalny serum do włosów w estetyce editorial studio — czarny mat,
+  kropla precyzji, ogromna ilość whitespace. Monochrom, zero ozdobników.
+
+layout_ref: references/layout-screenshots/inbox/47_designsakestudio_com_1782386772.png
+concept_id: sake-editorial
+layout_archetype: studio-manifesto
+palette_family: bw_editorial
+job_palette: bw_editorial
+
+product_visual_spec: >
+  50ml matte black cylindrical dropper bottle. Short wide cylinder (not tall skinny).
+  Matte black glass/plastic body, black dropper cap.
+  Small white sans-serif label on front: "ÉLAN" top line, "SCALP SERUM" second line,
+  "50 ML" third line — all centered, minimal, no other graphics.
+  Same exact bottle proportions, same cap, same label in every shot.
+  NOT perfume flacon. NOT gold accents. NOT colored liquid visible.
+
+notes:
+  active: peptydy, niacynamid, olej jojoba
+  use: 2–3 krople na skórę głowy wieczorem
+  format: 50 ml dropper
+
+shot_brief_source: profiles/job-types/product-brand.yaml
+
+image_narrative:
+  - shot_id: anchor_packshot
+    role: anchor
+    subject_hint: "ÉLAN black dropper bottle centered on white, soft shadow"
+    style_ref: references/layout-screenshots/inbox/47_designsakestudio_com_1782386772.png
+    style_dimensions: [bw_editorial, whitespace, minimal]
+  - shot_id: macro
+    role: macro
+    subject_hint: "SAME bottle — macro dropper tip and label"
+    gate: derived_from_anchor_only
+  - shot_id: lifestyle
+    role: editorial
+    subject_hint: "SAME bottle on marble with comb — hair ritual"
+    gate: derived_from_anchor_only

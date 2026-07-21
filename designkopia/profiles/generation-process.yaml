@@ -1,0 +1,287 @@
+# Proces generacji — SZCZEGÓŁY REGUŁ/BRAMEK (product lock, mockup, atmosphere, anti-AI, scoring).
+# ⚠️ KANON PRZEPŁYWU (kolejność faz/agentów) = profiles/pipeline.yaml. Ten plik = reguły, nie przepływ.
+# Aktywni agenci: profiles/AGENT-MAP.md (layout-planner/page-exporter to aliasy → patrz mapa).
+# Wczytują: design-orchestrator, layout-assembler, image-generator, html-assembler, style-qa, concept-guardian
+
+version: "1"
+updated_at: "2026-06-25"
+
+golden_reference:
+  pages: [lumera-landing, solace-landing]
+  why: "Mix 3–4 templateów YAML, 7–8 sekcji, numerowane bloki, asymetria — NIE domyślny recipe hero→manifesto→grid→founder"
+
+batch_limits:
+  max_full_landings_parallel: 2
+  reason: "batch 5× = skrócone MVP; jakość spada"
+
+# ─── 1. PRODUCT LOCK (obowiązkowe) ───
+product_lock:
+  enabled: true
+  steps:
+    - id: product_spec
+      file: products/<slug>/product.yaml
+      require: [product_visual_spec]
+    - id: anchor_packshot
+      output: outputs/images/<job-slug>/00-anchor-packshot.png
+      action: "Wygeneruj JEDEN packshot. STOP — nie generuj reszty bez anchor."
+    - id: user_or_qa_gate
+      action: "Kontynuuj tylko gdy anchor w manifest ma status approved lub user explicit proceed"
+    - id: derived_shots
+      rule: "Każdy kolejny prompt MUSI zawierać product_visual_spec + opis anchor. Użyj reference_image_paths: [anchor] gdy GenerateImage wspiera referencję."
+  manifest_fields:
+    - product_visual_spec_hash
+    - anchor_image
+    - derived_from_anchor: true
+
+product_visual_spec_template: |
+  Slim dual-ended lip pencil, matte cream barrel, gold cap band,
+  burgundy pigment tip on one end, white eraser tip on other end.
+  Same proportions in every shot. No brand text on packaging.
+
+# ─── 1b. MOCKUP INSPIRATION (skeleton ≠ skin) ───
+mockup_inspiration:
+  rules: profiles/mockup-inspiration-rules.yaml
+  library: references/layout-screenshots/
+  pick_script: scripts/pick-layout-mockup.py
+  workflow: >
+    1) pick-layout-mockup.py lub user wskazuje mockup
+    2) layout-screenshot-analyst → skeleton_signature w analysis/*.yaml
+    3) structure-planner → skeleton_transferred + vision_note (produkt)
+    4) palette/typography z produktu — NIE literal clone mockupu
+    5) concept-guardian FAIL na mockup-skin-clone
+  mandatory_plan_fields:
+    - layout_ref
+    - skeleton_elements
+    - adaptation_notes
+    - vision_note
+
+# ─── 1c. MOCKUP PHOTO INSPIRATION (photo grade z inbox) ───
+mockup_photo_inspiration:
+  rules: profiles/mockup-photo-inspiration-rules.yaml
+  pick_script: scripts/pick-photo-grade.py
+  workflow: >
+    1) przed anchor uruchom pick-photo-grade.py --job <slug>
+    2) zapisz outputs/pages/<slug>/photo-grade-ref.json
+    3) anchor prompt bierze reference_image_paths z photo_grade_ref (nie z approved 01/02)
+    4) style_ref w manifeście ma rotować vs lookback
+  forbidden_default_reference_paths:
+    - profiles/approved/01-bold-red-packshot.png
+    - profiles/approved/02-bw-geometric-packshot.png
+  required_manifest_fields_per_image:
+    - photo_grade_ref
+    - style_ref
+    - palette_family
+
+# ─── 1d. BRAND ATMOSPHERE SHOTS (tła, kafelki, sceny z mockupów) ───
+brand_atmosphere_shots:
+  rules: profiles/job-types/brand-atmosphere-shots.yaml
+  plan_script: scripts/plan-brand-shots.py
+  when: [product_brand, food_beverage]
+  workflow: >
+    1) po layout-plan uruchom plan-brand-shots.py --job <slug> --write-shot-plan
+    2) zapisz outputs/pages/<slug>/brand-atmosphere-plan.json
+    3) shot-plan.json = product lock shots + atmosphere shots (shot_type: atmosphere)
+    4) generuj atmosphere PO anchor gate; product_lock=false dla tych plików
+    5) page-exporter mapuje ui_use → hero bg / gallery tile / split section
+  min_atmosphere_shots: 2
+  max_atmosphere_shots: 5
+  forbidden:
+    - mockup_person_copy_1to1
+    - atmosphere_as_packshot_substitute
+    - same_composition_as_anchor
+
+# ─── 2. LAYOUT ARCHETYPE (nie jeden schemat) ───
+archetype_source: profiles/layout-archetypes.yaml
+selection_rule: "layout-planner wybiera JEDEN archetyp per job — zapisuje w layout-plan.json jako layout_archetype"
+forbidden_generic_recipe:
+  - "hero → manifesto → feature → pinterest grid → founder → cta (bez zmiany kolejności/sekcji z archetypu)"
+  - "Zawsze viewport-sections scroll-snap"
+  - "Zawsze Cormorant + Inter bez uzasadnienia"
+
+# ─── 3. TEMPLATE MIX (jak LUMÉRA) ───
+template_mix:
+  min_templates: 3
+  must_read_sections_from_yaml: true
+  example:
+    lumera: [salient, taylor, kirk, portfolite]
+  rule: "Każda sekcja w section_plan ma template_source z konkretnego pliku profiles/templates/*.yaml"
+
+# ─── 4. TYPOGRAFIA ───
+typography:
+  source: profiles/typography-pairings.yaml
+  banned_default_for_beauty: soft-beauty
+  rule: "Wybór z audytu web lub template YAML — NIE auto-serif beauty"
+  anti_ai_fonts:
+    avoid_unless_justified: [Cormorant Garamond, Playfair Display, Lora]
+  banned_lead_body:
+    pattern: inter-plain-lead
+    rule: "hero-lead, tagline, gallery-lead — nie sam Inter/system-ui; patrz typography-pairings.yaml banned_body_patterns"
+  prefer_from_audit:
+    editorial: [Space Grotesk, Space Mono, Inter, Syne]
+    commercial: [Inter, JetBrains Mono]
+
+# ─── 5. INTERAKCJE (nie zawsze te same 3) ───
+interactions:
+  source: profiles/interaction-sets.yaml
+  per_job: "2–4 efekty z interaction_set przypisanego do archetypu"
+  forbidden_default_bundle: [scroll-reveal, origin-button, letter-hover]
+  note: "Ten bundle dozwolony max 1× na 3 landings — rotuj zestawy"
+  banned: [hero-parallax-16]
+
+# ─── 6. INSPIRACJA OBRAZÓW (2026-06-24 — style vs subject) ───
+inspiration:
+  deprecated: references/inspiration/manifest.yaml
+  style_dna:
+    path: references/style-dna/
+    manifest: references/style-dna/manifest.yaml
+    rule: "style_ref — wyciągnij style_dimensions (światło, paleta, kadr). NIGDY nie kopiuj tematu."
+  agency_content:
+    path: references/agency-content/
+    manifest: references/agency-content/manifest.yaml
+    rule: "subject_ref — temat ujęć TYLKO dla job_type agency_portfolio"
+  moodboards_ui:
+    path: references/moodboards-ui/
+    manifest: references/moodboards-ui/manifest.yaml
+    rule: "layout-planner / typografia — NIE image-generator subject"
+  job_types:
+    agency_portfolio: profiles/job-types/agency-portfolio.yaml
+    product_brand: products/<slug>/product.yaml + product_lock
+  manifest_fields_per_image:
+    - subject_ref
+    - style_ref
+    - style_dimensions
+    - shot_rationale
+    - subject_hint
+  legacy_field: inspiration_ref  # tylko kompatybilność wsteczna
+  gate:
+    script: scripts/check-agency-shots.py
+    when: [before image-generator, after manifest write]
+    on_fail: "STOP dla agency_portfolio z beauty/skincare subject"
+
+# ─── 7. ANTI-AI UI PATTERNS ───
+anti_ai_ui:
+  avoid:
+    - "label uppercase letter-spacing 0.2em na każdej sekcji"
+    - "symetryczny 50/50 grid wszędzie"
+    - "poetycki manifesto block bez numeracji sekcji"
+    - "border-radius 16px na wszystkim"
+    - "scroll reveal na każdym .reveal"
+  prefer:
+    - "numerowane sekcje (01), (02) jak LUMÉRA"
+    - "asymetria hero"
+    - "mega type lub tight mono labels"
+    - "mniej copy, więcej kadru"
+
+# ─── 8. CONCEPT GUARDIAN (wizja usera) ───
+concept_guardian:
+  profile: profiles/concept-profile.yaml
+  agent: concept-guardian
+  gates:
+    A: { after: layout-planner, blocks: [image-generator] }
+    B: { after: image-generator, optional: true }
+    C: { after: interaction-composer, with: style-qa, blocks: delivery }
+  note: "Proces = style-qa. Wizja, kreatywność, rotacja = concept-guardian."
+
+# ─── 9a. WALIDACJA JOB (P0 — obowiązkowa) ───
+validation:
+  validate_job:
+    script: scripts/validate-job.py
+    when:
+      - after layout-planner (Gate A)
+      - before page-exporter
+    on_fail: "STOP — napraw layout-plan.json"
+  check_variability:
+    script: scripts/check-variability.py
+    when:
+      - after layout-planner (Gate A)
+      - with concept-guardian Gate A
+    on_fail: "FAIL — zmień archetyp, template_mix, interaction_set lub typography"
+    warn_only_flag: "--warn-only"
+  check_guardian_reports:
+    script: scripts/check-guardian-reports.py
+    when:
+      - after concept-guardian Gate C
+      - before final delivery
+    mandatory: true
+    on_fail: "STOP — brak raportów variability/coherence/concept-guardian albo status FAIL"
+  check_agency_shots:
+    script: scripts/check-agency-shots.py
+    when:
+      - job_type agency_portfolio before image-generator
+      - after manifest.json write
+    on_fail: "STOP — beauty/skincare subject na agencji"
+  check_image_variability:
+    script: scripts/check-image-variability.py
+    when:
+      - after image-generator
+      - before coherence-reviewer
+      - before final delivery
+    on_fail: "STOP — zmień style_ref/photo_grade_ref/palette_family, nie powtarzaj red/BW default"
+  plan_brand_shots:
+    script: scripts/plan-brand-shots.py
+    when:
+      - after layout-planner (product_brand)
+      - before shot-planner / image-generator
+    args: "--write-shot-plan --json"
+    on_fail: "STOP — brak brand-atmosphere-plan.json"
+  check_brand_shots:
+    script: scripts/check-brand-shots.py
+    when:
+      - after image-generator (product_brand)
+      - before coherence-reviewer
+    on_fail: "STOP — dodaj min. 2 atmosphere shots (tło/kafelek/scena)"
+  clean_image_folders:
+    script: scripts/clean-image-job-folders.py
+    when: after image batch lub gdy outputs/images/<job> ma obce PNG
+  compose_interactions:
+    script: scripts/compose-interactions.py
+    when: after page-exporter
+    mandatory: true
+    on_fail: "STOP — uruchom interaction-composer"
+  pick_template_mix:
+    script: scripts/pick-template-mix.py
+    when: layout-planner (before writing layout-plan.json)
+  assemble_section:
+    script: scripts/assemble-section.py
+    when: page-exporter
+  audit_site:
+    script: scripts/audit-site.py
+    when: user provides reference URL (before layout-planner)
+  emit_template_tokens:
+    script: scripts/emit-template-tokens.py
+    when: page-exporter (per template_mix)
+  list_jobs_dashboard:
+    script: scripts/list-jobs-dashboard.py
+    when: optional QA / sprint review
+  legacy_jobs:
+    path: profiles/legacy-jobs.yaml
+    note: excluded from variability lookback when exclude_from_variability true
+
+# ─── 9. SNIPPET LIBRARY + REFERENCE PATTERNS ───
+snippet_library:
+  path: references/interactions/snippets/
+  manifest: references/interactions/snippets/manifest.yaml
+  compose_script: scripts/compose-interactions.py
+  agent: interaction-composer
+  when: after page-exporter, before style-qa Gate C
+
+reference_patterns:
+  path: profiles/reference-patterns.yaml
+  audit: references/web-audits/editorial-sites-2026-06-23.md
+  rule: "layout-planner lookup URL / lane → archetyp + snippet_ids + typography"
+
+portfolio_data:
+  schema: profiles/SCHEMA-projects.md
+  path: products/<slug>/projects.yaml
+  required_for: [readymag-slides, portfolio-index, product-serial]
+
+scroll_modes:
+  - vertical
+  - viewport-sections
+  - case-study-long
+
+video_hero:
+  manifest_role: hero_loop
+  projects_yaml: media.hero_video
+  partial: references/interactions/snippets/video-hero/video-hero.html
+

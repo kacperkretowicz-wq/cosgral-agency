@@ -1,0 +1,44 @@
+version: "1"
+brand: PATINA
+slug: patina-cloth
+type: fashion_retail
+job_type: fashion_retail
+
+tagline: Age is the craft.
+positioning: >
+  Artystyczna marka odzieżowa — lniane formy, srebrna paleta, dorośli jako ikony stylu.
+  Pinterest editorial: prześwietlone portrety, delikatny blur, ciepły monochrom. Nie anti-aging — celebracja.
+
+layout_ref: references/layout-screenshots/inbox/47_designsakestudio_com_1782386772.png
+concept_id: patina-silver-editorial
+layout_archetype: masonry-portfolio
+palette_family: warm_organic
+job_palette: warm_organic
+
+brand_visual_spec: >
+  Linen and wool garments in oatmeal, silver-grey, soft black. Minimal seams, oversized relaxed fit.
+  No logos on clothes — texture and drape as identity. Mature models 55–75, dignified artistic poses.
+  Photography: lifted highlights, soft overexposure, subtle motion blur on fabric edges, fine film grain.
+
+collection:
+  - id: veil-coat
+    name: Veil Coat
+    price: "4 800 PLN"
+    material: washed linen, silver-grey
+  - id: drift-dress
+    name: Drift Dress
+    price: "3 200 PLN"
+    material: raw silk blend, oatmeal
+  - id: line-trousers
+    name: Line Trousers
+    price: "2 400 PLN"
+    material: wool-linen, soft black
+
+image_narrative:
+  - hero_overexposed_portrait
+  - manifesto_texture_bg
+  - lookbook_masonry_tiles
+  - piece_editorial_stills
+  - mature_lifestyle_scene
+
+shot_brief_source: fashion_retail — no SKU product lock

@@ -1,0 +1,98 @@
+{
+  "reduced_motion_reduce_glitch": {
+    "bodyClass": "u-body mode-classic",
+    "scroll": 2025,
+    "triggerProgress": 0.25,
+    "h1Text": "COSGRAL",
+    "h1Opacity": "1",
+    "h1ClipPath": "inset(0px 0% 0px 0px)",
+    "charSpansCount": 7,
+    "charSpansStyles": [
+      {
+        "char": "C",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "O",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "S",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "G",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "R",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "A",
+        "opacity": "1",
+        "display": "inline-block"
+      },
+      {
+        "char": "L",
+        "opacity": "1",
+        "display": "inline-block"
+      }
+    ],
+    "bodyClassInitial": "u-body mode-classic",
+    "screenshot": "C:\\Users\\kretowicz_k\\Desktop\\cosgral \u2014 kopia\\cosgral-main\\designkopia\\cosgral-agency\\test-output\\hero-tests\\reduce_motion_reduce_glitch.png"
+  },
+  "reduced_motion_no_preference_glitch": {
+    "bodyClass": "u-body mode-glitch",
+    "scroll": 2025,
+    "triggerProgress": 0.25,
+    "h1Text": "COSGRAL",
+    "h1Opacity": "1",
+    "h1ClipPath": "none",
+    "charSpansCount": 7,
+    "charSpansStyles": [
+      {
+        "char": "C",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "O",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "S",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "G",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "R",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "A",
+        "opacity": "0",
+        "display": "inline-block"
+      },
+      {
+        "char": "L",
+        "opacity": "0",
+        "display": "inline-block"
+      }
+    ],
+    "bodyClassInitial": "u-body mode-glitch",
+    "screenshot": "C:\\Users\\kretowicz_k\\Desktop\\cosgral \u2014 kopia\\cosgral-main\\designkopia\\cosgral-agency\\test-output\\hero-tests\\reduced_motion_no_preference_glitch.png"
+  }
+}

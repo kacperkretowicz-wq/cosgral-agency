@@ -1,0 +1,297 @@
+# Koncepcje użytkownika — creative intent, różnorodność, golden refs
+# Wczytują: concept-guardian, design-orchestrator (przed final delivery)
+# Aktualizuj po feedbacku usera lub akceptacji nowego golden page
+
+version: "1"
+updated_at: "2026-06-25"
+owner_notes: >
+  Ten plik koduje WIZJĘ i KREATYWNOŚĆ — nie compliance procesu (to style-qa).
+  Po każdym „to jest super” / „to słabe” dopisz wpis w tier lub anti_patterns.
+  2026-06-23: LUMÉRA = czerwień/biel/czerń ONLY — granat/navy/deep_luxury to FAIL dla lumera-*.
+
+# ─── Brand locks (concept-guardian Gate A/B — obowiązkowe) ───
+brand_locks:
+  lumera:
+    applies_to: [lumera-landing, lumera, vitamin-serum, night-renewal-oil]
+    source: products/lumera-brand.yaml
+    mandatory_palette: bold_monochrome
+    ui_colors: ["#E82323", "#C41E1E", "#0A0A0A", "#FAFAF8"]
+    forbidden_palette_families: [deep_luxury]
+    forbidden_colors: [navy, cobalt, granat, gold_foil_wine_bottle]
+    allowed_accent_families: [bw_editorial, cinematic_gel]
+    accent_limits:
+      bw_editorial: "max 2 shots / sekcje case-study"
+    forbidden_assets:
+      - 03-warm-organic-lifestyle.png
+      - asset-03-warm-editorial-portrait.png
+      - asset-03-warm-stone-shadows.png
+    product_rule: >
+      Vitamin C i Night Oil w tym samym visual language (red/black/white studio).
+      Night Oil NIE jest osobną linią navy/gold. Oba packshoty jak 01-bold-red, nie 04-deep-luxury.
+    fail_if:
+      - manifest lub HTML używa 04-deep-luxury-hero dla lumera
+      - nowy packshot oil w navy/gold bez akceptacji usera
+      - "więcej niż 1 sekcja dominująca warm_organic bez czerwonego kręgosłupa"
+      - ten sam plik PNG w >1 sekcji strony
+      - layout_archetype readymag-slides bez explicit user ask (LUMÉRA = lumera-commercial)
+      - manifesto display RED AND BLACK / RED AND LIGHT typography slides
+
+# ─── Golden references (co user uznaje za sukces) ───
+golden_pages:
+  tier_s:
+    - slug: lumera-landing
+      path: outputs/pages/lumera-landing/
+      traits:
+        - "mix 3–4 templateów YAML (salient, taylor, kirk, portfolite)"
+        - "7–8 sekcji z numeracją (01), (02)"
+        - "asymetryczny hero, product cards, FAQ"
+        - "Inter + JetBrains Mono — editorial commercial"
+        - "paleta: czerwień + biel + czerń + B&W akcent — BEZ granatu/navy na produktach"
+    - slug: solace-landing
+      path: outputs/pages/solace-landing/
+      traits:
+        - "głębokość jak LUMÉRA, paleta sage/terracotta"
+        - "art assets: portret, macro, abstract tło"
+        - "product-editorial bez beauty-serif default"
+  tier_b:
+    - slug: atlas-creative
+      path: outputs/pages/atlas-creative/
+      traits:
+        - "studio-manifesto / readymag-slides — agency dark"
+        - "8 sekcji, Syne + Manrope, stacked cards"
+      note: "Dobry kierunek v2; weryfikuj czy nie wraca do generic recipe"
+  rejected_patterns:
+    - id: batch-five-mvp
+      examples: [coral-clay, fabrica, matcha-field, lavender-sky, amber-mead]
+      why: "1–3 bloki HTML, brak sekcji z template YAML, batch 5× naraz"
+    - id: lippier-v1-process-fail
+      slug: lippier
+      why: "7 niezależnych GenerateImage, brak product lock, generic hero→manifesto→grid"
+    - id: generic-beauty-ai
+      why: "Cormorant + Inter, symetryczny grid, poetycki manifesto bez numeracji"
+
+# ─── Wizja kreatywna (słowa kluczowe usera) ───
+user_vision:
+  pillars:
+    - "Różnorodność tematów w photoshoot — nie tylko skincare (st02, st03)"
+    - "Editorial > template beauty AI"
+    - "Mniej copy, więcej kadru"
+    - "Numerowane sekcje, asymetria, mega type lub tight mono"
+    - "Jedna paleta per job — spójność mood, nie monotonia layoutu"
+    - "LUMÉRA: czerwień/biel/czerń dominanta — brand_locks w concept-profile"
+    - "Inspiracje = wyłącznie styl (style-dna); temat z agency-content lub product.yaml — nigdy 1:1 plik jako final"
+    - "Mockup layout = szkielet (rytm sekcji, grid, whitespace) — kolory/fonty/copy wymyśl pod produkt (profiles/mockup-inspiration-rules.yaml)"
+    - "Agencja marketingowa: kampanie/branding/studio — nie skincare macro jako portfolio"
+  copy_tone:
+    reference: trovearchive.com
+    rules:
+      - "Krótkie nagłówki: Not trending. Always chosen. — nie manifesto ściana"
+      - "Jedno zdanie lead max; reszta w specyfikacji produktu"
+      - "Filozofia: spokojna, bez metafory sztucznej (atrament, pismo odręczne)"
+      - "CTA: Zobacz kolekcję / Dodaj do koszyka — nie Kup kolekcję z poetyką"
+depth_benchmark:
+  compare_to: [lumera-landing, solace-landing]
+  min_scroll_sections: 6
+  target_sections: "7–9"
+image_creativity:
+  require_art_assets: true
+  art_asset_types:
+    - portrait_editorial
+    - macro_texture
+    - abstract_or_landscape
+    - still_life_botanical
+  diversity_is_feature: true
+  avoid:
+    - chess_pieces_green
+    - jewelry_macro
+    - neon_green_liquid
+    - male_craft_ai_staged
+    - random_text_on_packaging
+    - navy_granat_on_lumera_jobs
+
+# ─── Anti-patterns (kreatywne, nie tylko procesowe) ───
+anti_patterns:
+  layout:
+    - id: generic-recipe
+      pattern: "hero → manifesto → feature grid → founder → cta (bez archetypu)"
+      severity: fail
+    - id: symmetric-everywhere
+      pattern: "50/50 grid na każdej sekcji"
+      severity: warn
+    - id: short-landing
+      pattern: "<6 sekcji lub <2 pełne scrolla na commercial/product"
+      severity: fail
+    - id: copy-heavy-manifesto
+      pattern: "długi poetycki blok bez numeracji sekcji"
+      severity: warn
+    - id: mockup-skin-clone
+      pattern: "layout_ref z mockupu ale strona kopiuje paletę+fonty+gimmicki mockupu bez vision_note i adaptation_notes"
+      fix: "Weź skeleton (np. stagger, card grid); zmień hex/typografię; przetłumacz sekcje na język produktu"
+      severity: fail
+      source: profiles/mockup-inspiration-rules.yaml
+    - id: cringy-brand-poetry
+      pattern: "Pinterest w ruchu, atrament na jedwabiu, signature brand, pismo odręczne, cień robi robotę"
+      fix: "ton trovearchive — krótkie zdania, fakty produktu, jedna linia filozofii max"
+      severity: warn
+  typography:
+    - id: beauty-serif-default
+      fonts: [Cormorant Garamond, Playfair Display, Lora]
+      pairing_id: soft-beauty
+      unless: "explicit uzasadnienie w layout-plan.typography_map.notes"
+      severity: warn
+    - id: cormorant-inter-bundle
+      pattern: "Cormorant + Inter bez typography_map"
+      severity: fail
+    - id: italic-quote-serif
+      pattern: "duży italic blockquote w kolorze burgund — wygląda jak AI beauty template"
+      fix: "mono uppercase lub display bez kursywy"
+      severity: warn
+    - id: inter-plain-lead
+      pattern: "hero-lead / tagline / długi akapit w samym Inter 400 — neutralny sans bez charakteru"
+      fix: "DM Sans, Manrope, Instrument Sans, mono, lub display w mniejszym cut"
+      severity: fail
+  interactions:
+    - id: deprecated-triple
+      bundle: [scroll-reveal, origin-button, letter-hover]
+      max_per_3_landings: 1
+      severity: fail
+    - id: hero-parallax
+      effect: effect-16
+      severity: fail
+    - id: text-cycle-spam
+      effect: effect-05
+      max_per_project: 1
+      severity: warn
+  images:
+    - id: inspiration-reuse-as-final
+      pattern: "użycie plików z references/inspiration/* jako final assets na stronie"
+      fix: "generuj nowe obrazy na każdy job; references tylko do kierunku stylu"
+      severity: fail
+    - id: dark-on-dark-card
+      pattern: "ciemne zdjęcie w ostrej karcie na ciemnym tle"
+      fix: "blend / gradient mask"
+    - id: off-center-portrait
+      pattern: "twarz ucięta przez object-fit bez object-position"
+    - id: text-on-image
+      pattern: "napisy PACKSHOT/STILL LIFE/watermark na zdjęciu lub figcaption overlay"
+      severity: fail
+    - id: duplicate-shot-composition
+      pattern: "dwa kadry tego samego typu (np. poziomy packshot washi) z innymi rekwizytami"
+      severity: fail
+    - id: duplicate-image-on-page
+      pattern: "ten sam plik obrazu w więcej niż jednej sekcji HTML landingu"
+      fix: "każde ujęcie photoshoot raz; product packshot tylko w collection; gallery = inne kadry"
+      severity: fail
+    - id: lumera-navy-drift
+      pattern: "granat/navy/gold foil wine/deep_luxury na jobie lumera-*"
+      applies_to: [lumera-landing, lumera, vitamin-serum, night-renewal-oil]
+      fix: "Night Oil = black/red studio jak Serum; inspiration_ref 01-bold-red; products/lumera-brand.yaml"
+      severity: fail
+    - id: lumera-warm-organic-drift
+      pattern: "warm_organic na lumera — piasek, sage, asset-03, story+texture-bg z innej marki"
+      applies_to: [lumera-landing, lumera, vitamin-serum, night-renewal-oil]
+      severity: fail
+    - id: lumera-encre-archetype-drift
+      pattern: "lumera-commercial zamienione na readymag-slides / ENCRE copy bez brand_lock"
+      severity: warn
+    - id: red-bw-default-drift
+      pattern: "anchor i style_ref domyślnie red/BW bez briefu lub bez mockup photo grade"
+      fix: "pick-photo-grade.py + rotacja palette_family + check-image-variability.py"
+      severity: fail
+
+# ─── Macierz zmienności (guard against repetition) ───
+variability_matrix:
+  lookback_jobs: 3
+  sources:
+    recent_plans: "outputs/pages/*/layout-plan.json"
+    recent_manifests: "outputs/images/*/manifest.json"
+
+  typography:
+    rule: "pairing_id lub heading_font+body_font nie powtarzać 2× z rzędu"
+    rotate_from: profiles/typography-pairings.yaml
+    prefer_editorial: [editorial-red-impact, mono-architect, nocturne-luxury]
+    avoid_consecutive: [soft-beauty]
+
+  archetype:
+    field: layout_archetype  # fallback: layout_mode w starszych planach
+    rule: "inny archetyp niż poprzednie 2 joby (chyba że user explicit repeat)"
+    diversity_target: "5 archetypów z layout-archetypes.yaml w rotacji"
+
+  interaction_set:
+    source: profiles/interaction-sets.yaml
+    rule: "ten sam interaction_set max 1× na 3 landings"
+    no_consecutive_same: true
+
+  template_mix:
+    rule: "min 3 templateów; ≥1 template nowy względem poprzedniego joba (jeśli pool ≥5)"
+    overlap_max_with_previous: 2
+
+  section_recipe:
+    rule: "kolejność section_plan.id nie może być identyczna z poprzednimi 2 jobami"
+    compare_fields: [id, template_source]
+
+  layout_ref:
+    rule: "ten sam layout_ref max 1× na lookback_jobs — rotuj pick-layout-mockup.py"
+    source: scripts/pick-layout-mockup.py
+
+  scroll_mode:
+    rule: "rotuj viewport-sections | vertical | case-study-long gdy możliwe"
+
+# ─── Reguły kreatywności (novelty vs safe) ───
+creativity_rules:
+  novelty:
+    encourage:
+      - "nowy template w mixie względem ostatnich jobów"
+      - "asymetryczny hero inny niż poprzedni golden"
+      - "inny interaction_set z rotation_rule"
+      - "różne inspiration_ref themes per shot (nie ten sam folder 8×)"
+    safe_repeat_ok:
+      - "footer cosgral.design"
+      - "product lock workflow"
+      - "numeracja sekcji (01) gdy pasuje do archetypu"
+  balance:
+    - "Novelty NIE może obniżyć głębokości poniżej tier_s benchmark"
+    - "Batch >2 landings = tylko MVP z WARN concept-guardian (nie PASS creative)"
+
+# ─── Scoring (concept-guardian) ───
+scoring:
+  pass: 70
+  warn: 55
+  fail_below: 55
+  dimensions:
+    - id: vision_alignment
+      weight: 25
+      asks: "Czy przypomina tier_s (LUMÉRA/SOLACE), nie rejected_patterns?"
+    - id: depth_and_structure
+      weight: 20
+      asks: "Sekcje, scroll, template mix — głębokość nie MVP?"
+    - id: variability
+      weight: 25
+      asks: "Typografia, archetyp, interakcje, recipe ≠ ostatnie 2 joby?"
+    - id: creative_images
+      weight: 15
+      asks: "Art assets, różnorodność tematów, paleta spójna?"
+    - id: anti_ai_taste
+      weight: 15
+      asks: "Bez beauty-serif default, symetrii wszędzie, deprecated interaction bundle?"
+
+# ─── Bramki w pipeline (kiedy uruchamiać) ───
+gates:
+  A_plan_review:
+    after: layout-planner
+    before: image-generator
+    focus: [variability_matrix, section_depth, archetype_fit, typography_rotation]
+    can_block: true
+  B_assets_review:
+    after: image-generator
+    before: page-exporter
+    optional: true
+    focus: [user_vision.image_creativity, art_asset_types, palette_cohesion]
+    can_block: false
+  C_final_delivery:
+    after: page-exporter
+    before: user_handoff
+    focus: [vision_alignment, depth_vs_golden, anti_patterns, full_scoring]
+    can_block: true
+    runs_with: style-qa
+    note: "style-qa = proces; concept-guardian = kreatywność. Oba przed delivery."

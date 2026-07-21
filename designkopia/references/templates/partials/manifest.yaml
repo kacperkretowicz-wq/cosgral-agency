@@ -1,0 +1,56 @@
+# Mapowanie: template_id + section_type → partial HTML
+# page-exporter / assemble-section.py: składaj sekcje zamiast pisać od zera
+
+version: "1"
+placeholder_syntax: "{{key}}"
+
+# section_type = type lub id z profiles/templates/*.yaml sections[]
+partials:
+  spector:
+    hero: spector/hero.html
+    manifesto: spector/manifesto.html
+    services: spector/services-row.html
+    process: spector/process-four.html
+  ordina:
+    hero: ordina/hero-split.html
+    features: ordina/feature-blocks.html
+  makos:
+    hero: makos/desktop-shell.html
+    portfolio: makos/project-tiles.html
+  fabrica:
+    hero: fabrica/editorial-hero.html
+    lookbook: fabrica/lookbook-row.html
+  grid-editorial:
+    portfolio: grid-editorial/masonry.html
+    gallery: grid-editorial/masonry.html
+  kirk:
+    products: kirk/product-cards.html
+    portfolio: kirk/project-index.html
+  portfolite:
+    portfolio: portfolite/works-grid.html
+    footer: portfolite/footer.html
+  salient:
+    hero: salient/hero-asymmetric.html
+    cta: salient/cta-split.html
+  luzia:
+    features: luzia/feature-list.html
+    faq: luzia/faq-accordion.html
+  cta-minimal:
+    cta: cta-minimal/block.html
+  daniel:
+    hero: daniel/craft-hero.html
+  hero-minimal:
+    hero: hero-minimal/product-first.html
+  zentry:
+    hero: zentry/hero-immersive.html
+  majd:
+    gallery: majd/editorial-mosaic.html
+  vidhub:
+    hero: vidhub/video-hub.html
+
+fallback:
+  default: _shared/section-shell.html
+
+assemble:
+  script: scripts/assemble-section.py
+  example: python scripts/assemble-section.py kirk project-index --vars vars.json

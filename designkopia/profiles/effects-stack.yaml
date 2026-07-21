@@ -1,0 +1,239 @@
+# ─────────────────────────────────────────────────────────────────────────
+# EFFECTS / TECH ARSENAL — co system ma "w zanadrzu" dla stron na poziomie
+# voyeurverite / jackandai / parhouse / blueprintapps / trovearchive.
+#
+# Czytają: framer-effects-researcher, motion-director, motion-implementer.
+# Cel: agent motion zna technikę -> wie KTÓRĄ biblioteką ją zrobić w stacku
+# docelowym (React/Next + Framer) i którą stronę-referencję naśladuje.
+#
+# Detekcja stacku referencji = orientacyjna (markdown audit). Confidence oznaczony.
+# Pełna forensyka: BuiltWith/Wappalyzer lub Chrome DevTools na żywej stronie.
+# Audyt opisowy: references/web-audits/advanced-effects-arsenal-2026-06.md
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "1"
+updated_at: "2026-06-26"
+
+# ── STACK DOCELOWY (decyzja usera 26-06-2026) ────────────────────────────
+target_stack:
+  framework: "Next.js (App Router) + React + TypeScript"
+  styling: "Tailwind CSS (zgodne z efekty.txt) + CSS vars"
+  smooth_scroll: "Lenis (lenis/react: <ReactLenis root>)"
+  animation_core: "Framer Motion (komponentowe, whileInView, layout, AnimatePresence)"
+  animation_timeline: "GSAP + ScrollTrigger (pinning, scrub, sekwencje, horizontal scroll)"
+  three_d: "Three.js + React Three Fiber (@react-three/fiber) + drei"
+  three_d_nocode: "Spline (@splinetool/react-spline) — tylko z gotowym asset URL"
+  shaders_image: "OGL lub raw GLSL (dystorsja obrazu na hover/scroll)"
+  text: "split-type (split na litery/słowa) + Framer stagger"
+  carousel: "Embla Carousel"
+  transitions: "Framer Motion AnimatePresence / next-view-transitions"
+  physics_optional: "matter.js / @react-three/rapier (ruchome kształty z kolizją)"
+
+# ── TIERY ZAAWANSOWANIA (dobierane do PRZEKAZU marki — wizja pkt 10) ──────
+# Nie każda strona ma być parhouse. Tier wybiera concept-ideation / motion-director.
+tiers:
+  minimal:
+    feel: "spokój, luksus, „mindful” — ruch dyskretny, nie kradnie uwagi"
+    reference: trovearchive.com
+    techniques: [smooth-scroll, scroll-reveal-stagger, sticky-collapse-nav, image-progressive-reveal, hover-scale-soft]
+    when: "luksus/wellness/produkt premium gdzie cisza = jakość"
+  content:
+    feel: "gęsta treść, dane, dowód społeczny — motion służy czytelności"
+    reference: blueprintapps.io
+    techniques: [smooth-scroll, scroll-reveal-stagger, number-count-up, marquee-logos, embla-carousel, video-inline, sticky-collapse-nav, comparison-table]
+    when: "SaaS/B2B/usługi — dużo sekcji, metryki, case’y, mało WOW"
+  editorial_motion:
+    feel: "redakcyjny rytm + świadoma choreografia scrolla — agencyjny standard"
+    reference: [jackandai.com, voyeurverite.com]
+    techniques: [smooth-scroll, pinned-scroll-sequence, masked-image-reveal, parallax-layers, text-split-reveal, marquee-logos, magnetic-button, custom-cursor, page-transition, scroll-scrubbed-video, sticky-collapse-nav]
+    when: "marki, portfolio, kampanie, beauty/brand — narracja + gracja"
+  experimental:
+    feel: "WOW, artystyczny, ruchome kształty, 3D/WebGL — najwyższa półka"
+    reference: parhouse.agency
+    techniques: [smooth-scroll, webgl-image-distortion, r3f-scene, shader-gradient-bg, moving-shapes-physics, horizontal-scroll-pin, scroll-scrubbed-canvas, page-transition, custom-cursor, text-split-reveal]
+    when: "studio/manifesto/marka która SPRZEDAJE wrażeniem; budżet na ciężkie efekty"
+
+# ── KATALOG TECHNIK (technika -> biblioteka -> recepta -> referencja) ─────
+# complexity: low | mid | high   perf: koszt wydajności
+techniques:
+
+  smooth-scroll:
+    what: "Płynny, „ciężki” scroll inercyjny — baza pod wszystkie efekty scroll."
+    implement: "Lenis — <ReactLenis root> na layoutcie; spina się z GSAP ScrollTrigger przez lenis.on('scroll', ScrollTrigger.update)."
+    reference: [jackandai.com, voyeurverite.com, parhouse.agency]
+    complexity: low
+    perf: tani
+    notes: "Wyłącz dla prefers-reduced-motion. Bez tego scroll-efekty wyglądają „tanio”."
+
+  scroll-reveal-stagger:
+    what: "Wejścia elementów przy wjeździe w viewport, z opóźnieniem kaskadowym."
+    implement: "Framer Motion: motion.div initial/whileInView + transition staggerChildren. (NIE każdy .reveal tym samym — antywzorzec)."
+    reference: [jackandai.com, trovearchive.com]
+    complexity: low
+    perf: tani
+
+  pinned-scroll-sequence:
+    what: "Sekcja „przyklejona” na ekranie, treść/kroki 01–04 zmieniają się ze scrollem."
+    implement: "GSAP ScrollTrigger pin: true + scrub; albo Framer useScroll + sticky. Sygnaturowy efekt „HOW WE CREATE 001–004”."
+    reference: [jackandai.com, voyeurverite.com]
+    complexity: mid
+    perf: średni
+
+  masked-image-reveal:
+    what: "Obraz odsłaniany maską/clip-path zsynchronizowaną ze scrollem (nie zwykły fade)."
+    implement: "Framer Motion clipPath + useScroll, lub GSAP clip-path/scaleY na owrapie. Często z parallaxem wewnątrz maski."
+    reference: jackandai.com
+    complexity: mid
+    perf: średni
+
+  parallax-layers:
+    what: "Warstwy (tło/produkt/tekst) suną z różną prędkością przy scrollu."
+    implement: "Framer useScroll + useTransform na y; albo Lenis data-speed. Zakaz hero-parallax #16 (antywzorzec z generation-process)."
+    reference: jackandai.com
+    complexity: low
+    perf: tani
+
+  text-split-reveal:
+    what: "Nagłówek wjeżdża per litera/słowo/linia (mega-type editorial)."
+    implement: "split-type -> Framer/GSAP stagger na chars/words. Pasuje do jakościowej typografii (anti-AI)."
+    reference: [voyeurverite.com, parhouse.agency]
+    complexity: mid
+    perf: tani
+
+  text-scramble-decode:
+    what: "Litery dekodują się z losowego szumu do finalnego tekstu (sygnaturowy „wow” na hero/label)."
+    implement: "web/lib/effects/TextScramble.tsx — raw RAF, trigger inView/hover/mount, reduced-motion safe, bez zależności."
+    reference: [voyeurverite.com, awwwards-grade]
+    complexity: mid
+    perf: tani
+    notes: "Autorski efekt biblioteki (nie klon referencji). Dodany przez effect-smith 2026-06-26."
+
+  marquee-logos:
+    what: "Nieskończona, płynąca taśma logo/klientów lub słów."
+    implement: "CSS keyframes translateX + duplikat treści; albo Framer useAnimationFrame. Snippet już istnieje (marquee-logos)."
+    reference: jackandai.com
+    complexity: low
+    perf: tani
+
+  magnetic-button:
+    what: "Przycisk/element „przyciąga się” do kursora w pobliżu."
+    implement: "Framer Motion useMotionValue + spring na offset od kursora; albo GSAP quickTo."
+    reference: parhouse.agency
+    complexity: mid
+    perf: tani
+
+  custom-cursor:
+    what: "Własny kursor: kropka + pierścień, stany hover, „view/drag”."
+    implement: "Framer Motion follower (spring) + mix-blend-mode; ukryj na touch."
+    reference: [jackandai.com, parhouse.agency]
+    complexity: mid
+    perf: tani
+
+  page-transition:
+    what: "Płynne przejście między podstronami (zasłona/morph/fade), bez „mignięcia”."
+    implement: "Framer Motion AnimatePresence + next-view-transitions (App Router). Dla nie-React: Barba.js."
+    reference: voyeurverite.com
+    complexity: high
+    perf: średni
+
+  scroll-scrubbed-video:
+    what: "Wideo/sekwencja klatek przewija się scrollem (hero filmowy)."
+    implement: "GSAP ScrollTrigger scrub na video.currentTime lub canvas image-sequence. Ciężkie — preload."
+    reference: voyeurverite.com
+    complexity: high
+    perf: drogi
+
+  number-count-up:
+    what: "Liczniki metryk (5%, 94%) animują się od 0 przy wjeździe."
+    implement: "Framer Motion animate(count) + useInView."
+    reference: blueprintapps.io
+    complexity: low
+    perf: tani
+
+  embla-carousel:
+    what: "Karuzela case’ów/opinii z bezwładnością i snapem."
+    implement: "Embla Carousel (embla-carousel-react) + autoplay plugin."
+    reference: [blueprintapps.io, trovearchive.com]
+    complexity: low
+    perf: tani
+
+  video-inline:
+    what: "Pętle wideo w kafelkach/hero z play-state, lazy."
+    implement: "<video> muted loop playsInline + IntersectionObserver play/pause."
+    reference: blueprintapps.io
+    complexity: low
+    perf: średni
+
+  sticky-collapse-nav:
+    what: "Nav trzyma się góry i zwęża/zmienia po scrollu."
+    implement: "Framer useScroll + state; albo IntersectionObserver na hero."
+    reference: [voyeurverite.com, jackandai.com]
+    complexity: low
+    perf: tani
+
+  horizontal-scroll-pin:
+    what: "Sekcja przewija się poziomo wewnątrz pionowego scrolla."
+    implement: "ZROBIONE: web/lib/effects/HorizontalScrollPin.tsx (GSAP ScrollTrigger pin + translateX)."
+    reference: parhouse.agency
+    complexity: high
+    perf: średni
+
+  webgl-image-distortion:
+    what: "Obraz faluje/zniekształca się na hover lub przy scrollu (shader)."
+    implement: "ZROBIONE: web/lib/effects/WebGLImageDistortion.tsx (OGL) — ripple displacement + RGB-split na hover."
+    reference: parhouse.agency
+    complexity: high
+    perf: drogi
+
+  r3f-scene:
+    what: "Interaktywna scena 3D / model reagujący na scroll/mysz."
+    implement: "React Three Fiber + drei (useScroll, Float, Environment). Max 1 ciężka scena/stronę."
+    status: "ODŁOŻONE — three/@react-three/fiber/drei = konflikt peer-deps (ERESOLVE). OGL pokrywa shadery 2D bez R3F; R3F dodać osobno gdy potrzebna geometria 3D."
+    reference: parhouse.agency
+    complexity: high
+    perf: drogi
+
+  shader-gradient-bg:
+    what: "Żywe, płynące tło gradientowe/mesh (zamiast statycznego koloru)."
+    implement: "ZROBIONE: web/lib/effects/ShaderGradientBg.tsx (OGL) — fbm-noise mesh mieszający tokeny --bg/--accent/--surface."
+    reference: [parhouse.agency, voyeurverite.com]
+    complexity: mid
+    perf: średni
+
+  moving-shapes-physics:
+    what: "Pływające/odbijające się kształty, blobki, dymki — „ruch kształtów z gracją” (wizja pkt 6,9)."
+    implement: "SVG/blob + Framer (useTime, drift) dla lekkich; matter.js / rapier dla kolizji i grawitacji."
+    reference: [voyeurverite.com, parhouse.agency]
+    complexity: mid
+    perf: średni
+    notes: "To bezpośrednio realizuje 'przesuwanie kształtów po stronie' + dymki/półprzezroczystości z wizji."
+
+  image-progressive-reveal:
+    what: "Placeholder/blur -> ostry obraz przy ładowaniu (luksusowy, spokojny)."
+    implement: "next/image placeholder=blur; albo LQIP + opacity transition."
+    reference: [trovearchive.com, parhouse.agency]
+    complexity: low
+    perf: tani
+
+  hover-scale-soft:
+    what: "Delikatne scale/opacity/translate na kartach i CTA."
+    implement: "Framer whileHover; spring miękki, krótki dystans."
+    reference: trovearchive.com
+    complexity: low
+    perf: tani
+
+  grain-noise-overlay:
+    what: "Subtelne ziarno/szum na całej stronie — kino, nie 'flat AI'."
+    implement: "CSS overlay z noise PNG/SVG + mix-blend; albo shader noise."
+    reference: [voyeurverite.com, parhouse.agency]
+    complexity: low
+    perf: tani
+
+# ── ZASADY DOBORU (dla motion-director) ──────────────────────────────────
+selection_rules:
+  - "Tier wybierany do PRZEKAZU marki, nie domyślnie experimental (perf+czas)."
+  - "Min. 1 technika 'charakterystyczna' per landing (poza smooth-scroll i reveal)."
+  - "Max 1 ciężki efekt (r3f-scene / scroll-scrubbed-video / webgl-image-distortion) na stronę."
+  - "Zawsze respektuj prefers-reduced-motion (wariant statyczny)."
+  - "Rotuj efekty między jobami (variability-guardian) — nie ten sam zestaw 3×."
+  - "efekty.txt = surowa biblioteka inspiracji; ten plik = skatalogowana, wpięta wersja."

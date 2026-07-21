@@ -1,0 +1,66 @@
+{
+  "job_slug": "cosgral-agency",
+  "brand": "COSGRAL",
+  "domain": "cosgral.design",
+  "layout_archetype": "studio-manifesto",
+  "scroll_mode": "vertical",
+  "inspiration_mix": {
+    "lead": "voyeurverite",
+    "secondary": ["letsplayfight", "parhouse"]
+  },
+  "typography_map": {
+    "pairing_id": "editorial-red-impact",
+    "display": "Bebas Neue",
+    "body": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "palette": {
+    "bg": "#0A0505",
+    "red": "#E82323",
+    "red_deep": "#8B0F0F",
+    "text": "#F5F0EE",
+    "muted": "#9A8585"
+  },
+  "section_plan": [
+    "preloader",
+    "hero",
+    "manifesto",
+    "services",
+    "work-scroll",
+    "ai-spotlight",
+    "tech-stack",
+    "pillars",
+    "contact"
+  ],
+  "interactions": [
+    "voyeur-scroll-smoother",
+    "voyeur-preloader-001",
+    "voyeur-clip-path-hero-pin",
+    "voyeur-split-text-reveals",
+    "voyeur-mask-section-transition",
+    "voyeur-smooth-anchors",
+    "playfight-pin-scatter-flip",
+    "playfight-webgl-bulge",
+    "playfight-stacked-trail",
+    "playfight-nav-hide",
+    "playfight-typewrite",
+    "playfight-data-anim-para",
+    "parhouse-custom-cursor",
+    "parhouse-swiper-rails",
+    "parhouse-masonry-pin",
+    "parhouse-show-on-scroll",
+    "parhouse-mix-blend-hero",
+    "parhouse-hero-scroll-btn"
+  ],
+  "assets": [
+    {"file": "cosgral-01-hero-red-eye.png", "role": "hero", "object_position": "center 35%"},
+    {"file": "cosgral-02-manifesto-texture.png", "role": "atmosphere", "object_position": "center center"},
+    {"file": "cosgral-03-service-web.png", "role": "service", "object_position": "center center"},
+    {"file": "cosgral-04-service-ai-model.png", "role": "service", "object_position": "center top"},
+    {"file": "cosgral-05-service-ai-product.png", "role": "service", "object_position": "center center"},
+    {"file": "cosgral-06-work-editorial-bw.png", "role": "work", "object_position": "center center"},
+    {"file": "cosgral-07-work-grid-wall.png", "role": "work", "object_position": "center center"},
+    {"file": "cosgral-08-reels-motion.png", "role": "motion", "object_position": "center center"},
+    {"file": "cosgral-09-studio-bts.png", "role": "about", "object_position": "center 40%"}
+  ]
+}

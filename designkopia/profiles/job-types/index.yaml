@@ -1,0 +1,88 @@
+# Taksonomia typów jobów — każdy ma research lane + shot brief + pipeline
+
+version: "1"
+updated_at: "2026-06-24"
+
+# Klasyfikacja na starcie (design-orchestrator / domain-strategist)
+classification_hints:
+  agency_portfolio: [agencja, agency, studio, portfolio, case study, branding studio]
+  product_brand: [produkt, SKU, packshot, serum, cosmetics, lip pencil]
+  automotive_campaign: [samochód, auto, automotive, EV, dealer, campaign]
+  fashion_retail: [fashion, lookbook, kolekcja, retail, butik]
+  ecommerce_shop: [sklep, shop, e-commerce, kolekcja, cart, checkout]
+  food_beverage: [food, napój, restaurant, FMCG, bottle]
+  saas_tech: [SaaS, app, software, startup, dashboard]
+  photographer_portfolio: [fotograf, photographer, gallery, prints]
+
+types:
+  agency_portfolio:
+    brief: profiles/job-types/agency-portfolio.yaml
+    research_lane: profiles/research-lanes/agency.yaml
+    subject_refs: references/agency-content/
+    style_refs: references/style-dna/
+    strategist: agency-strategist
+    media_gate: scripts/check-agency-shots.py
+    product_lock: false
+
+  product_brand:
+    brief: profiles/job-types/product-brand.yaml
+    atmosphere_brief: profiles/job-types/brand-atmosphere-shots.yaml
+    research_lane: profiles/research-lanes/product.yaml
+    subject_refs: products/<slug>/product.yaml
+    style_refs: references/style-dna/
+    strategist: domain-strategist
+    media_gate: scripts/check-brand-shots.py
+    plan_atmosphere: scripts/plan-brand-shots.py
+    product_lock: true
+
+  automotive_campaign:
+    brief: profiles/job-types/automotive-campaign.yaml
+    research_lane: profiles/research-lanes/automotive.yaml
+    subject_refs: references/subject-lanes/automotive/
+    style_refs: references/style-dna/
+    strategist: domain-strategist
+    product_lock: false
+
+  fashion_retail:
+    brief: profiles/job-types/fashion-retail.yaml
+    research_lane: profiles/research-lanes/fashion-retail.yaml
+    subject_refs: references/subject-lanes/fashion/
+    style_refs: references/style-dna/
+    strategist: domain-strategist
+    product_lock: false
+
+  ecommerce_shop:
+    brief: profiles/job-types/ecommerce-shop.yaml
+    research_lane: profiles/research-lanes/ecommerce.yaml
+    subject_refs: references/subject-lanes/retail/
+    style_refs: references/style-dna/
+    strategist: domain-strategist
+    product_lock: partial
+
+  food_beverage:
+    brief: profiles/job-types/food-beverage.yaml
+    research_lane: profiles/research-lanes/food-beverage.yaml
+    subject_refs: references/subject-lanes/food-beverage/
+    style_refs: references/style-dna/
+    strategist: domain-strategist
+    product_lock: true
+
+  saas_tech:
+    brief: profiles/job-types/saas-tech.yaml
+    research_lane: profiles/research-lanes/saas.yaml
+    subject_refs: references/subject-lanes/saas/
+    style_refs: references/style-dna/
+    strategist: domain-strategist
+    product_lock: false
+
+  photographer_portfolio:
+    brief: profiles/job-types/photographer-portfolio.yaml
+    research_lane: profiles/research-lanes/photographer.yaml
+    subject_refs: references/subject-lanes/photography/
+    style_refs: references/style-dna/
+    strategist: domain-strategist
+    product_lock: false
+
+pipelines:
+  agency_portfolio: agency_full_v3
+  default: standard_full_v3

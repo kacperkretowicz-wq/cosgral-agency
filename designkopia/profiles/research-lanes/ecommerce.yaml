@@ -1,0 +1,17 @@
+# Research lane — sklep / e-commerce multi-product
+
+lane_id: ecommerce_shop
+search_targets:
+  web:
+    - type: shop_grid
+      look_for: [collection grid, filters, product card, cart CTA]
+    - type: brand_shop_editorial
+      look_for: [campaign + shop hybrid, category tiles]
+  typography:
+    - prefer: [commercial sans, clear hierarchy, mono for price/sku]
+  visual_subject:
+    - folder: references/subject-lanes/retail/
+      look_for: [multi product grid, lifestyle bundle, packaging lineup, store shelf]
+  visual_style:
+    - folder: references/style-dna/composition/
+      prefer: [grid, flatlay]

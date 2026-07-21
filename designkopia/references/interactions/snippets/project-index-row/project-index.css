@@ -1,0 +1,50 @@
+.project-index { max-width: var(--max, 1280px); margin: 0 auto; width: 100%; }
+
+.index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.index-list li { border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+
+.project-link {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 1.35rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.index-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 500;
+}
+
+.index-meta {
+  font-family: var(--mono, monospace);
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.view-project {
+  font-family: var(--mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.3s, transform 0.3s, color 0.3s;
+}
+
+.project-link:hover .view-project {
+  opacity: 1;
+  transform: none;
+  color: var(--accent, var(--burgundy));
+}

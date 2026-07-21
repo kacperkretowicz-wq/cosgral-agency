@@ -1,0 +1,92 @@
+# style-dna — JAK wygląda kadr (światło, paleta, kompozycja, grade)
+# NIGDY nie kopiuj tematu/subject z tych plików przy GenerateImage.
+# W manifeście joba: style_ref + style_dimensions; subject z product.yaml / agency-content.
+
+version: "1"
+updated_at: "2026-06-24"
+
+rules:
+  use_for: [lighting, palette, composition, grade, contrast, grain, dof]
+  forbidden_as: [final_asset, subject_copy, agency_portfolio_subject]
+  prompt_rule: >
+    Wyciągnij wyłącznie style_dimensions z wpisu. Temat ujęcia zawsze z shot_brief joba.
+  agency_jobs:
+    subject_from: references/agency-content/manifest.yaml
+    style_from: references/style-dna/manifest.yaml
+
+folders:
+  lighting:
+    description: Kierunek światła, chiaroscuro, rim, motion
+  palette:
+    description: Dominanta kolorystyczna — nie temat przedmiotu
+  composition:
+    description: Układ kadru, negative space, flatlay geometry
+  grade:
+    description: Retusz, tekstura, macro feel — nie beauty jako temat agencji
+
+images:
+  - file: lighting/hard-directional-red-portrait.png
+    style_dimensions: [hard_directional, chiaroscuro, low_angle]
+    palette_family: bold_red
+  - file: lighting/chiaroscuro-intimate-red-gel.png
+    style_dimensions: [chiaroscuro, cinematic_gel, intimate]
+    palette_family: bold_red
+  - file: lighting/bw-motion-rim-light.png
+    style_dimensions: [bw, motion_blur, rim_light]
+    palette_family: bw_editorial
+  - file: lighting/cinematic-red-gel-portrait.png
+    style_dimensions: [cinematic_gel, hard_shadow]
+    palette_family: bold_red
+
+  - file: palette/warm-orange-terracotta-still.png
+    style_dimensions: [warm_orange, terracotta, cream]
+    palette_family: warm_orange
+  - file: palette/aqua-orange-aerial.png
+    style_dimensions: [aqua_orange, turquoise, punchy_accent]
+    palette_family: aqua_orange
+  - file: palette/cerulean-white-splash.png
+    style_dimensions: [cerulean_white, airy, high_key]
+    palette_family: cerulean_white
+  - file: palette/editorial-red-hero-field.png
+    style_dimensions: [bold_red, saturated_field]
+    palette_family: bold_red
+  - file: palette/monochrome-red-product-tilt.png
+    style_dimensions: [bold_red, product_hero_angle]
+    palette_family: bold_red
+  - file: palette/orange-editorial-product-angle.png
+    style_dimensions: [warm_orange, product_tilt]
+    palette_family: warm_orange
+
+  - file: composition/clinical-flatlay-grey-grid.png
+    style_dimensions: [flatlay, cool_grey, clinical_spacing]
+    palette_family: cool_grey
+    forbidden_for: [agency_portfolio_subject]
+  - file: composition/bw-geometric-still-life.png
+    style_dimensions: [geometric, graphic_shadow, bw]
+    palette_family: bw_editorial
+
+  - file: grade/dewy-wet-look-macro.png
+    style_dimensions: [dewy, wet_look, macro_texture]
+    forbidden_for: [agency_portfolio_subject]
+  - file: grade/gloss-peach-macro.png
+    style_dimensions: [gloss, peach_nude, macro]
+    forbidden_for: [agency_portfolio_subject]
+  - file: grade/warm-playful-macro-freckles.png
+    style_dimensions: [warm_natural, playful, summer]
+    forbidden_for: [agency_portfolio_subject]
+  - file: grade/clean-marble-lifestyle-grade.png
+    style_dimensions: [white_pink, clean, marble]
+    forbidden_for: [agency_portfolio_subject]
+  - file: grade/bw-serene-profile-grade.png
+    style_dimensions: [bw_editorial, serene, texture]
+    palette_family: bw_editorial
+  - file: grade/luxury-macro-skin-device.png
+    style_dimensions: [macro, luxury, device]
+  - file: grade/fashion-profile-gold-rim.png
+    style_dimensions: [profile, gold_rim, knit_texture]
+
+  # agency-content file też jako style (palette) — jeden plik, dwa odczyty
+  - file: ../agency-content/campaigns/fashion-campaign-red-mirror.png
+    style_dimensions: [bold_red, gold_accent, mirror_reflection]
+    palette_family: bold_red
+    linked_subject: agency-content/campaigns/fashion-campaign-red-mirror.png

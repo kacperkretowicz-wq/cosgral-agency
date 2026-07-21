@@ -1,0 +1,32 @@
+/* Project index fan — effect-17 inspired, pure CSS/JS (no GSAP) */
+
+.index-fan-wrap {
+  perspective: 1200px;
+}
+
+.index-fan-wrap .project-link {
+  display: grid;
+  grid-template-columns: 72px 1.2fr 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  transition: transform 420ms cubic-bezier(0.4, 0.24, 0.4, 1), opacity 320ms;
+  transform-origin: left center;
+}
+
+.index-fan-wrap.is-fan-active .project-link {
+  opacity: 0.72;
+}
+
+.index-fan-wrap.is-fan-active .project-link.is-fan-focus {
+  opacity: 1;
+  transform: rotateY(-4deg) translateX(8px) scale(1.01);
+  z-index: 2;
+}
+
+.index-fan-wrap.is-fan-active .project-link.is-fan-above {
+  transform: rotateX(6deg) translateY(-4px);
+}
+
+.index-fan-wrap.is-fan-active .project-link.is-fan-below {
+  transform: rotateX(-6deg) translateY(4px);
+}

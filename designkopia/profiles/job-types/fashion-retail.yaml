@@ -1,0 +1,49 @@
+version: "1"
+job_type: fashion_retail
+product_lock: false
+
+description: >
+  Fashion / lookbook + shop. Blue Marble = garment-as-hero thumbnails.
+  Travel Agency = collage hero + collection hub — nie recycle atmosphere w shop.
+
+required_shot_roles:
+  min_count: 10
+  roles:
+    - id: garment_flatlay
+      label: Ubranie solo — flatlay / wieszak
+      product_presence: garment_only
+      ui_use: [shop_thumbnail, product_card]
+      forbidden: [same_file_as_campaign_editorial]
+
+    - id: garment_worn_crop
+      label: Produkt na ciele — crop bez twarzy lub z daleka
+      product_presence: garment_hero
+      ui_use: [shop_thumbnail, category_hero]
+
+    - id: garment_detail
+      label: Macro szwu / tkaniny na produkcie
+      ui_use: [product_detail, spec_band]
+
+    - id: campaign_editorial
+      label: Kampania — osoba / scena (aging OK)
+      ui_use: [hero, lookbook_feature]
+      max_reuse_on_page: 1
+
+    - id: atmosphere_texture
+      label: Tło / tekstura / blur
+      ui_use: [section_bg]
+      max_reuse_on_page: 1
+
+    - id: muse_portrait
+      label: Portret muse (55–75)
+      ui_use: [about, brand_story]
+      max_reuse_on_page: 1
+
+gates:
+  max_png_reuse_per_job: 1
+  shop_must_use_garment_roles: true
+  check_script: scripts/check-used-assets.py
+
+reference_patterns:
+  shop_skin: bluemarbleparis.com
+  layout_skeleton: travelagency.agency

@@ -1,0 +1,2934 @@
+1. // component.tsx
+'use client';
+import { ReactLenis } from 'lenis/react';
+import React, { forwardRef } from 'react';
+
+const Component = forwardRef<HTMLElement>((props, ref) => {
+  return (
+    <ReactLenis root>
+      <main className='bg-black' ref={ref}>
+        <div className='wrapper'>
+          <section className='text-white  h-screen  w-full bg-slate-950  grid place-content-center sticky top-0'>
+            <div className='absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:54px_54px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]'></div>
+
+            <h1 className='2xl:text-7xl text-5xl px-8 font-semibold text-center tracking-tight leading-[120%]'>
+              Create Gallery In a Better Way
+              <br />
+              Using CSS sticky properties <br />
+              Scroll down! 👇
+            </h1>
+          </section>
+        </div>
+
+        <section className='text-white   w-full bg-slate-950  '>
+          <div className='grid grid-cols-12 gap-2'>
+            <div className='grid gap-2 col-span-4'>
+              <figure className=' w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1718838541476-d04e71caa347?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className=' w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1715432362539-6ab2ab480db2?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className=' w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1718601980986-0ce75101d52d?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1685904042960-66242a0ac352?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1719411182379-ffd97c1f7ebf?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+            </div>
+            <div className='sticky top-0 h-screen w-full col-span-4 gap-2  grid grid-rows-3'>
+              <figure className='w-full h-full '>
+                <img
+                  src='https://images.unsplash.com/photo-1718969604981-de826f44ce15?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 h-full w-full  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full h-full '>
+                <img
+                  src='https://images.unsplash.com/photo-1476180814856-a36609db0493?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 h-full w-full align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full h-full '>
+                <img
+                  src='https://images.unsplash.com/photo-1595407660626-db35dcd16609?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 h-full w-full  align-bottom object-cover rounded-md '
+                />
+              </figure>
+            </div>
+            <div className='grid gap-2 col-span-4'>
+              <figure className='w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1719547907790-f661a88302c2?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1599054799131-4b09c73a63cf?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1719963532023-01b573d1d584?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1714328101501-3594de6cb80f?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+              <figure className='w-full'>
+                <img
+                  src='https://images.unsplash.com/photo-1719554873571-0fd6bf322bb1?w=500&auto=format&fit=crop'
+                  alt=''
+                  className='transition-all duration-300 w-full h-96  align-bottom object-cover rounded-md '
+                />
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <footer className='group bg-slate-950 '>
+          <h1 className='text-[16vw]  translate-y-20 leading-[100%] uppercase font-semibold text-center bg-gradient-to-r from-gray-400 to-gray-800 bg-clip-text text-transparent transition-all ease-linear'>
+            ui-layout
+          </h1>
+          <div className='bg-black h-40 relative z-10 grid place-content-center text-2xl rounded-tr-full rounded-tl-full'></div>
+        </footer>
+      </main>
+    </ReactLenis>
+  );
+});
+
+Component.displayName = 'Component';
+
+export default Component;
+
+
+2. import { MeshGradient } from "@paper-design/shaders-react"
+import { useEffect, useState } from "react"
+
+interface HeroSectionProps {
+  title?: string
+  highlightText?: string
+  description?: string
+  buttonText?: string
+  onButtonClick?: () => void
+  colors?: string[]
+  distortion?: number
+  swirl?: number
+  speed?: number
+  offsetX?: number
+  className?: string
+  titleClassName?: string
+  descriptionClassName?: string
+  buttonClassName?: string
+  maxWidth?: string
+  veilOpacity?: string
+  fontFamily?: string
+  fontWeight?: number
+}
+
+export function HeroSection({
+  title = "Intelligent AI Agents for",
+  highlightText = "Smart Brands",
+  description = "Transform your brand and evolve it through AI-driven brand guidelines and always up-to-date core components.",
+  buttonText = "Join Waitlist",
+  onButtonClick,
+  colors = ["#72b9bb", "#b5d9d9", "#ffd1bd", "#ffebe0", "#8cc5b8", "#dbf4a4"],
+  distortion = 0.8,
+  swirl = 0.6,
+  speed = 0.42,
+  offsetX = 0.08,
+  className = "",
+  titleClassName = "",
+  descriptionClassName = "",
+  buttonClassName = "",
+  maxWidth = "max-w-6xl",
+  veilOpacity = "bg-white/20 dark:bg-black/25",
+  fontFamily = "Satoshi, sans-serif",
+  fontWeight = 500,
+}: HeroSectionProps) {
+  const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const update = () =>
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      })
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [])
+
+  const handleButtonClick = () => {
+    if (onButtonClick) {
+      onButtonClick()
+    }
+  }
+
+  return (
+    <section className={`relative w-full min-h-screen overflow-hidden bg-background flex items-center justify-center ${className}`}>
+      <div className="fixed inset-0 w-screen h-screen">
+        {mounted && (
+          <>
+            <MeshGradient
+              width={dimensions.width}
+              height={dimensions.height}
+              colors={colors}
+              distortion={distortion}
+              swirl={swirl}
+              grainMixer={0}
+              grainOverlay={0}
+              speed={speed}
+              offsetX={offsetX}
+            />
+            <div className={`absolute inset-0 pointer-events-none ${veilOpacity}`} />
+          </>
+        )}
+      </div>
+      
+      <div className={`relative z-10 ${maxWidth} mx-auto px-6 w-full`}>
+        <div className="text-center">
+          <h1
+            className={`font-bold text-foreground text-balance text-4xl sm:text-5xl md:text-6xl xl:text-[80px] leading-tight sm:leading-tight md:leading-tight lg:leading-tight xl:leading-[1.1] mb-6 lg:text-7xl ${titleClassName}`}
+            style={{ fontFamily, fontWeight }}
+          >
+            {title} <span className="text-primary">{highlightText}</span>
+          </h1>
+          <p className={`text-lg sm:text-xl text-white text-pretty max-w-2xl mx-auto leading-relaxed mb-10 px-4 ${descriptionClassName}`}>
+            {description}
+          </p>
+          <button
+            onClick={handleButtonClick}
+            className={`px-6 py-4 sm:px-8 sm:py-6 rounded-full border-4 bg-[rgba(63,63,63,1)] border-card text-sm sm:text-base text-white hover:bg-[rgba(63,63,63,0.9)] transition-colors ${buttonClassName}`}
+          >
+            {buttonText}
+          </button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+3. import React, { useEffect, useRef } from 'react';
+
+// --- FRAGMENT SHADER ---
+// We add a `u_color` uniform to accept a color from our component.
+const fragmentShaderSource = `#version 300 es
+precision highp float;
+out vec4 O;
+uniform float time;
+uniform vec2 resolution;
+uniform vec3 u_color; // <-- The new color uniform
+
+#define FC gl_FragCoord.xy
+#define R resolution
+#define T (time+660.)
+
+float rnd(vec2 p){p=fract(p*vec2(12.9898,78.233));p+=dot(p,p+34.56);return fract(p.x*p.y);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);return mix(mix(rnd(i),rnd(i+vec2(1,0)),u.x),mix(rnd(i+vec2(0,1)),rnd(i+1.),u.x),u.y);}
+float fbm(vec2 p){float t=.0,a=1.;for(int i=0;i<5;i++){t+=a*noise(p);p*=mat2(1,-1.2,.2,1.2)*2.;a*=.5;}return t;}
+
+void main(){
+  vec2 uv=(FC-.5*R)/R.y;
+  vec3 col=vec3(1);
+  uv.x+=.25;
+  uv*=vec2(2,1);
+
+  float n=fbm(uv*.28-vec2(T*.01,0));
+  n=noise(uv*3.+n*2.);
+
+  col.r-=fbm(uv+vec2(0,T*.015)+n);
+  col.g-=fbm(uv*1.003+vec2(0,T*.015)+n+.003);
+  col.b-=fbm(uv*1.006+vec2(0,T*.015)+n+.006);
+
+  // KEY CHANGE: Instead of mixing with white (vec3(1)), we mix with our custom.
+  // This tints the brightest parts of the noise with the color provided by the user.
+  col=mix(col, u_color, dot(col,vec3(.21,.71,.07)));
+
+  col=mix(vec3(.08),col,min(time*.1,1.));
+  col=clamp(col,.08,1.);
+  O=vec4(col,1);
+}`;
+
+// --- RENDERER CLASS ---
+// Updated to handle the new color uniform
+class Renderer {
+  private readonly vertexSrc = "#version 300 es\nprecision highp float;\nin vec4 position;\nvoid main(){gl_Position=position;}";
+  private readonly vertices = [-1, 1, -1, -1, 1, 1, 1, -1];
+  
+  private gl: WebGL2RenderingContext;
+  private canvas: HTMLCanvasElement;
+  private program: WebGLProgram | null = null;
+  private vs: WebGLShader | null = null;
+  private fs: WebGLShader | null = null;
+  private buffer: WebGLBuffer | null = null;
+  private color: [number, number, number] = [0.5, 0.5, 0.5]; // Default to gray
+
+  constructor(canvas: HTMLCanvasElement, fragmentSource: string) {
+    this.canvas = canvas;
+    this.gl = canvas.getContext("webgl2") as WebGL2RenderingContext;
+    this.setup(fragmentSource);
+    this.init();
+  }
+  
+  updateColor(newColor: [number, number, number]) {
+    this.color = newColor;
+  }
+
+  updateScale() {
+    const dpr = Math.max(1, window.devicePixelRatio);
+    const { innerWidth: width, innerHeight: height } = window;
+    this.canvas.width = width * dpr;
+    this.canvas.height = height * dpr;
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  private compile(shader: WebGLShader, source: string) {
+    const gl = this.gl;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      console.error(`Shader compilation error: ${gl.getShaderInfoLog(shader)}`);
+    }
+  }
+
+  reset() {
+    const { gl, program, vs, fs } = this;
+    if (!program) return;
+    if (vs) { gl.detachShader(program, vs); gl.deleteShader(vs); }
+    if (fs) { gl.detachShader(program, fs); gl.deleteShader(fs); }
+    gl.deleteProgram(program);
+    this.program = null;
+  }
+
+  private setup(fragmentSource: string) {
+    const gl = this.gl;
+    this.vs = gl.createShader(gl.VERTEX_SHADER);
+    this.fs = gl.createShader(gl.FRAGMENT_SHADER);
+    const program = gl.createProgram();
+    if (!this.vs || !this.fs || !program) return;
+    this.compile(this.vs, this.vertexSrc);
+    this.compile(this.fs, fragmentSource);
+    this.program = program;
+    gl.attachShader(this.program, this.vs);
+    gl.attachShader(this.program, this.fs);
+    gl.linkProgram(this.program);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+      console.error(`Program linking error: ${gl.getProgramInfoLog(this.program)}`);
+    }
+  }
+
+  private init() {
+    const { gl, program } = this;
+    if (!program) return;
+    this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW);
+    const position = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+    Object.assign(program, {
+      resolution: gl.getUniformLocation(program, "resolution"),
+      time: gl.getUniformLocation(program, "time"),
+      u_color: gl.getUniformLocation(program, "u_color"), // Get location of our new uniform
+    });
+  }
+
+  render(now = 0) {
+    const { gl, program, buffer, canvas } = this;
+    if (!program || !gl.isProgram(program)) return;
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.uniform2f((program as any).resolution, canvas.width, canvas.height);
+    gl.uniform1f((program as any).time, now * 1e-3);
+    gl.uniform3fv((program as any).u_color, this.color); // Send the color to the shader
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+}
+
+// --- UTILITY FUNCTION ---
+// Converts a hex color string like "#FF5733" to an array of floats [r, g, b]
+const hexToRgb = (hex: string): [number, number, number] | null => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? [
+          parseInt(result[1], 16) / 255,
+          parseInt(result[2], 16) / 255,
+          parseInt(result[3], 16) / 255,
+        ]
+      : null;
+};
+
+// --- REACT COMPONENT ---
+interface AnimatedBackgroundProps {
+  smokeColor?: string; // e.g., "#8A2BE2"
+}
+
+export const SmokeBackground: React.FC<SmokeBackgroundProps> = ({ 
+  smokeColor = "#808080" // Default to gray
+}) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const rendererRef = useRef<Renderer | null>(null);
+
+    // Effect for initialization and cleanup
+    useEffect(() => {
+        if (!canvasRef.current) return;
+        const canvas = canvasRef.current;
+        const renderer = new Renderer(canvas, fragmentShaderSource);
+        rendererRef.current = renderer;
+        
+        const handleResize = () => renderer.updateScale();
+        handleResize(); // Initial size
+        window.addEventListener('resize', handleResize);
+        
+        let animationFrameId: number;
+        const loop = (now: number) => {
+            renderer.render(now);
+            animationFrameId = requestAnimationFrame(loop);
+        };
+        loop(0);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+            renderer.reset(); 
+        };
+    }, []);
+    
+    // Effect to update color when the prop changes
+    useEffect(() => {
+        const renderer = rendererRef.current;
+        if (renderer) {
+            const rgbColor = hexToRgb(smokeColor);
+            if (rgbColor) {
+                renderer.updateColor(rgbColor);
+            }
+        }
+    }, [smokeColor]);
+
+    return (
+            <canvas ref={canvasRef} className="w-full h-full block" />
+    );
+};
+
+4."use client"
+
+import { useEffect, useRef } from "react"
+
+declare global {
+  interface Window {
+    THREE: any
+  }
+}
+
+export function ShaderAnimation() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const sceneRef = useRef<{
+    camera: any
+    scene: any
+    renderer: any
+    uniforms: any
+    animationId: number | null
+  }>({
+    camera: null,
+    scene: null,
+    renderer: null,
+    uniforms: null,
+    animationId: null,
+  })
+
+  useEffect(() => {
+    // Load Three.js dynamically
+    const script = document.createElement("script")
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"
+    script.onload = () => {
+      if (containerRef.current && window.THREE) {
+        initThreeJS()
+      }
+    }
+    document.head.appendChild(script)
+
+    return () => {
+      // Cleanup
+      if (sceneRef.current.animationId) {
+        cancelAnimationFrame(sceneRef.current.animationId)
+      }
+      if (sceneRef.current.renderer) {
+        sceneRef.current.renderer.dispose()
+      }
+      document.head.removeChild(script)
+    }
+  }, [])
+
+  const initThreeJS = () => {
+    if (!containerRef.current || !window.THREE) return
+
+    const THREE = window.THREE
+    const container = containerRef.current
+
+    // Clear any existing content
+    container.innerHTML = ""
+
+    // Initialize camera
+    const camera = new THREE.Camera()
+    camera.position.z = 1
+
+    // Initialize scene
+    const scene = new THREE.Scene()
+
+    // Create geometry
+    const geometry = new THREE.PlaneBufferGeometry(2, 2)
+
+    // Define uniforms
+    const uniforms = {
+      time: { type: "f", value: 1.0 },
+      resolution: { type: "v2", value: new THREE.Vector2() },
+    }
+
+    // Vertex shader
+    const vertexShader = `
+      void main() {
+        gl_Position = vec4( position, 1.0 );
+      }
+    `
+
+    // Fragment shader
+    const fragmentShader = `
+      #define TWO_PI 6.2831853072
+      #define PI 3.14159265359
+
+      precision highp float;
+      uniform vec2 resolution;
+      uniform float time;
+        
+      float random (in float x) {
+          return fract(sin(x)*1e4);
+      }
+      float random (vec2 st) {
+          return fract(sin(dot(st.xy,
+                               vec2(12.9898,78.233)))*
+              43758.5453123);
+      }
+      
+      varying vec2 vUv;
+
+      void main(void) {
+        vec2 uv = (gl_FragCoord.xy * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
+        
+        vec2 fMosaicScal = vec2(4.0, 2.0);
+        vec2 vScreenSize = vec2(256,256);
+        uv.x = floor(uv.x * vScreenSize.x / fMosaicScal.x) / (vScreenSize.x / fMosaicScal.x);
+        uv.y = floor(uv.y * vScreenSize.y / fMosaicScal.y) / (vScreenSize.y / fMosaicScal.y);       
+          
+        float t = time*0.06+random(uv.x)*0.4;
+        float lineWidth = 0.0008;
+
+        vec3 color = vec3(0.0);
+        for(int j = 0; j < 3; j++){
+          for(int i=0; i < 5; i++){
+            color[j] += lineWidth*float(i*i) / abs(fract(t - 0.01*float(j)+float(i)*0.01)*1.0 - length(uv));        
+          }
+        }
+
+        gl_FragColor = vec4(color[2],color[1],color[0],1.0);
+      }
+    `
+
+    // Create material
+    const material = new THREE.ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+    })
+
+    // Create mesh and add to scene
+    const mesh = new THREE.Mesh(geometry, material)
+    scene.add(mesh)
+
+    // Initialize renderer
+    const renderer = new THREE.WebGLRenderer()
+    renderer.setPixelRatio(window.devicePixelRatio)
+    container.appendChild(renderer.domElement)
+
+    // Store references
+    sceneRef.current = {
+      camera,
+      scene,
+      renderer,
+      uniforms,
+      animationId: null,
+    }
+
+    // Handle resize
+    const onWindowResize = () => {
+      const rect = container.getBoundingClientRect()
+      renderer.setSize(rect.width, rect.height)
+      uniforms.resolution.value.x = renderer.domElement.width
+      uniforms.resolution.value.y = renderer.domElement.height
+    }
+
+    onWindowResize()
+    window.addEventListener("resize", onWindowResize, false)
+
+    // Animation loop
+    const animate = () => {
+      sceneRef.current.animationId = requestAnimationFrame(animate)
+      uniforms.time.value += 0.05
+      renderer.render(scene, camera)
+    }
+
+    animate()
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full absolute" 
+    />
+  )
+}
+
+
+5. import * as React from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface AnimatedTextCycleProps {
+  words: string[];
+  interval?: number;
+  className?: string;
+}
+
+export default function AnimatedTextCycle({
+  words,
+  interval = 5000,
+  className = "",
+}: AnimatedTextCycleProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [width, setWidth] = useState("auto");
+  const measureRef = useRef<HTMLDivElement>(null);
+
+  // Get the width of the current word
+  useEffect(() => {
+    if (measureRef.current) {
+      const elements = measureRef.current.children;
+      if (elements.length > currentIndex) {
+        // Add a small buffer (10px) to prevent text wrapping
+        const newWidth = elements[currentIndex].getBoundingClientRect().width;
+        setWidth(`${newWidth}px`);
+      }
+    }
+  }, [currentIndex]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [interval, words.length]);
+
+  // Container animation for the whole word
+  const containerVariants = {
+    hidden: { 
+      y: -20,
+      opacity: 0,
+      filter: "blur(8px)"
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      filter: "blur(0px)",
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    },
+    exit: { 
+      y: 20,
+      opacity: 0,
+      filter: "blur(8px)",
+      transition: { 
+        duration: 0.3, 
+        ease: "easeIn"
+      }
+    },
+  };
+
+  return (
+    <>
+      {/* Hidden measurement div with all words rendered */}
+      <div 
+        ref={measureRef} 
+        aria-hidden="true"
+        className="absolute opacity-0 pointer-events-none"
+        style={{ visibility: "hidden" }}
+      >
+        {words.map((word, i) => (
+          <span key={i} className={`font-bold ${className}`}>
+            {word}
+          </span>
+        ))}
+      </div>
+
+      {/* Visible animated word */}
+      <motion.span 
+        className="relative inline-block"
+        animate={{ 
+          width,
+          transition: { 
+            type: "spring",
+            stiffness: 150,
+            damping: 15,
+            mass: 1.2,
+          }
+        }}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={currentIndex}
+            className={`inline-block font-bold ${className}`}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            style={{ whiteSpace: "nowrap" }}
+          >
+            {words[currentIndex]}
+          </motion.span>
+        </AnimatePresence>
+      </motion.span>
+    </>
+  );
+} 
+
+6. "use client";
+
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+interface GooeyTextProps {
+  texts: string[];
+  morphTime?: number;
+  cooldownTime?: number;
+  className?: string;
+  textClassName?: string;
+}
+
+export function GooeyText({
+  texts,
+  morphTime = 1,
+  cooldownTime = 0.25,
+  className,
+  textClassName
+}: GooeyTextProps) {
+  const text1Ref = React.useRef<HTMLSpanElement>(null);
+  const text2Ref = React.useRef<HTMLSpanElement>(null);
+
+  React.useEffect(() => {
+    let textIndex = texts.length - 1;
+    let time = new Date();
+    let morph = 0;
+    let cooldown = cooldownTime;
+
+    const setMorph = (fraction: number) => {
+      if (text1Ref.current && text2Ref.current) {
+        text2Ref.current.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
+        text2Ref.current.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
+
+        fraction = 1 - fraction;
+        text1Ref.current.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
+        text1Ref.current.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
+      }
+    };
+
+    const doCooldown = () => {
+      morph = 0;
+      if (text1Ref.current && text2Ref.current) {
+        text2Ref.current.style.filter = "";
+        text2Ref.current.style.opacity = "100%";
+        text1Ref.current.style.filter = "";
+        text1Ref.current.style.opacity = "0%";
+      }
+    };
+
+    const doMorph = () => {
+      morph -= cooldown;
+      cooldown = 0;
+      let fraction = morph / morphTime;
+
+      if (fraction > 1) {
+        cooldown = cooldownTime;
+        fraction = 1;
+      }
+
+      setMorph(fraction);
+    };
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const newTime = new Date();
+      const shouldIncrementIndex = cooldown > 0;
+      const dt = (newTime.getTime() - time.getTime()) / 1000;
+      time = newTime;
+
+      cooldown -= dt;
+
+      if (cooldown <= 0) {
+        if (shouldIncrementIndex) {
+          textIndex = (textIndex + 1) % texts.length;
+          if (text1Ref.current && text2Ref.current) {
+            text1Ref.current.textContent = texts[textIndex % texts.length];
+            text2Ref.current.textContent = texts[(textIndex + 1) % texts.length];
+          }
+        }
+        doMorph();
+      } else {
+        doCooldown();
+      }
+    }
+
+    animate();
+
+    return () => {
+      // Cleanup function if needed
+    };
+  }, [texts, morphTime, cooldownTime]);
+
+  return (
+    <div className={cn("relative", className)}>
+      <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="threshold">
+            <feColorMatrix
+              in="SourceGraphic"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 255 -140"
+            />
+          </filter>
+        </defs>
+      </svg>
+
+      <div
+        className="flex items-center justify-center"
+        style={{ filter: "url(#threshold)" }}
+      >
+        <span
+          ref={text1Ref}
+          className={cn(
+            "absolute inline-block select-none text-center text-6xl md:text-[60pt]",
+            "text-foreground",
+            textClassName
+          )}
+        />
+        <span
+          ref={text2Ref}
+          className={cn(
+            "absolute inline-block select-none text-center text-6xl md:text-[60pt]",
+            "text-foreground",
+            textClassName
+          )}
+        />
+      </div>
+    </div>
+  );
+}
+
+7."use client"
+
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const SQRT_5000 = Math.sqrt(5000);
+
+const testimonials = [
+  {
+    tempId: 0,
+    testimonial: "My favorite solution in the market. We work 5x faster with COMPANY.",
+    by: "Alex, CEO at TechCorp",
+    imgSrc: "https://i.pravatar.cc/150?img=1"
+  },
+  {
+    tempId: 1,
+    testimonial: "I'm confident my data is safe with COMPANY. I can't say that about other providers.",
+    by: "Dan, CTO at SecureNet",
+    imgSrc: "https://i.pravatar.cc/150?img=2"
+  },
+  {
+    tempId: 2,
+    testimonial: "I know it's cliche, but we were lost before we found COMPANY. Can't thank you guys enough!",
+    by: "Stephanie, COO at InnovateCo",
+    imgSrc: "https://i.pravatar.cc/150?img=3"
+  },
+  {
+    tempId: 3,
+    testimonial: "COMPANY's products make planning for the future seamless. Can't recommend them enough!",
+    by: "Marie, CFO at FuturePlanning",
+    imgSrc: "https://i.pravatar.cc/150?img=4"
+  },
+  {
+    tempId: 4,
+    testimonial: "If I could give 11 stars, I'd give 12.",
+    by: "Andre, Head of Design at CreativeSolutions",
+    imgSrc: "https://i.pravatar.cc/150?img=5"
+  },
+  {
+    tempId: 5,
+    testimonial: "SO SO SO HAPPY WE FOUND YOU GUYS!!!! I'd bet you've saved me 100 hours so far.",
+    by: "Jeremy, Product Manager at TimeWise",
+    imgSrc: "https://i.pravatar.cc/150?img=6"
+  },
+  {
+    tempId: 6,
+    testimonial: "Took some convincing, but now that we're on COMPANY, we're never going back.",
+    by: "Pam, Marketing Director at BrandBuilders",
+    imgSrc: "https://i.pravatar.cc/150?img=7"
+  },
+  {
+    tempId: 7,
+    testimonial: "I would be lost without COMPANY's in-depth analytics. The ROI is EASILY 100X for us.",
+    by: "Daniel, Data Scientist at AnalyticsPro",
+    imgSrc: "https://i.pravatar.cc/150?img=8"
+  },
+  {
+    tempId: 8,
+    testimonial: "It's just the best. Period.",
+    by: "Fernando, UX Designer at UserFirst",
+    imgSrc: "https://i.pravatar.cc/150?img=9"
+  },
+  {
+    tempId: 9,
+    testimonial: "I switched 5 years ago and never looked back.",
+    by: "Andy, DevOps Engineer at CloudMasters",
+    imgSrc: "https://i.pravatar.cc/150?img=10"
+  },
+  {
+    tempId: 10,
+    testimonial: "I've been searching for a solution like COMPANY for YEARS. So glad I finally found one!",
+    by: "Pete, Sales Director at RevenueRockets",
+    imgSrc: "https://i.pravatar.cc/150?img=11"
+  },
+  {
+    tempId: 11,
+    testimonial: "It's so simple and intuitive, we got the team up to speed in 10 minutes.",
+    by: "Marina, HR Manager at TalentForge",
+    imgSrc: "https://i.pravatar.cc/150?img=12"
+  },
+  {
+    tempId: 12,
+    testimonial: "COMPANY's customer support is unparalleled. They're always there when we need them.",
+    by: "Olivia, Customer Success Manager at ClientCare",
+    imgSrc: "https://i.pravatar.cc/150?img=13"
+  },
+  {
+    tempId: 13,
+    testimonial: "The efficiency gains we've seen since implementing COMPANY are off the charts!",
+    by: "Raj, Operations Manager at StreamlineSolutions",
+    imgSrc: "https://i.pravatar.cc/150?img=14"
+  },
+  {
+    tempId: 14,
+    testimonial: "COMPANY has revolutionized how we handle our workflow. It's a game-changer!",
+    by: "Lila, Workflow Specialist at ProcessPro",
+    imgSrc: "https://i.pravatar.cc/150?img=15"
+  },
+  {
+    tempId: 15,
+    testimonial: "The scalability of COMPANY's solution is impressive. It grows with our business seamlessly.",
+    by: "Trevor, Scaling Officer at GrowthGurus",
+    imgSrc: "https://i.pravatar.cc/150?img=16"
+  },
+  {
+    tempId: 16,
+    testimonial: "I appreciate how COMPANY continually innovates. They're always one step ahead.",
+    by: "Naomi, Innovation Lead at FutureTech",
+    imgSrc: "https://i.pravatar.cc/150?img=17"
+  },
+  {
+    tempId: 17,
+    testimonial: "The ROI we've seen with COMPANY is incredible. It's paid for itself many times over.",
+    by: "Victor, Finance Analyst at ProfitPeak",
+    imgSrc: "https://i.pravatar.cc/150?img=18"
+  },
+  {
+    tempId: 18,
+    testimonial: "COMPANY's platform is so robust, yet easy to use. It's the perfect balance.",
+    by: "Yuki, Tech Lead at BalancedTech",
+    imgSrc: "https://i.pravatar.cc/150?img=19"
+  },
+  {
+    tempId: 19,
+    testimonial: "We've tried many solutions, but COMPANY stands out in terms of reliability and performance.",
+    by: "Zoe, Performance Manager at ReliableSystems",
+    imgSrc: "https://i.pravatar.cc/150?img=20"
+  }
+];
+
+interface TestimonialCardProps {
+  position: number;
+  testimonial: typeof testimonials[0];
+  handleMove: (steps: number) => void;
+  cardSize: number;
+}
+
+const TestimonialCard: React.FC<TestimonialCardProps> = ({ 
+  position, 
+  testimonial, 
+  handleMove, 
+  cardSize 
+}) => {
+  const isCenter = position === 0;
+
+  return (
+    <div
+      onClick={() => handleMove(position)}
+      className={cn(
+        "absolute left-1/2 top-1/2 cursor-pointer border-2 p-8 transition-all duration-500 ease-in-out",
+        isCenter 
+          ? "z-10 bg-primary text-primary-foreground border-primary" 
+          : "z-0 bg-card text-card-foreground border-border hover:border-primary/50"
+      )}
+      style={{
+        width: cardSize,
+        height: cardSize,
+        clipPath: `polygon(50px 0%, calc(100% - 50px) 0%, 100% 50px, 100% 100%, calc(100% - 50px) 100%, 50px 100%, 0 100%, 0 0)`,
+        transform: `
+          translate(-50%, -50%) 
+          translateX(${(cardSize / 1.5) * position}px)
+          translateY(${isCenter ? -65 : position % 2 ? 15 : -15}px)
+          rotate(${isCenter ? 0 : position % 2 ? 2.5 : -2.5}deg)
+        `,
+        boxShadow: isCenter ? "0px 8px 0px 4px hsl(var(--border))" : "0px 0px 0px 0px transparent"
+      }}
+    >
+      <span
+        className="absolute block origin-top-right rotate-45 bg-border"
+        style={{
+          right: -2,
+          top: 48,
+          width: SQRT_5000,
+          height: 2
+        }}
+      />
+      <img
+        src={testimonial.imgSrc}
+        alt={`${testimonial.by.split(',')[0]}`}
+        className="mb-4 h-14 w-12 bg-muted object-cover object-top"
+        style={{
+          boxShadow: "3px 3px 0px hsl(var(--background))"
+        }}
+      />
+      <h3 className={cn(
+        "text-base sm:text-xl font-medium",
+        isCenter ? "text-primary-foreground" : "text-foreground"
+      )}>
+        "{testimonial.testimonial}"
+      </h3>
+      <p className={cn(
+        "absolute bottom-8 left-8 right-8 mt-2 text-sm italic",
+        isCenter ? "text-primary-foreground/80" : "text-muted-foreground"
+      )}>
+        - {testimonial.by}
+      </p>
+    </div>
+  );
+};
+
+export const StaggerTestimonials: React.FC = () => {
+  const [cardSize, setCardSize] = useState(365);
+  const [testimonialsList, setTestimonialsList] = useState(testimonials);
+
+  const handleMove = (steps: number) => {
+    const newList = [...testimonialsList];
+    if (steps > 0) {
+      for (let i = steps; i > 0; i--) {
+        const item = newList.shift();
+        if (!item) return;
+        newList.push({ ...item, tempId: Math.random() });
+      }
+    } else {
+      for (let i = steps; i < 0; i++) {
+        const item = newList.pop();
+        if (!item) return;
+        newList.unshift({ ...item, tempId: Math.random() });
+      }
+    }
+    setTestimonialsList(newList);
+  };
+
+  useEffect(() => {
+    const updateSize = () => {
+      const { matches } = window.matchMedia("(min-width: 640px)");
+      setCardSize(matches ? 365 : 290);
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  return (
+    <div
+      className="relative w-full overflow-hidden bg-muted/30"
+      style={{ height: 600 }}
+    >
+      {testimonialsList.map((testimonial, index) => {
+        const position = testimonialsList.length % 2
+          ? index - (testimonialsList.length + 1) / 2
+          : index - testimonialsList.length / 2;
+        return (
+          <TestimonialCard
+            key={testimonial.tempId}
+            testimonial={testimonial}
+            handleMove={handleMove}
+            position={position}
+            cardSize={cardSize}
+          />
+        );
+      })}
+      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+        <button
+          onClick={() => handleMove(-1)}
+          className={cn(
+            "flex h-14 w-14 items-center justify-center text-2xl transition-colors",
+            "bg-background border-2 border-border hover:bg-primary hover:text-primary-foreground",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          )}
+          aria-label="Previous testimonial"
+        >
+          <ChevronLeft />
+        </button>
+        <button
+          onClick={() => handleMove(1)}
+          className={cn(
+            "flex h-14 w-14 items-center justify-center text-2xl transition-colors",
+            "bg-background border-2 border-border hover:bg-primary hover:text-primary-foreground",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          )}
+          aria-label="Next testimonial"
+        >
+          <ChevronRight />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+8. import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import { Layout, Pointer, Zap } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+interface TabContent {
+  badge: string;
+  title: string;
+  description: string;
+  buttonText: string;
+  imageSrc: string;
+  imageAlt: string;
+}
+
+interface Tab {
+  value: string;
+  icon: React.ReactNode;
+  label: string;
+  content: TabContent;
+}
+
+interface Feature108Props {
+  badge?: string;
+  heading?: string;
+  description?: string;
+  tabs?: Tab[];
+}
+
+const Feature108 = ({
+  badge = "shadcnblocks.com",
+  heading = "A Collection of Components Built With Shadcn & Tailwind",
+  description = "Join us to build flawless web solutions.",
+  tabs = [
+    {
+      value: "tab-1",
+      icon: <Zap className="h-auto w-4 shrink-0" />,
+      label: "Boost Revenue",
+      content: {
+        badge: "Modern Tactics",
+        title: "Make your site a true standout.",
+        description:
+          "Discover new web trends that help you craft sleek, highly functional sites that drive traffic and convert leads into customers.",
+        buttonText: "See Plans",
+        imageSrc:
+          "https://shadcnblocks.com/images/block/placeholder-dark-1.svg",
+        imageAlt: "placeholder",
+      },
+    },
+    {
+      value: "tab-2",
+      icon: <Pointer className="h-auto w-4 shrink-0" />,
+      label: "Higher Engagement",
+      content: {
+        badge: "Expert Features",
+        title: "Boost your site with top-tier design.",
+        description:
+          "Use stellar design to easily engage users and strengthen their loyalty. Create a seamless experience that keeps them coming back for more.",
+        buttonText: "See Tools",
+        imageSrc:
+          "https://shadcnblocks.com/images/block/placeholder-dark-2.svg",
+        imageAlt: "placeholder",
+      },
+    },
+    {
+      value: "tab-3",
+      icon: <Layout className="h-auto w-4 shrink-0" />,
+      label: "Stunning Layouts",
+      content: {
+        badge: "Elite Solutions",
+        title: "Build an advanced web experience.",
+        description:
+          "Lift your brand with modern tech that grabs attention and drives action. Create a digital experience that stands out from the crowd.",
+        buttonText: "See Options",
+        imageSrc:
+          "https://shadcnblocks.com/images/block/placeholder-dark-3.svg",
+        imageAlt: "placeholder",
+      },
+    },
+  ],
+}: Feature108Props) => {
+  return (
+    <section className="py-32">
+      <div className="container mx-auto">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <Badge variant="outline">{badge}</Badge>
+          <h1 className="max-w-2xl text-3xl font-semibold md:text-4xl">
+            {heading}
+          </h1>
+          <p className="text-muted-foreground">{description}</p>
+        </div>
+        <Tabs defaultValue={tabs[0].value} className="mt-8">
+          <TabsList className="container flex flex-col items-center justify-center gap-4 sm:flex-row md:gap-10">
+            {tabs.map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-muted-foreground data-[state=active]:bg-muted data-[state=active]:text-primary"
+              >
+                {tab.icon} {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <div className="mx-auto mt-8 max-w-screen-xl rounded-2xl bg-muted/70 p-6 lg:p-16">
+            {tabs.map((tab) => (
+              <TabsContent
+                key={tab.value}
+                value={tab.value}
+                className="grid place-items-center gap-20 lg:grid-cols-2 lg:gap-10"
+              >
+                <div className="flex flex-col gap-5">
+                  <Badge variant="outline" className="w-fit bg-background">
+                    {tab.content.badge}
+                  </Badge>
+                  <h3 className="text-3xl font-semibold lg:text-5xl">
+                    {tab.content.title}
+                  </h3>
+                  <p className="text-muted-foreground lg:text-lg">
+                    {tab.content.description}
+                  </p>
+                  <Button className="mt-2.5 w-fit gap-2" size="lg">
+                    {tab.content.buttonText}
+                  </Button>
+                </div>
+                <img
+                  src={tab.content.imageSrc}
+                  alt={tab.content.imageAlt}
+                  className="rounded-xl"
+                />
+              </TabsContent>
+            ))}
+          </div>
+        </Tabs>
+      </div>
+    </section>
+  );
+};
+
+export { Feature108 };
+
+
+9. "use client"
+
+import React, { useEffect, useState } from "react"
+import { motion } from "framer-motion"
+import Link from "next/link"
+import { LucideIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+interface NavItem {
+  name: string
+  url: string
+  icon: LucideIcon
+}
+
+interface NavBarProps {
+  items: NavItem[]
+  className?: string
+}
+
+export function NavBar({ items, className }: NavBarProps) {
+  const [activeTab, setActiveTab] = useState(items[0].name)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  return (
+    <div
+      className={cn(
+        "fixed bottom-0 sm:top-0 left-1/2 -translate-x-1/2 z-50 mb-6 sm:pt-6",
+        className,
+      )}
+    >
+      <div className="flex items-center gap-3 bg-background/5 border border-border backdrop-blur-lg py-1 px-1 rounded-full shadow-lg">
+        {items.map((item) => {
+          const Icon = item.icon
+          const isActive = activeTab === item.name
+
+          return (
+            <Link
+              key={item.name}
+              href={item.url}
+              onClick={() => setActiveTab(item.name)}
+              className={cn(
+                "relative cursor-pointer text-sm font-semibold px-6 py-2 rounded-full transition-colors",
+                "text-foreground/80 hover:text-primary",
+                isActive && "bg-muted text-primary",
+              )}
+            >
+              <span className="hidden md:inline">{item.name}</span>
+              <span className="md:hidden">
+                <Icon size={18} strokeWidth={2.5} />
+              </span>
+              {isActive && (
+                <motion.div
+                  layoutId="lamp"
+                  className="absolute inset-0 w-full bg-primary/5 rounded-full -z-10"
+                  initial={false}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                  }}
+                >
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-t-full">
+                    <div className="absolute w-12 h-6 bg-primary/20 rounded-full blur-md -top-2 -left-2" />
+                    <div className="absolute w-8 h-6 bg-primary/20 rounded-full blur-md -top-1" />
+                    <div className="absolute w-4 h-4 bg-primary/20 rounded-full blur-sm top-0 left-2" />
+                  </div>
+                </motion.div>
+              )}
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+10. import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { MoveRight, PhoneCall } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+function Hero() {
+  const [titleNumber, setTitleNumber] = useState(0);
+  const titles = useMemo(
+    () => ["amazing", "new", "wonderful", "beautiful", "smart"],
+    []
+  );
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (titleNumber === titles.length - 1) {
+        setTitleNumber(0);
+      } else {
+        setTitleNumber(titleNumber + 1);
+      }
+    }, 2000);
+    return () => clearTimeout(timeoutId);
+  }, [titleNumber, titles]);
+
+  return (
+    <div className="w-full">
+      <div className="container mx-auto">
+        <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
+          <div>
+            <Button variant="secondary" size="sm" className="gap-4">
+              Read our launch article <MoveRight className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex gap-4 flex-col">
+            <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
+              <span className="text-spektr-cyan-50">This is something</span>
+              <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
+                &nbsp;
+                {titles.map((title, index) => (
+                  <motion.span
+                    key={index}
+                    className="absolute font-semibold"
+                    initial={{ opacity: 0, y: "-100" }}
+                    transition={{ type: "spring", stiffness: 50 }}
+                    animate={
+                      titleNumber === index
+                        ? {
+                            y: 0,
+                            opacity: 1,
+                          }
+                        : {
+                            y: titleNumber > index ? -150 : 150,
+                            opacity: 0,
+                          }
+                    }
+                  >
+                    {title}
+                  </motion.span>
+                ))}
+              </span>
+            </h1>
+
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
+              Managing a small business today is already tough. Avoid further
+              complications by ditching outdated, tedious trade methods. Our
+              goal is to streamline SMB trade, making it easier and faster than
+              ever.
+            </p>
+          </div>
+          <div className="flex flex-row gap-3">
+            <Button size="lg" className="gap-4" variant="outline">
+              Jump on a call <PhoneCall className="w-4 h-4" />
+            </Button>
+            <Button size="lg" className="gap-4">
+              Sign up here <MoveRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export { Hero };
+
+11. "use client";
+
+import { cn } from "@/lib/utils";
+import { Sparkles } from "lucide-react";
+
+interface DisplayCardProps {
+  className?: string;
+  icon?: React.ReactNode;
+  title?: string;
+  description?: string;
+  date?: string;
+  iconClassName?: string;
+  titleClassName?: string;
+}
+
+function DisplayCard({
+  className,
+  icon = <Sparkles className="size-4 text-blue-300" />,
+  title = "Featured",
+  description = "Discover amazing content",
+  date = "Just now",
+  iconClassName = "text-blue-500",
+  titleClassName = "text-blue-500",
+}: DisplayCardProps) {
+  return (
+    <div
+      className={cn(
+        "relative flex h-36 w-[22rem] -skew-y-[8deg] select-none flex-col justify-between rounded-xl border-2 bg-muted/70 backdrop-blur-sm px-4 py-3 transition-all duration-700 after:absolute after:-right-1 after:top-[-5%] after:h-[110%] after:w-[20rem] after:bg-gradient-to-l after:from-background after:to-transparent after:content-[''] hover:border-white/20 hover:bg-muted [&>*]:flex [&>*]:items-center [&>*]:gap-2",
+        className
+      )}
+    >
+      <div>
+        <span className="relative inline-block rounded-full bg-blue-800 p-1">
+          {icon}
+        </span>
+        <p className={cn("text-lg font-medium", titleClassName)}>{title}</p>
+      </div>
+      <p className="whitespace-nowrap text-lg">{description}</p>
+      <p className="text-muted-foreground">{date}</p>
+    </div>
+  );
+}
+
+interface DisplayCardsProps {
+  cards?: DisplayCardProps[];
+}
+
+export default function DisplayCards({ cards }: DisplayCardsProps) {
+  const defaultCards = [
+    {
+      className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration:700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration:700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
+    },
+  ];
+
+  const displayCards = cards || defaultCards;
+
+  return (
+    <div className="grid [grid-template-areas:'stack'] place-items-center opacity-100 animate-in fade-in-0 duration-700">
+      {displayCards.map((cardProps, index) => (
+        <DisplayCard key={index} {...cardProps} />
+      ))}
+    </div>
+  );
+}
+
+12. "use client";
+
+import { motion } from "motion/react";
+import * as React from "react";
+
+import { cn } from "@/lib/utils";
+
+const componentThemeClassName =
+  "[--ic-background:#ffffff] [--ic-foreground:#111111] [--ic-primary:#111111] [--ic-secondary:#646b75] [--ic-surface-border:#e9edf2] [--ic-border:#e3e7ec] [--ic-card:#ffffff] [--ic-card-foreground:#111111] [--ic-muted:#f5f7fa] [--ic-muted-foreground:#6d7480] [--ic-accent:#f3f5f8] [--color-accent:var(--ic-accent)] [--color-accent-foreground:var(--ic-accent-foreground)] [--ic-accent-foreground:#111111] [--ic-input:#e3e7ec] [--ic-ring:rgba(17,17,17,0.16)] [--ic-destructive:#dc2626] [--ic-paper:#fcfcfd] [--ic-popover-foreground:#111111] [--ic-brand:#0ea5e9] [--ic-brand-soft:#bae6fd] [--ic-shadow-soft:0_18px_38px_-24px_rgba(15,23,42,0.35)] [--ic-chart-1:oklch(0.52_0.19_254)] [--ic-chart-2:oklch(0.74_0.11_232)] [--ic-chart-3:oklch(0.42_0.16_262)] [--ic-chart-4:oklch(0.84_0.07_228)] [--ic-chart-5:oklch(0.62_0.14_240)] [--color-background:var(--ic-background)] [--color-foreground:var(--ic-foreground)] [--color-primary:var(--ic-primary)] [--color-secondary:var(--ic-secondary)] [--color-border:var(--ic-border)] [--color-card:var(--ic-card)] [--color-card-foreground:var(--ic-card-foreground)] [--color-muted:var(--ic-muted)] [--color-muted-foreground:var(--ic-muted-foreground)] [--color-accent:var(--ic-accent)] [--color-accent-foreground:var(--ic-accent-foreground)] [--color-input:var(--ic-input)] [--color-ring:var(--ic-ring)] [--color-destructive:var(--ic-destructive)] [--color-paper:var(--ic-paper)] [--color-popover-foreground:var(--ic-popover-foreground)] [--color-brand:var(--ic-brand)] [--color-brand-soft:var(--ic-brand-soft)] [--color-chart-1:var(--ic-chart-1)] [--color-chart-2:var(--ic-chart-2)] [--color-chart-3:var(--ic-chart-3)] [--color-chart-4:var(--ic-chart-4)] [--color-chart-5:var(--ic-chart-5)] dark:[--ic-background:#111111] dark:[--ic-foreground:#f6f3ec] dark:[--ic-primary:#f6f3ec] dark:[--ic-secondary:#cbc6bb] dark:[--ic-surface-border:#2a2a25] dark:[--ic-border:#2b2a25] dark:[--ic-card:#111111] dark:[--ic-card-foreground:#f6f3ec] dark:[--ic-muted:#171716] dark:[--ic-muted-foreground:#9a958a] dark:[--ic-accent:#1a1a18] [--color-accent:var(--ic-accent)] [--color-accent-foreground:var(--ic-accent-foreground)] dark:[--ic-accent-foreground:#f6f3ec] dark:[--ic-input:#2b2a25] dark:[--ic-ring:rgba(246,243,236,0.18)] dark:[--ic-destructive:#f87171] dark:[--ic-paper:#171716] dark:[--ic-popover-foreground:#f6f3ec] dark:[--ic-brand:#38bdf8] dark:[--ic-brand-soft:#0c4a6e] dark:[--ic-shadow-soft:0_20px_44px_-28px_rgba(0,0,0,0.6)] dark:[--ic-chart-1:oklch(0.68_0.17_250)] dark:[--ic-chart-2:oklch(0.82_0.09_225)] dark:[--ic-chart-3:oklch(0.58_0.15_260)] dark:[--ic-chart-4:oklch(0.75_0.12_235)] dark:[--ic-chart-5:oklch(0.88_0.06_220)]";
+
+const FILL_DURATION = 0.5;
+const FILL_EASE = [0.16, 1, 0.3, 1] as const;
+
+type ButtonHTMLAttributesForMotion = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  | "onAnimationEnd"
+  | "onAnimationIteration"
+  | "onAnimationStart"
+  | "onDrag"
+  | "onDragEnd"
+  | "onDragEnter"
+  | "onDragExit"
+  | "onDragLeave"
+  | "onDragOver"
+  | "onDragStart"
+  | "onDrop"
+>;
+
+function getCoverDiameter(width: number, height: number, x: number, y: number) {
+  return Math.ceil(
+    2 *
+      Math.max(
+        Math.hypot(x, y),
+        Math.hypot(width - x, y),
+        Math.hypot(x, height - y),
+        Math.hypot(width - x, height - y)
+      )
+  );
+}
+
+function assignRef<T>(ref: React.ForwardedRef<T>, value: T | null) {
+  if (typeof ref === "function") {
+    ref(value);
+    return;
+  }
+
+  if (ref) {
+    ref.current = value;
+  }
+}
+
+function hasTextContent(node: React.ReactNode): boolean {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node).trim().length > 0;
+  }
+
+  if (Array.isArray(node)) {
+    return node.some(hasTextContent);
+  }
+
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return hasTextContent(node.props.children);
+  }
+
+  return false;
+}
+
+type OriginButtonProps = ButtonHTMLAttributesForMotion & {
+  children?: React.ReactNode;
+  loading?: boolean;
+};
+
+const OriginButton = React.forwardRef<HTMLButtonElement, OriginButtonProps>(
+  (
+    {
+      children,
+      className,
+      disabled = false,
+      loading = false,
+      type = "button",
+      onBlur,
+      onClick,
+      onFocus,
+      onKeyDown,
+      onKeyUp,
+      onPointerCancel,
+      onPointerDown,
+      onPointerEnter,
+      onPointerLeave,
+      onPointerUp,
+      ...props
+    },
+    ref
+  ) => {
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+    const isDisabled = Boolean(disabled || loading);
+    const [hovered, setHovered] = React.useState(false);
+    const [isPressed, setIsPressed] = React.useState(false);
+    const [origin, setOrigin] = React.useState({ x: 0, y: 0 });
+    const [coverSize, setCoverSize] = React.useState(0);
+
+    const ariaLabel = props["aria-label"];
+    const ariaLabelledBy = props["aria-labelledby"];
+
+    React.useEffect(() => {
+      if (process.env.NODE_ENV === "production") {
+        return;
+      }
+
+      if (
+        hasTextContent(children) ||
+        ariaLabel?.trim() ||
+        ariaLabelledBy?.trim()
+      ) {
+        return;
+      }
+
+      console.warn(
+        "OriginButton: provide visible label text or aria-label / aria-labelledby so the control has an accessible name."
+      );
+    }, [ariaLabel, ariaLabelledBy, children]);
+
+    const updateOrigin = React.useCallback((x: number, y: number) => {
+      const node = buttonRef.current;
+      if (!node) return;
+
+      const rect = node.getBoundingClientRect();
+      setOrigin({ x, y });
+      setCoverSize(getCoverDiameter(rect.width, rect.height, x, y));
+    }, []);
+
+    const updateOriginFromPointer = React.useCallback(
+      (event: React.PointerEvent<HTMLButtonElement>) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        updateOrigin(event.clientX - rect.left, event.clientY - rect.top);
+      },
+      [updateOrigin]
+    );
+
+    const updateOriginFromCenter = React.useCallback(() => {
+      const node = buttonRef.current;
+      if (!node) return;
+
+      const rect = node.getBoundingClientRect();
+      updateOrigin(rect.width / 2, rect.height / 2);
+    }, [updateOrigin]);
+
+    const showFill = !isDisabled && (hovered || isPressed);
+
+    React.useLayoutEffect(() => {
+      const node = buttonRef.current;
+      if (!(node && showFill)) return;
+
+      const measure = () => {
+        const rect = node.getBoundingClientRect();
+        setCoverSize(
+          getCoverDiameter(rect.width, rect.height, origin.x, origin.y)
+        );
+      };
+
+      measure();
+
+      const observer = new ResizeObserver(measure);
+      observer.observe(node);
+
+      const fonts = document.fonts;
+      if (fonts?.ready) {
+        fonts.ready.then(measure).catch(() => undefined);
+      }
+
+      return () => observer.disconnect();
+    }, [showFill, origin.x, origin.y]);
+
+    const fillTransition = { duration: FILL_DURATION, ease: FILL_EASE };
+
+    const setMergedRef = React.useCallback(
+      (node: HTMLButtonElement | null) => {
+        buttonRef.current = node;
+        assignRef(ref, node);
+      },
+      [ref]
+    );
+
+    return (
+      <motion.button
+        {...props}
+        aria-busy={loading || undefined}
+        className={cn(
+          componentThemeClassName,
+          "relative inline-flex h-12 cursor-pointer touch-manipulation select-none items-center justify-center overflow-hidden rounded-xl px-8 font-medium text-[15px] tracking-[-0.02em]",
+          "border-[0.5px] border-border bg-card text-card-foreground",
+          "dark:bg-muted dark:text-foreground",
+          "transition-[color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "disabled:pointer-events-none disabled:opacity-50",
+          showFill && "text-background dark:text-neutral-950",
+          className
+        )}
+        data-pressed={isPressed ? "true" : "false"}
+        disabled={isDisabled}
+        onBlur={(event) => {
+          onBlur?.(event);
+          setIsPressed(false);
+          if (!event.defaultPrevented) {
+            setHovered(false);
+          }
+        }}
+        onClick={onClick}
+        onFocus={(event) => {
+          onFocus?.(event);
+          if (isDisabled || event.defaultPrevented) return;
+          if (event.currentTarget.matches(":focus-visible")) {
+            updateOriginFromCenter();
+            setHovered(true);
+          }
+        }}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+
+          if (
+            event.defaultPrevented ||
+            isDisabled ||
+            event.repeat ||
+            (event.key !== " " && event.key !== "Enter")
+          ) {
+            return;
+          }
+
+          if (event.key === " ") {
+            event.preventDefault();
+          }
+
+          updateOriginFromCenter();
+          setIsPressed(true);
+          setHovered(true);
+        }}
+        onKeyUp={(event) => {
+          onKeyUp?.(event);
+
+          if (event.key === " " || event.key === "Enter") {
+            setIsPressed(false);
+            if (!event.currentTarget.matches(":focus-visible")) {
+              setHovered(false);
+            }
+          }
+        }}
+        onPointerCancel={(event) => {
+          onPointerCancel?.(event);
+          setIsPressed(false);
+        }}
+        onPointerDown={(event) => {
+          onPointerDown?.(event);
+
+          if (event.defaultPrevented || isDisabled || event.button !== 0) {
+            return;
+          }
+
+          updateOriginFromPointer(event);
+          setIsPressed(true);
+          setHovered(true);
+        }}
+        onPointerEnter={(event) => {
+          onPointerEnter?.(event);
+          if (isDisabled || event.defaultPrevented) return;
+          updateOriginFromPointer(event);
+          setHovered(true);
+        }}
+        onPointerLeave={(event) => {
+          onPointerLeave?.(event);
+          setHovered(false);
+          setIsPressed(false);
+        }}
+        onPointerUp={(event) => {
+          onPointerUp?.(event);
+          setIsPressed(false);
+        }}
+        ref={setMergedRef}
+        type={type}
+        whileTap={isDisabled ? undefined : { scale: 0.985 }}
+      >
+        <motion.span
+          animate={{ scale: showFill && coverSize > 0 ? 1 : 0 }}
+          aria-hidden
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground dark:bg-neutral-50"
+          initial={false}
+          style={{
+            height: coverSize,
+            left: origin.x,
+            top: origin.y,
+            width: coverSize,
+          }}
+          transition={fillTransition}
+        />
+        <span className="relative z-10 inline-flex items-center justify-center gap-2">
+          {children}
+        </span>
+      </motion.button>
+    );
+  }
+);
+OriginButton.displayName = "OriginButton";
+
+export { OriginButton };
+export type { OriginButtonProps };
+
+14. "use client";
+
+import { useState, useEffect, useRef, useCallback } from "react";
+import gsap from "gsap";
+
+export interface CardItem {
+  imgUrl: string;
+  alt?: string;
+  linkUrl?: string;
+}
+
+interface SocialCardsProps {
+  cards: CardItem[];
+}
+
+const MAX_VISIBLE = 7;
+const HALF = 3;
+
+const FAN_POSITIONS = [
+  { rot: -21, scale: 0.7756, x: -30, y: 7.3, zIndex: 1 },
+  { rot: -14, scale: 0.8498, x: -22, y: 4.0, zIndex: 2 },
+  { rot: -7,  scale: 0.9346, x: -11, y: 1.3, zIndex: 3 },
+  { rot: 0,   scale: 1.0,    x: 0,   y: 0.0, zIndex: 10 },
+  { rot: 7,   scale: 0.9346, x: 11,  y: 1.3, zIndex: 3 },
+  { rot: 14,  scale: 0.8498, x: 22,  y: 4.0, zIndex: 2 },
+  { rot: 21,  scale: 0.7756, x: 30,  y: 7.3, zIndex: 1 },
+];
+
+function getResponsiveMultiplier(width: number) {
+  if (width < 480) return 0.28;
+  if (width < 640) return 0.38;
+  if (width < 768) return 0.5;
+  if (width < 1024) return 0.75;
+  return 1.0;
+}
+
+/**
+ * Returns a multiplier (0..1] that scales y-offsets and entry animation
+ * distances when the viewport is too short for the ideal layout height.
+ */
+function getHeightMultiplier(width: number) {
+  // Ideal layout heights (in px at 16px root) matching the CSS breakpoints
+  let idealPx: number;
+  if (width < 480) idealPx = 22 * 16;       // 352px
+  else if (width < 640) idealPx = 26 * 16;  // 416px
+  else if (width < 768) idealPx = 28 * 16;  // 448px
+  else if (width < 1024) idealPx = 34 * 16; // 544px
+  else idealPx = 38 * 16;                    // 608px
+
+  const available = window.innerHeight * 0.7; // 70vh budget
+  if (available >= idealPx) return 1;
+  return available / idealPx;
+}
+
+function getSlotConfig(totalCards: number, slot: number) {
+  if (totalCards >= MAX_VISIBLE) return FAN_POSITIONS[slot];
+  const center = totalCards >> 1;
+  const distance = totalCards > 1 ? (slot - center) / center : 0;
+  const absDistance = Math.abs(distance);
+  return {
+    rot: distance * 21,
+    scale: 1.0 - 0.2244 * absDistance * absDistance,
+    x: distance * 30,
+    y: absDistance * absDistance * 7.3,
+    zIndex: 10 - Math.abs(slot - center),
+  };
+}
+
+const ARROW_CLASSES =
+  "relative flex items-center justify-center rounded-full border-[1.5px] border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 backdrop-blur-[16px] text-black/40 dark:text-white/55 cursor-pointer shrink-0 z-30 outline-none shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-black/25 dark:hover:border-white/25 hover:text-black/70 dark:hover:text-white/80 active:opacity-70 transition-colors duration-300 before:content-[''] before:absolute before:inset-[3px] before:rounded-full before:border before:border-black/[0.04] dark:before:border-white/[0.04] before:pointer-events-none";
+
+export default function SocialCards({ cards }: SocialCardsProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isAnimating = useRef(false);
+  const hasEntered = useRef(false);
+  const directionRef = useRef<"left" | "right" | null>(null);
+  const prevVisible = useRef<Set<number>>(new Set());
+
+  const totalCards = cards.length;
+  const needsPagination = totalCards > MAX_VISIBLE;
+  const [centerIndex, setCenterIndex] = useState(needsPagination ? HALF : totalCards >> 1);
+
+  const getVisibleMap = useCallback((center: number) => {
+    const map = new Map<number, number>();
+    if (!needsPagination) {
+      cards.forEach((_, i) => map.set(i, i));
+      return map;
+    }
+    for (let slot = 0; slot < MAX_VISIBLE; slot++) {
+      map.set(((center + slot - HALF) % totalCards + totalCards) % totalCards, slot);
+    }
+    return map;
+  }, [totalCards, needsPagination, cards]);
+
+  const cycle = useCallback((direction: "left" | "right") => {
+    if (isAnimating.current || !needsPagination) return;
+    isAnimating.current = true;
+    directionRef.current = direction;
+    setCenterIndex(prev =>
+      direction === "right" ? (prev + 1) % totalCards : (prev - 1 + totalCards) % totalCards
+    );
+  }, [totalCards, needsPagination]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !totalCards) return;
+
+    const cardElements = Array.from(container.querySelectorAll<HTMLElement>(".fan-card"));
+    if (!cardElements.length) return;
+
+    const visibleMap = getVisibleMap(centerIndex);
+    const previouslyVisible = prevVisible.current;
+    const direction = directionRef.current;
+    const isFirstMount = !hasEntered.current;
+    const multiplier = getResponsiveMultiplier(window.innerWidth);
+    const hMult = getHeightMultiplier(window.innerWidth);
+    const slotCount = needsPagination ? MAX_VISIBLE : totalCards;
+    const config = (slot: number) => getSlotConfig(slotCount, slot);
+
+    if (isFirstMount) isAnimating.current = true;
+
+    let completedCount = 0;
+    const visibleCount = visibleMap.size;
+    const onCardDone = () => {
+      if (++completedCount >= visibleCount) {
+        isAnimating.current = false;
+        if (isFirstMount) hasEntered.current = true;
+      }
+    };
+
+    cardElements.forEach((card, cardIndex) => {
+      const slot = visibleMap.get(cardIndex);
+      const wasVisible = previouslyVisible.has(cardIndex);
+
+      if (slot !== undefined) {
+        const { x, y, rot, scale, zIndex } = config(slot);
+        const target = {
+          x: `${x * multiplier}rem`,
+          y: `${y * hMult}rem`,
+          rotation: rot,
+          scale,
+          opacity: 1,
+          zIndex,
+        };
+
+        if (isFirstMount) {
+          gsap.set(card, { x: 0, y: `${12 * hMult}rem`, rotation: 0, scale: 0.5, opacity: 0 });
+          gsap.to(card, { ...target, duration: 1.2, ease: "elastic.out(1.05,.78)", delay: 0.2 + slot * 0.06, onComplete: onCardDone });
+        } else if (!wasVisible) {
+          const enterX = direction === "right" ? 40 : -40;
+          gsap.set(card, { x: `${enterX}rem`, y: `${y * hMult}rem`, rotation: direction === "right" ? 30 : -30, scale: 0.5, opacity: 0 });
+          gsap.to(card, { ...target, duration: 0.6, ease: "power2.out", onComplete: onCardDone });
+        } else {
+          gsap.to(card, { ...target, duration: 0.5, ease: "power2.out", onComplete: onCardDone });
+        }
+      } else if (wasVisible) {
+        const exitX = direction === "right" ? -40 : 40;
+        gsap.to(card, { x: `${exitX}rem`, opacity: 0, scale: 0.5, rotation: direction === "right" ? -30 : 30, duration: 0.4, ease: "power2.in", zIndex: 0 });
+      } else if (isFirstMount) {
+        gsap.set(card, { opacity: 0, scale: 0.3, x: 0, y: 0, zIndex: 0 });
+      }
+    });
+
+    prevVisible.current = new Set(visibleMap.keys());
+
+    // Hover interactions
+    const visibleEntries: { el: HTMLElement; slot: number }[] = [];
+    cardElements.forEach((el, i) => {
+      const slot = visibleMap.get(i);
+      if (slot !== undefined) visibleEntries.push({ el, slot });
+    });
+    visibleEntries.sort((a, b) => a.slot - b.slot);
+
+    let activeSlot: number | null = null;
+    let leaveTimer: NodeJS.Timeout | null = null;
+    const centerSlot = visibleEntries.length >> 1;
+
+    const updateHoverLayout = (hoveredSlot: number | null) => {
+      const mult = getResponsiveMultiplier(window.innerWidth);
+      const hM = getHeightMultiplier(window.innerWidth);
+
+      visibleEntries.forEach(({ el, slot }) => {
+        const base = config(slot);
+        let targetX = base.x * mult;
+        let targetY = base.y * hM;
+        let targetRot = base.rot;
+        let targetScale = base.scale;
+        let delay = 0;
+
+        if (hoveredSlot !== null) {
+          const distance = Math.abs(slot - hoveredSlot);
+          delay = distance * 0.02;
+
+          if (slot === hoveredSlot) {
+            targetY -= 2.5 * hM;
+            targetScale *= 1.08;
+          } else {
+            const normalized = centerSlot > 0 ? (slot - centerSlot) / centerSlot : 0;
+            const pushStrength = 8 * (1 - Math.abs(normalized)) * (1 + 0.2 * Math.max(0, 3 - distance));
+
+            if (slot < hoveredSlot) {
+              targetX -= pushStrength * mult;
+              targetRot -= 3 / (distance + 1);
+            } else {
+              targetX += pushStrength * mult;
+              targetRot += 3 / (distance + 1);
+            }
+
+            if (slot === visibleEntries.length - 1 && hoveredSlot < centerSlot) targetY -= 1 * hM;
+            if (slot === 0 && hoveredSlot > centerSlot) targetY -= 1 * hM;
+          }
+        } else {
+          delay = Math.abs(slot - centerSlot) * 0.02;
+        }
+
+        gsap.to(el, {
+          x: `${targetX}rem`, y: `${targetY}rem`, rotation: targetRot, scale: targetScale,
+          duration: 0.5, delay, ease: "elastic.out(1,.75)", overwrite: "auto",
+        });
+        gsap.set(el, { zIndex: base.zIndex });
+      });
+    };
+
+    const enterHandlers = visibleEntries.map(({ el, slot }) => {
+      const handler = () => {
+        if (isAnimating.current) return;
+        if (leaveTimer) { clearTimeout(leaveTimer); leaveTimer = null; }
+        if (activeSlot !== slot) { activeSlot = slot; updateHoverLayout(slot); }
+      };
+      el.addEventListener("mouseenter", handler);
+      return { el, handler };
+    });
+
+    const onMouseLeave = () => {
+      if (isAnimating.current) return;
+      if (leaveTimer) clearTimeout(leaveTimer);
+      leaveTimer = setTimeout(() => { activeSlot = null; updateHoverLayout(null); }, 50);
+    };
+    container.addEventListener("mouseleave", onMouseLeave);
+
+    const onResize = () => { if (!isAnimating.current) updateHoverLayout(activeSlot); };
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      enterHandlers.forEach(({ el, handler }) => el.removeEventListener("mouseenter", handler));
+      container.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("resize", onResize);
+      if (leaveTimer) clearTimeout(leaveTimer);
+    };
+  }, [centerIndex, totalCards, getVisibleMap, needsPagination]);
+
+  if (!totalCards) return null;
+
+  const chevron = (direction: "left" | "right") => (
+    <svg className="relative z-[2] w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points={direction === "left" ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} />
+    </svg>
+  );
+
+  return (
+    <section className="flex flex-col items-center w-full py-4 lg:py-8 px-4 md:px-8 relative z-20">
+      <div className="flex items-center justify-center w-full max-w-[90rem]">
+        <div ref={containerRef} className="fan-layout flex relative justify-center items-center w-full max-w-[80rem]">
+          {cards.map((card, index) => {
+            const image = (
+              <div className="relative w-full h-full overflow-hidden">
+                <img src={card.imgUrl} loading="lazy" alt={card.alt || `Card ${index}`} className="absolute inset-0 w-full h-full object-cover z-10" />
+              </div>
+            );
+            return card.linkUrl ? (
+              <a key={index} href={card.linkUrl} target={card.linkUrl.startsWith("http") ? "_blank" : "_self"} rel="noopener noreferrer" className="fan-card block cursor-pointer">{image}</a>
+            ) : (
+              <div key={index} className="fan-card">{image}</div>
+            );
+          })}
+        </div>
+      </div>
+
+      {needsPagination && (
+        <div className="flex items-center justify-center gap-4 mt-4 md:mt-6 z-30">
+          <button className={`${ARROW_CLASSES} w-10 h-10 md:w-12 md:h-12`} onClick={() => cycle("left")} aria-label="Previous">
+            {chevron("left")}
+          </button>
+          <div className="flex items-center gap-2">
+            {cards.map((_, i) => (
+              <span key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === centerIndex ? "bg-black/70 dark:bg-white/80 scale-[1.3]" : "bg-black/15 dark:bg-white/15"}`} />
+            ))}
+          </div>
+          <button className={`${ARROW_CLASSES} w-10 h-10 md:w-12 md:h-12`} onClick={() => cycle("right")} aria-label="Next">
+            {chevron("right")}
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+15. 'use client'
+
+import { useState } from "react"
+import { DynamicAnimationOptions, motion, useAnimate } from "framer-motion"
+import { debounce } from "lodash"
+
+interface TextProps {
+  label: string
+  reverse?: boolean
+  transition?: DynamicAnimationOptions
+  staggerDuration?: number
+  className?: string
+  onClick?: () => void
+}
+
+export function RandomLetterSwapForward({
+  label,
+  reverse = true,
+  transition = {
+    type: "spring",
+    duration: 0.8,
+  },
+  staggerDuration = 0.02,
+  className,
+  onClick,
+  ...props
+}: TextProps) {
+  const [scope, animate] = useAnimate()
+  const [blocked, setBlocked] = useState(false)
+
+  const mergeTransition = (transition: DynamicAnimationOptions, i: number) => ({
+    ...transition,
+    delay: i * staggerDuration,
+  })
+
+  const shuffledIndices = Array.from(
+    { length: label.length },
+    (_, i) => i
+  ).sort(() => Math.random() - 0.5)
+
+  const hoverStart = debounce(
+    () => {
+      if (blocked) return
+      setBlocked(true)
+
+      for (let i = 0; i < label.length; i++) {
+        const randomIndex = shuffledIndices[i]
+        animate(
+          ".letter-" + randomIndex,
+          {
+            y: reverse ? "100%" : "-100%",
+          },
+          mergeTransition(transition, i)
+        ).then(() => {
+          animate(
+            ".letter-" + randomIndex,
+            {
+              y: 0,
+            },
+            {
+              duration: 0,
+            }
+          )
+        })
+
+        animate(
+          ".letter-secondary-" + randomIndex,
+          {
+            top: "0%",
+          },
+          mergeTransition(transition, i)
+        )
+          .then(() => {
+            animate(
+              ".letter-secondary-" + randomIndex,
+              {
+                top: reverse ? "-100%" : "100%",
+              },
+              {
+                duration: 0,
+              }
+            )
+          })
+          .then(() => {
+            if (i === label.length - 1) {
+              setBlocked(false)
+            }
+          })
+      }
+    },
+    100,
+    { leading: true, trailing: true }
+  )
+
+  return (
+    <motion.span
+      className={`flex justify-center items-center relative overflow-hidden ${className}`}
+      onHoverStart={hoverStart}
+      onClick={onClick}
+      ref={scope}
+      {...props}
+    >
+      <span className="sr-only">{label}</span>
+
+      {label.split("").map((letter: string, i: number) => {
+        return (
+          <span className="whitespace-pre relative flex" key={i}>
+            <motion.span
+              className={`relative pb-2 letter-${i}`}
+              style={{ top: 0 }}
+            >
+              {letter}
+            </motion.span>
+            <motion.span
+              className={`absolute letter-secondary-${i}`}
+              aria-hidden={true}
+              style={{ top: reverse ? "-100%" : "100%" }}
+            >
+              {letter}
+            </motion.span>
+          </span>
+        )
+      })}
+    </motion.span>
+  )
+}
+
+export function RandomLetterSwapPingPong({
+  label,
+  reverse = true,
+  transition = {
+    type: "spring",
+    duration: 0.8,
+  },
+  staggerDuration = 0.02,
+  className,
+  onClick,
+  ...props
+}: TextProps) {
+  const [scope, animate] = useAnimate()
+  const [blocked, setBlocked] = useState(false)
+
+  const mergeTransition = (transition: DynamicAnimationOptions, i: number) => ({
+    ...transition,
+    delay: i * staggerDuration,
+  })
+
+  const shuffledIndices = Array.from(
+    { length: label.length },
+    (_, i) => i
+  ).sort(() => Math.random() - 0.5)
+
+  const hoverStart = debounce(
+    () => {
+      if (blocked) return
+      setBlocked(true)
+
+      for (let i = 0; i < label.length; i++) {
+        const randomIndex = shuffledIndices[i]
+        animate(
+          ".letter-" + randomIndex,
+          {
+            y: reverse ? "100%" : "-100%",
+          },
+          mergeTransition(transition, i)
+        )
+
+        animate(
+          ".letter-secondary-" + randomIndex,
+          {
+            top: "0%",
+          },
+          mergeTransition(transition, i)
+        )
+      }
+    },
+    100,
+    { leading: true, trailing: true }
+  )
+
+  const hoverEnd = debounce(
+    () => {
+      setBlocked(false)
+
+      for (let i = 0; i < label.length; i++) {
+        const randomIndex = shuffledIndices[i]
+        animate(
+          ".letter-" + randomIndex,
+          {
+            y: 0,
+          },
+          mergeTransition(transition, i)
+        )
+
+        animate(
+          ".letter-secondary-" + randomIndex,
+          {
+            top: reverse ? "-100%" : "100%",
+          },
+          mergeTransition(transition, i)
+        )
+      }
+    },
+    100,
+    { leading: true, trailing: true }
+  )
+
+  return (
+    <motion.span
+      className={`flex justify-center items-center relative overflow-hidden ${className}`}
+      onHoverStart={hoverStart}
+      onHoverEnd={hoverEnd}
+      onClick={onClick}
+      ref={scope}
+      {...props}
+    >
+      <span className="sr-only">{label}</span>
+
+      {label.split("").map((letter: string, i: number) => {
+        return (
+          <span className="whitespace-pre relative flex" key={i}>
+            <motion.span
+              className={`relative pb-2 letter-${i}`}
+              style={{ top: 0 }}
+            >
+              {letter}
+            </motion.span>
+            <motion.span
+              className={`absolute letter-secondary-${i}`}
+              aria-hidden={true}
+              style={{ top: reverse ? "-100%" : "100%" }}
+            >
+              {letter}
+            </motion.span>
+          </span>
+        )
+      })}
+    </motion.span>
+  )
+}
+
+16. import { useRef } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
+
+interface TextProps {
+  label: string
+  containerRef: React.RefObject<HTMLElement>
+  offset?: [string, string]
+  className?: string
+}
+
+const ScrollAndSwapText = ({
+  label,
+  offset = ["0 0", "0 1"],
+  className,
+  containerRef,
+  ...props
+}: TextProps) => {
+  const ref = useRef<HTMLSpanElement>(null)
+
+  const { scrollYProgress } = useScroll({
+    container: containerRef,
+    target: ref,
+    offset: offset as any, // framer motion doesnt export the type, so we have to cast it, sorry :/
+    layoutEffect: false,
+  })
+
+  const top = useTransform(scrollYProgress, [0, 1], ["0%", "-100%"])
+  const bottom = useTransform(scrollYProgress, [0, 1], ["100%", "0%"])
+
+  return (
+    <span
+      className={`flex overflow-hidden relative items-center justify-center p-0 
+      ${className}`}
+      ref={ref}
+      {...props}
+    >
+      <span className="relative text-transparent" aria-hidden="true">{label}</span>
+      <motion.span className="absolute " style={{ top: top }} >
+        {label}
+      </motion.span>
+      <motion.span
+        className="absolute "
+        style={{ top: bottom }}
+        aria-hidden="true"
+      >
+        {label}
+      </motion.span>
+    </span>
+  )
+}
+
+export {ScrollAndSwapText}
+
+17. "use client";
+import React from "react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+export function LampDemo() {
+  return (
+    <LampContainer>
+      <motion.h1
+        initial={{ opacity: 0.5, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3,
+          duration: 0.8,
+          ease: "easeInOut",
+        }}
+        className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
+      >
+        Build lamps <br /> the right way
+      </motion.h1>
+    </LampContainer>
+  );
+}
+
+export const LampContainer = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div
+      className={cn(
+        "relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-950 w-full rounded-md z-0",
+        className
+      )}
+    >
+      <div className="relative flex w-full flex-1 scale-y-125 items-center justify-center isolate z-0 ">
+        <motion.div
+          initial={{ opacity: 0.5, width: "15rem" }}
+          whileInView={{ opacity: 1, width: "30rem" }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          style={{
+            backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-stops))`,
+          }}
+          className="absolute inset-auto right-1/2 h-56 overflow-visible w-[30rem] bg-gradient-conic from-cyan-500 via-transparent to-transparent text-white [--conic-position:from_70deg_at_center_top]"
+        >
+          <div className="absolute  w-[100%] left-0 bg-slate-950 h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
+          <div className="absolute  w-40 h-[100%] left-0 bg-slate-950  bottom-0 z-20 [mask-image:linear-gradient(to_right,white,transparent)]" />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0.5, width: "15rem" }}
+          whileInView={{ opacity: 1, width: "30rem" }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          style={{
+            backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-stops))`,
+          }}
+          className="absolute inset-auto left-1/2 h-56 w-[30rem] bg-gradient-conic from-transparent via-transparent to-cyan-500 text-white [--conic-position:from_290deg_at_center_top]"
+        >
+          <div className="absolute  w-40 h-[100%] right-0 bg-slate-950  bottom-0 z-20 [mask-image:linear-gradient(to_left,white,transparent)]" />
+          <div className="absolute  w-[100%] right-0 bg-slate-950 h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
+        </motion.div>
+        <div className="absolute top-1/2 h-48 w-full translate-y-12 scale-x-150 bg-slate-950 blur-2xl"></div>
+        <div className="absolute top-1/2 z-50 h-48 w-full bg-transparent opacity-10 backdrop-blur-md"></div>
+        <div className="absolute inset-auto z-50 h-36 w-[28rem] -translate-y-1/2 rounded-full bg-cyan-500 opacity-50 blur-3xl"></div>
+        <motion.div
+          initial={{ width: "8rem" }}
+          whileInView={{ width: "16rem" }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          className="absolute inset-auto z-30 h-36 w-64 -translate-y-[6rem] rounded-full bg-cyan-400 blur-2xl"
+        ></motion.div>
+        <motion.div
+          initial={{ width: "15rem" }}
+          whileInView={{ width: "30rem" }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          className="absolute inset-auto z-50 h-0.5 w-[30rem] -translate-y-[7rem] bg-cyan-400 "
+        ></motion.div>
+
+        <div className="absolute inset-auto z-40 h-44 w-full -translate-y-[12.5rem] bg-slate-950 "></div>
+      </div>
+
+      <div className="relative z-50 flex -translate-y-80 flex-col items-center px-5">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+18. "use client";
+
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+
+interface AnimatedTextProps {
+    text?: string;
+    className?: string;
+}
+
+function Text_03({
+    text = "Hover me",
+    className = "",
+}: AnimatedTextProps) {
+    return (
+        <motion.span
+            className={cn(
+                "w-full text-center inline-block cursor-pointer text-3xl transition-all",
+                className
+            )}
+            whileHover="hover"
+            initial="initial"
+        >
+            {text.split("").map((char, index) => (
+                <motion.span
+                    key={index}
+                    className="inline-block"
+                    variants={{
+                        initial: {
+                            y: 0,
+                            scale: 1,
+                        },
+                        hover: {
+                            y: -4,
+                            scale: 1.2,
+                            transition: {
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 15,
+                                delay: index * 0.03,
+                            },
+                        },
+                    }}
+                >
+                    {char}
+                </motion.span>
+            ))}
+        </motion.span>
+    );
+}
+
+export { Text_03 }
+
+19. "use client"
+
+import React, { CSSProperties, forwardRef, useRef } from "react"
+import { motion, useAnimationFrame, useMotionValue, useTransform } from "motion/react"
+import { useMousePositionRef } from "@/hooks/use-mouse-position-ref"
+
+// Helper type that makes all properties of CSSProperties accept number | string
+type CSSPropertiesWithValues = {
+  [K in keyof CSSProperties]: string | number
+}
+
+interface StyleValue<T extends keyof CSSPropertiesWithValues> {
+  from: CSSPropertiesWithValues[T]
+  to: CSSPropertiesWithValues[T]
+}
+
+interface TextProps extends React.HTMLAttributes<HTMLSpanElement> {
+  label: string
+  styles: Partial<{
+    [K in keyof CSSPropertiesWithValues]: StyleValue<K>
+  }>
+  containerRef: React.RefObject<HTMLDivElement>
+  radius?: number
+  falloff?: "linear" | "exponential" | "gaussian"
+}
+
+const TextCursorProximity = forwardRef<HTMLSpanElement, TextProps>(
+  (
+    {
+      label,
+      styles,
+      containerRef,
+      radius = 50,
+      falloff = "linear",
+      className,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
+    const letterRefs = useRef<(HTMLSpanElement | null)[]>([])
+    const mousePositionRef = useMousePositionRef(containerRef)
+    
+    // Create a motion value for each letter's proximity
+    const letterProximities = useRef(
+      Array(label.replace(/\s/g, "").length)
+        .fill(0)
+        .map(() => useMotionValue(0))
+    )
+
+    const calculateDistance = (
+      x1: number,
+      y1: number,
+      x2: number,
+      y2: number
+    ): number => {
+      return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+    }
+
+    const calculateFalloff = (distance: number): number => {
+      const normalizedDistance = Math.min(Math.max(1 - distance / radius, 0), 1)
+
+      switch (falloff) {
+        case "exponential":
+          return Math.pow(normalizedDistance, 2)
+        case "gaussian":
+          return Math.exp(-Math.pow(distance / (radius / 2), 2) / 2)
+        case "linear":
+        default:
+          return normalizedDistance
+      }
+    }
+
+    useAnimationFrame(() => {
+      if (!containerRef.current) return
+      const containerRect = containerRef.current.getBoundingClientRect()
+
+      letterRefs.current.forEach((letterRef, index) => {
+        if (!letterRef) return
+
+        const rect = letterRef.getBoundingClientRect()
+        const letterCenterX = rect.left + rect.width / 2 - containerRect.left
+        const letterCenterY = rect.top + rect.height / 2 - containerRect.top
+
+        const distance = calculateDistance(
+          mousePositionRef.current.x,
+          mousePositionRef.current.y,
+          letterCenterX,
+          letterCenterY
+        )
+
+        const proximity = calculateFalloff(distance)
+        letterProximities.current[index].set(proximity)
+      })
+    })
+
+    const words = label.split(" ")
+    let letterIndex = 0
+
+    return (
+      <span
+        ref={ref}
+        className={`${className} inline`}
+        onClick={onClick}
+        {...props}
+      >
+        {words.map((word, wordIndex) => (
+          <span key={wordIndex} className="inline-block whitespace-nowrap">
+            {word.split("").map((letter) => {
+              const currentLetterIndex = letterIndex++
+              const proximity = letterProximities.current[currentLetterIndex]
+              
+              // Create transformed values for each style property
+              const transformedStyles = Object.entries(styles).reduce((acc, [key, value]) => {
+                acc[key] = useTransform(proximity, [0, 1], [value.from, value.to])
+                return acc
+              }, {} as Record<string, any>)
+
+              return (
+                <motion.span
+                  key={currentLetterIndex}
+                  ref={(el: HTMLSpanElement | null) => {
+                    letterRefs.current[currentLetterIndex] = el
+                  }}
+                  className="inline-block"
+                  aria-hidden="true"
+                  style={transformedStyles}
+                >
+                  {letter}
+                </motion.span>
+              )
+            })}
+            {wordIndex < words.length - 1 && (
+              <span className="inline-block">&nbsp;</span>
+            )}
+          </span>
+        ))}
+        <span className="sr-only">{label}</span>
+      </span>
+    )
+  }
+)
+
+TextCursorProximity.displayName = "TextCursorProximity"
+export default TextCursorProximity
+
+
+20 "use client";
+
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useState } from "react";
+
+const Card = ({
+className,
+image,
+children,
+}: {
+className?: string;
+image?: string;
+children?: React.ReactNode;
+}) => {
+return (
+  <div
+    className={cn(
+      "w-[350px] cursor-pointer h-[400px] overflow-hidden bg-white rounded-2xl shadow-[0_0_10px_rgba(0,0,0,0.02)] border border-gray-200/80",
+      className
+    )}
+  >
+    {image && (
+      <div className="relative h-72 rounded-xl shadow-lg overflow-hidden w-[calc(100%-1rem)] mx-2 mt-2">
+        <img
+          src={image}
+          alt="card"
+          className="object-cover mt-0 w-full h-full"
+        />
+      </div>
+    )}
+    {children && (
+      <div className="px-4 p-2 flex flex-col gap-y-2">{children}</div>
+    )}
+  </div>
+);
+};
+
+interface CardData {
+image: string;
+title: string;
+description: string;
+}
+
+const StackedCardsInteraction = ({
+cards,
+spreadDistance = 40,
+rotationAngle = 5,
+animationDelay = 0.1,
+}: {
+cards: CardData[];
+spreadDistance?: number;
+rotationAngle?: number;
+animationDelay?: number;
+}) => {
+const [isHovering, setIsHovering] = useState(false);
+
+// Limit to maximum of 3 cards
+const limitedCards = cards.slice(0, 3);
+
+return (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <div className="relative w-[350px] h-[400px]">
+      {limitedCards.map((card, index) => {
+        const isFirst = index === 0;
+
+        let xOffset = 0;
+        let rotation = 0;
+
+        if (limitedCards.length > 1) {
+          // First card stays in place
+          // Second card goes left
+          // Third card goes right
+          if (index === 1) {
+            xOffset = -spreadDistance;
+            rotation = -rotationAngle;
+          } else if (index === 2) {
+            xOffset = spreadDistance;
+            rotation = rotationAngle;
+          }
+        }
+
+        return (
+          <motion.div
+            key={index}
+            className={cn("absolute", isFirst ? "z-10" : "z-0")}
+            initial={{ x: 0, rotate: 0 }}
+            animate={{
+              x: isHovering ? xOffset : 0,
+              rotate: isHovering ? rotation : 0,
+              zIndex: isFirst ? 10 : 0,
+            }}
+            transition={{
+              duration: 0.3,
+              ease: "easeInOut",
+              delay: index * animationDelay,
+              type: "spring",
+            }}
+            {...(isFirst && {
+              onHoverStart: () => setIsHovering(true),
+              onHoverEnd: () => setIsHovering(false),
+            })}
+          >
+            <Card
+              className={isFirst ? "z-10 cursor-pointer" : "z-0"}
+              image={card.image}
+            >
+              <h2>{card.title}</h2>
+              <p>{card.description}</p>
+            </Card>
+          </motion.div>
+        );
+      })}
+    </div>
+  </div>
+);
+};
+
+export { StackedCardsInteraction, Card };
+
+
+21. "use client";
+
+import { cn } from "@/lib/utils";
+import { Sparkles } from "lucide-react";
+
+interface DisplayCardProps {
+  className?: string;
+  icon?: React.ReactNode;
+  title?: string;
+  description?: string;
+  date?: string;
+  iconClassName?: string;
+  titleClassName?: string;
+}
+
+function DisplayCard({
+  className,
+  icon = <Sparkles className="size-4 text-blue-300" />,
+  title = "Featured",
+  description = "Discover amazing content",
+  date = "Just now",
+  iconClassName = "text-blue-500",
+  titleClassName = "text-blue-500",
+}: DisplayCardProps) {
+  return (
+    <div
+      className={cn(
+        "relative flex h-36 w-[22rem] -skew-y-[8deg] select-none flex-col justify-between rounded-xl border-2 bg-muted/70 backdrop-blur-sm px-4 py-3 transition-all duration-700 after:absolute after:-right-1 after:top-[-5%] after:h-[110%] after:w-[20rem] after:bg-gradient-to-l after:from-background after:to-transparent after:content-[''] hover:border-white/20 hover:bg-muted [&>*]:flex [&>*]:items-center [&>*]:gap-2",
+        className
+      )}
+    >
+      <div>
+        <span className="relative inline-block rounded-full bg-blue-800 p-1">
+          {icon}
+        </span>
+        <p className={cn("text-lg font-medium", titleClassName)}>{title}</p>
+      </div>
+      <p className="whitespace-nowrap text-lg">{description}</p>
+      <p className="text-muted-foreground">{date}</p>
+    </div>
+  );
+}
+
+interface DisplayCardsProps {
+  cards?: DisplayCardProps[];
+}
+
+export default function DisplayCards({ cards }: DisplayCardsProps) {
+  const defaultCards = [
+    {
+      className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration:700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration:700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
+    },
+  ];
+
+  const displayCards = cards || defaultCards;
+
+  return (
+    <div className="grid [grid-template-areas:'stack'] place-items-center opacity-100 animate-in fade-in-0 duration-700">
+      {displayCards.map((cardProps, index) => (
+        <DisplayCard key={index} {...cardProps} />
+      ))}
+    </div>
+  );
+}

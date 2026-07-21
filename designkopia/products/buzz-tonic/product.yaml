@@ -1,0 +1,46 @@
+version: "1"
+brand: BUZZ
+slug: buzz-tonic
+type: product_brand
+job_type: product_brand
+
+tagline: Spark. Sip. Repeat.
+positioning: >
+  Neo-brutalist DTC tonic — limonka, yuzu, zero cukru. Puszka jak plakat:
+  grube obramowania, żółta energia, designerski chaos z kontrolą.
+
+layout_ref: references/layout-screenshots/inbox/01_readymag_com_1782385549.png
+concept_id: readymag-cinematic-grid
+layout_archetype: product-editorial
+palette_family: green_yellow
+job_palette: green_yellow
+
+product_visual_spec: >
+  330ml slim aluminum beverage can. Matte lime-chartreuse body (#C8F135).
+  Thick black border graphic printed around entire can (2-3px visual weight).
+  Large black sans-serif word "BUZZ" centered on front — bold, all caps.
+  Small black text below: "YUZU TONIC" and "330 ML".
+  Same exact can shape, same label layout, same lime color in every shot.
+  NOT glass bottle. NOT energy drink neon red. NOT slim white can.
+
+notes:
+  flavor: yuzu, limonka, świeża mięta
+  sweetener: zero cukru, erytrytol
+  format: 330 ml puszka
+
+shot_brief_source: profiles/job-types/product-brand.yaml
+
+image_narrative:
+  - shot_id: anchor_packshot
+    role: anchor
+    subject_hint: "BUZZ lime can centered on cream seamless, hard shadow"
+    style_ref: references/layout-screenshots/inbox/02_northbureau_com_1782385575.png
+    style_dimensions: [neo_brutalist, lime_yellow, bold_type]
+  - shot_id: hero_lifestyle
+    role: hero
+    subject_hint: "SAME can on purple surface with lime slice — playful"
+    gate: derived_from_anchor_only
+  - shot_id: flatlay
+    role: flatlay
+    subject_hint: "SAME can top-down with yuzu halves on cream"
+    gate: derived_from_anchor_only

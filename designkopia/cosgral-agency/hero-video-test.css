@@ -1,0 +1,285 @@
+/* COSGRAL — hero overlay: tło strony + film bez czerni (screen) na blurze */
+
+:root {
+  --hero-overlay-blur: 2.5px;
+  --hero-overlay-opacity: 0.88;
+  --hero-bg-blur: 10px;
+  --hero-plate-blur: 16px;
+}
+
+body.hero-mode--cubes {
+  --hero-overlay-blur: 2px;
+  --hero-overlay-opacity: 0.9;
+  --hero-bg-blur: 8px;
+  --hero-plate-blur: 14px;
+}
+
+body.hero-mode--ice {
+  --hero-overlay-blur: 3.25px;
+  --hero-overlay-opacity: 0.86;
+  --hero-bg-blur: 12px;
+  --hero-plate-blur: 20px;
+}
+
+/* Przezroczysty hero — widać mockup scroll + fashion-haze */
+body.hero-video-test-mode.hero-mode--cubes .act-wrapper,
+body.hero-video-test-mode.hero-mode--ice .act-wrapper {
+  background: transparent;
+}
+
+body.hero-video-test-mode.hero-mode--cubes .act-wrapper::before,
+body.hero-video-test-mode.hero-mode--ice .act-wrapper::before {
+  opacity: 1;
+  z-index: 0;
+}
+
+/* Stałe tło hero pod nakładką (cały pin aktów 1–4) */
+.hero-scene-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  overflow: hidden;
+}
+
+body.hero-mode--cubes .hero-scene-bg,
+body.hero-mode--ice .hero-scene-bg {
+  opacity: 1;
+}
+
+.hero-scene-bg img {
+  position: absolute;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  object-fit: cover;
+  opacity: 0.34;
+  filter: blur(var(--hero-bg-blur)) saturate(0.92) brightness(0.88);
+  transform: scale(1.02);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 0.15) 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 0.15) 88%, transparent 100%);
+}
+
+.hero-scene-bg__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 32% 28%, rgba(232, 140, 66, 0.07), transparent 68%),
+    radial-gradient(ellipse 55% 50% at 78% 72%, rgba(180, 188, 198, 0.08), transparent 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 100%);
+}
+
+/* Stack wideo — screen blend usuwa czarne tło filmu */
+.hero-video-stack {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Rozmyta „płyta” pod obiektem — maskuje watermark preview */
+.hero-video-plate {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(78vw, 960px);
+  height: min(62vh, 540px);
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+  background: rgba(8, 8, 10, 0.18);
+  backdrop-filter: blur(var(--hero-plate-blur));
+  -webkit-backdrop-filter: blur(var(--hero-plate-blur));
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  -webkit-mask-image: radial-gradient(ellipse 88% 82% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 88% 82% at 50% 50%, #000 55%, transparent 100%);
+}
+
+body.hero-mode--cubes .hero-video-plate,
+body.hero-mode--ice .hero-video-plate {
+  opacity: 1;
+}
+
+.hero-video-layer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(72vw, 880px);
+  height: min(58vh, 500px);
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  mix-blend-mode: screen;
+  filter: blur(var(--hero-overlay-blur)) contrast(1.1) brightness(1.06) saturate(0.95);
+  pointer-events: none;
+}
+
+body.hero-mode--cubes #hero-video-cubes,
+body.hero-mode--ice #hero-video-ice {
+  opacity: var(--hero-overlay-opacity);
+}
+
+body.hero-mode--cubes #cube-stage,
+body.hero-mode--ice #cube-stage {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+/* act__bg zostaje ukryte — hero-scene-bg przejmuje to samo zdjęcie na cały pin */
+body.hero-mode--cubes .act__bg,
+body.hero-mode--ice .act__bg {
+  opacity: 0 !important;
+}
+
+/* Panel wyboru */
+#hero-video-panel {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: 1000;
+  transform: translateY(-50%);
+  font-family: Arial, sans-serif;
+  font-size: 0.78rem;
+  color: #f5f0eb;
+}
+
+#hero-video-panel__toggle {
+  position: absolute;
+  left: -2.6rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(245, 240, 235, 0.15);
+  border-bottom: 0;
+  color: #f5f0eb;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+#hero-video-panel__inner {
+  width: min(19rem, 88vw);
+  max-height: min(82vh, 680px);
+  overflow-y: auto;
+  background: rgba(10, 10, 10, 0.94);
+  border: 1px solid rgba(245, 240, 235, 0.12);
+  border-right: 0;
+  backdrop-filter: blur(10px);
+  padding: 0.85rem;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+#hero-video-panel.is-open #hero-video-panel__inner {
+  transform: translateX(0);
+}
+
+#hero-video-panel h2 {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9a9a9a;
+  margin-bottom: 0.65rem;
+  font-weight: 400;
+}
+
+.hero-video-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: #f5f0eb;
+  background: transparent;
+  border: 1px solid rgba(245, 240, 235, 0.1);
+  padding: 0.45rem 0.55rem;
+  margin-bottom: 0.3rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.hero-video-option:hover,
+.hero-video-option:focus-visible {
+  border-color: rgba(180, 188, 198, 0.5);
+  outline: none;
+}
+
+.hero-video-option.is-active {
+  border-color: #b4bcc6;
+  color: #d0d6de;
+}
+
+.hero-video-option small {
+  display: block;
+  color: #6b6b6b;
+  font-size: 0.62rem;
+  margin-top: 0.15rem;
+  line-height: 1.35;
+}
+
+.hero-video-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  margin-top: 0.35rem;
+  border: 1px solid rgba(245, 240, 235, 0.08);
+  opacity: 0.85;
+}
+
+#hero-video-status {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(245, 240, 235, 0.08);
+  font-size: 0.62rem;
+  color: #6b6b6b;
+  line-height: 1.4;
+}
+
+.hero-video-note {
+  margin-top: 0.45rem;
+  font-size: 0.58rem;
+  color: #555;
+  line-height: 1.45;
+}
+
+.hero-video-note code {
+  font-size: 0.9em;
+  color: #888;
+}
+
+.hero-video-tuning {
+  margin-top: 0.55rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(245, 240, 235, 0.08);
+}
+
+.hero-tune-row {
+  display: grid;
+  grid-template-columns: 4.2rem 1fr 2.2rem;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.58rem;
+  color: #7a7a7a;
+  margin-bottom: 0.4rem;
+}
+
+.hero-tune-row input[type="range"] {
+  width: 100%;
+  accent-color: #b4bcc6;
+}
+
+.hero-tune-row output {
+  text-align: right;
+  color: #b4bcc6;
+  font-size: 0.55rem;
+}

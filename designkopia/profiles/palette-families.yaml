@@ -1,0 +1,91 @@
+# Rodziny palet — color-palette-guardian + palette-extractor
+# Rotacja między jobami; jedna rodzina spójna w obrębie joba.
+
+version: "1"
+updated_at: "2026-06-24"
+
+rules:
+  per_job: "Jedna palette_family dominująca na landing"
+  between_jobs: "color-palette-guardian blokuje powtórzenie tej samej rodziny w 2 kolejnych jobach"
+  source: "Hex z obrazów (extract-palette.py) — nie z głowy agenta"
+  ui_vars: ["--bg", "--text", "--accent", "--muted", "--accent-2", "--surface"]
+
+families:
+  warm_organic:
+    description: Cream, beige, terracotta, sage accents
+    hue_ranges: { h_min: 15, h_max: 45, secondary: sage }
+    hex_hints: ["#F4F1EA", "#C67B5C", "#8FA882", "#1A1A1A"]
+    avoid_repeating_after: [warm_organic]
+
+  dusty_rose_mauve:
+    description: Monochromatic rose, mauve, soft pink — DTC beauty (Rare Beauty lane)
+    hue_ranges: { h_min: 330, h_max: 20, s_low: true }
+    hex_hints: ["#E8B4B8", "#C9A0A8", "#8B5A6B", "#FDF6F6"]
+    example_refs: [layout-screenshots/processed/rare-beauty-dtc-mockup.png]
+
+  bold_orange:
+    description: Pomarańcz saturated, amber, punchy accent
+    hue_ranges: { h_min: 20, h_max: 38 }
+    hex_hints: ["#E85D04", "#F48C06", "#FF6B35", "#1A1A1A"]
+    subtones: [terracotta, amber, tangerine]
+
+  warm_yellow:
+    description: Żółty editorial — mustard, butter, citron
+    hue_ranges: { h_min: 45, h_max: 65 }
+    hex_hints: ["#FFD60A", "#F4D35E", "#E9C46A", "#2B2B2B"]
+    subtones: [mustard, butter, citron, chartreuse_edge]
+
+  sage_green:
+    description: Sage, muted green, wellness
+    hue_ranges: { h_min: 95, h_max: 145, s_moderate: true }
+    hex_hints: ["#8FA882", "#A8D5BA", "#2D6A4F", "#F4F1EA"]
+    subtones: [sage, eucalyptus, olive_muted]
+
+  forest_green:
+    description: Głęboka zieleń, forest, luxury green
+    hue_ranges: { h_min: 130, h_max: 165, s_high: true }
+    hex_hints: ["#1B4332", "#2D6A4F", "#40916C", "#F8F9FA"]
+    subtones: [forest, emerald_dark, pine]
+
+  lime_chartreuse:
+    description: Żółto-zielony punchy — sporty editorial
+    hue_ranges: { h_min: 65, h_max: 95 }
+    hex_hints: ["#B5E48C", "#34C759", "#FFD60A", "#1A1A1A"]
+    subtones: [lime, chartreuse, yellow_green]
+
+  mint_cool:
+    description: Mint, cool grey-green, clinical soft
+    hue_ranges: { h_min: 145, h_max: 175, l_high: true }
+    hex_hints: ["#A8D5BA", "#E5E5E5", "#3D3D3D"]
+    subtones: [mint, seafoam, cool_grey_green]
+
+  cherry_minimal:
+    description: Deep cherry red, near black, warm cream — niche perfumery
+    hue_ranges: { h_min: 340, h_max: 10, s_moderate: true }
+    hex_hints: ["#6B1F2E", "#8B2635", "#F5F0EB", "#0C0C0C"]
+    subtones: [deep_cherry, black_tea, cream]
+
+  bold_red:
+    description: Red-on-red editorial
+    hex_hints: ["#C41E1E", "#E82323", "#0A0A0A", "#FAFAF8"]
+
+  bw_editorial:
+    description: Strict monochrome
+    hex_hints: ["#000000", "#808080", "#FFFFFF"]
+
+  aqua_cerulean:
+    description: Turquoise, cerulean, summer
+    hex_hints: ["#40E0D0", "#0077B6", "#CAF0F8"]
+
+  purple_magenta:
+    description: Night fashion, magenta accent
+    hex_hints: ["#6B2D8B", "#DA70D6", "#1B1033"]
+
+rotation:
+  lookback_jobs: 3
+  fail_if_same_family_consecutive: true
+  encourage_untried: [dusty_rose_mauve, warm_yellow, lime_chartreuse, sage_green, forest_green, bold_orange]
+
+classification:
+  script: scripts/classify-palette-family.py
+  from_image: scripts/extract-palette.py outputs auto-suggest via dominant hues

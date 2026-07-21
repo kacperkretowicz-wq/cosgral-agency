@@ -1,0 +1,68 @@
+id: spector
+name: Spector — Narrative Portfolio
+preview_url: https://spector.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/spector/
+source_image: references/templates/spector.md
+tags:
+  - hero
+  - nav
+  - agency
+  - portfolio
+  - dark
+  - editorial
+  - motion
+  - video
+  - 3d
+  - process
+
+sections:
+  - id: hero
+    type: hero
+    notes: "NYC address, Y2K26 tag"
+  - id: projects
+    type: portfolio
+    layout: carousel
+  - id: clients
+    type: features
+    layout: carousel-3d
+  - id: services
+    type: services
+  - id: awards
+    type: features
+  - id: showreel
+    type: hero
+    layout: video
+  - id: process
+    type: process
+    layout: four-column
+
+typography:
+  heading_font: "Plus Jakarta Sans"
+  body_font: "Plus Jakarta Sans"
+  heading_sizes:
+    h1: "4rem"
+  body_size: "0.95rem"
+  weights:
+    heading: 700
+    body: 400
+
+spacing:
+  page_max_width: "1440px"
+  section_padding_y: "120px"
+  section_padding_x: "40px"
+  grid_columns: 12
+  gap: "48px"
+
+color_tokens:
+  background: "#050609"
+  accent: "#F94137"
+  text: "#E8D9C8"
+  muted: "#7A7A7A"
+
+mixable_with:
+  - fabrica
+  - astra
+  - kirk
+  - salient
+
+notes: "Narrative studio — motion, 3D carousel, awards, editorial swagger."

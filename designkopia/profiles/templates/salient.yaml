@@ -1,0 +1,113 @@
+id: salient
+name: Salient — Premium Studio Agency
+source_image: references/templates/salient.md
+preview_url: https://salient.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/salient/
+creator: Framer Marketplace
+tags:
+  - hero
+  - nav
+  - about
+  - portfolio
+  - services
+  - features
+  - process
+  - pricing
+  - testimonials
+  - faq
+  - blog
+  - footer
+
+sections:
+  - id: nav
+    type: nav
+    layout: split
+    notes: "Salient® logo, Studio/Projects/Blog/Contact, hamburger"
+  - id: hero
+    type: hero
+    layout: split
+    notes: "Tagline left, Start a project link, mega Salient® + live timestamp, full-width hero photo"
+  - id: logo-bar
+    type: features
+    layout: row
+    notes: "Grayscale client logos row"
+  - id: about
+    type: about
+    layout: centered
+    notes: "Studio intro + animated stat counters (Projects, Countries, Years, Awards)"
+  - id: selected-work
+    type: portfolio
+    layout: list
+    notes: "Section (02) — project list with tags: RESEARCH, BRAND IDENTITY, UX/UI…"
+  - id: services
+    type: services
+    layout: list
+    notes: "Section (03) — Brand Identity, UI/UX, Social, Web Dev, Motion, Production, Packaging"
+  - id: why-us
+    type: features
+    layout: three-column
+    columns: 3
+    notes: "Section (04) — Clear Process, Scalable Design, Focused Collaboration"
+  - id: how-we-work
+    type: process
+    layout: four-column
+    columns: 4
+    notes: "Section (05) — Discovery, Concept, Production, Delivery"
+  - id: pricing
+    type: pricing
+    layout: two-column
+    columns: 2
+    notes: "Section (06) — Essential $3000/mo vs Enterprise $8000/mo"
+  - id: testimonials
+    type: testimonials
+    layout: centered
+    notes: "Section (07) — 4.9/5, client quote, trusted by logos"
+  - id: faq
+    type: faq
+    layout: accordion
+    notes: "Any Questions? We Got You."
+  - id: blog
+    type: blog
+    layout: grid
+    notes: "Latest insights — 3 article cards"
+  - id: footer
+    type: footer
+    layout: centered
+    notes: "Salient® + Get Template"
+
+typography:
+  heading_font: "Inter"
+  body_font: "Inter"
+  heading_sizes:
+    h1: "clamp(4rem, 10vw, 8rem)"
+    h2: "2.5rem"
+  body_size: "1rem"
+  weights:
+    heading: 600
+    body: 400
+  notes: "Section numbers in parentheses: (02), (03). Live clock in hero."
+
+spacing:
+  page_max_width: "1280px"
+  section_padding_y: "100px"
+  section_padding_x: "32px"
+  grid_columns: 12
+  gap: "40px"
+
+color_tokens:
+  background: "#F5F5F5"
+  accent: "#0A0A0A"
+  text: "#0A0A0A"
+  muted: "#666666"
+  border: "#E5E5E5"
+
+mixable_with:
+  - portfolite
+  - taylor
+  - kirk
+  - grid-editorial
+  - cta-minimal
+
+notes: >
+  Pełny agency/studio template — najbogatszy w sekcje (pricing, FAQ, blog, stats).
+  Minimal B&W, duży display logo, hero photo z motion blur w tle.

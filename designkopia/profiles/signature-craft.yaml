@@ -1,0 +1,66 @@
+# ─────────────────────────────────────────────────────────────────────────
+# SIGNATURE CRAFT — rubryka ARTYZMU i KUNSZTU.
+# „Każdy projekt ma coś niepowtarzalnego, zrobionego najwyższą techniką —
+#  ktoś wchodzi na stronę i mówi WOW."
+#
+# Czytają: art-director (proponuje signature moment), concept-guardian (ocenia),
+#          effect-smith (buduje gdy trzeba nowego efektu), motion-implementer.
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "1"
+updated_at: "2026-06-26"
+
+# ── ZASADA: jeden niepowtarzalny moment per projekt ──────────────────────
+principle: >
+  Każdy projekt dostaje DOKŁADNIE JEDEN signature moment — bohaterski, dopracowany
+  do perfekcji, unikalny dla TEJ marki. Reszta strony go wspiera (restraint), nie
+  konkuruje. Lepiej jeden moment 10/10 niż pięć po 6/10.
+
+# ── RUBRYKA WOW (art-director scoruje 1–5 każdy wymiar; suma celowa ≥ 22/25) ──
+wow_rubric:
+  novelty:        "Czy widz widział to 100× (AI-default) czy to coś świeżego? Klon = 1."
+  craft:          "Wykończenie: timing/easing, sub-pixel, brak janku, dopięte detale."
+  brand_fit:      "Moment wynika z marki/produktu/zamysłu — nie doklejony efekt-gadżet."
+  restraint:      "Reszta strony ustępuje. Brak chaosu konkurujących animacji."
+  performance:    "60fps, brak CLS, działa na mobile, reduced-motion ma sensowny fallback."
+
+# ── KIERUNKI SIGNATURE (inspiracja, nie checklista — wybierz/wymyśl JEDEN) ──
+signature_directions:
+  - id: kinetic_typography
+    feel: "mega-type żyje — split/scramble/skew na scroll-velocity"
+    tech: [text-split-reveal, text-scramble-decode, scroll-velocity-skew]
+  - id: scroll_film
+    feel: "hero jak film — scrub klatek/clip-path, narracja scrollem"
+    tech: [scroll-scrubbed-video, voyeur-clip-path-hero-pin, pinned-scroll-sequence]
+  - id: tactile_webgl
+    feel: "obraz reaguje dotykiem — dystorsja/bulge/fluid pod kursorem"
+    tech: [webgl-image-distortion, playfight-webgl-bulge, shader-gradient-bg]
+  - id: spatial_3d
+    feel: "scena 3D / parallax głębi — produkt obraca się, kamera jedzie"
+    tech: [r3f-hero-scene, parallax-layers]
+  - id: physical_play
+    feel: "fizyka/przeciąganie — elementy mają masę, kolizje, momentum"
+    tech: [moving-shapes-physics, playfight-pin-scatter-flip]
+  - id: editorial_choreography
+    feel: "redakcyjny rytm — maski, stagger, przejścia stron bez mignięcia"
+    tech: [masked-image-reveal, page-transition, scroll-reveal-stagger]
+
+# ── ANTY-WOW (to NIE jest signature, to default — concept-guardian FAIL) ──
+anti_wow:
+  - "scroll-reveal na każdym .reveal jako jedyny 'efekt'"
+  - "ten sam bundle co ostatnie 3 joby (scroll-reveal+origin-button+letter-hover)"
+  - "efekt doklejony bez związku z marką (WebGL bo 'fajne')"
+  - "pięć średnich animacji zamiast jednej perfekcyjnej"
+  - "laggy custom-cursor / image-trail (patrz tuning w site-clone-registry)"
+
+# ── KONTRAKT: signature-spec.json (art-director produkuje) ───────────────
+signature_spec_fields:
+  - moment_name           # nazwa własna momentu (np. „BUZZ decode hero")
+  - direction             # id z signature_directions lub własny
+  - where                 # która sekcja/element
+  - brand_rationale       # dlaczego TA marka, nie inna
+  - tech                  # technique_id z effects-stack.yaml (+ czy potrzebny nowy → effect-smith)
+  - reference_bar         # strona/awwwards którą chcemy pobić
+  - reduced_motion_fallback
+  - wow_scores            # {novelty, craft, brand_fit, restraint, performance} 1–5
+  - rest_of_page_restraint # jak reszta strony ustępuje momentowi

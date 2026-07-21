@@ -1,0 +1,182 @@
+/* COSGRAL — tryb testowy tła scroll mockupów (index-bg-test.html) */
+
+body.bg-test-mode {
+  background: #0a0a0a;
+}
+
+#bg-test-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+#bg-test-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #0a0a0a;
+  background-repeat: no-repeat;
+  background-position: top center;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+body.bg-test-mode.has-mockup-bg #bg-test-canvas {
+  opacity: 1;
+}
+
+#bg-test-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Przezroczyste sekcje — mockup przebija spod treści */
+body.bg-test-mode.has-mockup-bg .act-wrapper,
+body.bg-test-mode.has-mockup-bg .scroll-sections-wrapper {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+body.bg-test-mode.has-mockup-bg .section,
+body.bg-test-mode.has-mockup-bg .section_history,
+body.bg-test-mode.has-mockup-bg .site-footer {
+  background: transparent !important;
+}
+
+body.bg-test-mode.has-mockup-bg .mesh-canvas {
+  opacity: 0 !important;
+}
+
+body.bg-test-mode.has-mockup-bg .mesh-canvas--video {
+  opacity: 0 !important;
+}
+
+body.bg-test-mode.has-mockup-bg .faq::before,
+body.bg-test-mode.has-mockup-bg .section_history::before {
+  opacity: 0 !important;
+}
+
+body.bg-test-mode.has-mockup-bg .act__bg {
+  opacity: 0 !important;
+}
+
+body.bg-test-mode.has-mockup-bg .act-wrapper::before {
+  opacity: 0.25;
+}
+
+/* Panel wyboru — poza shell, zawsze na wierzchu */
+#bg-test-panel {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: 1000;
+  transform: translateY(-50%);
+  font-family: Arial, sans-serif;
+  font-size: 0.78rem;
+  color: #f5f0eb;
+}
+
+#bg-test-panel__toggle {
+  position: absolute;
+  left: -2.4rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  background: rgba(10, 10, 10, 0.92);
+  border: 1px solid rgba(245, 240, 235, 0.15);
+  border-bottom: 0;
+  color: #f5f0eb;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+#bg-test-panel__inner {
+  width: min(18rem, 88vw);
+  max-height: min(82vh, 680px);
+  overflow-y: auto;
+  background: rgba(10, 10, 10, 0.94);
+  border: 1px solid rgba(245, 240, 235, 0.12);
+  border-right: 0;
+  backdrop-filter: blur(10px);
+  padding: 0.85rem;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+#bg-test-panel.is-open #bg-test-panel__inner {
+  transform: translateX(0);
+}
+
+#bg-test-panel h2 {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9a9a9a;
+  margin-bottom: 0.65rem;
+  font-weight: 400;
+}
+
+#bg-test-panel .bg-group { margin-bottom: 0.85rem; }
+
+#bg-test-panel .bg-group-title {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  margin-bottom: 0.35rem;
+}
+
+.bg-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: #f5f0eb;
+  background: transparent;
+  border: 1px solid rgba(245, 240, 235, 0.1);
+  padding: 0.45rem 0.55rem;
+  margin-bottom: 0.3rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.bg-option:hover,
+.bg-option:focus-visible {
+  border-color: rgba(180, 188, 198, 0.5);
+  outline: none;
+}
+
+.bg-option.is-active {
+  border-color: #b4bcc6;
+  color: #d0d6de;
+}
+
+.bg-option small {
+  display: block;
+  color: #6b6b6b;
+  font-size: 0.62rem;
+  margin-top: 0.15rem;
+}
+
+#bg-test-status {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(245, 240, 235, 0.08);
+  font-size: 0.62rem;
+  color: #6b6b6b;
+  line-height: 1.4;
+}
+
+#bg-test-loading {
+  font-size: 0.62rem;
+  color: #b4bcc6;
+  margin-top: 0.35rem;
+  min-height: 1em;
+}

@@ -1,0 +1,120 @@
+version: "1"
+updated_at: "2026-06-23"
+
+defaults:
+  body_min_size: "16px"
+  body_line_height: 1.6
+  max_families_per_page: 2
+  heading_tracking_default: "-0.01em"
+  body_tracking_default: "0em"
+  source: "Google Fonts"
+
+pairings:
+  - id: editorial-red-impact
+    palette_family: bold_red
+    heading_font: "Bebas Neue"
+    body_font: "Inter"
+    fallback: "Plus Jakarta Sans"
+    use_for: [hero, manifesto, campaign]
+    weights:
+      heading: [400]
+      body: [400, 500, 700]
+    notes: "Wysoki kontrast i mocny headline. Body neutralne dla czytelności."
+
+  - id: nocturne-luxury
+    palette_family: purple_magenta
+    heading_font: "Syne"
+    body_font: "Manrope"
+    fallback: "Inter"
+    use_for: [dark-editorial, motion-heavy, agency]
+    weights:
+      heading: [500, 700]
+      body: [400, 500, 700]
+    notes: "Nowoczesna geometria i nocny mood. Dobre pod motion/hover."
+
+  - id: warm-fashion
+    palette_family: warm_orange
+    heading_font: "Sora"
+    body_font: "DM Sans"
+    fallback: "Instrument Sans"
+    use_for: [case-study, product-showcase]
+    weights:
+      heading: [500, 600, 700]
+      body: [400, 500, 700]
+    notes: "Czytelny, portfolio-ready look pod zdjęcia w ciepłej palecie."
+
+  - id: aqua-clean
+    palette_family: aqua_orange
+    heading_font: "Space Grotesk"
+    body_font: "Inter"
+    fallback: "Manrope"
+    use_for: [summer, lifestyle, beauty]
+    weights:
+      heading: [500, 700]
+      body: [400, 500, 600]
+    notes: "Lekki, świeży rytm dla layoutów z dużą ilością przestrzeni."
+
+  - id: soft-beauty
+    palette_family: peach_nude
+    heading_font: "Cormorant Garamond"
+    body_font: "Inter"
+    fallback: "DM Sans"
+    use_for: [beauty, skincare, premium-minimal]
+    weights:
+      heading: [500, 600]
+      body: [400, 500]
+    notes: "Serif tylko do display/headline, reszta neutralna i czysta."
+
+  - id: mono-architect
+    palette_family: bw_editorial
+    heading_font: "Space Grotesk"
+    body_font: "Inter"
+    fallback: "Instrument Sans"
+    use_for: [black-white, architecture, portfolio]
+    weights:
+      heading: [500, 700]
+      body: [400, 500, 700]
+    notes: "Niezawodne i bardzo czytelne przy B&W oraz mocnych kadrach."
+
+rules:
+  - "Nie mieszaj więcej niż 2 rodzin fontów na jednej stronie."
+  - "Dla hero możesz użyć display, ale sekcje body/listy/faq trzymaj w neutralnym sans."
+  - "Przy ciężkich efektach scroll/motion preferuj prostszy krój body (Inter/Manrope/DM Sans)."
+  - "Jeśli template ma zdefiniowaną typografię, pairing traktuj jako override tylko po akceptacji usera."
+
+selection_rules:
+  source_priority:
+    - profiles/templates/*.yaml typography sekcji hero
+    - references/web-audits/editorial-sites-2026-06-23.md
+    - profiles/typography-pairings.yaml
+  banned_auto_default:
+    pairing_id: soft-beauty
+    reason: "Wygląda jak generyczny AI beauty — wymaga uzasadnienia w layout-plan typography_map"
+  banned_body_patterns:
+    - id: inter-plain-lead
+      pattern: "Inter 400 (lub system-ui) jako body/hero-lead/tagline bez drugiego charakteru"
+      applies_to: [hero-lead, gallery-lead, tagline, manifesto-body, founder-copy p]
+      why: "User feedback 2026-06-23 — wygląda bardzo AI i zwykle (Lippier v2 hero lead)"
+      severity: fail
+      use_instead:
+        - "DM Sans, Manrope, Instrument Sans, Plus Jakarta Sans, Archivo"
+        - "JetBrains Mono / Space Mono w małym rozmiarze dla leadów editorial"
+        - "Ten sam display co h1 w mniejszym rozmiarze (Space Grotesk, Syne)"
+      exception: "lumera-commercial gdy body=Inter ALE lead jest w mono lub display — nie samotny Inter paragraph"
+  avoid_unless_justified:
+    - Cormorant Garamond
+    - Playfair Display
+  lumera_reference:
+    heading: Inter
+    mono: JetBrains Mono
+    note: "Numerowane sekcje (01) — commercial editorial"
+
+display_proxy:
+  # Custom fonts z audytu Readymag → Google Fonts proxy
+  Suisse: Instrument Sans
+  "Suisse Int'l": Instrument Sans
+  Druk: Bebas Neue
+  Graphik: Space Grotesk
+  "Space Mono": Space Mono
+  RM_custom: Space Grotesk
+  rule: "layout-planner zapisuje display_proxy w typography_map gdy user wskazuje referencję RM"

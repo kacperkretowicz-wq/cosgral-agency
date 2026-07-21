@@ -1,0 +1,301 @@
+{
+  "url": "https://parhouse.agency",
+  "slug": "parhouse-agency",
+  "captured_at": "2026-07-05",
+  "title": "Home - PAR HOUSE Agency",
+  "meta_description": "",
+  "stack": {
+    "builder": [
+      "WordPress"
+    ],
+    "frameworks": [],
+    "services": [
+      "Google Analytics / GTM",
+      "Meta Pixel",
+      "hCaptcha/reCAPTCHA"
+    ]
+  },
+  "libs": {
+    "animation": [
+      "gsap",
+      "gsap/ScrollTrigger",
+      "gsap/ScrollSmoother",
+      "gsap/Flip",
+      "lenis"
+    ],
+    "webgl": [],
+    "ui": [
+      "swiper",
+      "masonry",
+      "tailwindcss"
+    ]
+  },
+  "fonts": {
+    "google": [],
+    "font_faces": [
+      "Geomanist",
+      "swiper-icons"
+    ],
+    "families_used": [
+      "Geomanist",
+      "swiper-icons"
+    ]
+  },
+  "colors_top": [
+    {
+      "hex": "#ffffff",
+      "count": 16
+    },
+    {
+      "hex": "#000000",
+      "count": 6
+    },
+    {
+      "hex": "#6b7280",
+      "count": 5
+    },
+    {
+      "hex": "#0b0b0b",
+      "count": 4
+    },
+    {
+      "hex": "#626262",
+      "count": 3
+    },
+    {
+      "hex": "#2563eb",
+      "count": 3
+    },
+    {
+      "hex": "#808080",
+      "count": 3
+    },
+    {
+      "hex": "#abb8c3",
+      "count": 2
+    },
+    {
+      "hex": "#f78da7",
+      "count": 2
+    },
+    {
+      "hex": "#cf2e2e",
+      "count": 2
+    },
+    {
+      "hex": "#ff6900",
+      "count": 2
+    },
+    {
+      "hex": "#fcb900",
+      "count": 2
+    },
+    {
+      "hex": "#7bdcb5",
+      "count": 2
+    },
+    {
+      "hex": "#00d084",
+      "count": 2
+    }
+  ],
+  "css_features": [
+    "mix-blend-mode",
+    "clip-path",
+    "backdrop-filter",
+    "position-sticky",
+    "scroll-snap",
+    "filter-blur",
+    "css-grid",
+    "aspect-ratio",
+    "custom-properties",
+    "keyframes"
+  ],
+  "dom": {
+    "counts": {
+      "section": 6,
+      "header": 1,
+      "footer": 1,
+      "nav": 3,
+      "canvas": 0,
+      "video": 2,
+      "svg": 30,
+      "iframe": 1,
+      "picture": 0,
+      "form": 0
+    },
+    "headings_h1_h2": [
+      "Koncentrujemy kreatywność w spójności, osiągając niemożliwe.",
+      "Kampanie Ads",
+      "AI Fashion Visuals",
+      "e-Commerce",
+      "LE POSSÉ®",
+      "Natalia Kutyła",
+      "1011 Clinic",
+      "SEMPRE",
+      "PAT ARROW",
+      "iOLA",
+      "Digitall Concept™",
+      "HEWKO Cars",
+      "Odkrywamy potencjał",
+      "Nadajemy formę wizji",
+      "Ożywiamy historię",
+      "Tworzymy trwały wpływ",
+      "Opinie naszych klientów",
+      "SEMPRE",
+      "Ewa Jeżewska",
+      "Wiktor Kowalski"
+    ],
+    "sections_order": [
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)",
+      "(bez id/class)"
+    ],
+    "nav_links": [
+      "Przejdź do treści",
+      "Przejdź do strony głównej",
+      "Prześlij Brief",
+      "Portfolio",
+      "Co robimy",
+      "AI Fashion Visuals",
+      "Kampanie Ads",
+      "e-Commerce",
+      "Strony i platformy internetowe",
+      "Branding",
+      "Social Media",
+      "Pozycjonowanie",
+      "Administracja",
+      "O nas",
+      "Blog",
+      "Kontakt",
+      "Behance link",
+      "Instagram link",
+      "Linkedin link",
+      "en",
+      "es",
+      "de",
+      "uk",
+      "HEWKO Cars",
+      "Zobacz wszystkie projekty"
+    ],
+    "top_data_attrs": {
+      "data-name": 242,
+      "data-src": 28,
+      "data-lazyloaded": 26,
+      "data-relative_url": 7,
+      "data-no-optimize": 4,
+      "data-category": 4,
+      "data-optimized": 3,
+      "data-nosnippet": 2,
+      "data-asynced": 1,
+      "data-litespeed-src": 1,
+      "data-prefix": 1,
+      "data-icon": 1
+    },
+    "top_class_tokens": [
+      "flex",
+      "flex-col",
+      "text-sm",
+      "items-center",
+      "text-white",
+      "gap-6",
+      "h-full",
+      "line-clamp-1",
+      "transition-colors",
+      "w-full",
+      "text-[#808080]",
+      "text-footer",
+      "justify-center",
+      "swiper-slide",
+      "text-base",
+      "3xl:text-lg",
+      "md:p-12",
+      "font-medium",
+      "justify-between",
+      "relative",
+      "shrink-0",
+      "bg-ph-gray-500",
+      "hover:text-white",
+      "font-light",
+      "w-fit"
+    ]
+  },
+  "effects_detected": [
+    {
+      "technique_id": "smooth-scroll",
+      "react_equiv": "SmoothScroll.tsx",
+      "evidence": "on(r){if(Q.slice(0).forEach(function(n){return n.vars.id!==\"ScrollSmoother\"&&n.kill()}),r!==!0){var s=Lr.killAll||[];Lr={},s.forEach(f"
+    },
+    {
+      "technique_id": "pinned-scroll-sequence",
+      "react_equiv": "PinnedSequence.tsx / HorizontalScrollPin.tsx",
+      "evidence": "fsetWidth\":\"offsetHeight\",o=s.pin[n];s.revert(!0,1),s.adjustPinSpacing(s.pin[n]-o),s.refresh()}}),Fo=1,ru(!0),Q.forEach(function(s"
+    },
+    {
+      "technique_id": "scroll-scrub",
+      "react_equiv": "PinnedSequence.tsx (scrub)",
+      "evidence": "eline({scrollTrigger:{trigger:e,start:\"top 40%\",end:\"+=30%\",scrub:1}}).to(t,{scale:r*.3,yPercent:-20,duration:45},0).to(t,{scal"
+    },
+    {
+      "technique_id": "masked-image-reveal",
+      "react_equiv": "MaskedReveal.tsx",
+      "evidence": "--preset--font-size--huge:42px}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;posit"
+    },
+    {
+      "technique_id": "marquee-logos",
+      "react_equiv": "Marquee.tsx",
+      "evidence": "></div></div></div></section><div class=\"ph-pb\"><div class=\"marquee-wrapper w-full overflow-hidden h-20 show-on-scroll-animatio"
+    },
+    {
+      "technique_id": "custom-cursor",
+      "react_equiv": "CustomCursor.tsx",
+      "evidence": "th:none}.h-screen-hero{height:100vh;height:100svh}#parhouse-custom-cursor{height:140px;width:140px;border-radius:140px;background-col"
+    },
+    {
+      "technique_id": "preloader-counter",
+      "react_equiv": "(GSAP timeline — wzor voyeur-preloader-001)",
+      "evidence": "custom-cursor.transitioning svg{display:none}#custom-cursor-preloader{display:none;position:fixed;right:6rem;bottom:5rem;font-siz"
+    },
+    {
+      "technique_id": "horizontal-scroll",
+      "react_equiv": "HorizontalScrollPin.tsx",
+      "evidence": "parse(window.name).prevent?B.set(\"#parhouse-custom-cursor\",{xPercent:-50,yPercent:-50,scaleX:.23,scaleY:.23,mixBlendMode:\"normal\"}"
+    },
+    {
+      "technique_id": "scroll-reveal-stagger",
+      "react_equiv": "Reveal.tsx",
+      "evidence": "=function(s,n,o){return ci(this,Ae.delayedCall(0,s,n),o)},t.staggerTo=function(s,n,o,l,c,u,d){return o.duration=n,o.stagger=o.s"
+    }
+  ],
+  "npm_install": [
+    "gsap",
+    "@gsap/react",
+    "lenis",
+    "embla-carousel-react  # swiper -> Embla w stacku docelowym"
+  ],
+  "assets": {
+    "css_urls": [
+      "https://parhouse.agency/wp-content/litespeed/ucss/08c0b81eb87998a43bebe9c77c243307.css?ver=3ec46"
+    ],
+    "js_urls": [
+      "https://parhouse.agency/wp-content/plugins/litespeed-cache/assets/js/css_async.min.js",
+      "https://parhouse.agency/wp-content/litespeed/js/a6974c8a8ac279802ce282d6755aa0a0.js?ver=3ec46"
+    ],
+    "css_total_found": 1,
+    "js_total_found": 2
+  },
+  "files_captured": [
+    "capture/index.html",
+    "capture/00-08c0b81eb87998a43bebe9c77c243307.css",
+    "capture/00-css_async.min.js",
+    "capture/01-a6974c8a8ac279802ce282d6755aa0a0.js"
+  ],
+  "next_steps": [
+    "Claude: przeczytaj capture/ i poglebij analize (choreografia, layout).",
+    "Claude: napisz REBUILD-BLUEPRINT.md wg .claude/skills/site-dna/SKILL.md.",
+    "Claude: dopisz nowe techniki do references/site-dna/effects-library.yaml."
+  ]
+}

@@ -1,0 +1,104 @@
+# Kadry atmosferyczne marki — tła, kafelki, sceny z ludźmi/rekwizytami
+# Inspiracja: mockupy layout-screenshots (nie tylko packshot produktu)
+# Użycie na stronie: hero bg, gallery tile, story band, split section
+
+version: "1"
+updated_at: "2026-06-25"
+
+description: >
+  Oprócz product lock (anchor + derived) generujemy sceny brandowe:
+  człowiek, tło, rekwizyty, klimat — jak na mockupach DTC/agency.
+  Produkt może być w kadrze (mały) lub nie; to NIE zastępuje anchor packshot.
+
+product_lock:
+  applies_to: [anchor, packshot, macro_derived, flatlay_derived]
+  does_not_apply_to: [section_background, brand_tile, lifestyle_scene, texture_mood, editorial_context]
+
+required_per_product_job:
+  min_atmosphere_shots: 2
+  max_atmosphere_shots: 5
+  min_distinct_roles: 2
+
+shot_roles:
+  - id: section_background
+    label: Tło sekcji / hero band
+    aspect: "16:9 or 3:2 wide"
+    product_presence: none
+    ui_use: [hero_bg, section_band, full_bleed]
+    subject_hint_template: >
+      Atmospheric brand scene for {brand} — environment and mood only, generous negative space
+      for typography overlay. No product. Palette {palette_family}. Editorial campaign quality.
+    composition_from_mockup: [hero_environment, color_field, wide_crop]
+    style_source: photo_grade_ref
+
+  - id: brand_tile
+    label: Kafelek galerii / grid
+    aspect: "1:1 or 4:5"
+    product_presence: optional_small
+    ui_use: [gallery_grid, masonry_tile, duo_card]
+    subject_hint_template: >
+      Editorial brand tile for {brand} — hands, texture, or lifestyle detail matching mockup grid energy.
+      Product may appear small/off-center if at all. No packshot clone.
+    composition_from_mockup: [grid_cell, detail_crop, asymmetric_tile]
+    style_source: photo_grade_ref
+
+  - id: lifestyle_scene
+    label: Scena lifestyle z kontekstem
+    aspect: "4:5 or 3:4"
+    product_presence: optional_hero
+    ui_use: [story_split, ritual_section, about_band]
+    subject_hint_template: >
+      Lifestyle editorial for {brand} — person or hands in environment with props matching brand world.
+      Same product only if specified in product_visual_spec and derived_from_anchor after gate.
+    composition_from_mockup: [lifestyle_with_human, hands_ritual, environmental_story]
+    style_source: photo_grade_ref + style_dna
+
+  - id: texture_mood
+    label: Tekstura / mood bez sceny
+    aspect: "1:1 or 16:9"
+    product_presence: none
+    ui_use: [texture_bg, accent_band, spec_section]
+    subject_hint_template: >
+      Abstract texture or color mood for {brand} — stone, fabric, light gradient, botanical shadow.
+      No people, no product. Matches {palette_family}.
+    composition_from_mockup: [palette_extract, material_closeup]
+    style_source: palette_lock + photo_grade_ref
+
+  - id: editorial_context
+    label: Pełna scena editorial (mockup energy)
+    aspect: "4:5 or 2:3"
+    product_presence: optional
+    ui_use: [gallery_feature, campaign_still, editorial_hero]
+    subject_hint_template: >
+      Full editorial campaign frame for {brand} — environment + human element + props like premium
+      mockup references. NOT generic stock. Cohesive with job palette.
+    composition_from_mockup: [full_scene, campaign_proof, editorial_portrait_env]
+    style_source: photo_grade_ref
+
+section_mapping:
+  hero: [section_background, editorial_context]
+  gallery: [brand_tile, brand_tile, editorial_context]
+  story: [lifestyle_scene, texture_mood]
+  ritual: [lifestyle_scene]
+  about: [lifestyle_scene, editorial_context]
+  manifesto: [texture_mood, section_background]
+  cta: [section_background]
+  default: [brand_tile, lifestyle_scene]
+
+prompt_rules:
+  always_add: "no text, no labels, no watermarks, photorealistic editorial, no AI stock smile"
+  never: [copy mockup person 1:1, copy mockup product from reference, generic white amazon bg]
+  mockup_inspiration: "composition and mood from layout_ref — invent new scene for this brand"
+
+manifest_fields:
+  - role
+  - shot_type: atmosphere
+  - product_presence
+  - ui_use
+  - photo_grade_ref
+  - style_ref
+  - style_dimensions
+  - subject_hint
+  - shot_rationale
+  - palette_family
+  - derived_from_anchor: false  # unless product_presence requires it

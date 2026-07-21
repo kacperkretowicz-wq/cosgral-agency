@@ -1,0 +1,51 @@
+id: rare-beauty-dtc-mockup
+source_inbox: references/layout-screenshots/inbox/rare-beauty-dtc-mockup.png
+processed_file: references/layout-screenshots/processed/rare-beauty-dtc-mockup.png
+ingested_at: "2026-06-24"
+status: reviewed
+job_type_suggested: product_brand
+palette_family: dusty_rose_mauve
+
+auto_tags: [dtc_beauty, dusty_rose, product_page]
+extracted_hex: ["#f0f0f0", "#d8a8c0", "#d8d8d8", "#f0d8d8", "#d8c0c0", "#c090a8"]
+
+sections_detected:
+  - id: header
+    layout: minimal nav — logo left, links + cart right
+  - id: hero
+    layout: asymmetric 2-col — portrait left, product card right on mauve field
+    notes: floating product card overlay on hero photo
+  - id: bestsellers
+    layout: 4-col product grid, rounded cards, name + price
+  - id: brand_typography
+    layout: script alphabet left + story card right (asymmetric)
+  - id: feature_band
+    layout: wide horizontal — copy block + 2 lifestyle crops
+
+typography_detected:
+  display_serif: high-contrast editorial (headings, logo)
+  body_sans: clean legible sans
+  accent_script: handwritten Rare script — brand personality
+
+style_sense:
+  mood: [soft, premium, approachable, monochromatic]
+  density: low_copy_high_image
+  contrast: medium_soft
+  motion_level: subtle
+
+routing:
+  layout_ref: references/layout-screenshots/processed/rare-beauty-dtc-mockup.png
+  moodboards_ui: use for section structure + grid rhythm
+  palette_extract_from: same file → palette-lock
+  style_dna_grade: photo grade matched to UI pink/mauve — extract lighting only
+  subject_lane: product_brand DTC beauty — generate NEW product/portrait shots
+  archetype_hint: lumera-commercial or product-editorial
+
+forbidden:
+  - copy mockup PNG as final asset
+  - reuse Selena/Rare trademark in generated UI
+  - default warm_organic beige when this ref is primary
+
+agent_tasks_done:
+  - layout-screenshot-analyst: sections mapped
+  - color-palette-guardian: dusty_rose_mauve locked

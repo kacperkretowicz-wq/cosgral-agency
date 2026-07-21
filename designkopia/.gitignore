@@ -1,0 +1,16 @@
+# Ignoruj wygenerowane assety (opcjonalnie commituj przykłady testowe)
+outputs/images/*
+!outputs/images/.gitkeep
+!outputs/images/vitamin-serum-test/
+!outputs/images/lumera-landing/
+!outputs/images/solace-landing/
+
+outputs/pages/*
+!outputs/pages/.gitkeep
+!outputs/pages/vitamin-serum-test/
+!outputs/pages/lumera-landing/
+!outputs/pages/solace-landing/
+
+__pycache__/
+*.pyc
+.venv/

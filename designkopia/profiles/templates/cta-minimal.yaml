@@ -1,0 +1,50 @@
+# Przykładowy template — nadpisz przez template-analyst po /design-onboard
+
+id: cta-minimal
+name: CTA Minimal Footer
+source_image: references/templates/cta-minimal.png
+tags:
+  - cta
+  - footer
+
+sections:
+  - id: cta
+    type: cta
+    layout: centered
+    notes: "Krótki headline, primary button, subtelne tło"
+  - id: footer
+    type: footer
+    layout: centered
+    notes: "Minimal links, copyright"
+
+typography:
+  heading_font: "Inter"
+  body_font: "Inter"
+  heading_sizes:
+    h1: "2rem"
+    h2: "1.5rem"
+  body_size: "0.875rem"
+  weights:
+    heading: 600
+    body: 400
+
+spacing:
+  page_max_width: "1200px"
+  section_padding_y: "64px"
+  section_padding_x: "24px"
+  grid_columns: 12
+  gap: "16px"
+
+color_tokens:
+  background: "#F5F5F3"
+  accent: "#1A1A1A"
+  text: "#1A1A1A"
+  muted: "#888888"
+
+mixable_with:
+  - hero-minimal
+  - grid-editorial
+  - salient
+  - portfolite
+
+notes: "Szablon startowy. Główne templatey Framer: kirk, portfolite, taylor, salient."

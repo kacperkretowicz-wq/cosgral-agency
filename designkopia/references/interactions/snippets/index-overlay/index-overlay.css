@@ -1,0 +1,52 @@
+.index-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 2.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s;
+}
+
+.index-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.index-overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.index-overlay-close {
+  background: none;
+  border: none;
+  font-family: var(--mono, monospace);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--ink, inherit);
+}
+
+.index-overlay-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.index-overlay-list a {
+  display: block;
+  padding: 1rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(1.25rem, 3vw, 2rem);
+}

@@ -1,0 +1,19 @@
+slug: noir-atelier
+brand: NOIR ATELIER
+tagline: Runway-grade ready-to-wear
+template: spector
+
+collection:
+  name: Line SS26
+  pieces:
+    - name: Sculpted Column Coat
+      price: 890
+    - name: Deconstructed Blazer
+      price: 620
+    - name: Liquid Silk Gown
+      price: 1240
+
+job_palette: dark_runway_bw_red
+palette_note: "Spójna strona: czarne tło, B&W runway, red rim accent — bez navy CGI gown"
+
+currency: USD

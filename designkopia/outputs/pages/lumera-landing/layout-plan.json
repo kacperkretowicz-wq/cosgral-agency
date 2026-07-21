@@ -1,0 +1,18 @@
+{
+  "job_slug": "lumera-landing",
+  "layout_archetype": "lumera-commercial",
+  "scroll_mode": "vertical",
+  "brand_lock": "lumera",
+  "interaction_set": "commercial-scroll",
+  "section_plan": [
+    { "id": "hero", "unchanged": true },
+    { "id": "shop", "images": ["01-bold-red-packshot", "09-night-oil-upright-black-label"] },
+    { "id": "gallery", "images": ["02-bw", "05-macro", "asset-01-abstract", "03-warm-lifestyle"] },
+    { "id": "story", "images": ["asset-03-portrait", "asset-03-stone-bg"] },
+    { "id": "ritual", "images": ["10-am-pm-flatlay"] },
+    { "id": "macro", "images": ["11e-oil-stream-flowing-skin-v2"] },
+    { "id": "faq" },
+    { "id": "contact" }
+  ],
+  "reworked_at": "2026-06-23"
+}

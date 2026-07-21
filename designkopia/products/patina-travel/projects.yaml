@@ -1,0 +1,11 @@
+version: "1"
+brand: PATINA
+drop: "001 — Silver Line"
+collections:
+  - id: silver-line
+    name: Silver Line
+    season: SS26
+    pieces:
+      - { slug: veil-coat, name: Veil Coat, price: "4 800 PLN", image: 01-piece-coat.png }
+      - { slug: drift-dress, name: Drift Dress, price: "3 200 PLN", image: 02-piece-dress.png }
+      - { slug: line-trousers, name: Line Trousers, price: "2 400 PLN", image: 03-piece-trousers.png }

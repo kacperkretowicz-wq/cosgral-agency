@@ -1,0 +1,13 @@
+version: "1"
+job_type: automotive_campaign
+product_lock: false
+required_shot_roles:
+  min_count: 5
+  roles:
+    - { id: hero_vehicle, subject_hint: "Vehicle hero — profile or 3/4, cinematic light" }
+    - { id: detail_macro, subject_hint: "Headlight, wheel, interior detail" }
+    - { id: motion_blur, subject_hint: "Driving motion, pan blur" }
+    - { id: environment, subject_hint: "Car in landscape or urban night" }
+    - { id: spec_context, subject_hint: "Studio spec or color swatch context" }
+research_lane: profiles/research-lanes/automotive.yaml
+subject_folder: references/subject-lanes/automotive/

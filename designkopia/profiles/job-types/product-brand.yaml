@@ -1,0 +1,10 @@
+version: "1"
+job_type: product_brand
+product_lock: true
+require: [product_visual_spec, job_palette]
+shot_roles:
+  product_lock: [anchor, packshot, macro, flatlay, editorial_portrait]
+  brand_atmosphere: [section_background, brand_tile, lifestyle_scene, texture_mood, editorial_context]
+atmosphere_brief: profiles/job-types/brand-atmosphere-shots.yaml
+plan_script: scripts/plan-brand-shots.py
+research_lane: profiles/research-lanes/product.yaml

@@ -1,0 +1,37 @@
+name: LUMÉRA
+slug: lumera
+tagline: "ART DIRECTION. + SKINCARE."
+description: Premium editorial skincare for those who treat routine as ritual.
+tone: minimal, bold, warm-meets-editorial
+
+# ─── Paleta marki (obowiązkowa dla wszystkich jobów LUMÉRA) ───
+job_palette: bold_monochrome
+palette_primary:
+  red: "#E82323"
+  red_dark: "#C41E1E"
+  black: "#0A0A0A"
+  white: "#FAFAF8"
+palette_rule: >
+  LUMÉRA = czerwień, biel, czerń. Ciemne tła i kadry, hard studio light, editorial impact.
+  Oba produkty (Serum + Night Oil) w TYM SAMYM visual language — nie osobna „linia navy/gold”.
+  B&W geometry może być akcentem case-study (max ~2 ujęcia). Warm stone opcjonalnie, max 1 sekcja — nie dominanta.
+
+forbidden_palette_families:
+  - deep_luxury
+  - warm_organic
+forbidden_assets:
+  - 03-warm-organic-lifestyle.png
+  - asset-03-warm-editorial-portrait.png
+  - asset-03-warm-stone-shadows.png
+forbidden_colors:
+  - navy
+  - cobalt_blue
+  - gold_foil_luxury_packaging   # chyba że minimalny akcent na czerwonym/czarnym studio
+
+allowed_accent_families:
+  - bw_editorial    # graficzne B&W, cienie geometryczne
+  - cinematic_gel   # czerwony rim light, macro szkła — w obrębie bold_monochrome
+
+products:
+  - vitamin-serum
+  - night-renewal-oil

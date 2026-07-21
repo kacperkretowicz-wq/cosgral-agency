@@ -1,0 +1,145 @@
+# Zasady inspiracji z mockupów layoutu (references/layout-screenshots/)
+# Źródło prawdy dla: layout-screenshot-analyst, structure-planner, concept-ideation,
+# layout-planner, layout-assembler, concept-guardian, variability-guardian
+#
+# Problem który rozwiązujemy: agent bierze mockup i robi klon (ÉLAN ≈ Design Sake 1:1).
+# Cel: mockup = szkielet + rytm; wizja = wymyślona pod produkt.
+
+version: "1"
+updated_at: "2026-06-25"
+
+library:
+  inbox: references/layout-screenshots/inbox/
+  processed: references/layout-screenshots/processed/
+  analysis: references/layout-screenshots/analysis/
+  manifest: references/layout-screenshots/manifest.yaml
+  ingest: "python scripts/ingest-layout-screenshot.py --process-inbox"
+  pick: "python scripts/pick-layout-mockup.py --job <slug> --json"
+
+# ─── Trzy warstwy (OBOWIĄZKOWE rozróżnienie) ───
+
+layers:
+  skeleton:
+    definition: >
+      Transferowalna architektura UI — kolejność typów sekcji, gęstość whitespace,
+      logika gridu (asymetria vs kolumny), gęstość nawigacji, viewport rhythm.
+    examples:
+      - "staggered index — elementy przesunięte w osi Y, dużo pustki"
+      - "neo-brutalist cards — grubo obramowane moduły w siatce"
+      - "horizontal manifesto band — jedna linia tekstu jako separator sekcji"
+      - "stats bar — 3 kolumny liczb między blokami treści"
+      - "split hero — produkt + typ po przeciwnych stronach"
+    rule: "MOŻNA przenieść na inny produkt i inną paletę"
+
+  skin:
+    definition: >
+      Warstwa wizualna mockupu — konkretne hex, fonty z referencji, copy, dekoracje,
+      proporcje border-radius, charakter ilustracji w mocku.
+    examples:
+      - "monochrom B&W + Instrument Sans"
+      - "cream + lime + Bebas"
+      - "tekst FOR THE SAKE OF… z konkretnej marki"
+    rule: "NIE kopiuj 1:1 — palette-extractor + typography-selector wybierają pod PRODUKT"
+
+  vision:
+    definition: >
+      Oryginalna koncepcja marki dopasowana do product.yaml — co mock NIE mówi:
+      narracja produktu, nazwy sekcji, CTA, które elementy szkieletu wziąć / pominąć.
+    examples:
+      - "Design Sake stagger → ÉLAN: stagger na warianty serum, NIE na fake portfolio"
+      - "North Bureau cards → BUZZ: karty smaków, NIE usług agencji"
+    rule: "Agent MUSI wymyślić — mock nie jest briefem copy"
+
+# ─── Co wolno / czego nie ───
+
+do:
+  - "Wybierz 1 mockup jako layout_ref — zapisz w layout-plan.json"
+  - "Wyciągnij skeleton_signature (2–5 cech strukturalnych) do structure-plan.json"
+  - "Zmień paletę pod product + palette_family z domain-brief"
+  - "Zmień typografię — inny pairing niż 'feel' mockupu jeśli mock był ostatnio użyty"
+  - "Przetłumacz sekcje mockupu na język produktu (agency services → flavor lineup)"
+  - "Weź 2–3 elementy szkieletu, pomiń resztę (nie kopiuj całej strony sekcja po sekcji)"
+  - "Rotuj layout_ref między jobami — pick-layout-mockup.py"
+
+dont:
+  - "Klonować mockup: ta sama paleta + te same fonty + te same 3 gimmicki (ticker + stagger + vertical label)"
+  - "Kopiować copy/strukturę agency 1:1 na product (Featured Projects → ten sam układ bez zmiany sensu)"
+  - "Używać layout_ref bez pola skeleton_transferred w structure-plan"
+  - "Ignorować product.yaml — mock nie zmienia product_visual_spec"
+  - "Traktować .txt tech-detect z inbox jako prawdę o stacku (słabe — patrz audit-site)"
+  - "Brać zawsze tego samego mockupu (Design Sake / Rare Beauty) bo jest w processed/"
+
+# ─── Workflow agentów ───
+
+agent_duties:
+  layout-screenshot-analyst:
+    - "Analizuj PNG → analysis/*.yaml z skeleton_signature, skin_notes, vision_prompts"
+    - "Taguj job_type_fit — nie każdy mock pasuje do każdego produktu"
+  concept-ideation:
+    - "Opcje A/B/C muszą mieć RÓŻNE layout_ref lub RÓŻNE skeleton_signature"
+    - "Każda opcja: jawne vision_note — co wymyślamy ponad mock"
+  structure-planner:
+    - "structure-plan.json: skeleton_transferred + sections z purpose pod produkt"
+    - "forbidden: kopiowanie nazw sekcji z mockupu agency (Our Services → bez zmiany)"
+  style-sense-agent:
+    - "Mood z produktu + style-dna; mock tylko jako density/rhythm hint"
+  template-mixer:
+    - "Sekcje mapuj na templates YAML — nie ręczny HTML klon mockupu"
+  layout-planner / layout-assembler:
+    - "layout-plan: layout_ref + skeleton_elements[] + adaptation_notes"
+    - "typography_map MUSI różnić się od typography_detected mockupu gdy lookback pokazuje powtórkę"
+  page-exporter / html-assembler:
+    - "Implementuj skeleton przez template partials — nie screenshot jako tło strony"
+  concept-guardian:
+    - "Gate A/C: sprawdź anti_pattern mockup-skin-clone"
+  variability-guardian:
+    - "layout_ref nie powtarzać w lookback_jobs bez user explicit"
+
+# ─── Schema pól w planach ───
+
+required_fields:
+  structure-plan.json:
+    - layout_ref
+    - skeleton_transferred
+    - skeleton_dropped
+    - vision_note
+  layout-plan.json:
+    - layout_ref
+    - skeleton_elements
+    - adaptation_notes
+    - mockup_inspiration:
+        ref: "path/to/mockup.png"
+        skeleton_only: true
+        palette_from: product  # nie from_mockup_literal
+
+# ─── Anti-pattern (concept-guardian) ───
+
+anti_pattern:
+  id: mockup-skin-clone
+  severity: fail
+  signals:
+    - "layout_ref ustawiony ALE adaptation_notes puste lub brak vision_note"
+    - "≥3 elementy skin mockupu razem: paleta mock + font feel mock + copy pattern mock"
+    - "section_plan kolejność i nazwy jak w mockupie agency bez product translation"
+    - "portfolio-index / studio-manifesto tylko dlatego że mock był minimalistyczny"
+  fix:
+    - "structure-planner: przepisz sekcje pod produkt"
+    - "palette-extractor: hex z product shots nie z mockupu"
+    - "typography-selector: inny pairing_id niż typography_detected"
+    - "concept-ideation: nowy kierunek z innym skeleton"
+
+# ─── Dobre przykłady adaptacji ───
+
+examples:
+  - mock: "02_northbureau — agency neo-brutalist"
+    product: "BUZZ tonic"
+    skeleton_taken: [thick_border_cards, stats_bar, playful_shapes, split_cta]
+    skin_changed: [lime palette, Bebas, FMCG copy]
+    vision_invented: [flavor grid zamiast services, yuzu ingredients]
+  - mock: "47_designsake — editorial stagger"
+    product: "hypothetical skincare"
+  bad_clone:
+    mock: "47_designsake"
+    product: "ÉLAN"
+    mistake: "ticker FOR THE SAKE + stagger featured + vertical label + B&W — klon skóry"
+    should_be: "stagger rhythm only; kolor z serum; sekcje serum/ritual; Syne lub Archivo zamiast Instrument"

@@ -1,0 +1,101 @@
+id: taylor
+name: Taylor — Bold Editorial Portfolio
+source_image: references/templates/taylor.md
+preview_url: https://taylordesigner.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/taylor/
+creator: Akin & Ed
+tags:
+  - hero
+  - nav
+  - portfolio
+  - services
+  - features
+  - testimonials
+  - blog
+  - cta
+  - footer
+
+sections:
+  - id: nav
+    type: nav
+    layout: split
+    notes: "Taylor ® + live clock (NY : time), Works/About/Blog/Contact"
+  - id: hero
+    type: hero
+    layout: full-bleed
+    notes: "Full-bleed portrait on saturated red, hand-over-face, mega type ART DIRECTOR + DESIGNER at bottom"
+  - id: hero-services
+    type: features
+    layout: left-stack
+    notes: "Brand Design, Web Design, Graphic Design — small white list on hero"
+  - id: intro
+    type: about
+    layout: split
+    notes: "Numbered section 02, bio paragraph, Read more"
+  - id: selected-works
+    type: portfolio
+    layout: list
+    notes: "BRAVEN BRAND WEB, LUMINA BRAND WEB… — typographic project list"
+  - id: services
+    type: services
+    layout: numbered
+    notes: "01 Art Direction, 02 Brand Identity, 03 Web Design — large numbered blocks"
+  - id: process
+    type: features
+    layout: numbered
+    notes: "Section 05 — Discovery, Strategy, Design, Delivery (01-04)"
+  - id: testimonials
+    type: testimonials
+    layout: centered
+    notes: "Section 06 — large quote"
+  - id: stats
+    type: features
+    layout: four-column
+    columns: 4
+    notes: "Section 07 — projects, $ raised, satisfaction, years"
+  - id: articles
+    type: blog
+    layout: list
+    notes: "Section 08 — blog posts with dates"
+  - id: cta
+    type: cta
+    layout: centered
+    notes: "Let's make something amazing together + CONTACT"
+
+typography:
+  heading_font: "Inter"
+  body_font: "Inter"
+  heading_sizes:
+    h1: "clamp(3rem, 8vw, 6rem)"
+    h2: "2rem"
+  body_size: "0.875rem"
+  weights:
+    heading: 700
+    body: 400
+  notes: "Section labels w nawiasach: ( Selected Works ), © 2026. Gradient silver on ART DIRECTOR."
+
+spacing:
+  page_max_width: "1440px"
+  section_padding_y: "120px"
+  section_padding_x: "40px"
+  grid_columns: 12
+  gap: "48px"
+
+color_tokens:
+  background: "#FFFFFF"
+  hero_background: "#C41E1E"
+  accent: "#0A0A0A"
+  text: "#0A0A0A"
+  text_on_hero: "#FFFFFF"
+  muted: "#666666"
+  gradient_heading: "linear-gradient(180deg, #C0C0C0, #FFFFFF)"
+
+mixable_with:
+  - kirk
+  - salient
+  - portfolite
+  - hero-minimal
+
+notes: >
+  High-fashion editorial hero (czerwone tło, portret). Struktura numerowana 01-08.
+  Bardzo bliski stylowi referencji photoshoot użytkownika (hand-over-face, red editorial).

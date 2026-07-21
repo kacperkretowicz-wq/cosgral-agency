@@ -1,0 +1,54 @@
+slug: atlas-creative
+brand: ATLAS CREATIVE
+tagline: Boutique creative agency — branding, campaigns, editorial
+template_mix:
+  - spector
+  - portfolite
+  - kirk
+
+role: founder / creative director portfolio
+scroll_mode: viewport-sections
+layout_mode: studio-manifesto
+
+job_palette: purple_magenta
+palette_note: >
+  Spójna strona: czarny canvas #050609, akcent magenta #DA70D6 / orchid #6B2D8B.
+  Editorial lane — full-viewport scroll-snap. Bez mixu bold_red.
+
+typography_pairing: nocturne-luxury
+
+services:
+  - Brand Identity
+  - Campaign Direction
+  - Editorial Design
+  - Motion & Content
+
+projects:
+  - title: Meridian Spirits
+    year: 2026
+    category: Branding
+  - title: Forma Archive
+    year: 2025
+    category: Editorial
+  - title: Lumen Cosmetics
+    year: 2025
+    category: Campaign
+  - title: Northwind Journal
+    year: 2024
+    category: Editorial
+  - title: Studio Kova
+    year: 2024
+    category: Identity
+  - title: Arc Light Festival
+    year: 2023
+    category: Campaign
+
+clients:
+  - Vogue
+  - Kinfolk
+  - Aesop
+  - Rimowa
+  - SSENSE
+  - Another Magazine
+
+currency: USD

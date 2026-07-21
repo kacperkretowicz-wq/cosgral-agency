@@ -1,0 +1,59 @@
+version: "1"
+brand: FORMA AGENCY
+slug: forma-agency
+type: agency_portfolio
+job_type: agency_portfolio
+
+services:
+  - Branding systems
+  - Product photoshoots
+  - Campaign art direction
+  - Launch visual kits
+
+positioning: >
+  Boutique agency for brands that need editorial taste and commercial clarity.
+  Not template beauty — authored client work, one palette per job.
+
+palette_default: warm_organic
+job_palette: warm_organic
+
+# Brak product_visual_spec — to portfolio agencji, nie SKU
+shot_brief_source: profiles/job-types/agency-portfolio.yaml
+
+image_narrative:
+  - shot_id: hero_campaign
+    role: hero
+    subject_hint: "Warm editorial campaign key visual — branded still life or environment, client work feel"
+    subject_ref: references/agency-content/campaigns/editorial-packaging-campaign.png
+    style_ref: references/style-dna/palette/warm-orange-terracotta-still.png
+    style_dimensions: [warm_orange, terracotta, natural_light]
+  - shot_id: case_study_grid
+    role: work_grid
+    subject_hint: "Case study grid wall — multiple campaign frames, agency portfolio"
+    subject_ref: references/agency-content/campaigns/bw-case-study-grid-wall.png
+    style_ref: references/style-dna/composition/bw-geometric-still-life.png
+    style_dimensions: [grid, graphic_shadow]
+  - shot_id: branding_proof
+    role: branding
+    subject_hint: "Brand identity guidelines mockup — logo system, print and screen"
+    subject_ref: references/agency-content/branding-systems/branding-guidelines-mockup.png
+    style_ref: references/style-dna/composition/clinical-flatlay-grey-grid.png
+    style_dimensions: [clinical_spacing, cool_grey]
+  - shot_id: campaign_spotlight_a
+    role: campaign_a
+    subject_hint: "Fashion or lifestyle campaign key visual — red mirror editorial, client campaign"
+    subject_ref: references/agency-content/campaigns/fashion-campaign-red-mirror.png
+    style_ref: references/style-dna/lighting/cinematic-red-gel-portrait.png
+    style_dimensions: [cinematic_gel, bold_red]
+  - shot_id: campaign_spotlight_b
+    role: campaign_b
+    subject_hint: "Product or packaging campaign — editorial launch visual, not skincare macro"
+    subject_ref: references/agency-content/campaigns/editorial-packaging-campaign.png
+    style_ref: references/style-dna/palette/orange-editorial-product-angle.png
+    style_dimensions: [warm_orange, product_tilt]
+  - shot_id: studio_culture
+    role: about
+    subject_hint: "Agency studio interior — minimal space, team culture, not beauty portrait"
+    subject_ref: references/agency-content/team-studio/minimal-studio-interior-mint.png
+    style_ref: references/style-dna/grade/bw-serene-profile-grade.png
+    style_dimensions: [serene, texture, natural]

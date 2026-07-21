@@ -1,0 +1,166 @@
+# Archetypy layoutu — wybór JEDNEGO per job (nie domyślny recipe)
+
+version: "1"
+
+archetypes:
+  lumera-commercial:
+    reference_pages: [lumera-landing, solace-landing, trovearchive.com]
+    scroll_mode: vertical
+    template_mix_min: 3
+    snippet_ids: [scroll-snap-vertical, scroll-reveal, origin-button]
+    suggested_templates: [salient, taylor, kirk, portfolite, luzia]
+    section_plan:
+      - { id: hero, from: taylor, notes: "asymetryczny hero + meta bar" }
+      - { id: products, from: kirk, notes: "product duo / cards z ceną" }
+      - { id: gallery, from: portfolite, notes: "masonry lub dark grid" }
+      - { id: story, from: salient, notes: "split story + texture bg" }
+      - { id: why-features, from: luzia, notes: "3–4 bullets" }
+      - { id: faq, from: luzia, notes: "accordion" }
+      - { id: cta, from: salient }
+      - { id: footer, from: portfolite }
+    interaction_set: commercial-scroll
+    typography_hint: "Inter + JetBrains Mono lub template hero font"
+
+  readymag-slides:
+    reference_pages: [willvint.com, bicemucci.com, n9cra.com]
+    scroll_mode: viewport-sections
+    navigation: keyboard-slides
+    template_mix_min: 3
+    requires: [products/<slug>/projects.yaml]
+    snippet_ids: [pill-nav, keyboard-slides, project-index-row, stacked-cards, origin-button]
+    suggested_templates: [spector, portfolite, kirk, makos, fabrica]
+    section_plan:
+      - { id: hero, from: spector, notes: "display type + video/badge" }
+      - { id: project-index, from: kirk, notes: "rok + kategoria + view project" }
+      - { id: works, from: portfolite, notes: "stack lub carousel" }
+      - { id: manifesto, from: spector }
+      - { id: services, from: spector }
+      - { id: clients, from: portfolite, notes: "marquee lub logo" }
+      - { id: process, from: spector }
+      - { id: cta-footer, from: portfolite }
+    interaction_set: editorial-slides
+    typography_hint: "Space Grotesk + Inter lub mono-architect"
+
+  studio-manifesto:
+    reference_pages: [bicemucci.com, from.cm, mashachern.com]
+    scroll_mode: viewport-sections
+    template_mix_min: 3
+    snippet_ids: [keyboard-slides, manifesto-display, project-index-row, stacked-cards, scroll-reveal]
+    suggested_templates: [spector, daniel, grid-editorial]
+    section_plan:
+      - { id: hero, from: daniel, notes: "craft image + name" }
+      - { id: manifesto, from: spector, notes: "display lines jak from.cm" }
+      - { id: works-grid, from: grid-editorial }
+      - { id: project-list, from: kirk }
+      - { id: japan-mood, from: hero-minimal, optional: true }
+      - { id: founder, from: luzia }
+      - { id: cta, from: cta-minimal }
+      - { id: footer, from: portfolite }
+    interaction_set: studio-editorial
+    typography_hint: "Inter body + Syne/Space Grotesk display — NIE Cormorant default"
+
+  masonry-portfolio:
+    reference_pages: [dave-green.com, marianorrisesparza.com]
+    scroll_mode: vertical
+    template_mix_min: 3
+    snippet_ids: [masonry-grid, expandable-plus, project-index-row, index-overlay]
+    suggested_templates: [luzia, grid-editorial, portfolite, majd, ordina]
+    section_plan:
+      - { id: nav-minimal, from: luzia }
+      - { id: masonry-works, from: grid-editorial, notes: "asymetryczne wysokości" }
+      - { id: categories, from: luzia, notes: "Fashion / Wellness tags" }
+      - { id: about, from: portfolite }
+      - { id: expandable-rep, from: dave-green, notes: "Info + / Rep +" }
+      - { id: contact, from: cta-minimal }
+      - { id: footer, from: portfolite }
+    interaction_set: portfolio-minimal
+    typography_hint: "Inter only lub mono-architect"
+
+  product-editorial:
+    reference_pages: [trovearchive.com, references/inspiration/beauty-skincare-macro]
+    scroll_mode: vertical
+    for: [beauty, skincare, artist-brand]
+    template_mix_min: 3
+    suggested_templates: [luzia, hero-minimal, grid-editorial, makos]
+    snippet_ids: [scroll-reveal, origin-button, scroll-snap-vertical]
+    section_plan:
+      - { id: hero, from: hero-minimal, notes: "product-first, nie manifesto first" }
+      - { id: product-detail, from: kirk, notes: "dual feature / specs" }
+      - { id: shades, from: makos }
+      - { id: gallery, from: grid-editorial, notes: "pinterest ale asymetryczny" }
+      - { id: story-short, from: luzia, notes: "max 2 akapity — nie manifesto wall" }
+      - { id: founder, from: luzia }
+      - { id: shop-cta, from: salient }
+      - { id: footer, from: portfolite }
+    interaction_set: product-light
+    typography_hint: "Z template YAML lub audit — unikaj soft-beauty i inter-plain-lead"
+
+  portfolio-index:
+    reference_pages: [marianorrisesparza.com, willvint.com, mashachern.com]
+    scroll_mode: vertical
+    navigation: optional-keyboard-slides
+    template_mix_min: 3
+    requires: [products/<slug>/projects.yaml]
+    suggested_templates: [luzia, grid-editorial, portfolite, kirk]
+    snippet_ids: [project-index-row, masonry-grid, index-overlay, expandable-plus]
+    section_plan:
+      - { id: nav-minimal, from: luzia }
+      - { id: hero-index, from: spector, notes: "display + krótki intro" }
+      - { id: project-list, from: kirk, notes: "rok + dyscyplina + view project" }
+      - { id: masonry-works, from: grid-editorial }
+      - { id: categories, from: luzia, notes: "Fashion / Wellness" }
+      - { id: about, from: portfolite }
+      - { id: contact, from: cta-minimal }
+      - { id: footer, from: portfolite }
+    interaction_set: portfolio-minimal
+    typography_hint: "warm-fashion lub mono-architect"
+
+  product-serial:
+    reference_pages: [travelagency.agency, n9cra.com, readymag JOSER]
+    scroll_mode: viewport-sections
+    navigation: keyboard-slides
+    template_mix_min: 3
+    requires: [products/<slug>/projects.yaml]
+    suggested_templates: [spector, kirk, portfolite, makos, zentry, vidhub]
+    snippet_ids: [pill-nav, video-hero, keyboard-slides, marquee-logos, origin-button]
+    section_plan:
+      - { id: hero-video, from: spector, notes: "video loop + badge" }
+      - { id: collections, from: makos, notes: "serie / kolekcje" }
+      - { id: lookbook, from: grid-editorial }
+      - { id: product-detail, from: kirk }
+      - { id: shop-cta, from: salient }
+      - { id: index-overlay-section, from: portfolite, optional: true }
+      - { id: about-brand, from: luzia }
+      - { id: footer, from: portfolite }
+    interaction_set: editorial-slides
+    typography_hint: "mono-architect + display proxy"
+
+  case-study-long:
+    reference_pages: [danilamel.com]
+    scroll_mode: case-study-long
+    navigation: keyboard-slides
+    template_mix_min: 3
+    explicit_only: true
+    suggested_templates: [spector, grid-editorial, portfolite]
+    snippet_ids: [manifesto-display, scroll-reveal, keyboard-slides]
+    section_plan:
+      - { id: intro, from: spector }
+      - { id: chapter-problem, from: spector, notes: "display per chapter" }
+      - { id: chapter-typography, from: spector }
+      - { id: chapter-ui, from: grid-editorial }
+      - { id: gallery-results, from: portfolite }
+      - { id: metrics, from: luzia }
+      - { id: cta, from: salient }
+      - { id: footer, from: portfolite }
+    interaction_set: studio-editorial
+    typography_hint: "chapter_typography: display zmienia się per sekcja"
+
+selection_hints:
+  creative_agency_dark: readymag-slides
+  beauty_artist_light: product-editorial
+  ecommerce_brand: lumera-commercial
+  photographer: masonry-portfolio
+  studio_personal: studio-manifesto
+  portfolio_list: portfolio-index
+  luxury_collections: product-serial
+  case_study_explicit: case-study-long

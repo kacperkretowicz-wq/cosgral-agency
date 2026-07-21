@@ -1,0 +1,262 @@
+# Zaakceptowane wzorce stylu — kalibracja style-test-01 (2026-06-22)
+# Użytkownik: wszystkie 5 ujęć OK
+
+approved:
+  - id: "01"
+    file: profiles/approved/01-bold-red-packshot.png
+    source_job: style-test-01
+    palette_family: bold_monochrome
+    shot_type: packshot
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "red-on-red product packshots, tilted angle, hard studio light"
+
+  - id: "02"
+    file: profiles/approved/02-bw-geometric-packshot.png
+    source_job: style-test-01
+    palette_family: bw_editorial
+    shot_type: packshot
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "B&W geometric shadows, white cube pedestal, case study aesthetic"
+
+  - id: "03"
+    file: profiles/approved/03-warm-organic-lifestyle.png
+    source_job: style-test-01
+    palette_family: warm_organic
+    shot_type: lifestyle
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "stone surfaces, direct sunlight, beige terracotta, boutique skincare"
+
+  - id: "04"
+    file: profiles/approved/04-deep-luxury-hero.png
+    source_job: style-test-01
+    palette_family: deep_luxury
+    shot_type: hero
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "navy background, gold accents, hero framing with headline space"
+
+  - id: "05"
+    file: profiles/approved/05-cinematic-red-macro.png
+    source_job: style-test-01
+    palette_family: cinematic_gel
+    shot_type: macro
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "red rim light macro, glass texture, moody editorial beauty"
+
+  # style-test-02 — użytkownik: bardzo podoba się różnorodność, zapamiętać wszystkie (2026-06-22)
+  - id: st02-01
+    file: profiles/approved/st02-01-red-citrus-editorial.png
+    source_job: style-test-02
+    palette_family: bold_monochrome
+    shot_type: food_editorial
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "citrus/food on saturated color field, centered, hard studio light"
+
+  - id: st02-02
+    file: profiles/approved/st02-02-bw-ceramic-geometric.png
+    source_job: style-test-02
+    palette_family: bw_editorial
+    shot_type: packshot
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "ceramics/objects on white cubes, B&W graphic shadows"
+
+  - id: st02-03
+    file: profiles/approved/st02-03-sage-portrait-centered.png
+    source_job: style-test-02
+    palette_family: warm_organic
+    shot_type: editorial_portrait
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "profile portrait sage wall, face centered, leaf shadows"
+
+  - id: st02-04
+    file: profiles/approved/st02-04-navy-wine-hero.png
+    source_job: style-test-02
+    palette_family: deep_luxury
+    shot_type: hero
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "beverage/luxury bottle navy gold, hero negative space"
+
+  - id: st02-05
+    file: profiles/approved/st02-05-red-macro-glass.png
+    source_job: style-test-02
+    palette_family: cinematic_gel
+    shot_type: macro
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "glass macro red rim light, droplets, moody"
+
+  - id: st02-06
+    file: profiles/approved/st02-06-botanical-stone-still-life.png
+    source_job: style-test-02
+    palette_family: warm_organic
+    shot_type: still_life
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "figs/botanical on stone, hard sunlight, organic props"
+
+  - id: st02-07
+    file: profiles/approved/st02-07-orange-amber-packshot.png
+    source_job: style-test-02
+    palette_family: bold_monochrome
+    shot_type: packshot
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "amber glass bottle orange studio, tilted centered"
+
+  - id: st02-08
+    file: profiles/approved/st02-08-bw-knit-texture-hands.png
+    source_job: style-test-02
+    palette_family: bw_editorial
+    shot_type: texture_lifestyle
+    approved_at: "2026-06-22"
+    user_verdict: "super — różnorodność OK"
+    use_for: "hands + fabric texture B&W, fashion editorial"
+
+  # style-test-03 — 7/10 zatwierdzone (2026-06-22); odrzucone: #04 pionek, #09 pierścionek, #10 zielony liquid
+  - id: st03-01
+    file: profiles/approved/st03-01-pink-grapefruit-editorial.png
+    source_job: style-test-03
+    palette_family: bold_monochrome
+    shot_type: food_editorial
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "pink/magenta fruit on saturated field, food editorial"
+
+  - id: st03-02
+    file: profiles/approved/st03-02-bw-camera-geometric.png
+    source_job: style-test-03
+    palette_family: bw_editorial
+    shot_type: packshot
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "vintage objects on white cubes, B&W case study"
+
+  - id: st03-03
+    file: profiles/approved/st03-03-bread-olive-flatlay.png
+    source_job: style-test-03
+    palette_family: warm_organic
+    shot_type: flatlay
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "food flatlay linen sunlight, bread olive rosemary"
+
+  - id: st03-05
+    file: profiles/approved/st03-05-orange-portrait-gel.png
+    source_job: style-test-03
+    palette_family: cinematic_gel
+    shot_type: editorial_portrait
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "male portrait orange rim light, moody editorial"
+
+  - id: st03-06
+    file: profiles/approved/st03-06-blue-vase-monochrome.png
+    source_job: style-test-03
+    palette_family: bold_monochrome
+    shot_type: packshot
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "cobalt ceramic on blue field, monochrome object"
+
+  - id: st03-07
+    file: profiles/approved/st03-07-bw-pomegranate-flatlay.png
+    source_job: style-test-03
+    palette_family: bw_editorial
+    shot_type: flatlay
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "fruit flatlay top-down B&W graphic shadows"
+
+  - id: st03-08
+    file: profiles/approved/st03-08-tea-hands-sunlight.png
+    source_job: style-test-03
+    palette_family: warm_organic
+    shot_type: lifestyle
+    approved_at: "2026-06-22"
+    user_verdict: "super"
+    use_for: "hands tea cup sunlight, intimate warm organic"
+
+rejected_examples:
+  - id: st03-04
+    file: outputs/images/style-test-03/style-test-03-04-green-chess-luxury.png
+    reason: "najmniej — pionek szachowy, zielony aksamit"
+  - id: st03-09
+    file: outputs/images/style-test-03/style-test-03-09-gold-ring-macro.png
+    reason: "najmniej — pierścionek jewelry macro"
+  - id: st03-10
+    file: outputs/images/style-test-03/style-test-03-10-green-liquid-macro.png
+    reason: "najmniej — zielony liquid macro"
+
+calibration_notes: >
+  Wszystkie palette_families potwierdzone. style-test-02 (8) + style-test-03 (7) w approved.
+  User lubi różnorodność tematów — nie ograniczaj do skincare. Unikaj: szachy/pionki na zieleni,
+  jewelry ring macro, neon-green liquid macro (słabsze wg usera). deep_luxury OK gdy wino/navy/gold hero.
+  Krecik portrety: najlepsze blue studio + B&W profil z boku — reszta v1 odrzucona.
+
+  - id: noir-03-gown
+    file: outputs/images/noir-atelier/noir-03-navy-silk-gown.png
+    reason: "sztuczne CGI gown na navy — nie generować, usunięte z UI"
+
+personal_portraits:
+  - id: krecik-01
+    file: profiles/approved/krecik-01-blue-studio-front.png
+    source_job: portfolio-krecik
+    palette_family: bold_monochrome
+    shot_type: editorial_portrait
+    approved_at: "2026-06-22"
+    user_verdict: "najlepsze — niebieskie tło"
+    use_for: "cobalt blue studio portrait, designer avatar, centered front on blue"
+
+  - id: krecik-02
+    file: profiles/approved/krecik-02-bw-profile-side.png
+    source_job: portfolio-krecik
+    palette_family: bw_editorial
+    shot_type: editorial_portrait
+    approved_at: "2026-06-22"
+    user_verdict: "najlepsze — profil z boku B&W"
+    use_for: "strict B&W side profile, turtleneck, graphic window light"
+
+artistic_assets:
+  - id: asset-01a
+    file: profiles/approved/asset-01-red-editorial-portrait.png
+    pairs_with: "01"
+    palette_family: bold_monochrome
+    type: editorial_portrait
+    approved_at: "2026-06-22"
+    user_verdict: "super — śliczne"
+    use_for: "hero section, about, campaign — realistyczna osoba red studio"
+
+  - id: asset-01b
+    file: profiles/approved/asset-01-red-abstract-light.png
+    pairs_with: "01"
+    palette_family: bold_monochrome
+    type: abstract_background
+    approved_at: "2026-06-22"
+    user_verdict: "super — śliczne"
+    use_for: "section background, divider, full-bleed accent — czerwony abstract light streak"
+
+  - id: asset-03a
+    file: profiles/approved/asset-03-warm-editorial-portrait.png
+    pairs_with: "03"
+    palette_family: warm_organic
+    type: editorial_portrait
+    approved_at: "2026-06-22"
+    user_verdict: "super — śliczne"
+    use_for: "lifestyle section, testimonial area — natural skin, stone sunlight"
+
+  - id: asset-03b
+    file: profiles/approved/asset-03-warm-stone-shadows.png
+    pairs_with: "03"
+    palette_family: warm_organic
+    type: texture_background
+    approved_at: "2026-06-22"
+    user_verdict: "super — śliczne"
+    use_for: "section background, texture block — kamień, cienie roślin, beige terracotta"

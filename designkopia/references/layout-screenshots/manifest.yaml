@@ -1,0 +1,15 @@
+version: '1'
+images:
+- id: rare-beauty-dtc-mockup
+  file: references/layout-screenshots/processed/rare-beauty-dtc-mockup.png
+  analysis: references/layout-screenshots/analysis/rare-beauty-dtc-mockup.yaml
+  palette_family: dusty_rose_mauve
+  tags:
+  - dtc_beauty
+  - dusty_rose
+  - product_page
+  use_for:
+  - layout_planner
+  - style-sense-agent
+  - palette-extractor
+updated_at: '2026-06-24'

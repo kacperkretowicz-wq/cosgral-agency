@@ -1,0 +1,21 @@
+{
+  "job_slug": "lumera-landing",
+  "brand": "LUMÉRA",
+  "tagline": "ART DIRECTION. + SKINCARE.",
+  "layout_archetype": "readymag-slides",
+  "products": ["vitamin-serum", "night-renewal-oil"],
+  "template_mix": {
+    "hero": "taylor",
+    "manifesto": "portfolite",
+    "work_index": "kirk",
+    "campaign": "grid-editorial",
+    "pieces": "kirk",
+    "cta": "taylor"
+  },
+  "images_source": "profiles/approved/",
+  "images_output": "outputs/images/lumera-landing/",
+  "page_output": "outputs/pages/lumera-landing/",
+  "figma": "skipped — fileKey empty",
+  "generated_at": "2026-06-22",
+  "reworked_portfolio_at": "2026-06-23"
+}

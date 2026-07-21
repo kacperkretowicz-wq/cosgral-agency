@@ -1,0 +1,7 @@
+version: '1'
+domain: travelagency.agency
+seed_url: https://travelagency.agency/
+updated_at: '2026-06-24'
+pages: []
+categories_index: {}
+page_count: 0

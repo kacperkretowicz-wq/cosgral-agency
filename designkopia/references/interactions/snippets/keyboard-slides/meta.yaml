@@ -1,0 +1,8 @@
+id: keyboard-slides
+name: Readymag keyboard slides + slide counter
+stack: vanilla
+requires:
+  - .snap-container
+  - .viewport-section
+  - #slide-counter
+ref: outputs/pages/atlas-creative/

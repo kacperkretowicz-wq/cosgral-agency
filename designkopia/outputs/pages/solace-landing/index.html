@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOLACE — Calm skin. Quiet luxury.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="interactions.css">
+</head>
+<body>
+  <!-- salient nav -->
+  <header class="header">
+    <nav class="nav">
+      <a class="logo" href="#">SOLACE</a>
+      <ul class="links">
+        <li><a href="#ritual">Ritual</a></li>
+        <li><a href="#collection">Collection</a></li>
+        <li><a href="#journal">Journal</a></li>
+      </ul>
+      <a class="nav-link-underline" href="#shop">Shop</a>
+    </nav>
+  </header>
+
+  <!-- salient hero — light, sage -->
+  <section class="hero">
+    <div class="hero-top">
+      <p class="tagline">We craft <em id="text-cycle">calm</em>, botanical formulas for skin that needs less noise and more care.</p>
+      <a class="nav-link-underline light" href="#shop">Start your ritual</a>
+    </div>
+    <div class="hero-brand">
+      <span class="hero-time" id="time">06:22</span>
+      <h1>SOLACE</h1>
+    </div>
+    <div class="hero-image">
+      <img src="../../images/solace-landing/solace-03-duo-lifestyle.png" alt="SOLACE cleanser and moisturizer on stone shelf" width="1400" height="700">
+    </div>
+    <div class="logo-bar marquee-wrap" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Botanical</span><span>Fragrance-free</span><span>Ceramide-rich</span><span>pH-balanced</span><span>Editorial craft</span>
+        <span>Botanical</span><span>Fragrance-free</span><span>Ceramide-rich</span><span>pH-balanced</span><span>Editorial craft</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- portfolite intro dark-light contrast -->
+  <section class="intro section reveal" id="ritual">
+    <div class="intro-grid">
+      <div class="intro-copy">
+        <span class="label">(01) THE RITUAL</span>
+        <h2>Calm skin.<br>Quiet luxury.</h2>
+        <p>Two formulas — cleanse and repair — shot in sunlight and stone. Sage, terracotta, cream. A palette that breathes.</p>
+      </div>
+      <div class="intro-visual">
+        <img src="../../images/solace-landing/solace-asset-botanical-still-life.png" alt="Botanical still life" width="520" height="640">
+      </div>
+    </div>
+  </section>
+
+  <!-- kirk product duo -->
+  <section class="collection section cream-bg reveal" id="shop">
+    <span class="label">(02) COLLECTION</span>
+    <h2 class="section-heading">Two essentials</h2>
+    <div class="products">
+      <article class="product">
+        <div class="product-img">
+          <img src="../../images/solace-landing/solace-01-sage-packshot.png" alt="Revive Gel Cleanser">
+        </div>
+        <div class="product-body">
+          <h3>Revive Gel Cleanser</h3>
+          <p>Gentle pH-balanced gel in matte sage tube. Cleanses without stripping.</p>
+          <ul>
+            <li>Centella &amp; chamomile</li>
+            <li>Sulfate-free</li>
+          </ul>
+          <div class="product-row">
+            <strong>38 USD</strong>
+            <a class="btn btn-sage" href="#">Shop</a>
+          </div>
+        </div>
+      </article>
+      <article class="product">
+        <div class="product-img">
+          <img src="../../images/solace-landing/solace-02-terracotta-hero.png" alt="Barrier Repair Moisturizer">
+        </div>
+        <div class="product-body">
+          <h3>Barrier Repair Moisturizer</h3>
+          <p>Ceramic terracotta jar. Ceramide-rich cream for overnight renewal.</p>
+          <ul>
+            <li>Ceramide NP complex</li>
+            <li>48-hour hydration</li>
+          </ul>
+          <div class="product-row">
+            <strong>54 USD</strong>
+            <a class="btn btn-terra" href="#">Shop</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- effect #14 GSAP fan — własne zdjęcia SOLACE -->
+  <section class="fan-section section reveal" id="fan">
+    <span class="label light">(02b) CAMPAIGN FAN</span>
+    <h2>Editorial collection</h2>
+    <p class="fan-lead">Swipe through campaign stills — all assets from SOLACE shoot.</p>
+    <div id="fan-gallery" class="fan-gallery">
+      <button type="button" class="fan-btn fan-prev" aria-label="Previous">←</button>
+      <button type="button" class="fan-btn fan-next" aria-label="Next">→</button>
+    </div>
+  </section>
+
+  <!-- portfolite gallery light -->
+  <section class="gallery section reveal" id="collection">
+    <span class="label light">(03) CAMPAIGN</span>
+    <h2>Editorial stills</h2>
+    <div class="gallery-grid">
+      <figure class="g-item large">
+        <img src="../../images/solace-landing/solace-05-forest-packshot.png" alt="Forest green packshot">
+        <figcaption>View Casestudy ↗</figcaption>
+      </figure>
+      <figure class="g-item">
+        <img src="../../images/solace-landing/solace-04-texture-macro.png" alt="Texture macro">
+        <figcaption>View Casestudy ↗</figcaption>
+      </figure>
+      <figure class="g-item">
+        <img src="../../images/solace-landing/solace-asset-sage-gradient.png" alt="Sage gradient">
+        <figcaption>View Casestudy ↗</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- taylor numbered process + portrait -->
+  <section class="process section texture-section reveal" id="journal">
+    <div class="process-grid">
+      <div class="process-visual">
+        <img src="../../images/solace-landing/solace-asset-portrait.png" alt="SOLACE editorial portrait">
+      </div>
+      <div class="process-copy">
+        <span class="label">(04) PROCESS</span>
+        <h2>How we work</h2>
+        <ol class="steps">
+          <li><span>01</span><div><strong>Botanical first</strong><p>Actives chosen for calm, not spectacle.</p></div></li>
+          <li><span>02</span><div><strong>Material honesty</strong><p>Matte tubes, ceramic jars — textures you want to touch.</p></div></li>
+          <li><span>03</span><div><strong>Editorial light</strong><p>Every frame shot like a campaign, not a catalog.</p></div></li>
+          <li><span>04</span><div><strong>Less, but better</strong><p>Two products. One visual world.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- salient faq -->
+  <section class="faq section">
+    <div class="faq-grid">
+      <div>
+        <span class="label">(05) FAQ</span>
+        <h2>Any questions?<br>We got you.</h2>
+      </div>
+      <dl>
+        <div><dt>Are SOLACE products fragrance-free?</dt><dd>Yes. Both formulas are fragrance-free and dermatologist tested.</dd></div>
+        <div><dt>Can I use both in one routine?</dt><dd>Cleanse with Revive Gel, follow with Barrier Repair — AM or PM.</dd></div>
+        <div><dt>What makes the palette different?</dt><dd>Sage, terracotta, and cream — warm organic editorial, not clinical white.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="cta reveal">
+    <h2 class="letter-hover">Begin with calm.</h2>
+    <p>Collection from 38 USD — shipped in editorial packaging.</p>
+    <a class="btn btn-dark btn-origin letter-hover" href="#shop">Shop SOLACE</a>
+  </section>
+
+  <footer class="footer">
+    <span>SOLACE</span>
+    <a href="https://cosgral.design" target="_blank" rel="noopener">cosgral.design</a>
+    <a href="../lumera-landing/index.html">LUMÉRA →</a>
+  </footer>
+
+  <script>
+    const el = document.getElementById('time');
+    if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="interactions.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+version: "1"
+updated_at: "2026-06-25"
+
+goal: >
+  Mockupy z references/layout-screenshots/ mają wpływać nie tylko na layout,
+  ale też na mood zdjęć (grade/palette/light). Mockup = inspiracja stylu zdjęcia,
+  nie klon finalnego obrazu.
+
+sources:
+  inbox: references/layout-screenshots/inbox/
+  analysis: references/layout-screenshots/analysis/
+  pick_script: scripts/pick-photo-grade.py
+
+policy:
+  required_for_image_jobs: true
+  anchor_reference_priority:
+    - photo_grade_from_mockup
+    - style_dna_matching_palette
+    - approved_examples_with_reason
+  forbidden_default_reference_paths:
+    - profiles/approved/01-bold-red-packshot.png
+    - profiles/approved/02-bw-geometric-packshot.png
+  forbidden_patterns:
+    - "red_or_bw_as_default_without_brief"
+    - "same_style_ref_as_previous_job"
+    - "mockup_subject_copy_1to1"
+
+required_manifest_fields_per_image:
+  - subject_ref
+  - style_ref
+  - style_dimensions
+  - shot_rationale
+  - palette_family
+  - photo_grade_ref
+
+rotation:
+  lookback_jobs: 3
+  palette_family_repeat_limit: 2
+  style_ref_repeat_limit: 1
+  action_on_fail: "select different mockup grade or different style_dna grade"
+
+checks:
+  pre_media:
+    - "python scripts/pick-photo-grade.py --job <slug> --json"
+    - "python scripts/plan-brand-shots.py --job <slug> --write-shot-plan --json"
+  post_media:
+    - "python scripts/check-image-variability.py <slug>"
+    - "python scripts/check-brand-shots.py <slug>"
+
+# ─── Brand atmosphere (tła, kafelki, sceny z ludźmi) ───
+brand_atmosphere:
+  rules: profiles/job-types/brand-atmosphere-shots.yaml
+  plan_script: scripts/plan-brand-shots.py
+  applies_to: [product_brand, food_beverage]
+  goal: >
+    Mockupy często mają ludzi, tło, rekwizyty obok produktu — to inspiracja dla
+    atmosphere shots (hero bg, gallery tiles, story bands), nie tylko packshot.
+  product_lock:
+    anchor_and_derived: true
+    atmosphere_shots: false
+  workflow: >
+    1) po layout-plan: plan-brand-shots.py --write-shot-plan
+    2) Faza A: anchor packshot (product lock)
+    3) Faza B: derived product shots + atmosphere shots (bez klonowania mockup person 1:1)
+  ui_mapping:
+    section_background: [hero_bg, full_bleed_band, cta_bg]
+    brand_tile: [gallery_grid, masonry, duo_card]
+    lifestyle_scene: [story_split, ritual, about]
+    texture_mood: [accent_band, spec_texture]
+    editorial_context: [gallery_feature, campaign_still]
+

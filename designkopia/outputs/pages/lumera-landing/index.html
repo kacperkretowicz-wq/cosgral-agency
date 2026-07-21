@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUMÉRA — Editorial Skincare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="#hero">LUMÉRA®</a>
+      <ul class="nav-links">
+        <li><a href="#shop">Collection</a></li>
+        <li><a href="#gallery">Campaign</a></li>
+        <li><a href="#ritual">Ritual</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a class="nav-cta" href="#shop">Shop</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <!-- HERO — unchanged -->
+    <section class="hero" id="hero">
+      <div class="hero-display" aria-hidden="true">LUMÉRA</div>
+      <div class="hero-grid reveal">
+        <div class="hero-copy">
+          <p class="mono eyebrow">CAMPAIGN 2026</p>
+          <div class="hero-lines" aria-label="LUMÉRA editorial">
+            <p class="hero-line">ART DIRECTION.</p>
+            <p class="hero-line hero-line--outline">+ SKINCARE.</p>
+          </div>
+          <a class="btn btn-invert btn-origin" href="#shop">View collection</a>
+        </div>
+        <div class="hero-media img-blur-edge">
+          <img src="../../images/lumera-landing/asset-01-red-editorial-portrait.png" alt="LUMÉRA editorial portrait" width="640" height="800" style="object-position: center 20%">
+        </div>
+      </div>
+    </section>
+
+    <!-- (01) COLLECTION — unique packshots only here -->
+    <section class="section products cream-section" id="shop">
+      <p class="mono section-tag section-tag--red reveal">(01) COLLECTION</p>
+      <h2 class="section-title reveal">Two essentials</h2>
+      <div class="product-duo reveal">
+        <article class="product-card" id="shop-serum">
+          <div class="product-image">
+            <img src="../../images/lumera-landing/01-bold-red-packshot.png" alt="Vitamin C Brightening Serum" width="600" height="600" style="object-position: center center">
+          </div>
+          <div class="product-info">
+            <h3>Vitamin C</h3>
+            <p class="mono product-meta">Serum · 30ml · AM</p>
+            <div class="product-footer">
+              <span class="price mono">49 USD</span>
+              <a class="btn btn-dark btn-origin" href="#contact">Shop</a>
+            </div>
+          </div>
+        </article>
+        <article class="product-card" id="shop-oil">
+          <div class="product-image">
+            <img src="../../images/lumera-landing/09-night-oil-upright-black-label.png" alt="Night Renewal Face Oil" width="600" height="600" style="object-position: center center">
+          </div>
+          <div class="product-info">
+            <h3>Night Oil</h3>
+            <p class="mono product-meta">Oil · 30ml · PM</p>
+            <div class="product-footer">
+              <span class="price mono">62 USD</span>
+              <a class="btn btn-dark btn-origin" href="#contact">Shop</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- (02) CAMPAIGN — 4 unique stills, never reused below -->
+    <section class="gallery-dark section" id="gallery">
+      <div class="gallery-dark-bg"></div>
+      <div class="gallery-dark-inner">
+        <p class="mono section-tag light reveal">(02) CAMPAIGN</p>
+        <h2 class="reveal">Campaign stills</h2>
+        <div class="gallery-grid reveal">
+          <figure class="gallery-item tall">
+            <img src="../../images/lumera-landing/02-bw-geometric-packshot.png" alt="B&amp;W geometric packshot" style="object-position: center center">
+          </figure>
+          <figure class="gallery-item">
+            <img src="../../images/lumera-landing/05-cinematic-red-macro.png" alt="Cinematic red macro glass" style="object-position: center center">
+          </figure>
+          <figure class="gallery-item">
+            <img src="../../images/lumera-landing/asset-01-red-abstract-light.png" alt="Red abstract light" style="object-position: center center">
+          </figure>
+          <figure class="gallery-item wide">
+            <img src="../../images/lumera-landing/12-red-black-editorial-still.png" alt="Red and black editorial still life" style="object-position: center center">
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- (03) STATS — red band, no warm assets -->
+    <section class="section stats-section" id="why">
+      <div class="stats-band reveal">
+        <p class="mono section-tag light">(03) LUMÉRA</p>
+        <h2>Two formulas.<br>One campaign.</h2>
+        <dl class="stats-mono mono light">
+          <div><dt>2</dt><dd>Formulas</dd></div>
+          <div><dt>30ml</dt><dd>Each</dd></div>
+          <div><dt>AM/PM</dt><dd>Ritual</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- (04) RITUAL -->
+    <section class="section ritual-full" id="ritual">
+      <div class="ritual-full-inner reveal">
+        <p class="mono section-tag section-tag--red">(04) RITUAL</p>
+        <h2>Morning + Night</h2>
+        <div class="ritual-full-media">
+          <img src="../../images/lumera-landing/10-am-pm-flatlay-black-red.png" alt="AM PM skincare flat lay" style="object-position: center 45%">
+        </div>
+        <ul class="ritual-tags mono">
+          <li>Vitamin C · AM</li>
+          <li>Night Oil · PM</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- (05) MACRO — unique droplet shot only -->
+    <section class="section macro-full" id="macro">
+      <div class="macro-full-inner reveal">
+        <p class="mono section-tag light">(05) MACRO</p>
+        <h2>Oil in motion</h2>
+        <div class="macro-full-media">
+          <img src="../../images/lumera-landing/11e-oil-stream-flowing-skin-v2.png" alt="Oil droplet flowing down cheek — editorial macro" style="object-position: center 42%">
+        </div>
+      </div>
+    </section>
+
+    <!-- (06) FAQ -->
+    <section class="section faq-section cream-section" id="faq">
+      <div class="faq-inner reveal">
+        <p class="mono section-tag section-tag--red">(06) FAQ</p>
+        <h2>Any questions?</h2>
+        <dl class="faq-list">
+          <div class="faq-row">
+            <dt>AM + PM together?</dt>
+            <dd>Vitamin C morning · Night Oil evening.</dd>
+          </div>
+          <div class="faq-row">
+            <dt>Dermatologist tested?</dt>
+            <dd>Both formulas · daily use.</dd>
+          </div>
+          <div class="faq-row">
+            <dt>Why two products?</dt>
+            <dd>Editorial focus · minimal SKUs.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- (07) CTA -->
+    <section class="section cta-section" id="contact">
+      <div class="cta-inner reveal">
+        <p class="mono section-tag light">(07) SHOP</p>
+        <h2 class="cta-display">LUMÉRA</h2>
+        <p class="mono cta-meta">hello@lumera.studio · Instagram · Behance</p>
+        <a class="btn btn-invert btn-origin btn-lg" href="#">Shop collection</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer-bottom">
+    <span>LUMÉRA®</span>
+    <a href="https://cosgral.design" target="_blank" rel="noopener">cosgral.design</a>
+    <span>© 2026</span>
+  </footer>
+
+  <script src="interactions.js"></script>
+</body>
+</html>

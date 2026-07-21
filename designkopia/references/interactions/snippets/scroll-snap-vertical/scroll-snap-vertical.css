@@ -1,0 +1,16 @@
+/* Commercial vertical scroll — trovearchive, lumera */
+.page-vertical {
+  overflow-x: hidden;
+}
+
+.section-scroll {
+  padding: 6rem 2rem;
+}
+
+.section-scroll--snap {
+  scroll-snap-align: start;
+}
+
+html.has-section-snap {
+  scroll-snap-type: y proximity;
+}

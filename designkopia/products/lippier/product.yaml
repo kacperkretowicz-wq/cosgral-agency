@@ -1,0 +1,37 @@
+slug: lippier
+brand: Lippier
+tagline: "Kolor, który zostaje. Dopóki sama nie zdecydujesz inaczej."
+template_mix: [luzia, hero-minimal, grid-editorial]
+job_palette: japan_warm_light
+palette:
+  background: "#FAF6F0"
+  cream: "#F5EFE6"
+  yellow: "#E8C547"
+  purple: "#7B5EA7"
+  burgundy: "#6B2D3C"
+  ink: "#2A2420"
+concept: >
+  Artystyczna szminka / liner dwustronny: pigment nie ściera się przez dzień,
+  drugi koniec to mini gumka do precyzyjnego usuwania. Estetyka japońskiego
+  minimalizmu (wabi-sabi, washi, soft light), Pinterest-clean, dusza artystki.
+
+product_visual_spec: >
+  Slim dual-ended lip pencil approximately 14cm, matte cream-white barrel,
+  thin gold metal band at center, one end burgundy-red pigment tip (bullet shape),
+  opposite end small white rubber eraser tip (same diameter as barrel).
+  Minimal luxury beauty packaging, no readable brand text. SAME product in every shot.
+
+founder:
+  name: Mika Sato
+  role: Założycielka & artystka wizualna
+  bio: >
+    Mika łączy malarstwo akwarelowe z designem kosmetycznym. Lippier powstał
+    z frustracji — kolor, który nie znika, dopóki sama nie chcesz go zmyć.
+job_palette_family: warm_organic
+narrative:
+  - hero product on washi
+  - dual-tip macro
+  - lifestyle portrait
+  - japanese still life
+  - lip wearing shade
+  - founder portrait

@@ -1,0 +1,97 @@
+# Katalog snippetów vanilla — interaction-composer składa z layout-plan.snippet_ids
+# Źródło: audyt web 2026-06-23 + ATLAS CREATIVE v2
+
+version: "1"
+base_path: references/interactions/snippets
+
+snippets:
+  keyboard-slides:
+    files: [keyboard-slides.css, keyboard-slides.js]
+    requires_html: [snap-container, viewport-section, slide-counter]
+    archetypes: [readymag-slides, studio-manifesto, case-study-long]
+    ref_sites: [willvint.com, from.cm, bicemucci.com]
+
+  pill-nav:
+    files: [pill-nav.css]
+    partial: pill-nav.html
+    archetypes: [readymag-slides, product-serial]
+    ref_sites: [willvint.com, n9cra.com]
+
+  index-overlay:
+    files: [index-overlay.css, index-overlay.js]
+    partial: index-overlay.html
+    archetypes: [masonry-portfolio, readymag-slides]
+    ref_sites: [mashachern.com, travelagency.agency]
+
+  project-index-row:
+    files: [project-index.css]
+    partial: project-index-row.html
+    data_source: products/<slug>/projects.yaml
+    archetypes: [readymag-slides, studio-manifesto, masonry-portfolio]
+    ref_sites: [bicemucci.com, marianorrisesparza.com, willvint.com]
+
+  expandable-plus:
+    files: [expandable-plus.css, expandable-plus.js]
+    archetypes: [masonry-portfolio, studio-manifesto]
+    ref_sites: [dave-green.com]
+
+  masonry-grid:
+    files: [masonry-grid.css]
+    partial: masonry-item.html
+    archetypes: [masonry-portfolio, readymag-slides]
+    ref_sites: [dave-green.com, marianorrisesparza.com]
+
+  manifesto-display:
+    files: [manifesto-display.css]
+    partial: manifesto-display.html
+    archetypes: [studio-manifesto, case-study-long]
+    ref_sites: [from.cm, bicemucci.com]
+
+  video-hero:
+    files: [video-hero.css]
+    partial: video-hero.html
+    archetypes: [readymag-slides, product-serial]
+    ref_sites: [n9cra.com, willvint.com]
+
+  marquee-logos:
+    files: [marquee-logos.css, marquee-logos.js]
+    archetypes: [readymag-slides, lumera-commercial]
+    ref_sites: [thomjohn.com]
+
+  scroll-reveal:
+    files: [scroll-reveal.css, scroll-reveal.js]
+    archetypes: [lumera-commercial, product-editorial, studio-manifesto]
+    ref_sites: [trovearchive.com]
+
+  origin-button:
+    files: [origin-button.css, origin-button.js]
+    archetypes: [all]
+    ref_sites: [bicemucci.com, trovearchive.com]
+
+  stacked-cards:
+    files: [stacked-cards.css, stacked-cards.js]
+    archetypes: [readymag-slides, studio-manifesto]
+    ref_sites: [bicemucci.com]
+
+  scroll-snap-vertical:
+    files: [scroll-snap-vertical.css]
+    archetypes: [lumera-commercial, product-editorial]
+    ref_sites: [trovearchive.com, lumera-landing]
+
+  webgl-noise-ambient:
+    files: [webgl-noise-ambient.css, webgl-noise-ambient.js]
+    requires_html: [data-noise-ambient]
+    archetypes: [readymag-slides, studio-manifesto, product-serial]
+    ref_sites: [from.cm, n9cra.com]
+    note: "effect-03 FBM noise — experimental ambient hero/section bg"
+
+  project-index-fan:
+    files: [project-index-fan.css, project-index-fan.js]
+    requires_html: [index-fan-wrap, project-link]
+    archetypes: [readymag-slides, portfolio-index, studio-manifesto]
+    ref_sites: [willvint.com, bicemucci.com]
+    note: "effect-17 GSAP fan — vanilla CSS 3D fan on project list hover"
+
+compose_order:
+  - css alphabetical per snippet id
+  - js: scroll-reveal, keyboard-slides, origin-button, expandable-plus, stacked-cards, marquee-logos, index-overlay

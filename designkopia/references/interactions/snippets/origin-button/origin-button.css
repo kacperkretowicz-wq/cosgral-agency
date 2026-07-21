@@ -1,0 +1,15 @@
+.btn-origin { position: relative; overflow: hidden; }
+
+.btn-origin::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #fff 20%, transparent);
+  border-radius: inherit;
+  transform: scale(0);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.btn-origin:active::before,
+.btn-origin.is-pressed::before { transform: scale(1); }

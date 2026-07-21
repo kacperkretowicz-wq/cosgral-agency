@@ -1,0 +1,54 @@
+/* Shared partial tokens — page-exporter imports + per-template overrides via data-template */
+
+:root {
+  --tpl-bg: var(--bg, #06050a);
+  --tpl-text: var(--text, #f4f0ff);
+  --tpl-muted: var(--muted, #a89bb8);
+  --tpl-accent: var(--accent, #c568ff);
+  --tpl-line: var(--line, rgba(243, 238, 255, 0.14));
+  --tpl-font-heading: var(--font-heading, "Syne", sans-serif);
+  --tpl-font-body: var(--font-body, "Manrope", sans-serif);
+  --tpl-font-mono: var(--font-mono, "Space Mono", monospace);
+  --tpl-section-pad-y: clamp(3rem, 8vh, 7rem);
+  --tpl-section-pad-x: clamp(1rem, 4vw, 2.5rem);
+  --tpl-max: min(1180px, 100%);
+}
+
+[data-template="spector"] { --tpl-accent: #f94137; --tpl-text: #e8d9c8; }
+[data-template="ordina"] { --tpl-bg: #f8f9fc; --tpl-text: #0f172a; --tpl-accent: #2563eb; }
+[data-template="makos"] { --tpl-bg: #f7f7f7; --tpl-text: #000; --tpl-accent: #34c75a; }
+[data-template="fabrica"] { --tpl-bg: #0a0a0a; --tpl-accent: #ff4d6d; }
+[data-template="salient"] { --tpl-accent: #e82323; }
+[data-template="daniel"] { --tpl-bg: #111; --tpl-text: #ece7df; }
+[data-template="zentry"] { --tpl-bg: #050508; --tpl-accent: #7c5cff; }
+
+.section[data-template] {
+  padding: var(--tpl-section-pad-y) var(--tpl-section-pad-x);
+  color: var(--tpl-text);
+  background: transparent;
+}
+
+.section[data-template] .eyebrow {
+  font-family: var(--tpl-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tpl-muted);
+}
+
+.section[data-template] h1,
+.section[data-template] h2 {
+  font-family: var(--tpl-font-heading);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.section[data-template] .section-lead {
+  color: var(--tpl-muted);
+  max-width: 48ch;
+}
+
+.section-inner {
+  width: var(--tpl-max);
+  margin: 0 auto;
+}

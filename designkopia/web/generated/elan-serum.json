@@ -1,0 +1,90 @@
+{
+  "job": "elan-serum",
+  "brand": "ÉLAN",
+  "tier": "content",
+  "tokens": {
+    "bg": "#FFFFFF",
+    "fg": "#111111",
+    "muted": "#6B6B6B",
+    "accent": "#111111",
+    "surface": "#141416",
+    "fontHeading": "\"Instrument Sans\", system-ui, sans-serif",
+    "fontBody": "\"Instrument Sans\", system-ui, sans-serif",
+    "fontMono": "\"JetBrains Mono\", ui-monospace, monospace",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "eyebrow": null,
+      "title": "ÉLAN",
+      "lead": "",
+      "cta": "Zobacz",
+      "bg": "image",
+      "image": "/g/elan-serum/00-anchor-packshot.png"
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "02-manifesto",
+      "body": "",
+      "image": "/g/elan-serum/02-lifestyle.png",
+      "reverse": true
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "03-index",
+      "body": "",
+      "image": "/g/elan-serum/01-macro.png",
+      "reverse": false
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "04-ingredients",
+      "body": "",
+      "image": "/g/elan-serum/02-lifestyle.png",
+      "reverse": true
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "05-process",
+      "body": "",
+      "image": "/g/elan-serum/01-macro.png",
+      "reverse": false
+    },
+    {
+      "type": "gallery",
+      "tag": null,
+      "heading": "Kadry",
+      "images": [
+        "/g/elan-serum/01-macro.png",
+        "/g/elan-serum/02-lifestyle.png"
+      ]
+    },
+    {
+      "type": "faq",
+      "tag": null,
+      "heading": "",
+      "items": [
+        {
+          "q": "Szczegóły",
+          "a": ""
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "title": "Zbudujmy to.",
+      "cta": "Kup teraz",
+      "meta": ""
+    },
+    {
+      "type": "footer",
+      "brand": "ÉLAN",
+      "credit": "cosgral.design"
+    }
+  ]
+}

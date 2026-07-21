@@ -1,0 +1,77 @@
+# Zestawy interakcji per archetyp — rotacja, nie zawsze scroll-reveal + origin + letter-hover
+
+version: "1"
+source_manifest: references/interactions/manifest.yaml
+
+sets:
+  commercial-scroll:
+    archetypes: [lumera-commercial]
+    effects:
+      - { id: effect-12, name: scroll reveal, max_sections: 3 }
+      - { id: effect-08, name: feature tabs }
+      - { id: effect-10, name: marquee }
+    banned: [effect-16, effect-05-more-than-once]
+
+  editorial-slides:
+    archetypes: [readymag-slides]
+    effects:
+      - { id: keyboard-slides, name: "ArrowDown/Up między sekcjami", custom: true }
+      - { id: effect-09, name: stacked cards }
+      - { id: effect-14, name: origin button }
+      - { id: slide-counter, name: "01 / N", custom: true }
+    snippet_ids: [pill-nav, keyboard-slides, project-index-row, stacked-cards, origin-button]
+    banned: [effect-16]
+
+  studio-editorial:
+    archetypes: [studio-manifesto]
+    effects:
+      - { id: effect-12, name: scroll reveal, max_sections: 2 }
+      - { id: effect-17, name: GSAP fan }
+      - { id: expandable-plus, name: "Represented by +", custom: true, ref: dave-green.com }
+    snippet_ids: [keyboard-slides, manifesto-display, project-index-fan, webgl-noise-ambient, expandable-plus]
+    banned: [effect-16, effect-05]
+
+  portfolio-minimal:
+    archetypes: [masonry-portfolio, portfolio-index]
+    effects:
+      - { id: effect-13, name: letter hover, max: 1 }
+      - { id: expandable-plus, name: "Info +", custom: true }
+      - { id: masonry-hover, name: "scale + CTA arrow", custom: true }
+    snippet_ids: [masonry-grid, expandable-plus, project-index-row, index-overlay]
+    banned: [effect-16, effect-05, effect-12-everywhere]
+
+  product-light:
+    archetypes: [product-editorial]
+    effects:
+      - { id: effect-12, name: scroll reveal, max_sections: 4 }
+      - { id: effect-14, name: origin button }
+      - { id: shade-swatch-hover, name: "swatch interaction", custom: true }
+    snippet_ids: [scroll-reveal, origin-button, scroll-snap-vertical]
+    banned: [effect-16, effect-05, letter-hover-default]
+
+  product-serial-motion:
+    archetypes: [product-serial]
+    effects:
+      - { id: keyboard-slides, custom: true }
+      - { id: video-hero, custom: true }
+    snippet_ids: [pill-nav, video-hero, keyboard-slides, marquee-logos, origin-button]
+    banned: [effect-16]
+
+  case-study-motion:
+    archetypes: [case-study-long]
+    effects:
+      - { id: effect-12, name: scroll reveal, max_sections: 6 }
+      - { id: manifesto-display, custom: true }
+    snippet_ids: [manifesto-display, scroll-reveal, keyboard-slides]
+    banned: [effect-16, effect-05-more-than-once]
+
+rotation_rule: >
+  Ostatni job użył commercial-scroll → następny product-editorial preferuj product-light.
+  Nie używaj tego samego setu 2× z rzędu bez uzasadnienia w layout-plan.json.
+
+default_bundle_deprecated:
+  ids:
+    - scroll-reveal
+    - origin-button
+    - letter-hover
+  note: "Używane zbyt często — style-qa FAIL jeśli brak interaction_set w planie"

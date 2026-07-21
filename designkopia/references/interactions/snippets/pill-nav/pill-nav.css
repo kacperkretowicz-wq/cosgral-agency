@@ -1,0 +1,43 @@
+/* Fixed pill nav — willvint, n9cra */
+.site-nav-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2.5rem;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 92%, transparent), transparent);
+  pointer-events: none;
+}
+
+.site-nav-fixed a,
+.site-nav-fixed button,
+.nav-pill,
+.slide-counter { pointer-events: auto; }
+
+.nav-pill {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.35rem 0.5rem;
+  background: color-mix(in srgb, var(--ink, #000) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.nav-pill a {
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  transition: background 0.25s, color 0.25s;
+}
+
+.nav-pill a:hover,
+.nav-index-btn {
+  background: color-mix(in srgb, var(--accent, var(--purple)) 15%, transparent);
+}

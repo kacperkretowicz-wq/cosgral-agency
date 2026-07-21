@@ -1,0 +1,27 @@
+# Research lane — agencja marketingowa
+
+lane_id: agency_portfolio
+search_targets:
+  web:
+    - type: agency_portfolio_site
+      look_for: [index rhythm, case study grid, services block, team, contact minimal]
+      example_urls_from_audits: [willvint.com, travelagency.agency, bicemucci.com]
+    - type: competitor_agency
+      look_for: [scroll mode, project index, motion level]
+  typography:
+    - source: reference-audit fonts + moodboards-ui
+      look_for: [display vs mono meta, pairing, tracking, numbered sections]
+    - avoid: [soft-beauty default, inter-plain-lead]
+  visual_subject:
+    - folder: references/agency-content/
+      look_for: [campaigns, branding-systems, team-studio]
+    - forbidden: [beauty-skincare as portfolio hero]
+  visual_style:
+    - folder: references/style-dna/
+      look_for: [lighting, palette, grade — not subject copy]
+
+outputs:
+  web: research-web.json
+  typography: research-typography.json
+  visual: research-visual.json
+  curated: research-manifest.json

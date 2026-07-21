@@ -1,0 +1,182 @@
+# Katalog efektów z efekty.txt (21 pozycji)
+# Używaj profiles/generation-learnings.md — bez obrazów z neta (unsplash, pravatar)
+
+snippets:
+  - id: effect-01
+    source: 21st.dev
+    file: references/interactions/efekty.txt
+    line: 1
+    name: Lenis sticky scroll gallery
+    tags: [scroll, lenis, gallery, sticky]
+    stack: [react]
+    external_images: true
+    solace_fit: low
+    note: "Unsplash w demo — użyć tylko profiles/approved lub outputs/images"
+
+  - id: effect-02
+    source: 21st.dev
+    line: 141
+    name: MeshGradient hero shader
+    tags: [hero, shader, gradient, background]
+    stack: [react]
+    solace_fit: medium
+    note: "Kolory sage #8FA882, terracotta #C67B5C, cream"
+
+  - id: effect-03
+    source: 21st.dev
+    line: 250
+    name: WebGL2 FBM noise canvas
+    tags: [shader, webgl, background, ambient]
+    stack: [react, webgl]
+    solace_fit: medium
+    note: "u_color → sage green"
+
+  - id: effect-04
+    source: 21st.dev
+    line: 454
+    name: Three.js shader animation
+    tags: [3d, threejs, shader, hero]
+    stack: [react, threejs]
+    solace_fit: low
+
+  - id: effect-05
+    source: 21st.dev
+    line: 632
+    name: Animated text cycle
+    tags: [text, cycle, hero]
+    stack: [react, framer-motion]
+    solace_fit: high
+    implemented_on: solace-landing
+    vanilla: true
+
+  - id: effect-06
+    source: 21st.dev
+    line: 745
+    name: Gooey text morph
+    tags: [text, morph, hero]
+    stack: [react]
+    solace_fit: low
+
+  - id: effect-07
+    source: 21st.dev
+    line: 880
+    name: Testimonials orbit carousel
+    tags: [testimonials, carousel, 3d]
+    stack: [react]
+    external_images: true
+    solace_fit: low
+    note: "pravatar — użyć solace-asset-portrait"
+
+  - id: effect-08
+    source: 21st.dev
+    line: 1161
+    name: Feature tabs (Radix)
+    tags: [tabs, features]
+    stack: [react]
+    solace_fit: medium
+
+  - id: effect-09
+    source: 21st.dev
+    line: 1302
+    name: Floating nav bar lamp
+    tags: [nav, mobile, glass]
+    stack: [react, framer-motion]
+    solace_fit: medium
+
+  - id: effect-10
+    source: 21st.dev
+    line: 1388
+    name: Hero rotating word titles
+    tags: [hero, text, cycle]
+    stack: [react, framer-motion]
+    solace_fit: high
+
+  - id: effect-11
+    source: 21st.dev
+    line: 1472
+    name: Display stacked cards skew
+    tags: [cards, stack, hover]
+    stack: [react]
+    solace_fit: medium
+
+  - id: effect-12
+    source: 21st.dev
+    line: 1543
+    name: Origin button fill animation
+    tags: [button, hover, cta]
+    stack: [react, motion]
+    solace_fit: high
+    implemented_on: solace-landing
+    vanilla: true
+
+  - id: effect-14
+    source: 21st.dev
+    line: 1848
+    name: GSAP social cards fan
+    tags: [gallery, gsap, cards, 3d]
+    stack: [react, gsap]
+    external_images: false_when_custom
+    solace_fit: high
+    implemented_on: solace-landing
+    note: "Własne obrazy z outputs/images/solace-landing/"
+
+  - id: effect-15
+    source: 21st.dev
+    line: 2145
+    name: Random letter swap on hover
+    tags: [text, hover, cta]
+    stack: [react, framer-motion]
+    solace_fit: medium
+
+  - id: effect-16
+    source: 21st.dev
+    line: 2386
+    name: Scroll and swap text
+    tags: [scroll, text, parallax]
+    stack: [react, framer-motion]
+    solace_fit: low
+    rejected: true
+    note: "Hero parallax odrzucone przez użytkownika — nie stosować"
+
+  - id: effect-17
+    source: 21st.dev
+    line: 2439
+    name: Lamp container reveal
+    tags: [hero, reveal, gradient]
+    stack: [react, framer-motion]
+    solace_fit: low
+
+  - id: effect-18
+    source: 21st.dev
+    line: 2544
+    name: Letter hover wave (Text_03)
+    tags: [text, hover, cta]
+    stack: [react, framer-motion]
+    solace_fit: high
+    implemented_on: solace-landing
+    vanilla: true
+
+  - id: effect-19
+    source: 21st.dev
+    line: 2597
+    name: Text cursor proximity
+    tags: [text, mouse, interactive]
+    stack: [react, motion]
+    solace_fit: medium
+
+  - id: effect-20
+    source: 21st.dev
+    line: 2744
+    name: Stacked cards spread on hover
+    tags: [cards, stack, product]
+    stack: [react, framer-motion]
+    solace_fit: high
+    note: "3 karty produktowe SOLACE"
+
+  - id: effect-21
+    source: 21st.dev
+    line: 2865
+    name: Display cards duplicate
+    tags: [cards, stack]
+    stack: [react]
+    solace_fit: low

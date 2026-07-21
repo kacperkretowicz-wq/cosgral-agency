@@ -1,0 +1,44 @@
+/* Readymag-style viewport sections — willvint, from.cm */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.viewport-section {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(var(--nav-h, 72px) + 2rem) 2.5rem 3rem;
+}
+
+.slide-counter {
+  font-family: var(--mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--muted, #8a7a9a);
+  font-variant-numeric: tabular-nums;
+}
+
+.slide-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 2.5rem;
+  z-index: 90;
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted, #8a7a9a);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .slide-counter,
+  .slide-hint { display: none; }
+}

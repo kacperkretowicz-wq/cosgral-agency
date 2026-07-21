@@ -1,0 +1,60 @@
+# Mapowanie stare → nowa struktura referencji (2026-06-24)
+# Uruchom: python scripts/reorganize-references.py [--dry-run]
+
+version: "1"
+updated_at: "2026-06-24"
+
+moves:
+  # Moodboards — UI only
+  - { from: references/inspiration/moodboards/moodboard-green-yellow-lifestyle.png, to: references/moodboards-ui/moodboard-green-yellow-lifestyle.png, role: ui_layout }
+  - { from: references/inspiration/moodboards/moodboard-orange-amora-grid.png, to: references/moodboards-ui/moodboard-orange-amora-grid.png, role: ui_layout }
+  - { from: references/inspiration/moodboards/moodboard-purple-magenta-strip.png, to: references/moodboards-ui/moodboard-purple-magenta-strip.png, role: ui_layout }
+  - { from: references/inspiration/moodboards/moodboard-green-top-yellow-bottom.png, to: references/moodboards-ui/moodboard-green-top-yellow-bottom.png, role: ui_layout, note: duplicate grid }
+
+  # style-dna / lighting
+  - { from: references/inspiration/bold-red-editorial/red-portrait-man-low-angle.png, to: references/style-dna/lighting/hard-directional-red-portrait.png, style_dimensions: [hard_directional, chiaroscuro] }
+  - { from: references/inspiration/bold-red-editorial/fashion-couple-chiaroscuro-red-lip.png, to: references/style-dna/lighting/chiaroscuro-intimate-red-gel.png, style_dimensions: [chiaroscuro, cinematic_gel] }
+  - { from: references/style/04-bw-motion-headphones.png, to: references/style-dna/lighting/bw-motion-rim-light.png, style_dimensions: [bw, motion_blur, rim_light] }
+  - { from: references/style/11-cinematic-red-portrait.png, to: references/style-dna/lighting/cinematic-red-gel-portrait.png, style_dimensions: [cinematic_gel, hard_shadow] }
+
+  # style-dna / palette
+  - { from: references/inspiration/warm-orange-terracotta/orange-editorial-still-life.png, to: references/style-dna/palette/warm-orange-terracotta-still.png, style_dimensions: [warm_orange, terracotta] }
+  - { from: references/inspiration/aquatic-summer/surfboard-turquoise-aerial.png, to: references/style-dna/palette/aqua-orange-aerial.png, style_dimensions: [aqua_orange, turquoise] }
+  - { from: references/inspiration/aquatic-summer/beach-model-white-shirt-splash.png, to: references/style-dna/palette/cerulean-white-splash.png, style_dimensions: [cerulean_white, airy] }
+  - { from: references/style/01-editorial-hero-red-portrait.png, to: references/style-dna/palette/editorial-red-hero-field.png, style_dimensions: [bold_red, saturated_field] }
+  - { from: references/style/03-monochrome-red-product-tilt.png, to: references/style-dna/palette/monochrome-red-product-tilt.png, style_dimensions: [bold_red, product_angle] }
+  - { from: references/style/10-orange-editorial-product-design.png, to: references/style-dna/palette/orange-editorial-product-angle.png, style_dimensions: [warm_orange, product_tilt] }
+
+  # style-dna / composition
+  - { from: references/inspiration/minimal-product-interior/skincare-bottles-grey-flatlay.png, to: references/style-dna/composition/clinical-flatlay-grey-grid.png, style_dimensions: [flatlay, cool_grey], forbidden_for: [agency_portfolio_subject] }
+  - { from: references/style/06-bw-geometric-citrus.png, to: references/style-dna/composition/bw-geometric-still-life.png, style_dimensions: [geometric, graphic_shadow, bw] }
+
+  # style-dna / grade
+  - { from: references/inspiration/beauty-skincare-macro/water-droplets-face-macro.png, to: references/style-dna/grade/dewy-wet-look-macro.png, style_dimensions: [dewy, wet_look], forbidden_for: [agency_portfolio_subject] }
+  - { from: references/inspiration/beauty-skincare-macro/lip-gloss-macro-peach.png, to: references/style-dna/grade/gloss-peach-macro.png, style_dimensions: [gloss, peach_nude], forbidden_for: [agency_portfolio_subject] }
+  - { from: references/inspiration/beauty-skincare-macro/beauty-ice-cream-freckles.png, to: references/style-dna/grade/warm-playful-macro-freckles.png, style_dimensions: [warm_natural, playful], forbidden_for: [agency_portfolio_subject] }
+  - { from: references/inspiration/beauty-skincare-macro/skincare-bathroom-marble.png, to: references/style-dna/grade/clean-marble-lifestyle-grade.png, style_dimensions: [white_pink, clean], forbidden_for: [agency_portfolio_subject] }
+  - { from: references/inspiration/bw-editorial-portrait/bw-profile-bald-serene.png, to: references/style-dna/grade/bw-serene-profile-grade.png, style_dimensions: [bw_editorial, serene] }
+  - { from: references/style/09-macro-skin-tablet-luxury.png, to: references/style-dna/grade/luxury-macro-skin-device.png, style_dimensions: [macro, luxury] }
+  - { from: references/style/02-fashion-profile-gold-knit.png, to: references/style-dna/grade/fashion-profile-gold-rim.png, style_dimensions: [profile, gold_rim] }
+
+  # agency-content — temat ujęć portfolio agencji
+  - { from: references/style/07-editorial-packaging-lifestyle.png, to: references/agency-content/campaigns/editorial-packaging-campaign.png, subject_tags: [campaign, packaging] }
+  - { from: references/style/08-branding-sensaya-califfo.png, to: references/agency-content/branding-systems/branding-guidelines-mockup.png, subject_tags: [branding, identity] }
+  - { from: references/style/05-bw-product-grid-casestudy.png, to: references/agency-content/campaigns/bw-case-study-grid-wall.png, subject_tags: [case_study, campaign_grid], also_style_dimensions: [grid, bw] }
+  - { from: references/inspiration/minimal-product-interior/interior-mint-sofa-minimal.png, to: references/agency-content/team-studio/minimal-studio-interior-mint.png, subject_tags: [studio, interior, agency_space] }
+  - { from: references/inspiration/minimal-product-interior/interior-transparent-chair-pink.png, to: references/agency-content/team-studio/sculptural-studio-chair-pink.png, subject_tags: [studio, furniture, agency_space] }
+  - { from: references/inspiration/bold-red-editorial/red-mirror-woman-white-blazer.png, to: references/agency-content/campaigns/fashion-campaign-red-mirror.png, subject_tags: [campaign, fashion, key_visual], style_dimensions: [bold_red, gold_accent] }
+
+archive_duplicates:
+  - references/inspiration/fashion-editorial
+
+legacy_inspiration_folders_remove_when_empty:
+  - references/inspiration/moodboards
+  - references/inspiration/bold-red-editorial
+  - references/inspiration/beauty-skincare-macro
+  - references/inspiration/minimal-product-interior
+  - references/inspiration/aquatic-summer
+  - references/inspiration/bw-editorial-portrait
+  - references/inspiration/warm-orange-terracotta
+  - references/inspiration/fashion-editorial

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Direction v2 — artistic dark backgrounds</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #080808; color: #e0e0e0; padding: 2rem; line-height: 1.6; }
+    h1 { font-size: 1.4rem; font-weight: 500; margin-bottom: 0.25rem; }
+    .sub { color: #666; font-size: 0.85rem; margin-bottom: 2rem; max-width: 60ch; }
+    .dna { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .dna span { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.25rem 0.6rem; border: 1px solid #333; border-radius: 999px; color: #999; }
+    .dirs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 2.5rem; }
+    .dir { background: #111; border: 1px solid #222; border-radius: 6px; padding: 1rem; }
+    .dir h3 { font-size: 0.8rem; color: #e82323; margin-bottom: 0.3rem; }
+    .dir p { font-size: 0.75rem; color: #888; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+    .card { background: #0f0f0f; border: 1px solid #1e1e1e; border-radius: 8px; overflow: hidden; }
+    .card.user_pick { border-color: #2a4a2a; }
+    .card.closest_partial { border-color: #4a3a10; }
+    .thumb { aspect-ratio: 16/10; background: #0a0a0a; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .thumb .ph { color: #444; font-size: 0.75rem; padding: 1rem; text-align: center; }
+    .body { padding: 1rem; }
+    .id { font-size: 1.1rem; font-weight: 600; color: #fff; }
+    .tier { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6a6; margin-bottom: 0.4rem; }
+    .card.closest_partial .tier { color: #ca6; }
+    .title { font-size: 0.88rem; margin-bottom: 0.4rem; }
+    .dna-text { font-size: 0.78rem; color: #777; margin-bottom: 0.75rem; }
+    a { font-size: 0.75rem; color: #e82323; text-decoration: none; border: 1px solid #333; padding: 0.3rem 0.6rem; border-radius: 4px; display: inline-block; }
+    a:hover { background: #1a1a1a; }
+    .reject { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1a1a1a; }
+    .reject h2 { font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; }
+    .reject p { font-size: 0.78rem; color: #444; }
+  </style>
+</head>
+<body>
+  <h1>Direction v2 — twoje referencje</h1>
+  <p class="sub">v1 odrzucona. Te 7 pinów definiuje kierunek: texture-first, artystyczne, nie stockowe.</p>
+
+  <div class="dna">
+    <span>grain</span><span>glitch lo-fi</span><span>liquid metal</span><span>bionic</span><span>ribbed glass</span><span>cinematic haze</span><span>editorial</span>
+  </div>
+
+  <div class="dirs" id="dirs"></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="reject">
+    <h2>Odrzucone z v1</h2>
+    <p>Film strip, generic stock cinematic, agency mockupy, smoke/spark, night path</p>
+  </div>
+
+  <script>
+    const DATA = {"items":[{"id":"A","tier":"closest_partial","title":"MANIFESTO — Neon Tech Interface / Bionic Poster","pinterest_url":"https://pl.pinterest.com/pin/3377768467851031/","type":"video","dna":"Kapsuła z kwiatem, chromatic aberration, digital ecology — editorial tech","direction":"bionic_manifesto"},{"id":"B","tier":"closest_partial","title":"Abstract black wavy lines — liquid metal","pinterest_url":"https://pl.pinterest.com/pin/1019995015605730952/","type":"video","duration":"0:10","dna":"Płynny metal, hipnotyczny ruch — voyeur tier","direction":"liquid_metal"},{"id":"C","tier":"user_pick","title":"Minimal Luxury Texture — fine grain on charcoal","pinterest_url":"https://pl.pinterest.com/pin/908319818603810525/","thumbnail":"https://i.pinimg.com/736x/26/f9/c7/26f9c702df7816b08cae157807418d21.jpg","type":"image","dna":"Subtelny film grain, diagonal light falloff — fashion/luxury","direction":"grain_field"},{"id":"D","tier":"user_pick","title":"Lo-fi glitch edit — grain + VHS + silhouette","pinterest_url":"https://pl.pinterest.com/pin/862650503660226272/","thumbnail":"https://i.pinimg.com/474x/28/ad/db/28addb4588fdcbb4cad44394d9e6baf7.jpg","type":"video","duration":"0:05","dna":"Artystyczny edit — heavy noise, motion blur, high contrast","direction":"cinematic_haze"},{"id":"E","tier":"user_pick","title":"Dark Nature Aesthetic — silhouette in golden haze","pinterest_url":"https://pl.pinterest.com/pin/1136384918459781284/","type":"video","dna":"Filmowy klimat — ciepła mgła, sylwetka, emocja nie stock","direction":"cinematic_haze"},{"id":"F","tier":"user_pick","title":"Black mesh fabric — tactile luxury folds","pinterest_url":"https://pl.pinterest.com/pin/966162926335475318/","thumbnail":"https://i.pinimg.com/736x/ba/15/7b/ba157bf6b9988d179a4b50db9a96a43a.jpg","type":"image","dna":"Tekstura materiału — premium, dotykowa, subtelna głębia","direction":"grain_field"},{"id":"G","tier":"user_pick","title":"Monotone Design — ribbed glass / vertical ridges","pinterest_url":"https://pl.pinterest.com/pin/4714774605682050/","type":"image","dna":"Pionowe żłobienia — brushed metal, ribbed glass, silk waves","direction":"grain_field"}],"implementation_directions":[{"id":"grain_field","label":"Grain + texture (C, F, G)","description":"Animowany grain overlay + opcjonalne ribbed glass shader."},{"id":"liquid_metal","label":"Liquid metal loop (B)","description":"Abstract 3D wavy shader — WebGL/OGL."},{"id":"bionic_manifesto","label":"Bionic manifesto (A)","description":"Centralny obiekt 3D + glitch typography."},{"id":"cinematic_haze","label":"Cinematic haze (D, E)","description":"Grain + light leak + golden glow + lo-fi filter."}]};
+
+    document.getElementById('dirs').innerHTML = DATA.implementation_directions.map(d =>
+      `<div class="dir"><h3>${d.label}</h3><p>${d.description}</p></div>`
+    ).join('');
+
+    document.getElementById('grid').innerHTML = DATA.items.map(item => `
+      <article class="card ${item.tier}">
+        <div class="thumb">
+          ${item.thumbnail ? `<img src="${item.thumbnail}" alt="" loading="lazy" />` : '<div class="ph">Wideo — zobacz na Pinterest</div>'}
+        </div>
+        <div class="body">
+          <div class="tier">${item.tier === 'user_pick' ? '✓ twój wybór' : '≈ blisko, ale nie to'}</div>
+          <div class="id">${item.id}</div>
+          <div class="title">${item.title}</div>
+          <p class="dna-text">${item.dna}</p>
+          <a href="${item.pinterest_url}" target="_blank" rel="noopener">Pin →</a>
+        </div>
+      </article>
+    `).join('');
+  </script>
+</body>
+</html>

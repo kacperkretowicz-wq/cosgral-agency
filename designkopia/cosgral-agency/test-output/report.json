@@ -1,0 +1,176 @@
+{
+  "url": "http://localhost:8766/index.html",
+  "samples": [
+    {
+      "mitosisReady": true,
+      "mitosisProgress": 0,
+      "pinProgress": 1.2010101009252785e-06,
+      "pinActive": true,
+      "pinStart": 17894,
+      "pinEnd": 23834,
+      "scrollTop": 17894.007134,
+      "canvasOpacity": "1",
+      "wrapSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "imgsSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "rendererSize": {
+        "w": 1920,
+        "h": 1080,
+        "cssW": 1920,
+        "cssH": 1080
+      },
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "textPanels": 0,
+      "navVisible": false,
+      "htmlBlocksVisible": false,
+      "triggerCount": 1,
+      "stageTop": 0.18817849457263947,
+      "label": "start"
+    },
+    {
+      "mitosisReady": true,
+      "mitosisProgress": 0.49997988282828293,
+      "pinProgress": 0.5000008542087543,
+      "pinActive": true,
+      "pinStart": 17894,
+      "pinEnd": 23834,
+      "scrollTop": 20864.005074,
+      "canvasOpacity": "1",
+      "wrapSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "imgsSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "rendererSize": {
+        "w": 1920,
+        "h": 1080,
+        "cssW": 1920,
+        "cssH": 1080
+      },
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "textPanels": 0,
+      "navVisible": false,
+      "htmlBlocksVisible": false,
+      "triggerCount": 1,
+      "stageTop": 0.18828538060188293,
+      "label": "mid"
+    },
+    {
+      "mitosisReady": true,
+      "mitosisProgress": 0.8495895723905724,
+      "pinProgress": 0.8500006114478115,
+      "pinActive": true,
+      "pinStart": 17894,
+      "pinEnd": 23834,
+      "scrollTop": 22943.003632,
+      "canvasOpacity": "1",
+      "wrapSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "imgsSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "rendererSize": {
+        "w": 1920,
+        "h": 1080,
+        "cssW": 1920,
+        "cssH": 1080
+      },
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "textPanels": 0,
+      "navVisible": false,
+      "htmlBlocksVisible": false,
+      "triggerCount": 1,
+      "stageTop": 0.18777425587177277,
+      "label": "late"
+    },
+    {
+      "mitosisReady": true,
+      "mitosisProgress": 0.9998998447811448,
+      "pinProgress": 1,
+      "pinActive": false,
+      "pinStart": 17894,
+      "pinEnd": 23834,
+      "scrollTop": 23834.003014,
+      "canvasOpacity": "1",
+      "wrapSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "imgsSize": {
+        "w": 1920,
+        "h": 1080
+      },
+      "rendererSize": {
+        "w": 1920,
+        "h": 1080,
+        "cssW": 1920,
+        "cssH": 1080
+      },
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "textPanels": 0,
+      "navVisible": false,
+      "htmlBlocksVisible": false,
+      "triggerCount": 1,
+      "stageTop": 0.1844860017299652,
+      "label": "end"
+    }
+  ],
+  "issues": [],
+  "initial": {
+    "mitosisReady": true,
+    "mitosisProgress": 0,
+    "pinProgress": 0,
+    "pinActive": null,
+    "pinStart": 17894,
+    "pinEnd": 23834,
+    "scrollTop": 0,
+    "canvasOpacity": "1",
+    "wrapSize": {
+      "w": 1920,
+      "h": 1080
+    },
+    "imgsSize": {
+      "w": 1920,
+      "h": 1080
+    },
+    "rendererSize": {
+      "w": 1920,
+      "h": 1080,
+      "cssW": 1920,
+      "cssH": 1080
+    },
+    "viewport": {
+      "w": 1920,
+      "h": 1080
+    },
+    "textPanels": 0,
+    "navVisible": false,
+    "htmlBlocksVisible": false,
+    "triggerCount": 1,
+    "stageTop": 17894.1875
+  },
+  "ok": true
+}

@@ -1,0 +1,28 @@
+/* WebGL-style ambient noise canvas — effect-03 inspired, vanilla 2D fallback */
+
+.noise-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.noise-ambient canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: var(--noise-opacity, 0.35);
+  mix-blend-mode: soft-light;
+}
+
+.section--has-noise {
+  position: relative;
+  isolation: isolate;
+}
+
+.section--has-noise > .section-inner,
+.section--has-noise > .hero-copy {
+  position: relative;
+  z-index: 1;
+}

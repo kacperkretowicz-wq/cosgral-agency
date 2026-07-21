@@ -1,0 +1,23 @@
+# moodboards-ui — layout, typografia, UI galerii — NIE do GenerateImage jako subject
+
+version: "1"
+updated_at: "2026-06-24"
+
+rules:
+  use_for: [layout_planner, typography_mood, gallery_ui, cta_placement]
+  forbidden_for: [image_generator_subject, final_asset_copy]
+
+images:
+  - file: moodboard-green-yellow-lifestyle.png
+    palette_family: green_yellow
+    use_for: [gallery_layout, color_story]
+  - file: moodboard-orange-amora-grid.png
+    palette_family: warm_orange
+    use_for: [gallery_layout, typography_ref, cta_on_image]
+  - file: moodboard-purple-magenta-strip.png
+    palette_family: purple_magenta
+    use_for: [color_story, fashion_runway, noir_with_color]
+  - file: moodboard-green-top-yellow-bottom.png
+    palette_family: green_yellow
+    duplicate_of: moodboard-green-yellow-lifestyle.png
+    note: user may delete duplicate

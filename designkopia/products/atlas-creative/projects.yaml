@@ -1,0 +1,63 @@
+# Projekty portfolio / agencja — opcjonalny plik obok product.yaml
+# page-exporter: project-index-row, masonry-grid, readymag-slides
+
+version: "1"
+brand: ATLAS CREATIVE
+slug: atlas-creative
+
+projects:
+  - id: ferroni
+    title: Ferroni
+    client: Ferroni
+    year: 2024
+    disciplines: [Branding, Video]
+    category: Brand
+    href: "#ferroni"
+    thumbnail: ../../images/atlas-creative/hero-editorial.png
+    object_position: center center
+    featured: true
+
+  - id: like-home
+    title: Like Home
+    client: Like Home
+    year: 2023
+    disciplines: [Branding, Video]
+    category: Hospitality
+    href: "#like-home"
+    thumbnail: ../../images/atlas-creative/masonry-01.png
+    object_position: center 30%
+
+  - id: noir-atelier
+    title: Noir Atelier
+    client: Noir Atelier
+    year: 2024
+    disciplines: [Art Direction, Campaign]
+    category: Fashion
+    href: "#noir"
+    thumbnail: ../../images/atlas-creative/masonry-02.png
+    object_position: center center
+
+categories:
+  - Fashion
+  - Brand
+  - Hospitality
+
+expandables:
+  - id: clients
+    label: "Clients +"
+    items:
+      - Vogue Italia
+      - Aesop
+      - Rimowa
+
+  - id: rep
+    label: "Represented by +"
+    items:
+      - Studio North — EU
+      - Pacific Rep — US
+
+media:
+  hero_video:
+    src: ""  # opcjonalnie: path do mp4 lub placeholder
+    poster: ../../images/atlas-creative/hero-editorial.png
+    role: hero_loop

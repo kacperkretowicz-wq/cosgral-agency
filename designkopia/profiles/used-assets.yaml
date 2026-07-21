@@ -1,0 +1,85 @@
+# Rejestr zużytych assetów — inspiracja ≠ final, zero reużycia PNG w UI
+
+version: "1"
+updated_at: "2026-06-24"
+
+rules:
+  inspiration_files:
+    path_prefixes:
+      - references/inspiration/
+      - references/style/
+    rule: "NIGDY nie kopiować 1:1 do outputs/images/ ani HTML — tylko styl do promptu GenerateImage"
+  approved_files:
+    path_prefix: profiles/approved/
+    rule: "Kopiowanie dobra tylko gdy user explicit lub brak GenerateImage; zawsze rebranduj nazwę pliku per job"
+  output_images:
+    rule: "Każdy plik w outputs/images/<job>/ użyty max w tym jobie; jeden folder = jeden job (clean-image-job-folders.py)"
+  reference_structure:
+    style: references/style-dna/
+    agency_subject: references/agency-content/
+    ui_only: references/moodboards-ui/
+
+# Pliki już użyte jako FINAL w HTML (nie używać ponownie w nowych jobach)
+used_in_ui:
+  - file: outputs/images/sioo-agency/00-hero-video-poster.png
+    jobs: [sioo-agency]
+    role: hero_bg
+    note: "generated 2026-06-24"
+  - file: outputs/images/sioo-agency/01-lumea-labs-hero.png
+    jobs: [sioo-agency]
+    role: editorial_hero
+  - file: outputs/images/sioo-agency/02-northline-spirits-still.png
+    jobs: [sioo-agency]
+    role: product_still
+  - file: outputs/images/sioo-agency/03-veila-skin-macro.png
+    jobs: [sioo-agency]
+    role: macro
+  - file: outputs/images/sioo-agency/04-atlas-fragrance-editorial.png
+    jobs: [sioo-agency]
+    role: portrait
+  - file: outputs/images/sioo-agency/05-karta-objects-grid.png
+    jobs: [sioo-agency]
+    role: grid
+  - file: outputs/images/sioo-agency/06-cinder-athletics-motion.png
+    jobs: [sioo-agency]
+    role: fashion
+  - file: outputs/images/sioo-agency/07-agency-team-bw-portrait.png
+    jobs: [sioo-agency]
+    role: about
+
+  - file: outputs/images/forma-agency/00-hero-organic.png
+    jobs: [forma-agency]
+    role: hero
+    note: "generated 2026-06-24"
+  - file: outputs/images/forma-agency/01-studio-arden.png
+    jobs: [forma-agency]
+    role: campaign_still
+  - file: outputs/images/forma-agency/02-veil-macro.png
+    jobs: [forma-agency]
+    role: macro
+  - file: outputs/images/forma-agency/03-north-fashion.png
+    jobs: [forma-agency]
+    role: editorial
+  - file: outputs/images/forma-agency/04-bw-craft.png
+    jobs: [forma-agency]
+    role: craft_tile
+  - file: outputs/images/forma-agency/05-mosaic-still.png
+    jobs: [forma-agency]
+    role: mosaic
+  - file: outputs/images/forma-agency/06-about-texture.png
+    jobs: [forma-agency]
+    role: about
+
+# Inspiracje już „spalone” jako główny motyw wizualny (preferuj inny folder przy nowym jobie)
+inspiration_themes_used:
+  - theme: bold-red-editorial
+    last_job: sioo-agency
+    refs: [references/inspiration/bold-red-editorial/red-mirror-woman-white-blazer.png]
+  - theme: beauty-skincare-macro
+    last_job: sioo-agency
+    refs: [references/inspiration/beauty-skincare-macro/water-droplets-face-macro.png]
+
+gate:
+  agent: image-generator
+  on_conflict: "FAIL — wybierz inny inspiration_ref lub wygeneruj nowy kadr"
+  update_after_job: "Dopisz każdy nowy plik z manifest.json do used_in_ui"

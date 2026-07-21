@@ -1,0 +1,23 @@
+slug: elara-photo
+brand: ELARA VANCE
+tagline: Fine art & editorial photography
+template: luzia
+
+person:
+  name: Elara Vance
+  role: Fine Art Photographer
+  location: Lisbon, PT
+  available: true
+
+services:
+  - Editorial portraits
+  - Gallery exhibitions
+  - Brand campaigns
+  - Artist books
+
+job_palette: warm_organic_bw
+palette_note: "Spójna strona: warm organic (sage, terracotta, cream) + B&W art — max 2 powiązane rodziny"
+
+pricing:
+  session_from: 1200
+  currency: EUR

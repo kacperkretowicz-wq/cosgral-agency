@@ -1,0 +1,77 @@
+{
+  "job": "hexion-foundry",
+  "brand": "HEXION",
+  "tier": "experimental",
+  "tokens": {
+    "bg": "#08080B",
+    "fg": "#F2F0E9",
+    "muted": "#8C8C80",
+    "accent": "#C6F432",
+    "surface": "#121316",
+    "fontHeading": "Anton, sans-serif",
+    "fontBody": "Inter, sans-serif",
+    "fontMono": "'JetBrains Mono', monospace",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "eyebrow": "ODLEWNIA TYPOGRAFII I RUCHU — EST. 2026 / WARSZAWA",
+      "title": "HEXION",
+      "lead": "Projektujemy znaki, które żyją. Kroje zmienne i ruch jako jedno rzemiosło — Twój znak zachowuje się jak interfejs, nie jak obrazek.",
+      "cta": "Zobacz specymeny",
+      "bg": "shader",
+      "effects": ["text-scramble-decode"]
+    },
+    {
+      "type": "marquee",
+      "items": ["KINETIC", "GLYPH", "VARIABLE", "SPECIMEN", "MOTION", "AÄBÇ—", "HEX·", "LIVING TYPE", "0123456789"]
+    },
+    {
+      "type": "pinned",
+      "label": "(JAK ODLEWAMY)",
+      "steps": [
+        { "n": "01", "title": "Brief → kształt", "body": "Z marki i głosu wyciągamy zasadę formy: rytm, kontrast, charakter. Zanim powstanie litera, powstaje zachowanie." },
+        { "n": "02", "title": "Rysunek glifu", "body": "Każdy znak rzeźbiony ręcznie — krzywe, kerning, hinting. Pełen zestaw z diakrytyką PL od pierwszego dnia." },
+        { "n": "03", "title": "Oś zmienności", "body": "Waga, szerokość, optyka i nachylenie jako osie variable font. Jeden plik, nieskończone stany." },
+        { "n": "04", "title": "Ruch i wdrożenie", "body": "Choreografia liter w kodzie (Framer/GSAP/OGL) + paczka webfont i tokeny. Znak gotowy, by ożyć w produkcie." }
+      ]
+    },
+    {
+      "type": "stats",
+      "items": [
+        { "value": 248, "suffix": "+", "label": "glifów na krój" },
+        { "value": 12, "label": "osi zmiennych" },
+        { "value": 40, "suffix": " ms", "label": "render klatki" },
+        { "value": 9.4, "decimals": 1, "label": "ocena jury" }
+      ]
+    },
+    {
+      "type": "split",
+      "tag": "(MANIFEST)",
+      "heading": "Litera to nie obraz. To zachowanie.",
+      "body": "Statyczny font jest martwą naturą. My projektujemy reguły: jak znak reaguje na scroll, kursor i kontekst. Typografia, która oddycha — i którą widz pamięta dłużej niż logo."
+    },
+    {
+      "type": "faq",
+      "tag": "(SZCZEGÓŁY)",
+      "heading": "Zanim napiszesz brief",
+      "items": [
+        { "q": "Czym jest font zmienny?", "a": "Jeden plik z osiami (waga/szerokość/optyka). Płynne przejścia bez dziesiątek osobnych plików — idealny do ruchu w sieci." },
+        { "q": "Dostaję licencję na wyłączność?", "a": "Tak — kroje custom są Twoje. Oferujemy też licencje retail na kroje z katalogu." },
+        { "q": "Czy ruch działa na słabszym sprzęcie?", "a": "Każdy efekt ma fallback i respektuje prefers-reduced-motion. Wydajność pilnuje osobny strażnik (60fps, bez CLS)." }
+      ]
+    },
+    {
+      "type": "cta",
+      "title": "Zbudujmy Twój żywy znak.",
+      "cta": "Napisz brief",
+      "meta": "studio@hexion.type — Warszawa / zdalnie"
+    },
+    {
+      "type": "footer",
+      "brand": "HEXION",
+      "credit": "hexion.type"
+    }
+  ]
+}

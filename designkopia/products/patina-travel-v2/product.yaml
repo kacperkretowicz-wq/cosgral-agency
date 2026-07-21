@@ -1,0 +1,26 @@
+version: "1"
+brand: PATINA
+slug: patina-travel-v2
+type: fashion_retail
+job_type: fashion_retail
+tagline: Age is the craft.
+positioning: >
+  Lniana odzież dla dojrzałych ciał — artystyczny e-commerce w duchu Blue Marble,
+  collage hero z Travel Agency. Warm silver, overexposed editorial.
+layout_ref: references/layout-screenshots/inbox/31_travelagency_agency_1782386301.png
+reference_shop: bluemarbleparis.com
+reference_layout: travelagency.agency
+concept_id: patina-travel-marble-v2
+layout_archetype: lumera-commercial
+palette_family: warm_organic
+job_palette: warm_organic
+product_visual_spec: >
+  Linen garments oatmeal and silver-grey. Flatlays solo garment on cream.
+  Mature models 55–75 only in campaign/muse shots. Soft overexposure, film grain.
+required_shot_roles:
+  garment_flatlay: 3
+  shop_thumbnail: 3
+  campaign_editorial: 2
+  atmosphere_texture: 2
+  garment_detail: 1
+  muse_portrait: 1

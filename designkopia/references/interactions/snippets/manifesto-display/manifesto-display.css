@@ -1,0 +1,26 @@
+.manifesto-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+}
+
+.display-line {
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.manifesto-display--light .display-line { color: var(--ink); }
+.manifesto-display--chapter .display-line { font-size: clamp(2rem, 5vw, 4rem); }
+
+.type-credit {
+  font-family: var(--mono, monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2rem;
+}

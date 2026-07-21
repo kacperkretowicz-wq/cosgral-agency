@@ -1,0 +1,92 @@
+[
+  {
+    "mode": "classic",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "liquid",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "spark",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "kinetic",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "glitch",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "ink",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "particles",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "slanted",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "strobe",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "matrix",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "vortex",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "slingshot",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "decode",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "zoom",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  },
+  {
+    "mode": "flip",
+    "logs": [],
+    "page_errors": [],
+    "gsap_warnings": []
+  }
+]

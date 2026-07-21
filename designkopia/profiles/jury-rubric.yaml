@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────────────────────────────────────
+# JURY RUBRIC — bezlitosna ocena „czy to wygrałoby nagrodę / czy ktoś powie WOW".
+# Wzorowane na kategoriach awwwards. Czyta: awwwards-juror.
+# Osobne od concept-guardian (proces/wizja) — to surowy smak z zewnątrz.
+# Para z profiles/signature-craft.yaml (wow_rubric).
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "1"
+updated_at: "2026-06-26"
+
+# ── KATEGORIE (każda 0–10; ważona suma = jury_score) ─────────────────────
+categories:
+  design:      { weight: 0.40, asks: "kompozycja, typografia, kolor, hierarchia, wykończenie" }
+  usability:   { weight: 0.30, asks: "nawigacja, czytelność, responsywność, brak frustracji, perf" }
+  creativity:  { weight: 0.20, asks: "oryginalność, signature moment, czy widziane 100× czy świeże" }
+  content:     { weight: 0.10, asks: "copy, obrazy, spójność narracji marki" }
+
+# ── PROGI WERDYKTU (jury_score 0–10) ─────────────────────────────────────
+verdict_thresholds:
+  honorable_mention: 6.5
+  site_of_the_day:   7.5      # cel: każdy projekt celuje tu lub wyżej
+  developer_award:   8.0
+  fail_delivery_under: 6.0    # poniżej = NIE wypuszczamy, wracamy do poprawek
+
+# ── INSTANT-FAIL (dowolny = werdykt FAIL bez względu na sumę) ─────────────
+instant_fail:
+  - "AI-default / generic recipe (hero→manifesto→grid→founder→cta) bez duszy"
+  - "brak signature momentu albo moment poniżej 22/25 w signature-craft"
+  - "janky/laggy motion, CLS skaczący layout"
+  - "klon skóry referencji (mockup-skin-clone / 1:1 copy)"
+  - "nieczytelny kontrast, zepsuty mobile, brak reduced-motion fallback"
+
+# ── KONTRAKT: jury-verdict.json (awwwards-juror produkuje) ───────────────
+verdict_fields:
+  - scores            # {design, usability, creativity, content} 0–10
+  - jury_score        # ważona suma
+  - verdict           # site_of_the_day | honorable_mention | FAIL
+  - wow_moment_check  # czy signature moment realnie robi „wow" (tak/nie + dlaczego)
+  - must_fix          # blokery przed delivery
+  - nice_to_have      # podniosłoby z honorable do SOTD
+  - compared_to       # 1–2 realne strony/awwwards jako poprzeczka

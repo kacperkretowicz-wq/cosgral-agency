@@ -1,0 +1,19 @@
+version: "1"
+brand: PATINA
+collection: Silver Line SS26
+pieces:
+  - slug: veil-coat
+    name: Veil Coat
+    price: "4 800 PLN"
+    material: Washed linen · silver-grey
+    category: Outerwear
+  - slug: drift-dress
+    name: Drift Dress
+    price: "3 200 PLN"
+    material: Raw linen · oatmeal
+    category: Dresses
+  - slug: tide-trouser
+    name: Tide Trouser
+    price: "2 600 PLN"
+    material: Herringbone linen · stone
+    category: Bottoms

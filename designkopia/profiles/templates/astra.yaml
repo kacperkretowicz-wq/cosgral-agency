@@ -1,0 +1,72 @@
+id: astra
+name: Astra — Cosmic Creative Agency
+source_image: references/templates/astra.md
+preview_url: https://astralab.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/astra/
+tags:
+  - hero
+  - nav
+  - agency
+  - dark
+  - portfolio
+  - services
+  - pricing
+  - testimonials
+  - video
+  - 3d
+  - stats
+
+sections:
+  - id: hero
+    type: hero
+    layout: split
+    notes: "Space of Creative Solutions, service tags, cosmic energy"
+  - id: stats
+    type: features
+    layout: four-column
+  - id: services
+    type: services
+    layout: numbered
+    notes: "/01 Branding through /04 SEO"
+  - id: projects
+    type: portfolio
+    layout: gallery
+  - id: pricing
+    type: pricing
+  - id: testimonials
+    type: testimonials
+  - id: team
+    type: about
+  - id: faq
+    type: faq
+
+typography:
+  heading_font: "Inter"
+  body_font: "Inter"
+  heading_sizes:
+    h1: "clamp(3rem, 6vw, 5rem)"
+  body_size: "1rem"
+  weights:
+    heading: 700
+    body: 400
+
+spacing:
+  page_max_width: "1400px"
+  section_padding_y: "96px"
+  section_padding_x: "40px"
+  grid_columns: 12
+  gap: "40px"
+
+color_tokens:
+  background: "#000000"
+  accent: "#FAFAFA"
+  text: "#EEEDEC"
+  muted: "#686963"
+
+mixable_with:
+  - fabrica
+  - zentry
+  - spector
+  - salient
+
+notes: "Cinematic cosmic agency — 3D/video accents, stats, bold headlines."

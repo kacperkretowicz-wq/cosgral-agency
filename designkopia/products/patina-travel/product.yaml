@@ -1,0 +1,16 @@
+version: "1"
+brand: PATINA
+slug: patina-travel
+type: fashion_retail
+job_type: fashion_retail
+tagline: Age is the craft.
+positioning: >
+  PATINA — lniana odzież dla dojrzałych ciał. Layout: travelagency collage + Blue Marble Paris shop grid.
+layout_ref: references/layout-screenshots/inbox/31_travelagency_agency_1782386301.png
+layout_ref_secondary: bluemarbleparis.com
+concept_id: patina-travel-marble
+layout_archetype: product-serial
+palette_family: warm_organic
+job_palette: warm_organic
+product_visual_spec: >
+  Linen garments oatmeal/silver. Models 55–75. Overexposed editorial, soft blur. No product lock.

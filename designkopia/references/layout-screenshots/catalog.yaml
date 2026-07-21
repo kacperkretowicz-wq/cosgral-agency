@@ -1,0 +1,60 @@
+# ─────────────────────────────────────────────────────────────────────────
+# MOCKUP CATALOG — indeks doboru układów wg marki / stylu / przedmiotu / zamysłu.
+# Utrzymuje: mockup-curator. Głęboki skeleton per mockup: analysis/*.yaml.
+#
+# Backlog (lista wszystkich plików inbox) NIE jest tu kopiowany ręcznie —
+# enumeruje go: `python scripts/pick-layout-mockup.py --list`.
+# Tu trzymamy WZBOGACONE tagi pod matching (brand/style/object/intent).
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "1"
+updated_at: "2026-06-26"
+
+coverage:
+  inbox_total: 86           # references/layout-screenshots/inbox/
+  catalogued: 1             # wpisy poniżej + analysis/*.yaml
+  note: "mockup-curator rośnie ten indeks oglądając obrazy (Read na PNG/JPG)."
+
+# ── SCHEMAT WPISU (kopiuj dla nowych) ────────────────────────────────────
+entry_schema:
+  id:               "slug z nazwy pliku (scripts: slugify)"
+  layout_ref:       "references/layout-screenshots/inbox/<plik>"
+  brand_type:       "np. dtc_beauty | agency | saas | fashion | food_beverage | photographer | automotive"
+  style:            "np. editorial | brutalist | minimal-luxury | playful | neo-grotesk"
+  palette_family:   "id z profiles/palette-families.yaml"
+  subject:          "przedmiot/temat na mocku (produkt, osoba, scena, dane)"
+  intent:           "zamysł/cel (sprzedaż DTC | manifest studia | dowód B2B | portfolio)"
+  mood:             "[lista nastrojów]"
+  archetype_hint:   "id z profiles/layout-archetypes.yaml"
+  sections_detected: "[lista sekcji]"
+  best_for:         "kiedy wybrać ten układ"
+  forbidden:        "[czego nie robić z tym mockiem]"
+
+# ── WPISY (wzbogacone) ───────────────────────────────────────────────────
+entries:
+  rare-beauty-dtc-mockup:
+    layout_ref: references/layout-screenshots/processed/rare-beauty-dtc-mockup.png
+    brand_type: dtc_beauty
+    style: minimal-luxury
+    palette_family: dusty_rose_mauve
+    subject: product + portrait (kosmetyk premium)
+    intent: sprzedaż DTC beauty
+    mood: [soft, premium, approachable, monochromatic]
+    archetype_hint: lumera-commercial   # lub product-editorial
+    sections_detected: [header, hero(asymmetric 2-col), bestsellers(4-col grid), brand_typography, feature_band]
+    best_for: "marka beauty/skincare premium, low-copy/high-image, paleta różu/mauve"
+    forbidden: [copy mockup PNG jako finał, reuse trademarku, default warm_organic beige gdy to primary]
+    deep_analysis: references/layout-screenshots/analysis/rare-beauty-dtc-mockup.yaml
+
+# ── HEURYSTYKI DOBORU (gdy brak pełnego wpisu — wsparcie, nie zamiast oglądania) ──
+matching_hints:
+  by_brand_type:
+    dtc_beauty:   [rare-beauty-dtc-mockup, jimmyfairly, kitskinkind]
+    food_beverage: [drinkdouze, cumuluscoffee, busy-bar, dirtyvine, almond]
+    agency:       [generousbranding, seenadvertising, willvint, forma]
+    editorial_readymag: ["01_readymag…", "03_readymag…", "readymag (viewport_sections)"]
+  by_style:
+    brutalist:    [northbureau]
+    extreme_whitespace: [designsake]
+    modular_editorial: [mashachern]
+  rule: "Heurystyki = punkt startu. Finalny dobór = oglądnięcie obrazu + dopasowanie do briefu."

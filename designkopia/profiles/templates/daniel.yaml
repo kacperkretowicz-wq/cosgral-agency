@@ -1,0 +1,57 @@
+id: daniel
+name: Daniel — Ultra Minimal Portfolio
+preview_url: https://daniel-reynolds.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/daniel/
+source_image: references/templates/daniel.md
+tags:
+  - hero
+  - nav
+  - portfolio
+  - minimal
+  - grid
+  - light
+  - video
+
+sections:
+  - id: top-bar
+    type: nav
+    layout: minimal
+  - id: project-index
+    type: portfolio
+    layout: list
+    notes: "Project names as main typographic voice — Luminex, Pixelcraft…"
+  - id: bottom-nav
+    type: nav
+  - id: collab-cta
+    type: cta
+
+typography:
+  heading_font: "IBM Plex Sans"
+  body_font: "Inter"
+  heading_sizes:
+    h1: "2rem"
+  body_size: "0.9rem"
+  weights:
+    heading: 500
+    body: 400
+
+spacing:
+  page_max_width: "900px"
+  section_padding_y: "64px"
+  section_padding_x: "24px"
+  grid_columns: 1
+  gap: "8px"
+
+color_tokens:
+  background: "#FFFFFF"
+  accent: "#000000"
+  text: "#000000"
+  muted: "#353535"
+
+mixable_with:
+  - luzia
+  - majd
+  - portfolite
+  - makos
+
+notes: "Distraction-free project index — work-first minimalism."

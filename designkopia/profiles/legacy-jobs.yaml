@@ -1,0 +1,43 @@
+# Joby bez layout-plan.json — wykluczone z check-variability lookback (stare MVP)
+# Nowe generacje MUSZĄ mieć plan + validate-job PASS
+
+version: "1"
+updated_at: "2026-06-24"
+
+legacy:
+  - slug: solace-landing
+    reason: "golden tier_s — brak layout-plan, pre-process"
+    exclude_from_variability: true
+  - slug: noir-atelier
+    reason: "pre-archetype, single template spector"
+    exclude_from_variability: true
+  - slug: batch-five
+    reason: "MVP batch — coral-clay, fabrica, matcha-field, lavender-sky, amber-mead"
+    exclude_from_variability: true
+  - slug: lippier
+    reason: "v1 process fail — retrofit lippier-v2 exists"
+    exclude_from_variability: true
+  - slug: portfolio-krecik
+    reason: "personal experiment"
+    exclude_from_variability: true
+  - slug: portfolio-krecik-v2
+    reason: "personal experiment"
+    exclude_from_variability: true
+  - slug: style-test-01
+    reason: "calibration only"
+    exclude_from_variability: true
+  - slug: style-test-02
+    reason: "calibration only"
+    exclude_from_variability: true
+  - slug: style-test-03
+    reason: "calibration only"
+    exclude_from_variability: true
+
+planned:
+  - slug: lumera-landing
+    note: "partial layout-plan — retrofit recommended"
+    exclude_from_variability: false
+
+rules:
+  check_variability_skips: "jobs where exclude_from_variability: true"
+  validate_job_required: "all new jobs since 2026-06-24"

@@ -1,0 +1,92 @@
+version: "1"
+brand: ENCRE
+slug: encre-atelier
+
+# Trzy produkty na sprzedaż + lookbook entries
+projects:
+  - id: veil-coat
+    title: Płaszcz Veil
+    client: ENCRE
+    year: 2026
+    disciplines: [RTW, Outerwear]
+    category: Shop
+    price: "4 200 PLN"
+    href: "#shop-veil"
+    thumbnail: ../../images/encre-atelier/04-piece-coat.png
+    object_position: center 20%
+    featured: true
+    shop: true
+
+  - id: ink-slip
+    title: Suknia Ink
+    client: ENCRE
+    year: 2026
+    disciplines: [RTW, Dress]
+    category: Shop
+    price: "2 800 PLN"
+    href: "#shop-ink"
+    thumbnail: ../../images/encre-atelier/05-piece-dress.png
+    object_position: center 35%
+    featured: true
+    shop: true
+
+  - id: line-gloves
+    title: Rękawiczki Line
+    client: ENCRE
+    year: 2026
+    disciplines: [Accessories, Leather]
+    category: Shop
+    price: "890 PLN"
+    href: "#shop-line"
+    thumbnail: ../../images/encre-atelier/06-piece-gloves.png
+    object_position: center center
+    featured: true
+    shop: true
+
+  - id: lookbook-01
+    title: Motion Study I
+    client: Editorial
+    year: 2026
+    disciplines: [Lookbook]
+    category: Campaign
+    href: "#gallery"
+    thumbnail: ../../images/encre-atelier/01-hero-motion-blur.png
+    object_position: center 30%
+    shop: false
+
+  - id: lookbook-02
+    title: Fabric Ghost
+    client: Editorial
+    year: 2026
+    disciplines: [Macro]
+    category: Campaign
+    href: "#gallery"
+    thumbnail: ../../images/encre-atelier/02-macro-fabric-blur.png
+    object_position: center center
+    shop: false
+
+categories:
+  - Shop
+  - Campaign
+  - Lookbook
+
+expandables:
+  - id: sizing
+    label: "Rozmiary +"
+    items:
+      - "Veil Coat — XS–L (oversize fit)"
+      - "Ink Slip — XS–M"
+      - "Line Gloves — S/M, M/L"
+
+  - id: care
+    label: "Pielęgnacja +"
+    items:
+      - "Wełna — pranie chemiczne"
+      - "Satyna — pranie delikatne"
+      - "Skóra — impregnacja co sezon"
+
+media:
+  hero_video:
+    src: ""
+    poster: ../../images/encre-atelier/01-hero-motion-blur.png
+    role: hero_loop

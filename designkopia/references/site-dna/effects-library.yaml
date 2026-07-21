@@ -1,0 +1,169 @@
+# ─────────────────────────────────────────────────────────────────────────
+# SITE-DNA EFFECTS LIBRARY — rosnąca biblioteka efektów WYUCZONYCH z analiz /site-dna.
+#
+# Zasila ją skill .claude/skills/site-dna/SKILL.md (Krok 4). Czytają:
+# motion-director, motion-implementer, effect-smith, framer-effects-researcher.
+#
+# Relacja do innych rejestrów:
+#   - profiles/site-clone-registry.yaml  → techniki z ręcznie sklonowanych stron
+#     (voyeur-*, playfight-*, parhouse-*) — NIE duplikuj ich tutaj, linkuj przez see.
+#   - profiles/effects-stack.yaml        → kanoniczny katalog technik w stacku docelowym;
+#     jeśli technika pasuje do istniejącego technique_id, użyj pola canonical_id.
+#
+# Schemat wpisu:
+#   <slug-strony>-<nazwa-efektu>:
+#     what: co robi (1 zdanie, po polsku)
+#     lib: czym zrobione w oryginale (gsap/ScrollTrigger, three.js, CSS…)
+#     dom: [zaczepy DOM / data-atrybuty z oryginału]
+#     impl_sketch: >
+#       skrót JAK to działa (wartości: pin, scrub, end, ease, stagger) — z realnego JS
+#     react_equiv: web/lib/effects/<Komponent>.tsx | "(brak — kandydat dla effect-smith)"
+#     canonical_id: technique_id z effects-stack.yaml (jeśli pasuje)
+#     see: id z site-clone-registry.yaml (jeśli to ta sama technika)
+#     seen_on: [url1, url2]          # częstość = które efekty są "standardem branży"
+#     first_seen: YYYY-MM-DD
+#     caution: opcjonalnie (laggy / a11y / perf)
+#     rating: 1-5                    # jak bardzo warte skopiowania (ocena kuratora)
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "1"
+updated_at: "2026-07-05"
+
+techniques:
+
+  # ── letsplayfight.com (analiza /site-dna 2026-07-05) ────────────────────
+  letsplayfight-hero-scroll-scrub:
+    what: hero pin + scrub — mega-typo skaluje sie i wyjezdza maska przy scrollu
+    lib: gsap/ScrollTrigger (pin:1, scrub:1) + clip-path
+    dom: ["[data-anim-hero-scroll]"]
+    impl_sketch: >
+      ScrollTrigger.create({ pin: true, scrub: 1 }) na hero; typewriter w h1;
+      easingi: power4.out (wejscie), none (scrub). Dowod: capture/dyn00-main.js
+    react_equiv: web/lib/effects/PinnedSequence.tsx + MaskedReveal.tsx
+    canonical_id: pinned-scroll-sequence
+    seen_on: [https://www.letsplayfight.com]
+    first_seen: 2026-07-05
+    rating: 5
+
+  letsplayfight-service-hover-reveal:
+    what: hover na pozycji listy uslug odsania media (opacity+scale, expo.out)
+    lib: gsap
+    dom: ["[data-service-hover]", ".service_item"]
+    impl_sketch: "tween ~0.6s expo.out na kontener mediow; wyjscie symetryczne"
+    react_equiv: "(brak 1:1 — kandydat dla effect-smith: HoverMediaReveal)"
+    seen_on: [https://www.letsplayfight.com]
+    first_seen: 2026-07-05
+    rating: 4
+
+  letsplayfight-typewrite:
+    what: typewriter w hero — cykliczna podmiana koncowki frazy
+    see: playfight-typewrite            # site-clone-registry.yaml
+    dom: ["[data-typewrite]"]
+    react_equiv: web/lib/effects/TextScramble.tsx (wariant)
+    seen_on: [https://www.letsplayfight.com]
+    first_seen: 2026-07-05
+    rating: 3
+
+  letsplayfight-webgl-img-distortion:
+    what: dystorsja/bulge obrazow na hover/scroll (uniformy u_nav, u_top)
+    see: playfight-webgl-bulge          # site-clone-registry.yaml
+    dom: ["[data-gl-img]"]
+    react_equiv: web/lib/effects/WebGLImageDistortion.tsx
+    canonical_id: webgl-image-distortion
+    seen_on: [https://www.letsplayfight.com]
+    first_seen: 2026-07-05
+    rating: 5
+
+  letsplayfight-stacked-trail:
+    what: slad obrazow za kursorem
+    see: playfight-stacked-trail        # site-clone-registry.yaml
+    dom: ["[data-stacked-trail-item]"]
+    caution: "laggy — desktop only, off przy prefers-reduced-motion"
+    seen_on: [https://www.letsplayfight.com]
+    first_seen: 2026-07-05
+    rating: 3
+
+  letsplayfight-anim-parallax:
+    what: parallax akapitow sterowany data-atrybutem
+    see: playfight-data-anim-para       # site-clone-registry.yaml
+    dom: ["[data-anim-parallax]"]
+    react_equiv: web/lib/effects/ParallaxLayer.tsx
+    canonical_id: parallax-layers
+    seen_on: [https://www.letsplayfight.com]
+    first_seen: 2026-07-05
+    rating: 4
+
+  letsplayfight-preloader:
+    what: pelnoekranowy loader przed odslonieciem hero
+    lib: gsap timeline
+    dom: ["[data-loader]"]
+    canonical_id: preloader-counter
+    see: voyeur-preloader-001           # ta sama rodzina co u voyeurverite
+    seen_on: [https://www.letsplayfight.com]
+    first_seen: 2026-07-05
+    rating: 4
+
+  # ── parhouse.agency (analiza /site-dna 2026-07-05) ──────────────────────
+  parhouse-cursor-preloader:
+    what: kursor JEST preloaderem — kropka skaluje sie x60 na caly ekran, licznik 0-100, zwezenie odsania strone
+    lib: gsap timeline + counter
+    dom: ["#parhouse-custom-cursor", "#custom-cursor-preloader"]
+    impl_sketch: >
+      to(cursor, {scaleX:60, scaleY:60, duration:1.6, ease:"power3"})
+      -> set('#custom-cursor-preloader', {display:"block"})
+      -> counter(end:100, duration:.8) -> reverse scale -> tryb follow (xPercent:-50).
+      Dowod: capture/01-a6974c8a...js
+    react_equiv: "(brak — kandydat dla effect-smith: CursorPreloader)"
+    seen_on: [https://parhouse.agency]
+    first_seen: 2026-07-05
+    caution: "desktop-only (pointer: fine); prefers-reduced-motion -> prosty fade"
+    rating: 5
+
+  parhouse-growing-header:
+    what: naglowek dostaje height 100vh z JS, rosnie/trzyma ekran przy scrollu, tresc odjezdza z fade
+    lib: gsap/ScrollTrigger (start "center center", end "90% top", scrub)
+    dom: [".special-growing-header"]
+    impl_sketch: >
+      gsap.set(el, {height: innerHeight}); timeline scrub: yPercent 25 -> 50 + opacity 0
+      na wyjsciu. Dowod: capture/01-a6974c8a...js
+    react_equiv: web/lib/effects/PinnedSequence.tsx (wariant)
+    canonical_id: pinned-scroll-sequence
+    seen_on: [https://parhouse.agency]
+    first_seen: 2026-07-05
+    rating: 4
+
+  parhouse-masonry-scrub:
+    what: pinowana siatka masonry case studies ze scrubem .5 (kolumny rozne predkosci)
+    see: parhouse-masonry-pin           # site-clone-registry.yaml
+    dom: [".case-study-image-masonry-container"]
+    impl_sketch: 'start "top-=30% center", end "bottom-=20% center", scrub .5'
+    seen_on: [https://parhouse.agency]
+    first_seen: 2026-07-05
+    rating: 4
+
+  parhouse-cursor-follow:
+    what: wlasny kursor (follow, xPercent -50)
+    see: parhouse-custom-cursor         # site-clone-registry.yaml
+    dom: ["#parhouse-custom-cursor"]
+    canonical_id: custom-cursor
+    caution: "czesto laggy — w cosgral wylaczony w tuningu"
+    seen_on: [https://parhouse.agency]
+    first_seen: 2026-07-05
+    rating: 3
+
+  parhouse-case-rails:
+    what: poziome szyny case studies (free-mode momentum)
+    see: parhouse-swiper-rails          # site-clone-registry.yaml
+    canonical_id: embla-carousel
+    seen_on: [https://parhouse.agency]
+    first_seen: 2026-07-05
+    rating: 4
+
+  # ── techniki wielokrotnie widziane (licznik czestosci) ───────────────────
+  common-marquee-strip:
+    what: pas logotypow/tekstu w nieskonczonym przesuwie
+    canonical_id: marquee-logos
+    react_equiv: web/lib/effects/Marquee.tsx
+    seen_on: [https://parhouse.agency, https://www.jackandai.com]
+    first_seen: 2026-07-05
+    rating: 3

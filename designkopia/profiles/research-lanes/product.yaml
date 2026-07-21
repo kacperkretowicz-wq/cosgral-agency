@@ -1,0 +1,25 @@
+# Research lane — produkt / brand e-commerce
+
+lane_id: product_brand
+search_targets:
+  web:
+    - type: dtc_product_page
+      look_for: [hero product, shade swatches, ingredients, FAQ, sticky CTA]
+      examples: [trovearchive.com, lumera golden]
+    - type: editorial_commerce
+      look_for: [asymmetric hero, numbered sections, art + packshot mix]
+  typography:
+    - prefer: [Inter + JetBrains Mono, Space Grotesk + DM Sans, mono-architect]
+    - avoid: [Cormorant default, inter-plain-lead]
+  visual_subject:
+    - source: product.yaml product_visual_spec
+    - shot_types: [anchor packshot, macro, lifestyle, flatlay, portrait, section_background, brand_tile, lifestyle_scene, texture_mood, editorial_context]
+  visual_style:
+    - folder: references/style-dna/
+    - match: job_palette in product.yaml
+
+outputs:
+  web: research-web.json
+  typography: research-typography.json
+  visual: research-visual.json
+  curated: research-manifest.json

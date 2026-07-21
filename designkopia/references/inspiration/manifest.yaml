@@ -1,0 +1,16 @@
+# DEPRECATED — użyj references/style-dna/, agency-content/, moodboards-ui/
+# Ten plik zachowany dla kompatybilności ze starymi manifestami jobów.
+
+version: "1"
+deprecated: true
+deprecated_at: "2026-06-24"
+replacement:
+  style: references/style-dna/manifest.yaml
+  agency_subject: references/agency-content/manifest.yaml
+  ui: references/moodboards-ui/manifest.yaml
+  readme: references/README.md
+
+migration: references/_migration-map.yaml
+note: >
+  Wszystkie pliki przeniesione. Przy aktualizacji jobów zamień inspiration_ref na:
+  style_ref (style-dna) + subject_ref (agency-content lub product.yaml).

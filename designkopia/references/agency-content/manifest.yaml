@@ -1,0 +1,55 @@
+# agency-content — CO pokazuje portfolio agencji marketingowej (temat ujęć)
+# Dla job_type: agency_portfolio — subject_ref ZAWSZE stąd, nie z beauty/skincare folderów.
+
+version: "1"
+updated_at: "2026-06-24"
+
+rules:
+  use_for: [subject, shot_brief, portfolio_narrative]
+  forbidden_as: [style_only_without_shot_brief]
+  pair_with: references/style-dna/manifest.yaml
+  banned_subjects_for_agency:
+    - skincare_macro_as_hero
+    - product_flatlay_as_main_portfolio
+    - generic_beauty_portrait_without_campaign_context
+
+folders:
+  campaigns:
+    description: Key visuale kampanii, case study walls, editorial campaign stills
+  branding-systems:
+    description: Identity, guidelines, logo systems, brand book mockups
+  digital-social:
+    description: Ekrany, formaty social, paid media layouts — dodaj pliki gdy masz
+  events-experiential:
+    description: Eventy, instalacje, activations — dodaj pliki gdy masz
+  team-studio:
+    description: Zespół przy pracy, przestrzeń studia — nie beauty portret
+
+images:
+  - file: campaigns/editorial-packaging-campaign.png
+    subject_tags: [campaign, packaging, lifestyle]
+    shot_roles: [hero_campaign, case_study_tile]
+  - file: campaigns/bw-case-study-grid-wall.png
+    subject_tags: [case_study, campaign_grid, portfolio_piece]
+    shot_roles: [work_grid, index_thumbnail]
+    style_dimensions: [grid, bw]
+  - file: campaigns/fashion-campaign-red-mirror.png
+    subject_tags: [campaign, fashion, key_visual]
+    shot_roles: [hero, campaign_spotlight]
+    style_dimensions: [bold_red, gold_accent]
+
+  - file: branding-systems/branding-guidelines-mockup.png
+    subject_tags: [branding, identity, guidelines]
+    shot_roles: [services_proof, branding_section]
+
+  - file: team-studio/minimal-studio-interior-mint.png
+    subject_tags: [studio, interior, agency_space]
+    shot_roles: [about, studio_culture]
+  - file: team-studio/sculptural-studio-chair-pink.png
+    subject_tags: [studio, furniture, agency_space]
+    shot_roles: [about, environment]
+
+# Placeholdery — wrzuć własne pliki:
+placeholders:
+  digital-social: "Reklamy, ekrany IG, carousel mockupy"
+  events-experiential: "Event, instalacja, activation photo"

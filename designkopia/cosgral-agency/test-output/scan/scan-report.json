@@ -1,0 +1,155 @@
+{
+  "samples": [
+    {
+      "mitosisProgress": 1.2010101009252785e-06,
+      "pinProgress": 1.2010101009252785e-06,
+      "target": 0.0,
+      "i": 0
+    },
+    {
+      "mitosisProgress": 0.04175102525252552,
+      "pinProgress": 0.04175102525252552,
+      "target": 0.041666666666666664,
+      "i": 1
+    },
+    {
+      "mitosisProgress": 0.08333307845117852,
+      "pinProgress": 0.08333307845117852,
+      "target": 0.08333333333333333,
+      "i": 2
+    },
+    {
+      "mitosisProgress": 0.1250829026936025,
+      "pinProgress": 0.1250829026936025,
+      "target": 0.125,
+      "i": 3
+    },
+    {
+      "mitosisProgress": 0.1666649558922561,
+      "pinProgress": 0.1666649558922561,
+      "target": 0.16666666666666666,
+      "i": 4
+    },
+    {
+      "mitosisProgress": 0.20841897441077462,
+      "pinProgress": 0.20841897441077462,
+      "target": 0.20833333333333334,
+      "i": 5
+    },
+    {
+      "mitosisProgress": 0.2500010276094276,
+      "pinProgress": 0.2500010276094276,
+      "target": 0.25,
+      "i": 6
+    },
+    {
+      "mitosisProgress": 0.2917508518518516,
+      "pinProgress": 0.2917508518518516,
+      "target": 0.2916666666666667,
+      "i": 7
+    },
+    {
+      "mitosisProgress": 0.3333329050505052,
+      "pinProgress": 0.3333329050505052,
+      "target": 0.3333333333333333,
+      "i": 8
+    },
+    {
+      "mitosisProgress": 0.3750827292929292,
+      "pinProgress": 0.3750827292929292,
+      "target": 0.375,
+      "i": 9
+    },
+    {
+      "mitosisProgress": 0.4166647824915822,
+      "pinProgress": 0.4166647824915822,
+      "target": 0.4166666666666667,
+      "i": 10
+    },
+    {
+      "mitosisProgress": 0.4584188010101013,
+      "pinProgress": 0.4584188010101013,
+      "target": 0.4583333333333333,
+      "i": 11
+    },
+    {
+      "mitosisProgress": 0.5000008542087543,
+      "pinProgress": 0.5000008542087543,
+      "target": 0.5,
+      "i": 12
+    },
+    {
+      "mitosisProgress": 0.5417506784511783,
+      "pinProgress": 0.5417506784511783,
+      "target": 0.5416666666666666,
+      "i": 13
+    },
+    {
+      "mitosisProgress": 0.5833327316498319,
+      "pinProgress": 0.5833327316498319,
+      "target": 0.5833333333333334,
+      "i": 14
+    },
+    {
+      "mitosisProgress": 0.6250825558922559,
+      "pinProgress": 0.6250825558922559,
+      "target": 0.625,
+      "i": 15
+    },
+    {
+      "mitosisProgress": 0.6666646090909089,
+      "pinProgress": 0.6666646090909089,
+      "target": 0.6666666666666666,
+      "i": 16
+    },
+    {
+      "mitosisProgress": 0.7084186276094274,
+      "pinProgress": 0.7084186276094274,
+      "target": 0.7083333333333334,
+      "i": 17
+    },
+    {
+      "mitosisProgress": 0.750000680808081,
+      "pinProgress": 0.750000680808081,
+      "target": 0.75,
+      "i": 18
+    },
+    {
+      "mitosisProgress": 0.7917505050505049,
+      "pinProgress": 0.7917505050505049,
+      "target": 0.7916666666666666,
+      "i": 19
+    },
+    {
+      "mitosisProgress": 0.833332558249158,
+      "pinProgress": 0.833332558249158,
+      "target": 0.8333333333333334,
+      "i": 20
+    },
+    {
+      "mitosisProgress": 0.8750823824915825,
+      "pinProgress": 0.8750823824915825,
+      "target": 0.875,
+      "i": 21
+    },
+    {
+      "mitosisProgress": 0.9166686299663301,
+      "pinProgress": 0.9166686299663301,
+      "target": 0.9166666666666666,
+      "i": 22
+    },
+    {
+      "mitosisProgress": 0.958418454208754,
+      "pinProgress": 0.958418454208754,
+      "target": 0.9583333333333334,
+      "i": 23
+    },
+    {
+      "mitosisProgress": 1,
+      "pinProgress": 1,
+      "target": 1.0,
+      "i": 24
+    }
+  ],
+  "issues": []
+}

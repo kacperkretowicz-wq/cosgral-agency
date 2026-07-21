@@ -1,0 +1,168 @@
+# Wygenerowany przez style-analyst — onboarding użytkownika 2026-06-22
+# 11 referencji w references/style/ (01-11)
+
+version: "1"
+updated_at: "2026-06-25"
+reference_count: 11
+inspiration_count: 29
+inspiration_manifest: references/inspiration/manifest.yaml
+calibrated: true
+calibrated_at: "2026-06-22"
+
+style_family: editorial_premium_agency
+style_summary: >
+  Różnorodny, ale spójny styl premium editorial / design agency: odważna kolorystyka
+  LUB high-contrast B&W, minimalistyczna kompozycja, dramatyczne światło, produkt
+  lub portret jako bohater kadru. Nie generic e-commerce — raczej lookbook, case study,
+  kampania kreatywna.
+
+lighting: mixed
+lighting_modes:
+  - hard_directional: sharp shadows, chiaroscuro, architectural light on geometric sets
+  - soft_studio: diffused premium studio, subtle contact shadows on products
+  - cinematic_gel: colored rim/side light (red, orange), moody portraits
+  - natural_hard: direct sunlight, strong shadows on stone/textured surfaces
+
+background: >
+  Solid saturated color fields (red, orange, sage, navy), neutral warm beige/cream,
+  strict light grey for B&W, geometric blocks (white cubes, stone steps), minimal props.
+  Nigdy busy cluttered scenes.
+
+camera:
+  angle: "Mix: profile portraits, dynamic product tilt 20-30°, centered hero, top-down editorial, tight macro"
+  focal_feel: medium format editorial, fashion campaign, design agency portfolio
+  depth_of_field: shallow on subject with soft or graphic background falloff
+
+color_grade:
+  temperature: "Variable — warm editorial OR neutral B&W; pick one palette per shot"
+  contrast: high
+  saturation: "Bold monochromatic color stories OR desaturated B&W; avoid muddy mid-tones"
+  palette_families:
+    - bold_monochrome: single saturated color (red-on-red, orange studio) + white/black type accents
+    - bw_editorial: strict black white grey, graphic shadows
+    - warm_organic: cream, beige, terracotta, sage, earthy luxury
+    - deep_luxury: navy, forest green, gold accents
+    - purple_magenta: indigo, orchid, neon pink — night / fashion with color
+    - aqua_orange: turquoise water + punchy orange accent — summer lifestyle
+    - green_yellow: forest green + saturated yellow — sporty editorial moodboards
+
+realism_level: natural
+realism_notes: >
+  Photorealistic, high-end retouch but not plastic. Macro skin texture OK when beauty/lifestyle.
+  Products: matte/semi-matte premium packaging, subtle studio shadows.
+
+props_and_composition: >
+  Minimal intentional props: geometric pedestals, stone blocks, knit textures, mesh bags,
+  plants casting shadows. Generous negative space. Product often angled or floating.
+  Portraits: profile, hand-over-face, motion blur edges OK for artistic shots.
+  Typography in-scene when hero/web: bold all-caps sans-serif, ghost buttons — optional for pure product shots.
+
+negative_prompts:
+  - cheap amateur snapshot look
+  - flat even lighting with no shadows
+  - cluttered messy background
+  - oversaturated neon rainbow unrelated colors
+  - cartoon illustration CGI fake look
+  - watermark text overlay stock photo feel
+  - distorted product proportions
+  - generic white-background Amazon packshot (unless explicitly requested)
+  - low resolution soft blur on main subject
+  - chess pieces on green velvet (user rejected st03-04)
+  - jewelry ring macro on black sand (user rejected st03-09)
+  - neon green liquid in glass macro (user rejected st03-10)
+  - liquid silk gown on navy background mannequin CGI (noir-03 — sztuczne, nie generować)
+
+prompt_prefix: "Premium editorial product and brand photography, design agency campaign quality,"
+prompt_suffix: "intentional composition, high contrast, photorealistic, no watermark, no random text, 8k detail, magazine editorial finish"
+
+notes: >
+  Styl celowo różnorodny w execution (B&W vs bold color vs warm organic), ale wspólny DNA:
+  premium, minimal, high-contrast, editorial. Przy generacji wybierz jeden color_mode z palette_families
+  pasujący do produktu/kontekstu — nie mieszaj w jednym kadrze red studio z sage packaging unless prompt asks.
+  KALIBRACJA 2026-06-22: użytkownik zaakceptował wszystkie 5 ujęć style-test-01 → profiles/approved/.
+  KALIBRACJA 2026-06-22: style-test-02 (8 ujęć) — user: bardzo podoba się różnorodność, zapamiętać wszystkie.
+  Generuj różne tematy: owoc, ceramika, portret, napoje, macro, botanika, fashion, flatlay — nie tylko skincare.
+  INSPIRACJA 2026-06-23: user dodał 29 zdjęć w references/inspiration/ (pogrupowane tematycznie).
+  Przy nowym landingu: wybierz folder palette z manifest.yaml, nie mieszaj bold_red z cerulean_white w jednej stronie.
+
+inspiration:
+  deprecated: references/inspiration/manifest.yaml
+  style_dna: references/style-dna/manifest.yaml
+  agency_content: references/agency-content/manifest.yaml
+  moodboards_ui: references/moodboards-ui/manifest.yaml
+  readme: references/README.md
+  rule: >
+    style-dna = JAK (światło, paleta). agency-content = CO dla portfolio agencji.
+    Generuj nowe obrazy — referencje nie są finalami.
+
+approved_examples:
+  manifest: profiles/approved/approved.yaml
+  files:
+    - profiles/approved/01-bold-red-packshot.png
+    - profiles/approved/02-bw-geometric-packshot.png
+    - profiles/approved/03-warm-organic-lifestyle.png
+    - profiles/approved/04-deep-luxury-hero.png
+    - profiles/approved/05-cinematic-red-macro.png
+    - profiles/approved/st02-01-red-citrus-editorial.png
+    - profiles/approved/st02-02-bw-ceramic-geometric.png
+    - profiles/approved/st02-03-sage-portrait-centered.png
+    - profiles/approved/st02-04-navy-wine-hero.png
+    - profiles/approved/st02-05-red-macro-glass.png
+    - profiles/approved/st02-06-botanical-stone-still-life.png
+    - profiles/approved/st02-07-orange-amber-packshot.png
+    - profiles/approved/st02-08-bw-knit-texture-hands.png
+    - profiles/approved/st03-01-pink-grapefruit-editorial.png
+    - profiles/approved/st03-02-bw-camera-geometric.png
+    - profiles/approved/st03-03-bread-olive-flatlay.png
+    - profiles/approved/st03-05-orange-portrait-gel.png
+    - profiles/approved/st03-06-blue-vase-monochrome.png
+    - profiles/approved/st03-07-bw-pomegranate-flatlay.png
+    - profiles/approved/st03-08-tea-hands-sunlight.png
+  rule: "Przed generacją wczytaj approved_examples jako kalibrację jakości, NIE jako domyślny reference_image_paths dla anchor."
+  artistic_assets: profiles/approved/approved.yaml#artistic_assets
+
+approved_usage_policy:
+  mode: calibration_only
+  do_not_use_as_default_reference_paths:
+    - profiles/approved/01-bold-red-packshot.png
+    - profiles/approved/02-bw-geometric-packshot.png
+  allowed_when:
+    - "job_slug startswith lumera-"
+    - "user explicit prosi o czerwony/BW mood"
+    - "brak mockup photo grade i user akceptuje fallback"
+  fallback_order:
+    - "pick photo grade from layout mockup (scripts/pick-photo-grade.py)"
+    - "style-dna grade matching product palette"
+    - "approved examples (only with explicit reason in manifest)"
+
+references:
+  - references/style/01-editorial-hero-red-portrait.png
+  - references/style/02-fashion-profile-gold-knit.png
+  - references/style/03-monochrome-red-product-tilt.png
+  - references/style/04-bw-motion-headphones.png
+  - references/style/05-bw-product-grid-casestudy.png
+  - references/style/06-bw-geometric-citrus.png
+  - references/style/07-editorial-packaging-lifestyle.png
+  - references/style/08-branding-sensaya-califfo.png
+  - references/style/09-macro-skin-tablet-luxury.png
+  - references/style/10-orange-editorial-product-design.png
+  - references/style/11-cinematic-red-portrait.png
+
+shot_types:
+  packshot:
+    extra: "bold monochromatic or B&W, product tilted or on geometric pedestal, hard directional light, soft drop shadow, matte premium packaging"
+  hero:
+    extra: "full-bleed editorial, space for bold typography, saturated color field or high-contrast B&W, campaign hero feel"
+  lifestyle:
+    extra: "editorial context — stone surfaces, textured materials, direct sunlight shadows, human element optional, boutique luxury"
+  macro:
+    extra: "extreme close-up texture — skin pores, fabric knit, product surface, hyper-real detail, soft or dramatic light"
+  flatlay:
+    extra: "top-down editorial arrangement, organic + structured objects, high contrast, case-study portfolio aesthetic"
+
+color_mode_hints:
+  default: rotate_by_product_and_mockup
+  beauty_skincare: warm_organic
+  tech_creative: bw_editorial
+  bold_brand: bold_monochrome
+  luxury_packaging: deep_luxury

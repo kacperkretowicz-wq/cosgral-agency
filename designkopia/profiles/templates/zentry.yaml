@@ -1,0 +1,67 @@
+id: zentry
+name: Zentry — Modern Colorful Agency
+preview_url: https://zentry.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/zentry/
+source_image: references/templates/zentry.md
+tags:
+  - hero
+  - nav
+  - agency
+  - portfolio
+  - colorful
+  - ticker
+  - stats
+  - process
+  - testimonials
+
+sections:
+  - id: hero
+    type: hero
+    notes: "TURNING VISION INTO DIGITAL SOLUTIONS — condensed type"
+  - id: process
+    type: process
+    layout: four-column
+  - id: ticker
+    type: features
+    layout: marquee
+  - id: projects
+    type: portfolio
+  - id: services
+    type: services
+    layout: numbered
+  - id: stats
+    type: features
+  - id: testimonials
+    type: testimonials
+
+typography:
+  heading_font: "Anton"
+  body_font: "Poppins"
+  heading_sizes:
+    h1: "clamp(3rem, 8vw, 6rem)"
+  body_size: "1rem"
+  weights:
+    heading: 400
+    body: 400
+
+spacing:
+  page_max_width: "1320px"
+  section_padding_y: "100px"
+  section_padding_x: "32px"
+  grid_columns: 12
+  gap: "36px"
+
+color_tokens:
+  background: "#070809"
+  accent: "#FEE300"
+  accent_orange: "#EB5014"
+  text: "#FFFFFF"
+  muted: "#888888"
+
+mixable_with:
+  - astra
+  - fabrica
+  - vidhub
+  - kirk
+
+notes: "High-energy agency — yellow/orange, marquee ticker, conversion stats."

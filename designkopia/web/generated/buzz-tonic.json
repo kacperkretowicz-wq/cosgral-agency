@@ -1,0 +1,106 @@
+{
+  "job": "buzz-tonic",
+  "brand": "BUZZ",
+  "tier": "editorial_motion",
+  "tokens": {
+    "bg": "#0A0A0A",
+    "fg": "#F4F1EA",
+    "muted": "#888888",
+    "accent": "#C8F135",
+    "surface": "#141416",
+    "fontHeading": "\"Bebas Neue\", system-ui, sans-serif",
+    "fontBody": "\"DM Sans\", system-ui, sans-serif",
+    "fontMono": "\"JetBrains Mono\", ui-monospace, monospace"
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "eyebrow": null,
+      "title": "BUZZ",
+      "lead": "",
+      "cta": "Zobacz",
+      "bg": "image",
+      "image": "/g/buzz-tonic/00-anchor-packshot.png"
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "02-manifesto",
+      "body": "",
+      "image": "/g/buzz-tonic/02-flatlay.png",
+      "reverse": true
+    },
+    {
+      "type": "gallery",
+      "tag": null,
+      "heading": "Kadry",
+      "images": [
+        "/g/buzz-tonic/01-hero-lifestyle.png",
+        "/g/buzz-tonic/02-flatlay.png",
+        "/g/buzz-tonic/atmo-01-section-background.png",
+        "/g/buzz-tonic/atmo-02-editorial-context.png"
+      ]
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "04-flavors",
+      "body": "",
+      "image": "/g/buzz-tonic/atmo-02-editorial-context.png",
+      "reverse": true
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "",
+      "body": "",
+      "image": "/g/buzz-tonic/atmo-03-brand-tile.png",
+      "reverse": true
+    },
+    {
+      "type": "stats",
+      "items": [
+        {
+          "value": 100,
+          "suffix": "%",
+          "label": "jakość"
+        },
+        {
+          "value": 24,
+          "suffix": "h",
+          "label": "wsparcie"
+        }
+      ]
+    },
+    {
+      "type": "split",
+      "tag": null,
+      "heading": "07-ingredients",
+      "body": "",
+      "image": "/g/buzz-tonic/atmo-05-texture-mood.png",
+      "reverse": false
+    },
+    {
+      "type": "faq",
+      "tag": null,
+      "heading": "",
+      "items": [
+        {
+          "q": "Szczegóły",
+          "a": ""
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "title": "Zbudujmy to.",
+      "cta": "Kup teraz",
+      "meta": ""
+    },
+    {
+      "type": "footer",
+      "brand": "BUZZ",
+      "credit": "cosgral.design"
+    }
+  ]
+}

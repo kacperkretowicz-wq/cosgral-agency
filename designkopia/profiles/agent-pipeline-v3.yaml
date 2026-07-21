@@ -1,0 +1,204 @@
+# ⚠️ REFERENCJA OPISOWA (v3). KANON WYKONYWALNY = profiles/pipeline.yaml (czyta go run-pipeline.py).
+# Ten plik = szczegóły ról/atomów; przy konflikcie przepływu wygrywa pipeline.yaml. Aktywni agenci: AGENT-MAP.md.
+# v3 — research-first pipeline + atomizacja agentów
+# Poprzednia wersja: v2 w tym samym pliku (zachowana poniżej jako pipelines.*_v2)
+
+version: "3"
+updated_at: "2026-06-24"
+
+phases:
+  - id: intake
+    agents: [design-orchestrator]
+    output: job-type-lock.json
+  - id: research
+    parallel: true
+    agents: [inspiration-harvester, web-researcher, typography-researcher, visual-researcher, layout-screenshot-analyst]
+    then_parallel: [style-sense-agent, framer-effects-researcher]
+    then: inspiration-curator → research-manifest.json
+  - id: strategy
+    agents: [domain-strategist]
+    note: agency-strategist gdy job_type=agency_portfolio
+    output: domain-brief.json
+  - id: structure
+    agents: [structure-planner, copy-writer]
+    output: [structure-plan.json, copy-draft.json]
+  - id: design_tokens
+    parallel: true
+    agents: [motion-director, color-palette-guardian, palette-extractor, typography-selector]
+    output: [motion-plan.json, palette-lock.json, typography-lock.json]
+  - id: layout_assembly
+    agents: [template-mixer, layout-assembler]
+    output: layout-plan.json
+    gates: [validate-job, variability-guardian]
+  - id: media
+    agents: [shot-planner, media-producer, image-generator]
+    optional: [video-producer]
+    output: manifest.json
+  - id: coherence
+    agents: [coherence-reviewer]
+  - id: build
+    agents: [html-assembler, snippet-integrator, motion-implementer]
+  - id: qa
+    agents: [process-validator, vision-scorer]
+
+pipelines_v3:
+  standard_full_v3:
+    steps:
+      - intake
+      - research
+      - strategy
+      - structure
+      - design_tokens
+      - layout_assembly
+      - media
+      - coherence
+      - build
+      - qa
+
+  agency_full_v3:
+    steps:
+      - intake
+      - { phase: research, lane: profiles/research-lanes/agency.yaml }
+      - { phase: strategy, agent: agency-strategist, output: agency-brief.json }
+      - structure
+      - design_tokens
+      - layout_assembly
+      - { phase: media, gate: check-agency-shots.py }
+      - coherence
+      - build
+      - qa
+
+# ─── Nowi agenci v3 (research + atomizacja) ───
+
+agent_atoms:
+  research:
+    web-researcher:
+      role: URL discovery, audit orchestration, scroll/layout/tech capture
+      output: research-web.json
+      tools: [scripts/audit-site.py, references/web-audits/, puppeteer]
+    inspiration-harvester:
+      role: Crawl domeny, segregacja podstron, incremental registry
+      output: references/inspiration-registry/<domain>/registry.yaml
+      tools: [scripts/crawl-inspiration-site.py]
+    typography-researcher:
+      role: Fonty z audytów URL, moodboards-ui, template YAML; proponuje pairing
+      output: research-typography.json
+      reads: [research-web.json, profiles/typography-pairings.yaml]
+    visual-researcher:
+      role: Subject + style refs per job_type lane (auto, product, agency, shop)
+      output: research-visual.json
+      reads: [profiles/research-lanes/, references/style-dna/, references/subject-lanes/]
+    layout-screenshot-analyst:
+      role: Mockupy PNG → skeleton_signature + vision_prompts (nie klon skin)
+      output: references/layout-screenshots/analysis/*.yaml
+      tools: [scripts/ingest-layout-screenshot.py, scripts/pick-layout-mockup.py]
+      reads: [profiles/mockup-inspiration-rules.yaml]
+    style-sense-agent:
+      role: Mood, density, contrast, motion appetite — style-brief.json
+      output: style-brief.json
+      reads: [style-dna, inspiration-registry, research-typography]
+    framer-effects-researcher:
+      role: Framer / motion patterns → mapowanie na vanilla/GSAP/snippets
+      output: framer-effects-research.json
+      reads: [inspiration-registry, reference-audit]
+    inspiration-curator:
+      role: Wybór finalnych refs + research-manifest; zero 1:1 copy jako final
+      output: research-manifest.json
+
+  strategy:
+    domain-strategist:
+      role: Universal brief — product, auto, fashion, shop, SaaS
+      output: domain-brief.json
+      reads: [research-manifest.json, profiles/job-types/]
+    agency-strategist:
+      role: Brief tylko agencja (alias z węższym scope)
+      output: agency-brief.json
+
+  structure:
+    structure-planner:
+      role: Sekcje pod produkt; skeleton z mockupu + vision_note
+      reads: [profiles/mockup-inspiration-rules.yaml, structure-plan skeleton fields]
+    copy-writer:
+      role: Nagłówki, lead, CTA z copy-draft.json
+      output: copy-draft.json
+
+  layout_atoms:
+    template-mixer:
+      role: pick-template-mix.py + uzasadnienie per sekcja
+      output: template-mix.json
+    typography-selector:
+      role: pairing_id z research-typography + variability
+      output: typography-lock.json
+    layout-assembler:
+      role: Merge structure + motion + palette + typography + template → layout-plan.json
+      replaces: layout-planner monolith
+
+  media_atoms:
+    shot-planner:
+      role: Lista ujęć subject_ref + style_ref + photo_grade_ref przed GenerateImage
+      output: shot-plan.json
+    media-producer:
+      role: Orchestracja generacji + pick-photo-grade + check-image-variability
+    image-generator:
+      role: Pojedyncze kadry
+    video-producer:
+      role: hero loop brief, gif, placeholder video poster
+
+  build_atoms:
+    html-assembler:
+      role: assemble-section.py, index.html skeleton
+      splits_from: page-exporter
+    snippet-integrator:
+      role: compose-interactions.py
+      splits_from: interaction-composer
+    motion-implementer:
+      role: Custom GSAP / R3F / Spline embed
+      splits_from: interaction-composer
+
+  qa_atoms:
+    process-validator:
+      role: Footer, object-position, gates, YAML compliance
+      alias: style-qa
+    vision-scorer:
+      role: tier_s, anti-patterns, creative score
+      splits_from: concept-guardian
+    variability-guardian:
+      role: Między jobami
+    coherence-reviewer:
+      role: W obrębie joba
+
+# ─── Rozbicie starych agentów ───
+
+deprecation_map:
+  layout-planner:
+    status: split
+    replaced_by: [template-mixer, typography-selector, layout-assembler]
+  page-exporter:
+    status: split
+    replaced_by: [html-assembler]
+  interaction-composer:
+    status: split
+    replaced_by: [snippet-integrator, motion-implementer]
+  reference-auditor:
+    status: absorbed
+    replaced_by: [web-researcher]
+  concept-guardian:
+    status: split
+    replaced_by: [vision-scorer, variability-guardian, coherence-reviewer]
+
+research_artifacts:
+  research-web.json:
+    fields: [urls_audited, scroll_mode, section_count, nav_pattern, tech_hints, layout_patterns]
+  research-typography.json:
+    fields: [fonts_detected, pairing_recommendation, display_proxy, audit_quotes, banned_detected]
+  research-visual.json:
+    fields: [job_lane, subject_refs[], style_refs[], style_dimensions[], forbidden[]]
+  research-manifest.json:
+    fields: [curated_web, curated_typography, curated_subject, curated_style, rationale]
+  domain-brief.json:
+    fields: [job_type, positioning, must_have, forbidden, research_manifest_ref]
+
+subject_lanes:
+  path: references/subject-lanes/
+  folders: [automotive, fashion, retail, food-beverage, saas, photography]
+  rule: Temat ujęć per branża — parallel do agency-content

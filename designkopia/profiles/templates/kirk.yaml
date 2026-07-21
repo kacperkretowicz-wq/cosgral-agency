@@ -1,0 +1,81 @@
+id: kirk
+name: Kirk — Unapologetic Colorful Portfolio
+source_image: references/templates/kirk.md
+preview_url: https://kirk-sinner.framer.website/
+marketplace_url: https://www.framer.com/community/marketplace/templates/kirk/
+creator: Gustave Flowbert
+tags:
+  - hero
+  - nav
+  - portfolio
+  - editorial
+  - colorful
+  - about
+  - contact
+  - footer
+
+sections:
+  - id: nav-meta
+    type: nav
+    layout: split
+    notes: "Monospace meta bar — role left, year center, handle right"
+  - id: hero
+    type: hero
+    layout: centered
+    notes: "Ogromny display name (KIRK SINNER), subtitle monospace, pełna szerokość"
+  - id: gallery-2col
+    type: product-grid
+    layout: two-column
+    columns: 2
+    notes: "Dwa duże kafle ze zdjęciami, zaokrąglone rogi"
+  - id: about
+    type: features
+    layout: split
+    columns: 2
+    notes: "Bio po lewej, CLIENTS + SERVICES listy po prawej, czerwony tekst"
+  - id: portfolio-grid
+    type: portfolio
+    layout: two-column
+    columns: 2
+    notes: "Pary obrazów projektów (Sensaya, Schløng, Califfo…)"
+  - id: contact
+    type: contact
+    layout: split
+    notes: "Social links, email, telefon, CTA GET KIRK"
+
+typography:
+  heading_font: "Inter"
+  display_font: "Inter"
+  body_font: "JetBrains Mono"
+  heading_sizes:
+    h1: "clamp(4rem, 12vw, 9rem)"
+    h2: "2rem"
+  body_size: "0.75rem"
+  weights:
+    heading: 800
+    body: 400
+  notes: "Display = ekstremalnie bold rounded sans; meta/labels = monospace uppercase"
+
+spacing:
+  page_max_width: "1440px"
+  section_padding_y: "80px"
+  section_padding_x: "32px"
+  grid_columns: 12
+  gap: "24px"
+
+color_tokens:
+  background: "#FFFFFF"
+  accent: "#E82323"
+  text: "#0A0A0A"
+  muted: "#E82323"
+  gradient_accent: "linear-gradient(90deg, #7B5CFF, #E82323)"
+
+mixable_with:
+  - taylor
+  - portfolite
+  - salient
+  - hero-minimal
+
+notes: >
+  Bold colorful editorial od Gustave Flowbert. Pasuje do stylu photoshoot użytkownika
+  (Sensaya, Califfo, Schløng w projektach). Czerwony akcent + monospace meta.

@@ -1,0 +1,54 @@
+# Przykładowy template — nadpisz przez template-analyst po /design-onboard
+
+id: hero-minimal
+name: Hero Minimal Editorial
+source_image: references/templates/hero-minimal.svg
+tags:
+  - hero
+  - nav
+  - minimal
+  - editorial
+
+sections:
+  - id: nav
+    type: nav
+    layout: centered
+    notes: "Logo centrum, minimal links"
+  - id: hero
+    type: hero
+    layout: split
+    columns: 2
+    notes: "Headline + CTA left, large product image right"
+
+typography:
+  heading_font: "Playfair Display"
+  body_font: "Inter"
+  heading_sizes:
+    h1: "3.5rem"
+    h2: "2rem"
+  body_size: "1.125rem"
+  weights:
+    heading: 500
+    body: 400
+
+spacing:
+  page_max_width: "1280px"
+  section_padding_y: "96px"
+  section_padding_x: "32px"
+  grid_columns: 12
+  gap: "32px"
+
+color_tokens:
+  background: "#FAFAF8"
+  accent: "#3D3D3D"
+  text: "#1A1A1A"
+  muted: "#737373"
+
+mixable_with:
+  - grid-editorial
+  - cta-minimal
+  - kirk
+  - taylor
+  - salient
+
+notes: "Szablon startowy. Główne templatey Framer: kirk, portfolite, taylor, salient."

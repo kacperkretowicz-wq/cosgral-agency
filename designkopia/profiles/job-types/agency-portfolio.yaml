@@ -1,0 +1,75 @@
+# Shot brief dla job_type: agency_portfolio
+# image-generator: subject ZAWSZE z tego pliku + agency-content/manifest.yaml
+
+version: "1"
+job_type: agency_portfolio
+
+description: >
+  Portfolio agencji marketingowej / kreatywnej — pokazuje pracę dla klientów,
+  nie generyczny beauty photoshoot. Inspiracje = styl; temat = case study / branding / studio.
+
+product_lock:
+  enabled: false
+  note: "Brak jednego SKU — anchor to hero campaign still, nie packshot produktu"
+
+anchor:
+  role: hero_campaign
+  subject: "Flagowy kadr kampanii lub case study wall — kontekst klienta, nie skincare macro"
+  min_dimensions: [editorial_campaign, not_product_flatlay]
+
+required_shot_roles:
+  min_count: 6
+  roles:
+    - id: hero_campaign
+      label: Hero — key visual kampanii lub case study
+      subject_hint: "Campaign hero, installation, or branded environment — agency work"
+      subject_ref_folder: agency-content/campaigns
+      style_ref_folder: style-dna/palette
+    - id: case_study_grid
+      label: Siatka prac / case study wall
+      subject_hint: "Grid of campaign frames, portfolio wall, mixed client work"
+      subject_ref_folder: agency-content/campaigns
+      style_ref_folder: style-dna/composition
+    - id: branding_proof
+      label: Branding / identity
+      subject_hint: "Brand guidelines, logo system, identity mockup on desk or wall"
+      subject_ref_folder: agency-content/branding-systems
+      style_ref_folder: style-dna/composition
+    - id: campaign_spotlight_a
+      label: Campaign spotlight A
+      subject_hint: "Single strong campaign frame — fashion, FMCG, tech, culture — pick industry variety"
+      subject_ref_folder: agency-content/campaigns
+      style_ref_folder: style-dna/lighting
+    - id: campaign_spotlight_b
+      label: Campaign spotlight B
+      subject_hint: "Different industry or format than A — social, OOH, editorial, packaging"
+      subject_ref_folder: agency-content/campaigns
+      style_ref_folder: style-dna/grade
+    - id: studio_culture
+      label: Studio / team / culture
+      subject_hint: "Agency space, team at work, hands on moodboard — not beauty portrait"
+      subject_ref_folder: agency-content/team-studio
+      style_ref_folder: style-dna/grade
+
+forbidden_shot_subjects:
+  - skincare_macro_as_hero
+  - water_droplets_face
+  - lip_gloss_macro
+  - generic_product_flatlay_without_client_story
+  - duplicate_beauty_still_life_set
+
+style_rules:
+  extract_from_style_dna_only: [lighting, palette, composition, grade]
+  never_copy_subject_from:
+    - references/style-dna/grade/dewy-wet-look-macro.png
+    - references/style-dna/grade/gloss-peach-macro.png
+    - references/style-dna/composition/clinical-flatlay-grey-grid.png
+  prompt_template: >
+    SUBJECT (generate this): {subject_hint} for a marketing agency portfolio.
+    STYLE ONLY from reference (do not copy subjects from style ref): {style_dimensions}.
+    Palette family: {palette_family}. Photorealistic editorial, no watermark, no text overlay.
+
+diversity_per_job:
+  min_distinct_industries: 2
+  min_distinct_shot_types: 4
+  note: "Nie powtarzaj tego samego typu kadru (macro skincare) w jednym jobie"

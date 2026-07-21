@@ -1,0 +1,15 @@
+version: "1"
+brand: PATINA
+slug: patina-cloth
+type: fashion_retail
+job_type: fashion_retail
+tagline: Age is the craft.
+positioning: >
+  Artystyczna marka odzieżowa — lniane formy, srebrna paleta, dorośli jako ikony stylu.
+layout_ref: references/layout-screenshots/inbox/47_designsakestudio_com_1782386772.png
+concept_id: patina-silver-editorial
+layout_archetype: masonry-portfolio
+palette_family: warm_organic
+job_palette: warm_organic
+product_visual_spec: >
+  Linen garments oatmeal and silver-grey. Mature models 55–75. Soft overexposure, subtle blur, film grain.

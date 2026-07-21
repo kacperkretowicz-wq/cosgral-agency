@@ -1,0 +1,9 @@
+{
+  "page": "solace-landing",
+  "interactions": {
+    "source": "references/interactions/efekty.txt",
+    "applied": ["effect-05", "effect-12", "effect-14", "effect-18", "marquee", "scroll-reveal"],
+    "rejected": ["hero-parallax", "effect-16"],
+    "images_policy": "outputs/images/solace-landing/ only"
+  }
+}

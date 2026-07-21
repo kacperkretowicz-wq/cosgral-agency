@@ -1,0 +1,123 @@
+# Mapowanie stron referencyjnych (audyt 2026-06-23) → archetyp + snippety + typografia
+# layout-planner: gdy user poda URL inspiracji lub site_id — lookup tutaj
+
+version: "1"
+audit_source: references/web-audits/editorial-sites-2026-06-23.md
+
+lanes:
+  editorial_readymag:
+    description: overflow hidden, keyboard slides, viewport sections
+    sites: [willvint.com, bicemucci.com, from.cm, mashachern.com, n9cra.com, dave-green.com]
+  commercial_vertical:
+    description: klasyczny scroll, produkty, CTA
+    sites: [trovearchive.com]
+  portfolio_index:
+    description: lista projektów, kategorie, masonry
+    sites: [marianorrisesparza.com, willvint.com]
+  product_luxury_serial:
+    description: serie/kolekcje, shop + lookbook, video hero
+    sites: [readymag JOSER, travelagency.agency, n9cra.com]
+  case_study:
+    description: ultra-long scroll, rozdziały, zmiana display per chapter
+    sites: [danilamel.com]
+
+patterns:
+  willvint.com:
+    lane: editorial_readymag
+    layout_archetype: readymag-slides
+    scroll_mode: viewport-sections
+    navigation: keyboard-slides
+    snippet_ids: [pill-nav, keyboard-slides, project-index-row, stacked-cards, origin-button]
+    typography_pairing: mono-architect
+    display_proxy: Space Mono
+    notes: "Space Mono labels, video grid, ArrowDown slides"
+
+  bicemucci.com:
+    lane: editorial_readymag
+    layout_archetype: studio-manifesto
+    scroll_mode: viewport-sections
+    navigation: keyboard-slides
+    snippet_ids: [keyboard-slides, manifesto-display, project-index-row, stacked-cards, origin-button]
+    typography_pairing: warm-fashion
+    notes: "Manifesto personal + view project grid"
+
+  from.cm:
+    lane: editorial_readymag
+    layout_archetype: studio-manifesto
+    scroll_mode: viewport-sections
+    navigation: keyboard-slides
+    snippet_ids: [keyboard-slides, manifesto-display, scroll-reveal]
+    typography_pairing: nocturne-luxury
+    notes: "Gigantyczna typografia po liniach"
+
+  mashachern.com:
+    lane: editorial_readymag
+    layout_archetype: masonry-portfolio
+    scroll_mode: viewport-sections
+    snippet_ids: [pill-nav, index-overlay, manifesto-display]
+    typography_pairing: mono-architect
+    type_credit: true
+    notes: "INDEX overlay, typeface credit w UI"
+
+  marianorrisesparza.com:
+    lane: portfolio_index
+    layout_archetype: masonry-portfolio
+    scroll_mode: vertical
+    snippet_ids: [masonry-grid, project-index-row, scroll-reveal]
+    typography_pairing: warm-fashion
+    notes: "Fashion / Wellness categories"
+
+  dave-green.com:
+    lane: portfolio_index
+    layout_archetype: masonry-portfolio
+    scroll_mode: vertical
+    snippet_ids: [masonry-grid, expandable-plus, origin-button]
+    typography_pairing: mono-architect
+    notes: "Info + / Rep + expandable"
+
+  trovearchive.com:
+    lane: commercial_vertical
+    layout_archetype: lumera-commercial
+    scroll_mode: vertical
+    snippet_ids: [scroll-snap-vertical, scroll-reveal, origin-button]
+    typography_pairing: aqua-clean
+    notes: "Hero → produkty → filozofia → newsletter"
+
+  n9cra.com:
+    lane: product_luxury_serial
+    layout_archetype: product-serial
+    scroll_mode: viewport-sections
+    navigation: keyboard-slides
+    snippet_ids: [pill-nav, video-hero, keyboard-slides, marquee-logos]
+    typography_pairing: mono-architect
+    notes: "Video hero loop, grain/VHS mood"
+
+  travelagency.agency:
+    lane: product_luxury_serial
+    layout_archetype: product-serial
+    scroll_mode: viewport-sections
+    snippet_ids: [index-overlay, pill-nav, masonry-grid]
+    typography_pairing: nocturne-luxury
+    notes: "COLLECTION / INDEX / SHOP / LIBRARY"
+
+  danilamel.com:
+    lane: case_study
+    layout_archetype: case-study-long
+    scroll_mode: case-study-long
+    snippet_ids: [scroll-reveal, manifesto-display, keyboard-slides]
+    typography_pairing: editorial-red-impact
+    chapter_typography: true
+    notes: "Display font per chapter — tylko explicit case-study job"
+
+  lumera-landing:
+    lane: commercial_vertical
+    layout_archetype: lumera-commercial
+    scroll_mode: vertical
+    snippet_ids: [scroll-snap-vertical, scroll-reveal, origin-button]
+    typography_pairing: lumera_reference
+    internal_golden: true
+
+lookup:
+  by_url: "Dopasuj hostname z patterns.*"
+  by_lane: "User mówi 'jak willvint' → willvint.com pattern"
+  fallback: lumera-commercial

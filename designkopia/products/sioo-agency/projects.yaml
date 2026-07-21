@@ -1,0 +1,100 @@
+version: "1"
+brand: SIOO AGENCY
+slug: sioo-agency
+
+projects:
+  - id: lumea-labs
+    title: Lumea Labs
+    client: Lumea Labs
+    year: 2026
+    disciplines: [Branding, Product Photoshoot, Art Direction]
+    category: Beauty
+    href: "#lumea-labs"
+    thumbnail: ../../images/sioo-agency/01-lumea-labs-hero.png
+    object_position: center 30%
+    featured: true
+
+  - id: northline-spirits
+    title: Northline Spirits
+    client: Northline Spirits
+    year: 2025
+    disciplines: [Campaign, Packaging, Motion]
+    category: Beverage
+    href: "#northline-spirits"
+    thumbnail: ../../images/sioo-agency/02-northline-spirits-still.png
+    object_position: center center
+    featured: true
+
+  - id: veila-skin
+    title: Veila Skin Ritual
+    client: Veila
+    year: 2026
+    disciplines: [Product Photoshoot, Retouch, Set Design]
+    category: Skincare
+    href: "#veila-skin"
+    thumbnail: ../../images/sioo-agency/03-veila-skin-macro.png
+    object_position: center 35%
+
+  - id: atlas-fragrance
+    title: Atlas Fragrance Notes
+    client: Atlas Fragrance
+    year: 2024
+    disciplines: [Brand Strategy, Editorial, EPK]
+    category: Luxury
+    href: "#atlas-fragrance"
+    thumbnail: ../../images/sioo-agency/04-atlas-fragrance-editorial.png
+    object_position: center center
+
+  - id: studio-karta
+    title: KARTA Studio Objects
+    client: KARTA Studio
+    year: 2025
+    disciplines: [Creative Direction, Product Launch, Web Design]
+    category: Interior
+    href: "#studio-karta"
+    thumbnail: ../../images/sioo-agency/05-karta-objects-grid.png
+    object_position: center 25%
+
+  - id: cinder-athletics
+    title: Cinder Athletics SS26
+    client: Cinder Athletics
+    year: 2026
+    disciplines: [Fashion Campaign, Film Stills, Social Cutdowns]
+    category: Fashion
+    href: "#cinder-athletics"
+    thumbnail: ../../images/sioo-agency/06-cinder-athletics-motion.png
+    object_position: center 20%
+
+categories:
+  - Beauty
+  - Skincare
+  - Fashion
+  - Beverage
+  - Luxury
+  - Interior
+
+expandables:
+  - id: clients
+    label: "Clients +"
+    items:
+      - Lumea Labs
+      - Northline Spirits
+      - Veila
+      - Atlas Fragrance
+      - KARTA Studio
+      - Cinder Athletics
+  - id: disciplines
+    label: "Disciplines +"
+    items:
+      - Branding Systems
+      - Product Photoshoots
+      - Campaign Motion
+      - Art Direction
+      - Packaging Design
+      - Web Experiences
+
+media:
+  hero_video:
+    src: ""
+    poster: ../../images/sioo-agency/00-hero-video-poster.png
+    role: hero_loop

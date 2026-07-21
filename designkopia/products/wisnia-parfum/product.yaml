@@ -1,0 +1,63 @@
+version: "1"
+brand: WIŚNIA
+slug: wisnia-parfum
+type: product_brand
+job_type: product_brand
+
+tagline: Cherry, distilled.
+positioning: >
+  Wisniowe perfumy niche w miękkim DTC wydaniu — blush, mauve, wiśnia.
+  Designerski minimal: przezroczyste szkło, matowa czapka, zero złota, zero tekstu na etykiecie.
+
+concept_id: B
+layout_archetype: lumera-commercial
+palette_family: dusty_rose_mauve
+job_palette: dusty_rose_mauve
+
+product_visual_spec: >
+  Artisan crystal perfume bottle, 50ml, highly irregular sculptural glass form —
+  curved banana-like silhouette, asymmetric faceted cut crystal, NOT symmetrical,
+  NOT rectangular. Strange niche designer flacon shape.
+  Deep burgundy-cherry liquid inside (dark wine-red).
+  Matte blush-rose cylindrical cap (NOT gold atomizer, NOT spherical).
+  Minimal branding ON glass: embossed or sandblasted text "WIŚNIA" only — small,
+  elegant, vertical or subtle on one facet. No other text.
+  Same exact bottle shape in every shot. Same cap. Same liquid level ~85%.
+
+notes:
+  top: wild cherry, bitter almond
+  heart: cherry blossom, iris
+  base: black tea, soft wood
+
+shot_brief_source: profiles/job-types/product-brand.yaml
+
+image_narrative:
+  - shot_id: anchor_packshot
+    role: anchor
+    subject_hint: "Same WIŚNIA bottle centered on soft blush-cream seamless, gentle shadow"
+    style_ref: references/layout-screenshots/processed/rare-beauty-dtc-mockup.png
+    style_dimensions: [dusty_rose, soft_dtc, airy_spacing]
+  - shot_id: hero_still
+    role: hero
+    subject_hint: "SAME bottle with cherry blossom petal nearby — blush cream background"
+    style_ref: references/style-dna/grade/dewy-wet-look-macro.png
+    style_dimensions: [dewy, soft_highlight]
+    gate: "derived_from_anchor_only"
+  - shot_id: macro_glass
+    role: macro
+    subject_hint: "SAME bottle — macro glass shoulder and cherry liquid meniscus"
+    style_ref: references/style-dna/grade/dewy-wet-look-macro.png
+    style_dimensions: [macro, dewy]
+    gate: "derived_from_anchor_only"
+  - shot_id: notes_flatlay
+    role: flatlay
+    subject_hint: "SAME bottle cap beside SAME bottle — cherry stones flatlay top-down"
+    style_ref: references/style-dna/composition/bw-geometric-still-life.png
+    style_dimensions: [top_down, geometric]
+    gate: "derived_from_anchor_only"
+  - shot_id: editorial_stem
+    role: editorial
+    subject_hint: "Cherry stem sharp focus, SAME bottle soft bokeh background"
+    style_ref: references/style-dna/lighting/cinematic-red-gel-portrait.png
+    style_dimensions: [chiaroscuro, soft]
+    gate: "derived_from_anchor_only"

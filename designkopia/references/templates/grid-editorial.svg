@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <rect width="1440" height="900" fill="#FFFFFF"/>
+  <rect x="80" y="120" width="620" height="520" rx="8" fill="#E8E4DF"/>
+  <rect x="740" y="120" width="280" height="240" rx="8" fill="#F0EDE8"/>
+  <rect x="1040" y="120" width="280" height="240" rx="8" fill="#F0EDE8"/>
+  <rect x="740" y="400" width="580" height="240" rx="8" fill="#F5F5F3"/>
+  <text x="80" y="80" font-family="serif" font-size="32" fill="#1A1A1A">Product story</text>
+  <text x="80" y="860" font-family="sans-serif" font-size="12" fill="#999">Test template  grid editorial</text>
+</svg>

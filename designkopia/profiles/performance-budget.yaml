@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────────────────
+# PERFORMANCE BUDGET — twarde progi wydajności i wagi.
+# Pilnuje, by signature „wow" nie zabił ładowania (zwłaszcza mobile).
+# Czyta: performance-warden. Para z restraint art-directora.
+# ─────────────────────────────────────────────────────────────────────────
+
+version: "1"
+updated_at: "2026-06-26"
+
+# ── BUDŻETY CORE WEB VITALS (mobile, 4G, mid-tier) ───────────────────────
+web_vitals:
+  LCP_ms:   { good: 2500, fail_over: 4000 }   # largest contentful paint
+  CLS:      { good: 0.1,  fail_over: 0.25 }    # layout shift — efekty NIE mogą przesuwać layoutu
+  INP_ms:   { good: 200,  fail_over: 500 }     # interaction to next paint
+  TTFB_ms:  { good: 800,  fail_over: 1800 }
+
+# ── BUDŻETY WAGI (per strona, gzip) ──────────────────────────────────────
+weight_budget:
+  js_kb:        { target: 250, fail_over: 450 }   # JS razem (Framer+GSAP+lib)
+  css_kb:       { target: 80,  fail_over: 150 }
+  hero_image_kb: { target: 300, fail_over: 600 }   # LCP image
+  page_image_total_kb: { target: 1800, fail_over: 3500 }
+  fonts_kb:     { target: 180, fail_over: 320 }    # subset + woff2 + max 2 rodziny
+
+# ── REGUŁY EFEKTÓW (perf-safe) ───────────────────────────────────────────
+effect_rules:
+  - "Animuj tylko transform/opacity (GPU). Nigdy width/height/top/left w pętli scroll."
+  - "Ciężkie (WebGL/3D/scroll-scrubbed-video) = lazy + tylko gdy w viewport; pauza poza ekranem."
+  - "Obrazy: AVIF/WebP, responsywne srcset, lazy poza pierwszym ekranem, wymiary z góry (anty-CLS)."
+  - "Fonty: woff2, font-display: swap, max 2 rodziny, subset; preload tylko font LCP."
+  - "reduced-motion: wyłącz scroll-scrub/parallax/WebGL — statyczny fallback."
+  - "Mobile: wyłącz custom-cursor i image-trail (i tak są caution w site-clone-registry)."
+
+# ── KONTRAKT: perf-report.json (performance-warden produkuje) ────────────
+report_fields:
+  - measured            # {LCP, CLS, INP, weights...} (z next build / lighthouse / heurystyki)
+  - budget_status       # per metryka: pass | warn | FAIL
+  - offenders           # co przekracza (plik/efekt/obraz) + waga
+  - fixes               # konkretne działania (lazy, subset, kompresja, usuń efekt)
+  - pass                # bool — FAIL gdy którakolwiek metryka > fail_over
+
+# ── JAK MIERZYĆ (kolejność preferencji) ──────────────────────────────────
+how_to_measure:
+  - "cd web && npm run build — rozmiary route/first-load JS z outputu Next."
+  - "Wagi assetów: du -k web/public/g/<job>/ + outputs/images/<job>/."
+  - "Lighthouse (gdy dostępny Chrome): npx lighthouse http://localhost:3000/g/<job> --only-categories=performance."
+  - "Brak Chrome → heurystyki wag + statyczna analiza efektów w build.json/layout-plan.json."

@@ -1,0 +1,19 @@
+{
+  "job_slug": "solace-landing",
+  "brand": "SOLACE",
+  "products": ["revive-cleanser", "barrier-moisturizer"],
+  "palette": "sage, terracotta, cream, forest green",
+  "images": [
+    {"file": "solace-01-sage-packshot.png", "type": "packshot", "product": "revive-cleanser"},
+    {"file": "solace-02-terracotta-hero.png", "type": "hero", "product": "barrier-moisturizer"},
+    {"file": "solace-03-duo-lifestyle.png", "type": "lifestyle", "product": "both"},
+    {"file": "solace-04-texture-macro.png", "type": "macro", "product": "both"},
+    {"file": "solace-05-forest-packshot.png", "type": "packshot", "product": "revive-cleanser"},
+    {"file": "solace-asset-portrait.png", "type": "editorial_portrait"},
+    {"file": "solace-asset-stone-texture.png", "type": "texture_background"},
+    {"file": "solace-asset-sage-gradient.png", "type": "abstract_background"},
+    {"file": "solace-asset-botanical-still-life.png", "type": "still_life"}
+  ],
+  "template_mix": ["salient", "portfolite", "kirk", "taylor"],
+  "generated_at": "2026-06-22"
+}
