@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "title": {
+      "pl": "COSGRAL — strony, CRM, automatyzacje, SEO i kreacja",
+      "en": "COSGRAL — websites, CRM, automation, SEO and creative"
+    },
+    "description": {
+      "pl": "cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje ecommerce, grafika, wideo, social media, SEO/GEO i kampanie Meta & Google Ads.",
+      "en": "cosgral.agency — websites, apps, CRM, ecommerce automation, design, video, social media, SEO/GEO and Meta & Google Ads campaigns."
+    }
+  },
+  "nav": {
+    "menu": { "pl": "Menu", "en": "Menu" },
+    "start": { "pl": "Start", "en": "Start" },
+    "work": { "pl": "Realizacje", "en": "Work" },
+    "services": { "pl": "Usługi", "en": "Services" },
+    "process": { "pl": "Proces", "en": "Process" },
+    "faq": { "pl": "FAQ", "en": "FAQ" },
+    "team": { "pl": "Zespół", "en": "Team" },
+    "contact": { "pl": "Kontakt", "en": "Contact" }
+  },
+  "preloader": {
+    "label": { "pl": "Inicjalizacja sygnału", "en": "Initializing signal" }
+  },
+  "hero": {
+    "scroll": { "pl": "Przewiń", "en": "Scroll" },
+    "act1_lead": {
+      "pl": "Twój biznes zasługuje na sygnał.",
+      "en": "Your business deserves the signal."
+    },
+    "act1_sub": {
+      "pl": "Strony, systemy, kreacja i wzrost — zaprojektowane jako jeden ekosystem.",
+      "en": "Websites, systems, creative and growth — designed as one ecosystem."
+    },
+    "act2_lead": {
+      "pl": "Tworzymy strony i produkty,<br />które wyglądają jak dzieła.",
+      "en": "We build websites and products<br />that feel like art."
+    },
+    "act3_lead": {
+      "pl": "Automatyzujemy ecommerce.<br />CRM, który pracuje za Ciebie.",
+      "en": "We automate ecommerce.<br />CRM that works for you."
+    },
+    "act4_lead": {
+      "pl": "Grafika. Montaż. Social.<br />Treści, które zatrzymują scroll.",
+      "en": "Design. Edit. Social.<br />Content that stops the scroll."
+    },
+    "act5_lead": {
+      "pl": "SEO, GEO, Meta Ads, Google Ads.<br />Wzrost mierzony danymi.",
+      "en": "SEO, GEO, Meta Ads, Google Ads.<br />Growth measured in data."
+    },
+    "act6_lead": {
+      "pl": "Zacznijmy od bezpłatnego audytu.",
+      "en": "Let's start with a free audit."
+    },
+    "act4_sub": {
+      "pl": "Pozwól technologii pracować za Ciebie, podczas gdy Ty skupisz się na biznesie.",
+      "en": "Let technology work for you while you focus on the business."
+    }
+  },
+  "work": {
+    "eyebrow": { "pl": "Realizacje", "en": "Selected work" },
+    "title": {
+      "pl": "Sygnatury, które wysłaliśmy w świat.",
+      "en": "Signatures we've sent into the world."
+    },
+    "visit": { "pl": "Zobacz live", "en": "View live" }
+  },
+  "services": {
+    "eyebrow": { "pl": "Usługi", "en": "Services" },
+    "title": {
+      "pl": "Co budujemy dla Ciebie",
+      "en": "What we build for you"
+    }
+  },
+  "process": {
+    "eyebrow": { "pl": "Jak pracujemy?", "en": "How we work" },
+    "title": { "pl": "Transparentny proces", "en": "Transparent process" },
+    "lead": {
+      "pl": "Od audytu po wdrożenie — bez niedomówień.",
+      "en": "From audit to launch — no guesswork."
+    }
+  },
+  "faq": {
+    "eyebrow": { "pl": "FAQ", "en": "FAQ" },
+    "title": { "pl": "Pytania, które i tak zadasz", "en": "Questions you'll ask anyway" }
+  },
+  "team": {
+    "title": { "pl": "Zespół cosgral.agency", "en": "The cosgral.agency team" },
+    "decor1": { "pl": "Kod, kadr", "en": "Code, frame" },
+    "decor2": { "pl": "i motion w jednym studio", "en": "and motion in one studio" }
+  },
+  "form": {
+    "name": { "pl": "Imię", "en": "Name" },
+    "email": { "pl": "Email*", "en": "Email*" },
+    "company": { "pl": "Firma", "en": "Company" },
+    "message": { "pl": "Wiadomość", "en": "Message" },
+    "submit": { "pl": "Wyślij", "en": "Send" },
+    "placeholder_message": {
+      "pl": "Cześć! Opowiedz nam o swoim projekcie…",
+      "en": "Hi! Tell us about your project…"
+    }
+  },
+  "footer": {
+    "wordmark": { "pl": "cosgral agency", "en": "cosgral agency" },
+    "sections": { "pl": "Sekcje", "en": "Sections" },
+    "services": { "pl": "Usługi", "en": "Services" },
+    "contact": { "pl": "Kontakt", "en": "Contact" },
+    "social": { "pl": "Social", "en": "Social" },
+    "audit": { "pl": "Bezpłatny audyt →", "en": "Free audit →" },
+    "privacy": { "pl": "Privacy Policy", "en": "Privacy Policy" },
+    "copyright": { "pl": "© 2026 cosgral agency", "en": "© 2026 cosgral agency" }
+  }
+}

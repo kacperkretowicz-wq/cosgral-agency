@@ -1,0 +1,68 @@
+{
+  "projects": [
+    {
+      "id": "trovearchive",
+      "name": "Trove Archive",
+      "url": "https://trovearchive.com/",
+      "tagPl": "Moda luksusowa · Ecommerce",
+      "tagEn": "Luxury fashion · Ecommerce",
+      "cover": "images/cosgral-agency/approved/svc-halftone-silk.jpg"
+    },
+    {
+      "id": "semprelove",
+      "name": "SEMPRE with Love",
+      "url": "https://semprelove.pl/",
+      "tagPl": "Fashion · Sklep online",
+      "tagEn": "Fashion · Online store",
+      "cover": "images/cosgral-agency/approved/svc-halftone-fabric.jpg"
+    },
+    {
+      "id": "logelulu",
+      "name": "LOGE LULU",
+      "url": "https://logelulu.com/",
+      "tagPl": "Moda autorska",
+      "tagEn": "Authorial fashion",
+      "cover": "images/cosgral-agency/approved/svc-prism-cube.jpg"
+    },
+    {
+      "id": "patarrow",
+      "name": "PAT ARROW",
+      "url": "https://patarrow.pl/",
+      "tagPl": "Perfumy · Lifestyle",
+      "tagEn": "Fragrance · Lifestyle",
+      "cover": "images/cosgral-agency/approved/svc-refraction-color.jpg"
+    },
+    {
+      "id": "nkutyla",
+      "name": "NKutyla",
+      "url": "https://nkutyla.com/",
+      "tagPl": "Marka · Portfolio",
+      "tagEn": "Brand · Portfolio",
+      "cover": "images/cosgral-agency/approved/svc-liquid-silver.jpg"
+    },
+    {
+      "id": "dexol",
+      "name": "Dexol",
+      "url": "https://dexol.pl/",
+      "tagPl": "B2B · Przemysł",
+      "tagEn": "B2B · Industrial",
+      "cover": "images/cosgral-agency/approved/svc-ribbed-stairs.jpg"
+    },
+    {
+      "id": "digitall",
+      "name": "Digitall",
+      "url": "https://digitall.com.pl/",
+      "tagPl": "Digital · Agencja",
+      "tagEn": "Digital · Agency",
+      "cover": "images/cosgral-agency/approved/svc-halftone-silk.jpg"
+    },
+    {
+      "id": "joszka",
+      "name": "Joszka",
+      "url": "https://joszka.pl/",
+      "tagPl": "Marka osobista",
+      "tagEn": "Personal brand",
+      "cover": "images/cosgral-agency/approved/svc-halftone-fabric.jpg"
+    }
+  ]
+}
