@@ -3,39 +3,46 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>COSGRAL — strony internetowe, pozycjonowanie SEO/GEO, automatyzacje</title>
-<meta name="description" content="cosgral.agency — strony internetowe, aplikacje, pozycjonowanie SEO i GEO, automatyzacje, systemy CRM oraz grafika i wideo. Przekształcamy śmiałe wizje w precyzyjne rozwiązania cyfrowe." />
+<title>COSGRAL — agencja cyfrowa | strony, wideo, automatyzacje</title>
+<meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-v4.css?v=20260726k" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260730r" />
 <script>
   (function () {
-    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || new URLSearchParams(location.search).has("reduceMotion")) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
       document.documentElement.classList.add("reduce-motion");
     }
   })();
 </script>
 </head>
-<body class="has-page-scroll-bg">
+<body class="home-page">
+
+<canvas id="home-ambient" class="home-ambient" aria-hidden="true"></canvas>
+<div class="home-ambient__blur" aria-hidden="true"></div>
+<div class="home-ambient__shade" aria-hidden="true"></div>
+
+<div class="home-cursor" data-cursor aria-hidden="true">
+  <div class="home-cursor__dot"></div>
+  <div class="home-cursor__ring"></div>
+</div>
+
 <div id="preloader" aria-hidden="true">
   <div class="preloader__inner">
-    <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="72" height="72" />
+    <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" />
     <div class="preloader__counter" id="preloader-counter">000</div>
     <p class="preloader__label" data-i18n="preloader.label">Inicjalizacja sygnału</p>
   </div>
 </div>
-<div id="page-scroll-shell">
-  <div id="page-scroll-content">
+
 <a class="visually-hidden" href="#main">Przejdź do treści</a>
 
-<!-- ============ NAV ============ -->
 <nav class="site-nav" id="site-nav">
-  <a href="#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
-    <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="56" height="56" />
+  <a href="#top" class="site-nav__logo" aria-label="COSGRAL">
+    <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <div class="site-nav__actions">
-    <div class="lang-switch" role="group" aria-label="Język / Language">
+    <div class="lang-switch" role="group" aria-label="Język">
       <button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button>
       <button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button>
     </div>
@@ -45,391 +52,245 @@
     </button>
   </div>
 </nav>
+
 <div class="nav-overlay" id="nav-overlay" data-lenis-prevent>
   <ul class="nav-overlay__list">
     <li><a href="#top" data-nav-close data-i18n="nav.start">Start</a></li>
-    <li><a href="#realizacje" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+    <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
     <li><a href="#uslugi" data-nav-close data-i18n="nav.services">Usługi</a></li>
     <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
     <li><a href="#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
-    <li><a href="#zespol" data-nav-close data-i18n="nav.team">Zespół</a></li>
     <li><a href="#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
   </ul>
 </div>
 
 <main id="main">
 
-<!-- ============ ROZDZIAŁY 1-6 — Black Signal ============ -->
-<section id="top" class="act-wrapper">
-  <div class="act-texts">
-
-    <!-- Rozdział 1 — VOID -->
-    <div class="act act--1" data-act="1" data-chapter="void">
-      <div class="act__hero-media" data-hero-bg-video-wrap aria-hidden="true">
-        <video src="images/cosgral-agency/approved/cosgral-bg-loop.mp4" muted loop playsinline autoplay preload="auto" data-hero-bg-video width="1920" height="1080"></video>
-      </div>
-      <div class="act__bg" aria-hidden="true">
-        <img src="images/cosgral-agency/approved/satin-black.jpg" alt="" />
-      </div>
-      <div class="act__cube-video" aria-hidden="true">
-        <video src="images/cosgral-agency/approved/mirrored-cube-loop.mp4" muted loop playsinline autoplay preload="auto" data-loop-video></video>
-      </div>
-      <div class="hero-heading-wrap">
-        <div class="hero_root_line" aria-hidden="true">
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path class="rl-lead" d="" />
-            <path class="rl-w1" d="" />
-          </svg>
-        </div>
-        <h1 class="hero-wordmark" data-hero-heading="main">COSGRAL</h1>
-      </div>
-      <p class="act__lead" data-i18n="hero.act1_lead" data-i18n-html>Twój biznes zasługuje na sygnał.</p>
-      <p class="act__sub" data-i18n="hero.act1_sub">Strony, systemy, kreacja i wzrost — zaprojektowane jako jeden ekosystem.</p>
-    </div>
-
-    <!-- Rozdział 2 — CREATE -->
-    <div class="act act--2" data-act="2" data-chapter="create">
-      <div class="act__hero-media" aria-hidden="true">
-        <video src="images/cosgral-agency/approved/cosgral-act2-loop.mp4" muted loop playsinline preload="auto" data-act2-bg-video width="1920" height="1080"></video>
-      </div>
-      <h2 class="act__lead" data-i18n="hero.act2_lead" data-i18n-html>Tworzymy strony i produkty,<br />które wyglądają jak dzieła.</h2>
-    </div>
-
-    <!-- Rozdział 3 — AUTOMATE -->
-    <div class="act act--3" data-act="3" data-chapter="automate">
-      <h2 class="act__lead" data-i18n="hero.act3_lead" data-i18n-html>Automatyzujemy ecommerce.<br />CRM, który pracuje za Ciebie.</h2>
-    </div>
-
-    <!-- Rozdział 4 — DESIGN -->
-    <div class="act act--4" data-act="4" data-chapter="design">
-      <div class="act__keys-video" aria-hidden="true">
-        <video src="images/cosgral-agency/approved/keys-loop.mp4" muted loop playsinline autoplay preload="auto" data-loop-video></video>
-      </div>
-      <h2 class="act__lead" data-i18n="hero.act4_lead" data-i18n-html>Grafika. Montaż. Social.<br />Treści, które zatrzymują scroll.</h2>
-    </div>
-
-    <!-- Rozdział 5 — GROW -->
-    <div class="act act--5" data-act="5" data-chapter="grow">
-      <h2 class="act__lead" data-i18n="hero.act5_lead" data-i18n-html>SEO, GEO, Meta Ads, Google Ads.<br />Wzrost mierzony danymi.</h2>
-    </div>
-
-    <!-- Rozdział 6 — CONTACT -->
-    <div class="act act--6" data-act="6" data-chapter="contact" id="kontakt">
-      <video class="mesh-canvas--video mesh-canvas--video-kontakt" autoplay muted loop playsinline aria-hidden="true">
-        <source src="images/cosgral-agency/approved/cinematic-waves.mp4" type="video/mp4" />
-      </video>
-      <h2 class="act__lead" data-i18n="hero.act6_lead">Zacznijmy od bezpłatnego audytu.</h2>
-
-      <form id="audit-form" class="audit-form" name="audit-form" method="post" data-audit-form>
-        <div class="audit-form__row">
-          <label for="audit-name" data-i18n="form.name">Imię</label>
-          <input type="text" id="audit-name" name="name" autocomplete="name" required />
-        </div>
-        <div class="audit-form__row">
-          <label for="audit-email" data-i18n="form.email">Email*</label>
-          <input type="email" id="audit-email" name="email" placeholder="hello@cosgral.agency" autocomplete="email" required />
-        </div>
-        <div class="audit-form__row">
-          <label for="audit-company" data-i18n="form.company">Firma</label>
-          <input type="text" id="audit-company" name="company" autocomplete="organization" />
-        </div>
-        <div class="audit-form__row">
-          <label for="audit-message" data-i18n="form.message">Wiadomość</label>
-          <textarea id="audit-message" name="message" data-i18n="form.placeholder_message" data-i18n-placeholder placeholder="Cześć! Opowiedz nam o swoim projekcie…"></textarea>
-        </div>
-        <button type="submit" class="audit-form__submit glass-btn" data-i18n="form.submit">Wyślij</button>
-        <p class="audit-form__status" data-audit-status role="status" aria-live="polite"></p>
-      </form>
-    </div>
-
+<!-- 1. HERO -->
+<section id="top" class="home-hero">
+  <div class="home-hero__video" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="metadata" src="images/cosgral-agency/approved/cinematic-waves.mp4"></video>
   </div>
-
-  <span class="act-scroll-hint" aria-hidden="true" data-i18n="hero.scroll">Przewiń</span>
+  <div class="home-hero__globe-wrap" aria-hidden="true">
+    <canvas id="hero-3d" class="home-hero__canvas"></canvas>
+  </div>
+  <div class="home-hero__veil" aria-hidden="true"></div>
+  <div class="home-hero__content">
+    <h1 class="home-hero__title" aria-label="COSGRAL">
+      <span class="home-hero__letter">C</span><span class="home-hero__letter">O</span><span class="home-hero__letter">S</span><span class="home-hero__letter">G</span><span class="home-hero__letter">R</span><span class="home-hero__letter">A</span><span class="home-hero__letter">L</span>
+    </h1>
+    <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">WE BUILD DIGITAL EXPERIENCES</p>
+  </div>
+  <a href="#uslugi" class="home-hero__scroll" data-i18n="hero.scroll">
+    <span class="home-hero__scroll-line" aria-hidden="true"></span>
+    Scroll
+  </a>
 </section>
 
-<div class="scroll-sections-wrapper">
-
-<!-- ============ REALIZACJE — portfolio ============ -->
-<section id="realizacje" class="section section--work">
-  <div class="container">
-    <div class="section-head" data-reveal>
-      <span class="section-eyebrow" data-i18n="work.eyebrow">Realizacje</span>
-      <h2 class="section-title" data-i18n="work.title">Sygnatury, które wysłaliśmy w świat.</h2>
-    </div>
-    <div class="work-grid" id="work-grid"></div>
+<!-- 2. USŁUGI — 3D wachlarz -->
+<section id="uslugi" class="services-fan">
+  <div class="container services-fan__head" data-reveal>
+    <p class="section-label" data-i18n="services.eyebrow">Usługi</p>
+    <h2 class="services-fan__title" data-i18n="services.title">Co budujemy dla Ciebie</h2>
   </div>
+
+  <div class="services-fan__controls" data-reveal>
+    <button type="button" class="services-fan__arrow" data-fan-prev aria-label="Poprzednia usługa">←</button>
+    <span class="services-fan__counter" data-fan-counter aria-live="polite">01 / 06</span>
+    <button type="button" class="services-fan__arrow" data-fan-next aria-label="Następna usługa">→</button>
+  </div>
+
+  <div class="services-fan__stage" data-reveal>
+    <div class="services-fan__carousel" data-services-fan>
+      <a class="services-fan__card" href="uslugi/tworzenie-stron-internetowych.html" data-tile-interact>
+        <div class="services-fan__card-media" aria-hidden="true">
+          <video muted loop playsinline preload="metadata" src="assets/stock/hero-abstract.mp4"></video>
+          <div class="services-fan__card-liquid"></div>
+        </div>
+        <span class="services-fan__num">01</span>
+        <span class="services-fan__name">Strony internetowe</span>
+      </a>
+      <a class="services-fan__card" href="uslugi/projektowanie-aplikacji.html" data-tile-interact>
+        <div class="services-fan__card-media" aria-hidden="true">
+          <video muted loop playsinline preload="metadata" src="assets/stock/manifesto-tech.mp4"></video>
+          <div class="services-fan__card-liquid"></div>
+        </div>
+        <span class="services-fan__num">02</span>
+        <span class="services-fan__name">Aplikacje</span>
+      </a>
+      <a class="services-fan__card" href="uslugi/pozycjonowanie-seo-geo.html" data-tile-interact>
+        <div class="services-fan__card-media" aria-hidden="true">
+          <video muted loop playsinline preload="metadata" src="images/cosgral-agency/approved/cosgral-act2-loop.mp4"></video>
+          <div class="services-fan__card-liquid"></div>
+        </div>
+        <span class="services-fan__num">03</span>
+        <span class="services-fan__name">Pozycjonowanie SEO &amp; GEO</span>
+      </a>
+      <a class="services-fan__card" href="uslugi/wdrazanie-automatyzacji.html" data-tile-interact>
+        <div class="services-fan__card-media" aria-hidden="true">
+          <video muted loop playsinline preload="metadata" src="images/cosgral-agency/approved/keys-loop.mp4"></video>
+          <div class="services-fan__card-liquid"></div>
+        </div>
+        <span class="services-fan__num">04</span>
+        <span class="services-fan__name">Automatyzacje</span>
+      </a>
+      <a class="services-fan__card" href="uslugi/systemy-crm.html" data-tile-interact>
+        <div class="services-fan__card-media" aria-hidden="true">
+          <video muted loop playsinline preload="metadata" src="images/cosgral-agency/approved/mirrored-cube-loop.mp4"></video>
+          <div class="services-fan__card-liquid"></div>
+        </div>
+        <span class="services-fan__num">05</span>
+        <span class="services-fan__name">Systemy CRM</span>
+      </a>
+      <a class="services-fan__card" href="uslugi/grafika-i-montaz-wideo.html" data-tile-interact>
+        <div class="services-fan__card-media" aria-hidden="true">
+          <video muted loop playsinline preload="metadata" src="assets/stock/service-creative.mp4"></video>
+          <div class="services-fan__card-liquid"></div>
+        </div>
+        <span class="services-fan__num">06</span>
+        <span class="services-fan__name">Grafika i montaż wideo</span>
+      </a>
+    </div>
+  </div>
+  <p class="services-fan__hint" data-reveal>← → strzałki na klawiaturze</p>
 </section>
 
-<!-- ============ USŁUGI ============ -->
-<section id="uslugi" class="section services">
-  <canvas class="mesh-canvas" data-mesh-canvas="mesh" aria-hidden="true"></canvas>
-  <div class="container">
-    <div class="section-head" data-reveal>
-      <span class="section-eyebrow" data-i18n="services.eyebrow">Usługi</span>
-      <h2 class="section-title" data-i18n="services.title">Co budujemy dla Ciebie</h2>
-    </div>
+<!-- 3. PROCES -->
+<section id="proces" class="home-process">
+  <div class="container" data-reveal>
+    <p class="section-label" data-i18n="process.eyebrow">Jak pracujemy?</p>
+    <h2 class="home-services__title" data-i18n="process.title">Transparentny proces</h2>
+    <p class="home-process__lead" data-i18n="process.lead">Od audytu po wdrożenie — bez niedomówień.</p>
   </div>
-
-  <!-- Port .section_pillars: heading Review 900 + rectangle hover-wipe + dim pozostałych.
-       6 usług (pełna oferta z SEO/GEO) — każda linkuje do swojej podstrony. -->
-  <div class="container pillars_container">
-    <div class="pillars_wrapper">
-      <a class="pillar left" href="uslugi/tworzenie-stron-internetowych.html">
-        <div class="pillar_heading_wrapper">
-          <div class="pillar_heading heading-h2-review" data-heading-pillars>Tworzenie stron<span class="pillar_heading_num"> 01</span></div>
-          <div class="pillar_heading_rectangle" aria-hidden="true"></div>
-        </div>
-        <div class="pillar_content" data-body-pillars><p>Strony i landingi z pinned scroll, GSAP i WebGL — pod Twój brand, nie z szablonu.</p></div>
-      </a>
-      <a class="pillar right" href="uslugi/projektowanie-aplikacji.html">
-        <div class="pillar_heading_wrapper right">
-          <div class="pillar_heading heading-h2-review reverse" data-heading-pillars><span class="pillar_heading_num">02 </span>Aplikacje</div>
-          <div class="pillar_heading_rectangle" aria-hidden="true"></div>
-        </div>
-        <div class="pillar_content" data-body-pillars><p>Panele klienckie, portale B2B i narzędzia wewnętrzne skrojone pod Twój proces.</p></div>
-      </a>
-      <a class="pillar left" href="uslugi/pozycjonowanie-seo-geo.html">
-        <div class="pillar_heading_wrapper">
-          <div class="pillar_heading heading-h2-review" data-heading-pillars>Pozycjonowanie<span class="pillar_heading_num"> 03</span></div>
-          <div class="pillar_heading_rectangle" aria-hidden="true"></div>
-        </div>
-        <div class="pillar_content" data-body-pillars><p>SEO i GEO — widoczność w Google i w odpowiedziach AI. Technika, treści, dane strukturalne.</p></div>
-      </a>
-      <a class="pillar right" href="uslugi/wdrazanie-automatyzacji.html">
-        <div class="pillar_heading_wrapper right">
-          <div class="pillar_heading heading-h2-review reverse" data-heading-pillars><span class="pillar_heading_num">04 </span>Automatyzacje</div>
-          <div class="pillar_heading_rectangle" aria-hidden="true"></div>
-        </div>
-        <div class="pillar_content" data-body-pillars><p>Powtarzalną pracę oddaj botom — mniej błędów, więcej czasu na biznes.</p></div>
-      </a>
-      <a class="pillar left" href="uslugi/systemy-crm.html">
-        <div class="pillar_heading_wrapper">
-          <div class="pillar_heading heading-h2-review" data-heading-pillars>Systemy CRM<span class="pillar_heading_num"> 05</span></div>
-          <div class="pillar_heading_rectangle" aria-hidden="true"></div>
-        </div>
-        <div class="pillar_content" data-body-pillars><p>Jedno źródło prawdy o kliencie i uporządkowany lejek sprzedaży.</p></div>
-      </a>
-      <a class="pillar right" href="uslugi/grafika-i-montaz-wideo.html">
-        <div class="pillar_heading_wrapper right">
-          <div class="pillar_heading heading-h2-review reverse" data-heading-pillars><span class="pillar_heading_num">06 </span>Grafika i wideo</div>
-          <div class="pillar_heading_rectangle" aria-hidden="true"></div>
-        </div>
-        <div class="pillar_content" data-body-pillars><p>Wizualizacje, reels i motion post — od briefu do finalnego grade.</p></div>
-      </a>
+  <div class="home-process__steps container">
+    <div class="home-process__step is-active" data-tile-interact data-reveal>
+      <span class="home-process__num">01</span>
+      <div>
+        <h3 class="home-process__step-title">Discovery (Audyt i Analiza)</h3>
+        <p class="home-process__step-body">Diagnozujemy wąskie gardła w Twojej firmie.</p>
+      </div>
     </div>
-  </div>
-</section>
-
-<!-- SEKCJA "Realizacje" usunięta świadomie (2026-07-20): duplikowała Usługi
-     (karty "Usługa: 01/05" linkowały do tych samych podstron) i niosła treści
-     z fashion-klonu (AI Shoot, editorial) niezwiązane z ofertą agencji.
-     TODO(człowiek): przywrócić jako case studies, gdy będą realne realizacje. -->
-
-<!-- ============ SEKCJA 6 — proces ============ -->
-<section id="proces" class="section process">
-  <canvas class="mesh-canvas mesh-canvas--metal" data-mesh-canvas="liquid-metal" aria-hidden="true"></canvas>
-  <div class="container">
-    <div class="section-head" data-reveal>
-      <span class="section-eyebrow" data-i18n="process.eyebrow">Jak pracujemy?</span>
-      <h2 class="section-title" data-i18n="process.title">Transparentny proces</h2>
-      <p class="section-lead" data-i18n="process.lead">Od audytu po wdrożenie — bez niedomówień.</p>
+    <div class="home-process__step" data-tile-interact data-reveal>
+      <span class="home-process__num">02</span>
+      <div>
+        <h3 class="home-process__step-title">Strategia i Architektura</h3>
+        <p class="home-process__step-body">Dobieramy narzędzia i projektujemy przepływ pracy.</p>
+      </div>
     </div>
-
-    <div class="process-steps">
-      <div class="process-step" data-reveal>
-        <span class="process-step__num">01</span>
-        <div>
-          <p class="process-step__label">Workflow</p>
-          <h3 class="process-step__title">Discovery (Audyt i Analiza)</h3>
-          <p class="process-step__body">Diagnozujemy wąskie gardła w Twojej firmie.</p>
-        </div>
+    <div class="home-process__step" data-tile-interact data-reveal>
+      <span class="home-process__num">03</span>
+      <div>
+        <h3 class="home-process__step-title">Wdrożenie i Development</h3>
+        <p class="home-process__step-body">Budujemy, kodujemy i integrujemy ekosystem.</p>
       </div>
-      <div class="process-step" data-reveal>
-        <span class="process-step__num">02</span>
-        <div>
-          <p class="process-step__label">Workflow</p>
-          <h3 class="process-step__title">Strategia i Architektura</h3>
-          <p class="process-step__body">Dobieramy narzędzia i projektujemy przepływ pracy.</p>
-        </div>
-      </div>
-      <div class="process-step" data-reveal>
-        <span class="process-step__num">03</span>
-        <div>
-          <p class="process-step__label">Workflow</p>
-          <h3 class="process-step__title">Wdrożenie i Development</h3>
-          <p class="process-step__body">Budujemy, kodujemy i integrujemy ekosystem.</p>
-        </div>
-      </div>
-      <div class="process-step" data-reveal>
-        <span class="process-step__num">04</span>
-        <div>
-          <p class="process-step__label">Workflow</p>
-          <h3 class="process-step__title">Optymalizacja i Wsparcie</h3>
-          <p class="process-step__body">Szkolimy i dbamy o bezawaryjne działanie.</p>
-        </div>
+    </div>
+    <div class="home-process__step" data-tile-interact data-reveal>
+      <span class="home-process__num">04</span>
+      <div>
+        <h3 class="home-process__step-title">Optymalizacja i Wsparcie</h3>
+        <p class="home-process__step-body">Szkolimy i dbamy o bezawaryjne działanie.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ SEKCJA 7 — FAQ ============ -->
-<section id="faq" class="section faq">
-  <div class="container">
-    <div class="section-head" data-reveal>
-      <span class="section-eyebrow" data-i18n="faq.eyebrow">FAQ</span>
-      <h2 class="section-title" data-i18n="faq.title">Pytania, które i tak zadasz</h2>
-    </div>
-
-    <div class="faq-list">
-      <div class="faq-item" data-open="false" data-reveal>
-        <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-          <span>Ile kosztuje wdrożenie CRM lub nowej strony?</span>
-          <span class="faq-item__icon" aria-hidden="true">+</span>
-        </button>
-        <div class="faq-item__a">
-          <div class="faq-item__a-inner">
-            <!-- TODO(człowiek): potwierdzić realną kwotę startową -->
-            <p>Zależy od skali projektu. Nasze wdrożenia zaczynają się od <strong>[X 000] PLN</strong> — dokładną wycenę dostajesz po kroku Discovery, kiedy znamy realny zakres. Bez ukrytych kosztów i bez „wyceny z sufitu”.</p>
-          </div>
-        </div>
-      </div>
-      <div class="faq-item" data-open="false" data-reveal>
-        <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-          <span>Ile potrwa realizacja?</span>
-          <span class="faq-item__icon" aria-hidden="true">+</span>
-        </button>
-        <div class="faq-item__a">
-          <div class="faq-item__a-inner">
-            <p>Landing strona: 2–3 tygodnie. Rozbudowana strona firmowa: 4–6 tygodni. Wdrożenie CRM lub automatyzacji: 3–8 tygodni, zależnie od integracji. Dokładny harmonogram ustalamy po kroku Discovery — dostajesz go na piśmie, zanim zaczynamy.</p>
-          </div>
-        </div>
-      </div>
-      <div class="faq-item" data-open="false" data-reveal>
-        <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-          <span>Czy muszę znać się na technologii, żeby z Wami współpracować?</span>
-          <span class="faq-item__icon" aria-hidden="true">+</span>
-        </button>
-        <div class="faq-item__a">
-          <div class="faq-item__a-inner">
-            <p>Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje w prostym języku, pokazujemy postępy na bieżąco i podejmujemy z Tobą tylko te decyzje, które faktycznie wpływają na biznes. Ty skupiasz się na firmie, my na wykonaniu.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- 4. FAQ -->
+<section id="faq" class="home-faq">
+  <h2 class="home-faq__title" data-reveal data-i18n="faq.title">Pytania, które i tak zadasz</h2>
+  <div class="faq-item" data-open="false" data-reveal>
+    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
+      <span>Ile kosztuje wdrożenie CRM lub nowej strony?</span>
+      <span class="faq-item__icon" aria-hidden="true">+</span>
+    </button>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p>Zależy od skali projektu. Wycenę dostajesz po Discovery — bez ukrytych kosztów.</p></div></div>
+  </div>
+  <div class="faq-item" data-open="false" data-reveal>
+    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
+      <span>Ile potrwa realizacja?</span>
+      <span class="faq-item__icon" aria-hidden="true">+</span>
+    </button>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p>Landing: 2–3 tygodnie. Strona firmowa: 4–6 tygodni. CRM/automatyzacja: 3–8 tygodni.</p></div></div>
+  </div>
+  <div class="faq-item" data-open="false" data-reveal>
+    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
+      <span>Czy muszę znać się na technologii?</span>
+      <span class="faq-item__icon" aria-hidden="true">+</span>
+    </button>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p>Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje prostym językiem.</p></div></div>
   </div>
 </section>
 
-<!-- ============ SEKCJA 8 — zespół (port 1:1 .section_history ze starej strony) ============ -->
-<section id="zespol" class="section_history">
-  <div class="container history_container">
-    <div class="history_head" data-reveal>
-      <h2 class="history_heading" data-i18n="team.title">Zespół cosgral.agency</h2>
-      <div class="history_decor">
-        <div class="u-p2" data-i18n="team.decor1">Kod, kadr</div>
-        <div class="u-p2" data-i18n="team.decor2">i motion w jednym studio</div>
+<!-- 5. KONTAKT -->
+<section id="kontakt" class="home-contact">
+  <div class="home-contact__video" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="metadata" src="assets/stock/contact-cinematic.mp4"></video>
+  </div>
+  <canvas id="contact-3d" class="home-contact__canvas" aria-hidden="true"></canvas>
+  <div class="home-contact__shade" aria-hidden="true"></div>
+  <div class="home-contact__inner" data-reveal>
+    <h2 class="home-contact__title" data-i18n="hero.act6_lead">Zacznijmy od bezpłatnego audytu.</h2>
+    <form id="audit-form" class="audit-form" method="post" data-audit-form data-lenis-prevent>
+      <div class="audit-form__row">
+        <label for="audit-name" data-i18n="form.name">Imię</label>
+        <input type="text" id="audit-name" name="name" autocomplete="name" required />
       </div>
-    </div>
-    <div class="history_steps_wrapper">
-      <div class="history_team">
-        <div class="history_team_card" data-team-card>
-          <!-- TODO(człowiek): wstawić realny portret — do tego czasu typograficzny monogram. -->
-          <div class="history_team_media">
-            <div class="history_team_media_shade" aria-hidden="true"></div>
-            <div class="history_team_placeholder" aria-hidden="true">KK</div>
-          </div>
-          <div class="history_team_info">
-            <p class="history_team_role">Co-Founder &amp; Managing Partner</p>
-            <p class="history_team_name">Kacper<br /><span>Kosikowski</span></p>
-            <div class="history_team_row">
-              <a href="#kontakt" class="history_team_cta" aria-label="Poznaj Kacpra Kosikowskiego">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </a>
-              <p class="history_team_bio">Specjalista motion designu. Projektuje animacje, przejścia i interakcje, które nadają markom charakter — od koncepcji ruchu po dopracowane wdrożenie na stronie.</p>
-            </div>
-          </div>
-        </div>
-        <div class="history_team_card is-right" data-team-card>
-          <div class="history_team_media">
-            <div class="history_team_media_shade" aria-hidden="true"></div>
-            <div class="history_team_placeholder" aria-hidden="true">JG</div>
-          </div>
-          <div class="history_team_info">
-            <p class="history_team_role">Co-Founder &amp; Managing Partner</p>
-            <p class="history_team_name">Jakub<br /><span>Gral</span></p>
-            <div class="history_team_row">
-              <a href="#kontakt" class="history_team_cta" aria-label="Poznaj Jakuba Grala">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </a>
-              <p class="history_team_bio">Specjalista montażu wideo i rolek. Tworzy dynamiczne materiały na strony i social media — od selekcji ujęć i rytmu cięć po color grading i finalny eksport.</p>
-            </div>
-          </div>
-        </div>
+      <div class="audit-form__row">
+        <label for="audit-email" data-i18n="form.email">Email*</label>
+        <input type="email" id="audit-email" name="email" placeholder="hello@cosgral.agency" autocomplete="email" required />
       </div>
-    </div>
+      <div class="audit-form__row">
+        <label for="audit-company" data-i18n="form.company">Firma</label>
+        <input type="text" id="audit-company" name="company" autocomplete="organization" />
+      </div>
+      <div class="audit-form__row">
+        <label for="audit-message" data-i18n="form.message">Wiadomość</label>
+        <textarea id="audit-message" name="message" data-i18n="form.placeholder_message" data-i18n-placeholder placeholder="Opowiedz nam o projekcie…"></textarea>
+      </div>
+      <button type="submit" class="btn btn--primary audit-form__submit" data-i18n="form.submit">Wyślij</button>
+      <p class="audit-form__status" data-audit-status role="status" aria-live="polite"></p>
+    </form>
   </div>
 </section>
 
 </main>
 
-<!-- ============ STOPKA ============ -->
-<!-- Stopka — jasny motyw z rozmytym cosgral-approved-footer.jpg (port ze starej strony) -->
 <footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-cta">
-        <p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p>
-      </div>
-      <div class="footer-col">
-        <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
-        <ul>
-          <li><a href="#top" data-i18n="nav.start">Start</a></li>
-          <li><a href="#realizacje" data-i18n="nav.work">Realizacje</a></li>
-          <li><a href="#uslugi" data-i18n="nav.services">Usługi</a></li>
-          <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
-          <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
-          <li><a href="#zespol" data-i18n="nav.team">Zespół</a></li>
-          <li><a href="#kontakt" data-i18n="nav.contact">Kontakt</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
-        <ul>
-          <li><a href="uslugi/tworzenie-stron-internetowych.html">Strony internetowe</a></li>
-          <li><a href="uslugi/projektowanie-aplikacji.html">Aplikacje</a></li>
-          <li><a href="uslugi/pozycjonowanie-seo-geo.html">Pozycjonowanie SEO/GEO</a></li>
-          <li><a href="uslugi/wdrazanie-automatyzacji.html">Automatyzacje</a></li>
-          <li><a href="uslugi/systemy-crm.html">Systemy CRM</a></li>
-          <li><a href="uslugi/grafika-i-montaz-wideo.html">Grafika i wideo</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
-        <ul>
-          <li><a href="mailto:hello@cosgral.agency">hello@cosgral.agency</a></li>
-          <li><a href="#kontakt" data-i18n="footer.audit">Bezpłatny audyt →</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <p class="footer-col__title" data-i18n="footer.social">Social</p>
-        <ul>
-          <!-- TODO(człowiek): podmienić na realne profile -->
-          <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
-          <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a></li>
-        </ul>
-      </div>
+  <div class="footer-grid container">
+    <div class="footer-cta">
+      <p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p>
     </div>
-    <div class="footer-bottom">
-      <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
-      <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
+    <div class="footer-col">
+      <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
+      <ul>
+        <li><a href="#top" data-i18n="nav.start">Start</a></li>
+        <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="#uslugi" data-i18n="nav.services">Usługi</a></li>
+        <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
+        <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="#kontakt" data-i18n="nav.contact">Kontakt</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
+      <ul>
+        <li><a href="uslugi/tworzenie-stron-internetowych.html">Strony</a></li>
+        <li><a href="uslugi/grafika-i-montaz-wideo.html">Wideo</a></li>
+        <li><a href="uslugi/systemy-crm.html">CRM</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
+      <ul>
+        <li><a href="mailto:hello@cosgral.agency">hello@cosgral.agency</a></li>
+      </ul>
     </div>
   </div>
+  <div class="footer-bottom container">
+    <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
+    <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
+  </div>
 </footer>
-</div> <!-- Koniec scroll-sections-wrapper -->
 
-</div><!-- #page-scroll-content -->
-</div><!-- #page-scroll-shell -->
-
-<!-- ============ SCRIPTS ============ -->
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
@@ -437,12 +298,12 @@
 <script src="i18n.js"></script>
 <script src="preloader.js"></script>
 <script src="smooth-scroll.js"></script>
-<script src="page-scroll-bg.js"></script>
-<script src="hero-cube-video.js"></script>
-<script src="hero-text-reveal.js"></script>
-<script src="chapter-director.js"></script>
-<script type="module" src="mesh-gradient-bg.js"></script>
-<script src="portfolio-gallery.js"></script>
-<script src="sections.js"></script>
+<script src="home-cursor-field.js"></script>
+<script src="home-ambient-bg.js"></script>
+<script type="module" src="home-hero-3d.js"></script>
+<script src="home-cursor.js"></script>
+<script src="home-services-fan.js"></script>
+<script src="home-tile-interact.js"></script>
+<script src="home-director.js"></script>
 </body>
 </html>

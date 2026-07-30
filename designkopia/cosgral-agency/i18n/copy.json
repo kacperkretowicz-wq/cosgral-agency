@@ -10,20 +10,50 @@
     }
   },
   "nav": {
-    "menu": { "pl": "Menu", "en": "Menu" },
-    "start": { "pl": "Start", "en": "Start" },
-    "work": { "pl": "Realizacje", "en": "Work" },
-    "services": { "pl": "Usługi", "en": "Services" },
-    "process": { "pl": "Proces", "en": "Process" },
-    "faq": { "pl": "FAQ", "en": "FAQ" },
-    "team": { "pl": "Zespół", "en": "Team" },
-    "contact": { "pl": "Kontakt", "en": "Contact" }
+    "menu": {
+      "pl": "Menu",
+      "en": "Menu"
+    },
+    "start": {
+      "pl": "Start",
+      "en": "Start"
+    },
+    "work": {
+      "pl": "Realizacje",
+      "en": "Work"
+    },
+    "services": {
+      "pl": "Usługi",
+      "en": "Services"
+    },
+    "process": {
+      "pl": "Proces",
+      "en": "Process"
+    },
+    "faq": {
+      "pl": "FAQ",
+      "en": "FAQ"
+    },
+    "team": {
+      "pl": "Zespół",
+      "en": "Team"
+    },
+    "contact": {
+      "pl": "Kontakt",
+      "en": "Contact"
+    }
   },
   "preloader": {
-    "label": { "pl": "Inicjalizacja sygnału", "en": "Initializing signal" }
+    "label": {
+      "pl": "Inicjalizacja sygnału",
+      "en": "Initializing signal"
+    }
   },
   "hero": {
-    "scroll": { "pl": "Przewiń", "en": "Scroll" },
+    "scroll": {
+      "pl": "Przewiń",
+      "en": "Scroll"
+    },
     "act1_lead": {
       "pl": "Twój biznes zasługuje na sygnał.",
       "en": "Your business deserves the signal."
@@ -55,59 +85,140 @@
     "act4_sub": {
       "pl": "Pozwól technologii pracować za Ciebie, podczas gdy Ty skupisz się na biznesie.",
       "en": "Let technology work for you while you focus on the business."
+    },
+    "monopo_tagline": {
+      "pl": "WE BUILD DIGITAL EXPERIENCES",
+      "en": "WE BUILD DIGITAL EXPERIENCES"
+    },
+    "monopo_eyebrow": {
+      "pl": "Agencja kreatywna oparta na designie",
+      "en": "Design-led creative agency"
+    },
+    "watchReel": {
+      "pl": "Obejrzyj reel",
+      "en": "Watch reel"
     }
   },
   "work": {
-    "eyebrow": { "pl": "Realizacje", "en": "Selected work" },
+    "eyebrow": {
+      "pl": "Realizacje",
+      "en": "Selected work"
+    },
     "title": {
       "pl": "Sygnatury, które wysłaliśmy w świat.",
       "en": "Signatures we've sent into the world."
     },
-    "visit": { "pl": "Zobacz live", "en": "View live" }
+    "visit": {
+      "pl": "Zobacz live",
+      "en": "View live"
+    }
   },
   "services": {
-    "eyebrow": { "pl": "Usługi", "en": "Services" },
+    "eyebrow": {
+      "pl": "Usługi",
+      "en": "Services"
+    },
     "title": {
       "pl": "Co budujemy dla Ciebie",
       "en": "What we build for you"
     }
   },
   "process": {
-    "eyebrow": { "pl": "Jak pracujemy?", "en": "How we work" },
-    "title": { "pl": "Transparentny proces", "en": "Transparent process" },
+    "eyebrow": {
+      "pl": "Jak pracujemy?",
+      "en": "How we work"
+    },
+    "title": {
+      "pl": "Transparentny proces",
+      "en": "Transparent process"
+    },
     "lead": {
       "pl": "Od audytu po wdrożenie — bez niedomówień.",
       "en": "From audit to launch — no guesswork."
     }
   },
   "faq": {
-    "eyebrow": { "pl": "FAQ", "en": "FAQ" },
-    "title": { "pl": "Pytania, które i tak zadasz", "en": "Questions you'll ask anyway" }
+    "eyebrow": {
+      "pl": "FAQ",
+      "en": "FAQ"
+    },
+    "title": {
+      "pl": "Pytania, które i tak zadasz",
+      "en": "Questions you'll ask anyway"
+    }
   },
   "team": {
-    "title": { "pl": "Zespół cosgral.agency", "en": "The cosgral.agency team" },
-    "decor1": { "pl": "Kod, kadr", "en": "Code, frame" },
-    "decor2": { "pl": "i motion w jednym studio", "en": "and motion in one studio" }
+    "title": {
+      "pl": "Zespół cosgral.agency",
+      "en": "The cosgral.agency team"
+    },
+    "decor1": {
+      "pl": "Kod, kadr",
+      "en": "Code, frame"
+    },
+    "decor2": {
+      "pl": "i motion w jednym studio",
+      "en": "and motion in one studio"
+    }
   },
   "form": {
-    "name": { "pl": "Imię", "en": "Name" },
-    "email": { "pl": "Email*", "en": "Email*" },
-    "company": { "pl": "Firma", "en": "Company" },
-    "message": { "pl": "Wiadomość", "en": "Message" },
-    "submit": { "pl": "Wyślij", "en": "Send" },
+    "name": {
+      "pl": "Imię",
+      "en": "Name"
+    },
+    "email": {
+      "pl": "Email*",
+      "en": "Email*"
+    },
+    "company": {
+      "pl": "Firma",
+      "en": "Company"
+    },
+    "message": {
+      "pl": "Wiadomość",
+      "en": "Message"
+    },
+    "submit": {
+      "pl": "Wyślij",
+      "en": "Send"
+    },
     "placeholder_message": {
       "pl": "Cześć! Opowiedz nam o swoim projekcie…",
       "en": "Hi! Tell us about your project…"
     }
   },
   "footer": {
-    "wordmark": { "pl": "cosgral agency", "en": "cosgral agency" },
-    "sections": { "pl": "Sekcje", "en": "Sections" },
-    "services": { "pl": "Usługi", "en": "Services" },
-    "contact": { "pl": "Kontakt", "en": "Contact" },
-    "social": { "pl": "Social", "en": "Social" },
-    "audit": { "pl": "Bezpłatny audyt →", "en": "Free audit →" },
-    "privacy": { "pl": "Privacy Policy", "en": "Privacy Policy" },
-    "copyright": { "pl": "© 2026 cosgral agency", "en": "© 2026 cosgral agency" }
+    "wordmark": {
+      "pl": "cosgral agency",
+      "en": "cosgral agency"
+    },
+    "sections": {
+      "pl": "Sekcje",
+      "en": "Sections"
+    },
+    "services": {
+      "pl": "Usługi",
+      "en": "Services"
+    },
+    "contact": {
+      "pl": "Kontakt",
+      "en": "Contact"
+    },
+    "social": {
+      "pl": "Social",
+      "en": "Social"
+    },
+    "audit": {
+      "pl": "Bezpłatny audyt →",
+      "en": "Free audit →"
+    },
+    "privacy": {
+      "pl": "Privacy Policy",
+      "en": "Privacy Policy"
+    },
+    "copyright": {
+      "pl": "© 2026 cosgral agency",
+      "en": "© 2026 cosgral agency"
+    }
   }
 }
