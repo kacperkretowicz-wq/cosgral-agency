@@ -14,6 +14,7 @@
     var video = card.querySelector("video");
 
     card.addEventListener("mouseenter", function () {
+      if (!card.classList.contains("is-active")) return;
       card.classList.add("is-hovered");
       if (video) video.play().catch(function () {});
     });
@@ -23,10 +24,11 @@
       card.style.setProperty("--lx", "50%");
       card.style.setProperty("--ly", "50%");
       if (media) media.style.transform = "";
-      if (video) video.pause();
+      if (video && !card.classList.contains("is-active")) video.pause();
     });
 
     card.addEventListener("mousemove", function (e) {
+      if (!card.classList.contains("is-active")) return;
       var r = card.getBoundingClientRect();
       var x = ((e.clientX - r.left) / r.width) * 100;
       var y = ((e.clientY - r.top) / r.height) * 100;

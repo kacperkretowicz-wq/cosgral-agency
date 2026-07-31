@@ -7,7 +7,7 @@
 <meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260730r" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260731au" />
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -21,6 +21,13 @@
 <canvas id="home-ambient" class="home-ambient" aria-hidden="true"></canvas>
 <div class="home-ambient__blur" aria-hidden="true"></div>
 <div class="home-ambient__shade" aria-hidden="true"></div>
+<canvas id="home-sand" class="home-sand" aria-hidden="true"></canvas>
+
+<div class="home-thump" aria-hidden="true">
+  <div class="home-thump__ring"></div>
+  <div class="home-thump__ring home-thump__ring--late"></div>
+  <div class="home-thump__ring home-thump__ring--soft"></div>
+</div>
 
 <div class="home-cursor" data-cursor aria-hidden="true">
   <div class="home-cursor__dot"></div>
@@ -64,16 +71,17 @@
   </ul>
 </div>
 
-<main id="main">
+<div class="home-scene-curtain" data-scene-curtain aria-hidden="true"></div>
+
+<div class="home-cube-portal" aria-hidden="true">
+  <canvas id="hero-3d" class="home-hero__canvas"></canvas>
+</div>
+
+<main id="main" class="home-film">
 
 <!-- 1. HERO -->
-<section id="top" class="home-hero">
-  <div class="home-hero__video" aria-hidden="true">
-    <video autoplay muted loop playsinline preload="metadata" src="images/cosgral-agency/approved/cinematic-waves.mp4"></video>
-  </div>
-  <div class="home-hero__globe-wrap" aria-hidden="true">
-    <canvas id="hero-3d" class="home-hero__canvas"></canvas>
-  </div>
+<section id="top" class="home-hero home-scene">
+  <div class="home-scene__panel">
   <div class="home-hero__veil" aria-hidden="true"></div>
   <div class="home-hero__content">
     <h1 class="home-hero__title" aria-label="COSGRAL">
@@ -81,26 +89,46 @@
     </h1>
     <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">WE BUILD DIGITAL EXPERIENCES</p>
   </div>
-  <a href="#uslugi" class="home-hero__scroll" data-i18n="hero.scroll">
+  <a href="#rozpad" class="home-hero__scroll" data-i18n="hero.scroll">
     <span class="home-hero__scroll-line" aria-hidden="true"></span>
     Scroll
   </a>
+  </div>
 </section>
 
-<!-- 2. USŁUGI — 3D wachlarz -->
-<section id="uslugi" class="services-fan">
-  <div class="container services-fan__head" data-reveal>
-    <p class="section-label" data-i18n="services.eyebrow">Usługi</p>
-    <h2 class="services-fan__title" data-i18n="services.title">Co budujemy dla Ciebie</h2>
+<!-- 2. ROZPAD — tylko przejście sześcian → piasek (bez treści UI) -->
+<section id="rozpad" class="home-shatter home-scene" aria-label="Rozpad formy" aria-hidden="true">
+  <div class="home-scene__panel">
+    <p class="home-shatter__caption">Materia w ruchu</p>
+  </div>
+</section>
+
+<!-- 3. USŁUGI — kafelki z oddali -->
+<section id="uslugi" class="services-fan home-scene">
+  <div class="home-scene__panel">
+  <div class="container services-fan__head">
+    <p class="section-label" data-enter="left" data-i18n="services.eyebrow">Usługi</p>
+    <h2 class="services-fan__title" data-reveal-words data-i18n="services.title">Co robimy</h2>
   </div>
 
-  <div class="services-fan__controls" data-reveal>
-    <button type="button" class="services-fan__arrow" data-fan-prev aria-label="Poprzednia usługa">←</button>
+  <div class="services-fan__meta" data-enter="bottom">
     <span class="services-fan__counter" data-fan-counter aria-live="polite">01 / 06</span>
-    <button type="button" class="services-fan__arrow" data-fan-next aria-label="Następna usługa">→</button>
+    <div class="services-fan__progress" aria-hidden="true"><span data-fan-progress></span></div>
   </div>
 
-  <div class="services-fan__stage" data-reveal>
+  <div class="services-fan__stage" data-fan-stage data-enter="right">
+    <button type="button" class="services-fan__nav-btn services-fan__nav-btn--prev" data-fan-prev aria-label="Poprzednia usługa">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button type="button" class="services-fan__nav-btn services-fan__nav-btn--next" data-fan-next aria-label="Następna usługa">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="services-fan__hint" data-fan-hint>
+      <span class="services-fan__hint-gesture" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14h16M16 10l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="14" r="2.5" stroke="currentColor" stroke-width="1.2"/></svg>
+      </span>
+      <span class="services-fan__hint-text">Przesuń w lewo lub prawo — touchpad, palec lub strzałki</span>
+    </div>
     <div class="services-fan__carousel" data-services-fan>
       <a class="services-fan__card" href="uslugi/tworzenie-stron-internetowych.html" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
@@ -152,39 +180,40 @@
       </a>
     </div>
   </div>
-  <p class="services-fan__hint" data-reveal>← → strzałki na klawiaturze</p>
+  </div>
 </section>
 
-<!-- 3. PROCES -->
-<section id="proces" class="home-process">
-  <div class="container" data-reveal>
-    <p class="section-label" data-i18n="process.eyebrow">Jak pracujemy?</p>
-    <h2 class="home-services__title" data-i18n="process.title">Transparentny proces</h2>
-    <p class="home-process__lead" data-i18n="process.lead">Od audytu po wdrożenie — bez niedomówień.</p>
+<!-- 4. WORKFLOW -->
+<section id="proces" class="home-process home-scene">
+  <div class="home-scene__panel">
+  <div class="container">
+    <p class="section-label" data-enter="top" data-i18n="process.eyebrow">Jak pracujemy?</p>
+    <h2 class="home-services__title" data-reveal-words data-i18n="process.title">Transparentny proces</h2>
+    <p class="home-process__lead" data-enter="right" data-i18n="process.lead">Od audytu po wdrożenie — bez niedomówień.</p>
   </div>
   <div class="home-process__steps container">
-    <div class="home-process__step is-active" data-tile-interact data-reveal>
+    <div class="home-process__step is-active" data-tile-interact data-enter="left">
       <span class="home-process__num">01</span>
       <div>
         <h3 class="home-process__step-title">Discovery (Audyt i Analiza)</h3>
         <p class="home-process__step-body">Diagnozujemy wąskie gardła w Twojej firmie.</p>
       </div>
     </div>
-    <div class="home-process__step" data-tile-interact data-reveal>
+    <div class="home-process__step" data-tile-interact data-enter="right">
       <span class="home-process__num">02</span>
       <div>
         <h3 class="home-process__step-title">Strategia i Architektura</h3>
         <p class="home-process__step-body">Dobieramy narzędzia i projektujemy przepływ pracy.</p>
       </div>
     </div>
-    <div class="home-process__step" data-tile-interact data-reveal>
+    <div class="home-process__step" data-tile-interact data-enter="left">
       <span class="home-process__num">03</span>
       <div>
         <h3 class="home-process__step-title">Wdrożenie i Development</h3>
         <p class="home-process__step-body">Budujemy, kodujemy i integrujemy ekosystem.</p>
       </div>
     </div>
-    <div class="home-process__step" data-tile-interact data-reveal>
+    <div class="home-process__step" data-tile-interact data-enter="bottom">
       <span class="home-process__num">04</span>
       <div>
         <h3 class="home-process__step-title">Optymalizacja i Wsparcie</h3>
@@ -192,63 +221,68 @@
       </div>
     </div>
   </div>
+  </div>
 </section>
 
-<!-- 4. FAQ -->
-<section id="faq" class="home-faq">
-  <h2 class="home-faq__title" data-reveal data-i18n="faq.title">Pytania, które i tak zadasz</h2>
-  <div class="faq-item" data-open="false" data-reveal>
+<!-- 5. FAQ -->
+<section id="faq" class="home-faq home-scene">
+  <div class="home-scene__panel">
+  <h2 class="home-faq__title" data-reveal-words data-i18n="faq.title">Pytania, które i tak zadasz</h2>
+  <div class="faq-item" data-open="false" data-enter="left">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
       <span>Ile kosztuje wdrożenie CRM lub nowej strony?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
     </button>
     <div class="faq-item__a"><div class="faq-item__a-inner"><p>Zależy od skali projektu. Wycenę dostajesz po Discovery — bez ukrytych kosztów.</p></div></div>
   </div>
-  <div class="faq-item" data-open="false" data-reveal>
+  <div class="faq-item" data-open="false" data-enter="right">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
       <span>Ile potrwa realizacja?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
     </button>
     <div class="faq-item__a"><div class="faq-item__a-inner"><p>Landing: 2–3 tygodnie. Strona firmowa: 4–6 tygodni. CRM/automatyzacja: 3–8 tygodni.</p></div></div>
   </div>
-  <div class="faq-item" data-open="false" data-reveal>
+  <div class="faq-item" data-open="false" data-enter="bottom">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
       <span>Czy muszę znać się na technologii?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
     </button>
     <div class="faq-item__a"><div class="faq-item__a-inner"><p>Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje prostym językiem.</p></div></div>
   </div>
+  </div>
 </section>
 
-<!-- 5. KONTAKT -->
-<section id="kontakt" class="home-contact">
+<!-- 6. KONTAKT + stopka poniżej -->
+<section id="kontakt" class="home-contact home-scene">
+  <div class="home-scene__panel">
   <div class="home-contact__video" aria-hidden="true">
     <video autoplay muted loop playsinline preload="metadata" src="assets/stock/contact-cinematic.mp4"></video>
   </div>
   <canvas id="contact-3d" class="home-contact__canvas" aria-hidden="true"></canvas>
   <div class="home-contact__shade" aria-hidden="true"></div>
-  <div class="home-contact__inner" data-reveal>
-    <h2 class="home-contact__title" data-i18n="hero.act6_lead">Zacznijmy od bezpłatnego audytu.</h2>
+  <div class="home-contact__inner">
+    <h2 class="home-contact__title" data-reveal-words data-i18n="hero.act6_lead">Zacznijmy od bezpłatnego audytu.</h2>
     <form id="audit-form" class="audit-form" method="post" data-audit-form data-lenis-prevent>
-      <div class="audit-form__row">
+      <div class="audit-form__row" data-enter="left">
         <label for="audit-name" data-i18n="form.name">Imię</label>
         <input type="text" id="audit-name" name="name" autocomplete="name" required />
       </div>
-      <div class="audit-form__row">
+      <div class="audit-form__row" data-enter="right">
         <label for="audit-email" data-i18n="form.email">Email*</label>
         <input type="email" id="audit-email" name="email" placeholder="hello@cosgral.agency" autocomplete="email" required />
       </div>
-      <div class="audit-form__row">
+      <div class="audit-form__row" data-enter="left">
         <label for="audit-company" data-i18n="form.company">Firma</label>
         <input type="text" id="audit-company" name="company" autocomplete="organization" />
       </div>
-      <div class="audit-form__row">
+      <div class="audit-form__row" data-enter="right">
         <label for="audit-message" data-i18n="form.message">Wiadomość</label>
         <textarea id="audit-message" name="message" data-i18n="form.placeholder_message" data-i18n-placeholder placeholder="Opowiedz nam o projekcie…"></textarea>
       </div>
-      <button type="submit" class="btn btn--primary audit-form__submit" data-i18n="form.submit">Wyślij</button>
+      <button type="submit" class="btn btn--primary audit-form__submit" data-enter="bottom" data-i18n="form.submit">Wyślij</button>
       <p class="audit-form__status" data-audit-status role="status" aria-live="polite"></p>
     </form>
+  </div>
   </div>
 </section>
 
@@ -256,10 +290,10 @@
 
 <footer class="site-footer">
   <div class="footer-grid container">
-    <div class="footer-cta">
+    <div class="footer-cta" data-enter="left">
       <p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p>
     </div>
-    <div class="footer-col">
+    <div class="footer-col" data-enter="right">
       <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
       <ul>
         <li><a href="#top" data-i18n="nav.start">Start</a></li>
@@ -270,7 +304,7 @@
         <li><a href="#kontakt" data-i18n="nav.contact">Kontakt</a></li>
       </ul>
     </div>
-    <div class="footer-col">
+    <div class="footer-col" data-enter="top">
       <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
       <ul>
         <li><a href="uslugi/tworzenie-stron-internetowych.html">Strony</a></li>
@@ -278,7 +312,7 @@
         <li><a href="uslugi/systemy-crm.html">CRM</a></li>
       </ul>
     </div>
-    <div class="footer-col">
+    <div class="footer-col" data-enter="bottom">
       <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
       <ul>
         <li><a href="mailto:hello@cosgral.agency">hello@cosgral.agency</a></li>
@@ -297,13 +331,16 @@
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js"></script>
 <script src="preloader.js"></script>
-<script src="smooth-scroll.js"></script>
+<script src="smooth-scroll.js?v=20260731am"></script>
 <script src="home-cursor-field.js"></script>
 <script src="home-ambient-bg.js"></script>
-<script type="module" src="home-hero-3d.js"></script>
+<script type="module" src="home-hero-3d.js?v=20260731ae"></script>
 <script src="home-cursor.js"></script>
-<script src="home-services-fan.js"></script>
+<script src="home-sand-stream.js?v=20260731s"></script>
+<script src="home-thump.js?v=20260731ae"></script>
+<script src="home-services-fan.js?v=20260731au"></script>
 <script src="home-tile-interact.js"></script>
+<script src="home-section-flow.js?v=20260731au"></script>
 <script src="home-director.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * Homepage director — GSAP + UI (globe hero, services fan, process, FAQ, form).
+ * Homepage director — UI, hero intro, process highlight, form.
  */
 (function () {
   "use strict";
@@ -76,25 +76,6 @@
     });
   }
 
-  var revealEls = document.querySelectorAll("[data-reveal]");
-  if (REDUCED) {
-    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
-  } else if (!window.gsap) {
-    if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            io.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
-      revealEls.forEach(function (el) { io.observe(el); });
-    } else {
-      revealEls.forEach(function (el) { el.classList.add("is-visible"); });
-    }
-  }
-
   if (REDUCED || !window.gsap) return;
 
   (async function () {
@@ -102,7 +83,7 @@
 
     function heroIntro() {
       var tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-      tl.from(".home-hero__globe-wrap", { scale: 0.55, opacity: 0, rotateY: -0.8, duration: 1.4 }, 0)
+      tl.from(".home-cube-portal", { scale: 0.28, opacity: 0, rotateY: -0.8, duration: 1.4 }, 0)
         .to(".home-hero__letter", {
           opacity: 1,
           y: 0,
@@ -127,37 +108,13 @@
     document.querySelectorAll(".home-process__step").forEach(function (step) {
       ScrollTrigger.create({
         trigger: step,
-        start: "top 68%",
-        end: "bottom 32%",
+        start: "top 72%",
+        end: "bottom 28%",
         onEnter: function () { step.classList.add("is-active"); },
         onEnterBack: function () { step.classList.add("is-active"); },
         onLeave: function () { step.classList.remove("is-active"); },
         onLeaveBack: function () { step.classList.remove("is-active"); },
       });
-    });
-
-    gsap.utils.toArray("[data-reveal]").forEach(function (el) {
-      gsap.fromTo(
-        el,
-        { autoAlpha: 0, y: 48, filter: "blur(8px)" },
-        {
-          autoAlpha: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: 0.9,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 88%",
-            toggleActions: "play none none none",
-          },
-          onComplete: function () {
-            el.classList.add("is-visible");
-            el.style.filter = "";
-            el.style.willChange = "";
-          },
-        }
-      );
     });
 
     ScrollTrigger.refresh();

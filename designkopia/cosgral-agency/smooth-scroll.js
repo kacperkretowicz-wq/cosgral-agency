@@ -31,10 +31,13 @@
   }
 
   var lenis = new Lenis({
-    duration: 1.18,
+    lerp: 0.1,
+    duration: 1.15,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: true,
-    touchMultiplier: 1.25,
+    smoothTouch: false,
+    touchMultiplier: 1.2,
+    wheelMultiplier: 1.15,
   });
 
   window.cosgralSmoothScroll.lenis = lenis;

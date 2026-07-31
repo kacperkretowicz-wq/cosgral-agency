@@ -108,10 +108,29 @@
       "pl": "Sygnatury, które wysłaliśmy w świat.",
       "en": "Signatures we've sent into the world."
     },
+    "lead": {
+      "pl": "Marki, którym dostarczamy social, wideo i kreację — od briefu po publikację.",
+      "en": "Brands we deliver social, video and creative for — from brief to publish."
+    },
     "visit": {
       "pl": "Zobacz live",
       "en": "View live"
-    }
+    },
+    "visualTitle": { "pl": "Wybrane sygnatury.", "en": "Selected signatures." },
+    "fullPortfolio": { "pl": "Pełne portfolio", "en": "Discover all projects" },
+    "bentoTitle": { "pl": "Recent work", "en": "Recent work" },
+    "bentoLead": {
+      "pl": "Montaż, produkty cyfrowe i kreacja — w jednej sygnaturze.",
+      "en": "Video, digital products and creative — one signature."
+    },
+    "caseStudy": { "pl": "Case study", "en": "Case study" },
+    "featured": { "pl": "Wyróżnione", "en": "Featured" },
+    "statsLabel": { "pl": "zaufali nam", "en": "trusted us" }
+  },
+  "bento": {
+    "montaz": { "pl": "Montaż wideo", "en": "Video editing" },
+    "grafiki": { "pl": "Grafiki & social", "en": "Graphics & social" },
+    "strony": { "pl": "Strony internetowe", "en": "Websites" }
   },
   "services": {
     "eyebrow": {
@@ -119,8 +138,8 @@
       "en": "Services"
     },
     "title": {
-      "pl": "Co budujemy dla Ciebie",
-      "en": "What we build for you"
+      "pl": "Co robimy",
+      "en": "What we do"
     }
   },
   "process": {

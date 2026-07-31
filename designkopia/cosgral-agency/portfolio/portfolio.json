@@ -1,68 +1,122 @@
 {
+  "stats": {
+    "countPl": "7 marek",
+    "countEn": "7 brands",
+    "scopePl": "Social · Wideo · Kreacja · Kampanie",
+    "scopeEn": "Social · Video · Creative · Campaigns"
+  },
   "projects": [
     {
-      "id": "trovearchive",
+      "id": "juicy-events",
+      "name": "Juicy Events",
+      "featured": true,
+      "url": "",
+      "tagPl": "Event marketing · Social media",
+      "tagEn": "Event marketing · Social media",
+      "descPl": "Kampania Instagram na sezon letni — seria postów i stories pod wydarzenia i sprzedaż biletów.",
+      "descEn": "Summer Instagram campaign — posts and stories for events and ticket sales.",
+      "servicesPl": ["Social media", "Kreacja graficzna", "Instagram"],
+      "servicesEn": ["Social media", "Graphic design", "Instagram"],
+      "cover": "portfolio/clients/juicy-events/cover.jpg",
+      "gallery": [
+        "portfolio/clients/juicy-events/gallery/1.jpg",
+        "portfolio/clients/juicy-events/gallery/2.jpg",
+        "portfolio/clients/juicy-events/gallery/3.jpg",
+        "portfolio/clients/juicy-events/gallery/4.jpg",
+        "portfolio/clients/juicy-events/gallery/5.jpg",
+        "portfolio/clients/juicy-events/gallery/6.jpg"
+      ],
+      "mediaType": "gallery"
+    },
+    {
+      "id": "far-east",
+      "name": "Far East",
+      "featured": true,
+      "url": "",
+      "tagPl": "Brand content · Rolki graficzne",
+      "tagEn": "Brand content · Motion graphics",
+      "descPl": "Seria rolek graficznych pod social — szybkie formaty, spójny język wizualny marki.",
+      "descEn": "Social motion graphics — fast formats with a consistent brand visual language.",
+      "servicesPl": ["Motion design", "Social media", "Montaż"],
+      "servicesEn": ["Motion design", "Social media", "Editing"],
+      "cover": "portfolio/clients/far-east/cover.jpg",
+      "previewVideo": "portfolio/clients/far-east/preview.mp4",
+      "mediaType": "video"
+    },
+    {
+      "id": "safe-grant",
+      "name": "Safe Grant",
+      "featured": false,
+      "url": "",
+      "tagPl": "Dotacje · Edukacja · Social",
+      "tagEn": "Grants · Education · Social",
+      "descPl": "Stories, rolki i materiały edukacyjne — komunikacja programów wsparcia dla MŚP.",
+      "descEn": "Stories, reels and educational assets — grant programme comms for SMEs.",
+      "servicesPl": ["Social media", "Wideo", "Kreacja"],
+      "servicesEn": ["Social media", "Video", "Creative"],
+      "cover": "",
+      "accent": "#3d5a80",
+      "mediaType": "typographic"
+    },
+    {
+      "id": "trove-archive",
       "name": "Trove Archive",
+      "featured": false,
       "url": "https://trovearchive.com/",
-      "tagPl": "Moda luksusowa · Ecommerce",
-      "tagEn": "Luxury fashion · Ecommerce",
-      "cover": "images/cosgral-agency/approved/svc-halftone-silk.jpg"
+      "tagPl": "Moda luksusowa · Reklama wideo",
+      "tagEn": "Luxury fashion · Video ads",
+      "descPl": "Reklamy produktowe i content wideo pod ecommerce marki premium.",
+      "descEn": "Product ads and video content for a premium ecommerce brand.",
+      "servicesPl": ["Produkcja wideo", "Reklama", "Ecommerce"],
+      "servicesEn": ["Video production", "Advertising", "Ecommerce"],
+      "cover": "",
+      "accent": "#8a7f72",
+      "mediaType": "typographic"
     },
     {
-      "id": "semprelove",
-      "name": "SEMPRE with Love",
-      "url": "https://semprelove.pl/",
-      "tagPl": "Fashion · Sklep online",
-      "tagEn": "Fashion · Online store",
-      "cover": "images/cosgral-agency/approved/svc-halftone-fabric.jpg"
+      "id": "anna-jarosik",
+      "name": "Anna Jarosik",
+      "featured": false,
+      "url": "",
+      "tagPl": "Marka osobista · Reels",
+      "tagEn": "Personal brand · Reels",
+      "descPl": "Rolki i materiały wideo — współprace brandowe i content pod social.",
+      "descEn": "Reels and video content — brand collaborations and social-first storytelling.",
+      "servicesPl": ["Montaż wideo", "Reels", "Social media"],
+      "servicesEn": ["Video editing", "Reels", "Social media"],
+      "cover": "",
+      "accent": "#6b4f5a",
+      "mediaType": "typographic"
     },
     {
-      "id": "logelulu",
-      "name": "LOGE LULU",
-      "url": "https://logelulu.com/",
-      "tagPl": "Moda autorska",
-      "tagEn": "Authorial fashion",
-      "cover": "images/cosgral-agency/approved/svc-prism-cube.jpg"
+      "id": "orlincy",
+      "name": "Orlińscy",
+      "featured": false,
+      "url": "",
+      "tagPl": "Produkcja wideo · Content",
+      "tagEn": "Video production · Content",
+      "descPl": "Seria materiałów wideo — od planu po finalny montaż i formaty pod kanały.",
+      "descEn": "Video series — from planning through final edit and channel-ready formats.",
+      "servicesPl": ["Produkcja wideo", "Montaż", "Postprodukcja"],
+      "servicesEn": ["Video production", "Editing", "Post-production"],
+      "cover": "",
+      "accent": "#4a5568",
+      "mediaType": "typographic"
     },
     {
-      "id": "patarrow",
-      "name": "PAT ARROW",
-      "url": "https://patarrow.pl/",
-      "tagPl": "Perfumy · Lifestyle",
-      "tagEn": "Fragrance · Lifestyle",
-      "cover": "images/cosgral-agency/approved/svc-refraction-color.jpg"
-    },
-    {
-      "id": "nkutyla",
-      "name": "NKutyla",
-      "url": "https://nkutyla.com/",
-      "tagPl": "Marka · Portfolio",
-      "tagEn": "Brand · Portfolio",
-      "cover": "images/cosgral-agency/approved/svc-liquid-silver.jpg"
-    },
-    {
-      "id": "dexol",
-      "name": "Dexol",
-      "url": "https://dexol.pl/",
-      "tagPl": "B2B · Przemysł",
-      "tagEn": "B2B · Industrial",
-      "cover": "images/cosgral-agency/approved/svc-ribbed-stairs.jpg"
-    },
-    {
-      "id": "digitall",
-      "name": "Digitall",
-      "url": "https://digitall.com.pl/",
-      "tagPl": "Digital · Agencja",
-      "tagEn": "Digital · Agency",
-      "cover": "images/cosgral-agency/approved/svc-halftone-silk.jpg"
-    },
-    {
-      "id": "joszka",
-      "name": "Joszka",
-      "url": "https://joszka.pl/",
-      "tagPl": "Marka osobista",
-      "tagEn": "Personal brand",
-      "cover": "images/cosgral-agency/approved/svc-halftone-fabric.jpg"
+      "id": "wiktoria-wolniak",
+      "name": "Wiktoria Wolniak",
+      "featured": false,
+      "url": "",
+      "tagPl": "Stylistka · Fashion · Reels",
+      "tagEn": "Stylist · Fashion · Reels",
+      "descPl": "Content wideo i rolki pod markę osobistą stylistki — estetyka, tempo, social.",
+      "descEn": "Video and reels for a stylist personal brand — aesthetic, pace, social-native.",
+      "servicesPl": ["Reels", "Montaż wideo", "Social media"],
+      "servicesEn": ["Reels", "Video editing", "Social media"],
+      "cover": "",
+      "accent": "#7c6f64",
+      "mediaType": "typographic"
     }
   ]
 }

@@ -14,3 +14,6 @@ outputs/pages/*
 __pycache__/
 *.pyc
 .venv/
+
+# Surowe pobrania z Google Drive (do portfolio używamy portfolio/showcase/)
+cosgral-agency/portfolio/_drive-import/
