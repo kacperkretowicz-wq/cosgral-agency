@@ -87,8 +87,8 @@
       "en": "Let technology work for you while you focus on the business."
     },
     "monopo_tagline": {
-      "pl": "WE BUILD DIGITAL EXPERIENCES",
-      "en": "WE BUILD DIGITAL EXPERIENCES"
+      "pl": "Tworzymy cyfrowe doświadczenia",
+      "en": "We build digital experiences"
     },
     "monopo_eyebrow": {
       "pl": "Agencja kreatywna oparta na designie",
@@ -140,7 +140,17 @@
     "title": {
       "pl": "Co robimy",
       "en": "What we do"
-    }
+    },
+    "fan_hint": {
+      "pl": "Przesuń w lewo lub prawo — touchpad, palec lub strzałki",
+      "en": "Swipe left or right — touchpad, finger or arrow keys"
+    },
+    "card1": { "pl": "Strony internetowe", "en": "Websites" },
+    "card2": { "pl": "Aplikacje", "en": "Applications" },
+    "card3": { "pl": "Pozycjonowanie SEO & GEO", "en": "SEO & GEO positioning" },
+    "card4": { "pl": "Automatyzacje", "en": "Automation" },
+    "card5": { "pl": "Systemy CRM", "en": "CRM systems" },
+    "card6": { "pl": "Grafika i montaż wideo", "en": "Graphics & video editing" }
   },
   "process": {
     "eyebrow": {
@@ -154,7 +164,15 @@
     "lead": {
       "pl": "Od audytu po wdrożenie — bez niedomówień.",
       "en": "From audit to launch — no guesswork."
-    }
+    },
+    "step1_title": { "pl": "Audyt i analiza", "en": "Audit & analysis" },
+    "step1_body": { "pl": "Diagnozujemy wąskie gardła w Twojej firmie.", "en": "We diagnose bottlenecks in your business." },
+    "step2_title": { "pl": "Strategia i architektura", "en": "Strategy & architecture" },
+    "step2_body": { "pl": "Dobieramy narzędzia i projektujemy przepływ pracy.", "en": "We select tools and design the workflow." },
+    "step3_title": { "pl": "Wdrożenie i rozwój", "en": "Implementation & development" },
+    "step3_body": { "pl": "Budujemy, kodujemy i integrujemy ekosystem.", "en": "We build, code and integrate the ecosystem." },
+    "step4_title": { "pl": "Optymalizacja i wsparcie", "en": "Optimization & support" },
+    "step4_body": { "pl": "Szkolimy i dbamy o bezawaryjne działanie.", "en": "We train your team and ensure reliable operation." }
   },
   "faq": {
     "eyebrow": {
@@ -164,7 +182,13 @@
     "title": {
       "pl": "Pytania, które i tak zadasz",
       "en": "Questions you'll ask anyway"
-    }
+    },
+    "q1": { "pl": "Ile kosztuje wdrożenie CRM lub nowej strony?", "en": "How much does a CRM or new website cost?" },
+    "a1": { "pl": "Zależy od skali projektu. Wycenę dostajesz po audycie — bez ukrytych kosztów.", "en": "It depends on project scope. You get a quote after the audit — no hidden fees." },
+    "q2": { "pl": "Ile potrwa realizacja?", "en": "How long will it take?" },
+    "a2": { "pl": "Landing: 2–3 tygodnie. Strona firmowa: 4–6 tygodni. CRM/automatyzacja: 3–8 tygodni.", "en": "Landing page: 2–3 weeks. Company site: 4–6 weeks. CRM/automation: 3–8 weeks." },
+    "q3": { "pl": "Czy muszę znać się na technologii?", "en": "Do I need to be tech-savvy?" },
+    "a3": { "pl": "Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje prostym językiem.", "en": "No — we handle the technical side. We explain decisions in plain language." }
   },
   "team": {
     "title": {
@@ -204,6 +228,22 @@
     "placeholder_message": {
       "pl": "Cześć! Opowiedz nam o swoim projekcie…",
       "en": "Hi! Tell us about your project…"
+    },
+    "error_email": {
+      "pl": "Podaj adres email.",
+      "en": "Please enter your email address."
+    },
+    "success_mailto": {
+      "pl": "Otworzyliśmy program pocztowy — wyślij wiadomość.",
+      "en": "We opened your mail app — send the message."
+    },
+    "mailto_subject": {
+      "pl": "Bezpłatny audyt",
+      "en": "Free audit"
+    },
+    "mailto_inquiry": {
+      "pl": "zapytanie",
+      "en": "inquiry"
     }
   },
   "footer": {
@@ -238,6 +278,9 @@
     "copyright": {
       "pl": "© 2026 cosgral agency",
       "en": "© 2026 cosgral agency"
-    }
+    },
+    "link_websites": { "pl": "Strony", "en": "Websites" },
+    "link_video": { "pl": "Wideo", "en": "Video" },
+    "link_crm": { "pl": "CRM", "en": "CRM" }
   }
 }

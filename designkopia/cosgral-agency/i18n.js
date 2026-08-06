@@ -19,10 +19,10 @@
   }
 
   function t(key) {
-    if (!copy) return key;
+    if (!copy) return null;
     var node = get(copy, key);
-    if (!node) return key;
-    return node[lang] || node.pl || key;
+    if (!node) return null;
+    return node[lang] || node.pl || null;
   }
 
   function applyLang(next) {
@@ -39,10 +39,15 @@
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       var key = el.getAttribute("data-i18n");
       var val = t(key);
+      if (val == null) return;
       if (el.hasAttribute("data-i18n-placeholder")) {
         el.placeholder = val;
       } else if (el.hasAttribute("data-i18n-html")) {
         el.innerHTML = val;
+      } else if (el.hasAttribute("data-reveal-words")) {
+        el.textContent = val;
+        delete el.dataset.wordsReady;
+        if (window.cosgralRevealWords) window.cosgralRevealWords.build(el);
       } else {
         el.textContent = val;
       }
@@ -71,6 +76,7 @@
       copy = data;
       bindSwitcher();
       applyLang(lang);
+      window.dispatchEvent(new CustomEvent("cosgral:i18n-ready", { detail: { lang: lang } }));
     })
     .catch(function () {
       bindSwitcher();

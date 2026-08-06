@@ -9,9 +9,16 @@
   var CYCLE = ["left", "right", "top", "bottom"];
   var curtain = document.querySelector("[data-scene-curtain]");
 
-  document.querySelectorAll("[data-reveal-words]").forEach(function (el) {
+  function buildRevealWords(el) {
+    if (!el) return;
     if (el.dataset.wordsReady) return;
+    var key = el.getAttribute("data-i18n");
     var text = el.textContent.trim();
+    if (key && window.cosgralI18n) {
+      var translated = window.cosgralI18n.t(key);
+      if (translated) text = translated;
+    }
+    if (!text) return;
     el.textContent = "";
     text.split(/\s+/).forEach(function (word, i) {
       var wrap = document.createElement("span");
@@ -23,7 +30,17 @@
       el.appendChild(wrap);
     });
     el.dataset.wordsReady = "1";
-  });
+  }
+
+  window.cosgralRevealWords = {
+    build: buildRevealWords,
+    rebuildAll: function () {
+      document.querySelectorAll("[data-reveal-words]").forEach(function (el) {
+        delete el.dataset.wordsReady;
+        buildRevealWords(el);
+      });
+    },
+  };
 
   function panelOf(scene) {
     return scene.querySelector(".home-scene__panel") || scene;
@@ -34,7 +51,36 @@
     gsap.set(curtain, { autoAlpha: amount });
   }
 
-  /** Pinowana scena: ciemność → zoom in → pauza → ciemność */
+  function lockSandStream() {
+    document.documentElement.classList.add("is-sand-stream");
+    window.cosgralSand = window.cosgralSand || {};
+    var c = window.cosgralSand.cinema || 0;
+    if (c < 0.96) return;
+    window.cosgralSand.locked = true;
+    window.cosgralSand.break = Math.max(window.cosgralSand.break || 0, 0.98);
+    window.cosgralSand.stream = Math.max(window.cosgralSand.stream || 0, 0.98);
+  }
+
+  function setCinema(value) {
+    window.cosgralSand = window.cosgralSand || {};
+    var c = Math.max(0, Math.min(1, value));
+    window.cosgralSand.cinema = c;
+    window.cosgralSand.motion = c;
+    window.cosgralSand.break = smooth01(0.08, 0.58, c) * 0.52;
+    window.cosgralSand.stream = smooth01(0.2, 0.94, c) * 0.96;
+
+    if (c >= 0.96) {
+      lockSandStream();
+    } else if (c <= 0.04) {
+      window.cosgralSand.locked = false;
+      document.documentElement.classList.remove("is-sand-stream");
+    } else {
+      window.cosgralSand.locked = false;
+      document.documentElement.classList.add("is-sand-stream");
+    }
+  }
+
+  /** Pinowana scena: ciemność → zoom in → długa pauza → ciemność */
   function wireScene(scene, opts) {
     if (!scene || REDUCED) {
       if (scene) scene.classList.add("is-entered", "is-visible");
@@ -43,7 +89,7 @@
 
     opts = opts || {};
     var panel = panelOf(scene);
-    var pinLen = opts.pin || (MOBILE ? "+=72%" : "+=88%");
+    var pinLen = opts.pin || (MOBILE ? "+=88%" : "+=108%");
     var fadeOut = opts.fadeOut !== false;
 
     gsap.set(panel, { autoAlpha: 0, scale: MOBILE ? 1.04 : 1.07, filter: "blur(14px)" });
@@ -56,7 +102,7 @@
         end: pinLen,
         pin: true,
         pinSpacing: true,
-        scrub: MOBILE ? 1.05 : 1.25,
+        scrub: MOBILE ? 1.2 : 1.5,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         refreshPriority: opts.priority || 1,
@@ -79,48 +125,57 @@
       },
     });
 
-    // 0–22%: wjeżdża z ciemności
+    // 0–12%: szybki wjazd z ciemności
     tl.to(
       panel,
       {
         autoAlpha: 1,
         scale: 1,
         filter: "blur(0px)",
-        duration: 0.22,
-        ease: "power2.out",
+        duration: 0.12,
+        ease: "power3.out",
       },
       0
     );
 
     if (curtain) {
-      tl.to(curtain, { autoAlpha: 0.72, duration: 0.08, ease: "power1.in" }, 0)
-        .to(curtain, { autoAlpha: 0, duration: 0.18, ease: "power2.out" }, 0.08);
+      tl.to(curtain, { autoAlpha: 0.78, duration: 0.05, ease: "power1.in" }, 0)
+        .to(curtain, { autoAlpha: 0, duration: 0.1, ease: "power2.out" }, 0.05);
     }
 
-    // 22–72%: treść na ekranie (pauza)
-    tl.to(panel, { autoAlpha: 1, scale: 1, duration: 0.5, ease: "none" }, 0.22);
+    // 12–84%: długa pauza na treści
+    tl.to(panel, { autoAlpha: 1, scale: 1, duration: 0.72, ease: "none" }, 0.12);
 
-  if (fadeOut) {
-      // 72–100%: zanik w ciemność
+    if (fadeOut) {
+      // 84–100%: szybki zjazd w ciemność
       tl.to(
         panel,
         {
           autoAlpha: 0,
           scale: MOBILE ? 0.96 : 0.94,
           filter: "blur(12px)",
-          duration: 0.28,
-          ease: "power2.in",
+          duration: 0.16,
+          ease: "power3.in",
         },
-        0.72
+        0.84
       );
       if (curtain) {
-        tl.to(curtain, { autoAlpha: 0.85, duration: 0.2, ease: "power2.in" }, 0.78);
+        tl.to(curtain, { autoAlpha: 0.88, duration: 0.12, ease: "power3.in" }, 0.88);
       }
     } else {
-      tl.to(panel, { autoAlpha: 1, duration: 0.28, ease: "none" }, 0.72);
+      tl.to(panel, { autoAlpha: 1, duration: 0.16, ease: "none" }, 0.84);
     }
 
     return tl;
+  }
+
+  function holdScroll(st, hold) {
+    return st.start + (st.end - st.start) * hold;
+  }
+
+  function smooth01(a, b, x) {
+    var t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
   }
 
   (async function () {
@@ -165,22 +220,26 @@
             id: "hero-pin",
             trigger: hero,
             start: "top top",
-            end: MOBILE ? "+=50%" : "+=65%",
+            end: MOBILE ? "+=72%" : "+=95%",
             pin: true,
             pinSpacing: true,
-            scrub: 1,
+            scrub: MOBILE ? 1.15 : 1.4,
             anticipatePin: 1,
+            onEnterBack: function () {
+              if (window.cosgralRestoreHero) window.cosgralRestoreHero();
+            },
           },
         })
-        .to(heroContent, { autoAlpha: 0, y: -48, filter: "blur(10px)", ease: "none", duration: 1 }, 0.25)
-        .to(heroScroll, { autoAlpha: 0, duration: 0.3, ease: "none" }, 0.1)
-        .to(curtain, { autoAlpha: 0.6, duration: 0.35, ease: "power2.in" }, 0.75);
+        .to(heroContent, { autoAlpha: 1, duration: 0.18, ease: "none" }, 0)
+        .to(heroContent, { autoAlpha: 1, duration: 0.48, ease: "none" }, 0.18)
+        .to(heroContent, { autoAlpha: 0, y: -48, filter: "blur(10px)", ease: "power3.in", duration: 0.22 }, 0.66)
+        .to(heroScroll, { autoAlpha: 0, duration: 0.2, ease: "none" }, 0.62)
+        .to(curtain, { autoAlpha: 0.65, duration: 0.18, ease: "power3.in" }, 0.72);
     }
 
     // ——— 2. SHATTER ———
     if (shatter) {
       var shatterPanel = panelOf(shatter);
-      var shatterCap = shatter.querySelector(".home-shatter__caption");
       gsap.set(shatterPanel, { autoAlpha: 1 });
       gsap.set(shatter, { autoAlpha: 1 });
 
@@ -189,10 +248,10 @@
           id: "shatter-beat",
           trigger: shatter,
           start: "top top",
-          end: MOBILE ? "+=120%" : "+=145%",
+          end: MOBILE ? "+=218%" : "+=272%",
           pin: true,
           pinSpacing: true,
-          scrub: 1.35,
+          scrub: MOBILE ? 1.85 : 2.15,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 5,
@@ -214,43 +273,28 @@
           onLeave: function () {
             shatter.classList.remove("is-active");
             document.documentElement.classList.remove("is-shattering");
-            document.documentElement.classList.add("is-sand-stream");
+            setCinema(1);
             gsap.set(shatterPanel, { autoAlpha: 0 });
             gsap.set(shatter, { autoAlpha: 0, visibility: "hidden" });
           },
           onLeaveBack: function () {
             shatter.classList.add("is-active");
             document.documentElement.classList.remove("is-shattering");
-            document.documentElement.classList.remove("is-sand-stream");
             gsap.set(shatter, { autoAlpha: 1, visibility: "visible" });
             gsap.set(shatterPanel, { autoAlpha: 1 });
           },
           onUpdate: function (self) {
-            window.cosgralSand = window.cosgralSand || {};
             var p = self.progress;
-            window.cosgralSand.break = Math.min(
-              1,
-              Math.pow(Math.min(1, Math.max(0, (p - 0.02) / 0.5)), 0.9)
-            );
-            window.cosgralSand.stream = Math.min(1, Math.max(0, (p - 0.08) / 0.45));
+            setCinema(p * 0.8);
 
-            if (shatterCap) {
-              var capIn = Math.min(1, Math.max(0, (p - 0.08) / 0.2));
-              var capOut = p > 0.55 ? (p - 0.55) / 0.25 : 0;
-              gsap.set(shatterCap, {
-                autoAlpha: Math.max(0, capIn * (1 - Math.min(1, capOut))),
-                y: (1 - capIn) * 20 - capOut * 30,
-              });
-            }
-
-            var out = p > 0.78 ? (p - 0.78) / 0.22 : 0;
+            var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
             gsap.set(shatterPanel, {
               autoAlpha: 1 - out,
               filter: out ? "blur(" + out * 8 + "px)" : "blur(0px)",
             });
 
             if (curtain) {
-              var c = p > 0.7 ? (p - 0.7) / 0.3 : 0.55 * (1 - p / 0.7);
+              var c = p > 0.78 ? (p - 0.78) / 0.22 : 0.5 * (1 - p / 0.78);
               gsap.set(curtain, { autoAlpha: Math.min(0.9, c) });
             }
           },
@@ -261,25 +305,63 @@
     // ——— 3–6: kinowe sceny (pin + fade) ———
     wireScene(services, {
       id: "scene-uslugi",
-      pin: MOBILE ? "+=78%" : "+=92%",
+      pin: MOBILE ? "+=95%" : "+=118%",
       priority: 2,
       onEnter: function () {
-        document.documentElement.classList.add("is-sand-stream");
+        lockSandStream();
+        window.cosgralSand.servicesVisible = true;
       },
       onEnterBack: function () {
-        document.documentElement.classList.add("is-sand-stream");
+        lockSandStream();
+        window.cosgralSand.servicesVisible = true;
       },
       onLeave: function () {
-        document.documentElement.classList.remove("is-sand-stream");
+        lockSandStream();
+        if (window.cosgralSand) window.cosgralSand.servicesVisible = false;
       },
       onLeaveBack: function () {
-        document.documentElement.classList.add("is-sand-stream");
+        lockSandStream();
+        window.cosgralSand.servicesVisible = true;
       },
     });
 
-    wireScene(process, { id: "scene-proces", pin: MOBILE ? "+=68%" : "+=82%" });
-    wireScene(faq, { id: "scene-faq", pin: MOBILE ? "+=62%" : "+=76%" });
-    wireScene(contact, { id: "scene-kontakt", pin: MOBILE ? "+=70%" : "+=84%", fadeOut: false });
+    if (services) {
+      ScrollTrigger.create({
+        id: "cube-motion-tail",
+        trigger: services,
+        start: "top bottom",
+        end: "top 22%",
+        scrub: MOBILE ? 2.4 : 2.85,
+        onUpdate: function (self) {
+          var q = self.progress;
+          var tail = 1 - Math.pow(1 - q, 1.12);
+          window.cosgralSand = window.cosgralSand || {};
+          window.cosgralSand.motionTail = tail;
+          setCinema(Math.min(1, 0.8 + tail * 0.2));
+          window.cosgralSand.servicesVisible = q > 0.06;
+        },
+      });
+    }
+
+    wireScene(process, {
+      id: "scene-proces",
+      pin: MOBILE ? "+=82%" : "+=102%",
+      onEnter: lockSandStream,
+      onEnterBack: lockSandStream,
+    });
+    wireScene(faq, {
+      id: "scene-faq",
+      pin: MOBILE ? "+=76%" : "+=94%",
+      onEnter: lockSandStream,
+      onEnterBack: lockSandStream,
+    });
+    wireScene(contact, {
+      id: "scene-kontakt",
+      pin: MOBILE ? "+=84%" : "+=104%",
+      fadeOut: false,
+      onEnter: lockSandStream,
+      onEnterBack: lockSandStream,
+    });
 
     gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
       gsap.from(el, {
@@ -298,5 +380,6 @@
     });
 
     ScrollTrigger.refresh();
+    window.dispatchEvent(new CustomEvent("cosgral:sections-ready"));
   })();
 })();

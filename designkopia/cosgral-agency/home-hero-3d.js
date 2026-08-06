@@ -22,7 +22,29 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   var streamAmt = 0;
   var displayBreak = 0;
   var displayStream = 0;
+  var displayMotion = 0;
+  var displayCinema = 0;
+  var sandLocked = false;
   var cardForces = new Float32Array(8 * 4); // up to 8 cards: cx,cy,w,h in NDC-ish
+  var menuBlend = 0;
+  var menuTween = { blend: 0 };
+  var menuFrom = {
+    px: 0,
+    py: 0,
+    pz: 0,
+    rx: 0.22,
+    ry: -0.35,
+    rz: 0,
+    sc: CUBE_SCALE * 0.78,
+    visible: true,
+    offscreen: false,
+    sideEntry: false,
+  };
+
+  function smooth01(a, b, x) {
+    var t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
 
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -263,9 +285,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       void main() {
         float local = clamp((uBreak - aDelay) / 0.7, 0.0, 1.0);
         local = easeOutCubic(local);
-        // Settle onto full-screen ribbon early — not a short trail by the cube
-        float morph = clamp((uStream - aDelay * 0.06) / 0.5, 0.0, 1.0);
-        morph = easeInOut(morph) * smoothstep(0.02, 0.45, local);
+        // Trail lags behind cube — ribbon forms after cube passes
+        float morph = clamp((uStream - aDelay * 0.24) / 0.78, 0.0, 1.0);
+        morph = easeInOut(morph) * smoothstep(0.05, 0.55, local);
 
         vec3 start = (uCubeMat * vec4(aStart, 1.0)).xyz;
         vec3 outward = normalize(start + 0.0001);
@@ -414,11 +436,17 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       end: "bottom top",
       scrub: 1.1,
       onUpdate: function (self) {
-        var cur = window.cosgralSand || { break: 0, stream: 0 };
-        window.cosgralSand = {
-          break: Math.max(cur.break || 0, 0.98),
-          stream: Math.max(cur.stream || 0, 0.85 + self.progress * 0.15),
-        };
+        var cur = window.cosgralSand || {};
+        if ((cur.cinema || 0) >= 0.96) {
+          window.cosgralSand = {
+            break: Math.max(cur.break || 0, 0.98),
+            stream: Math.max(cur.stream || 0, 0.85 + self.progress * 0.15),
+            cinema: Math.max(cur.cinema || 0, 1),
+            locked: true,
+            motion: 1,
+          };
+          document.documentElement.classList.add("is-sand-stream");
+        }
       },
     });
   }
@@ -433,51 +461,168 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     mouse.y += (mouse.ty - mouse.y) * 0.06;
 
     var sandExt = window.cosgralSand;
-    if (sandExt && typeof sandExt.break === "number") {
-      breakAmt = sandExt.break;
-      streamAmt = sandExt.stream || 0;
+    var sm = 0;
+    var tm = 0;
+    var cinema = 0;
+    menuBlend = menuTween.blend;
+    if (sandExt) {
+      cinema = Math.max(0, Math.min(1, sandExt.cinema ?? sandExt.motion ?? 0));
+      sm = cinema;
+      tm = sandExt.motionTail || 0;
+      if (sandExt.resetCube) {
+        cinema = 0;
+        displayCinema = 0;
+        displayMotion = 0;
+        sandLocked = false;
+        delete sandExt.resetCube;
+      }
+      if (sandExt.locked && cinema >= 0.96) sandLocked = true;
     }
-    // Critically damped display lerp — tracks scrub without jitter
-    displayBreak += (breakAmt - displayBreak) * 0.1;
-    displayStream += (streamAmt - displayStream) * 0.12;
+    if (sandLocked && cinema < 0.96) sandLocked = false;
+
+    displayCinema += (cinema - displayCinema) * 0.22;
+    displayMotion += (sm - displayMotion) * 0.2;
+    var c = displayCinema;
+
+    var breakAmt = smooth01(0.08, 0.58, c) * 0.52;
+    var streamAmt = smooth01(0.2, 0.94, c) * 0.96;
+    if (sandLocked && c >= 0.96) {
+      breakAmt = Math.max(breakAmt, 0.98);
+      streamAmt = Math.max(streamAmt, 0.98);
+    }
+
+    displayBreak += (breakAmt - displayBreak) * 0.18;
+    displayStream += (streamAmt - displayStream) * 0.18;
 
     sMat.uniforms.uTime.value = t;
     sMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
 
-    // Slow tumble + exit toward top-left so sand can fill TL → BR diagonal
-    var flyAway = Math.pow(Math.min(1, Math.max(0, (displayBreak - 0.04) / 0.78)), 0.88);
-    var cubeFade = 1 - Math.pow(Math.max(0, flyAway - 0.62) / 0.38, 1.25);
-    sMat.uniforms.uFade.value = cubeFade;
-    shell.material.opacity = 0.58 * cubeFade;
-    wire.material.opacity = 0.09 * cubeFade;
-    edges.material.opacity = 0.42 * cubeFade;
-    cubeGroup.visible = flyAway < 0.97 && cubeFade > 0.02;
+    var motion = c;
+    var heroX = MOBILE ? 0.3 : 0.4;
+    var heroY = MOBILE ? 0.54 : 0.7;
+    var heroZ = 0.36;
+    var heroScale = CUBE_SCALE * (MOBILE ? 0.74 : 0.78);
+    var peakScale = CUBE_SCALE * (MOBILE ? 1.06 : 1.16);
+    var cornerX = MOBILE ? 4.35 : 5.55;
+    var cornerY = MOBILE ? 3.05 : 3.85;
+    var centerX = mouse.x * 0.028;
+    var centerY = mouse.y * 0.018;
 
-    cubeGroup.rotation.y = t * (0.045 + flyAway * 0.08) + mouse.x * 0.14 + flyAway * 0.25;
-    cubeGroup.rotation.x = 0.22 + mouse.y * 0.08 + t * (0.018 + flyAway * 0.045) + flyAway * 0.15;
-    cubeGroup.rotation.z = mouse.x * 0.012 + t * (0.014 + flyAway * 0.04) + flyAway * 0.1;
-    // Screen top-left ≈ -X / +Y
-    cubeGroup.position.x = mouse.x * 0.03 - flyAway * 4.5;
-    cubeGroup.position.y = mouse.y * 0.02 + flyAway * 3.0;
-    cubeGroup.position.z = -flyAway * 1.05;
-    var sc = CUBE_SCALE * (1 - flyAway * 0.22);
+    var approach = smooth01(0, 0.34, motion);
+    var depart = smooth01(0.32, 0.93, motion);
+
+    var posX = centerX + (1 - approach) * heroX - depart * cornerX;
+    var posY = centerY + (1 - approach) * heroY + depart * cornerY;
+    var posZ = (1 - approach) * heroZ - depart * 0.72;
+    cubeGroup.position.set(posX, posY, posZ);
+
+    var sc = heroScale + (peakScale - heroScale) * approach;
     cubeGroup.scale.set(sc, sc, sc);
+
+    var cubeVisible = depart < 0.93;
+
+    var uslugiPanel = document.querySelector("#uslugi .home-scene__panel");
+    var tilesOp = 0;
+    if (uslugiPanel && window.gsap) {
+      tilesOp = parseFloat(gsap.getProperty(uslugiPanel, "opacity")) || 0;
+    }
+
+    var spin = 0.016 + approach * 0.01 + depart * 0.005;
+    cubeGroup.rotation.y =
+      t * spin + mouse.x * 0.1 + (1 - approach) * -0.28 + approach * 0.18 - depart * 0.08;
+    cubeGroup.rotation.x =
+      0.22 + mouse.y * 0.05 + t * (0.009 + approach * 0.005) + (1 - approach) * 0.26;
+    cubeGroup.rotation.z =
+      mouse.x * 0.01 + t * 0.008 + (1 - approach) * -0.08 + depart * 0.03;
+
+    if (menuBlend > 0.001) {
+      var menuScale = heroScale * 1.14;
+      var menuX = heroX;
+      var menuY = heroY;
+      var menuZ = heroZ;
+      var cubeDim = 1 - menuBlend * 0.4;
+
+      if (menuFrom.sideEntry) {
+        var flyT = Math.min(1, menuBlend / 0.58);
+        var flyEase = 1 - Math.pow(1 - flyT, 2.65);
+        var rotT = Math.max(0, (menuBlend - 0.5) / 0.5);
+        var rotEase = rotT * rotT * (3 - 2 * rotT);
+
+        posX = menuFrom.px + (menuX - menuFrom.px) * flyEase;
+        posY = menuFrom.py + (menuY - menuFrom.py) * flyEase;
+        posZ = menuFrom.pz + (menuZ - menuFrom.pz) * flyEase;
+        sc = menuFrom.sc + (menuScale - menuFrom.sc) * flyEase;
+
+        cubeGroup.position.set(posX, posY, posZ);
+        cubeGroup.scale.set(sc, sc, sc);
+        cubeGroup.rotation.x = menuFrom.rx + (0 - menuFrom.rx) * rotEase;
+        cubeGroup.rotation.y = menuFrom.ry + (0 - menuFrom.ry) * rotEase;
+        cubeGroup.rotation.z = menuFrom.rz + (0 - menuFrom.rz) * rotEase;
+      } else {
+        var mb = menuBlend * menuBlend * (3 - 2 * menuBlend);
+        posX = menuFrom.px + (menuX - menuFrom.px) * mb;
+        posY = menuFrom.py + (menuY - menuFrom.py) * mb;
+        posZ = menuFrom.pz + (menuZ - menuFrom.pz) * mb;
+        sc = menuFrom.sc + (menuScale - menuFrom.sc) * mb;
+
+        cubeGroup.position.set(posX, posY, posZ);
+        cubeGroup.scale.set(sc, sc, sc);
+        cubeGroup.rotation.x = menuFrom.rx + (0 - menuFrom.rx) * mb;
+        cubeGroup.rotation.y = menuFrom.ry + (0 - menuFrom.ry) * mb;
+        cubeGroup.rotation.z = menuFrom.rz + (0 - menuFrom.rz) * mb;
+      }
+
+      cubeVisible = true;
+      sMat.uniforms.uFade.value = cubeDim;
+      shell.material.opacity = 0.58 * cubeDim;
+      wire.material.opacity = 0.09 * cubeDim;
+      edges.material.opacity = 0.42 * cubeDim;
+    } else {
+      sMat.uniforms.uFade.value = cubeVisible ? 1 : 0;
+      shell.material.opacity = cubeVisible ? 0.58 : 0;
+      wire.material.opacity = cubeVisible ? 0.09 : 0;
+      edges.material.opacity = cubeVisible ? 0.42 : 0;
+    }
+
+    cubeGroup.visible = cubeVisible;
+
     cubeGroup.updateMatrixWorld(true);
 
+    var shardBreak = displayBreak;
+    var shardStream = displayStream;
+    if (menuBlend > 0.001) {
+      var menuFade = Math.max(0, 1 - menuBlend * 1.12);
+      shardBreak *= menuFade;
+      shardStream *= menuFade;
+    }
+    if (sandLocked && c >= 0.96) {
+      shardBreak = Math.max(shardBreak, 0.98);
+      shardStream = Math.max(shardStream, 0.98);
+    }
+
     shardMat.uniforms.uTime.value = t;
-    shardMat.uniforms.uBreak.value = displayBreak;
-    shardMat.uniforms.uStream.value = displayStream;
+    shardMat.uniforms.uBreak.value = shardBreak;
+    shardMat.uniforms.uStream.value = shardStream;
     shardMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
     shardMat.uniforms.uCubeMat.value.copy(cubeGroup.matrixWorld);
 
-    if (displayStream > 0.15) sampleCards();
+    if (displayStream > 0.15 || sandLocked) sampleCards();
 
-    // Portal visibility after full sand
+    // Portal stays visible for sand ribbon after cube exits
     if (canvas.parentElement) {
-      var portalFade = displayStream > 0.92 ? Math.max(0.35, 1 - (displayStream - 0.92) * 2) : 1;
-      // keep particles visible; don't hide whole portal
-      canvas.parentElement.style.opacity = "1";
-      canvas.parentElement.style.visibility = "visible";
+      var sandOn =
+        menuBlend > 0.02 ||
+        sandLocked ||
+        displayStream > 0.32 ||
+        displayBreak > 0.4 ||
+        tm > 0.08;
+      var portalOp = sandOn
+        ? 1
+        : tilesOp > 0.45
+          ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
+          : 1;
+      canvas.parentElement.style.opacity = String(portalOp);
+      canvas.parentElement.style.visibility = portalOp > 0.05 ? "visible" : "hidden";
     }
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
@@ -494,5 +639,127 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     animate();
   })();
 
-  window.cosgralCube = { group: cubeGroup, shards: shards };
+  function captureMenuFrom() {
+    var heroX = MOBILE ? 0.3 : 0.4;
+    var heroY = MOBILE ? 0.54 : 0.7;
+    var heroZ = 0.36;
+    var heroScale = CUBE_SCALE * (MOBILE ? 0.74 : 0.78);
+    var sectionIdx = window.cosgralSectionSnap?.getIndex?.() ?? 0;
+
+    menuFrom.offscreen = false;
+    menuFrom.sideEntry = false;
+
+    if (sectionIdx === 0 && cubeGroup.visible) {
+      menuFrom.px = cubeGroup.position.x;
+      menuFrom.py = cubeGroup.position.y;
+      menuFrom.pz = cubeGroup.position.z;
+      menuFrom.rx = cubeGroup.rotation.x;
+      menuFrom.ry = cubeGroup.rotation.y;
+      menuFrom.rz = cubeGroup.rotation.z;
+      menuFrom.sc = cubeGroup.scale.x;
+      menuFrom.visible = true;
+      return;
+    }
+
+    menuFrom.sideEntry = true;
+    menuFrom.visible = false;
+    menuFrom.px = -(MOBILE ? 7.8 : 9.4);
+    menuFrom.py = heroY;
+    menuFrom.pz = heroZ;
+    menuFrom.rx = 0.16;
+    menuFrom.ry = -Math.PI * 0.52;
+    menuFrom.rz = 0.05;
+    menuFrom.sc = heroScale * 1.02;
+  }
+
+  function snapMenuFromPose() {
+    if (!menuFrom.sideEntry) return;
+    cubeGroup.position.set(menuFrom.px, menuFrom.py, menuFrom.pz);
+    cubeGroup.scale.set(menuFrom.sc, menuFrom.sc, menuFrom.sc);
+    cubeGroup.rotation.set(menuFrom.rx, menuFrom.ry, menuFrom.rz);
+    cubeGroup.visible = true;
+    sMat.uniforms.uFade.value = 1;
+    shell.material.opacity = 0.58;
+    wire.material.opacity = 0.09;
+    edges.material.opacity = 0.42;
+  }
+
+  function getMenuFaceRect() {
+    if (menuBlend < 0.04 || !cubeGroup.visible) return null;
+
+    var pts = [
+      [-0.82, 0.82, 1],
+      [0.82, 0.82, 1],
+      [-0.82, -0.82, 1],
+      [0.82, -0.82, 1],
+    ];
+    var minX = Infinity;
+    var maxX = -Infinity;
+    var minY = Infinity;
+    var maxY = -Infinity;
+
+    for (var i = 0; i < pts.length; i++) {
+      _faceVec.set(pts[i][0] * HALF, pts[i][1] * HALF, pts[i][2] * HALF);
+      cubeGroup.localToWorld(_faceVec);
+      _faceScreen.copy(_faceVec).project(camera);
+      var sx = (_faceScreen.x * 0.5 + 0.5) * window.innerWidth;
+      var sy = (-_faceScreen.y * 0.5 + 0.5) * window.innerHeight;
+      minX = Math.min(minX, sx);
+      maxX = Math.max(maxX, sx);
+      minY = Math.min(minY, sy);
+      maxY = Math.max(maxY, sy);
+    }
+
+    _faceVec.set(0, 0, HALF);
+    cubeGroup.localToWorld(_faceVec);
+    _faceScreen.copy(_faceVec).project(camera);
+    var cx = (_faceScreen.x * 0.5 + 0.5) * window.innerWidth;
+    var cy = (-_faceScreen.y * 0.5 + 0.5) * window.innerHeight;
+
+    var size = Math.min(maxX - minX, maxY - minY) * 0.94;
+    return { x: cx, y: cy, size: size };
+  }
+
+  var _faceVec = new THREE.Vector3();
+  var _faceScreen = new THREE.Vector3();
+
+  window.cosgralCube = {
+    group: cubeGroup,
+    shards: shards,
+    getMenuFaceRect: getMenuFaceRect,
+    getMenuBlend: function () {
+      return menuBlend;
+    },
+    isSideEntry: function () {
+      return menuFrom.sideEntry;
+    },
+    openMenu: function () {
+      captureMenuFrom();
+      snapMenuFromPose();
+      menuTween.blend = 0;
+      var dur = menuFrom.sideEntry ? 1.08 : 0.92;
+      if (window.gsap) {
+        gsap.killTweensOf(menuTween);
+        return gsap.to(menuTween, { blend: 1, duration: dur, ease: "power3.out" });
+      }
+      menuTween.blend = 1;
+      return null;
+    },
+    closeMenu: function () {
+      if (window.gsap) {
+        gsap.killTweensOf(menuTween);
+        return gsap.to(menuTween, {
+          blend: 0,
+          duration: 0.72,
+          ease: "power3.in",
+          onComplete: function () {
+            menuFrom.sideEntry = false;
+          },
+        });
+      }
+      menuTween.blend = 0;
+      menuFrom.sideEntry = false;
+      return null;
+    },
+  };
 })();

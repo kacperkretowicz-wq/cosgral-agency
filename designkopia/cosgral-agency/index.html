@@ -7,7 +7,7 @@
 <meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260731au" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260807h" />
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -60,15 +60,20 @@
   </div>
 </nav>
 
-<div class="nav-overlay" id="nav-overlay" data-lenis-prevent>
-  <ul class="nav-overlay__list">
-    <li><a href="#top" data-nav-close data-i18n="nav.start">Start</a></li>
-    <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
-    <li><a href="#uslugi" data-nav-close data-i18n="nav.services">Usługi</a></li>
-    <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
-    <li><a href="#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
-    <li><a href="#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
-  </ul>
+<div class="nav-overlay" id="nav-overlay" data-lenis-prevent aria-hidden="true">
+  <div class="nav-overlay__backdrop" data-nav-backdrop></div>
+  <div class="nav-overlay__stage">
+    <nav class="nav-overlay__links" aria-label="Menu główne">
+      <ul class="nav-overlay__list">
+        <li><a href="#top" data-nav-close data-i18n="nav.start">Start</a></li>
+        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="#uslugi" data-nav-close data-i18n="nav.services">Usługi</a></li>
+        <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
+        <li><a href="#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
 </div>
 
 <div class="home-scene-curtain" data-scene-curtain aria-hidden="true"></div>
@@ -89,18 +94,16 @@
     </h1>
     <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">WE BUILD DIGITAL EXPERIENCES</p>
   </div>
-  <a href="#rozpad" class="home-hero__scroll" data-i18n="hero.scroll">
+  <a href="#rozpad" class="home-hero__scroll">
     <span class="home-hero__scroll-line" aria-hidden="true"></span>
-    Scroll
+    <span data-i18n="hero.scroll">Przewiń</span>
   </a>
   </div>
 </section>
 
 <!-- 2. ROZPAD — tylko przejście sześcian → piasek (bez treści UI) -->
 <section id="rozpad" class="home-shatter home-scene" aria-label="Rozpad formy" aria-hidden="true">
-  <div class="home-scene__panel">
-    <p class="home-shatter__caption">Materia w ruchu</p>
-  </div>
+  <div class="home-scene__panel"></div>
 </section>
 
 <!-- 3. USŁUGI — kafelki z oddali -->
@@ -117,17 +120,23 @@
   </div>
 
   <div class="services-fan__stage" data-fan-stage data-enter="right">
-    <button type="button" class="services-fan__nav-btn services-fan__nav-btn--prev" data-fan-prev aria-label="Poprzednia usługa">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--prev" data-fan-prev aria-label="Kliknij lewą stronę ekranu" aria-hidden="true" tabindex="-1">
+      <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
+      <span class="services-fan__tap-pulse-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
     </button>
-    <button type="button" class="services-fan__nav-btn services-fan__nav-btn--next" data-fan-next aria-label="Następna usługa">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--next" data-fan-next aria-label="Kliknij prawą stronę ekranu" aria-hidden="true" tabindex="-1">
+      <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
+      <span class="services-fan__tap-pulse-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
     </button>
     <div class="services-fan__hint" data-fan-hint>
       <span class="services-fan__hint-gesture" aria-hidden="true">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14h16M16 10l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="14" r="2.5" stroke="currentColor" stroke-width="1.2"/></svg>
       </span>
-      <span class="services-fan__hint-text">Przesuń w lewo lub prawo — touchpad, palec lub strzałki</span>
+      <span class="services-fan__hint-text" data-i18n="services.fan_hint">Przesuń w lewo lub prawo — touchpad, palec lub strzałki</span>
     </div>
     <div class="services-fan__carousel" data-services-fan>
       <a class="services-fan__card" href="uslugi/tworzenie-stron-internetowych.html" data-tile-interact>
@@ -136,7 +145,7 @@
           <div class="services-fan__card-liquid"></div>
         </div>
         <span class="services-fan__num">01</span>
-        <span class="services-fan__name">Strony internetowe</span>
+        <span class="services-fan__name" data-i18n="services.card1">Strony internetowe</span>
       </a>
       <a class="services-fan__card" href="uslugi/projektowanie-aplikacji.html" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
@@ -144,7 +153,7 @@
           <div class="services-fan__card-liquid"></div>
         </div>
         <span class="services-fan__num">02</span>
-        <span class="services-fan__name">Aplikacje</span>
+        <span class="services-fan__name" data-i18n="services.card2">Aplikacje</span>
       </a>
       <a class="services-fan__card" href="uslugi/pozycjonowanie-seo-geo.html" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
@@ -152,7 +161,7 @@
           <div class="services-fan__card-liquid"></div>
         </div>
         <span class="services-fan__num">03</span>
-        <span class="services-fan__name">Pozycjonowanie SEO &amp; GEO</span>
+        <span class="services-fan__name" data-i18n="services.card3">Pozycjonowanie SEO &amp; GEO</span>
       </a>
       <a class="services-fan__card" href="uslugi/wdrazanie-automatyzacji.html" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
@@ -160,7 +169,7 @@
           <div class="services-fan__card-liquid"></div>
         </div>
         <span class="services-fan__num">04</span>
-        <span class="services-fan__name">Automatyzacje</span>
+        <span class="services-fan__name" data-i18n="services.card4">Automatyzacje</span>
       </a>
       <a class="services-fan__card" href="uslugi/systemy-crm.html" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
@@ -168,7 +177,7 @@
           <div class="services-fan__card-liquid"></div>
         </div>
         <span class="services-fan__num">05</span>
-        <span class="services-fan__name">Systemy CRM</span>
+        <span class="services-fan__name" data-i18n="services.card5">Systemy CRM</span>
       </a>
       <a class="services-fan__card" href="uslugi/grafika-i-montaz-wideo.html" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
@@ -176,7 +185,7 @@
           <div class="services-fan__card-liquid"></div>
         </div>
         <span class="services-fan__num">06</span>
-        <span class="services-fan__name">Grafika i montaż wideo</span>
+        <span class="services-fan__name" data-i18n="services.card6">Grafika i montaż wideo</span>
       </a>
     </div>
   </div>
@@ -195,29 +204,29 @@
     <div class="home-process__step is-active" data-tile-interact data-enter="left">
       <span class="home-process__num">01</span>
       <div>
-        <h3 class="home-process__step-title">Discovery (Audyt i Analiza)</h3>
-        <p class="home-process__step-body">Diagnozujemy wąskie gardła w Twojej firmie.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step1_title">Audyt i analiza</h3>
+        <p class="home-process__step-body" data-i18n="process.step1_body">Diagnozujemy wąskie gardła w Twojej firmie.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="right">
       <span class="home-process__num">02</span>
       <div>
-        <h3 class="home-process__step-title">Strategia i Architektura</h3>
-        <p class="home-process__step-body">Dobieramy narzędzia i projektujemy przepływ pracy.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step2_title">Strategia i architektura</h3>
+        <p class="home-process__step-body" data-i18n="process.step2_body">Dobieramy narzędzia i projektujemy przepływ pracy.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="left">
       <span class="home-process__num">03</span>
       <div>
-        <h3 class="home-process__step-title">Wdrożenie i Development</h3>
-        <p class="home-process__step-body">Budujemy, kodujemy i integrujemy ekosystem.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step3_title">Wdrożenie i rozwój</h3>
+        <p class="home-process__step-body" data-i18n="process.step3_body">Budujemy, kodujemy i integrujemy ekosystem.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="bottom">
       <span class="home-process__num">04</span>
       <div>
-        <h3 class="home-process__step-title">Optymalizacja i Wsparcie</h3>
-        <p class="home-process__step-body">Szkolimy i dbamy o bezawaryjne działanie.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step4_title">Optymalizacja i wsparcie</h3>
+        <p class="home-process__step-body" data-i18n="process.step4_body">Szkolimy i dbamy o bezawaryjne działanie.</p>
       </div>
     </div>
   </div>
@@ -230,29 +239,29 @@
   <h2 class="home-faq__title" data-reveal-words data-i18n="faq.title">Pytania, które i tak zadasz</h2>
   <div class="faq-item" data-open="false" data-enter="left">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-      <span>Ile kosztuje wdrożenie CRM lub nowej strony?</span>
+      <span data-i18n="faq.q1">Ile kosztuje wdrożenie CRM lub nowej strony?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
     </button>
-    <div class="faq-item__a"><div class="faq-item__a-inner"><p>Zależy od skali projektu. Wycenę dostajesz po Discovery — bez ukrytych kosztów.</p></div></div>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a1">Zależy od skali projektu. Wycenę dostajesz po audycie — bez ukrytych kosztów.</p></div></div>
   </div>
   <div class="faq-item" data-open="false" data-enter="right">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-      <span>Ile potrwa realizacja?</span>
+      <span data-i18n="faq.q2">Ile potrwa realizacja?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
     </button>
-    <div class="faq-item__a"><div class="faq-item__a-inner"><p>Landing: 2–3 tygodnie. Strona firmowa: 4–6 tygodni. CRM/automatyzacja: 3–8 tygodni.</p></div></div>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a2">Landing: 2–3 tygodnie. Strona firmowa: 4–6 tygodni. CRM/automatyzacja: 3–8 tygodni.</p></div></div>
   </div>
   <div class="faq-item" data-open="false" data-enter="bottom">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-      <span>Czy muszę znać się na technologii?</span>
+      <span data-i18n="faq.q3">Czy muszę znać się na technologii?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
     </button>
-    <div class="faq-item__a"><div class="faq-item__a-inner"><p>Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje prostym językiem.</p></div></div>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a3">Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje prostym językiem.</p></div></div>
   </div>
   </div>
 </section>
 
-<!-- 6. KONTAKT + stopka poniżej -->
+<!-- 6. KONTAKT — audyt (stopka osobno poniżej) -->
 <section id="kontakt" class="home-contact home-scene">
   <div class="home-scene__panel">
   <div class="home-contact__video" aria-hidden="true">
@@ -289,6 +298,8 @@
 </main>
 
 <footer class="site-footer">
+  <div class="site-footer__ambient" aria-hidden="true"></div>
+  <div class="site-footer__rule" aria-hidden="true"><span></span></div>
   <div class="footer-grid container">
     <div class="footer-cta" data-enter="left">
       <p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p>
@@ -307,9 +318,9 @@
     <div class="footer-col" data-enter="top">
       <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
       <ul>
-        <li><a href="uslugi/tworzenie-stron-internetowych.html">Strony</a></li>
-        <li><a href="uslugi/grafika-i-montaz-wideo.html">Wideo</a></li>
-        <li><a href="uslugi/systemy-crm.html">CRM</a></li>
+        <li><a href="uslugi/tworzenie-stron-internetowych.html" data-i18n="footer.link_websites">Strony</a></li>
+        <li><a href="uslugi/grafika-i-montaz-wideo.html" data-i18n="footer.link_video">Wideo</a></li>
+        <li><a href="uslugi/systemy-crm.html" data-i18n="footer.link_crm">CRM</a></li>
       </ul>
     </div>
     <div class="footer-col" data-enter="bottom">
@@ -319,7 +330,7 @@
       </ul>
     </div>
   </div>
-  <div class="footer-bottom container">
+  <div class="footer-bottom container" data-enter="bottom">
     <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
     <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
   </div>
@@ -331,16 +342,19 @@
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js"></script>
 <script src="preloader.js"></script>
-<script src="smooth-scroll.js?v=20260731am"></script>
+<script src="smooth-scroll.js?v=20260806d"></script>
 <script src="home-cursor-field.js"></script>
 <script src="home-ambient-bg.js"></script>
-<script type="module" src="home-hero-3d.js?v=20260731ae"></script>
+<script type="module" src="home-hero-3d.js?v=20260807h"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
-<script src="home-services-fan.js?v=20260731au"></script>
+<script src="home-services-fan.js?v=20260806o"></script>
 <script src="home-tile-interact.js"></script>
-<script src="home-section-flow.js?v=20260731au"></script>
-<script src="home-director.js"></script>
+<script src="home-section-flow.js?v=20260806y"></script>
+<script src="home-scroll-rail.js?v=20260806y"></script>
+<script src="home-section-stepper.js?v=20260807e"></script>
+<script src="home-director.js?v=20260807e"></script>
+<script defer src="home-nav-menu.js?v=20260807h"></script>
 </body>
 </html>

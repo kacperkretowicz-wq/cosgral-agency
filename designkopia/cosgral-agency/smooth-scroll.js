@@ -31,16 +31,34 @@
   }
 
   var lenis = new Lenis({
-    lerp: 0.1,
-    duration: 1.15,
+    lerp: 0.08,
+    duration: 1.2,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
-    smoothWheel: true,
+    smoothWheel: false,
     smoothTouch: false,
-    touchMultiplier: 1.2,
-    wheelMultiplier: 1.15,
+    touchMultiplier: 1,
+    wheelMultiplier: 1,
   });
 
   window.cosgralSmoothScroll.lenis = lenis;
+
+  ScrollTrigger.scrollerProxy(document.documentElement, {
+    scrollTop: function (value) {
+      if (arguments.length) {
+        lenis.scrollTo(value, { immediate: true });
+      }
+      return lenis.scroll;
+    },
+    getBoundingClientRect: function () {
+      return {
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+    },
+    pinType: document.documentElement.style.transform ? "transform" : "fixed",
+  });
 
   lenis.on("scroll", ScrollTrigger.update);
 
@@ -49,10 +67,13 @@
   });
   gsap.ticker.lagSmoothing(0);
 
+  var SECTION_IDS = ["top", "rozpad", "uslugi", "proces", "faq", "kontakt"];
+
   document.querySelectorAll('a[href^="#"]').forEach(function (link) {
     link.addEventListener("click", function (e) {
       var href = link.getAttribute("href");
       if (!href || href === "#") return;
+      if (SECTION_IDS.indexOf(href.slice(1)) >= 0) return;
       var target = document.querySelector(href);
       if (!target) return;
       e.preventDefault();

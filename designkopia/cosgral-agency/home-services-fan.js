@@ -26,6 +26,9 @@
   var touchStartX = 0;
   var touchStartY = 0;
   var hintHidden = false;
+  var tapHintTimer = null;
+  var tapHintVisible = false;
+  var TAP_HINT_MS = 3000;
   var wheelAccumX = 0;
   var wheelCooldown = false;
   var lastNavAt = 0;
@@ -171,8 +174,8 @@
       progressBar.style.width =
         ((activeIndex / Math.max(1, total - 1)) * 100).toFixed(1) + "%";
     }
-    if (btnPrev) btnPrev.disabled = false;
-    if (btnNext) btnNext.disabled = false;
+    if (btnPrev) btnPrev.setAttribute("aria-hidden", tapHintVisible ? "false" : "true");
+    if (btnNext) btnNext.setAttribute("aria-hidden", tapHintVisible ? "false" : "true");
 
     index = activeIndex;
   }
@@ -205,6 +208,7 @@
     if (!canNavigate()) return false;
     lastNavAt = Date.now();
     hideHint();
+    hideTapHint();
     if (dir > 0) next();
     else prev();
     return true;
@@ -214,6 +218,28 @@
     if (hintHidden || !hint) return;
     hintHidden = true;
     hint.classList.add("is-hidden");
+  }
+
+  function hideTapHint() {
+    if (!tapHintVisible) return;
+    tapHintVisible = false;
+    stage.classList.remove("is-tap-hint");
+    if (tapHintTimer) {
+      window.clearTimeout(tapHintTimer);
+      tapHintTimer = null;
+    }
+    if (btnPrev) btnPrev.setAttribute("aria-hidden", "true");
+    if (btnNext) btnNext.setAttribute("aria-hidden", "true");
+  }
+
+  function showTapHint() {
+    if (REDUCED || tapHintVisible) return;
+    tapHintVisible = true;
+    stage.classList.add("is-tap-hint");
+    if (btnPrev) btnPrev.setAttribute("aria-hidden", "false");
+    if (btnNext) btnNext.setAttribute("aria-hidden", "false");
+    if (tapHintTimer) window.clearTimeout(tapHintTimer);
+    tapHintTimer = window.setTimeout(hideTapHint, TAP_HINT_MS);
   }
 
   function goTo(nextIndex) {
@@ -240,15 +266,17 @@
   }
 
   // ——— Nawigacja ———
-  if (btnPrev) btnPrev.addEventListener("click", function (e) { e.preventDefault(); prev(); });
-  if (btnNext) btnNext.addEventListener("click", function (e) { e.preventDefault(); next(); });
-
   stage.addEventListener("click", function (e) {
     if (e.target.closest(".services-fan__card.is-active")) return;
     var rect = stage.getBoundingClientRect();
     var x = e.clientX - rect.left;
-    if (x < rect.width * 0.28) prev();
-    else if (x > rect.width * 0.72) next();
+    if (x < rect.width * 0.28) {
+      hideTapHint();
+      prev();
+    } else if (x > rect.width * 0.72) {
+      hideTapHint();
+      next();
+    }
   });
 
   stage.addEventListener(
@@ -269,6 +297,7 @@
       var dy = e.changedTouches[0].clientY - touchStartY;
       if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
       hideHint();
+      hideTapHint();
       if (dx < 0) next();
       else prev();
     },
@@ -331,8 +360,14 @@
           section.classList.toggle("is-in-view", entry.isIntersecting);
           if (entry.isIntersecting) {
             document.documentElement.classList.add("is-sand-stream");
-          } else if (!document.getElementById("rozpad")?.classList.contains("is-active")) {
-            document.documentElement.classList.remove("is-sand-stream");
+            showTapHint();
+          } else {
+            hideTapHint();
+            if (!(window.cosgralSand && window.cosgralSand.locked)) {
+              if (!document.getElementById("rozpad")?.classList.contains("is-active")) {
+                document.documentElement.classList.remove("is-sand-stream");
+              }
+            }
           }
         });
       },
