@@ -28,6 +28,13 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   var cardForces = new Float32Array(8 * 4); // up to 8 cards: cx,cy,w,h in NDC-ish
   var menuBlend = 0;
   var menuTween = { blend: 0 };
+  var heroLook = { x: 0, y: 0 };
+  var scrollHandoff = null;
+  var prevMotion = 0;
+  var introTween = { progress: 0 };
+  var introStarted = false;
+  var introDone = false;
+  var INTRO_DUR = MOBILE ? 2.9 : 3.35;
   var menuFrom = {
     px: 0,
     py: 0,
@@ -45,6 +52,51 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     var t = Math.min(1, Math.max(0, (x - a) / (b - a)));
     return t * t * (3 - 2 * t);
   }
+
+  function introEase01(p) {
+    return 1 - Math.pow(1 - p, 2.45);
+  }
+
+  function quadArc(t, sx, sy, cx, cy, ex, ey) {
+    var u = 1 - t;
+    return {
+      x: u * u * sx + 2 * u * t * cx + t * t * ex,
+      y: u * u * sy + 2 * u * t * cy + t * t * ey,
+    };
+  }
+
+  function startIntro() {
+    if (introStarted) return;
+    introStarted = true;
+    if (window.gsap) {
+      gsap.killTweensOf(introTween);
+      gsap.to(introTween, {
+        progress: 1,
+        duration: INTRO_DUR,
+        ease: "power2.out",
+        onComplete: function () {
+          introDone = true;
+        },
+      });
+      return;
+    }
+    introTween.progress = 1;
+    introDone = true;
+  }
+
+  function watchIntroReady() {
+    if (document.body.classList.contains("is-ready")) startIntro();
+    else {
+      new MutationObserver(function (_, obs) {
+        if (document.body.classList.contains("is-ready")) {
+          obs.disconnect();
+          startIntro();
+        }
+      }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    }
+  }
+
+  watchIntroReady();
 
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -471,9 +523,8 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       tm = sandExt.motionTail || 0;
       if (sandExt.resetCube) {
         cinema = 0;
-        displayCinema = 0;
-        displayMotion = 0;
         sandLocked = false;
+        scrollHandoff = null;
         delete sandExt.resetCube;
       }
       if (sandExt.locked && cinema >= 0.96) sandLocked = true;
@@ -510,14 +561,130 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
     var approach = smooth01(0, 0.34, motion);
     var depart = smooth01(0.32, 0.93, motion);
+    var heroReady = document.body.classList.contains("is-ready");
+    var inHero = motion < 0.01 && menuBlend < 0.001;
 
-    var posX = centerX + (1 - approach) * heroX - depart * cornerX;
-    var posY = centerY + (1 - approach) * heroY + depart * cornerY;
-    var posZ = (1 - approach) * heroZ - depart * 0.72;
+    var scrollPosX = centerX + (1 - approach) * heroX - depart * cornerX;
+    var scrollPosY = centerY + (1 - approach) * heroY + depart * cornerY;
+    var scrollPosZ = (1 - approach) * heroZ - depart * 0.72;
+    var scrollSc = heroScale + (peakScale - heroScale) * approach;
+
+    var spin = 0.016 + approach * 0.01 + depart * 0.005;
+    var scrollRotX =
+      0.22 + mouse.y * 0.05 + t * (0.009 + approach * 0.005) + (1 - approach) * 0.26;
+    var scrollRotY =
+      t * spin + mouse.x * 0.1 + (1 - approach) * -0.28 + approach * 0.18 - depart * 0.08;
+    var scrollRotZ = mouse.x * 0.01 + t * 0.008 + (1 - approach) * -0.08 + depart * 0.03;
+
+    var idleRotX = 0.22 + Math.sin(t * 0.35) * 0.04;
+    var idleRotY = -0.35 + Math.cos(t * 0.28) * 0.05;
+    var idleRotZ = Math.sin(t * 0.22) * 0.02;
+
+    var introActive = introStarted && !introDone && motion < 0.01 && menuBlend < 0.001;
+    var introDim = 1;
+    var motionDelta = motion - prevMotion;
+    var leavingHero = motionDelta > 0.00008;
+    var returningHero = motionDelta < -0.00008;
+
+    if (returningHero) scrollHandoff = null;
+    if (motion < 0.008) scrollHandoff = null;
+
+    if (heroReady && inHero && introDone) {
+      var ptr = window.cosgralPointer;
+      if (ptr) {
+        heroLook.y += ptr.nx * 0.023;
+        heroLook.x += ptr.ny * 0.016;
+      }
+    } else if (!inHero && motion > 0.01) {
+      heroLook.x *= 0.98;
+      heroLook.y *= 0.98;
+    }
+
+    if (!scrollHandoff && leavingHero && motion >= 0.01 && motion < 0.04) {
+      scrollHandoff = {
+        px: heroX,
+        py: heroY,
+        pz: heroZ,
+        rx: idleRotX + heroLook.x,
+        ry: idleRotY + heroLook.y,
+        rz: idleRotZ,
+        sc: heroScale,
+      };
+    }
+
+    var posX;
+    var posY;
+    var posZ;
+    var sc;
+    var rotX;
+    var rotY;
+    var rotZ;
+
+    if (introActive) {
+      var introT = introEase01(introTween.progress);
+      var flyStartX = MOBILE ? 7.15 : 8.75;
+      var flyStartY = MOBILE ? -4.15 : -5.05;
+      var flyStartZ = 0.14;
+      var flyCtrlX = flyStartX * 0.36 + heroX * 0.64;
+      var flyCtrlY = heroY + (MOBILE ? 1.28 : 1.72);
+      var flyArc = quadArc(introT, flyStartX, flyStartY, flyCtrlX, flyCtrlY, heroX, heroY);
+      posX = flyArc.x;
+      posY = flyArc.y;
+      posZ = flyStartZ + (heroZ - flyStartZ) * introT;
+      sc = heroScale * (0.82 + 0.18 * introT);
+      var flyStartRx = 0.52;
+      var flyStartRy = -1.18;
+      var flyStartRz = 0.32;
+      rotX = flyStartRx + (idleRotX - flyStartRx) * introT;
+      rotY = flyStartRy + (idleRotY - flyStartRy) * introT;
+      rotZ = flyStartRz + (idleRotZ - flyStartRz) * introT;
+      introDim = Math.min(1, introTween.progress * 3.2);
+    } else if (!introStarted && motion < 0.01 && menuBlend < 0.001) {
+      posX = MOBILE ? 7.15 : 8.75;
+      posY = MOBILE ? -4.15 : -5.05;
+      posZ = 0.14;
+      sc = heroScale * 0.82;
+      rotX = 0.52;
+      rotY = -1.18;
+      rotZ = 0.32;
+      introDim = 0;
+    } else if (inHero) {
+      posX = heroX;
+      posY = heroY;
+      posZ = heroZ;
+      sc = heroScale;
+      rotX = idleRotX + heroLook.x;
+      rotY = idleRotY + heroLook.y;
+      rotZ = idleRotZ;
+    } else if (scrollHandoff && leavingHero) {
+      var handoffT = smooth01(0.01, 0.26, motion);
+      posX = scrollHandoff.px + (scrollPosX - scrollHandoff.px) * handoffT;
+      posY = scrollHandoff.py + (scrollPosY - scrollHandoff.py) * handoffT;
+      posZ = scrollHandoff.pz + (scrollPosZ - scrollHandoff.pz) * handoffT;
+      sc = scrollHandoff.sc + (scrollSc - scrollHandoff.sc) * handoffT;
+      rotX = scrollHandoff.rx + (scrollRotX - scrollHandoff.rx) * handoffT;
+      rotY = scrollHandoff.ry + (scrollRotY - scrollHandoff.ry) * handoffT;
+      rotZ = scrollHandoff.rz + (scrollRotZ - scrollHandoff.rz) * handoffT;
+    } else if (motion >= 0.01) {
+      posX = scrollPosX;
+      posY = scrollPosY;
+      posZ = scrollPosZ;
+      sc = scrollSc;
+      rotX = scrollRotX;
+      rotY = scrollRotY;
+      rotZ = scrollRotZ;
+    }
+
+    prevMotion = motion;
+
     cubeGroup.position.set(posX, posY, posZ);
-
-    var sc = heroScale + (peakScale - heroScale) * approach;
     cubeGroup.scale.set(sc, sc, sc);
+    cubeGroup.rotation.x = rotX;
+    cubeGroup.rotation.y = rotY;
+    cubeGroup.rotation.z = rotZ;
+
+    root.position.set(0, 0, 0);
+    root.rotation.set(0, 0, 0);
 
     var cubeVisible = depart < 0.93;
 
@@ -526,14 +693,6 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     if (uslugiPanel && window.gsap) {
       tilesOp = parseFloat(gsap.getProperty(uslugiPanel, "opacity")) || 0;
     }
-
-    var spin = 0.016 + approach * 0.01 + depart * 0.005;
-    cubeGroup.rotation.y =
-      t * spin + mouse.x * 0.1 + (1 - approach) * -0.28 + approach * 0.18 - depart * 0.08;
-    cubeGroup.rotation.x =
-      0.22 + mouse.y * 0.05 + t * (0.009 + approach * 0.005) + (1 - approach) * 0.26;
-    cubeGroup.rotation.z =
-      mouse.x * 0.01 + t * 0.008 + (1 - approach) * -0.08 + depart * 0.03;
 
     if (menuBlend > 0.001) {
       var menuScale = heroScale * 1.14;
@@ -578,10 +737,18 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       wire.material.opacity = 0.09 * cubeDim;
       edges.material.opacity = 0.42 * cubeDim;
     } else {
-      sMat.uniforms.uFade.value = cubeVisible ? 1 : 0;
-      shell.material.opacity = cubeVisible ? 0.58 : 0;
-      wire.material.opacity = cubeVisible ? 0.09 : 0;
-      edges.material.opacity = cubeVisible ? 0.42 : 0;
+      var fade = introActive || (!introStarted && motion < 0.01 && menuBlend < 0.001)
+        ? introDim
+        : cubeVisible
+          ? 1
+          : 0;
+      sMat.uniforms.uFade.value = fade;
+      shell.material.opacity = 0.58 * fade;
+      wire.material.opacity = 0.09 * fade;
+      edges.material.opacity = 0.42 * fade;
+      if (introActive || (!introStarted && motion < 0.01 && menuBlend < 0.001)) {
+        cubeVisible = fade > 0.02;
+      }
     }
 
     cubeGroup.visible = cubeVisible;

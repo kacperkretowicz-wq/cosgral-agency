@@ -196,12 +196,13 @@
     var hero = document.getElementById("top");
     var shatter = document.getElementById("rozpad");
     var services = document.getElementById("uslugi");
+    var work = document.getElementById("realizacje");
     var process = document.getElementById("proces");
     var faq = document.getElementById("faq");
     var contact = document.getElementById("kontakt");
 
     if (REDUCED) {
-      [hero, shatter, services, process, faq, contact].forEach(function (s) {
+      [hero, shatter, services, work, process, faq, contact].forEach(function (s) {
         if (s) s.classList.add("is-entered", "is-visible");
       });
       return;
@@ -342,6 +343,14 @@
         },
       });
     }
+
+    wireScene(work, {
+      id: "scene-realizacje",
+      pin: MOBILE ? "+=88%" : "+=108%",
+      priority: 2,
+      onEnter: lockSandStream,
+      onEnterBack: lockSandStream,
+    });
 
     wireScene(process, {
       id: "scene-proces",

@@ -7,7 +7,7 @@
 <meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260807h" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260808j" />
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -36,7 +36,9 @@
 
 <div id="preloader" aria-hidden="true">
   <div class="preloader__inner">
-    <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" />
+    <div class="preloader__cube-slot" aria-hidden="true">
+      <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" />
+    </div>
     <div class="preloader__counter" id="preloader-counter">000</div>
     <p class="preloader__label" data-i18n="preloader.label">Inicjalizacja sygnału</p>
   </div>
@@ -45,7 +47,7 @@
 <a class="visually-hidden" href="#main">Przejdź do treści</a>
 
 <nav class="site-nav" id="site-nav">
-  <a href="#top" class="site-nav__logo" aria-label="COSGRAL">
+  <a href="index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
     <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <div class="site-nav__actions">
@@ -192,7 +194,61 @@
   </div>
 </section>
 
-<!-- 4. WORKFLOW -->
+<!-- 4. REALIZACJE — podgląd + link do portfolio -->
+<section id="realizacje" class="home-work home-scene">
+  <div class="home-scene__panel">
+  <div class="container home-work__head">
+    <p class="section-label" data-enter="left" data-i18n="work.eyebrow">Realizacje</p>
+    <h2 class="home-work__title" data-reveal-words data-i18n="work.title">Sygnatury, które wysłaliśmy w świat.</h2>
+    <p class="home-work__lead" data-enter="right" data-i18n="work.bentoLead">Montaż, produkty cyfrowe i kreacja — w jednej sygnaturze.</p>
+  </div>
+
+  <div class="home-work__grid container" data-enter="bottom">
+    <a class="home-work__card home-work__card--wide" href="portfolio.html#strony" data-tile-interact>
+      <div class="home-work__card-media" aria-hidden="true">
+        <video muted loop playsinline preload="metadata" src="portfolio/showcase/web/trove-archive.mp4"></video>
+      </div>
+      <div class="home-work__card-body">
+        <span class="home-work__card-tag" data-i18n="bento.strony">Strony internetowe</span>
+        <span class="home-work__card-cta" data-i18n="work.visit">Zobacz live</span>
+      </div>
+    </a>
+    <a class="home-work__card" href="portfolio.html#montaz" data-tile-interact>
+      <div class="home-work__card-media" aria-hidden="true">
+        <video muted loop playsinline preload="metadata" poster="portfolio/reels/orlincy/001-poster.jpg" src="portfolio/reels/orlincy/001.mp4"></video>
+      </div>
+      <div class="home-work__card-body">
+        <span class="home-work__card-tag" data-i18n="bento.montaz">Montaż wideo</span>
+        <span class="home-work__card-cta" data-i18n="work.caseStudy">Case study</span>
+      </div>
+    </a>
+    <a class="home-work__card" href="portfolio.html#grafiki" data-tile-interact>
+      <div class="home-work__card-media" aria-hidden="true">
+        <video muted loop playsinline preload="metadata" poster="portfolio/showcase/graphics/home-grafiki-social-poster.jpg" src="portfolio/showcase/graphics/home-grafiki-social.mp4"></video>
+      </div>
+      <div class="home-work__card-body">
+        <span class="home-work__card-tag" data-i18n="bento.grafiki">Grafiki &amp; social</span>
+        <span class="home-work__card-cta" data-i18n="work.caseStudy">Case study</span>
+      </div>
+    </a>
+    <a class="home-work__card" href="portfolio.html#automatyzacje" data-tile-interact>
+      <div class="home-work__card-media home-work__card-media--dim" aria-hidden="true">
+        <video muted loop playsinline preload="metadata" src="assets/services/automatyzacje.mp4"></video>
+      </div>
+      <div class="home-work__card-body">
+        <span class="home-work__card-tag" data-i18n="work.card_automation">Systemy i automatyzacje</span>
+        <span class="home-work__card-cta" data-i18n="work.caseStudy">Case study</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="container home-work__footer" data-enter="bottom">
+    <a class="home-work__link glass-btn" href="portfolio.html" data-i18n="work.fullPortfolio">Pełne portfolio</a>
+  </div>
+  </div>
+</section>
+
+<!-- 5. WORKFLOW -->
 <section id="proces" class="home-process home-scene">
   <div class="home-scene__panel">
   <div class="container">
@@ -233,7 +289,7 @@
   </div>
 </section>
 
-<!-- 5. FAQ -->
+<!-- 6. FAQ -->
 <section id="faq" class="home-faq home-scene">
   <div class="home-scene__panel">
   <h2 class="home-faq__title" data-reveal-words data-i18n="faq.title">Pytania, które i tak zadasz</h2>
@@ -261,7 +317,7 @@
   </div>
 </section>
 
-<!-- 6. KONTAKT — audyt (stopka osobno poniżej) -->
+<!-- 7. KONTAKT — audyt (stopka osobno poniżej) -->
 <section id="kontakt" class="home-contact home-scene">
   <div class="home-scene__panel">
   <div class="home-contact__video" aria-hidden="true">
@@ -308,7 +364,7 @@
       <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
       <ul>
         <li><a href="#top" data-i18n="nav.start">Start</a></li>
-        <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="#realizacje" data-i18n="nav.work">Realizacje</a></li>
         <li><a href="#uslugi" data-i18n="nav.services">Usługi</a></li>
         <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
         <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
@@ -341,20 +397,20 @@
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js"></script>
-<script src="preloader.js"></script>
+<script src="preloader.js?v=20260807y"></script>
 <script src="smooth-scroll.js?v=20260806d"></script>
 <script src="home-cursor-field.js"></script>
 <script src="home-ambient-bg.js"></script>
-<script type="module" src="home-hero-3d.js?v=20260807h"></script>
+<script type="module" src="home-hero-3d.js?v=20260808g"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260806o"></script>
 <script src="home-tile-interact.js"></script>
-<script src="home-section-flow.js?v=20260806y"></script>
-<script src="home-scroll-rail.js?v=20260806y"></script>
-<script src="home-section-stepper.js?v=20260807e"></script>
+<script src="home-section-flow.js?v=20260808h"></script>
+<script src="home-scroll-rail.js?v=20260808h"></script>
+<script src="home-section-stepper.js?v=20260808h"></script>
 <script src="home-director.js?v=20260807e"></script>
-<script defer src="home-nav-menu.js?v=20260807i"></script>
+<script defer src="home-nav-menu.js?v=20260807w"></script>
 </body>
 </html>

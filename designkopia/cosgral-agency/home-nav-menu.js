@@ -70,10 +70,10 @@
       {
         opacity: 1,
         y: 0,
-        duration: 0.48,
-        stagger: 0.045,
+        duration: 0.52,
+        stagger: 0.055,
         ease: "power3.out",
-        delay: side ? 0.62 : 0.46,
+        delay: side ? 1.24 : 0.92,
         overwrite: true,
         clearProps: "transform",
       }
@@ -133,7 +133,7 @@
     if (cubeTween && cubeTween.eventCallback) {
       cubeTween.eventCallback("onComplete", done);
     } else {
-      window.setTimeout(done, REDUCED ? 0 : 920);
+      window.setTimeout(done, REDUCED ? 0 : 1840);
     }
   }
 
@@ -154,7 +154,7 @@
         animating = false;
         if (onComplete) onComplete();
       },
-      REDUCED ? 0 : 300
+      REDUCED ? 0 : 560
     );
   }
 
@@ -189,6 +189,24 @@
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && isOpen) closeNav();
+  });
+
+  document.querySelectorAll("a.site-nav__logo").forEach(function (logo) {
+    logo.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (isOpen) closeNav();
+      if (window.cosgralSectionSnap?.jumpTo) {
+        window.cosgralSectionSnap.jumpTo(0);
+        return;
+      }
+      if (window.cosgralSmoothScroll?.scrollTo) {
+        window.cosgralSmoothScroll.scrollTo(0, { duration: 2.2 });
+        return;
+      }
+      var top = document.getElementById("top");
+      if (top) top.scrollIntoView({ behavior: "smooth" });
+      else window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   });
 
   window.cosgralNavMenu = { open: openNav, close: closeNav, isOpen: function () { return isOpen; } };

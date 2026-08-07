@@ -118,6 +118,10 @@
     },
     "visualTitle": { "pl": "Wybrane sygnatury.", "en": "Selected signatures." },
     "fullPortfolio": { "pl": "Pełne portfolio", "en": "Discover all projects" },
+    "card_automation": {
+      "pl": "Systemy i automatyzacje",
+      "en": "Systems & automation"
+    },
     "bentoTitle": { "pl": "Recent work", "en": "Recent work" },
     "bentoLead": {
       "pl": "Montaż, produkty cyfrowe i kreacja — w jednej sygnaturze.",

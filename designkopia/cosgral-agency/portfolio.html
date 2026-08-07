@@ -4,10 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Portfolio — cosgral.agency</title>
-<meta name="description" content="Realizacje COSGRAL — montaż wideo, kreacja graficzna, strony internetowe i więcej." />
+<meta name="description" content="Realizacje — montaż wideo, kreacja graficzna, strony internetowe i więcej." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260807i" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260807ak" />
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -25,87 +25,32 @@
 <div class="subpage-cube-portal" aria-hidden="true">
   <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
 </div>
+<div class="grafiki-bloom" id="grafiki-bloom" aria-hidden="true"></div>
 
 <nav class="site-nav" id="site-nav">
   <a href="index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
     <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
-  <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
-    <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-    <span>Menu</span>
-  </button>
 </nav>
-<div class="nav-overlay" id="nav-overlay" aria-hidden="true">
-  <div class="nav-overlay__backdrop" data-nav-close></div>
-  <div class="nav-overlay__stage">
-    <nav class="nav-overlay__links" aria-label="Menu główne">
-      <ul class="nav-overlay__list">
-        <li><a href="index.html#top" data-nav-close>Start</a></li>
-        <li><a href="portfolio.html" data-nav-close>Realizacje</a></li>
-        <li><a href="index.html#uslugi" data-nav-close>Usługi</a></li>
-        <li><a href="index.html#proces" data-nav-close>Proces</a></li>
-        <li><a href="index.html#faq" data-nav-close>FAQ</a></li>
-        <li><a href="index.html#kontakt" data-nav-close>Kontakt</a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
 
 <main id="main">
-  <header class="portfolio-hero container">
-    <span class="section-eyebrow">Portfolio</span>
-    <h1 class="portfolio-hero__title">Realizacje COSGRAL</h1>
-    <p class="portfolio-hero__lead">Prace podzielone według usług — montaż, kreacja graficzna, strony internetowe i kolejne obszary w drodze.</p>
+  <header class="portfolio-hero">
+    <h1 class="portfolio-hero__title">Realizacje</h1>
+    <p class="portfolio-hero__lead">Zobacz, co tworzymy i co możemy stworzyć wspólnie</p>
   </header>
 
-  <nav class="portfolio-nav" aria-label="Sekcje portfolio">
-    <a href="#montaz">Montaż wideo</a>
-    <a href="#grafiki">Grafiki</a>
-    <a href="#strony">Strony internetowe</a>
-    <span class="is-disabled">Social media</span>
-    <span class="is-disabled">Reklama</span>
-    <span class="is-disabled">Automatyzacje</span>
-  </nav>
-
-  <section id="montaz" class="portfolio-section">
+  <section id="strony" class="portfolio-section" data-portfolio-section>
+    <div class="portfolio-section__curtain" aria-hidden="true"></div>
     <div class="container">
-      <div class="portfolio-section__head">
-        <h2 class="portfolio-section__title">Montaż wideo</h2>
-        <p class="section-lead">Rolki, reklamy, BTS — od surowego materiału po gotowy format pod social.</p>
-        <a class="portfolio-section__link" href="uslugi/grafika-i-montaz-wideo.html">Usługa: montaż i wideo →</a>
-      </div>
-      <div id="reels-tiles" class="reels-tiles"></div>
-      <p class="reels-tiles__footer">
-        <a class="reels-tiles__cta glass-btn" href="portfolio-montaz.html">Zobacz wszystko →</a>
-      </p>
-    </div>
-  </section>
-
-  <section id="grafiki" class="portfolio-section">
-    <div class="container">
-      <div class="portfolio-section__head">
-        <h2 class="portfolio-section__title">Grafiki</h2>
-        <p class="section-lead">Posty, stories i key visuale — kreacja pod social i kampanie.</p>
-        <a class="portfolio-section__link" href="uslugi/grafika-i-montaz-wideo.html">Usługa: grafika i wideo →</a>
-      </div>
-      <div id="graphics-collage" class="graphics-collage"></div>
-      <p class="graphics-collage__footer">
-        <a class="graphics-collage__cta glass-btn" href="portfolio-grafiki.html">Zobacz wszystko →</a>
-      </p>
-    </div>
-  </section>
-
-  <section id="strony" class="portfolio-section">
-    <div class="container">
-      <div class="portfolio-section__head">
+      <div class="portfolio-section__head" data-portfolio-head>
         <h2 class="portfolio-section__title">Strony internetowe</h2>
         <p class="section-lead">Projekty web — od landingów po rozbudowane serwisy marek.</p>
         <a class="portfolio-section__link" href="uslugi/tworzenie-stron-internetowych.html">Usługa: strony internetowe →</a>
       </div>
-      <div class="portfolio-web-grid">
+      <div class="portfolio-web-grid" data-portfolio-body>
         <a class="portfolio-web-card" href="https://mjsocialmedia.netlify.app/" target="_blank" rel="noopener noreferrer">
           <div class="portfolio-web-card__preview portfolio-web-card__preview--mj" aria-hidden="true">
-            <video class="portfolio-web-card__video" src="portfolio/showcase/web/mj-social-media.mp4" muted loop playsinline autoplay></video>
+            <video class="portfolio-web-card__video" data-portfolio-video data-video-src="portfolio/showcase/web/mj-social-media.mp4" muted loop playsinline preload="none"></video>
             <div class="portfolio-web-card__chrome">
               <span></span><span></span><span></span>
             </div>
@@ -120,7 +65,7 @@
         </a>
         <a class="portfolio-web-card" href="https://trovearchive.com/" target="_blank" rel="noopener noreferrer">
           <div class="portfolio-web-card__preview portfolio-web-card__preview--trove" aria-hidden="true">
-            <video class="portfolio-web-card__video" src="portfolio/showcase/web/trove-archive.mp4" muted loop playsinline autoplay></video>
+            <video class="portfolio-web-card__video" data-portfolio-video data-video-src="portfolio/showcase/web/trove-archive.mp4" muted loop playsinline preload="none"></video>
             <div class="portfolio-web-card__chrome">
               <span></span><span></span><span></span>
             </div>
@@ -136,35 +81,136 @@
       </div>
     </div>
   </section>
+
+  <section id="montaz" class="portfolio-section" data-portfolio-section>
+    <div class="portfolio-section__curtain" aria-hidden="true"></div>
+    <div class="container">
+      <div class="portfolio-section__head" data-portfolio-head>
+        <h2 class="portfolio-section__title">Montaż wideo</h2>
+        <p class="section-lead">Rolki, reklamy, BTS — od surowego materiału po gotowy format pod social.</p>
+        <a class="portfolio-section__link" href="uslugi/grafika-i-montaz-wideo.html">Usługa: montaż i wideo →</a>
+      </div>
+      <div data-portfolio-body>
+        <div id="reels-tiles" class="reels-tiles"></div>
+        <p class="reels-tiles__footer">
+          <a class="reels-tiles__cta glass-btn" href="portfolio-montaz.html">Zobacz wszystko →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="grafiki" class="portfolio-section portfolio-section--grafiki" data-portfolio-section>
+    <div class="portfolio-section__curtain" aria-hidden="true"></div>
+    <div class="container">
+      <div class="portfolio-section__head" data-portfolio-head>
+        <h2 class="portfolio-section__title">Grafiki</h2>
+        <p class="section-lead">Posty, stories i key visuale — kreacja pod social i kampanie.</p>
+        <a class="portfolio-section__link" href="uslugi/grafika-i-montaz-wideo.html">Usługa: grafika i wideo →</a>
+      </div>
+    </div>
+    <div class="graphics-collage-wrap" data-portfolio-body>
+      <div id="graphics-collage" class="graphics-collage"></div>
+    </div>
+    <div class="container">
+      <p class="graphics-collage__footer">
+        <a class="graphics-collage__cta glass-btn" href="portfolio-grafiki.html">Zobacz wszystko →</a>
+      </p>
+    </div>
+  </section>
+
+  <section id="automatyzacje" class="portfolio-section portfolio-section--automatyzacje" data-portfolio-section>
+    <div class="portfolio-section__curtain" aria-hidden="true"></div>
+    <div class="container">
+      <div class="portfolio-section__head" data-portfolio-head>
+        <h2 class="portfolio-section__title">Systemy i Automatyzacje</h2>
+        <p class="section-lead">Workflowy, integracje i narzędzia — kolejne case study w przygotowaniu.</p>
+      </div>
+      <div class="portfolio-section__spacer" data-portfolio-body aria-hidden="true"></div>
+    </div>
+  </section>
 </main>
 
+<div class="reels-lightbox" id="reels-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Podgląd rolki">
+  <button type="button" class="reels-lightbox__backdrop" data-reel-close aria-label="Zamknij"></button>
+  <figure class="reels-lightbox__figure">
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev aria-label="Poprzednia rolka" hidden>‹</button>
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next aria-label="Następna rolka" hidden>›</button>
+    <video class="reels-lightbox__video" controls playsinline hidden></video>
+    <button type="button" class="reels-lightbox__close" data-reel-close aria-label="Zamknij">×</button>
+  </figure>
+</div>
+
+<div class="graphics-lightbox" id="graphics-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Podgląd grafiki">
+  <button type="button" class="graphics-lightbox__backdrop" data-lightbox-close aria-label="Zamknij"></button>
+  <figure class="graphics-lightbox__figure">
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev aria-label="Poprzednia grafika" hidden>‹</button>
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next aria-label="Następna grafika" hidden>›</button>
+    <img class="graphics-lightbox__img" alt="" hidden />
+    <video class="graphics-lightbox__video" controls playsinline hidden></video>
+    <button type="button" class="graphics-lightbox__close" data-lightbox-close aria-label="Zamknij">×</button>
+  </figure>
+</div>
+
 <footer class="site-footer">
-  <div class="container footer-inner">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-cta"><p class="cosgral-footer-wordmark">cosgral agency</p></div>
+      <div class="footer-col">
+        <p class="footer-col__title">Sekcje</p>
+        <ul>
+          <li><a href="index.html#top">Start</a></li>
+          <li><a href="portfolio.html">Realizacje</a></li>
+          <li><a href="index.html#uslugi">Usługi</a></li>
+          <li><a href="index.html#proces">Proces</a></li>
+          <li><a href="index.html#faq">FAQ</a></li>
+          <li><a href="index.html#kontakt">Kontakt</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title">Usługi</p>
+        <ul>
+          <li><a href="uslugi/tworzenie-stron-internetowych.html">Strony internetowe</a></li>
+          <li><a href="uslugi/projektowanie-aplikacji.html">Aplikacje</a></li>
+          <li><a href="uslugi/pozycjonowanie-seo-geo.html">Pozycjonowanie SEO/GEO</a></li>
+          <li><a href="uslugi/wdrazanie-automatyzacji.html">Automatyzacje</a></li>
+          <li><a href="uslugi/systemy-crm.html">Systemy CRM</a></li>
+          <li><a href="uslugi/grafika-i-montaz-wideo.html">Grafika i wideo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title">Kontakt</p>
+        <ul>
+          <li><a href="mailto:hello@cosgral.agency">hello@cosgral.agency</a></li>
+          <li><a href="index.html#kontakt">Bezpłatny audyt →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title">Social</p>
+        <ul>
+          <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
     <div class="footer-bottom">
       <span>© 2026 cosgral agency</span>
-      <a href="index.html#top">← Strona główna</a>
+      <a href="/privacy-policy">Privacy Policy</a>
     </div>
   </div>
 </footer>
 
+<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
+<script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="home-cursor-field.js"></script>
 <script src="subpage-ambient-bg.js?v=20260807a"></script>
-<script type="module" src="subpage-cube.js?v=20260807a"></script>
+<script type="module" src="subpage-cube.js?v=20260807w"></script>
 <script src="sections.js"></script>
-<script src="portfolio-montaz.js?v=20260807i"></script>
-<script src="portfolio-graphics.js?v=20260807g"></script>
-<script>
-(function () {
-  var links = document.querySelectorAll(".portfolio-nav a[href^='#']");
-  function sync() {
-    var id = (location.hash || "#montaz").slice(1);
-    links.forEach(function (a) {
-      a.classList.toggle("is-active", a.getAttribute("href") === "#" + id);
-    });
-  }
-  window.addEventListener("hashchange", sync);
-  sync();
-})();
-</script>
+<script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
+<script src="portfolio-video.js?v=20260807ag"></script>
+<script src="portfolio-montaz.js?v=20260807ap"></script>
+<script src="portfolio-graphics.js?v=20260807ak"></script>
+<script src="portfolio-page-motion.js?v=20260807m"></script>
+<script src="portfolio-scroll-rail.js?v=20260807ae"></script>
 </body>
 </html>

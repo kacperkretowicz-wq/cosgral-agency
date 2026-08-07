@@ -6,10 +6,7 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
-  var cards = document.querySelectorAll(".services-fan__card[data-tile-interact]");
-  if (!cards.length) return;
-
-  cards.forEach(function (card) {
+  document.querySelectorAll(".services-fan__card[data-tile-interact]").forEach(function (card) {
     var media = card.querySelector(".services-fan__card-media");
     var video = card.querySelector("video");
 
@@ -45,6 +42,21 @@
         media.style.transform =
           "translate(" + (dx * 14).toFixed(1) + "px, " + (dy * 14).toFixed(1) + "px) scale(1.14) rotateX(" +
           tiltX.toFixed(2) + "deg) rotateY(" + tiltY.toFixed(2) + "deg)";
+      }
+    });
+  });
+
+  document.querySelectorAll(".home-work__card[data-tile-interact]").forEach(function (card) {
+    var video = card.querySelector("video");
+
+    card.addEventListener("mouseenter", function () {
+      if (video) video.play().catch(function () {});
+    });
+
+    card.addEventListener("mouseleave", function () {
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
       }
     });
   });

@@ -1,6 +1,5 @@
 /**
- * Subpage cube — lighter variant of homepage hero cube.
- * Scroll-driven drift + rotation; subtle idle motion.
+ * Subpage cube — scroll drift + menu fly-in (jak homepage).
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
@@ -14,8 +13,23 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
   var HALF = 1.35;
   var CUBE_SCALE = MOBILE ? 0.36 : 0.46;
+  var MENU_SIZE_MULT = 1.5;
+  var MENU_OPEN_DUR = 2.16;
+  var MENU_CLOSE_DUR = 1.44;
   var scrollProgress = 0;
   var mouse = { x: 0, y: 0 };
+  var menuBlend = 0;
+  var menuTween = { blend: 0 };
+  var menuFrom = {
+    px: 0,
+    py: 0,
+    pz: 0,
+    rx: 0,
+    ry: 0,
+    rz: 0,
+    sc: CUBE_SCALE,
+    sideEntry: true,
+  };
 
   function randomOnCube(h) {
     var face = Math.floor(Math.random() * 6);
@@ -119,6 +133,79 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   );
   cubeGroup.add(shell, wire, edges, new THREE.Points(sGeo, sMat));
 
+  var _faceVec = new THREE.Vector3();
+  var _faceScreen = new THREE.Vector3();
+
+  function menuTargets() {
+    return {
+      x: mouse.x * 0.02,
+      y: mouse.y * 0.015,
+      z: 0.18,
+      sc: CUBE_SCALE * 1.14 * MENU_SIZE_MULT,
+      rx: 0,
+      ry: 0,
+      rz: 0,
+    };
+  }
+
+  function captureMenuFrom() {
+    menuFrom.sideEntry = true;
+    menuFrom.px = -(MOBILE ? 10.2 : 12.2);
+    menuFrom.py = MOBILE ? 4.1 : 4.75;
+    menuFrom.pz = 0.42;
+    menuFrom.rx = 0.18;
+    menuFrom.ry = -Math.PI * 0.55;
+    menuFrom.rz = 0.06;
+    menuFrom.sc = CUBE_SCALE * 0.85;
+  }
+
+  function snapMenuFromPose() {
+    root.position.set(0, 0, 0);
+    root.rotation.set(0, 0, 0);
+    cubeGroup.position.set(menuFrom.px, menuFrom.py, menuFrom.pz);
+    cubeGroup.scale.set(menuFrom.sc, menuFrom.sc, menuFrom.sc);
+    cubeGroup.rotation.set(menuFrom.rx, menuFrom.ry, menuFrom.rz);
+    sMat.uniforms.uFade.value = 1;
+    shell.material.opacity = 0.62;
+    wire.material.opacity = 0.1;
+    edges.material.opacity = 0.48;
+  }
+
+  function getMenuFaceRect() {
+    if (menuBlend < 0.04) return null;
+
+    var pts = [
+      [-0.82, 0.82, 1],
+      [0.82, 0.82, 1],
+      [-0.82, -0.82, 1],
+      [0.82, -0.82, 1],
+    ];
+    var minX = Infinity;
+    var maxX = -Infinity;
+    var minY = Infinity;
+    var maxY = -Infinity;
+
+    for (var i = 0; i < pts.length; i++) {
+      _faceVec.set(pts[i][0] * HALF, pts[i][1] * HALF, pts[i][2] * HALF);
+      cubeGroup.localToWorld(_faceVec);
+      _faceScreen.copy(_faceVec).project(camera);
+      var sx = (_faceScreen.x * 0.5 + 0.5) * window.innerWidth;
+      var sy = (-_faceScreen.y * 0.5 + 0.5) * window.innerHeight;
+      minX = Math.min(minX, sx);
+      maxX = Math.max(maxX, sx);
+      minY = Math.min(minY, sy);
+      maxY = Math.max(maxY, sy);
+    }
+
+    _faceVec.set(0, 0, HALF);
+    cubeGroup.localToWorld(_faceVec);
+    _faceScreen.copy(_faceVec).project(camera);
+    var cx = (_faceScreen.x * 0.5 + 0.5) * window.innerWidth;
+    var cy = (-_faceScreen.y * 0.5 + 0.5) * window.innerHeight;
+    var size = Math.min(maxX - minX, maxY - minY) * 0.94;
+    return { x: cx, y: cy, size: size };
+  }
+
   function resize() {
     var w = canvas.clientWidth;
     var h = canvas.clientHeight;
@@ -140,30 +227,101 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   function animate(now) {
     var t = now * 0.001;
     var p = scrollProgress;
+    menuBlend = menuTween.blend;
 
-    cubeGroup.rotation.x = 0.22 + p * 0.9 + Math.sin(t * 0.35) * 0.04;
-    cubeGroup.rotation.y = -0.35 + p * Math.PI * 1.5 + Math.cos(t * 0.28) * 0.05;
-    cubeGroup.rotation.z = p * 0.28 + Math.sin(t * 0.22) * 0.02;
+    if (menuBlend > 0.001) {
+      var target = menuTargets();
+      var flyT = Math.min(1, menuBlend / 0.58);
+      var flyEase = 1 - Math.pow(1 - flyT, 2.65);
+      var rotT = Math.max(0, (menuBlend - 0.5) / 0.5);
+      var rotEase = rotT * rotT * (3 - 2 * rotT);
+      var cubeDim = 1 - menuBlend * 0.4;
 
-    root.position.x = -0.55 + p * 1.2 + Math.sin(t * 0.18) * 0.07;
-    root.position.y = 0.3 - p * 0.85 + Math.cos(t * 0.15) * 0.05;
-    root.position.z = -p * 0.35;
+      root.position.set(0, 0, 0);
+      root.rotation.set(0, 0, 0);
 
-    var ptr = window.cosgralPointer;
-    if (ptr) {
-      mouse.x += (ptr.nx - mouse.x) * 0.06;
-      mouse.y += (ptr.ny - mouse.y) * 0.06;
-      root.rotation.y += ptr.nx * 0.06;
-      root.rotation.x += ptr.ny * 0.04;
+      cubeGroup.position.x = menuFrom.px + (target.x - menuFrom.px) * flyEase;
+      cubeGroup.position.y = menuFrom.py + (target.y - menuFrom.py) * flyEase;
+      cubeGroup.position.z = menuFrom.pz + (target.z - menuFrom.pz) * flyEase;
+      var sc = menuFrom.sc + (target.sc - menuFrom.sc) * flyEase;
+      cubeGroup.scale.set(sc, sc, sc);
+      cubeGroup.rotation.x = menuFrom.rx + (target.rx - menuFrom.rx) * rotEase;
+      cubeGroup.rotation.y = menuFrom.ry + (target.ry - menuFrom.ry) * rotEase;
+      cubeGroup.rotation.z = menuFrom.rz + (target.rz - menuFrom.rz) * rotEase;
+
+      sMat.uniforms.uFade.value = cubeDim;
+      shell.material.opacity = 0.62 * cubeDim;
+      wire.material.opacity = 0.1 * cubeDim;
+      edges.material.opacity = 0.48 * cubeDim;
+    } else {
+      cubeGroup.rotation.x = 0.22 + p * 0.9 + Math.sin(t * 0.35) * 0.04;
+      cubeGroup.rotation.y = -0.35 + p * Math.PI * 1.5 + Math.cos(t * 0.28) * 0.05;
+      cubeGroup.rotation.z = p * 0.28 + Math.sin(t * 0.22) * 0.02;
+      cubeGroup.position.set(0, 0, 0);
+      cubeGroup.scale.set(CUBE_SCALE, CUBE_SCALE, CUBE_SCALE);
+
+      root.position.x = -0.55 + p * 1.2 + Math.sin(t * 0.18) * 0.07;
+      root.position.y = 0.3 - p * 0.85 + Math.cos(t * 0.15) * 0.05;
+      root.position.z = -p * 0.35;
+
+      var ptr = window.cosgralPointer;
+      if (ptr) {
+        mouse.x += (ptr.nx - mouse.x) * 0.06;
+        mouse.y += (ptr.ny - mouse.y) * 0.06;
+        root.rotation.y += ptr.nx * 0.06;
+        root.rotation.x += ptr.ny * 0.04;
+      } else {
+        mouse.x *= 0.94;
+        mouse.y *= 0.94;
+      }
+
+      sMat.uniforms.uFade.value = 0.85 - p * 0.25;
+      shell.material.opacity = 0.62;
+      wire.material.opacity = 0.1;
+      edges.material.opacity = 0.48;
     }
 
     sMat.uniforms.uTime.value = t;
     sMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
-    sMat.uniforms.uFade.value = 0.85 - p * 0.25;
-
+    camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
+    camera.lookAt(0, 0, 0);
+    cubeGroup.updateMatrixWorld(true);
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }
 
   requestAnimationFrame(animate);
+
+  window.cosgralCube = {
+    getMenuFaceRect: getMenuFaceRect,
+    getMenuBlend: function () {
+      return menuBlend;
+    },
+    isSideEntry: function () {
+      return menuFrom.sideEntry;
+    },
+    openMenu: function () {
+      captureMenuFrom();
+      snapMenuFromPose();
+      menuTween.blend = 0;
+      if (window.gsap) {
+        gsap.killTweensOf(menuTween);
+        return gsap.to(menuTween, { blend: 1, duration: MENU_OPEN_DUR, ease: "power3.out" });
+      }
+      menuTween.blend = 1;
+      return null;
+    },
+    closeMenu: function () {
+      if (window.gsap) {
+        gsap.killTweensOf(menuTween);
+        return gsap.to(menuTween, {
+          blend: 0,
+          duration: MENU_CLOSE_DUR,
+          ease: "power3.in",
+        });
+      }
+      menuTween.blend = 0;
+      return null;
+    },
+  };
 })();

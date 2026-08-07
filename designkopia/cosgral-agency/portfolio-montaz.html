@@ -7,7 +7,7 @@
 <meta name="description" content="Rolki i montaż wideo COSGRAL — Orlińscy, Far East, Anna Jarosik, BTS i więcej." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260807i" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260807w" />
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -65,24 +65,68 @@
 <div class="reels-lightbox" id="reels-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Podgląd rolki">
   <button type="button" class="reels-lightbox__backdrop" data-reel-close aria-label="Zamknij"></button>
   <figure class="reels-lightbox__figure">
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev aria-label="Poprzednia rolka" hidden>‹</button>
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next aria-label="Następna rolka" hidden>›</button>
     <video class="reels-lightbox__video" controls playsinline hidden></video>
     <button type="button" class="reels-lightbox__close" data-reel-close aria-label="Zamknij">×</button>
   </figure>
 </div>
 
 <footer class="site-footer">
-  <div class="container footer-inner">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-cta"><p class="cosgral-footer-wordmark">cosgral agency</p></div>
+      <div class="footer-col">
+        <p class="footer-col__title">Sekcje</p>
+        <ul>
+          <li><a href="index.html#top">Start</a></li>
+          <li><a href="portfolio.html">Realizacje</a></li>
+          <li><a href="index.html#uslugi">Usługi</a></li>
+          <li><a href="index.html#proces">Proces</a></li>
+          <li><a href="index.html#faq">FAQ</a></li>
+          <li><a href="index.html#kontakt">Kontakt</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title">Usługi</p>
+        <ul>
+          <li><a href="uslugi/tworzenie-stron-internetowych.html">Strony internetowe</a></li>
+          <li><a href="uslugi/projektowanie-aplikacji.html">Aplikacje</a></li>
+          <li><a href="uslugi/pozycjonowanie-seo-geo.html">Pozycjonowanie SEO/GEO</a></li>
+          <li><a href="uslugi/wdrazanie-automatyzacji.html">Automatyzacje</a></li>
+          <li><a href="uslugi/systemy-crm.html">Systemy CRM</a></li>
+          <li><a href="uslugi/grafika-i-montaz-wideo.html">Grafika i wideo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title">Kontakt</p>
+        <ul>
+          <li><a href="mailto:hello@cosgral.agency">hello@cosgral.agency</a></li>
+          <li><a href="index.html#kontakt">Bezpłatny audyt →</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title">Social</p>
+        <ul>
+          <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
     <div class="footer-bottom">
       <span>© 2026 cosgral agency</span>
-      <a href="portfolio.html">← Portfolio</a>
+      <a href="/privacy-policy">Privacy Policy</a>
     </div>
   </div>
 </footer>
 
+<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
 <script src="home-cursor-field.js"></script>
 <script src="subpage-ambient-bg.js?v=20260807a"></script>
-<script type="module" src="subpage-cube.js?v=20260807a"></script>
+<script type="module" src="subpage-cube.js?v=20260807w"></script>
 <script src="sections.js"></script>
-<script src="portfolio-montaz.js?v=20260807i"></script>
+<script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
+<script src="portfolio-video.js?v=20260807ag"></script>
+<script src="portfolio-montaz.js?v=20260807ap"></script>
 </body>
 </html>

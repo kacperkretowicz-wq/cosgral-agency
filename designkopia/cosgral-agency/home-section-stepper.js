@@ -9,6 +9,7 @@
   var HOLDS_CONFIG = [
     { stId: "hero-pin", hold: 0.52, id: "top" },
     { stId: "scene-uslugi", hold: 0.48, id: "uslugi" },
+    { stId: "scene-realizacje", hold: 0.48, id: "realizacje" },
     { stId: "scene-proces", hold: 0.48, id: "proces" },
     { stId: "scene-faq", hold: 0.48, id: "faq" },
     { stId: "scene-kontakt", hold: 0.48, id: "kontakt" },

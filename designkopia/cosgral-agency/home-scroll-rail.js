@@ -20,6 +20,16 @@
       showTitle: true,
     },
     {
+      id: "realizacje",
+      stId: "scene-realizacje",
+      label: "Realizacje",
+      i18n: "nav.work",
+      hold: 0.48,
+      holdStart: 0.14,
+      holdEnd: 0.82,
+      showTitle: true,
+    },
+    {
       id: "proces",
       stId: "scene-proces",
       label: "Proces",
@@ -187,23 +197,20 @@
       holdPositions = [];
 
       SCENES.forEach(function (scene, i) {
-        var li = ui.dots[i]?.closest(".home-scroll-rail__item");
         if (scene.footer) {
           var footerY = footerHoldY();
           holdPositions.push(footerY);
           snapPoints.push(footerY / maxScroll);
-          if (li) li.style.top = ((footerY / maxScroll) * 100).toFixed(2) + "%";
           return;
         }
         var st = ScrollTrigger.getById(scene.stId);
         if (!st) {
-          if (li) li.style.top = (i / Math.max(1, SCENES.length - 1) * 100).toFixed(2) + "%";
+          holdPositions.push(0);
           return;
         }
         var pos = holdScroll(st, scene.hold);
         holdPositions.push(pos);
         snapPoints.push(pos / maxScroll);
-        if (li) li.style.top = ((pos / maxScroll) * 100).toFixed(2) + "%";
       });
     }
 

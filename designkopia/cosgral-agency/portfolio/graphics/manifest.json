@@ -189,7 +189,7 @@
           "type": "video",
           "src": "portfolio/graphics/far-east/001.mp4",
           "poster": "portfolio/graphics/far-east/001-poster.jpg",
-          "full": "portfolio/graphics/far-east/001.mp4",
+          "full": "portfolio/graphics/far-east/001-full.mp4",
           "w": 900,
           "h": 1600
         },
@@ -197,7 +197,7 @@
           "type": "video",
           "src": "portfolio/graphics/far-east/002.mp4",
           "poster": "portfolio/graphics/far-east/002-poster.jpg",
-          "full": "portfolio/graphics/far-east/002.mp4",
+          "full": "portfolio/graphics/far-east/002-full.mp4",
           "w": 900,
           "h": 1600
         },
@@ -205,7 +205,7 @@
           "type": "video",
           "src": "portfolio/graphics/far-east/003.mp4",
           "poster": "portfolio/graphics/far-east/003-poster.jpg",
-          "full": "portfolio/graphics/far-east/003.mp4",
+          "full": "portfolio/graphics/far-east/003-full.mp4",
           "w": 900,
           "h": 1600
         },
@@ -213,7 +213,7 @@
           "type": "video",
           "src": "portfolio/graphics/far-east/004.mp4",
           "poster": "portfolio/graphics/far-east/004-poster.jpg",
-          "full": "portfolio/graphics/far-east/004.mp4",
+          "full": "portfolio/graphics/far-east/004-full.mp4",
           "w": 900,
           "h": 1600
         },
@@ -221,7 +221,7 @@
           "type": "video",
           "src": "portfolio/graphics/far-east/005.mp4",
           "poster": "portfolio/graphics/far-east/005-poster.jpg",
-          "full": "portfolio/graphics/far-east/005.mp4",
+          "full": "portfolio/graphics/far-east/005-full.mp4",
           "w": 900,
           "h": 1600
         },
@@ -229,7 +229,7 @@
           "type": "video",
           "src": "portfolio/graphics/far-east/006.mp4",
           "poster": "portfolio/graphics/far-east/006-poster.jpg",
-          "full": "portfolio/graphics/far-east/006.mp4",
+          "full": "portfolio/graphics/far-east/006-full.mp4",
           "w": 900,
           "h": 1600
         },
@@ -237,7 +237,7 @@
           "type": "video",
           "src": "portfolio/graphics/far-east/007.mp4",
           "poster": "portfolio/graphics/far-east/007-poster.jpg",
-          "full": "portfolio/graphics/far-east/007.mp4",
+          "full": "portfolio/graphics/far-east/007-full.mp4",
           "w": 900,
           "h": 1600
         }
@@ -355,7 +355,7 @@
           "type": "video",
           "src": "portfolio/graphics/bts/001.mp4",
           "poster": "portfolio/graphics/bts/001-poster.jpg",
-          "full": "portfolio/graphics/bts/001.mp4",
+          "full": "portfolio/graphics/bts/001-full.mp4",
           "w": 720,
           "h": 900
         },
@@ -363,7 +363,7 @@
           "type": "video",
           "src": "portfolio/graphics/bts/002.mp4",
           "poster": "portfolio/graphics/bts/002-poster.jpg",
-          "full": "portfolio/graphics/bts/002.mp4",
+          "full": "portfolio/graphics/bts/002-full.mp4",
           "w": 720,
           "h": 900
         }
@@ -407,7 +407,7 @@
       "type": "video",
       "src": "portfolio/graphics/far-east/001.mp4",
       "poster": "portfolio/graphics/far-east/001-poster.jpg",
-      "full": "portfolio/graphics/far-east/001.mp4",
+      "full": "portfolio/graphics/far-east/001-full.mp4",
       "client": "Far East",
       "id": "far-east"
     },
@@ -415,7 +415,7 @@
       "type": "video",
       "src": "portfolio/graphics/far-east/002.mp4",
       "poster": "portfolio/graphics/far-east/002-poster.jpg",
-      "full": "portfolio/graphics/far-east/002.mp4",
+      "full": "portfolio/graphics/far-east/002-full.mp4",
       "client": "Far East",
       "id": "far-east"
     },
@@ -430,7 +430,7 @@
       "type": "video",
       "src": "portfolio/graphics/bts/001.mp4",
       "poster": "portfolio/graphics/bts/001-poster.jpg",
-      "full": "portfolio/graphics/bts/001.mp4",
+      "full": "portfolio/graphics/bts/001-full.mp4",
       "client": "BTS",
       "id": "bts"
     }
