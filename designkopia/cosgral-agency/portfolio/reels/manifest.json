@@ -1,0 +1,314 @@
+{
+  "groups": [
+    {
+      "id": "orlincy",
+      "name": "Orli\u0144scy",
+      "items": [
+        {
+          "type": "video",
+          "src": "portfolio/reels/orlincy/001.mp4",
+          "poster": "portfolio/reels/orlincy/001-poster.jpg",
+          "full": "portfolio/reels/orlincy/001.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/orlincy/002.mp4",
+          "poster": "portfolio/reels/orlincy/002-poster.jpg",
+          "full": "portfolio/reels/orlincy/002.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/orlincy/003.mp4",
+          "poster": "portfolio/reels/orlincy/003-poster.jpg",
+          "full": "portfolio/reels/orlincy/003.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/orlincy/004.mp4",
+          "poster": "portfolio/reels/orlincy/004-poster.jpg",
+          "full": "portfolio/reels/orlincy/004.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/orlincy/005.mp4",
+          "poster": "portfolio/reels/orlincy/005-poster.jpg",
+          "full": "portfolio/reels/orlincy/005.mp4",
+          "w": 720,
+          "h": 1280
+        }
+      ]
+    },
+    {
+      "id": "reklamy",
+      "name": "Reklamy",
+      "items": [
+        {
+          "type": "video",
+          "src": "portfolio/reels/reklamy/001.mp4",
+          "poster": "portfolio/reels/reklamy/001-poster.jpg",
+          "full": "portfolio/reels/reklamy/001.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/reklamy/002.mp4",
+          "poster": "portfolio/reels/reklamy/002-poster.jpg",
+          "full": "portfolio/reels/reklamy/002.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/reklamy/003.mp4",
+          "poster": "portfolio/reels/reklamy/003-poster.jpg",
+          "full": "portfolio/reels/reklamy/003.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/reklamy/004.mp4",
+          "poster": "portfolio/reels/reklamy/004-poster.jpg",
+          "full": "portfolio/reels/reklamy/004.mp4",
+          "w": 720,
+          "h": 1280
+        }
+      ]
+    },
+    {
+      "id": "far-east",
+      "name": "Far East",
+      "items": [
+        {
+          "type": "video",
+          "src": "portfolio/reels/far-east/001.mp4",
+          "poster": "portfolio/reels/far-east/001-poster.jpg",
+          "full": "portfolio/reels/far-east/001.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/far-east/002.mp4",
+          "poster": "portfolio/reels/far-east/002-poster.jpg",
+          "full": "portfolio/reels/far-east/002.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/far-east/003.mp4",
+          "poster": "portfolio/reels/far-east/003-poster.jpg",
+          "full": "portfolio/reels/far-east/003.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/far-east/004.mp4",
+          "poster": "portfolio/reels/far-east/004-poster.jpg",
+          "full": "portfolio/reels/far-east/004.mp4",
+          "w": 720,
+          "h": 1280
+        }
+      ]
+    },
+    {
+      "id": "safe-grant",
+      "name": "Safe Grant",
+      "items": [
+        {
+          "type": "video",
+          "src": "portfolio/reels/safe-grant/001.mp4",
+          "poster": "portfolio/reels/safe-grant/001-poster.jpg",
+          "full": "portfolio/reels/safe-grant/001.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/safe-grant/002.mp4",
+          "poster": "portfolio/reels/safe-grant/002-poster.jpg",
+          "full": "portfolio/reels/safe-grant/002.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/safe-grant/003.mp4",
+          "poster": "portfolio/reels/safe-grant/003-poster.jpg",
+          "full": "portfolio/reels/safe-grant/003.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/safe-grant/004.mp4",
+          "poster": "portfolio/reels/safe-grant/004-poster.jpg",
+          "full": "portfolio/reels/safe-grant/004.mp4",
+          "w": 720,
+          "h": 1280
+        }
+      ]
+    },
+    {
+      "id": "bts",
+      "name": "BTS",
+      "items": [
+        {
+          "type": "video",
+          "src": "portfolio/reels/bts/001.mp4",
+          "poster": "portfolio/reels/bts/001-poster.jpg",
+          "full": "portfolio/reels/bts/001.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/bts/002.mp4",
+          "poster": "portfolio/reels/bts/002-poster.jpg",
+          "full": "portfolio/reels/bts/002.mp4",
+          "w": 720,
+          "h": 1280
+        }
+      ]
+    },
+    {
+      "id": "anna-jarosik",
+      "name": "Anna Jarosik",
+      "items": [
+        {
+          "type": "video",
+          "src": "portfolio/reels/anna-jarosik/001.mp4",
+          "poster": "portfolio/reels/anna-jarosik/001-poster.jpg",
+          "full": "portfolio/reels/anna-jarosik/001.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/anna-jarosik/002.mp4",
+          "poster": "portfolio/reels/anna-jarosik/002-poster.jpg",
+          "full": "portfolio/reels/anna-jarosik/002.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/anna-jarosik/003.mp4",
+          "poster": "portfolio/reels/anna-jarosik/003-poster.jpg",
+          "full": "portfolio/reels/anna-jarosik/003.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/anna-jarosik/004.mp4",
+          "poster": "portfolio/reels/anna-jarosik/004-poster.jpg",
+          "full": "portfolio/reels/anna-jarosik/004.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio/reels/anna-jarosik/005.mp4",
+          "poster": "portfolio/reels/anna-jarosik/005-poster.jpg",
+          "full": "portfolio/reels/anna-jarosik/005.mp4",
+          "w": 720,
+          "h": 1280
+        }
+      ]
+    }
+  ],
+  "collage": [
+    {
+      "type": "video",
+      "src": "portfolio/reels/orlincy/001.mp4",
+      "poster": "portfolio/reels/orlincy/001-poster.jpg",
+      "full": "portfolio/reels/orlincy/001.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Orli\u0144scy",
+      "id": "orlincy"
+    },
+    {
+      "type": "video",
+      "src": "portfolio/reels/orlincy/002.mp4",
+      "poster": "portfolio/reels/orlincy/002-poster.jpg",
+      "full": "portfolio/reels/orlincy/002.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Orli\u0144scy",
+      "id": "orlincy"
+    },
+    {
+      "type": "video",
+      "src": "portfolio/reels/reklamy/001.mp4",
+      "poster": "portfolio/reels/reklamy/001-poster.jpg",
+      "full": "portfolio/reels/reklamy/001.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Reklamy",
+      "id": "reklamy"
+    },
+    {
+      "type": "video",
+      "src": "portfolio/reels/far-east/001.mp4",
+      "poster": "portfolio/reels/far-east/001-poster.jpg",
+      "full": "portfolio/reels/far-east/001.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Far East",
+      "id": "far-east"
+    },
+    {
+      "type": "video",
+      "src": "portfolio/reels/far-east/002.mp4",
+      "poster": "portfolio/reels/far-east/002-poster.jpg",
+      "full": "portfolio/reels/far-east/002.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Far East",
+      "id": "far-east"
+    },
+    {
+      "type": "video",
+      "src": "portfolio/reels/safe-grant/001.mp4",
+      "poster": "portfolio/reels/safe-grant/001-poster.jpg",
+      "full": "portfolio/reels/safe-grant/001.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Safe Grant",
+      "id": "safe-grant"
+    },
+    {
+      "type": "video",
+      "src": "portfolio/reels/bts/001.mp4",
+      "poster": "portfolio/reels/bts/001-poster.jpg",
+      "full": "portfolio/reels/bts/001.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "BTS",
+      "id": "bts"
+    },
+    {
+      "type": "video",
+      "src": "portfolio/reels/anna-jarosik/001.mp4",
+      "poster": "portfolio/reels/anna-jarosik/001-poster.jpg",
+      "full": "portfolio/reels/anna-jarosik/001.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Anna Jarosik",
+      "id": "anna-jarosik"
+    }
+  ]
+}

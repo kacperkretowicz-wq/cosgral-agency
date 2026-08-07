@@ -383,6 +383,7 @@
       link.addEventListener(
         "click",
         function (e) {
+          if (link.closest(".nav-overlay")) return;
           var href = link.getAttribute("href");
           if (!href || href === "#") return;
           var id = href.slice(1);

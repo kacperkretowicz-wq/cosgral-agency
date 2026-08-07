@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Grafiki — Portfolio COSGRAL</title>
+<meta name="description" content="Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260807i" />
+<script>
+  (function () {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
+      document.documentElement.classList.add("reduce-motion");
+    }
+  })();
+</script>
+</head>
+<body class="subpage portfolio-page graphics-gallery-page">
+<a class="visually-hidden" href="#main">Przejdź do treści</a>
+
+<canvas id="subpage-ambient" class="subpage-ambient" aria-hidden="true"></canvas>
+<div class="subpage-ambient__blur" aria-hidden="true"></div>
+<div class="subpage-ambient__shade" aria-hidden="true"></div>
+<div class="subpage-cube-portal" aria-hidden="true">
+  <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
+</div>
+
+<nav class="site-nav" id="site-nav">
+  <a href="index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
+    <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
+  </a>
+  <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
+    <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span>Menu</span>
+  </button>
+</nav>
+<div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+  <div class="nav-overlay__backdrop" data-nav-close></div>
+  <div class="nav-overlay__stage">
+    <nav class="nav-overlay__links" aria-label="Menu główne">
+      <ul class="nav-overlay__list">
+        <li><a href="index.html#top" data-nav-close>Start</a></li>
+        <li><a href="portfolio.html" data-nav-close>Realizacje</a></li>
+        <li><a href="index.html#uslugi" data-nav-close>Usługi</a></li>
+        <li><a href="index.html#proces" data-nav-close>Proces</a></li>
+        <li><a href="index.html#faq" data-nav-close>FAQ</a></li>
+        <li><a href="index.html#kontakt" data-nav-close>Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<main id="main">
+  <header class="portfolio-hero container">
+    <span class="section-eyebrow">Portfolio</span>
+    <h1 class="portfolio-hero__title">Grafiki</h1>
+    <p class="portfolio-hero__lead">Posty, stories i key visuale — od Juicy Events przez Far East po Safe Grant i BTS.</p>
+    <p class="graphics-gallery-page__back"><a href="portfolio.html#grafiki">← Wróć do portfolio</a></p>
+  </header>
+
+  <div id="graphics-gallery" class="graphics-gallery" aria-live="polite"></div>
+</main>
+
+<div class="graphics-lightbox" id="graphics-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Podgląd grafiki">
+  <button type="button" class="graphics-lightbox__backdrop" data-lightbox-close aria-label="Zamknij"></button>
+  <figure class="graphics-lightbox__figure">
+    <img class="graphics-lightbox__img" alt="" hidden />
+    <video class="graphics-lightbox__video" controls playsinline hidden></video>
+    <button type="button" class="graphics-lightbox__close" data-lightbox-close aria-label="Zamknij">×</button>
+  </figure>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-bottom">
+      <span>© 2026 cosgral agency</span>
+      <a href="portfolio.html">← Portfolio</a>
+    </div>
+  </div>
+</footer>
+
+<script src="home-cursor-field.js"></script>
+<script src="subpage-ambient-bg.js?v=20260807a"></script>
+<script type="module" src="subpage-cube.js?v=20260807a"></script>
+<script src="sections.js"></script>
+<script src="portfolio-graphics.js?v=20260807i"></script>
+</body>
+</html>

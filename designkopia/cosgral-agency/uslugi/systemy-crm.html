@@ -5,34 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Systemy CRM — cosgral.agency</title>
 <meta name="description" content="Wdrożenie i konfiguracja CRM, migracja danych i automatyzacja lejka sprzedaży — porządek w relacjach z klientami zamiast rozproszonych arkuszy." />
-<link rel="stylesheet" href="../cosgral-v4.css?v=20260726k" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="../cosgral-subpages.css?v=20260807a" />
+<script>
+  (function () {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
+      document.documentElement.classList.add("reduce-motion");
+    }
+  })();
+</script>
 </head>
-<body class="service-page">
+<body class="subpage service-page">
 <a class="visually-hidden" href="#main">Przejdź do treści</a>
-<!-- Tlo podstrony: jasna tekstura z inspo (patrz .service-bg w cosgral-v3.css) -->
-<div class="service-bg" aria-hidden="true" style="background-image:url('../images/cosgral-agency/approved/svc-halftone-fabric.jpg')"></div>
 
+<canvas id="subpage-ambient" class="subpage-ambient" aria-hidden="true"></canvas>
+<div class="subpage-ambient__blur" aria-hidden="true"></div>
+<div class="subpage-ambient__shade" aria-hidden="true"></div>
+<div class="subpage-cube-portal" aria-hidden="true">
+  <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
+</div>
 
 <nav class="site-nav" id="site-nav">
   <a href="../index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
-    <img src="../images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="56" height="56" />
+    <img src="../images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
     <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-    Menu
+    <span>Menu</span>
   </button>
 </nav>
-<div class="nav-overlay" id="nav-overlay">
-  <ul class="nav-overlay__list">
-    <li><a href="../index.html#top" data-nav-close>Start</a></li>
-    <li><a href="../index.html#realizacje" data-nav-close>Realizacje</a></li>
-    <li><a href="../index.html#uslugi" data-nav-close>Usługi</a></li>
-    <li><a href="../index.html#proces" data-nav-close>Proces</a></li>
-    <li><a href="../index.html#faq" data-nav-close>FAQ</a></li>
-    <li><a href="../index.html#zespol" data-nav-close>Zespół</a></li>
-    <li><a href="../index.html#kontakt" data-nav-close>Kontakt</a></li>
-  </ul>
+<div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+  <div class="nav-overlay__backdrop" data-nav-close></div>
+  <div class="nav-overlay__stage">
+    <nav class="nav-overlay__links" aria-label="Menu główne">
+      <ul class="nav-overlay__list">
+        <li><a href="../index.html#top" data-nav-close>Start</a></li>
+        <li><a href="../portfolio.html" data-nav-close>Realizacje</a></li>
+        <li><a href="../index.html#uslugi" data-nav-close>Usługi</a></li>
+        <li><a href="../index.html#proces" data-nav-close>Proces</a></li>
+        <li><a href="../index.html#faq" data-nav-close>FAQ</a></li>
+        <li><a href="../index.html#kontakt" data-nav-close>Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
 </div>
+
 
 <main id="main">
   <section class="service-hero container">
@@ -110,6 +128,9 @@
   </div>
 </footer>
 
+<script src="../home-cursor-field.js"></script>
+<script src="../subpage-ambient-bg.js?v=20260807a"></script>
+<script type="module" src="../subpage-cube.js?v=20260807a"></script>
 <script src="../sections.js"></script>
 </body>
 </html>

@@ -27,7 +27,7 @@
       const isOpen = nav.classList.contains("is-open");
       isOpen ? closeNav() : openNav();
     });
-    overlay.querySelectorAll("[data-nav-close]").forEach((a) => a.addEventListener("click", closeNav));
+    overlay.querySelectorAll("[data-nav-close]").forEach((el) => el.addEventListener("click", closeNav));
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeNav();
     });

@@ -12,9 +12,18 @@
 
   var links = overlay.querySelectorAll(".nav-overlay__list a");
   var stage = overlay.querySelector(".nav-overlay__stage");
+  var backdrop = overlay.querySelector("[data-nav-backdrop]");
   var isOpen = false;
   var animating = false;
   var syncRaf = null;
+
+  var SECTION_INDEX = {
+    top: 0,
+    uslugi: 1,
+    proces: 2,
+    faq: 3,
+    kontakt: 4,
+  };
 
   function syncStageToCube() {
     if (!isOpen || !stage) return;
@@ -84,6 +93,32 @@
     });
   }
 
+  function navigateTo(href) {
+    if (!href || href === "#") return;
+
+    if (href.charAt(0) === "#") {
+      var id = href.slice(1);
+      var idx = SECTION_INDEX[id];
+      if (idx != null && window.cosgralSectionSnap) {
+        if (window.cosgralSectionSnap.jumpTo) {
+          window.cosgralSectionSnap.jumpTo(idx);
+        } else if (window.cosgralSectionSnap.goTo) {
+          window.cosgralSectionSnap.goTo(idx);
+        }
+        return;
+      }
+      var target = document.getElementById(id);
+      if (target && window.cosgralSmoothScroll?.scrollTo) {
+        window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1 });
+      } else if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+      return;
+    }
+
+    window.location.href = href;
+  }
+
   function openNav() {
     if (isOpen || animating) return;
     animating = true;
@@ -102,35 +137,54 @@
     }
   }
 
-  function closeNav() {
-    if (!isOpen || animating) return;
+  function closeNav(onComplete) {
+    if (!isOpen) {
+      if (onComplete) onComplete();
+      return;
+    }
+    if (animating && !onComplete) return;
+
     animating = true;
     animateLinksOut();
+    window.cosgralCube?.closeMenu?.();
 
-    var cubeTween = window.cosgralCube?.closeMenu?.();
     window.setTimeout(
       function () {
         setOpenState(false);
         animating = false;
+        if (onComplete) onComplete();
       },
-      REDUCED ? 0 : 320
+      REDUCED ? 0 : 300
     );
-
-    if (cubeTween && cubeTween.eventCallback) {
-      cubeTween.eventCallback("onComplete", function () {
-        if (!isOpen) animating = false;
-      });
-    }
   }
 
-  toggle.addEventListener("click", function () {
+  toggle.addEventListener("click", function (e) {
+    e.stopPropagation();
     isOpen ? closeNav() : openNav();
   });
 
-  overlay.querySelectorAll("[data-nav-close]").forEach(function (a) {
-    a.addEventListener("click", function () {
+  links.forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var href = a.getAttribute("href");
+      closeNav(function () {
+        navigateTo(href);
+      });
+    });
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener("click", function () {
       closeNav();
     });
+  }
+
+  overlay.addEventListener("click", function (e) {
+    if (!isOpen) return;
+    if (toggle.contains(e.target)) return;
+    if (stage && stage.contains(e.target)) return;
+    closeNav();
   });
 
   document.addEventListener("keydown", function (e) {

@@ -408,6 +408,7 @@ html.reduce-motion .home-cursor { display: none; }
   backdrop-filter: blur(22px);
   opacity: 0;
   transition: opacity 0.55s var(--ease);
+  cursor: pointer;
 }
 .nav-overlay.is-open .nav-overlay__backdrop {
   opacity: 1;
