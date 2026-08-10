@@ -2293,9 +2293,9 @@ html.is-form-focus .home-scroll-rail__arrow {
     width: 100%;
     max-width: none;
     margin-inline: 0;
-    margin-top: auto;
+    margin-top: 0.35rem;
     padding-inline: 0;
-    padding-top: 1.15rem;
+    padding-top: 0.85rem;
     border-top: 0;
     box-sizing: border-box;
   }
