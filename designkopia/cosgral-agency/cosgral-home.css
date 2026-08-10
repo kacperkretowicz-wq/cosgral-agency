@@ -1943,14 +1943,47 @@ html.is-form-focus .home-scroll-rail__arrow {
     gap: 0.35rem;
   }
 
+  /* Balanced inset: leave room for the rail, but keep content optically centered */
   .home-scene .container,
   .home-faq.home-scene .home-scene__panel,
   .home-contact.home-scene .home-scene__panel,
   .home-process.home-scene .home-scene__panel,
   .home-work .home-scene__panel,
   .home-work .container {
+    padding-left: var(--gutter);
     padding-right: calc(var(--gutter) + var(--rail-safe));
     box-sizing: border-box;
+  }
+
+  .home-faq.home-scene .home-scene__panel,
+  .home-process.home-scene .home-scene__panel,
+  .home-contact.home-scene .home-scene__panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .home-faq.home-scene .home-faq__title,
+  .home-process .home-services__title,
+  .home-process .home-process__lead,
+  .home-process .section-label,
+  .home-work .home-work__title,
+  .services-fan .services-fan__title,
+  .services-fan .section-label,
+  .services-fan .services-fan__lead {
+    text-align: center;
+    width: 100%;
+  }
+
+  .home-faq.home-scene .home-faq__title,
+  .home-faq.home-scene .faq-item,
+  .home-process.home-scene .container,
+  .home-process.home-scene .home-process__steps,
+  .home-contact__inner,
+  .services-fan.home-scene .services-fan__head {
+    width: 100%;
+    max-width: min(100%, 24.5rem);
+    margin-inline: auto;
   }
 
   #realizacje.home-work.home-scene,
@@ -1963,7 +1996,7 @@ html.is-form-focus .home-scroll-rail__arrow {
     display: grid;
     grid-template-columns: 1fr;
     column-gap: 0;
-    max-width: none;
+    max-width: min(100%, 24.5rem);
   }
   .home-process.home-scene .home-process__step {
     grid-template-columns: 2.75rem 1fr;
@@ -2057,10 +2090,14 @@ html.is-form-focus .home-scroll-rail__arrow {
   }
 
   .home-contact {
+    padding-left: var(--gutter);
     padding-right: calc(var(--gutter) + var(--rail-safe));
+    text-align: center;
   }
   .home-contact__inner {
-    max-width: 100%;
+    max-width: min(100%, 24.5rem);
+    width: 100%;
+    margin-inline: auto;
   }
   .home-contact__title {
     font-size: clamp(1.35rem, 4.6vw, 1.85rem);
@@ -2068,6 +2105,14 @@ html.is-form-focus .home-scroll-rail__arrow {
     padding-inline: 0.15rem;
     hyphens: none;
     text-wrap: balance;
+    text-align: center;
+  }
+  .audit-form {
+    width: 100%;
+  }
+  .audit-form__submit {
+    align-self: center;
+    min-width: min(100%, 11rem);
   }
 
   html.is-form-focus #kontakt.home-scene {
@@ -2088,17 +2133,57 @@ html.is-form-focus .home-scroll-rail__arrow {
   .services-fan.home-scene .services-fan__stage,
   .services-fan__stage { height: clamp(300px, 44vh, 400px); }
   .services-fan__card { width: 210px; height: 280px; }
-  .footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+
+  /* Footer — centered column stack on mobile */
+  .site-footer {
+    padding-left: var(--gutter);
+    padding-right: calc(var(--gutter) + var(--rail-safe));
+    text-align: center;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.55rem;
+    justify-items: center;
+    text-align: center;
+    margin-bottom: 1.35rem;
+    width: 100%;
+    max-width: min(100%, 24.5rem);
+    margin-inline: auto;
+  }
+  .footer-cta,
+  .footer-col,
   .site-footer .footer-col--social {
     grid-column: 1 / -1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .footer-col__title {
+    margin-bottom: 0.85rem;
+  }
+  .footer-col ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .footer-col ul li {
+    margin-bottom: 0;
+  }
+  .footer-col a:hover {
+    transform: none;
   }
   .footer-social {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: flex-start;
-    gap: 0.65rem;
+    justify-content: center;
+    gap: 0.75rem;
   }
   .footer-social__link {
     width: 2.5rem;
@@ -2110,8 +2195,23 @@ html.is-form-focus .home-scroll-rail__arrow {
     height: 18px;
     display: block;
   }
+  .cosgral-footer-wordmark {
+    text-align: center;
+    font-size: clamp(1.65rem, 7.2vw, 2.35rem);
+  }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.55rem;
+    width: 100%;
+    max-width: min(100%, 24.5rem);
+    margin-inline: auto;
+  }
   html.is-footer-step .site-footer {
     padding-bottom: clamp(4.75rem, 17vh, 8rem);
+    align-items: center;
   }
 }
 @media (max-width: 540px) {
