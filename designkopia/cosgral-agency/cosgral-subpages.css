@@ -1514,6 +1514,7 @@ html.reduce-motion .reels-tiles__card {
   min-width: 14px;
   height: min(72vh, 560px);
   pointer-events: none;
+  --rail-dot: 7px;
   --rail-track-edge: rgba(255, 255, 255, 0.04);
   --rail-track-mid: rgba(255, 255, 255, 0.14);
   --rail-fill-1: rgba(255, 255, 255, 0.35);
@@ -1533,9 +1534,9 @@ html.reduce-motion .reels-tiles__card {
 }
 .portfolio-page .home-scroll-rail__track {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 3px;
+  top: calc(var(--rail-dot) / 2);
+  bottom: calc(var(--rail-dot) / 2);
+  right: calc(var(--rail-dot) / 2);
   left: auto;
   width: 1px;
   translate: 50% 0;
@@ -1550,11 +1551,11 @@ html.reduce-motion .reels-tiles__card {
 .portfolio-page .home-scroll-rail__fill {
   position: absolute;
   top: 0;
-  right: 3px;
-  left: auto;
+  left: 50%;
+  right: auto;
   width: 2px;
   height: 0;
-  translate: 50% 0;
+  translate: -50% 0;
   background: linear-gradient(to bottom, var(--rail-fill-1), var(--rail-fill-2));
   box-shadow: 0 0 10px var(--rail-fill-shadow);
   transition: height 0.12s linear;
@@ -1664,9 +1665,23 @@ html.reduce-motion .portfolio-page .home-scroll-rail { display: none; }
   .site-footer .footer-col--social {
     grid-column: 1 / -1;
   }
+  .footer-social {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.65rem;
+  }
   .footer-social__link {
     width: 2.5rem;
     height: 2.5rem;
+    flex-shrink: 0;
+  }
+  .footer-social__link svg {
+    width: 18px;
+    height: 18px;
+    display: block;
   }
 }
 
@@ -1682,6 +1697,7 @@ html.reduce-motion .portfolio-page .home-scroll-rail { display: none; }
   .portfolio-page .home-scroll-rail {
     right: 0.35rem;
     height: min(64vh, 460px);
+    --rail-dot: 6px;
   }
   .portfolio-page .home-scroll-rail__title {
     font-size: calc(0.62rem - 2px);

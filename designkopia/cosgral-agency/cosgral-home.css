@@ -1737,12 +1737,13 @@ html.reduce-motion .reveal-word > span {
   min-width: 14px;
   height: min(72vh, 560px);
   pointer-events: none;
+  --rail-dot: 7px;
 }
 .home-scroll-rail__track {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 3px;
+  top: calc(var(--rail-dot) / 2);
+  bottom: calc(var(--rail-dot) / 2);
+  right: calc(var(--rail-dot) / 2);
   left: auto;
   width: 1px;
   translate: 50% 0;
@@ -1757,11 +1758,11 @@ html.reduce-motion .reveal-word > span {
 .home-scroll-rail__fill {
   position: absolute;
   top: 0;
-  right: 3px;
-  left: auto;
+  left: 50%;
+  right: auto;
   width: 2px;
   height: 0;
-  translate: 50% 0;
+  translate: -50% 0;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.85));
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   transition: height 0.35s var(--ease);
@@ -1914,6 +1915,7 @@ html.is-form-focus .home-scroll-rail__arrow {
     flex-direction: column;
     align-items: flex-end;
     gap: 0.4rem;
+    --rail-dot: 6px;
   }
   .home-scroll-rail__body {
     position: relative;
@@ -2089,14 +2091,24 @@ html.is-form-focus .home-scroll-rail__arrow {
   .footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
   .site-footer .footer-col--social {
     grid-column: 1 / -1;
-    padding-top: 0.35rem;
   }
   .footer-social {
-    gap: 0.8rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.65rem;
   }
   .footer-social__link {
     width: 2.5rem;
     height: 2.5rem;
+    flex-shrink: 0;
+  }
+  .footer-social__link svg {
+    width: 18px;
+    height: 18px;
+    display: block;
   }
   html.is-footer-step .site-footer {
     padding-bottom: clamp(4.75rem, 17vh, 8rem);

@@ -3,6 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import { RoundedBoxGeometry } from "https://unpkg.com/three@0.170.0/examples/jsm/geometries/RoundedBoxGeometry.js";
 
 (function () {
   "use strict";
@@ -258,11 +259,11 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: !LOW_PERF,
+    antialias: true,
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.5 : 2));
   renderer.setClearColor(0x000000, 0);
 
   var scene = new THREE.Scene();
@@ -290,7 +291,8 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     return [a, b, -h];
   }
 
-  var SURFACE = LOW_PERF ? 220 : 4200;
+  // Surface density closer to Realizacje (subpage-cube); shards stay on LOW_PERF budget.
+  var SURFACE = LOW_PERF ? 1200 : 4200;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
@@ -343,20 +345,40 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     `,
   });
 
+  // Look-only: rounded shell like a soft 3D model. Shatter physics still use HALF box.
+  var EDGE_SOFT = 0.12;
   var boxGeo = new THREE.BoxGeometry(HALF * 2, HALF * 2, HALF * 2);
+  var shellGeo = new RoundedBoxGeometry(HALF * 2, HALF * 2, HALF * 2, 5, EDGE_SOFT);
   var shell = new THREE.Mesh(
-    boxGeo,
-    new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0.62, depthWrite: true })
+    shellGeo,
+    new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0.58, depthWrite: true })
   );
   var wire = new THREE.Mesh(
-    boxGeo,
-    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 })
+    shellGeo,
+    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.055 })
   );
   var edges = new THREE.LineSegments(
-    new THREE.EdgesGeometry(boxGeo),
-    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.48 })
+    new THREE.EdgesGeometry(boxGeo, 20),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.34,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
   );
-  cubeGroup.add(shell, wire, edges, new THREE.Points(sGeo, sMat));
+  var edgeGlow = new THREE.LineSegments(
+    new THREE.EdgesGeometry(boxGeo, 20),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.14,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
+  );
+  edgeGlow.scale.setScalar(1.012);
+  cubeGroup.add(shell, wire, edges, edgeGlow, new THREE.Points(sGeo, sMat));
 
   // ——— Shatter shards (deferred on mobile to avoid blocking first paint) ———
   var shards = null;
@@ -945,8 +967,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       cubeVisible = true;
       sMat.uniforms.uFade.value = cubeDim;
       shell.material.opacity = 0.58 * cubeDim;
-      wire.material.opacity = 0.09 * cubeDim;
-      edges.material.opacity = 0.42 * cubeDim;
+      wire.material.opacity = 0.055 * cubeDim;
+      edges.material.opacity = 0.34 * cubeDim;
+      edgeGlow.material.opacity = 0.14 * cubeDim;
     } else {
       var fade = introActive || (!introStarted && motion < 0.01 && menuBlend < 0.001)
         ? introDim
@@ -955,8 +978,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
           : 0;
       sMat.uniforms.uFade.value = fade;
       shell.material.opacity = 0.58 * fade;
-      wire.material.opacity = 0.09 * fade;
-      edges.material.opacity = 0.42 * fade;
+      wire.material.opacity = 0.055 * fade;
+      edges.material.opacity = 0.34 * fade;
+      edgeGlow.material.opacity = 0.14 * fade;
       if (introActive || (!introStarted && motion < 0.01 && menuBlend < 0.001)) {
         cubeVisible = fade > 0.02;
       }
@@ -1096,8 +1120,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     cubeGroup.visible = true;
     sMat.uniforms.uFade.value = 1;
     shell.material.opacity = 0.58;
-    wire.material.opacity = 0.09;
-    edges.material.opacity = 0.42;
+    wire.material.opacity = 0.055;
+    edges.material.opacity = 0.34;
+    edgeGlow.material.opacity = 0.14;
   }
 
   function getMenuFaceRect() {

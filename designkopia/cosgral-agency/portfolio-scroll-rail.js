@@ -112,17 +112,41 @@
       return best;
     }
 
+    function dotPercent(index) {
+      var n = SCENES.length;
+      if (n <= 1) return 0;
+      return (index / (n - 1)) * 100;
+    }
+
+    function fillHeightForScroll(scroll, idx, inHold) {
+      var n = SCENES.length;
+      if (n <= 1) return 0;
+      if (inHold) return dotPercent(idx);
+      if (holdPositions.length < 2) return dotPercent(idx);
+
+      var start = holdPositions[idx] ?? 0;
+      var end = holdPositions[idx + 1];
+      if (end == null) return dotPercent(idx);
+
+      if (scroll <= start + 4) return dotPercent(idx);
+      if (scroll >= end - 4) return dotPercent(Math.min(idx + 1, n - 1));
+
+      var span = end - start;
+      if (span <= 0) return dotPercent(idx);
+      var t = Math.min(1, Math.max(0, (scroll - start) / span));
+      return dotPercent(idx) + t * (dotPercent(idx + 1) - dotPercent(idx));
+    }
+
     function update() {
       refreshMetrics();
-      var max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      ui.fill.style.height = ((window.scrollY / max) * 100).toFixed(2) + "%";
-
+      var scroll = window.scrollY;
       var idx = activeIndex();
       if (idx !== lastIndex) {
         revealTitle(idx);
         lastIndex = idx;
       }
 
+      var currentInHold = false;
       ui.dots.forEach(function (dot, i) {
         var isCurrent = i === idx;
         var el = document.querySelector(SCENES[i].selector);
@@ -131,6 +155,7 @@
           var rect = el.getBoundingClientRect();
           inHold = rect.top < window.innerHeight * 0.55 && rect.bottom > window.innerHeight * 0.35;
         }
+        if (isCurrent) currentInHold = inHold;
         dot.classList.toggle("is-active", isCurrent);
         dot.classList.toggle("is-hold", isCurrent && inHold);
         if (isCurrent) dot.setAttribute("aria-current", "step");
@@ -138,6 +163,8 @@
         var li = dot.closest(".home-scroll-rail__item");
         if (li) li.classList.toggle("is-current", isCurrent);
       });
+
+      ui.fill.style.height = fillHeightForScroll(scroll, idx, currentInHold).toFixed(2) + "%";
     }
 
     function goToScene(index) {

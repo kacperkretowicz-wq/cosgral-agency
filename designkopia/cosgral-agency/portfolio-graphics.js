@@ -330,40 +330,98 @@
     gsap.set(camera, start);
     if (watermark) gsap.set(watermark, { opacity: 0.07, scale: 1 });
 
+    var grafikiSection = document.getElementById("grafiki");
+    var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
+
+    // Mobile pause A — tytuł „Grafiki” + wczesne karty (przed cinema pin)
+    if (mobile && grafikiSection) {
+      ScrollTrigger.create({
+        trigger: grafikiSection,
+        start: "top top",
+        end: "+=58%",
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        id: "grafiki-entry-hold",
+      });
+    }
+
     var tl = gsap.timeline({
       scrollTrigger: {
         trigger: cinema,
         start: "top top",
-        end: "+=720%",
+        end: mobile ? "+=980%" : "+=720%",
         pin: true,
         scrub: 1.85,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        id: "grafiki-cinema",
       },
     });
 
-    tl.to(camera, Object.assign({ duration: 0.26, ease: "power1.inOut" }, act1), 0);
-    tl.to(camera, Object.assign({ duration: 0.28, ease: "power2.inOut" }, act2), 0.24);
-    tl.to(camera, Object.assign({ duration: 0.1, ease: "sine.inOut" }, act2b), 0.48);
-    tl.to(camera, Object.assign({ duration: 0.28, ease: "power2.inOut" }, full), 0.54);
-    tl.to(camera, Object.assign({ duration: 0.32, ease: "power1.inOut" }, fullWide), 0.76);
+    if (mobile) {
+      tl.to(camera, Object.assign({ duration: 0.18, ease: "power1.inOut" }, act1), 0);
+      tl.to(camera, Object.assign({ duration: 0.2, ease: "none" }, act1), 0.18);
+      tl.to(camera, Object.assign({ duration: 0.24, ease: "power2.inOut" }, act2), 0.38);
+      tl.to(camera, Object.assign({ duration: 0.1, ease: "sine.inOut" }, act2b), 0.6);
+      tl.to(camera, Object.assign({ duration: 0.24, ease: "power2.inOut" }, full), 0.68);
+      // Pause B — pełny rozrzut (karty wypełniają kadr)
+      tl.to(camera, Object.assign({ duration: 0.28, ease: "none" }, full), 0.92);
+      tl.to(camera, Object.assign({ duration: 0.26, ease: "power1.inOut" }, fullWide), 1.2);
 
-    if (watermark) {
-      tl.to(watermark, { opacity: 0.11, scale: 1.04, duration: 0.28, ease: "power2.inOut" }, 0.54);
+      if (watermark) {
+        tl.to(watermark, { opacity: 0.11, scale: 1.04, duration: 0.24, ease: "power2.inOut" }, 0.68);
+      }
+
+      tiles.forEach(function (tile) {
+        var idx = Number(tile.getAttribute("data-idx"));
+        if (EARLY_VISIBLE.indexOf(idx) >= 0) return;
+        var pos = WORLD[idx];
+        if (!pos) return;
+        tl.fromTo(
+          tile,
+          { opacity: 0, scale: pos.s * 0.72 },
+          { opacity: 1, scale: pos.s, duration: 0.24, ease: "power2.out" },
+          0.7 + (idx % 9) * 0.012
+        );
+      });
+
+      // Mobile pause B (ekran z CTA) — przytrzymaj „Zobacz wszystko”
+      if (grafikiCta) {
+        ScrollTrigger.create({
+          trigger: grafikiCta,
+          start: "top 82%",
+          end: "+=52%",
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          id: "grafiki-cta-hold",
+        });
+      }
+    } else {
+      tl.to(camera, Object.assign({ duration: 0.26, ease: "power1.inOut" }, act1), 0);
+      tl.to(camera, Object.assign({ duration: 0.28, ease: "power2.inOut" }, act2), 0.24);
+      tl.to(camera, Object.assign({ duration: 0.1, ease: "sine.inOut" }, act2b), 0.48);
+      tl.to(camera, Object.assign({ duration: 0.28, ease: "power2.inOut" }, full), 0.54);
+      tl.to(camera, Object.assign({ duration: 0.32, ease: "power1.inOut" }, fullWide), 0.76);
+
+      if (watermark) {
+        tl.to(watermark, { opacity: 0.11, scale: 1.04, duration: 0.28, ease: "power2.inOut" }, 0.54);
+      }
+
+      tiles.forEach(function (tile) {
+        var idx = Number(tile.getAttribute("data-idx"));
+        if (EARLY_VISIBLE.indexOf(idx) >= 0) return;
+        var pos = WORLD[idx];
+        if (!pos) return;
+        tl.fromTo(
+          tile,
+          { opacity: 0, scale: pos.s * 0.72 },
+          { opacity: 1, scale: pos.s, duration: 0.26, ease: "power2.out" },
+          0.56 + (idx % 9) * 0.014
+        );
+      });
     }
-
-    tiles.forEach(function (tile) {
-      var idx = Number(tile.getAttribute("data-idx"));
-      if (EARLY_VISIBLE.indexOf(idx) >= 0) return;
-      var pos = WORLD[idx];
-      if (!pos) return;
-      tl.fromTo(
-        tile,
-        { opacity: 0, scale: pos.s * 0.72 },
-        { opacity: 1, scale: pos.s, duration: 0.26, ease: "power2.out" },
-        0.56 + (idx % 9) * 0.014
-      );
-    });
 
     collageRoot.classList.add("is-ready");
 

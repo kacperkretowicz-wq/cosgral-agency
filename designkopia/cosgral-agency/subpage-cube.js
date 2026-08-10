@@ -2,6 +2,7 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage).
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import { RoundedBoxGeometry } from "https://unpkg.com/three@0.170.0/examples/jsm/geometries/RoundedBoxGeometry.js";
 
 (function () {
   "use strict";
@@ -118,20 +119,39 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     `,
   });
 
+  var EDGE_SOFT = 0.12;
   var boxGeo = new THREE.BoxGeometry(HALF * 2, HALF * 2, HALF * 2);
+  var shellGeo = new RoundedBoxGeometry(HALF * 2, HALF * 2, HALF * 2, 5, EDGE_SOFT);
   var shell = new THREE.Mesh(
-    boxGeo,
-    new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0.62, depthWrite: true })
+    shellGeo,
+    new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0.58, depthWrite: true })
   );
   var wire = new THREE.Mesh(
-    boxGeo,
-    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 })
+    shellGeo,
+    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.055 })
   );
   var edges = new THREE.LineSegments(
-    new THREE.EdgesGeometry(boxGeo),
-    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.48 })
+    new THREE.EdgesGeometry(boxGeo, 20),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.34,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
   );
-  cubeGroup.add(shell, wire, edges, new THREE.Points(sGeo, sMat));
+  var edgeGlow = new THREE.LineSegments(
+    new THREE.EdgesGeometry(boxGeo, 20),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.14,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
+  );
+  edgeGlow.scale.setScalar(1.012);
+  cubeGroup.add(shell, wire, edges, edgeGlow, new THREE.Points(sGeo, sMat));
 
   var _faceVec = new THREE.Vector3();
   var _faceScreen = new THREE.Vector3();
@@ -166,9 +186,10 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     cubeGroup.scale.set(menuFrom.sc, menuFrom.sc, menuFrom.sc);
     cubeGroup.rotation.set(menuFrom.rx, menuFrom.ry, menuFrom.rz);
     sMat.uniforms.uFade.value = 1;
-    shell.material.opacity = 0.62;
-    wire.material.opacity = 0.1;
-    edges.material.opacity = 0.48;
+    shell.material.opacity = 0.58;
+    wire.material.opacity = 0.055;
+    edges.material.opacity = 0.34;
+    edgeGlow.material.opacity = 0.14;
   }
 
   function getMenuFaceRect() {
@@ -250,9 +271,10 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       cubeGroup.rotation.z = menuFrom.rz + (target.rz - menuFrom.rz) * rotEase;
 
       sMat.uniforms.uFade.value = cubeDim;
-      shell.material.opacity = 0.62 * cubeDim;
-      wire.material.opacity = 0.1 * cubeDim;
-      edges.material.opacity = 0.48 * cubeDim;
+      shell.material.opacity = 0.58 * cubeDim;
+      wire.material.opacity = 0.055 * cubeDim;
+      edges.material.opacity = 0.34 * cubeDim;
+      edgeGlow.material.opacity = 0.14 * cubeDim;
     } else {
       cubeGroup.rotation.x = 0.22 + p * 0.9 + Math.sin(t * 0.35) * 0.04;
       cubeGroup.rotation.y = -0.35 + p * Math.PI * 1.5 + Math.cos(t * 0.28) * 0.05;
@@ -276,9 +298,10 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       }
 
       sMat.uniforms.uFade.value = 0.85 - p * 0.25;
-      shell.material.opacity = 0.62;
-      wire.material.opacity = 0.1;
-      edges.material.opacity = 0.48;
+      shell.material.opacity = 0.58;
+      wire.material.opacity = 0.055;
+      edges.material.opacity = 0.34;
+      edgeGlow.material.opacity = 0.14;
     }
 
     sMat.uniforms.uTime.value = t;
