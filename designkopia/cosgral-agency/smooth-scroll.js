@@ -30,6 +30,10 @@
     return;
   }
 
+  var MOBILE =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
   var lenis = new Lenis({
     lerp: 0.08,
     duration: 1.2,

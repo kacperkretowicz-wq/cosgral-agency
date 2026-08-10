@@ -20,10 +20,40 @@
   var SECTION_INDEX = {
     top: 0,
     uslugi: 1,
-    proces: 2,
-    faq: 3,
-    kontakt: 4,
+    realizacje: 2,
+    proces: 3,
+    faq: 4,
+    kontakt: 5,
   };
+
+  function getLinkText(a) {
+    var key = a.getAttribute("data-i18n");
+    if (key && window.cosgralI18n && window.cosgralI18n.t) {
+      var val = window.cosgralI18n.t(key);
+      if (val) return val;
+    }
+    return (a.textContent || "").trim();
+  }
+
+  function prepareNavLabels() {
+    links.forEach(function (a) {
+      var text = getLinkText(a);
+      a.textContent = "";
+      var label = document.createElement("span");
+      label.className = "nav-overlay__label";
+      for (var i = 0; i < text.length; i++) {
+        var ch = document.createElement("span");
+        ch.className = "nav-overlay__char";
+        ch.textContent = text.charAt(i) === " " ? "\u00a0" : text.charAt(i);
+        label.appendChild(ch);
+      }
+      a.appendChild(label);
+    });
+  }
+
+  function menuChars() {
+    return overlay.querySelectorAll(".nav-overlay__char");
+  }
 
   function syncStageToCube() {
     if (!isOpen || !stage) return;
@@ -56,6 +86,9 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("is-nav-menu-open", open);
     document.documentElement.classList.toggle("is-nav-menu-open", open);
+    if (open && backdrop && window.gsap) {
+      gsap.set(backdrop, { opacity: 1 });
+    }
     if (open) startStageSync();
     else stopStageSync();
   }
@@ -63,30 +96,84 @@
   function animateLinksIn() {
     if (REDUCED || !window.gsap) return;
     var side = window.cosgralCube?.isSideEntry?.();
+    var chars = menuChars();
+    var delay = side ? 1.14 : 0.68;
+
     gsap.killTweensOf(links);
+    gsap.killTweensOf(chars);
+    gsap.set(links, { opacity: 1, y: 0, scale: 1 });
+
     gsap.fromTo(
       links,
-      { opacity: 0, y: 14 },
+      { clipPath: "inset(0 100% 0 0)" },
+      {
+        clipPath: "inset(0 0% 0 0)",
+        duration: 0.38,
+        stagger: 0.045,
+        ease: "power3.out",
+        delay: delay,
+        overwrite: true,
+      }
+    );
+
+    gsap.fromTo(
+      chars,
+      {
+        opacity: 0,
+        y: 12,
+        filter: "blur(4px)",
+      },
       {
         opacity: 1,
         y: 0,
-        duration: 0.52,
-        stagger: 0.055,
+        filter: "blur(0px)",
+        duration: 0.32,
+        stagger: { each: 0.01, from: "start" },
         ease: "power3.out",
-        delay: side ? 1.24 : 0.92,
+        delay: delay + 0.04,
         overwrite: true,
-        clearProps: "transform",
+        clearProps: "filter,transform",
       }
     );
   }
 
+  function bindLinkHover() {
+    if (REDUCED) return;
+    links.forEach(function (a) {
+      a.addEventListener("mouseenter", function () {
+        a.classList.add("is-hovered");
+      });
+      a.addEventListener("mouseleave", function () {
+        a.classList.remove("is-hovered");
+      });
+      a.addEventListener("focus", function () {
+        a.classList.add("is-hovered");
+      });
+      a.addEventListener("blur", function () {
+        a.classList.remove("is-hovered");
+      });
+    });
+  }
+
   function animateLinksOut() {
     if (REDUCED || !window.gsap) return;
+    var chars = menuChars();
     gsap.killTweensOf(links);
-    gsap.to(links, {
+    gsap.killTweensOf(chars);
+    links.forEach(function (a) {
+      a.classList.remove("is-hovered");
+    });
+    gsap.to(chars, {
       opacity: 0,
-      y: 18,
-      duration: 0.28,
+      y: -8,
+      duration: 0.14,
+      stagger: { each: 0.004, from: "end" },
+      ease: "power2.in",
+      overwrite: true,
+    });
+    gsap.to(links, {
+      clipPath: "inset(0 0 0 100%)",
+      duration: 0.16,
       stagger: 0.02,
       ease: "power2.in",
       overwrite: true,
@@ -116,12 +203,39 @@
       return;
     }
 
+    var hashIdx = href.indexOf("#");
+    if (hashIdx > 0) {
+      var path = href.slice(0, hashIdx);
+      var hash = href.slice(hashIdx);
+      var id = hash.slice(1);
+      var onHome =
+        document.body.classList.contains("home-page") ||
+        /(^|\/)index\.html?$/.test(window.location.pathname);
+      var sameHomeTarget =
+        onHome &&
+        (!path || path === "index.html" || path === "./index.html" || path === "/" || path === ".");
+      if (sameHomeTarget && SECTION_INDEX[id] != null && window.cosgralSectionSnap) {
+        if (window.cosgralSectionSnap.jumpTo) {
+          window.cosgralSectionSnap.jumpTo(SECTION_INDEX[id]);
+        } else if (window.cosgralSectionSnap.goTo) {
+          window.cosgralSectionSnap.goTo(SECTION_INDEX[id]);
+        }
+        return;
+      }
+    }
+
+    if (window.cosgralPageTransition?.navigate) {
+      window.cosgralPageTransition.navigate(href);
+      return;
+    }
+
     window.location.href = href;
   }
 
   function openNav() {
-    if (isOpen || animating) return;
+    if (isOpen) return;
     animating = true;
+    prepareNavLabels();
     setOpenState(true);
 
     var cubeTween = window.cosgralCube?.openMenu?.();
@@ -133,7 +247,8 @@
     if (cubeTween && cubeTween.eventCallback) {
       cubeTween.eventCallback("onComplete", done);
     } else {
-      window.setTimeout(done, REDUCED ? 0 : 1840);
+      var openMs = (window.cosgralCube?.getMenuOpenDuration?.() || 5.3) * 1000 + 180;
+      window.setTimeout(done, REDUCED ? 0 : openMs);
     }
   }
 
@@ -142,20 +257,44 @@
       if (onComplete) onComplete();
       return;
     }
-    if (animating && !onComplete) return;
 
     animating = true;
-    animateLinksOut();
-    window.cosgralCube?.closeMenu?.();
 
-    window.setTimeout(
-      function () {
-        setOpenState(false);
-        animating = false;
-        if (onComplete) onComplete();
-      },
-      REDUCED ? 0 : 560
-    );
+    if (window.gsap) {
+      gsap.killTweensOf(links);
+      gsap.killTweensOf(menuChars());
+    }
+
+    animateLinksOut();
+    if (backdrop && window.gsap && !REDUCED) {
+      gsap.killTweensOf(backdrop);
+      gsap.to(backdrop, { opacity: 0, duration: 0.26, ease: "power2.in", overwrite: true });
+    }
+
+    var cubeTween = window.cosgralCube?.closeMenu?.();
+    var overlayDone = false;
+
+    var finishOverlay = function () {
+      if (overlayDone) return;
+      overlayDone = true;
+      setOpenState(false);
+    };
+
+    var finishAll = function () {
+      finishOverlay();
+      animating = false;
+      if (onComplete) onComplete();
+    };
+
+    var closeMs = (window.cosgralCube?.getMenuCloseDuration?.() || 1.95) * 1000 + 80;
+    if (cubeTween && cubeTween.eventCallback) {
+      cubeTween.eventCallback("onUpdate", function () {
+        if (cubeTween.progress() >= 0.48) finishOverlay();
+      });
+      cubeTween.eventCallback("onComplete", finishAll);
+    } else {
+      window.setTimeout(finishAll, REDUCED ? 0 : closeMs);
+    }
   }
 
   toggle.addEventListener("click", function (e) {
@@ -191,6 +330,15 @@
     if (e.key === "Escape" && isOpen) closeNav();
   });
 
+  window.addEventListener("cosgral:langchange", function () {
+    if (!isOpen) return;
+    prepareNavLabels();
+    if (!REDUCED && window.gsap) {
+      gsap.set(menuChars(), { opacity: 1, y: 0, rotateX: 0, filter: "none" });
+      gsap.set(links, { opacity: 1, clipPath: "inset(0 0% 0 0)" });
+    }
+  });
+
   document.querySelectorAll("a.site-nav__logo").forEach(function (logo) {
     logo.addEventListener("click", function (e) {
       e.preventDefault();
@@ -210,4 +358,5 @@
   });
 
   window.cosgralNavMenu = { open: openNav, close: closeNav, isOpen: function () { return isOpen; } };
+  bindLinkHover();
 })();

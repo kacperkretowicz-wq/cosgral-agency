@@ -92,7 +92,11 @@
     var pinLen = opts.pin || (MOBILE ? "+=88%" : "+=108%");
     var fadeOut = opts.fadeOut !== false;
 
-    gsap.set(panel, { autoAlpha: 0, scale: MOBILE ? 1.04 : 1.07, filter: "blur(14px)" });
+    gsap.set(panel, {
+      autoAlpha: 0,
+      scale: MOBILE ? 1.04 : 1.07,
+      filter: MOBILE ? "none" : "blur(14px)",
+    });
 
     var tl = gsap.timeline({
       scrollTrigger: {
@@ -131,7 +135,7 @@
       {
         autoAlpha: 1,
         scale: 1,
-        filter: "blur(0px)",
+        filter: MOBILE ? "none" : "blur(0px)",
         duration: 0.12,
         ease: "power3.out",
       },
@@ -153,7 +157,7 @@
         {
           autoAlpha: 0,
           scale: MOBILE ? 0.96 : 0.94,
-          filter: "blur(12px)",
+          filter: MOBILE ? "none" : "blur(12px)",
           duration: 0.16,
           ease: "power3.in",
         },
@@ -233,7 +237,17 @@
         })
         .to(heroContent, { autoAlpha: 1, duration: 0.18, ease: "none" }, 0)
         .to(heroContent, { autoAlpha: 1, duration: 0.48, ease: "none" }, 0.18)
-        .to(heroContent, { autoAlpha: 0, y: -48, filter: "blur(10px)", ease: "power3.in", duration: 0.22 }, 0.66)
+        .to(
+          heroContent,
+          {
+            autoAlpha: 0,
+            y: -48,
+            filter: MOBILE ? "none" : "blur(10px)",
+            ease: "power3.in",
+            duration: 0.22,
+          },
+          0.66
+        )
         .to(heroScroll, { autoAlpha: 0, duration: 0.2, ease: "none" }, 0.62)
         .to(curtain, { autoAlpha: 0.65, duration: 0.18, ease: "power3.in" }, 0.72);
     }
@@ -289,10 +303,11 @@
             setCinema(p * 0.8);
 
             var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
-            gsap.set(shatterPanel, {
-              autoAlpha: 1 - out,
-              filter: out ? "blur(" + out * 8 + "px)" : "blur(0px)",
-            });
+            var shatterProps = { autoAlpha: 1 - out };
+            if (!MOBILE) {
+              shatterProps.filter = out ? "blur(" + out * 8 + "px)" : "blur(0px)";
+            }
+            gsap.set(shatterPanel, shatterProps);
 
             if (curtain) {
               var c = p > 0.78 ? (p - 0.78) / 0.22 : 0.5 * (1 - p / 0.78);

@@ -12,11 +12,13 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
+  var LOW_PERF =
+    MOBILE || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   if (REDUCED) return;
 
   var HALF = 1.35;
   var CUBE_SCALE = 0.5;
-  var SHARDS = MOBILE ? 900 : 1600;
+  var SHARDS = LOW_PERF ? 280 : 1600;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
   var streamAmt = 0;
@@ -27,14 +29,14 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   var sandLocked = false;
   var cardForces = new Float32Array(8 * 4); // up to 8 cards: cx,cy,w,h in NDC-ish
   var menuBlend = 0;
-  var menuTween = { blend: 0 };
+  var menuTween = { blend: 0, closing: false };
   var heroLook = { x: 0, y: 0 };
   var scrollHandoff = null;
   var prevMotion = 0;
   var introTween = { progress: 0 };
   var introStarted = false;
   var introDone = false;
-  var INTRO_DUR = MOBILE ? 2.9 : 3.35;
+  var INTRO_DUR = MOBILE ? 2.1 : 3.35;
   var menuFrom = {
     px: 0,
     py: 0,
@@ -57,6 +59,129 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     return 1 - Math.pow(1 - p, 2.45);
   }
 
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  var FACE_NORMALS = [
+    new THREE.Vector3(0, 0, 1),
+    new THREE.Vector3(0, 0, -1),
+    new THREE.Vector3(1, 0, 0),
+    new THREE.Vector3(-1, 0, 0),
+    new THREE.Vector3(0, 1, 0),
+    new THREE.Vector3(0, -1, 0),
+  ];
+
+  var FACE_CORNERS = [
+    [
+      [-0.82, 0.82, 1],
+      [0.82, 0.82, 1],
+      [-0.82, -0.82, 1],
+      [0.82, -0.82, 1],
+    ],
+    [
+      [-0.82, 0.82, -1],
+      [0.82, 0.82, -1],
+      [-0.82, -0.82, -1],
+      [0.82, -0.82, -1],
+    ],
+    [
+      [1, 0.82, 0.82],
+      [1, 0.82, -0.82],
+      [1, -0.82, 0.82],
+      [1, -0.82, -0.82],
+    ],
+    [
+      [-1, 0.82, 0.82],
+      [-1, 0.82, -0.82],
+      [-1, -0.82, 0.82],
+      [-1, -0.82, -0.82],
+    ],
+    [
+      [-0.82, 1, 0.82],
+      [0.82, 1, 0.82],
+      [-0.82, 1, -0.82],
+      [0.82, 1, -0.82],
+    ],
+    [
+      [-0.82, -1, 0.82],
+      [0.82, -1, 0.82],
+      [-0.82, -1, -0.82],
+      [0.82, -1, -0.82],
+    ],
+  ];
+
+  var _cubePos = new THREE.Vector3();
+  var _toCam = new THREE.Vector3();
+  var _worldNormal = new THREE.Vector3();
+  var _qAlign = new THREE.Quaternion();
+  var _qTarget = new THREE.Quaternion();
+  var _qMenuStart = new THREE.Quaternion();
+  var _qFaceSpin = new THREE.Quaternion();
+  var _axisSpin = new THREE.Vector3(0.18, 1, 0.12);
+  var _screenRay = new THREE.Vector3();
+
+  var MENU_OPEN_SIDE_DUR = 6.1;
+  var MENU_OPEN_HERO_DUR = 5.3;
+  var MENU_CLOSE_SIDE_DUR = 1.95;
+  var MENU_CLOSE_HERO_DUR = 1.45;
+
+  function syncCamera() {
+    camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
+    camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
+  }
+
+  function worldPosFromScreen(sx, sy, planeZ) {
+    var ndcX = (sx / window.innerWidth) * 2 - 1;
+    var ndcY = -(sy / window.innerHeight) * 2 + 1;
+    _screenRay.set(ndcX, ndcY, 0.5).unproject(camera);
+    _toCam.copy(_screenRay).sub(camera.position).normalize();
+    var hit = (planeZ - camera.position.z) / _toCam.z;
+    return {
+      x: camera.position.x + _toCam.x * hit,
+      y: camera.position.y + _toCam.y * hit,
+      z: planeZ,
+    };
+  }
+
+  function getMenuCornerWorld(planeZ) {
+    return worldPosFromScreen(MOBILE ? 38 : 54, MOBILE ? 34 : 50, planeZ);
+  }
+
+  function getBestFaceIndex() {
+    cubeGroup.getWorldPosition(_cubePos);
+    _toCam.copy(camera.position).sub(_cubePos).normalize();
+    var best = 0;
+    var bestDot = -Infinity;
+    for (var fi = 0; fi < FACE_NORMALS.length; fi++) {
+      _worldNormal.copy(FACE_NORMALS[fi]).applyQuaternion(cubeGroup.quaternion).normalize();
+      var dot = _worldNormal.dot(_toCam);
+      if (dot > bestDot) {
+        bestDot = dot;
+        best = fi;
+      }
+    }
+    return best;
+  }
+
+  function getFaceCameraQuaternion() {
+    var idx = getBestFaceIndex();
+    _worldNormal.copy(FACE_NORMALS[idx]).applyQuaternion(cubeGroup.quaternion).normalize();
+    cubeGroup.getWorldPosition(_cubePos);
+    _toCam.copy(camera.position).sub(_cubePos).normalize();
+    if (_worldNormal.dot(_toCam) > 0.9995) return cubeGroup.quaternion.clone();
+    _qAlign.setFromUnitVectors(_worldNormal, _toCam);
+    return cubeGroup.quaternion.clone().premultiply(_qAlign);
+  }
+
+  function applyMenuFaceOrientation(strength) {
+    if (strength <= 0) return;
+    _qTarget.copy(getFaceCameraQuaternion());
+    cubeGroup.quaternion.slerp(_qTarget, strength);
+    cubeGroup.rotation.setFromQuaternion(cubeGroup.quaternion, "XYZ");
+  }
+
   function quadArc(t, sx, sy, cx, cy, ex, ey) {
     var u = 1 - t;
     return {
@@ -76,30 +201,68 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
         ease: "power2.out",
         onComplete: function () {
           introDone = true;
+          window.dispatchEvent(new CustomEvent("cosgral:cube-intro-done"));
         },
       });
       return;
     }
     introTween.progress = 1;
     introDone = true;
+    window.dispatchEvent(new CustomEvent("cosgral:cube-intro-done"));
   }
 
   function watchIntroReady() {
-    if (document.body.classList.contains("is-ready")) startIntro();
-    else {
-      new MutationObserver(function (_, obs) {
-        if (document.body.classList.contains("is-ready")) {
-          obs.disconnect();
-          startIntro();
-        }
-      }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    function kick() {
+      if (LOW_PERF) {
+        window.setTimeout(startIntro, 160);
+        return;
+      }
+      startIntro();
     }
+
+    function ready() {
+      if (document.body.classList.contains("is-ready")) return true;
+      var preloader = document.getElementById("preloader");
+      return !!(preloader && preloader.classList.contains("is-settled"));
+    }
+
+    if (ready()) {
+      kick();
+      return;
+    }
+
+    var bodyObs = new MutationObserver(function () {
+      if (ready()) {
+        bodyObs.disconnect();
+        if (preObs) preObs.disconnect();
+        kick();
+      }
+    });
+    bodyObs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    var preloader = document.getElementById("preloader");
+    var preObs = null;
+    if (preloader) {
+      preObs = new MutationObserver(function () {
+        if (ready()) {
+          bodyObs.disconnect();
+          preObs.disconnect();
+          kick();
+        }
+      });
+      preObs.observe(preloader, { attributes: true, attributeFilter: ["class"] });
+    }
+
+    window.setTimeout(kick, LOW_PERF ? 2600 : 4200);
   }
 
-  watchIntroReady();
-
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  var renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: !LOW_PERF,
+    alpha: true,
+    powerPreference: LOW_PERF ? "low-power" : "high-performance",
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 2));
   renderer.setClearColor(0x000000, 0);
 
   var scene = new THREE.Scene();
@@ -127,7 +290,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     return [a, b, -h];
   }
 
-  var SURFACE = MOBILE ? 1800 : 4200;
+  var SURFACE = LOW_PERF ? 220 : 4200;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
@@ -195,7 +358,15 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   );
   cubeGroup.add(shell, wire, edges, new THREE.Points(sGeo, sMat));
 
-  // ——— Shatter shards (volume sample of cube → diagonal sand) ———
+  // ——— Shatter shards (deferred on mobile to avoid blocking first paint) ———
+  var shards = null;
+  var shardMat = null;
+  var shardsBuilt = false;
+
+  function buildShards() {
+    if (shardsBuilt) return;
+    shardsBuilt = true;
+
   var aStart = new Float32Array(SHARDS * 3);
   var aSand = new Float32Array(SHARDS * 3);
   var aSeed = new Float32Array(SHARDS);
@@ -292,7 +463,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   boxBase.setAttribute("aDelay", new THREE.InstancedBufferAttribute(aDelay, 1));
   boxBase.setAttribute("aSize0", new THREE.InstancedBufferAttribute(aSize0, 1));
 
-  var shardMat = new THREE.ShaderMaterial({
+  shardMat = new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: true,
     depthTest: true,
@@ -426,7 +597,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   shardMat.depthWrite = false;
   shardMat.blending = THREE.NormalBlending;
 
-  var shards = new THREE.InstancedMesh(boxBase, shardMat, SHARDS);
+  shards = new THREE.InstancedMesh(boxBase, shardMat, SHARDS);
   shards.frustumCulled = false;
   shards.castShadow = false;
   shards.receiveShadow = false;
@@ -435,6 +606,17 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   for (var ii = 0; ii < SHARDS; ii++) shards.setMatrixAt(ii, _id);
   shards.instanceMatrix.needsUpdate = true;
   root.add(shards);
+  }
+
+  if (LOW_PERF) {
+    function scheduleShards() {
+      window.setTimeout(buildShards, 100);
+    }
+    window.addEventListener("cosgral:cube-intro-done", scheduleShards, { once: true });
+    window.setTimeout(scheduleShards, INTRO_DUR * 1000 + 500);
+  } else {
+    buildShards();
+  }
 
   function resize() {
     var w = canvas.clientWidth;
@@ -444,8 +626,22 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   }
+
   window.addEventListener("resize", resize);
   resize();
+
+  function restoreRendererDpr() {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.25 : 2));
+    resize();
+  }
+  window.addEventListener("cosgral:cube-intro-done", restoreRendererDpr, { once: true });
+
+  canvas.addEventListener("webglcontextlost", function (e) {
+    e.preventDefault();
+  });
+  canvas.addEventListener("webglcontextrestored", function () {
+    resize();
+  });
 
   function syncPointer() {
     var ptr = window.cosgralPointer;
@@ -455,6 +651,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   }
 
   function sampleCards() {
+    if (!shardMat) return;
     var nodes = document.querySelectorAll(".services-fan__card");
     var n = 0;
     var w = window.innerWidth || 1;
@@ -504,9 +701,11 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   }
 
   var clock = new THREE.Clock();
+  var cardSampleTick = 0;
 
   function animate() {
     requestAnimationFrame(animate);
+    if (document.hidden) return;
     var t = clock.getElapsedTime();
     syncPointer();
     mouse.x += (mouse.tx - mouse.x) * 0.06;
@@ -522,7 +721,6 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       sm = cinema;
       tm = sandExt.motionTail || 0;
       if (sandExt.resetCube) {
-        cinema = 0;
         sandLocked = false;
         scrollHandoff = null;
         delete sandExt.resetCube;
@@ -569,16 +767,20 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     var scrollPosZ = (1 - approach) * heroZ - depart * 0.72;
     var scrollSc = heroScale + (peakScale - heroScale) * approach;
 
+    var idleRotX = 0.22 + Math.sin(t * 0.035) * 0.04;
+    var idleRotY = -0.35 + Math.cos(t * 0.028) * 0.05;
+    var idleRotZ = Math.sin(t * 0.022) * 0.02;
+
     var spin = 0.016 + approach * 0.01 + depart * 0.005;
     var scrollRotX =
-      0.22 + mouse.y * 0.05 + t * (0.009 + approach * 0.005) + (1 - approach) * 0.26;
+      idleRotX + heroLook.x + approach * 0.18 + depart * 0.28 + mouse.y * 0.05 * depart;
     var scrollRotY =
-      t * spin + mouse.x * 0.1 + (1 - approach) * -0.28 + approach * 0.18 - depart * 0.08;
-    var scrollRotZ = mouse.x * 0.01 + t * 0.008 + (1 - approach) * -0.08 + depart * 0.03;
-
-    var idleRotX = 0.22 + Math.sin(t * 0.35) * 0.04;
-    var idleRotY = -0.35 + Math.cos(t * 0.28) * 0.05;
-    var idleRotZ = Math.sin(t * 0.22) * 0.02;
+      idleRotY +
+      heroLook.y +
+      approach * 0.2 -
+      depart * 0.12 +
+      (t * spin + mouse.x * 0.1) * depart;
+    var scrollRotZ = idleRotZ + depart * 0.08 + mouse.x * 0.01 * depart + t * 0.008 * depart;
 
     var introActive = introStarted && !introDone && motion < 0.01 && menuBlend < 0.001;
     var introDim = 1;
@@ -592,12 +794,12 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     if (heroReady && inHero && introDone) {
       var ptr = window.cosgralPointer;
       if (ptr) {
-        heroLook.y += ptr.nx * 0.023;
-        heroLook.x += ptr.ny * 0.016;
+        heroLook.y += ptr.nx * 0.0023;
+        heroLook.x += ptr.ny * 0.0016;
       }
     } else if (!inHero && motion > 0.01) {
-      heroLook.x *= 0.98;
-      heroLook.y *= 0.98;
+      heroLook.x *= 0.994;
+      heroLook.y *= 0.994;
     }
 
     if (!scrollHandoff && leavingHero && motion >= 0.01 && motion < 0.04) {
@@ -640,22 +842,16 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       rotZ = flyStartRz + (idleRotZ - flyStartRz) * introT;
       introDim = Math.min(1, introTween.progress * 3.2);
     } else if (!introStarted && motion < 0.01 && menuBlend < 0.001) {
-      posX = MOBILE ? 7.15 : 8.75;
-      posY = MOBILE ? -4.15 : -5.05;
+      var waitX = MOBILE ? 7.15 : 8.75;
+      var waitY = MOBILE ? -4.15 : -5.05;
+      posX = waitX;
+      posY = waitY;
       posZ = 0.14;
       sc = heroScale * 0.82;
       rotX = 0.52;
       rotY = -1.18;
       rotZ = 0.32;
-      introDim = 0;
-    } else if (inHero) {
-      posX = heroX;
-      posY = heroY;
-      posZ = heroZ;
-      sc = heroScale;
-      rotX = idleRotX + heroLook.x;
-      rotY = idleRotY + heroLook.y;
-      rotZ = idleRotZ;
+      introDim = document.body.classList.contains("is-ready") ? 0.72 : 0.45;
     } else if (scrollHandoff && leavingHero) {
       var handoffT = smooth01(0.01, 0.26, motion);
       posX = scrollHandoff.px + (scrollPosX - scrollHandoff.px) * handoffT;
@@ -665,7 +861,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       rotX = scrollHandoff.rx + (scrollRotX - scrollHandoff.rx) * handoffT;
       rotY = scrollHandoff.ry + (scrollRotY - scrollHandoff.ry) * handoffT;
       rotZ = scrollHandoff.rz + (scrollRotZ - scrollHandoff.rz) * handoffT;
-    } else if (motion >= 0.01) {
+    } else {
       posX = scrollPosX;
       posY = scrollPosY;
       posZ = scrollPosZ;
@@ -677,11 +873,15 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
     prevMotion = motion;
 
-    cubeGroup.position.set(posX, posY, posZ);
-    cubeGroup.scale.set(sc, sc, sc);
-    cubeGroup.rotation.x = rotX;
-    cubeGroup.rotation.y = rotY;
-    cubeGroup.rotation.z = rotZ;
+    if (typeof posX === "number") {
+      cubeGroup.position.set(posX, posY, posZ);
+      cubeGroup.scale.set(sc, sc, sc);
+      if (menuBlend < 0.001) {
+        cubeGroup.rotation.x = rotX;
+        cubeGroup.rotation.y = rotY;
+        cubeGroup.rotation.z = rotZ;
+      }
+    }
 
     root.position.set(0, 0, 0);
     root.rotation.set(0, 0, 0);
@@ -702,21 +902,32 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       var cubeDim = 1 - menuBlend * 0.4;
 
       if (menuFrom.sideEntry) {
-        var flyT = Math.min(1, menuBlend / 0.58);
+        var flyT = menuTween.closing ? 1 - menuBlend : menuBlend;
         var flyEase = 1 - Math.pow(1 - flyT, 2.65);
-        var rotT = Math.max(0, (menuBlend - 0.5) / 0.5);
-        var rotEase = rotT * rotT * (3 - 2 * rotT);
+        var arrive = menuTween.closing ? 1 - flyEase : flyEase;
 
-        posX = menuFrom.px + (menuX - menuFrom.px) * flyEase;
-        posY = menuFrom.py + (menuY - menuFrom.py) * flyEase;
-        posZ = menuFrom.pz + (menuZ - menuFrom.pz) * flyEase;
-        sc = menuFrom.sc + (menuScale - menuFrom.sc) * flyEase;
+        posX = menuFrom.px + (menuX - menuFrom.px) * arrive;
+        posY = menuFrom.py + (menuY - menuFrom.py) * arrive;
+        posZ = menuFrom.pz + (menuZ - menuFrom.pz) * arrive;
+        sc = menuFrom.sc + (menuScale - menuFrom.sc) * arrive;
 
         cubeGroup.position.set(posX, posY, posZ);
         cubeGroup.scale.set(sc, sc, sc);
-        cubeGroup.rotation.x = menuFrom.rx + (0 - menuFrom.rx) * rotEase;
-        cubeGroup.rotation.y = menuFrom.ry + (0 - menuFrom.ry) * rotEase;
-        cubeGroup.rotation.z = menuFrom.rz + (0 - menuFrom.rz) * rotEase;
+        if (menuFrom.qStart) {
+          _axisSpin.set(0.18, 1, 0.12).normalize();
+          _qFaceSpin.setFromAxisAngle(_axisSpin, arrive * Math.PI * 2);
+          cubeGroup.quaternion.copy(menuFrom.qStart).multiply(_qFaceSpin);
+          cubeGroup.rotation.setFromQuaternion(cubeGroup.quaternion, "XYZ");
+        }
+        cubeGroup.updateMatrixWorld(true);
+
+        if (!menuTween.closing && menuBlend > 0.72) {
+          applyMenuFaceOrientation(((menuBlend - 0.72) / 0.28) * 0.14);
+        }
+
+        if (menuTween.closing && flyT > 0.86) {
+          cubeDim *= Math.max(0, 1 - (flyT - 0.86) / 0.14);
+        }
       } else {
         var mb = menuBlend * menuBlend * (3 - 2 * menuBlend);
         posX = menuFrom.px + (menuX - menuFrom.px) * mb;
@@ -726,9 +937,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
         cubeGroup.position.set(posX, posY, posZ);
         cubeGroup.scale.set(sc, sc, sc);
-        cubeGroup.rotation.x = menuFrom.rx + (0 - menuFrom.rx) * mb;
-        cubeGroup.rotation.y = menuFrom.ry + (0 - menuFrom.ry) * mb;
-        cubeGroup.rotation.z = menuFrom.rz + (0 - menuFrom.rz) * mb;
+        cubeGroup.updateMatrixWorld(true);
+
+        applyMenuFaceOrientation(menuTween.closing ? 0 : 0.1 + menuBlend * 0.24);
       }
 
       cubeVisible = true;
@@ -767,13 +978,20 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       shardStream = Math.max(shardStream, 0.98);
     }
 
-    shardMat.uniforms.uTime.value = t;
-    shardMat.uniforms.uBreak.value = shardBreak;
-    shardMat.uniforms.uStream.value = shardStream;
-    shardMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
-    shardMat.uniforms.uCubeMat.value.copy(cubeGroup.matrixWorld);
+    if (shardMat) {
+      if (!shardsBuilt && (displayBreak > 0.04 || displayStream > 0.04 || c > 0.03)) {
+        buildShards();
+      }
+      shardMat.uniforms.uTime.value = t;
+      shardMat.uniforms.uBreak.value = shardBreak;
+      shardMat.uniforms.uStream.value = shardStream;
+      shardMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
+      shardMat.uniforms.uCubeMat.value.copy(cubeGroup.matrixWorld);
+    }
 
-    if (displayStream > 0.15 || sandLocked) sampleCards();
+    if (displayStream > 0.15 || sandLocked) {
+      if (!LOW_PERF || cardSampleTick++ % 3 === 0) sampleCards();
+    }
 
     // Portal stays visible for sand ribbon after cube exits
     if (canvas.parentElement) {
@@ -797,14 +1015,27 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     renderer.render(scene, camera);
   }
 
+  if (canvas.parentElement) {
+    canvas.parentElement.style.opacity = "1";
+    canvas.parentElement.style.visibility = "visible";
+  }
+
+  watchIntroReady();
+  animate();
+
   (async function () {
     if (window.cosgralSmoothScroll && window.cosgralSmoothScroll.ready) {
       await window.cosgralSmoothScroll.ready;
     }
     bindScroll();
-    // Prefer section-flow values if present; still bind local as backup
-    animate();
   })();
+
+  window.cosgralCube = {
+    introDone: function () {
+      return introDone;
+    },
+    forceIntro: startIntro,
+  };
 
   function captureMenuFrom() {
     var heroX = MOBILE ? 0.3 : 0.4;
@@ -830,20 +1061,38 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
     menuFrom.sideEntry = true;
     menuFrom.visible = false;
-    menuFrom.px = -(MOBILE ? 7.8 : 9.4);
-    menuFrom.py = heroY;
-    menuFrom.pz = heroZ;
-    menuFrom.rx = 0.16;
-    menuFrom.ry = -Math.PI * 0.52;
-    menuFrom.rz = 0.05;
-    menuFrom.sc = heroScale * 1.02;
+    syncCamera();
+    var corner = getMenuCornerWorld(heroZ);
+    menuFrom.px = corner.x;
+    menuFrom.py = corner.y;
+    menuFrom.pz = corner.z;
+    if (cubeGroup.visible) {
+      menuFrom.rx = cubeGroup.rotation.x;
+      menuFrom.ry = cubeGroup.rotation.y;
+      menuFrom.rz = cubeGroup.rotation.z;
+      menuFrom.sc = cubeGroup.scale.x;
+      _qMenuStart.copy(cubeGroup.quaternion);
+    } else {
+      menuFrom.rx = 0.16;
+      menuFrom.ry = -Math.PI * 0.52;
+      menuFrom.rz = 0.05;
+      menuFrom.sc = heroScale * 1.02;
+      _qMenuStart.setFromEuler(new THREE.Euler(0.16, -Math.PI * 0.52, 0.05, "XYZ"));
+    }
+    menuFrom.qStart = _qMenuStart.clone();
+    delete menuFrom.qEnd;
   }
 
   function snapMenuFromPose() {
     if (!menuFrom.sideEntry) return;
     cubeGroup.position.set(menuFrom.px, menuFrom.py, menuFrom.pz);
     cubeGroup.scale.set(menuFrom.sc, menuFrom.sc, menuFrom.sc);
-    cubeGroup.rotation.set(menuFrom.rx, menuFrom.ry, menuFrom.rz);
+    if (menuFrom.qStart) {
+      cubeGroup.quaternion.copy(menuFrom.qStart);
+      cubeGroup.rotation.setFromQuaternion(cubeGroup.quaternion, "XYZ");
+    } else {
+      cubeGroup.rotation.set(menuFrom.rx, menuFrom.ry, menuFrom.rz);
+    }
     cubeGroup.visible = true;
     sMat.uniforms.uFade.value = 1;
     shell.material.opacity = 0.58;
@@ -854,19 +1103,15 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   function getMenuFaceRect() {
     if (menuBlend < 0.04 || !cubeGroup.visible) return null;
 
-    var pts = [
-      [-0.82, 0.82, 1],
-      [0.82, 0.82, 1],
-      [-0.82, -0.82, 1],
-      [0.82, -0.82, 1],
-    ];
+    var faceIdx = getBestFaceIndex();
+    var corners = FACE_CORNERS[faceIdx];
     var minX = Infinity;
     var maxX = -Infinity;
     var minY = Infinity;
     var maxY = -Infinity;
 
-    for (var i = 0; i < pts.length; i++) {
-      _faceVec.set(pts[i][0] * HALF, pts[i][1] * HALF, pts[i][2] * HALF);
+    for (var i = 0; i < corners.length; i++) {
+      _faceVec.set(corners[i][0] * HALF, corners[i][1] * HALF, corners[i][2] * HALF);
       cubeGroup.localToWorld(_faceVec);
       _faceScreen.copy(_faceVec).project(camera);
       var sx = (_faceScreen.x * 0.5 + 0.5) * window.innerWidth;
@@ -877,12 +1122,8 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       maxY = Math.max(maxY, sy);
     }
 
-    _faceVec.set(0, 0, HALF);
-    cubeGroup.localToWorld(_faceVec);
-    _faceScreen.copy(_faceVec).project(camera);
-    var cx = (_faceScreen.x * 0.5 + 0.5) * window.innerWidth;
-    var cy = (-_faceScreen.y * 0.5 + 0.5) * window.innerHeight;
-
+    var cx = (minX + maxX) * 0.5;
+    var cy = (minY + maxY) * 0.5;
     var size = Math.min(maxX - minX, maxY - minY) * 0.94;
     return { x: cx, y: cy, size: size };
   }
@@ -900,11 +1141,18 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     isSideEntry: function () {
       return menuFrom.sideEntry;
     },
+    getMenuOpenDuration: function () {
+      return menuFrom.sideEntry ? MENU_OPEN_SIDE_DUR : MENU_OPEN_HERO_DUR;
+    },
+    getMenuCloseDuration: function () {
+      return menuFrom.sideEntry ? MENU_CLOSE_SIDE_DUR : MENU_CLOSE_HERO_DUR;
+    },
     openMenu: function () {
       captureMenuFrom();
       snapMenuFromPose();
+      menuTween.closing = false;
       menuTween.blend = 0;
-      var dur = menuFrom.sideEntry ? 1.08 : 0.92;
+      var dur = menuFrom.sideEntry ? MENU_OPEN_SIDE_DUR : MENU_OPEN_HERO_DUR;
       if (window.gsap) {
         gsap.killTweensOf(menuTween);
         return gsap.to(menuTween, { blend: 1, duration: dur, ease: "power3.out" });
@@ -913,19 +1161,24 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       return null;
     },
     closeMenu: function () {
+      menuTween.closing = true;
+      var dur = menuFrom.sideEntry ? MENU_CLOSE_SIDE_DUR : MENU_CLOSE_HERO_DUR;
       if (window.gsap) {
         gsap.killTweensOf(menuTween);
         return gsap.to(menuTween, {
           blend: 0,
-          duration: 0.72,
-          ease: "power3.in",
+          duration: dur,
+          ease: "power3.out",
           onComplete: function () {
+            menuTween.blend = 0;
             menuFrom.sideEntry = false;
+            menuTween.closing = false;
           },
         });
       }
       menuTween.blend = 0;
       menuFrom.sideEntry = false;
+      menuTween.closing = false;
       return null;
     },
   };

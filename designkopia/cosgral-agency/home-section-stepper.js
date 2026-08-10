@@ -61,6 +61,8 @@
   function shouldIgnore() {
     if (!document.body.classList.contains("is-ready")) return true;
     if (document.querySelector(".nav-overlay.is-open")) return true;
+    if (document.documentElement.classList.contains("is-service-panel-open")) return true;
+    if (document.documentElement.classList.contains("is-form-focus")) return true;
     return false;
   }
 
@@ -76,12 +78,31 @@
     var wheelAccum = 0;
     var wheelTimer = null;
     var guardTimer = null;
-    var STEP_MS = MOBILE ? 4.32 : 5.28;
+    var STEP_MS = 5.28;
     var SNAP_MS = 1.44;
-    var WHEEL_END = MOBILE ? 42 : 52;
+    var WHEEL_END = 52;
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
+    var HOLD_COOLDOWN_MS = 100;
     var lastCommitDir = 0;
+    var cooldownUntil = 0;
+    var formFocusLock = false;
+
+    function beginCooldown() {
+      cooldownUntil = Date.now() + HOLD_COOLDOWN_MS;
+    }
+
+    function canStep() {
+      if (locked) return false;
+      if (formFocusLock) return false;
+      if (Date.now() < cooldownUntil) return false;
+      return true;
+    }
+
+    function setFormFocusLock(on) {
+      formFocusLock = !!on;
+      document.documentElement.classList.toggle("is-form-focus", formFocusLock);
+    }
 
     function nearestIndex(scroll) {
       var best = 0;
@@ -122,6 +143,11 @@
     function syncStepView(index) {
       var isFooter = index === holds.length - 1;
       document.documentElement.classList.toggle("is-footer-step", isFooter);
+      if (isFooter && window.gsap) {
+        window.gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
+          window.gsap.set(el, { autoAlpha: 1, y: 0, clearProps: "filter" });
+        });
+      }
       var contact = document.getElementById("kontakt");
       if (contact) contact.classList.toggle("is-footer-handoff", isFooter);
     }
@@ -138,19 +164,17 @@
     function syncSandForJump(index) {
       window.cosgralSand = window.cosgralSand || {};
       if (index === 0) {
-        window.cosgralSand.cinema = 0;
-        window.cosgralSand.motion = 0;
         window.cosgralSand.locked = false;
-        window.cosgralSand.resetCube = true;
+        delete window.cosgralSand.resetCube;
         document.documentElement.classList.remove("is-sand-stream");
-      } else {
-        window.cosgralSand.cinema = 1;
-        window.cosgralSand.motion = 1;
-        window.cosgralSand.locked = true;
-        window.cosgralSand.break = 0.98;
-        window.cosgralSand.stream = 0.98;
-        document.documentElement.classList.add("is-sand-stream");
+        return;
       }
+      window.cosgralSand.cinema = 1;
+      window.cosgralSand.motion = 1;
+      window.cosgralSand.locked = true;
+      window.cosgralSand.break = 0.98;
+      window.cosgralSand.stream = 0.98;
+      document.documentElement.classList.add("is-sand-stream");
     }
 
     function jumpTo(index) {
@@ -175,16 +199,13 @@
       var tl = gsap.timeline({
         onComplete: function () {
           locked = false;
+          beginCooldown();
           if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
         },
       });
 
       if (fromPanel && toPanel && fromPanel !== toPanel) {
-        tl.to(
-          fromPanel,
-          { autoAlpha: 0, filter: "blur(10px)", duration: 0.42, ease: "power2.in" },
-          0
-        );
+        tl.to(fromPanel, { autoAlpha: 0, filter: "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
       }
       if (curtain) {
         tl.to(curtain, { autoAlpha: 0.88, duration: 0.38, ease: "power2.in" }, 0);
@@ -243,6 +264,7 @@
         lock: true,
         onComplete: function () {
           locked = false;
+          beginCooldown();
           if (Math.abs(lenis.scroll - target) > 2) {
             lenis.scrollTo(target, { immediate: true });
           }
@@ -262,6 +284,7 @@
     }
 
     function stepUp() {
+      if (!canStep()) return;
       if (activeIndex <= 0) {
         goTo(0, SNAP_MS);
         return;
@@ -272,8 +295,18 @@
       lastCommitDir = -1;
     }
 
+    function stepDown() {
+      if (!canStep()) return;
+      if (activeIndex >= holds.length - 1) {
+        goTo(activeIndex, SNAP_MS);
+        return;
+      }
+      goTo(activeIndex + 1);
+      lastCommitDir = 1;
+    }
+
     function enforceHold() {
-      if (locked) return;
+      if (locked || formFocusLock || Date.now() < cooldownUntil) return;
       holds = buildHolds();
       var idx = nearestIndex(lenis.scroll);
       var dist = Math.abs(lenis.scroll - holds[idx]);
@@ -286,6 +319,7 @@
 
     function scheduleGuard() {
       if (guardTimer) window.clearTimeout(guardTimer);
+      if (formFocusLock) return;
       guardTimer = window.setTimeout(enforceHold, 32);
     }
 
@@ -296,7 +330,7 @@
       e.preventDefault();
       e.stopPropagation();
 
-      if (locked) {
+      if (!canStep()) {
         wheelAccum = 0;
         return;
       }
@@ -315,7 +349,7 @@
 
     function commitWheel() {
       wheelTimer = null;
-      if (locked) {
+      if (!canStep()) {
         wheelAccum = 0;
         return;
       }
@@ -329,12 +363,7 @@
       wheelAccum = 0;
 
       if (dir > 0) {
-        lastCommitDir = 1;
-        if (activeIndex >= holds.length - 1) {
-          goTo(activeIndex, SNAP_MS);
-          return;
-        }
-        goTo(activeIndex + 1);
+        stepDown();
         return;
       }
 
@@ -342,36 +371,66 @@
     }
 
     var touchStartY = 0;
+    var touchLastY = 0;
+    var touchAccum = 0;
+    var touchActive = false;
+
     window.addEventListener(
       "touchstart",
       function (e) {
-        if (!e.touches[0]) return;
+        if (!e.touches[0] || REDUCED || shouldIgnore()) return;
         touchStartY = e.touches[0].clientY;
+        touchLastY = touchStartY;
+        touchAccum = 0;
+        touchActive = true;
       },
-      { passive: true }
+      { passive: true, capture: true }
+    );
+
+    window.addEventListener(
+      "touchmove",
+      function (e) {
+        if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
+        var y = e.touches[0].clientY;
+        touchAccum += touchLastY - y;
+        touchLastY = y;
+        e.preventDefault();
+      },
+      { passive: false, capture: true }
     );
 
     window.addEventListener(
       "touchend",
-      function (e) {
-        if (REDUCED || shouldIgnore() || !e.changedTouches[0]) return;
-        var dy = touchStartY - e.changedTouches[0].clientY;
-        if (Math.abs(dy) < 22) {
+      function () {
+        if (!touchActive) return;
+        touchActive = false;
+        if (REDUCED || shouldIgnore()) {
+          touchAccum = 0;
           return;
         }
-        if (locked) return;
-        if (dy > 0) {
-          lastCommitDir = 1;
-          if (activeIndex >= holds.length - 1) {
-            goTo(activeIndex, SNAP_MS);
-            return;
-          }
-          goTo(activeIndex + 1);
+        if (!canStep()) {
+          touchAccum = 0;
           return;
         }
-        stepUp();
+        if (Math.abs(touchAccum) < WHEEL_MIN) {
+          touchAccum = 0;
+          return;
+        }
+        var dir = touchAccum > 0 ? 1 : -1;
+        touchAccum = 0;
+        if (dir > 0) stepDown();
+        else stepUp();
       },
-      { passive: true }
+      { passive: true, capture: true }
+    );
+
+    window.addEventListener(
+      "touchcancel",
+      function () {
+        touchActive = false;
+        touchAccum = 0;
+      },
+      { passive: true, capture: true }
     );
 
     lenis.on("scroll", function () {
@@ -402,6 +461,7 @@
     activeIndex = nearestIndex(lenis.scroll);
     syncStepView(activeIndex);
     goTo(activeIndex, 0, true);
+    beginCooldown();
 
     window.cosgralSectionSnap = {
       holds: holds,
@@ -409,6 +469,9 @@
       goTo: function (index) {
         goTo(index);
       },
+      stepUp: stepUp,
+      stepDown: stepDown,
+      setFormFocusLock: setFormFocusLock,
       jumpTo: function (index) {
         jumpTo(index);
       },
@@ -458,6 +521,19 @@
     });
 
     if (window.ScrollTrigger) ScrollTrigger.refresh();
+    if (MOBILE) {
+      await new Promise(function (resolve) {
+        if (window.cosgralCube?.introDone?.()) {
+          resolve();
+          return;
+        }
+        var done = function () {
+          resolve();
+        };
+        window.addEventListener("cosgral:cube-intro-done", done, { once: true });
+        window.setTimeout(done, 3800);
+      });
+    }
     init();
   })();
 })();

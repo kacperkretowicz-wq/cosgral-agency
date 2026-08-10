@@ -138,9 +138,25 @@
     toggle.addEventListener("click", () => {
       isOpen ? closeNavAnimated() : openNav();
     });
-    overlay.querySelectorAll("[data-nav-close]").forEach((el) =>
-      el.addEventListener("click", () => closeNavAnimated())
-    );
+    overlay.querySelectorAll("[data-nav-close]").forEach((el) => {
+      if (el.matches(".nav-overlay__list a")) return;
+      el.addEventListener("click", () => closeNavAnimated());
+    });
+
+    overlay.querySelectorAll(".nav-overlay__list a").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const href = a.getAttribute("href");
+        closeNavAnimated(() => {
+          if (window.cosgralPageTransition?.navigate) {
+            window.cosgralPageTransition.navigate(href);
+            return;
+          }
+          window.location.href = href;
+        });
+      });
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && isOpen) closeNavAnimated();
     });
@@ -323,7 +339,7 @@
         message || "(brak wiadomości)",
       ];
       const body = encodeURIComponent(bodyLines.join("\n"));
-      window.location.href = `mailto:hello@cosgral.agency?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:kontakt@cosgral.pl?subject=${subject}&body=${body}`;
 
       status.dataset.state = "success";
       status.textContent = "Dziękujemy! Otworzyliśmy Twój program pocztowy z gotową wiadomością — wystarczy wysłać.";

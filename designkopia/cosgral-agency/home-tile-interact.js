@@ -6,6 +6,10 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
+  var MOBILE =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
   document.querySelectorAll(".services-fan__card[data-tile-interact]").forEach(function (card) {
     var media = card.querySelector(".services-fan__card-media");
     var video = card.querySelector("video");
@@ -48,16 +52,37 @@
 
   document.querySelectorAll(".home-work__card[data-tile-interact]").forEach(function (card) {
     var video = card.querySelector("video");
+    if (!video) return;
+
+    if (MOBILE) {
+      video.muted = true;
+      video.setAttribute("playsinline", "");
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              video.play().catch(function () {});
+            } else {
+              video.pause();
+            }
+          });
+        },
+        { threshold: 0.28, rootMargin: "8% 0px" }
+      );
+      io.observe(card);
+      if (card.getBoundingClientRect().height > 0) {
+        video.play().catch(function () {});
+      }
+      return;
+    }
 
     card.addEventListener("mouseenter", function () {
-      if (video) video.play().catch(function () {});
+      video.play().catch(function () {});
     });
 
     card.addEventListener("mouseleave", function () {
-      if (video) {
-        video.pause();
-        video.currentTime = 0;
-      }
+      video.pause();
+      video.currentTime = 0;
     });
   });
 

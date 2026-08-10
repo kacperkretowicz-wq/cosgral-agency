@@ -118,8 +118,43 @@
       list.appendChild(li);
     });
 
-    rail.appendChild(track);
-    rail.appendChild(list);
+    var body = document.createElement("div");
+    body.className = "home-scroll-rail__body";
+    body.appendChild(track);
+    body.appendChild(list);
+    rail.appendChild(body);
+
+    if (MOBILE) {
+      var arrows = document.createElement("div");
+      arrows.className = "home-scroll-rail__arrows";
+      arrows.setAttribute("aria-hidden", "false");
+
+      var btnUp = document.createElement("button");
+      btnUp.type = "button";
+      btnUp.className = "home-scroll-rail__arrow home-scroll-rail__arrow--up";
+      btnUp.setAttribute("aria-label", "Poprzednia sekcja");
+      btnUp.innerHTML =
+        '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2.5 2.5 6.5h7L6 2.5z" fill="currentColor"/></svg>';
+
+      var btnDown = document.createElement("button");
+      btnDown.type = "button";
+      btnDown.className = "home-scroll-rail__arrow home-scroll-rail__arrow--down";
+      btnDown.setAttribute("aria-label", "Następna sekcja");
+      btnDown.innerHTML =
+        '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 9.5 9.5 5.5h-7L6 9.5z" fill="currentColor"/></svg>';
+
+      arrows.appendChild(btnUp);
+      arrows.appendChild(btnDown);
+      rail.appendChild(arrows);
+
+      btnUp.addEventListener("click", function () {
+        if (window.cosgralSectionSnap?.stepUp) window.cosgralSectionSnap.stepUp();
+      });
+      btnDown.addEventListener("click", function () {
+        if (window.cosgralSectionSnap?.stepDown) window.cosgralSectionSnap.stepDown();
+      });
+    }
+
     document.body.appendChild(rail);
     return { rail: rail, fill: fill, dots: list.querySelectorAll("[data-scroll-rail-dot]") };
   }
@@ -268,32 +303,77 @@
       return best;
     }
 
+    function dotPercent(index) {
+      var n = SCENES.length;
+      if (n <= 1) return 0;
+      return (index / (n - 1)) * 100;
+    }
+
+    function fillHeightForScroll(scroll, current) {
+      var snapIdx = window.cosgralSectionSnap?.getIndex?.();
+      var idx = snapIdx != null && snapIdx >= 0 ? snapIdx : current ? current.index : 0;
+
+      if (current && current.st && current.st.isActive) {
+        return dotPercent(current.index);
+      }
+
+      if (holdPositions.length < 2) return dotPercent(idx);
+
+      var start = holdPositions[idx] ?? 0;
+      var end = holdPositions[idx + 1];
+
+      if (end == null) {
+        return dotPercent(idx);
+      }
+
+      if (scroll <= start + 4) {
+        return dotPercent(idx);
+      }
+
+      if (scroll >= end - 4) {
+        return dotPercent(Math.min(idx + 1, SCENES.length - 1));
+      }
+
+      var span = end - start;
+      if (span <= 0) return dotPercent(idx);
+
+      var t = (scroll - start) / span;
+      t = Math.min(1, Math.max(0, t));
+      return dotPercent(idx) + t * (dotPercent(idx + 1) - dotPercent(idx));
+    }
+
     function update() {
       refreshMetrics();
       var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
-      var progress = maxScroll > 0 ? scroll / maxScroll : 0;
-      ui.fill.style.height = (progress * 100).toFixed(2) + "%";
-
       var current = activeScene();
-      if (current && current.index !== lastIndex) {
-        revealTitle(current.index);
-        lastIndex = current.index;
+      var fillPct = fillHeightForScroll(scroll, current);
+      ui.fill.style.height = fillPct.toFixed(2) + "%";
+
+      var snapIdx = window.cosgralSectionSnap?.getIndex?.();
+      var currentIndex = snapIdx != null && snapIdx >= 0 ? snapIdx : current ? current.index : -1;
+
+      if (currentIndex >= 0 && currentIndex !== lastIndex) {
+        revealTitle(currentIndex);
+        lastIndex = currentIndex;
       }
 
       ui.dots.forEach(function (dot, i) {
         var scene = SCENES[i];
         var st = scene.footer ? null : ScrollTrigger.getById(scene.stId);
-        var isCurrent = current && current.index === i;
+        var isCurrent = currentIndex === i;
         var inHold = false;
 
         if (scene.footer && isCurrent) {
           inHold = true;
         } else if (st && isCurrent) {
-          inHold = st.progress >= scene.holdStart && st.progress <= scene.holdEnd;
+          inHold = st.isActive && st.progress >= scene.holdStart && st.progress <= scene.holdEnd;
+        } else if (isCurrent) {
+          inHold = true;
         }
 
         dot.classList.toggle("is-active", !!isCurrent);
         dot.classList.toggle("is-hold", !!inHold);
+        dot.classList.toggle("is-passed", i < currentIndex);
         if (isCurrent) dot.setAttribute("aria-current", "step");
         else dot.removeAttribute("aria-current");
 
@@ -325,7 +405,11 @@
 
     window.addEventListener("cosgral:section-step", function (e) {
       var idx = e.detail?.index;
-      if (typeof idx === "number") revealTitle(idx);
+      if (typeof idx === "number") {
+        revealTitle(idx);
+        lastIndex = idx;
+      }
+      update();
     });
 
     update();

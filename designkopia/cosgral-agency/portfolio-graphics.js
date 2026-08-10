@@ -648,6 +648,9 @@
     galleryRoot.innerHTML = html;
     bindLightboxTriggers(galleryRoot);
     if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.scan(galleryRoot);
+    if (window.CosgralPortfolioColorZone && document.body.classList.contains("graphics-gallery-page")) {
+      window.CosgralPortfolioColorZone.watch(galleryRoot, ".graphics-masonry__item", { observe: galleryRoot });
+    }
   }
 
   function bindLightboxUi() {

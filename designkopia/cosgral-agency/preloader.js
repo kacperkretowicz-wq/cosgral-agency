@@ -5,6 +5,7 @@
   "use strict";
 
   var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var MOBILE = window.matchMedia("(max-width: 900px)").matches;
   var shell = document.getElementById("preloader");
   var counter = document.getElementById("preloader-counter");
   var cube = document.querySelector(".preloader__cube");
@@ -20,7 +21,7 @@
   var value = 0;
   var target = 100;
   var start = performance.now();
-  var duration = 3000;
+  var duration = MOBILE ? 2200 : 3000;
   var flight = null;
 
   function easeOut(t) {
@@ -115,7 +116,7 @@
       setTimeout(function () {
         shell.classList.add("is-done");
         document.body.classList.add("is-ready");
-      }, 650);
+      }, MOBILE ? 380 : 650);
     }
   }
 

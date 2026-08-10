@@ -179,19 +179,12 @@
     document.dispatchEvent(new CustomEvent("portfolio:media-ready", { detail: { type: "reels" } }));
   }
 
-  function cmToPx(cm) {
-    var probe = document.createElement("div");
-    probe.style.cssText = "position:absolute;visibility:hidden;width:" + cm + "cm";
-    document.documentElement.appendChild(probe);
-    var px = probe.offsetWidth;
-    probe.remove();
-    return px;
-  }
-
   function initTilesCenterFocus() {
     var stage = tilesRoot && tilesRoot.querySelector(".reels-tiles__stage");
     var section = document.getElementById("montaz");
     if (!stage || !section) return;
+
+    if (document.body.classList.contains("reels-gallery-page")) return;
 
     var radius = cmToPx(7);
     var radiusSq = radius * radius;
@@ -237,6 +230,15 @@
 
     io.observe(section);
     window.addEventListener("resize", updateFocus);
+  }
+
+  function cmToPx(cm) {
+    var probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;visibility:hidden;width:" + cm + "cm";
+    document.documentElement.appendChild(probe);
+    var px = probe.offsetWidth;
+    probe.remove();
+    return px;
   }
 
   function initTilesEntrance() {
@@ -311,6 +313,9 @@
     galleryRoot.innerHTML = html;
     bindLightboxTriggers(galleryRoot);
     if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.scan(galleryRoot);
+    if (window.CosgralPortfolioColorZone && document.body.classList.contains("reels-gallery-page")) {
+      window.CosgralPortfolioColorZone.watch(galleryRoot, ".reels-masonry__item", { observe: galleryRoot });
+    }
   }
 
   function bindLightboxUi() {

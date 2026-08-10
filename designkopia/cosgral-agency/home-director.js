@@ -27,6 +27,68 @@
 
   var form = document.querySelector("[data-audit-form]");
   var status = document.querySelector("[data-audit-status]");
+  var MOBILE =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+  function scrollFieldIntoView(el) {
+    if (!MOBILE || !el || typeof el.getBoundingClientRect !== "function") return;
+    var run = function () {
+      var vv = window.visualViewport;
+      var viewH = vv ? vv.height : window.innerHeight;
+      var viewTop = vv ? vv.offsetTop : 0;
+      var rect = el.getBoundingClientRect();
+      var margin = 20;
+      var targetBottom = viewTop + viewH - margin;
+      if (rect.bottom > targetBottom) {
+        var offset = rect.bottom - targetBottom + 12;
+        var lenis = window.cosgralSmoothScroll?.lenis;
+        if (lenis) {
+          lenis.scrollTo(lenis.scroll + offset, { immediate: true });
+        } else {
+          window.scrollBy(0, offset);
+        }
+      } else if (rect.top < viewTop + margin) {
+        var up = rect.top - (viewTop + margin) - 8;
+        var lenisUp = window.cosgralSmoothScroll?.lenis;
+        if (lenisUp) {
+          lenisUp.scrollTo(lenisUp.scroll + up, { immediate: true });
+        } else {
+          window.scrollBy(0, up);
+        }
+      }
+    };
+    requestAnimationFrame(function () {
+      requestAnimationFrame(run);
+    });
+  }
+
+  if (form) {
+    form.addEventListener("focusin", function (e) {
+      if (window.cosgralSectionSnap?.setFormFocusLock) {
+        window.cosgralSectionSnap.setFormFocusLock(true);
+      }
+      scrollFieldIntoView(e.target);
+    });
+
+    form.addEventListener("focusout", function () {
+      window.setTimeout(function () {
+        if (!form.contains(document.activeElement)) {
+          if (window.cosgralSectionSnap?.setFormFocusLock) {
+            window.cosgralSectionSnap.setFormFocusLock(false);
+          }
+        }
+      }, 80);
+    });
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", function () {
+        var active = document.activeElement;
+        if (form.contains(active)) scrollFieldIntoView(active);
+      });
+    }
+  }
+
   if (form && status) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -45,7 +107,7 @@
       var inquiryLabel = (i18n && i18n.t("form.mailto_inquiry")) || "zapytanie";
       var subject = encodeURIComponent(subjectLabel + " — " + (name || inquiryLabel));
       var body = encodeURIComponent(["Imię: " + (name || "-"), "Email: " + email, "Firma: " + (company || "-"), "", message || "(brak wiadomości)"].join("\n"));
-      window.location.href = "mailto:hello@cosgral.agency?subject=" + subject + "&body=" + body;
+      window.location.href = "mailto:kontakt@cosgral.pl?subject=" + subject + "&body=" + body;
       status.dataset.state = "success";
       status.textContent = (i18n && i18n.t("form.success_mailto")) || "Otworzyliśmy program pocztowy — wyślij wiadomość.";
       form.reset();

@@ -19,6 +19,18 @@
     cy = e.clientY;
   });
 
+  document.addEventListener("mouseover", function (e) {
+    if (e.target.closest("a, button, [data-magnetic], .service-panel__close, .service-panel__cta")) {
+      root.classList.add("is-hover");
+    }
+  });
+  document.addEventListener("mouseout", function (e) {
+    var rel = e.relatedTarget;
+    if (!rel || !rel.closest || !rel.closest("a, button, [data-magnetic], .service-panel__close, .service-panel__cta")) {
+      root.classList.remove("is-hover");
+    }
+  });
+
   document.querySelectorAll("a, button, [data-magnetic]").forEach(function (el) {
     el.addEventListener("mouseenter", function () { root.classList.add("is-hover"); });
     el.addEventListener("mouseleave", function () { root.classList.remove("is-hover"); });

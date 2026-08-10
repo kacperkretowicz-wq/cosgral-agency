@@ -1,0 +1,15 @@
+/portfolio   /portfolio.html   200
+/portfolio/  /portfolio.html   200
+
+/uslugi/tworzenie-stron-internetowych.html    /index.html?service=blue    302
+/uslugi/tworzenie-stron-internetowych         /index.html?service=blue    302
+/uslugi/projektowanie-aplikacji.html          /index.html?service=purple  302
+/uslugi/projektowanie-aplikacji               /index.html?service=purple  302
+/uslugi/pozycjonowanie-seo-geo.html           /index.html?service=gold    302
+/uslugi/pozycjonowanie-seo-geo                /index.html?service=gold    302
+/uslugi/wdrazanie-automatyzacji.html          /index.html?service=orange  302
+/uslugi/wdrazanie-automatyzacji               /index.html?service=orange  302
+/uslugi/systemy-crm.html                      /index.html?service=crimson 302
+/uslugi/systemy-crm                           /index.html?service=crimson 302
+/uslugi/grafika-i-montaz-wideo.html           /index.html?service=green   302
+/uslugi/grafika-i-montaz-wideo                /index.html?service=green   302

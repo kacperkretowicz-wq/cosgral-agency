@@ -6,6 +6,7 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
+  var COARSE = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var root = document.documentElement;
   var state = {
     x: window.innerWidth * 0.5,
@@ -25,6 +26,13 @@
     state.ty = clientY;
     state.tnx = (clientX / window.innerWidth) * 2 - 1;
     state.tny = -((clientY / window.innerHeight) * 2 - 1);
+    if (COARSE) {
+      state.x = state.tx;
+      state.y = state.ty;
+      state.nx = state.tnx;
+      state.ny = state.tny;
+      applyPointer();
+    }
   }
 
   document.addEventListener(
@@ -44,12 +52,7 @@
     { passive: true }
   );
 
-  function tick() {
-    state.x += (state.tx - state.x) * 0.08;
-    state.y += (state.ty - state.y) * 0.08;
-    state.nx += (state.tnx - state.nx) * 0.08;
-    state.ny += (state.tny - state.ny) * 0.08;
-
+  function applyPointer() {
     var px = (state.x / window.innerWidth) * 100;
     var py = (state.y / window.innerHeight) * 100;
 
@@ -57,9 +60,20 @@
     root.style.setProperty("--pointer-y", py.toFixed(2) + "%");
     root.style.setProperty("--pointer-nx", state.nx.toFixed(4));
     root.style.setProperty("--pointer-ny", state.ny.toFixed(4));
+  }
 
+  function tick() {
+    state.x += (state.tx - state.x) * 0.08;
+    state.y += (state.ty - state.y) * 0.08;
+    state.nx += (state.tnx - state.nx) * 0.08;
+    state.ny += (state.tny - state.ny) * 0.08;
+    applyPointer();
     requestAnimationFrame(tick);
   }
 
-  tick();
+  if (COARSE) {
+    applyPointer();
+  } else {
+    tick();
+  }
 })();

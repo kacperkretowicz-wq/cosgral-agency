@@ -379,6 +379,44 @@
   layout(0);
   tick();
 
+  window.cosgralServicesFan = {
+    goToIndex: function (nextIndex) {
+      goTo(nextIndex);
+    },
+    goToTheme: function (themeId, done) {
+      var idx = -1;
+      for (var i = 0; i < cards.length; i++) {
+        if (cards[i].getAttribute("data-service-theme") === themeId) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx < 0) {
+        if (done) done();
+        return;
+      }
+      goTo(idx);
+      if (REDUCED) {
+        displayPos = idx;
+        targetPos = idx;
+        layout(idx);
+        if (done) done();
+        return;
+      }
+      var started = performance.now();
+      function waitSettled() {
+        if (Math.abs(shortestDelta(displayPos, targetPos)) < 0.02 || performance.now() - started > 1800) {
+          displayPos = targetPos;
+          layout(displayPos);
+          if (done) done();
+          return;
+        }
+        requestAnimationFrame(waitSettled);
+      }
+      requestAnimationFrame(waitSettled);
+    },
+  };
+
   window.addEventListener("resize", function () {
     MOBILE = window.matchMedia("(max-width: 900px)").matches;
     layout(displayPos);
