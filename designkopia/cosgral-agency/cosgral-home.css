@@ -310,6 +310,10 @@ html.is-footer-step .site-footer {
   padding-top: clamp(1.5rem, 4vh, 2.5rem);
   padding-bottom: clamp(5.5rem, 16vh, 9.75rem);
 }
+html.is-footer-step .site-footer [data-enter] {
+  opacity: 1;
+  visibility: visible;
+}
 
 .home-cursor { position: fixed; top: 0; left: 0; z-index: 10001; pointer-events: none; mix-blend-mode: difference; }
 .home-cursor__dot { position: fixed; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #fff; transform: translate(var(--cx,0), var(--cy,0)); }
@@ -2133,39 +2137,72 @@ html.is-form-focus .home-scroll-rail__arrow {
   .services-fan__stage { height: clamp(300px, 44vh, 400px); }
   .services-fan__card { width: 210px; height: 280px; }
 
-  /* Footer — centered column stack on mobile */
+  /* Footer — kompaktowe kolumny, ~½ ekranu treści, góra pusta */
   .site-footer {
     padding-left: var(--gutter);
     padding-right: calc(var(--gutter) + var(--rail-safe));
     text-align: center;
+    overflow: visible;
+  }
+  html.is-footer-step .site-footer {
+    min-height: 100dvh;
+    height: 100dvh;
+    max-height: 100dvh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 42dvh;
+    padding-bottom: clamp(3.5rem, 11vh, 5.5rem);
+    overflow: hidden;
+  }
+  html.is-footer-step .site-footer [data-enter] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
   }
   .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 1.55rem;
-    justify-items: center;
-    text-align: center;
-    margin-bottom: 1.35rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem 1.15rem;
+    justify-items: stretch;
+    align-items: start;
+    text-align: left;
+    margin-bottom: 0.95rem;
     width: 100%;
-    max-width: min(100%, 24.5rem);
+    max-width: min(100%, 26rem);
     margin-inline: auto;
   }
-  .footer-cta,
-  .footer-col,
-  .site-footer .footer-col--social {
+  .footer-cta {
     grid-column: 1 / -1;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
+    margin-bottom: 0.15rem;
+  }
+  .footer-col,
+  .site-footer .footer-col--social {
+    grid-column: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
   }
   .footer-col__title {
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.55rem;
+    font-size: 0.58rem;
   }
   .footer-col ul {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.45rem;
+    align-items: flex-start;
+    gap: 0.28rem;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -2173,47 +2210,51 @@ html.is-form-focus .home-scroll-rail__arrow {
   .footer-col ul li {
     margin-bottom: 0;
   }
+  .footer-col a {
+    font-size: 0.84rem;
+  }
   .footer-col a:hover {
     transform: none;
+  }
+  .site-footer .footer-col--social {
+    align-items: flex-start;
   }
   .footer-social {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
+    justify-content: flex-start;
+    gap: 0.55rem;
   }
   .footer-social__link {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.25rem;
+    height: 2.25rem;
     flex-shrink: 0;
   }
   .footer-social__link svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     display: block;
   }
   .cosgral-footer-wordmark {
     text-align: center;
-    font-size: clamp(1.65rem, 7.2vw, 2.35rem);
+    font-size: clamp(1.45rem, 6.4vw, 2.05rem);
+    line-height: 1;
   }
   .footer-bottom {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 0.55rem;
+    justify-content: space-between;
+    text-align: left;
+    gap: 0.45rem 1rem;
     width: 100%;
-    max-width: min(100%, 24.5rem);
+    max-width: min(100%, 26rem);
     margin-inline: auto;
-  }
-  html.is-footer-step .site-footer {
-    padding-bottom: clamp(4.75rem, 17vh, 8rem);
-    align-items: center;
+    padding-top: 0.85rem;
   }
 }
 @media (max-width: 540px) {
-  .footer-grid { grid-template-columns: 1fr; }
   .services-fan__hint { display: none; }
 }
