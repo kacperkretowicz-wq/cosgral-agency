@@ -2,7 +2,6 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage).
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
-import { RoundedBoxGeometry } from "https://unpkg.com/three@0.170.0/examples/jsm/geometries/RoundedBoxGeometry.js";
 
 (function () {
   "use strict";
@@ -119,15 +118,14 @@ import { RoundedBoxGeometry } from "https://unpkg.com/three@0.170.0/examples/jsm
     `,
   });
 
-  var EDGE_SOFT = 0.12;
-  var boxGeo = new THREE.BoxGeometry(HALF * 2, HALF * 2, HALF * 2);
-  var shellGeo = new RoundedBoxGeometry(HALF * 2, HALF * 2, HALF * 2, 5, EDGE_SOFT);
+  // Soft pro look without RoundedBox (CDN examples import bare "three" and break modules).
+  var boxGeo = new THREE.BoxGeometry(HALF * 2, HALF * 2, HALF * 2, 2, 2, 2);
   var shell = new THREE.Mesh(
-    shellGeo,
+    boxGeo,
     new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0.58, depthWrite: true })
   );
   var wire = new THREE.Mesh(
-    shellGeo,
+    boxGeo,
     new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.055 })
   );
   var edges = new THREE.LineSegments(
