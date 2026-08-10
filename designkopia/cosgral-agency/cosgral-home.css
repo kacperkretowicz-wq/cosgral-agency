@@ -1969,8 +1969,7 @@ html.is-form-focus .home-scroll-rail__arrow {
   .home-process .section-label,
   .home-work .home-work__title,
   .services-fan .services-fan__title,
-  .services-fan .section-label,
-  .services-fan .services-fan__lead {
+  .services-fan .section-label {
     text-align: center;
     width: 100%;
   }
