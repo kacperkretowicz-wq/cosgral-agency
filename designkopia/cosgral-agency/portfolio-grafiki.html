@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" data-i18n-meta="portfolio.grafiki_meta">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,7 +7,7 @@
 <meta name="description" content="Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260810t" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260814e" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
   (function () {
@@ -26,7 +26,7 @@
 </script>
 </head>
 <body class="subpage portfolio-page graphics-gallery-page">
-<a class="visually-hidden" href="#main">Przejdź do treści</a>
+<a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
 
 <canvas id="subpage-ambient" class="subpage-ambient" aria-hidden="true"></canvas>
 <div class="subpage-ambient__blur" aria-hidden="true"></div>
@@ -36,25 +36,32 @@
 </div>
 
 <nav class="site-nav" id="site-nav">
-  <a href="index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
+  <a href="index.html#top" class="site-nav__logo" data-i18n-aria-label="common.logo_aria" aria-label="COSGRAL — strona główna">
     <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
-  <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
-    <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-    <span>Menu</span>
-  </button>
+  <div class="site-nav__actions">
+    <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
+      <button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button>
+      <button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
+      <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span data-i18n="nav.menu">Menu</span>
+    </button>
+  </div>
 </nav>
 <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
   <div class="nav-overlay__backdrop" data-nav-close></div>
   <div class="nav-overlay__stage">
     <nav class="nav-overlay__links" aria-label="Menu główne">
       <ul class="nav-overlay__list">
-        <li><a href="index.html#top" data-nav-close>Start</a></li>
-        <li><a href="portfolio.html" data-nav-close>Realizacje</a></li>
-        <li><a href="index.html#uslugi" data-nav-close>Usługi</a></li>
-        <li><a href="index.html#proces" data-nav-close>Proces</a></li>
-        <li><a href="index.html#faq" data-nav-close>FAQ</a></li>
-        <li><a href="index.html#kontakt" data-nav-close>Kontakt</a></li>
+        <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
+        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="index.html#uslugi" data-nav-close data-i18n="nav.services">Usługi</a></li>
+        <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
+        <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
+        <li><a href="index.html#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
       </ul>
     </nav>
   </div>
@@ -62,64 +69,66 @@
 
 <main id="main">
   <header class="portfolio-hero container">
-    <span class="section-eyebrow">Portfolio</span>
-    <h1 class="portfolio-hero__title">Grafiki</h1>
-    <p class="portfolio-hero__lead">Posty, stories i key visuale — od Juicy Events przez Far East po Safe Grant i BTS.</p>
-    <p class="graphics-gallery-page__back"><a href="portfolio.html#grafiki">← Wróć do portfolio</a></p>
+    <span class="section-eyebrow" data-i18n="common.portfolio_eyebrow">Portfolio</span>
+    <h1 class="portfolio-hero__title" data-i18n="portfolio.grafiki_title">Grafiki</h1>
+    <p class="portfolio-hero__lead" data-i18n="portfolio.grafiki_page_lead">Posty, stories i key visuale — od Juicy Events przez Far East po Safe Grant i BTS.</p>
+    <p class="graphics-gallery-page__back"><a href="portfolio.html#grafiki" data-i18n="portfolio.back_portfolio">← Wróć do portfolio</a></p>
   </header>
 
   <div id="graphics-gallery" class="graphics-gallery" aria-live="polite"></div>
 </main>
 
-<div class="graphics-lightbox" id="graphics-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Podgląd grafiki">
-  <button type="button" class="graphics-lightbox__backdrop" data-lightbox-close aria-label="Zamknij"></button>
+<div class="graphics-lightbox" id="graphics-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" data-i18n-aria-label="portfolio.lightbox_graphic" aria-label="Podgląd grafiki">
+  <button type="button" class="graphics-lightbox__backdrop" data-lightbox-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij"></button>
   <figure class="graphics-lightbox__figure">
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev aria-label="Poprzednia grafika" hidden>‹</button>
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next aria-label="Następna grafika" hidden>›</button>
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev data-i18n-aria-label="portfolio.lightbox_prev_graphic" aria-label="Poprzednia grafika" hidden>‹</button>
+    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next data-i18n-aria-label="portfolio.lightbox_next_graphic" aria-label="Następna grafika" hidden>›</button>
     <img class="graphics-lightbox__img" alt="" hidden />
     <video class="graphics-lightbox__video" controls playsinline hidden></video>
-    <button type="button" class="graphics-lightbox__close" data-lightbox-close aria-label="Zamknij">×</button>
+    <button type="button" class="graphics-lightbox__close" data-lightbox-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij">×</button>
   </figure>
 </div>
 
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <div class="footer-cta"><p class="cosgral-footer-wordmark">cosgral agency</p></div>
+      <div class="footer-cta"><p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p></div>
       <div class="footer-col">
-        <p class="footer-col__title">Sekcje</p>
+        <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
         <ul>
-          <li><a href="index.html#top">Start</a></li>
-          <li><a href="portfolio.html">Realizacje</a></li>
-          <li><a href="portfolio.html#strony">Strony</a></li>
-          <li><a href="portfolio.html#montaz">Montaż</a></li>
-          <li><a href="portfolio.html#grafiki">Grafiki</a></li>
-          <li><a href="index.html#uslugi">Usługi</a></li>
-          <li><a href="index.html#proces">Proces</a></li>
-          <li><a href="index.html#faq">FAQ</a></li>
-          <li><a href="index.html#kontakt">Kontakt</a></li>
+          <li><a href="index.html#top" data-i18n="nav.start">Start</a></li>
+          <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
+          <li><a href="portfolio.html#strony" data-i18n="bento.strony">Strony internetowe</a></li>
+          <li><a href="portfolio.html#montaz" data-i18n="bento.montaz">Montaż wideo</a></li>
+          <li><a href="portfolio.html#grafiki" data-i18n="bento.grafiki">Grafiki &amp; social</a></li>
+          <li><a href="index.html#uslugi" data-i18n="nav.services">Usługi</a></li>
+          <li><a href="index.html#proces" data-i18n="nav.process">Proces</a></li>
+          <li><a href="index.html#faq" data-i18n="nav.faq">FAQ</a></li>
+          <li><a href="o-nas.html" data-i18n="nav.about">O nas</a></li>
+          <li><a href="index.html#kontakt" data-i18n="nav.contact">Kontakt</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <p class="footer-col__title">Usługi</p>
+        <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
         <ul>
-          <li><a href="index.html?service=blue">Strony internetowe</a></li>
-          <li><a href="index.html?service=purple">Aplikacje</a></li>
-          <li><a href="index.html?service=gold">Pozycjonowanie SEO/GEO</a></li>
-          <li><a href="index.html?service=orange">Automatyzacje</a></li>
-          <li><a href="index.html?service=crimson">Systemy CRM</a></li>
-          <li><a href="index.html?service=green">Grafika i wideo</a></li>
+          <li><a href="index.html?service=blue" data-i18n="services.card1">Strony internetowe</a></li>
+          <li><a href="index.html?service=purple" data-i18n="services.card2">Aplikacje</a></li>
+          <li><a href="index.html?service=gold" data-i18n="services.card3">Pozycjonowanie SEO/GEO</a></li>
+          <li><a href="index.html?service=orange" data-i18n="services.card4">Automatyzacje</a></li>
+          <li><a href="index.html?service=crimson" data-i18n="services.card5">Systemy CRM</a></li>
+          <li><a href="index.html?service=green" data-i18n="services.card6">Grafika i wideo</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <p class="footer-col__title">Kontakt</p>
+        <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
         <ul>
           <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
-          <li><a href="index.html#kontakt">Bezpłatny audyt →</a></li>
+          <li><a href="tel:+48533790518" data-i18n="contact.phone_kuba">Kuba · +48 533 790 518</a></li>
+          <li><a href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a></li>
         </ul>
       </div>
       <div class="footer-col footer-col--social">
-        <p class="footer-col__title">Social</p>
+        <p class="footer-col__title" data-i18n="footer.social">Social</p>
         <div class="footer-social" role="list">
           <a class="footer-social__link" href="https://www.facebook.com/people/cosgralagency/61591582027536/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" data-no-transition>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.027 4.388 11.026 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.099 24 18.1 24 12.073z"/></svg>
@@ -134,20 +143,25 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 cosgral agency</span>
-      <a href="/privacy-policy">Privacy Policy</a>
+      <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
+      <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
     </div>
   </div>
 </footer>
 
+<script src="i18n.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
-<script src="home-cursor-field.js"></script>
-<script src="subpage-ambient-bg.js?v=20260807a"></script>
-<script type="module" src="subpage-cube.js?v=20260810b"></script>
-<script src="sections.js?v=20260810i"></script>
+<script src="home-cursor-field.js?v=20260814i"></script>
+<script src="home-cursor.js?v=20260812a"></script>
+<script src="home-tile-interact.js?v=20260814i"></script>
+<script src="subpage-ambient-bg.js?v=20260814e"></script>
+<script src="subpage-menu-water.js?v=20260814e"></script>
+<script type="module" src="subpage-cube.js?v=20260814e"></script>
+<script defer src="home-nav-menu.js?v=20260814e"></script>
+<script src="sections.js?v=20260814e"></script>
 <script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
 <script src="portfolio-video.js?v=20260807ag"></script>
-<script src="portfolio-color-zone.js?v=20260810t"></script>
-<script src="portfolio-graphics.js?v=20260810t"></script>
+<script src="portfolio-color-zone.js?v=20260814e"></script>
+<script src="portfolio-graphics.js?v=20260814e"></script>
 </body>
 </html>

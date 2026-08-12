@@ -12,7 +12,7 @@
 
   var links = overlay.querySelectorAll(".nav-overlay__list a");
   var stage = overlay.querySelector(".nav-overlay__stage");
-  var backdrop = overlay.querySelector("[data-nav-backdrop]");
+  var backdrop = overlay.querySelector("[data-nav-backdrop], .nav-overlay__backdrop");
   var isOpen = false;
   var animating = false;
   var syncRaf = null;
@@ -64,6 +64,7 @@
       stage.style.width = rect.size + "px";
       stage.style.height = rect.size + "px";
       stage.style.setProperty("--menu-face-size", rect.size + "px");
+      stage.style.transform = "translate(-50%, -50%)";
     }
     syncRaf = window.requestAnimationFrame(syncStageToCube);
   }
@@ -97,7 +98,8 @@
     if (REDUCED || !window.gsap) return;
     var side = window.cosgralCube?.isSideEntry?.();
     var chars = menuChars();
-    var delay = side ? 1.14 : 0.68;
+    var openDur = window.cosgralCube?.getMenuOpenDuration?.() || 5.3;
+    var delay = side ? openDur * 0.187 : openDur * 0.128;
 
     gsap.killTweensOf(links);
     gsap.killTweensOf(chars);
@@ -232,13 +234,36 @@
     window.location.href = href;
   }
 
+  function invokeCubeOpen() {
+    if (window.cosgralCube && typeof window.cosgralCube.openMenu === "function") {
+      return window.cosgralCube.openMenu();
+    }
+    return null;
+  }
+
   function openNav() {
     if (isOpen) return;
     animating = true;
     prepareNavLabels();
     setOpenState(true);
 
-    var cubeTween = window.cosgralCube?.openMenu?.();
+    var cubeTween = invokeCubeOpen();
+    if (!cubeTween && !REDUCED) {
+      window.addEventListener(
+        "cosgral:cube-ready",
+        function onCubeReady() {
+          window.removeEventListener("cosgral:cube-ready", onCubeReady);
+          if (!isOpen) return;
+          var retryTween = invokeCubeOpen();
+          if (retryTween && retryTween.eventCallback) {
+            retryTween.eventCallback("onComplete", function () {
+              animating = false;
+            });
+          }
+        },
+        { once: true }
+      );
+    }
     animateLinksIn();
 
     var done = function () {
@@ -278,6 +303,12 @@
       if (overlayDone) return;
       overlayDone = true;
       setOpenState(false);
+      document.body.classList.remove("is-cube-menu-front", "is-cube-menu-passing");
+      document.documentElement.style.removeProperty("--menu-water-bend");
+      document.documentElement.style.removeProperty("--menu-wave-x");
+      document.documentElement.style.removeProperty("--menu-wave-y");
+      document.documentElement.style.removeProperty("--menu-wave-progress");
+      document.documentElement.style.removeProperty("--menu-wave-punch");
     };
 
     var finishAll = function () {

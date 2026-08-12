@@ -122,19 +122,11 @@
 
   window.addEventListener("resize", resize);
   resize();
+  gl.uniform2f(uRes, canvas.width, canvas.height);
+  gl.uniform1f(uTime, 0);
+  gl.uniform2f(uMouse, 0, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
   play();
-
-  if (MOBILE) {
-    pause();
-    window.addEventListener(
-      "cosgral:cube-intro-done",
-      function () {
-        play();
-      },
-      { once: true }
-    );
-    window.setTimeout(play, 4200);
-  }
 
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) pause();

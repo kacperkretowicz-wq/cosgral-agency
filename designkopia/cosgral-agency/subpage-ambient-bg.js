@@ -381,6 +381,13 @@
 
     window.addEventListener("resize", resize);
     resize();
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uTime, 0);
+    gl.uniform2f(uMouse, 0, 0);
+    gl.uniform3fv(uBase, colors.base);
+    gl.uniform3fv(uAccent, colors.accent);
+    gl.uniform3fv(uHighlight, colors.highlight);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
     play();
 
     document.addEventListener("visibilitychange", function () {
@@ -392,6 +399,6 @@
   if (themeId !== "default" && "requestIdleCallback" in window) {
     requestIdleCallback(boot, { timeout: 120 });
   } else {
-    requestAnimationFrame(boot);
+    boot();
   }
 })();

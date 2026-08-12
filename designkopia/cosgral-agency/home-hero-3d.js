@@ -3,6 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
 (function () {
   "use strict";
@@ -36,7 +37,10 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   var introTween = { progress: 0 };
   var introStarted = false;
   var introDone = false;
+  var introSettle = 1;
+  var introDoneDispatched = false;
   var INTRO_DUR = MOBILE ? 2.1 : 3.35;
+  var INTRO_START_DELAY = MOBILE ? 920 : 680;
   var menuFrom = {
     px: 0,
     py: 0,
@@ -201,23 +205,25 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
         ease: "power2.out",
         onComplete: function () {
           introDone = true;
-          window.dispatchEvent(new CustomEvent("cosgral:cube-intro-done"));
+          introSettle = 0;
+          window.setTimeout(function () {
+            if (!introDoneDispatched) {
+              introDoneDispatched = true;
+              window.dispatchEvent(new CustomEvent("cosgral:cube-intro-done"));
+            }
+          }, 1400);
         },
       });
       return;
     }
     introTween.progress = 1;
     introDone = true;
-    window.dispatchEvent(new CustomEvent("cosgral:cube-intro-done"));
+    introSettle = 0;
   }
 
   function watchIntroReady() {
     function kick() {
-      if (LOW_PERF) {
-        window.setTimeout(startIntro, 160);
-        return;
-      }
-      startIntro();
+      window.setTimeout(startIntro, INTRO_START_DELAY);
     }
 
     function ready() {
@@ -258,11 +264,11 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: true,
+    antialias: !LOW_PERF,
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.5 : 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 2));
   renderer.setClearColor(0x000000, 0);
 
   var scene = new THREE.Scene();
@@ -290,8 +296,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     return [a, b, -h];
   }
 
-  // Surface density closer to Realizacje (subpage-cube); shards stay on LOW_PERF budget.
-  var SURFACE = LOW_PERF ? 1200 : 4200;
+  var SURFACE = MOBILE ? 1200 : 2800;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
@@ -344,38 +349,12 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     `,
   });
 
-  // Soft pro look without RoundedBox (CDN examples import bare "three" and break modules).
-  var boxGeo = new THREE.BoxGeometry(HALF * 2, HALF * 2, HALF * 2, 2, 2, 2);
-  var shell = new THREE.Mesh(
-    boxGeo,
-    new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0.58, depthWrite: true })
-  );
-  var wire = new THREE.Mesh(
-    boxGeo,
-    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.055 })
-  );
-  var edges = new THREE.LineSegments(
-    new THREE.EdgesGeometry(boxGeo, 20),
-    new THREE.LineBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.34,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
-  );
-  var edgeGlow = new THREE.LineSegments(
-    new THREE.EdgesGeometry(boxGeo, 20),
-    new THREE.LineBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.14,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
-  );
-  edgeGlow.scale.setScalar(1.012);
-  cubeGroup.add(shell, wire, edges, edgeGlow, new THREE.Points(sGeo, sMat));
+  var cubeParts = createIntactCubeParts(HALF);
+  var shell = cubeParts.shell;
+  var wire = cubeParts.wire;
+  var edges = cubeParts.edges;
+  var setWireOpacity = cubeParts.setWireOpacity;
+  cubeGroup.add(shell, edges, new THREE.Points(sGeo, sMat));
 
   // ——— Shatter shards (deferred on mobile to avoid blocking first paint) ———
   var shards = null;
@@ -475,7 +454,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     aSize0[i] = 0.016 + hash(i, 14) * 0.02;
   }
 
-  var boxBase = new THREE.BoxGeometry(1, 1, 1);
+  var boxBase = createShardGeometry();
   boxBase.setAttribute("aStart", new THREE.InstancedBufferAttribute(aStart, 3));
   boxBase.setAttribute("aSand", new THREE.InstancedBufferAttribute(aSand, 3));
   boxBase.setAttribute("aSeed", new THREE.InstancedBufferAttribute(aSeed, 1));
@@ -802,7 +781,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     var scrollRotZ = idleRotZ + depart * 0.08 + mouse.x * 0.01 * depart + t * 0.008 * depart;
 
     var introActive = introStarted && !introDone && motion < 0.01 && menuBlend < 0.001;
+    var introLanding = introDone && introSettle < 1 && motion < 0.01 && menuBlend < 0.001;
     var introDim = 1;
+
     var motionDelta = motion - prevMotion;
     var leavingHero = motionDelta > 0.00008;
     var returningHero = motionDelta < -0.00008;
@@ -841,8 +822,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     var rotY;
     var rotZ;
 
-    if (introActive) {
-      var introT = introEase01(introTween.progress);
+    if (introActive || introLanding) {
+      if (introLanding) introSettle = Math.min(1, introSettle + 0.034);
+      var introT = introActive ? introEase01(introTween.progress) : 1;
       var flyStartX = MOBILE ? 7.15 : 8.75;
       var flyStartY = MOBILE ? -4.15 : -5.05;
       var flyStartZ = 0.14;
@@ -859,18 +841,33 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
       rotX = flyStartRx + (idleRotX - flyStartRx) * introT;
       rotY = flyStartRy + (idleRotY - flyStartRy) * introT;
       rotZ = flyStartRz + (idleRotZ - flyStartRz) * introT;
-      introDim = Math.min(1, introTween.progress * 3.2);
+      introDim = introActive
+        ? Math.min(1, introTween.progress * 3.2)
+        : 1;
+
+      if (introLanding) {
+        var landT = introEase01(introSettle);
+        posX += (scrollPosX - posX) * landT;
+        posY += (scrollPosY - posY) * landT;
+        posZ += (scrollPosZ - posZ) * landT;
+        sc += (scrollSc - sc) * landT;
+        rotX += (scrollRotX - rotX) * landT;
+        rotY += (scrollRotY - rotY) * landT;
+        rotZ += (scrollRotZ - rotZ) * landT;
+        if (introSettle >= 1 && !introDoneDispatched) {
+          introDoneDispatched = true;
+          window.dispatchEvent(new CustomEvent("cosgral:cube-intro-done"));
+        }
+      }
     } else if (!introStarted && motion < 0.01 && menuBlend < 0.001) {
-      var waitX = MOBILE ? 7.15 : 8.75;
-      var waitY = MOBILE ? -4.15 : -5.05;
-      posX = waitX;
-      posY = waitY;
+      posX = MOBILE ? 7.15 : 8.75;
+      posY = MOBILE ? -4.15 : -5.05;
       posZ = 0.14;
       sc = heroScale * 0.82;
       rotX = 0.52;
       rotY = -1.18;
       rotZ = 0.32;
-      introDim = document.body.classList.contains("is-ready") ? 0.72 : 0.45;
+      introDim = 0;
     } else if (scrollHandoff && leavingHero) {
       var handoffT = smooth01(0.01, 0.26, motion);
       posX = scrollHandoff.px + (scrollPosX - scrollHandoff.px) * handoffT;
@@ -963,22 +960,20 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
       cubeVisible = true;
       sMat.uniforms.uFade.value = cubeDim;
-      shell.material.opacity = 0.58 * cubeDim;
-      wire.material.opacity = 0.055 * cubeDim;
-      edges.material.opacity = 0.34 * cubeDim;
-      edgeGlow.material.opacity = 0.14 * cubeDim;
+      setWireOpacity(wire, 0.1 * cubeDim);
+      shell.material.opacity = 0.62 * cubeDim;
+      edges.material.opacity = 0.44 * cubeDim;
     } else {
-      var fade = introActive || (!introStarted && motion < 0.01 && menuBlend < 0.001)
+      var fade = introActive || introLanding || (!introStarted && motion < 0.01 && menuBlend < 0.001)
         ? introDim
         : cubeVisible
           ? 1
           : 0;
       sMat.uniforms.uFade.value = fade;
-      shell.material.opacity = 0.58 * fade;
-      wire.material.opacity = 0.055 * fade;
-      edges.material.opacity = 0.34 * fade;
-      edgeGlow.material.opacity = 0.14 * fade;
-      if (introActive || (!introStarted && motion < 0.01 && menuBlend < 0.001)) {
+      shell.material.opacity = 0.62 * fade;
+      setWireOpacity(wire, 0.1 * fade);
+      edges.material.opacity = 0.44 * fade;
+      if (introActive || introLanding || (!introStarted && motion < 0.01 && menuBlend < 0.001)) {
         cubeVisible = fade > 0.02;
       }
     }
@@ -1026,7 +1021,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
         ? 1
         : tilesOp > 0.45
           ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
-          : 1;
+          : 0.68;
       canvas.parentElement.style.opacity = String(portalOp);
       canvas.parentElement.style.visibility = portalOp > 0.05 ? "visible" : "hidden";
     }
@@ -1037,7 +1032,7 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
   }
 
   if (canvas.parentElement) {
-    canvas.parentElement.style.opacity = "1";
+    canvas.parentElement.style.opacity = "0.68";
     canvas.parentElement.style.visibility = "visible";
   }
 
@@ -1116,10 +1111,9 @@ import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
     }
     cubeGroup.visible = true;
     sMat.uniforms.uFade.value = 1;
-    shell.material.opacity = 0.58;
-    wire.material.opacity = 0.055;
-    edges.material.opacity = 0.34;
-    edgeGlow.material.opacity = 0.14;
+    shell.material.opacity = 0.62;
+    setWireOpacity(wire, 0.1);
+    edges.material.opacity = 0.44;
   }
 
   function getMenuFaceRect() {

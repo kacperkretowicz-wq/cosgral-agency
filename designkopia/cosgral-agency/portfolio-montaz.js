@@ -8,6 +8,13 @@
   var galleryRoot = document.getElementById("reels-gallery");
   var lightbox = document.getElementById("reels-lightbox");
   var lightboxNav = null;
+  var MEDIA_VERSION = "20260814g";
+
+  function mediaUrl(path) {
+    if (!path) return "";
+    if (path.indexOf("?") !== -1) return path;
+    return path + "?v=" + MEDIA_VERSION;
+  }
 
   function openLightbox(item, alt) {
     if (!lightbox) return;
@@ -68,15 +75,15 @@
     if (isClone) {
       return (
         '<img class="reels-tiles__poster" src="' +
-        (item.poster || item.src) +
+        mediaUrl(item.poster || item.src) +
         '" alt="" loading="lazy" decoding="async" />'
       );
     }
     return (
       '<video data-portfolio-video data-video-mode="focus-only" data-video-src="' +
-      item.src +
+      mediaUrl(item.src) +
       '" poster="' +
-      (item.poster || "") +
+      mediaUrl(item.poster || "") +
       '" muted loop playsinline preload="none"></video>'
     );
   }
@@ -96,11 +103,11 @@
       ";--lane:" +
       lane +
       '" data-reel-src="' +
-      item.src +
+      mediaUrl(item.src) +
       '" data-reel-full="' +
-      (item.full || item.src) +
+      mediaUrl(item.full || item.src) +
       '" data-reel-poster="' +
-      (item.poster || "") +
+      mediaUrl(item.poster || "") +
       '" data-reel-alt="' +
       (item.client || "Rolka") +
       '" data-reel-audio="' +
@@ -139,8 +146,14 @@
 
   function renderTiles(data) {
     if (!tilesRoot) return;
-    var pool = collectItems(data);
-    if (!pool.length && data.collage) pool = data.collage.slice();
+    var pool = collectItems(data).filter(function (item) {
+      return item.id !== "orlincy";
+    });
+    if (!pool.length && data.collage) {
+      pool = data.collage.filter(function (item) {
+        return item.id !== "orlincy";
+      });
+    }
     if (!pool.length) return;
 
     var tiles = pickTiles(pool, 20);
@@ -285,11 +298,11 @@
       group.items.forEach(function (item, idx) {
         html +=
           '<button type="button" class="reels-masonry__item" data-reel-src="' +
-          item.src +
+          mediaUrl(item.src) +
           '" data-reel-full="' +
-          (item.full || item.src) +
+          mediaUrl(item.full || item.src) +
           '" data-reel-poster="' +
-          (item.poster || "") +
+          mediaUrl(item.poster || "") +
           '" data-reel-alt="' +
           group.name +
           " " +
@@ -300,9 +313,9 @@
           (item.h / item.w).toFixed(4) +
           '">' +
           '<video data-portfolio-video data-video-src="' +
-          item.src +
+          mediaUrl(item.src) +
           '" poster="' +
-          (item.poster || "") +
+          mediaUrl(item.poster || "") +
           '" muted loop playsinline preload="none"></video>' +
           "</button>";
       });
@@ -342,7 +355,7 @@
 
   bindLightboxUi();
 
-  fetch("portfolio/reels/manifest.json?v=20260807ap")
+  fetch("portfolio/reels/manifest.json?v=20260814g")
     .then(function (r) {
       return r.json();
     })

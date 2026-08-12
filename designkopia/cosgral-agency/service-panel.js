@@ -30,7 +30,12 @@
   }
 
   function contentData(id) {
-    return window.cosgralServicesContent?.[id] || null;
+    var lang = window.cosgralI18n?.getLang?.() || "pl";
+    return window.cosgralServicesContent?.get?.(id, lang) || null;
+  }
+
+  function panelT(key) {
+    return (window.cosgralI18n && window.cosgralI18n.t(key)) || null;
   }
 
   function lockScroll(on) {
@@ -55,39 +60,67 @@
         '<div class="service-panel__links">' +
         data.links
           .map(function (l) {
-            return '<a href="' + l.href + '" data-panel-link>' + l.label + " →</a>";
+            var label = l.i18n && panelT(l.i18n) ? panelT(l.i18n) : l.label;
+            return '<a href="' + l.href + '" data-panel-link>' + label + " →</a>";
           })
           .join("") +
         "</div>";
     }
 
+    var serviceLabel = panelT("panel.service_label") || "Usługa";
+    var whatWeDo = panelT("panel.what_we_do") || "Co robimy";
+    var forWho = panelT("panel.for_who") || "Dla kogo i jaki efekt";
+    var cta = panelT("panel.cta") || "Zacznijmy od bezpłatnego audytu";
+
     return (
       '<header class="service-panel__head">' +
       '<p class="service-panel__num">' +
       data.num +
-      " — Usługa</p>" +
+      " — " +
+      serviceLabel +
+      "</p>" +
       '<h2 class="service-panel__title" id="service-panel-title">' +
       data.title +
       "</h2>" +
       "</header>" +
       '<section class="service-panel__col service-panel__col--list">' +
-      "<h3>Co robimy</h3>" +
+      "<h3>" +
+      whatWeDo +
+      "</h3>" +
       "<ul>" +
       itemsHtml +
       "</ul>" +
       linksHtml +
       "</section>" +
       '<section class="service-panel__col service-panel__col--effect">' +
-      "<h3>Dla kogo i jaki efekt</h3>" +
+      "<h3>" +
+      forWho +
+      "</h3>" +
       '<div class="service-panel__copy">' +
       parasHtml +
       "</div>" +
       "</section>" +
       '<footer class="service-panel__foot">' +
-      '<a class="service-panel__cta" href="#kontakt" data-panel-contact>Zacznijmy od bezpłatnego audytu</a>' +
+      '<a class="service-panel__cta" href="#kontakt" data-panel-contact data-i18n="panel.cta">' +
+      cta +
+      "</a>" +
       "</footer>"
     );
   }
+
+  function refreshOpenPanel() {
+    if (!openPanel || !openCard) return;
+    var themeId = openCard.getAttribute("data-service-theme");
+    var data = contentData(themeId);
+    if (!data) return;
+    var inner = openPanel.querySelector(".service-panel__inner");
+    if (inner) inner.innerHTML = buildInner(data);
+    if (window.cosgralI18n?.applyLang) {
+      window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
+    }
+  }
+
+  window.addEventListener("cosgral:langchange", refreshOpenPanel);
 
   function playShellVideo(shell) {
     shell.querySelectorAll("video").forEach(function (video) {
@@ -95,12 +128,20 @@
     });
   }
 
-  function setShellRect(shell, rect) {
+  function setShellRect(shell, card, themeId) {
+    var rect = card.getBoundingClientRect();
+    var radius = window.getComputedStyle(card).borderRadius || "28px";
     shell.style.left = rect.left + "px";
     shell.style.top = rect.top + "px";
     shell.style.width = rect.width + "px";
     shell.style.height = rect.height + "px";
-    shell.style.borderRadius = "28px";
+    shell.style.borderRadius = radius;
+    if (themeId) shell.setAttribute("data-service-theme", themeId);
+  }
+
+  function setCardSourceHidden(card, hidden) {
+    if (!card) return;
+    card.classList.toggle("is-service-panel-source", !!hidden);
   }
 
   function openFromCard(card) {
@@ -112,7 +153,6 @@
     if (!themeId || !data || !theme) return false;
 
     openCard = card;
-    var rect = card.getBoundingClientRect();
 
     window.cosgralServiceThemes?.apply?.(themeId);
 
@@ -129,6 +169,7 @@
     panel.innerHTML =
       '<div class="service-panel__shell">' +
       '<div class="service-panel__bg" aria-hidden="true"></div>' +
+      '<div class="service-panel__scrim" aria-hidden="true"></div>' +
       '<div class="service-panel__inner">' +
       buildInner(data) +
       "</div></div>";
@@ -153,7 +194,8 @@
         '<div class="service-panel__tint service-panel__tint--panel" aria-hidden="true"></div>'
     );
 
-    setShellRect(shell, rect);
+    setShellRect(shell, card, themeId);
+    setCardSourceHidden(card, true);
 
     document.body.appendChild(panel);
     openPanel = panel;
@@ -176,7 +218,7 @@
     return true;
   }
 
-  function closePanel() {
+  function closePanel(onClosed) {
     if (!openPanel || closing) return;
     closing = true;
 
@@ -190,24 +232,52 @@
 
     window.setTimeout(function () {
       if (card) {
-        setShellRect(panel.querySelector(".service-panel__shell"), card.getBoundingClientRect());
+        setShellRect(panel.querySelector(".service-panel__shell"), card, panel.getAttribute("data-service-theme"));
       }
       panel.classList.remove("is-open");
 
       window.setTimeout(function () {
+        setCardSourceHidden(card, false);
         panel.remove();
         openPanel = null;
         openCard = null;
         closing = false;
         lockScroll(false);
+        if (typeof onClosed === "function") onClosed();
       }, CLOSE_MS);
     }, CONTENT_OUT_MS);
+  }
+
+  function goToContactSection() {
+    if (window.cosgralSectionSnap?.jumpTo) {
+      window.cosgralSectionSnap.jumpTo(5);
+      return;
+    }
+    if (window.cosgralSectionSnap?.goTo) {
+      window.cosgralSectionSnap.goTo(5);
+      return;
+    }
+    var target = document.getElementById("kontakt");
+    if (target && window.cosgralSmoothScroll?.scrollTo) {
+      window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1 });
+    } else if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  function onContactCtaClick(e) {
+    var cta = e.target.closest("[data-panel-contact]");
+    if (!cta || !openPanel) return;
+    e.preventDefault();
+    e.stopPropagation();
+    closePanel(goToContactSection);
   }
 
   function onPanelDismiss(e) {
     if (!openPanel || closing) return;
     if (!openPanel.classList.contains("is-content-ready")) return;
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (e.target.closest("a, button, input, textarea, select, label")) return;
 
     closePanel();
   }
@@ -331,6 +401,7 @@
   };
 
   document.addEventListener("keydown", onKeydown);
+  document.addEventListener("click", onContactCtaClick, true);
 
   function init() {
     bindCards();

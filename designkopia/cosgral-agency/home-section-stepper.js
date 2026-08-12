@@ -21,7 +21,20 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    return Math.min(max, Math.max(0, footer.offsetTop - (MOBILE ? 162 : 234)));
+    if (MOBILE) {
+      var viewH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      var footerH = footer.offsetHeight;
+      var topInset = 64;
+      var bottomInset = 12;
+      if (footerH + topInset + bottomInset <= viewH) {
+        return Math.min(max, Math.max(0, footer.offsetTop - topInset));
+      }
+      return Math.min(
+        max,
+        Math.max(0, footer.offsetTop + footerH - viewH + bottomInset)
+      );
+    }
+    return Math.min(max, Math.max(0, footer.offsetTop - 234));
   }
 
   function buildHolds() {
@@ -64,6 +77,15 @@
     if (document.documentElement.classList.contains("is-service-panel-open")) return true;
     if (document.documentElement.classList.contains("is-form-focus")) return true;
     return false;
+  }
+
+  function isHomeReload() {
+    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    return !!(nav && nav.type === "reload");
+  }
+
+  function hasStoredHashNav() {
+    return !!sessionStorage.getItem("cosgral-scroll-target");
   }
 
   function init() {

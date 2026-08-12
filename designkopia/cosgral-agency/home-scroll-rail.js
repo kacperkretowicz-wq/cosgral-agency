@@ -8,7 +8,7 @@
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
 
   var SCENES = [
-    { id: "top", stId: "hero-pin", label: "Start", hold: 0.52, holdStart: 0.18, holdEnd: 0.72 },
+    { id: "top", stId: "hero-pin", label: "Start", i18n: "nav.start", hold: 0.52, holdStart: 0.18, holdEnd: 0.72 },
     {
       id: "uslugi",
       stId: "scene-uslugi",
@@ -59,7 +59,7 @@
       holdEnd: 0.88,
       showTitle: true,
     },
-    { id: "footer", label: "Stopka", footer: true, holdStart: 0, holdEnd: 1 },
+    { id: "footer", label: "Stopka", i18n: "rail.footer", footer: true, holdStart: 0, holdEnd: 1 },
   ];
 
   function footerHoldY() {
@@ -77,6 +77,7 @@
     var rail = document.createElement("nav");
     rail.className = "home-scroll-rail";
     rail.setAttribute("data-scroll-rail", "");
+    rail.setAttribute("data-i18n-aria-label", "rail.aria");
     rail.setAttribute("aria-label", "Postęp sekcji");
 
     var track = document.createElement("div");
@@ -114,6 +115,10 @@
       btn.setAttribute("data-scene-index", String(i));
       btn.setAttribute("aria-label", scene.label);
       btn.title = scene.label;
+      if (scene.i18n) {
+        btn.setAttribute("data-i18n-aria-label", scene.i18n);
+        btn.setAttribute("data-i18n-title", scene.i18n);
+      }
       li.appendChild(btn);
       list.appendChild(li);
     });
@@ -132,6 +137,7 @@
       var btnUp = document.createElement("button");
       btnUp.type = "button";
       btnUp.className = "home-scroll-rail__arrow home-scroll-rail__arrow--up";
+      btnUp.setAttribute("data-i18n-aria-label", "rail.prev");
       btnUp.setAttribute("aria-label", "Poprzednia sekcja");
       btnUp.innerHTML =
         '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2.5 2.5 6.5h7L6 2.5z" fill="currentColor"/></svg>';
@@ -139,6 +145,7 @@
       var btnDown = document.createElement("button");
       btnDown.type = "button";
       btnDown.className = "home-scroll-rail__arrow home-scroll-rail__arrow--down";
+      btnDown.setAttribute("data-i18n-aria-label", "rail.next");
       btnDown.setAttribute("aria-label", "Następna sekcja");
       btnDown.innerHTML =
         '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 9.5 9.5 5.5h-7L6 9.5z" fill="currentColor"/></svg>';
@@ -213,7 +220,7 @@
         titleBtn.disabled = false;
         titleBtn.removeAttribute("aria-hidden");
         titleBtn.tabIndex = 0;
-        titleBtn.setAttribute("aria-label", scene.label);
+        titleBtn.setAttribute("aria-label", scene.i18n && window.cosgralI18n?.t ? (window.cosgralI18n.t(scene.i18n) || scene.label) : scene.label);
       }
     }
 

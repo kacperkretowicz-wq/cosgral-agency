@@ -8,6 +8,17 @@
   var copy = null;
   var lang = localStorage.getItem(STORAGE_KEY) || "pl";
 
+  function copyJsonUrl() {
+    var scripts = document.getElementsByTagName("script");
+    for (var i = 0; i < scripts.length; i++) {
+      var src = scripts[i].getAttribute("src") || "";
+      if (src.indexOf("i18n.js") !== -1) {
+        return src.replace(/i18n\.js(\?.*)?$/, "i18n/copy.json");
+      }
+    }
+    return "i18n/copy.json";
+  }
+
   function get(obj, path) {
     var parts = path.split(".");
     var cur = obj;
@@ -30,10 +41,11 @@
     localStorage.setItem(STORAGE_KEY, lang);
     document.documentElement.lang = lang;
 
-    if (copy && copy.meta) {
-      document.title = t("meta.title");
+    var metaKey = document.documentElement.getAttribute("data-i18n-meta") || "meta";
+    if (copy && get(copy, metaKey)) {
+      document.title = t(metaKey + ".title");
       var metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute("content", t("meta.description"));
+      if (metaDesc) metaDesc.setAttribute("content", t(metaKey + ".description"));
     }
 
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
@@ -53,6 +65,16 @@
       }
     });
 
+    document.querySelectorAll("[data-i18n-aria-label]").forEach(function (el) {
+      var ariaVal = t(el.getAttribute("data-i18n-aria-label"));
+      if (ariaVal != null) el.setAttribute("aria-label", ariaVal);
+    });
+
+    document.querySelectorAll("[data-i18n-title]").forEach(function (el) {
+      var titleVal = t(el.getAttribute("data-i18n-title"));
+      if (titleVal != null) el.setAttribute("title", titleVal);
+    });
+
     document.querySelectorAll("[data-i18n-lang-btn]").forEach(function (btn) {
       var btnLang = btn.getAttribute("data-i18n-lang-btn");
       btn.classList.toggle("is-active", btnLang === lang);
@@ -70,7 +92,7 @@
     });
   }
 
-  fetch("i18n/copy.json")
+  fetch(copyJsonUrl())
     .then(function (r) { return r.json(); })
     .then(function (data) {
       copy = data;

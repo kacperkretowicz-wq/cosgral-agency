@@ -8,6 +8,15 @@
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
   var root = document.querySelector("[data-cursor]");
+  if (!root) {
+    root = document.createElement("div");
+    root.className = "home-cursor";
+    root.setAttribute("data-cursor", "");
+    root.setAttribute("aria-hidden", "true");
+    root.innerHTML =
+      '<div class="home-cursor__dot"></div><div class="home-cursor__ring"></div>';
+    document.body.appendChild(root);
+  }
   if (!root) return;
 
   var dot = root.querySelector(".home-cursor__dot");
@@ -20,7 +29,7 @@
   });
 
   document.addEventListener("mouseover", function (e) {
-    if (e.target.closest("a, button, [data-magnetic], .service-panel__close, .service-panel__cta")) {
+    if (e.target.closest("a, button, [data-magnetic], [data-tile-interact], .footer-social__link, .service-panel__close, .service-panel__cta, .portfolio-web-card, .reels-tiles__card, .home-scroll-rail__dot")) {
       root.classList.add("is-hover");
     }
   });

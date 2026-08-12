@@ -1,15 +1,33 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" data-i18n-meta="meta">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="cosgral-build" content="20260814g" />
+<script src="site-cache-bust.js?v=20260814g"></script>
 <title>COSGRAL — agencja cyfrowa | strony, wideo, automatyzacje</title>
 <meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260810s" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260814e" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
-<link rel="stylesheet" href="service-panel.css?v=20260810r" />
+<link rel="stylesheet" href="service-panel.css?v=20260812a" />
+<script>
+  (function () {
+    var path = (location.pathname || "/").replace(/\/$/, "") || "/";
+    var isHome = path === "/" || path.endsWith("/index.html");
+    if (!isHome) return;
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    if (nav && nav.type === "reload") {
+      window.scrollTo(0, 0);
+      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    }
+  })();
+</script>
 <script>
   (function () {
     if (sessionStorage.getItem("cosgral-page-transition")) {
@@ -19,7 +37,7 @@
 </script>
 <script src="service-themes.js?v=20260810l"></script>
 <script src="services-content.js?v=20260810m"></script>
-<script src="service-panel.js?v=20260810r"></script>
+<script src="service-panel.js?v=20260812a"></script>
 <script src="page-transitions.js?v=20260810r"></script>
 <script>
   (function () {
@@ -50,21 +68,23 @@
 <div id="preloader" aria-hidden="true">
   <div class="preloader__inner">
     <div class="preloader__cube-slot" aria-hidden="true">
-      <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" />
+      <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" decoding="async" />
     </div>
-    <div class="preloader__counter" id="preloader-counter">000</div>
     <p class="preloader__label" data-i18n="preloader.label">Inicjalizacja sygnału</p>
+    <div class="preloader__bar" aria-hidden="true">
+      <div class="preloader__bar-fill" id="preloader-bar"></div>
+    </div>
   </div>
 </div>
 
-<a class="visually-hidden" href="#main">Przejdź do treści</a>
+<a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
 
 <nav class="site-nav" id="site-nav">
-  <a href="index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
+  <a href="index.html#top" class="site-nav__logo" data-i18n-aria-label="common.logo_aria" aria-label="COSGRAL — strona główna">
     <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <div class="site-nav__actions">
-    <div class="lang-switch" role="group" aria-label="Język">
+    <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
       <button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button>
       <button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button>
     </div>
@@ -85,6 +105,7 @@
         <li><a href="#uslugi" data-nav-close data-i18n="nav.services">Usługi</a></li>
         <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
         <li><a href="#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
       </ul>
     </nav>
@@ -345,8 +366,22 @@
   <canvas id="contact-3d" class="home-contact__canvas" aria-hidden="true"></canvas>
   <div class="home-contact__shade" aria-hidden="true"></div>
   <div class="home-contact__inner">
-    <h2 class="home-contact__title" data-reveal-words data-i18n="hero.act6_lead">Zacznijmy od bezpłatnego audytu.</h2>
-    <form id="audit-form" class="audit-form" method="post" data-audit-form data-lenis-prevent>
+    <div class="audit-form__success" data-audit-success hidden>
+      <h3 class="audit-form__success-title" data-i18n="form.success_title">Dziękujemy za kontakt</h3>
+      <p class="audit-form__success-body" data-i18n="form.success_body">Otrzymaliśmy Twoją wiadomość. Wrócimy do Ciebie w ciągu jednego dnia roboczego — zwykle szybciej.</p>
+    </div>
+    <div class="home-contact__content" data-contact-content>
+      <h2 class="home-contact__title" data-reveal-words data-i18n="contact.call_title">Zadzwoń</h2>
+      <p class="home-contact__lead" data-enter="right" data-i18n="contact.call_lead">Zadzwoń na te numery, lub zostaw nam wiadomość o sobie.</p>
+      <div class="home-contact__phones" data-enter="left">
+        <a class="home-contact__phone" href="tel:+48533790518" data-i18n="contact.phone_kuba">Kuba · +48 533 790 518</a>
+        <a class="home-contact__phone" href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a>
+      </div>
+      <form id="audit-form" class="audit-form" name="audit-contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" data-audit-form data-lenis-prevent>
+        <input type="hidden" name="form-name" value="audit-contact" />
+        <p class="visually-hidden" hidden>
+          <label>Nie wypełniaj: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+        </p>
       <div class="audit-form__row" data-enter="left">
         <label for="audit-name" data-i18n="form.name">Imię</label>
         <input type="text" id="audit-name" name="name" autocomplete="name" required />
@@ -366,6 +401,7 @@
       <button type="submit" class="btn btn--primary audit-form__submit" data-enter="bottom" data-i18n="form.submit">Wyślij</button>
       <p class="audit-form__status" data-audit-status role="status" aria-live="polite"></p>
     </form>
+    </div>
   </div>
   </div>
 </section>
@@ -375,62 +411,59 @@
 <footer class="site-footer">
   <div class="site-footer__ambient" aria-hidden="true"></div>
   <div class="site-footer__rule" aria-hidden="true"><span></span></div>
-  <div class="site-footer__inner container">
-    <div class="footer-grid">
-      <div class="footer-cta" data-enter="left">
-        <p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p>
-      </div>
-      <div class="footer-col footer-col--sections" data-enter="right">
-        <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
-        <ul>
-          <li><a href="#top" data-i18n="nav.start">Start</a></li>
-          <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
-          <li><a href="portfolio.html#strony">Strony internetowe</a></li>
-          <li><a href="portfolio.html#montaz">Montaż wideo</a></li>
-          <li><a href="portfolio.html#grafiki">Grafiki &amp; social</a></li>
-          <li><a href="#uslugi" data-i18n="nav.services">Usługi</a></li>
-          <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
-          <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
-          <li><a href="#kontakt" data-i18n="nav.contact">Kontakt</a></li>
-        </ul>
-      </div>
-      <div class="footer-col footer-col--services" data-enter="top">
-        <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
-        <ul>
-          <li><a href="#uslugi" data-open-service="blue" data-i18n="footer.link_websites">Strony internetowe</a></li>
-          <li><a href="#uslugi" data-open-service="purple">Aplikacje</a></li>
-          <li><a href="#uslugi" data-open-service="gold">Pozycjonowanie SEO &amp; GEO</a></li>
-          <li><a href="#uslugi" data-open-service="orange">Automatyzacje</a></li>
-          <li><a href="#uslugi" data-open-service="crimson" data-i18n="footer.link_crm">Systemy CRM</a></li>
-          <li><a href="#uslugi" data-open-service="green" data-i18n="footer.link_video">Grafika i montaż wideo</a></li>
-        </ul>
-      </div>
-      <div class="footer-col footer-col--contact" data-enter="bottom">
-        <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
-        <ul>
-          <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
-          <li><a href="#kontakt">Bezpłatny audyt →</a></li>
-        </ul>
-      </div>
-      <div class="footer-col footer-col--social" data-enter="bottom">
-        <p class="footer-col__title" data-i18n="footer.social">Social</p>
-        <div class="footer-social" role="list">
-          <a class="footer-social__link" href="https://www.facebook.com/people/cosgralagency/61591582027536/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" data-no-transition>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.027 4.388 11.026 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.099 24 18.1 24 12.073z"/></svg>
-          </a>
-          <a class="footer-social__link" href="https://www.instagram.com/cosgral.agency?igsh=Ynl6dmJucTEzYTk2" target="_blank" rel="noopener noreferrer" aria-label="Instagram" role="listitem" data-no-transition>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.881 0 1.44 1.44 0 012.881 0z"/></svg>
-          </a>
-          <a class="footer-social__link" href="https://www.linkedin.com/company/cosgral-agency" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" role="listitem" data-no-transition>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.062 2.062 0 114.126 0 2.063 2.063 0 01-2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          </a>
-        </div>
+  <div class="footer-grid container">
+    <div class="footer-cta" data-enter="left">
+      <p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p>
+    </div>
+    <div class="footer-col" data-enter="right">
+      <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
+      <ul>
+        <li><a href="#top" data-i18n="nav.start">Start</a></li>
+        <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="#uslugi" data-i18n="nav.services">Usługi</a></li>
+        <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
+        <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="o-nas.html" data-i18n="nav.about">O nas</a></li>
+        <li><a href="#kontakt" data-i18n="nav.contact">Kontakt</a></li>
+      </ul>
+    </div>
+    <div class="footer-col" data-enter="top">
+      <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
+      <ul>
+        <li><a href="#uslugi" data-open-service="blue" data-i18n="footer.link_websites">Strony</a></li>
+        <li><a href="#uslugi" data-open-service="purple" data-i18n="services.card2">Aplikacje</a></li>
+        <li><a href="#uslugi" data-open-service="gold" data-i18n="services.card3">SEO / GEO</a></li>
+        <li><a href="#uslugi" data-open-service="orange" data-i18n="services.card4">Automatyzacje</a></li>
+        <li><a href="#uslugi" data-open-service="crimson" data-i18n="footer.link_crm">CRM</a></li>
+        <li><a href="#uslugi" data-open-service="green" data-i18n="footer.link_video">Wideo</a></li>
+      </ul>
+    </div>
+    <div class="footer-col" data-enter="bottom">
+      <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
+      <ul>
+        <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
+        <li><a href="tel:+48533790518" data-i18n="contact.phone_kuba">Kuba · +48 533 790 518</a></li>
+        <li><a href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a></li>
+      </ul>
+    </div>
+    <div class="footer-col footer-col--social" data-enter="bottom">
+      <p class="footer-col__title" data-i18n="footer.social">Social</p>
+      <div class="footer-social" role="list">
+        <a class="footer-social__link" href="https://www.facebook.com/people/cosgralagency/61591582027536/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" data-no-transition>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.027 4.388 11.026 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.099 24 18.1 24 12.073z"/></svg>
+        </a>
+        <a class="footer-social__link" href="https://www.instagram.com/cosgral.agency?igsh=Ynl6dmJucTEzYTk2" target="_blank" rel="noopener noreferrer" aria-label="Instagram" role="listitem" data-no-transition>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.881 0 1.44 1.44 0 012.881 0z"/></svg>
+        </a>
+        <a class="footer-social__link" href="https://www.linkedin.com/company/cosgral-agency" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" role="listitem" data-no-transition>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.062 2.062 0 114.126 0 2.063 2.063 0 01-2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
       </div>
     </div>
-    <div class="footer-bottom" data-enter="bottom">
-      <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
-      <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
-    </div>
+  </div>
+  <div class="footer-bottom container" data-enter="bottom">
+    <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
+    <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
   </div>
 </footer>
 
@@ -439,20 +472,20 @@
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js"></script>
-<script src="preloader.js?v=20260810e"></script>
+<script src="preloader.js?v=20260814e"></script>
 <script src="smooth-scroll.js?v=20260810g"></script>
-<script src="home-cursor-field.js?v=20260810a"></script>
-<script src="home-ambient-bg.js?v=20260810g"></script>
-<script type="module" src="home-hero-3d.js?v=20260810i"></script>
+<script src="home-cursor-field.js?v=20260814i"></script>
+<script src="home-ambient-bg.js?v=20260814e"></script>
+<script type="module" src="home-hero-3d.js?v=20260815e"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
-<script src="home-services-fan.js?v=20260810r"></script>
+<script src="home-services-fan.js?v=20260812c"></script>
 <script src="home-section-flow.js?v=20260810a"></script>
 <script src="home-scroll-rail.js?v=20260810d"></script>
 <script src="home-section-stepper.js?v=20260810i"></script>
-<script src="home-director.js?v=20260810d"></script>
-<script src="home-tile-interact.js?v=20260810d"></script>
-<script defer src="home-nav-menu.js?v=20260810i"></script>
+<script src="home-director.js?v=20260815a"></script>
+<script src="home-tile-interact.js?v=20260814i"></script>
+<script defer src="home-nav-menu.js?v=20260812j"></script>
 </body>
 </html>

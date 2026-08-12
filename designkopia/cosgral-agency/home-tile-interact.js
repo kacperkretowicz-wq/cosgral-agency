@@ -1,5 +1,6 @@
 /**
- * Cursor-reactive tiles — tilt, liquid spotlight, video blur on service cards.
+ * Subtle global pointer tilt — CSS vars + visible-section targeting.
+ * Never transforms #main (breaks scroll-snap layout).
  */
 (function () {
   "use strict";
@@ -10,93 +11,139 @@
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
-  document.querySelectorAll(".services-fan__card[data-tile-interact]").forEach(function (card) {
-    var media = card.querySelector(".services-fan__card-media");
-    var video = card.querySelector("video");
+  var TILT_PITCH = 5.8;
+  var TILT_YAW = 7.5;
 
-    card.addEventListener("mouseenter", function () {
-      if (!card.classList.contains("is-active")) return;
-      card.classList.add("is-hovered");
-      if (video) video.play().catch(function () {});
-    });
-
-    card.addEventListener("mouseleave", function () {
-      card.classList.remove("is-hovered", "is-cursor-active");
-      card.style.setProperty("--lx", "50%");
-      card.style.setProperty("--ly", "50%");
-      if (media) media.style.transform = "";
-      if (video && !card.classList.contains("is-active")) video.pause();
-    });
-
-    card.addEventListener("mousemove", function (e) {
-      if (!card.classList.contains("is-active")) return;
-      var r = card.getBoundingClientRect();
-      var x = ((e.clientX - r.left) / r.width) * 100;
-      var y = ((e.clientY - r.top) / r.height) * 100;
-      var tiltY = ((x - 50) / 50) * 8;
-      var tiltX = ((50 - y) / 50) * 6;
-
-      card.classList.add("is-cursor-active");
-      card.style.setProperty("--lx", x.toFixed(1) + "%");
-      card.style.setProperty("--ly", y.toFixed(1) + "%");
-
-      if (media) {
-        var dx = (x - 50) / 50;
-        var dy = (y - 50) / 50;
-        media.style.transform =
-          "translate(" + (dx * 14).toFixed(1) + "px, " + (dy * 14).toFixed(1) + "px) scale(1.14) rotateX(" +
-          tiltX.toFixed(2) + "deg) rotateY(" + tiltY.toFixed(2) + "deg)";
-      }
-    });
-  });
-
-  document.querySelectorAll(".home-work__card[data-tile-interact]").forEach(function (card) {
-    var video = card.querySelector("video");
-    if (!video) return;
-
-    if (MOBILE) {
-      video.muted = true;
-      video.setAttribute("playsinline", "");
-      var io = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              video.play().catch(function () {});
-            } else {
-              video.pause();
-            }
-          });
-        },
-        { threshold: 0.28, rootMargin: "8% 0px" }
-      );
-      io.observe(card);
-      if (card.getBoundingClientRect().height > 0) {
-        video.play().catch(function () {});
-      }
+  function applyGlobalTilt() {
+    var ptr = window.cosgralPointer;
+    if (!ptr) {
+      requestAnimationFrame(applyGlobalTilt);
       return;
     }
 
-    card.addEventListener("mouseenter", function () {
-      video.play().catch(function () {});
+    var root = document.documentElement;
+    var lx = ((ptr.x / Math.max(window.innerWidth, 1)) * 100).toFixed(1) + "%";
+    var ly = ((ptr.y / Math.max(window.innerHeight, 1)) * 100).toFixed(1) + "%";
+
+    root.style.setProperty("--global-tilt-x", (ptr.ny * TILT_PITCH).toFixed(2) + "deg");
+    root.style.setProperty("--global-tilt-y", (ptr.nx * TILT_YAW).toFixed(2) + "deg");
+    root.style.setProperty("--lx", lx);
+    root.style.setProperty("--ly", ly);
+
+    requestAnimationFrame(applyGlobalTilt);
+  }
+
+  function watchVisibleScenes() {
+    var scenes = document.querySelectorAll(".home-scene, [data-portfolio-section], .portfolio-hero");
+    if (!scenes.length && !document.body.classList.contains("about-page")) return;
+
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          entry.target.classList.toggle("is-in-view", entry.isIntersecting && entry.intersectionRatio >= 0.35);
+        });
+      },
+      { threshold: [0.2, 0.35, 0.5, 0.65] }
+    );
+
+    scenes.forEach(function (scene) {
+      io.observe(scene);
     });
 
-    card.addEventListener("mouseleave", function () {
-      video.pause();
-      video.currentTime = 0;
-    });
-  });
+    if (document.body.classList.contains("about-page")) {
+      document.querySelectorAll("#main > header, #main > section").forEach(function (block) {
+        io.observe(block);
+      });
+    }
 
-  document.querySelectorAll(".home-process__step[data-tile-interact]").forEach(function (step) {
-    step.addEventListener("mousemove", function (e) {
-      var r = step.getBoundingClientRect();
-      var x = ((e.clientX - r.left) / r.width) * 100;
-      var y = ((e.clientY - r.top) / r.height) * 100;
-      step.style.setProperty("--lx", x.toFixed(1) + "%");
-      step.style.setProperty("--ly", y.toFixed(1) + "%");
-      step.classList.add("is-cursor-active");
+    if (
+      document.body.classList.contains("graphics-gallery-page") ||
+      document.body.classList.contains("reels-gallery-page")
+    ) {
+      document.querySelectorAll("#main > header, #main > .graphics-gallery, #main > .reels-gallery, #graphics-gallery, #reels-gallery").forEach(function (block) {
+        if (block) io.observe(block);
+      });
+    }
+  }
+
+  function observeDynamicTiles() {
+    ["reels-tiles", "graphics-collage"].forEach(function (id) {
+      var root = document.getElementById(id);
+      if (!root) return;
+      var mo = new MutationObserver(bindHoverTargets);
+      mo.observe(root, { childList: true, subtree: true });
     });
-    step.addEventListener("mouseleave", function () {
-      step.classList.remove("is-cursor-active");
+  }
+
+  function bindHoverMedia(el) {
+    if (el.dataset.hoverBound === "1") return;
+    el.dataset.hoverBound = "1";
+
+    el.addEventListener("mouseenter", function () {
+      el.classList.add("is-hovered");
+      var video = el.querySelector("video");
+      if (video) video.play().catch(function () {});
     });
-  });
+
+    el.addEventListener("mouseleave", function () {
+      el.classList.remove("is-hovered", "is-cursor-active");
+      var video = el.querySelector("video");
+      if (video && el.classList.contains("home-work__card")) {
+        video.pause();
+        video.currentTime = 0;
+      }
+      if (video && el.classList.contains("services-fan__card") && !el.classList.contains("is-active")) {
+        video.pause();
+      }
+    });
+  }
+
+  function bindHoverTargets() {
+    document
+      .querySelectorAll(
+        "[data-tile-interact], .home-work__card, .services-fan__card, .portfolio-web-card, .reels-tiles__card, .graphics-cinema__tile"
+      )
+      .forEach(bindHoverMedia);
+  }
+
+  function bindWorkCardVideos() {
+    document.querySelectorAll(".home-work__card[data-tile-interact], .home-work__card").forEach(function (card) {
+      var video = card.querySelector("video");
+      if (!video) return;
+
+      if (MOBILE) {
+        video.muted = true;
+        video.setAttribute("playsinline", "");
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) video.play().catch(function () {});
+              else video.pause();
+            });
+          },
+          { threshold: 0.28, rootMargin: "8% 0px" }
+        );
+        io.observe(card);
+        if (card.getBoundingClientRect().height > 0) video.play().catch(function () {});
+      }
+    });
+  }
+
+  function init() {
+    document.documentElement.classList.add("has-global-tilt");
+    bindWorkCardVideos();
+    watchVisibleScenes();
+    requestAnimationFrame(applyGlobalTilt);
+
+    if (!MOBILE) {
+      bindHoverTargets();
+      observeDynamicTiles();
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();

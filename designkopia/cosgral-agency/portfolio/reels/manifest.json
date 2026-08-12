@@ -6,6 +6,14 @@
       "items": [
         {
           "type": "video",
+          "src": "portfolio/reels/orlincy/006.mp4",
+          "poster": "portfolio/reels/orlincy/006-poster.jpg",
+          "full": "portfolio/reels/orlincy/006-full.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
           "src": "portfolio/reels/orlincy/001.mp4",
           "poster": "portfolio/reels/orlincy/001-poster.jpg",
           "full": "portfolio/reels/orlincy/001-full.mp4",
@@ -240,6 +248,16 @@
   "collage": [
     {
       "type": "video",
+      "src": "portfolio/reels/orlincy/006.mp4",
+      "poster": "portfolio/reels/orlincy/006-poster.jpg",
+      "full": "portfolio/reels/orlincy/006-full.mp4",
+      "w": 720,
+      "h": 1280,
+      "client": "Wiktoria stylistka",
+      "id": "wiktoria"
+    },
+    {
+      "type": "video",
       "src": "portfolio/reels/orlincy/001.mp4",
       "poster": "portfolio/reels/orlincy/001-poster.jpg",
       "full": "portfolio/reels/orlincy/001-full.mp4",
@@ -287,16 +305,6 @@
       "h": 1280,
       "client": "Far East",
       "id": "far-east"
-    },
-    {
-      "type": "video",
-      "src": "portfolio/reels/safe-grant/001.mp4",
-      "poster": "portfolio/reels/safe-grant/001-poster.jpg",
-      "full": "portfolio/reels/safe-grant/001-full.mp4",
-      "w": 720,
-      "h": 1280,
-      "client": "Orlińscy",
-      "id": "orlincy"
     },
     {
       "type": "video",

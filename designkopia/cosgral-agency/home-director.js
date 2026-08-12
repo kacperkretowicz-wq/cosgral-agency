@@ -27,6 +27,8 @@
 
   var form = document.querySelector("[data-audit-form]");
   var status = document.querySelector("[data-audit-status]");
+  var contactContent = document.querySelector("[data-contact-content]");
+  var successPanel = document.querySelector("[data-audit-success]");
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
@@ -89,28 +91,72 @@
     }
   }
 
+  function resetContactSection() {
+    if (contactContent) contactContent.hidden = false;
+    if (successPanel) successPanel.hidden = true;
+    if (form) form.reset();
+    if (status) {
+      status.dataset.state = "";
+      status.textContent = "";
+    }
+    var submitBtn = form && form.querySelector('[type="submit"]');
+    if (submitBtn) submitBtn.disabled = false;
+  }
+
+  function showContactSuccess() {
+    if (contactContent) contactContent.hidden = true;
+    if (successPanel) successPanel.hidden = false;
+    if (status) {
+      status.dataset.state = "";
+      status.textContent = "";
+    }
+  }
+
+  window.addEventListener("cosgral:section-step", function (e) {
+    if (e.detail && e.detail.id !== "kontakt") resetContactSection();
+  });
+
   if (form && status) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var data = new FormData(form);
-      var name = (data.get("name") || "").toString().trim();
       var email = (data.get("email") || "").toString().trim();
-      var company = (data.get("company") || "").toString().trim();
-      var message = (data.get("message") || "").toString().trim();
       var i18n = window.cosgralI18n;
       if (!email) {
         status.dataset.state = "error";
         status.textContent = (i18n && i18n.t("form.error_email")) || "Podaj adres email.";
         return;
       }
-      var subjectLabel = (i18n && i18n.t("form.mailto_subject")) || "Bezpłatny audyt";
-      var inquiryLabel = (i18n && i18n.t("form.mailto_inquiry")) || "zapytanie";
-      var subject = encodeURIComponent(subjectLabel + " — " + (name || inquiryLabel));
-      var body = encodeURIComponent(["Imię: " + (name || "-"), "Email: " + email, "Firma: " + (company || "-"), "", message || "(brak wiadomości)"].join("\n"));
-      window.location.href = "mailto:kontakt@cosgral.pl?subject=" + subject + "&body=" + body;
-      status.dataset.state = "success";
-      status.textContent = (i18n && i18n.t("form.success_mailto")) || "Otworzyliśmy program pocztowy — wyślij wiadomość.";
-      form.reset();
+
+      var submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+      status.dataset.state = "";
+      status.textContent = "";
+
+      var params = new URLSearchParams();
+      params.append("form-name", "audit-contact");
+      ["name", "email", "company", "message", "bot-field"].forEach(function (key) {
+        params.append(key, (data.get(key) || "").toString());
+      });
+
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error("send failed");
+          showContactSuccess();
+        })
+        .catch(function () {
+          status.dataset.state = "error";
+          status.textContent =
+            (i18n && i18n.t("form.error_send")) ||
+            "Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na kontakt@cosgral.pl.";
+        })
+        .finally(function () {
+          if (submitBtn) submitBtn.disabled = false;
+        });
     });
   }
 
@@ -118,6 +164,8 @@
 
   (async function () {
     await window.cosgralSmoothScroll?.ready;
+
+    var heroIntroComplete = false;
 
     function restoreHeroUi() {
       var hero = document.getElementById("top");
@@ -135,11 +183,14 @@
         title.classList.add("is-revealed");
         gsap.set(title, { letterSpacing: "0.16em" });
       }
+      document.body.classList.add("is-hero-intro-done");
+      document.body.classList.remove("is-hero-intro-active");
     }
 
     window.cosgralRestoreHero = restoreHeroUi;
 
     window.addEventListener("cosgral:section-step", function (e) {
+      if (!heroIntroComplete) return;
       if (e.detail && e.detail.index === 0) restoreHeroUi();
     });
 
@@ -148,18 +199,31 @@
       var letters = gsap.utils.toArray(".home-hero__letter");
       if (!letters.length) return;
 
+      document.body.classList.add("is-hero-intro-active");
+      document.body.classList.remove("is-hero-intro-done");
+
       gsap.set(letters, {
         opacity: 0,
         y: 28,
         scale: 1.04,
         filter: "blur(14px)",
       });
-      if (title) gsap.set(title, { letterSpacing: "0.3em" });
+      if (title) {
+        title.classList.remove("is-revealed");
+        gsap.set(title, { letterSpacing: "0.3em" });
+      }
       gsap.set(".home-hero__tagline", { y: 14, opacity: 0 });
+      gsap.set(".home-hero__scroll", { opacity: 0 });
 
-      var tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
-      tl.from(".home-cube-portal", { scale: 0.34, opacity: 0, duration: 1.65, ease: "power3.out" }, 0)
-        .to(
+      var tl = gsap.timeline({
+        defaults: { ease: "power2.inOut" },
+        onComplete: function () {
+          heroIntroComplete = true;
+          document.body.classList.add("is-hero-intro-done");
+          document.body.classList.remove("is-hero-intro-active");
+        },
+      });
+      tl.to(
           title,
           { letterSpacing: "0.16em", duration: 2.1, ease: "power2.out" },
           0.12

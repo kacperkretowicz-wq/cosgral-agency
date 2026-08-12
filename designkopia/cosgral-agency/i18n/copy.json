@@ -41,6 +41,10 @@
     "contact": {
       "pl": "Kontakt",
       "en": "Contact"
+    },
+    "about": {
+      "pl": "O nas",
+      "en": "About"
     }
   },
   "preloader": {
@@ -241,6 +245,18 @@
       "pl": "Otworzyliśmy program pocztowy — wyślij wiadomość.",
       "en": "We opened your mail app — send the message."
     },
+    "success_title": {
+      "pl": "Dziękujemy za kontakt",
+      "en": "Thank you for reaching out"
+    },
+    "success_body": {
+      "pl": "Otrzymaliśmy Twoją wiadomość. Wrócimy do Ciebie w ciągu jednego dnia roboczego — zwykle szybciej.",
+      "en": "We've received your message. We'll get back to you within one business day — usually sooner."
+    },
+    "error_send": {
+      "pl": "Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na kontakt@cosgral.pl.",
+      "en": "We couldn't send your message. Please try again or email kontakt@cosgral.pl."
+    },
     "mailto_subject": {
       "pl": "Bezpłatny audyt",
       "en": "Free audit"
@@ -286,5 +302,143 @@
     "link_websites": { "pl": "Strony", "en": "Websites" },
     "link_video": { "pl": "Wideo", "en": "Video" },
     "link_crm": { "pl": "CRM", "en": "CRM" }
+  },
+  "contact": {
+    "call_title": {
+      "pl": "Zadzwoń",
+      "en": "Call us"
+    },
+    "call_lead": {
+      "pl": "Zadzwoń na te numery, lub zostaw nam wiadomość o sobie.",
+      "en": "Call us on these numbers, or leave us a message about yourself."
+    },
+    "phone_kuba": {
+      "pl": "Kuba · +48 533 790 518",
+      "en": "Kuba · +48 533 790 518"
+    },
+    "phone_kacper": {
+      "pl": "Kacper · +48 571 798 397",
+      "en": "Kacper · +48 571 798 397"
+    }
+  },
+  "about": {
+    "meta": {
+      "title": {
+        "pl": "O nas — cosgral.agency",
+        "en": "About us — cosgral.agency"
+      },
+      "description": {
+        "pl": "Kim jesteśmy — cosgral.agency, agencja cyfrowa.",
+        "en": "Who we are — cosgral.agency, digital agency."
+      }
+    },
+    "title": {
+      "pl": "Kim jesteśmy?",
+      "en": "Who are we?"
+    }
+  },
+  "common": {
+    "skip": { "pl": "Przejdź do treści", "en": "Skip to content" },
+    "lang": { "pl": "Język", "en": "Language" },
+    "logo_aria": { "pl": "COSGRAL — strona główna", "en": "COSGRAL — homepage" },
+    "portfolio_eyebrow": { "pl": "Portfolio", "en": "Portfolio" }
+  },
+  "rail": {
+    "aria": { "pl": "Postęp sekcji", "en": "Section progress" },
+    "footer": { "pl": "Stopka", "en": "Footer" },
+    "prev": { "pl": "Poprzednia sekcja", "en": "Previous section" },
+    "next": { "pl": "Następna sekcja", "en": "Next section" },
+    "portfolio_aria": { "pl": "Postęp sekcji portfolio", "en": "Portfolio section progress" }
+  },
+  "panel": {
+    "service_label": { "pl": "Usługa", "en": "Service" },
+    "what_we_do": { "pl": "Co robimy", "en": "What we do" },
+    "for_who": { "pl": "Dla kogo i jaki efekt", "en": "Who it's for & the outcome" },
+    "cta": { "pl": "Zacznijmy od bezpłatnego audytu", "en": "Let's start with a free audit" }
+  },
+  "portfolio": {
+    "meta": {
+      "title": { "pl": "Portfolio — cosgral.agency", "en": "Portfolio — cosgral.agency" },
+      "description": {
+        "pl": "Realizacje — montaż wideo, kreacja graficzna, strony internetowe i więcej.",
+        "en": "Selected work — video editing, graphic design, websites and more."
+      }
+    },
+    "montaz_meta": {
+      "title": { "pl": "Montaż wideo — Portfolio COSGRAL", "en": "Video editing — COSGRAL portfolio" },
+      "description": {
+        "pl": "Rolki i montaż wideo COSGRAL — Orlińscy, Far East, Anna Jarosik, BTS i więcej.",
+        "en": "COSGRAL video reels and editing — Orlińscy, Far East, Anna Jarosik, BTS and more."
+      }
+    },
+    "grafiki_meta": {
+      "title": { "pl": "Grafiki — Portfolio COSGRAL", "en": "Graphics — COSGRAL portfolio" },
+      "description": {
+        "pl": "Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej.",
+        "en": "COSGRAL graphics gallery — Juicy Events, Far East, Safe Grant, BTS and more."
+      }
+    },
+    "hero_title": { "pl": "Realizacje", "en": "Selected work" },
+    "hero_lead": {
+      "pl": "Zobacz, co tworzymy i co możemy stworzyć wspólnie",
+      "en": "See what we build and what we can create together"
+    },
+    "web_title": { "pl": "Strony internetowe", "en": "Websites" },
+    "web_lead": {
+      "pl": "Projekty web — od landingów po rozbudowane serwisy marek.",
+      "en": "Web projects — from landing pages to full brand websites."
+    },
+    "web_service": { "pl": "Usługa: strony internetowe →", "en": "Service: websites →" },
+    "mj_title": { "pl": "Strona dla content creatora", "en": "Website for a content creator" },
+    "mj_desc": {
+      "pl": "Landing marki osobistej — oferta, portfolio i kontakt w spokojnym, autentycznym tonie.",
+      "en": "Personal brand landing — offer, portfolio and contact in a calm, authentic tone."
+    },
+    "trove_title": { "pl": "Sklep e-commerce — odzież", "en": "E-commerce store — fashion" },
+    "trove_desc": {
+      "pl": "Vintage luxury fashion — katalog produktów, koszyk i checkout w estetyce mindful luxury.",
+      "en": "Vintage luxury fashion — product catalog, cart and checkout in a mindful luxury aesthetic."
+    },
+    "montaz_title": { "pl": "Montaż wideo", "en": "Video editing" },
+    "montaz_lead": {
+      "pl": "Rolki, reklamy, BTS — od surowego materiału po gotowy format pod social.",
+      "en": "Reels, ads, BTS — from raw footage to social-ready formats."
+    },
+    "montaz_service": { "pl": "Usługa: montaż i wideo →", "en": "Service: video editing →" },
+    "montaz_page_title": { "pl": "Montaż wideo", "en": "Video editing" },
+    "montaz_page_lead": {
+      "pl": "Rolki, reklamy i BTS — od surowego materiału po gotowy format pod social.",
+      "en": "Reels, ads and BTS — from raw footage to social-ready formats."
+    },
+    "grafiki_title": { "pl": "Grafiki", "en": "Graphics" },
+    "grafiki_lead": {
+      "pl": "Posty, stories i key visuale — kreacja pod social i kampanie.",
+      "en": "Posts, stories and key visuals — creative for social and campaigns."
+    },
+    "grafiki_page_lead": {
+      "pl": "Posty, stories i key visuale — od Juicy Events przez Far East po Safe Grant i BTS.",
+      "en": "Posts, stories and key visuals — from Juicy Events to Far East, Safe Grant and BTS."
+    },
+    "grafiki_service": { "pl": "Usługa: grafika i wideo →", "en": "Service: design & video →" },
+    "automation_title": { "pl": "Systemy i Automatyzacje", "en": "Systems & automation" },
+    "automation_lead": {
+      "pl": "Workflowy, integracje i narzędzia — kolejne case study w przygotowaniu.",
+      "en": "Workflows, integrations and tools — more case studies coming soon."
+    },
+    "view_all": { "pl": "Zobacz wszystko →", "en": "View all →" },
+    "view_site": { "pl": "Zobacz stronę →", "en": "View site →" },
+    "back_portfolio": { "pl": "← Wróć do portfolio", "en": "← Back to portfolio" },
+    "lightbox_reel": { "pl": "Podgląd rolki", "en": "Reel preview" },
+    "lightbox_graphic": { "pl": "Podgląd grafiki", "en": "Graphic preview" },
+    "lightbox_close": { "pl": "Zamknij", "en": "Close" },
+    "lightbox_prev_reel": { "pl": "Poprzednia rolka", "en": "Previous reel" },
+    "lightbox_next_reel": { "pl": "Następna rolka", "en": "Next reel" },
+    "lightbox_prev_graphic": { "pl": "Poprzednia grafika", "en": "Previous graphic" },
+    "lightbox_next_graphic": { "pl": "Następna grafika", "en": "Next graphic" },
+    "rail_portfolio": { "pl": "Portfolio", "en": "Portfolio" },
+    "rail_strony": { "pl": "Strony", "en": "Websites" },
+    "rail_montaz": { "pl": "Montaż", "en": "Video" },
+    "rail_grafiki": { "pl": "Grafiki", "en": "Graphics" },
+    "rail_automation": { "pl": "Automatyzacje", "en": "Automation" }
   }
 }

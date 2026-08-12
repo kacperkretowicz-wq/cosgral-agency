@@ -57,6 +57,7 @@
 
     function tick() {
       if (!running) return;
+      if (document.body.classList.contains("is-nav-menu-open")) return;
       applyToElements(nodes());
       if (options.onUpdate) options.onUpdate();
       requestAnimationFrame(tick);

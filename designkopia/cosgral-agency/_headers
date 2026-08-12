@@ -1,0 +1,21 @@
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/*.js
+  Cache-Control: no-cache, must-revalidate
+
+/portfolio/reels/manifest.json
+  Cache-Control: no-cache, must-revalidate
+
+/portfolio/reels/*.json
+  Cache-Control: no-cache, must-revalidate
+
+/portfolio/reels/*
+  Cache-Control: public, max-age=3600
