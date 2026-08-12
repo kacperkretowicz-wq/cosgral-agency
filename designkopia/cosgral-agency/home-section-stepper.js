@@ -459,6 +459,13 @@
     });
 
     activeIndex = nearestIndex(lenis.scroll);
+    // Po odpaleniu z linku / z cache zawsze Start (chyba że ?service=).
+    var bootService = new URLSearchParams(location.search).has("service");
+    if (!bootService) {
+      window.scrollTo(0, 0);
+      lenis.scrollTo(0, { immediate: true });
+      activeIndex = 0;
+    }
     syncStepView(activeIndex);
     goTo(activeIndex, 0, true);
     beginCooldown();

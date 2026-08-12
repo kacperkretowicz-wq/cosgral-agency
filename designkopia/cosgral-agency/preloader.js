@@ -14,6 +14,8 @@
 
   if (REDUCED) {
     shell.classList.add("is-done", "is-settled");
+    document.documentElement.classList.remove("is-booting");
+    document.documentElement.style.backgroundColor = "";
     document.body.classList.add("is-ready");
     return;
   }
@@ -115,10 +117,24 @@
       shell.classList.add("is-exiting");
       setTimeout(function () {
         shell.classList.add("is-done");
+        document.documentElement.classList.remove("is-booting");
+        document.documentElement.style.backgroundColor = "";
         document.body.classList.add("is-ready");
       }, MOBILE ? 380 : 650);
     }
   }
 
   requestAnimationFrame(tick);
+
+  // Powrót z bfcache / back-forward → też Start + czarny boot niepotrzebny (już ready).
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    if (new URLSearchParams(location.search).has("service")) return;
+    window.scrollTo(0, 0);
+    if (window.cosgralSmoothScroll?.lenis) {
+      window.cosgralSmoothScroll.lenis.scrollTo(0, { immediate: true });
+    }
+    if (window.cosgralSectionSnap?.jumpTo) window.cosgralSectionSnap.jumpTo(0);
+    else if (window.cosgralSectionSnap?.goTo) window.cosgralSectionSnap.goTo(0, 0, true);
+  });
 })();
