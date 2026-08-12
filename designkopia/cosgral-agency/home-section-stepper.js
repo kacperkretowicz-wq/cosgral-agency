@@ -106,9 +106,13 @@
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
     var HOLD_COOLDOWN_MS = 100;
+    var SECTION_READY_MS = 1000;
+    var SECTION_REACH_PX = 16;
     var lastCommitDir = 0;
     var cooldownUntil = 0;
     var formFocusLock = false;
+    var scrollUnlockTimer = null;
+    var scrollUnlockRaf = 0;
 
     function beginCooldown() {
       cooldownUntil = Date.now() + HOLD_COOLDOWN_MS;
@@ -152,14 +156,61 @@
 
     function stepDurationDown(fromIndex, toIndex) {
       if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 2;
+      if (fromIndex === 1 && toIndex > fromIndex) return STEP_MS / 4.2;
       if (fromIndex >= 1 && toIndex > fromIndex) return STEP_MS / 3;
       return STEP_MS;
     }
 
     function stepDurationUp(fromIndex, toIndex) {
       if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 2;
+      if (fromIndex === 1 && toIndex < fromIndex) return STEP_MS / 4.2;
       if (fromIndex >= 1 && toIndex < fromIndex) return STEP_MS / 3;
       return STEP_MS / 3;
+    }
+
+    function clearScrollUnlockWatch() {
+      if (scrollUnlockTimer) {
+        window.clearTimeout(scrollUnlockTimer);
+        scrollUnlockTimer = null;
+      }
+      if (scrollUnlockRaf) {
+        window.cancelAnimationFrame(scrollUnlockRaf);
+        scrollUnlockRaf = 0;
+      }
+    }
+
+    function finishScrollStep(target) {
+      if (!locked) return;
+      clearScrollUnlockWatch();
+      locked = false;
+      beginCooldown();
+      if (Math.abs(lenis.scroll - target) > 2) {
+        lenis.scrollTo(target, { immediate: true });
+      }
+      if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+    }
+
+    function watchScrollUnlock(target) {
+      clearScrollUnlockWatch();
+      var reachedAt = 0;
+
+      function tryScheduleUnlock() {
+        if (!locked || reachedAt) return;
+        if (Math.abs(lenis.scroll - target) > SECTION_REACH_PX) return;
+        reachedAt = Date.now();
+        scrollUnlockTimer = window.setTimeout(function () {
+          finishScrollStep(target);
+        }, SECTION_READY_MS);
+      }
+
+      function tick() {
+        if (!locked) return;
+        tryScheduleUnlock();
+        if (!locked) return;
+        scrollUnlockRaf = window.requestAnimationFrame(tick);
+      }
+
+      scrollUnlockRaf = window.requestAnimationFrame(tick);
     }
 
     function syncStepView(index) {
@@ -278,21 +329,35 @@
       locked = true;
       activeIndex = index;
       syncStepView(index);
+      clearScrollUnlockWatch();
+
+      var scrollDuration = immediate ? 0 : duration != null ? duration : stepDurationDown(fromIndex, index);
 
       lenis.scrollTo(target, {
         immediate: !!immediate,
-        duration: immediate ? 0 : duration != null ? duration : stepDurationDown(fromIndex, index),
+        duration: scrollDuration,
         easing: easeOutCubic,
         lock: true,
         onComplete: function () {
-          locked = false;
-          beginCooldown();
           if (Math.abs(lenis.scroll - target) > 2) {
             lenis.scrollTo(target, { immediate: true });
           }
-          if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+          if (immediate || scrollDuration <= 0.05) {
+            finishScrollStep(target);
+            return;
+          }
+          if (!locked) {
+            if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+            return;
+          }
+          if (scrollUnlockTimer) return;
+          finishScrollStep(target);
         },
       });
+
+      if (!immediate && scrollDuration > 0.05) {
+        watchScrollUnlock(target);
+      }
 
       window.dispatchEvent(
         new CustomEvent("cosgral:section-step", {
@@ -480,16 +545,17 @@
       );
     });
 
-    activeIndex = nearestIndex(lenis.scroll);
-    syncStepView(activeIndex);
-    goTo(activeIndex, 0, true);
+    activeIndex = 0;
+    syncStepView(0);
+    syncSandForJump(0);
+    goTo(0, 0, true);
     beginCooldown();
 
     window.cosgralSectionSnap = {
       holds: holds,
       refreshHolds: buildHolds,
-      goTo: function (index) {
-        goTo(index);
+      goTo: function (index, duration, immediate) {
+        goTo(index, duration, immediate);
       },
       stepUp: stepUp,
       stepDown: stepDown,

@@ -76,6 +76,24 @@
     return p;
   }
 
+  function isHomePath(pathname) {
+    var p = normalizePath(pathname);
+    return p === "/" || p.endsWith("/index.html");
+  }
+
+  function forceHomeStart() {
+    if (!isHomePath(window.location.pathname)) return;
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (window.cosgralSmoothScroll?.lenis) {
+      window.cosgralSmoothScroll.lenis.scrollTo(0, { immediate: true });
+    }
+    if (window.cosgralSectionSnap?.goTo) {
+      window.cosgralSectionSnap.goTo(0, 0, true);
+    }
+  }
+
   function ensureOverlay() {
     var el = document.getElementById("page-transition");
     if (el) return el;
@@ -139,8 +157,13 @@
     if (new URLSearchParams(window.location.search).get("service")) return;
 
     var hash = sessionStorage.getItem(HASH_KEY);
-    if (!hash) return;
     sessionStorage.removeItem(HASH_KEY);
+    if (!hash) return;
+
+    if (isHomePath(window.location.pathname)) {
+      forceHomeStart();
+      return;
+    }
 
     window.setTimeout(function () {
       var id = hash.replace(/^#/, "");
@@ -217,10 +240,11 @@
     try {
       var parsed = new URL(url, window.location.href);
       var service = parsed.searchParams.get("service");
+      var homeDest = isHomePath(parsed.pathname);
       if (service) {
         sessionStorage.setItem(SERVICE_KEY, service);
         sessionStorage.removeItem(HASH_KEY);
-      } else if (parsed.hash) {
+      } else if (parsed.hash && !homeDest) {
         sessionStorage.setItem(HASH_KEY, parsed.hash);
       } else {
         sessionStorage.removeItem(HASH_KEY);

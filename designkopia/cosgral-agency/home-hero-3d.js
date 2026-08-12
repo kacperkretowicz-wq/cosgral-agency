@@ -124,6 +124,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   var _qFaceSpin = new THREE.Quaternion();
   var _axisSpin = new THREE.Vector3(0.18, 1, 0.12);
   var _screenRay = new THREE.Vector3();
+  var mobileHeroSpinReady = false;
 
   var MENU_OPEN_SIDE_DUR = 6.1;
   var MENU_OPEN_HERO_DUR = 5.3;
@@ -748,7 +749,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     var heroX = MOBILE ? 0.3 : 0.4;
     var heroY = MOBILE ? 0.54 : 0.7;
     var heroZ = 0.36;
-    var heroScale = CUBE_SCALE * (MOBILE ? 0.74 : 0.78);
+    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
     var peakScale = CUBE_SCALE * (MOBILE ? 1.06 : 1.16);
     var cornerX = MOBILE ? 4.35 : 5.55;
     var cornerY = MOBILE ? 3.05 : 3.85;
@@ -765,9 +766,14 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     var scrollPosZ = (1 - approach) * heroZ - depart * 0.72;
     var scrollSc = heroScale + (peakScale - heroScale) * approach;
 
-    var idleRotX = 0.22 + Math.sin(t * 0.035) * 0.04;
-    var idleRotY = -0.35 + Math.cos(t * 0.028) * 0.05;
-    var idleRotZ = Math.sin(t * 0.022) * 0.02;
+    var introActive = introStarted && !introDone && motion < 0.01 && menuBlend < 0.001;
+    var introLanding = introDone && introSettle < 1 && motion < 0.01 && menuBlend < 0.001;
+    var mobileHeroIdle =
+      MOBILE && inHero && introDone && menuBlend < 0.001 && !introActive && !introLanding;
+
+    var idleRotX = 0.22 + Math.sin(t * (mobileHeroIdle ? 0.16 : 0.035)) * 0.04;
+    var idleRotY = -0.35 + Math.cos(t * (mobileHeroIdle ? 0.13 : 0.028)) * 0.05;
+    var idleRotZ = Math.sin(t * (mobileHeroIdle ? 0.1 : 0.022)) * 0.02;
 
     var spin = 0.016 + approach * 0.01 + depart * 0.005;
     var scrollRotX =
@@ -780,8 +786,6 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       (t * spin + mouse.x * 0.1) * depart;
     var scrollRotZ = idleRotZ + depart * 0.08 + mouse.x * 0.01 * depart + t * 0.008 * depart;
 
-    var introActive = introStarted && !introDone && motion < 0.01 && menuBlend < 0.001;
-    var introLanding = introDone && introSettle < 1 && motion < 0.01 && menuBlend < 0.001;
     var introDim = 1;
 
     var motionDelta = motion - prevMotion;
@@ -893,9 +897,22 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       cubeGroup.position.set(posX, posY, posZ);
       cubeGroup.scale.set(sc, sc, sc);
       if (menuBlend < 0.001) {
-        cubeGroup.rotation.x = rotX;
-        cubeGroup.rotation.y = rotY;
-        cubeGroup.rotation.z = rotZ;
+        if (mobileHeroIdle) {
+          if (!mobileHeroSpinReady) {
+            cubeGroup.rotation.set(rotX, rotY, rotZ);
+            cubeGroup.quaternion.setFromEuler(cubeGroup.rotation);
+            mobileHeroSpinReady = true;
+          }
+          _axisSpin.set(0.12, 1, 0.08).normalize();
+          _qFaceSpin.setFromAxisAngle(_axisSpin, 0.00135);
+          cubeGroup.quaternion.multiply(_qFaceSpin);
+          cubeGroup.rotation.setFromQuaternion(cubeGroup.quaternion, "XYZ");
+        } else {
+          mobileHeroSpinReady = false;
+          cubeGroup.rotation.x = rotX;
+          cubeGroup.rotation.y = rotY;
+          cubeGroup.rotation.z = rotZ;
+        }
       }
     }
 
@@ -1057,7 +1074,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     var heroX = MOBILE ? 0.3 : 0.4;
     var heroY = MOBILE ? 0.54 : 0.7;
     var heroZ = 0.36;
-    var heroScale = CUBE_SCALE * (MOBILE ? 0.74 : 0.78);
+    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
     var sectionIdx = window.cosgralSectionSnap?.getIndex?.() ?? 0;
 
     menuFrom.offscreen = false;

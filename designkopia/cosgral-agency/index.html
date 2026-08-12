@@ -21,11 +21,15 @@
     var isHome = path === "/" || path.endsWith("/index.html");
     if (!isHome) return;
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-    if (nav && nav.type === "reload") {
-      window.scrollTo(0, 0);
-      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (location.hash) {
+      history.replaceState(null, "", location.pathname + location.search);
     }
+    try {
+      sessionStorage.removeItem("cosgral-scroll-target");
+    } catch (e) {}
   })();
 </script>
 <script>
@@ -38,7 +42,7 @@
 <script src="service-themes.js?v=20260810l"></script>
 <script src="services-content.js?v=20260810m"></script>
 <script src="service-panel.js?v=20260812a"></script>
-<script src="page-transitions.js?v=20260810r"></script>
+<script src="page-transitions.js?v=20260816e"></script>
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -476,14 +480,14 @@
 <script src="smooth-scroll.js?v=20260810g"></script>
 <script src="home-cursor-field.js?v=20260814i"></script>
 <script src="home-ambient-bg.js?v=20260814e"></script>
-<script type="module" src="home-hero-3d.js?v=20260815e"></script>
+<script type="module" src="home-hero-3d.js?v=20260816d"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260812c"></script>
 <script src="home-section-flow.js?v=20260810a"></script>
 <script src="home-scroll-rail.js?v=20260810d"></script>
-<script src="home-section-stepper.js?v=20260810i"></script>
+<script src="home-section-stepper.js?v=20260816e"></script>
 <script src="home-director.js?v=20260815a"></script>
 <script src="home-tile-interact.js?v=20260814i"></script>
 <script defer src="home-nav-menu.js?v=20260812j"></script>
