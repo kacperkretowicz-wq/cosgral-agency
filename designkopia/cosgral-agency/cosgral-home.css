@@ -25,7 +25,21 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: var(--bg); }
+html { background: #000; }
+html.is-booting {
+  background: #000 !important;
+}
+html.is-booting body.home-page {
+  background: #000 !important;
+}
+/* Podczas bootu zasłoń treść — widać tylko czarne + preloader */
+html.is-booting body.home-page > :not(#preloader) {
+  visibility: hidden !important;
+}
+html.is-booting #preloader {
+  visibility: visible !important;
+  background: #000 !important;
+}
 body.home-page {
   background: transparent;
   color: var(--ink);
@@ -325,7 +339,7 @@ html.reduce-motion .home-cursor { display: none; }
 #preloader {
   position: fixed; inset: 0; z-index: 10000;
   display: grid; place-items: center;
-  background: var(--bg);
+  background: #000;
   transition: opacity 0.6s var(--ease), visibility 0.6s;
 }
 #preloader.is-exiting { opacity: 0; }

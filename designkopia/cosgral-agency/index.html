@@ -7,11 +7,29 @@
 <meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260810s" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260812a" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <link rel="stylesheet" href="service-panel.css?v=20260810r" />
 <script>
   (function () {
+    try {
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    } catch (e) {}
+    document.documentElement.classList.add("is-booting");
+    document.documentElement.style.backgroundColor = "#000";
+    // Zwykły link do Home → zawsze Start (bez przywracania scrolla / hasha).
+    // Deep-link ?service= zostawiamy panelowi usług.
+    var params = new URLSearchParams(location.search);
+    if (!params.has("service")) {
+      if (location.hash && location.hash !== "#" && location.hash !== "#top") {
+        try {
+          history.replaceState(null, "", location.pathname + location.search);
+        } catch (e2) {}
+      }
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    }
     if (sessionStorage.getItem("cosgral-page-transition")) {
       document.documentElement.classList.add("is-page-enter");
     }
@@ -47,7 +65,7 @@
   <div class="home-cursor__ring"></div>
 </div>
 
-<div id="preloader" aria-hidden="true">
+<div id="preloader" aria-hidden="true" style="background:#000">
   <div class="preloader__inner">
     <div class="preloader__cube-slot" aria-hidden="true">
       <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" />
@@ -439,8 +457,8 @@
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js"></script>
-<script src="preloader.js?v=20260810e"></script>
-<script src="smooth-scroll.js?v=20260810g"></script>
+<script src="preloader.js?v=20260812a"></script>
+<script src="smooth-scroll.js?v=20260812a"></script>
 <script src="home-cursor-field.js?v=20260810a"></script>
 <script src="home-ambient-bg.js?v=20260810g"></script>
 <script type="module" src="home-hero-3d.js?v=20260810i"></script>
@@ -450,7 +468,7 @@
 <script src="home-services-fan.js?v=20260810r"></script>
 <script src="home-section-flow.js?v=20260810a"></script>
 <script src="home-scroll-rail.js?v=20260810d"></script>
-<script src="home-section-stepper.js?v=20260810i"></script>
+<script src="home-section-stepper.js?v=20260812a"></script>
 <script src="home-director.js?v=20260810d"></script>
 <script src="home-tile-interact.js?v=20260810d"></script>
 <script defer src="home-nav-menu.js?v=20260810i"></script>

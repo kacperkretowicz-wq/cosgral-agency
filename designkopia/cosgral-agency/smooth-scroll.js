@@ -46,6 +46,15 @@
 
   window.cosgralSmoothScroll.lenis = lenis;
 
+  // Zawsze zaczynaj od góry — przeglądarka nie może przywrócić środka strony.
+  try {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  } catch (e) {}
+  if (!new URLSearchParams(location.search).has("service")) {
+    lenis.scrollTo(0, { immediate: true });
+    window.scrollTo(0, 0);
+  }
+
   ScrollTrigger.scrollerProxy(document.documentElement, {
     scrollTop: function (value) {
       if (arguments.length) {
