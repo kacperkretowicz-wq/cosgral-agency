@@ -238,7 +238,12 @@
       window.cosgralSand = window.cosgralSand || {};
       if (index === 0) {
         window.cosgralSand.locked = false;
-        delete window.cosgralSand.resetCube;
+        window.cosgralSand.cinema = 0;
+        window.cosgralSand.motion = 0;
+        window.cosgralSand.break = 0;
+        window.cosgralSand.stream = 0;
+        window.cosgralSand.motionTail = 0;
+        window.cosgralSand.resetCube = true;
         document.documentElement.classList.remove("is-sand-stream");
         return;
       }
@@ -329,6 +334,11 @@
       locked = true;
       activeIndex = index;
       syncStepView(index);
+      if (index === 0 && fromIndex !== 0) {
+        syncSandForJump(0);
+      } else if (index >= 1 && fromIndex >= 1) {
+        syncSandForJump(index);
+      }
       clearScrollUnlockWatch();
 
       var scrollDuration = immediate ? 0 : duration != null ? duration : stepDurationDown(fromIndex, index);
@@ -342,6 +352,7 @@
           if (Math.abs(lenis.scroll - target) > 2) {
             lenis.scrollTo(target, { immediate: true });
           }
+          if (index >= 1) syncSandForJump(index);
           if (immediate || scrollDuration <= 0.05) {
             finishScrollStep(target);
             return;
@@ -545,10 +556,31 @@
       );
     });
 
-    activeIndex = 0;
-    syncStepView(0);
-    syncSandForJump(0);
-    goTo(0, 0, true);
+    function bootSectionIndex() {
+      if (hasStoredHashNav()) return 0;
+
+      var hash = (location.hash || "").replace(/^#/, "");
+      if (hash) {
+        var cfgIdx = SECTION_IDS.indexOf(hash);
+        if (cfgIdx >= 0) return cfgIdx;
+        if (hash === "rozpad") {
+          var uslIdx = SECTION_IDS.indexOf("uslugi");
+          if (uslIdx >= 0) return uslIdx;
+        }
+      }
+
+      if (isHomeReload()) {
+        return nearestIndex(lenis.scroll);
+      }
+
+      return 0;
+    }
+
+    var bootIndex = bootSectionIndex();
+    activeIndex = bootIndex;
+    syncStepView(bootIndex);
+    syncSandForJump(bootIndex);
+    goTo(bootIndex, 0, true);
     beginCooldown();
 
     window.cosgralSectionSnap = {
@@ -609,7 +641,7 @@
     });
 
     if (window.ScrollTrigger) ScrollTrigger.refresh();
-    if (MOBILE) {
+    if (MOBILE && !isHomeReload()) {
       await new Promise(function (resolve) {
         if (window.cosgralCube?.introDone?.()) {
           resolve();

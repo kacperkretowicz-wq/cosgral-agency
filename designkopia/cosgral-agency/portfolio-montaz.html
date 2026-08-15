@@ -12,7 +12,7 @@
 <meta name="description" content="Rolki i montaż wideo COSGRAL — Orlińscy, Far East, Anna Jarosik, BTS i więcej." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260814e" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260816at" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
   (function () {
@@ -21,7 +21,7 @@
     }
   })();
 </script>
-<script src="page-transitions.js?v=20260810r"></script>
+<script src="page-transitions.js?v=20260816at"></script>
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -38,6 +38,12 @@
 <div class="subpage-ambient__shade" aria-hidden="true"></div>
 <div class="subpage-cube-portal" aria-hidden="true">
   <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
+</div>
+<div class="portfolio-sand-portal portfolio-sand-portal--back" aria-hidden="true">
+  <canvas id="portfolio-sand-back" class="portfolio-sand__canvas"></canvas>
+</div>
+<div class="portfolio-sand-portal portfolio-sand-portal--front" aria-hidden="true">
+  <canvas id="portfolio-sand-front" class="portfolio-sand__canvas"></canvas>
 </div>
 
 <nav class="site-nav" id="site-nav">
@@ -62,7 +68,7 @@
       <ul class="nav-overlay__list">
         <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
         <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
-        <li><a href="index.html#uslugi" data-nav-close data-i18n="nav.services">Usługi</a></li>
+        <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
         <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
         <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
@@ -73,7 +79,7 @@
 </div>
 
 <main id="main">
-  <header class="portfolio-hero container">
+  <header class="portfolio-hero gallery-hero">
     <span class="section-eyebrow" data-i18n="common.portfolio_eyebrow">Portfolio</span>
     <h1 class="portfolio-hero__title" data-i18n="portfolio.montaz_page_title">Montaż wideo</h1>
     <p class="portfolio-hero__lead" data-i18n="portfolio.montaz_page_lead">Rolki, reklamy i BTS — od surowego materiału po gotowy format pod social.</p>
@@ -155,13 +161,17 @@
 
 <script src="i18n.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
+<script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="home-cursor-field.js?v=20260814i"></script>
 <script src="home-cursor.js?v=20260812a"></script>
 <script src="home-tile-interact.js?v=20260814i"></script>
 <script src="subpage-ambient-bg.js?v=20260814e"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
-<script type="module" src="subpage-cube.js?v=20260814e"></script>
-<script defer src="home-nav-menu.js?v=20260814e"></script>
+<script type="module" src="subpage-cube.js?v=20260816at"></script>
+<script type="module" src="portfolio-hero-sand.js?v=20260816at"></script>
+<script defer src="home-nav-menu.js?v=20260816at"></script>
+<script src="sand-hero-subpage.js?v=20260816a"></script>
 <script src="sections.js?v=20260814e"></script>
 <script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
 <script src="portfolio-video.js?v=20260807ag"></script>

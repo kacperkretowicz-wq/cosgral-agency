@@ -31,6 +31,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   var cardForces = new Float32Array(8 * 4); // up to 8 cards: cx,cy,w,h in NDC-ish
   var menuBlend = 0;
   var menuTween = { blend: 0, closing: false };
+  var menuSandHold = null;
   var heroLook = { x: 0, y: 0 };
   var scrollHandoff = null;
   var prevMotion = 0;
@@ -52,6 +53,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     visible: true,
     offscreen: false,
     sideEntry: false,
+    galleryMenu: false,
   };
 
   function smooth01(a, b, x) {
@@ -125,11 +127,34 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   var _axisSpin = new THREE.Vector3(0.18, 1, 0.12);
   var _screenRay = new THREE.Vector3();
   var mobileHeroSpinReady = false;
+  var mobileDriftSpinReady = false;
+
+  function applyMobileIdleSpin(group) {
+    _axisSpin.set(0.12, 1, 0.08).normalize();
+    _qFaceSpin.setFromAxisAngle(_axisSpin, 0.00135);
+    group.quaternion.multiply(_qFaceSpin);
+    group.rotation.setFromQuaternion(group.quaternion, "XYZ");
+  }
 
   var MENU_OPEN_SIDE_DUR = 6.1;
+  var MENU_OPEN_GALLERY_DUR = 4.1;
   var MENU_OPEN_HERO_DUR = 5.3;
   var MENU_CLOSE_SIDE_DUR = 1.95;
+  var MENU_CLOSE_GALLERY_DUR = 3.9;
   var MENU_CLOSE_HERO_DUR = 1.45;
+  var MENU_LABELS_BEFORE_CUBE = 1.0;
+  var MENU_CUBE_LABEL_DIM = 0.5;
+  var MENU_LINKS_LEAD = 0.07;
+  var homeCubeVisible = false;
+
+  function menuLabelsBlendAt(openDur) {
+    return Math.max(0, (openDur - MENU_LABELS_BEFORE_CUBE) / openDur);
+  }
+
+  function menuLabelRevealAtBlend(blend, labelsAt) {
+    if (blend < labelsAt - 0.02) return 0;
+    return smooth01(labelsAt - 0.02, labelsAt + 0.06, blend);
+  }
 
   function syncCamera() {
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
@@ -154,13 +179,50 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     return worldPosFromScreen(MOBILE ? 38 : 54, MOBILE ? 34 : 50, planeZ);
   }
 
-  function getBestFaceIndex() {
-    cubeGroup.getWorldPosition(_cubePos);
+  function getMenuEntryStartWorld(planeZ) {
+    return worldPosFromScreen(MOBILE ? -108 : -156, MOBILE ? -96 : -128, planeZ);
+  }
+
+  function sideEntryFlyEase(t, useSoft) {
+    var pow = useSoft ? 1.48 : 2.65;
+    return 1 - Math.pow(1 - t, pow);
+  }
+
+  function getMenuLabelReveal() {
+    if (menuBlend <= 0.001) return 0;
+    if (menuFrom.galleryMenu) {
+      return menuLabelRevealAtBlend(menuBlend, menuLabelsBlendAt(MENU_OPEN_GALLERY_DUR));
+    }
+    if (menuFrom.sideEntry) {
+      if (menuTween.closing) return 0;
+      if (menuBlend < 0.72) return 0;
+      return smooth01(0.72, 0.92, menuBlend);
+    }
+    if (menuBlend < 0.35) return 0;
+    return smooth01(0.35, 0.72, menuBlend);
+  }
+
+  function getMenuCubeDimMul() {
+    return 1 - getMenuLabelReveal() * MENU_CUBE_LABEL_DIM;
+  }
+
+  function getMenuLinksDelay() {
+    if (menuFrom.galleryMenu) {
+      return Math.max(0, MENU_OPEN_GALLERY_DUR - MENU_LABELS_BEFORE_CUBE) + MENU_LINKS_LEAD;
+    }
+    if (menuFrom.sideEntry) {
+      return MENU_OPEN_SIDE_DUR * 0.128;
+    }
+    return MENU_OPEN_HERO_DUR * 0.42 + MENU_LINKS_LEAD;
+  }
+
+  function getBestFaceIndexFor(group) {
+    group.getWorldPosition(_cubePos);
     _toCam.copy(camera.position).sub(_cubePos).normalize();
     var best = 0;
     var bestDot = -Infinity;
     for (var fi = 0; fi < FACE_NORMALS.length; fi++) {
-      _worldNormal.copy(FACE_NORMALS[fi]).applyQuaternion(cubeGroup.quaternion).normalize();
+      _worldNormal.copy(FACE_NORMALS[fi]).applyQuaternion(group.quaternion).normalize();
       var dot = _worldNormal.dot(_toCam);
       if (dot > bestDot) {
         bestDot = dot;
@@ -168,6 +230,10 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       }
     }
     return best;
+  }
+
+  function getBestFaceIndex() {
+    return getBestFaceIndexFor(cubeGroup);
   }
 
   function getFaceCameraQuaternion() {
@@ -180,11 +246,18 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     return cubeGroup.quaternion.clone().premultiply(_qAlign);
   }
 
-  function applyMenuFaceOrientation(strength) {
+  function applyMenuFaceOrientation(strength, target) {
     if (strength <= 0) return;
-    _qTarget.copy(getFaceCameraQuaternion());
-    cubeGroup.quaternion.slerp(_qTarget, strength);
-    cubeGroup.rotation.setFromQuaternion(cubeGroup.quaternion, "XYZ");
+    var group = target || cubeGroup;
+    var idx = getBestFaceIndexFor(group);
+    _worldNormal.copy(FACE_NORMALS[idx]).applyQuaternion(group.quaternion).normalize();
+    group.getWorldPosition(_cubePos);
+    _toCam.copy(camera.position).sub(_cubePos).normalize();
+    if (_worldNormal.dot(_toCam) > 0.9995) return;
+    _qAlign.setFromUnitVectors(_worldNormal, _toCam);
+    _qTarget.copy(group.quaternion).premultiply(_qAlign);
+    group.quaternion.slerp(_qTarget, strength);
+    group.rotation.setFromQuaternion(group.quaternion, "XYZ");
   }
 
   function quadArc(t, sx, sy, cx, cy, ex, ey) {
@@ -284,6 +357,9 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   cubeGroup.scale.set(CUBE_SCALE, CUBE_SCALE, CUBE_SCALE);
   cubeGroup.rotation.set(0.22, -0.35, 0);
   root.add(cubeGroup);
+
+  var menuAnchorGroup = new THREE.Group();
+  root.add(menuAnchorGroup);
 
   function randomOnCube(h) {
     var face = Math.floor(Math.random() * 6);
@@ -477,6 +553,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       uCardCount: { value: 0 },
       uDiag: { value: new THREE.Vector2(cA, sA) },
       uCubeMat: { value: new THREE.Matrix4() },
+      uMenuAbsorb: { value: 0 },
     },
     vertexShader: `
       attribute vec3 aStart;
@@ -492,6 +569,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       uniform float uCards[32];
       uniform float uCardCount;
       uniform mat4 uCubeMat;
+      uniform float uMenuAbsorb;
       varying float vAlpha;
       varying float vShade;
       varying float vForm;
@@ -510,6 +588,9 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
         // Trail lags behind cube — ribbon forms after cube passes
         float morph = clamp((uStream - aDelay * 0.24) / 0.78, 0.0, 1.0);
         morph = easeInOut(morph) * smoothstep(0.05, 0.55, local);
+        float menuT = clamp(uMenuAbsorb, 0.0, 1.0);
+        morph *= (1.0 - menuT);
+        local *= (1.0 - menuT);
 
         vec3 start = (uCubeMat * vec4(aStart, 1.0)).xyz;
         vec3 outward = normalize(start + 0.0001);
@@ -702,6 +783,16 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   var clock = new THREE.Clock();
   var cardSampleTick = 0;
 
+  function sandLineActive() {
+    return sandLocked || displayStream > 0.18 || displayBreak > 0.12;
+  }
+
+  function menuSandAbsorb() {
+    if (menuBlend <= 0.001) return 0;
+    // Ta sama krzywa w obie strony — zamknięcie = odwrócone otwarcie
+    return 1 - Math.pow(Math.max(0, 1 - menuBlend), 0.68);
+  }
+
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
@@ -722,14 +813,33 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       if (sandExt.resetCube) {
         sandLocked = false;
         scrollHandoff = null;
+        displayBreak = 0;
+        displayStream = 0;
+        displayCinema = 0;
+        displayMotion = 0;
         delete sandExt.resetCube;
       }
-      if (sandExt.locked && cinema >= 0.96) sandLocked = true;
+      if (sandExt.locked) sandLocked = true;
     }
-    if (sandLocked && cinema < 0.96) sandLocked = false;
+    if (sandLocked && cinema < 0.96 && !(sandExt && sandExt.locked)) {
+      sandLocked = false;
+    }
 
-    displayCinema += (cinema - displayCinema) * 0.22;
-    displayMotion += (sm - displayMotion) * 0.2;
+    if (sandExt && sandExt.locked && cinema >= 0.96) {
+      sandLocked = true;
+      displayCinema = cinema;
+      displayMotion = sm;
+      displayBreak = 0.98;
+      displayStream = 0.98;
+    }
+
+    if (sandLocked) {
+      cinema = Math.max(cinema, 0.96);
+      sm = Math.max(sm, 0.96);
+    }
+
+    displayCinema += (cinema - displayCinema) * (sandLocked ? 0.55 : 0.22);
+    displayMotion += (sm - displayMotion) * (sandLocked ? 0.5 : 0.2);
     var c = displayCinema;
 
     var breakAmt = smooth01(0.08, 0.58, c) * 0.52;
@@ -739,8 +849,13 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       streamAmt = Math.max(streamAmt, 0.98);
     }
 
-    displayBreak += (breakAmt - displayBreak) * 0.18;
-    displayStream += (streamAmt - displayStream) * 0.18;
+    if (sandLocked && c >= 0.96 && menuBlend <= 0.001) {
+      displayBreak = 0.98;
+      displayStream = 0.98;
+    } else if (!(menuBlend > 0.001 && menuSandHold)) {
+      displayBreak += (breakAmt - displayBreak) * 0.18;
+      displayStream += (streamAmt - displayStream) * 0.18;
+    }
 
     sMat.uniforms.uTime.value = t;
     sMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
@@ -770,6 +885,13 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     var introLanding = introDone && introSettle < 1 && motion < 0.01 && menuBlend < 0.001;
     var mobileHeroIdle =
       MOBILE && inHero && introDone && menuBlend < 0.001 && !introActive && !introLanding;
+    var mobileDriftIdle =
+      MOBILE &&
+      !inHero &&
+      depart > 0.12 &&
+      menuBlend < 0.001 &&
+      !introActive &&
+      !introLanding;
 
     var idleRotX = 0.22 + Math.sin(t * (mobileHeroIdle ? 0.16 : 0.035)) * 0.04;
     var idleRotY = -0.35 + Math.cos(t * (mobileHeroIdle ? 0.13 : 0.028)) * 0.05;
@@ -903,12 +1025,19 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
             cubeGroup.quaternion.setFromEuler(cubeGroup.rotation);
             mobileHeroSpinReady = true;
           }
-          _axisSpin.set(0.12, 1, 0.08).normalize();
-          _qFaceSpin.setFromAxisAngle(_axisSpin, 0.00135);
-          cubeGroup.quaternion.multiply(_qFaceSpin);
-          cubeGroup.rotation.setFromQuaternion(cubeGroup.quaternion, "XYZ");
+          mobileDriftSpinReady = false;
+          applyMobileIdleSpin(cubeGroup);
+        } else if (mobileDriftIdle) {
+          mobileHeroSpinReady = false;
+          if (!mobileDriftSpinReady) {
+            cubeGroup.rotation.set(rotX, rotY, rotZ);
+            cubeGroup.quaternion.setFromEuler(cubeGroup.rotation);
+            mobileDriftSpinReady = true;
+          }
+          applyMobileIdleSpin(cubeGroup);
         } else {
           mobileHeroSpinReady = false;
+          mobileDriftSpinReady = false;
           cubeGroup.rotation.x = rotX;
           cubeGroup.rotation.y = rotY;
           cubeGroup.rotation.z = rotZ;
@@ -928,20 +1057,32 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     }
 
     if (menuBlend > 0.001) {
+      mobileDriftSpinReady = false;
       var menuScale = heroScale * 1.14;
       var menuX = heroX;
       var menuY = heroY;
       var menuZ = heroZ;
-      var cubeDim = 1 - menuBlend * 0.4;
+      var cubeDim = (1 - menuBlend * 0.4) * getMenuCubeDimMul();
 
       if (menuFrom.sideEntry) {
         var flyT = menuTween.closing ? 1 - menuBlend : menuBlend;
-        var flyEase = 1 - Math.pow(1 - flyT, 2.65);
+        var flyEase = sideEntryFlyEase(flyT, menuFrom.galleryMenu);
         var arrive = menuTween.closing ? 1 - flyEase : flyEase;
+        var startX = menuFrom.px;
+        var startY = menuFrom.py;
+        var startZ = menuFrom.pz;
 
-        posX = menuFrom.px + (menuX - menuFrom.px) * arrive;
-        posY = menuFrom.py + (menuY - menuFrom.py) * arrive;
-        posZ = menuFrom.pz + (menuZ - menuFrom.pz) * arrive;
+        if (menuFrom.galleryMenu) {
+          var ctrlX = startX * 0.56 + menuX * 0.44;
+          var ctrlY = startY * 0.18 + menuY * 0.82;
+          var arc = quadArc(arrive, startX, startY, ctrlX, ctrlY, menuX, menuY);
+          posX = arc.x;
+          posY = arc.y;
+        } else {
+          posX = startX + (menuX - startX) * arrive;
+          posY = startY + (menuY - startY) * arrive;
+        }
+        posZ = startZ + (menuZ - startZ) * arrive;
         sc = menuFrom.sc + (menuScale - menuFrom.sc) * arrive;
 
         cubeGroup.position.set(posX, posY, posZ);
@@ -996,28 +1137,33 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     }
 
     cubeGroup.visible = cubeVisible;
+    homeCubeVisible = cubeVisible && menuBlend < 0.001;
 
     cubeGroup.updateMatrixWorld(true);
 
     var shardBreak = displayBreak;
     var shardStream = displayStream;
-    if (menuBlend > 0.001) {
-      var menuFade = Math.max(0, 1 - menuBlend * 1.12);
-      shardBreak *= menuFade;
-      shardStream *= menuFade;
-    }
-    if (sandLocked && c >= 0.96) {
+    var menuAbsorb = 0;
+
+    if (menuBlend > 0.001 && sandLineActive()) {
+      menuAbsorb = menuSandAbsorb();
+      var hold = menuSandHold || { break: displayBreak, stream: displayStream };
+      var keep = 1 - menuAbsorb;
+      shardBreak = hold.break * keep;
+      shardStream = hold.stream * keep;
+    } else if (menuBlend <= 0.001 && sandLocked && c >= 0.96) {
       shardBreak = Math.max(shardBreak, 0.98);
       shardStream = Math.max(shardStream, 0.98);
     }
 
     if (shardMat) {
-      if (!shardsBuilt && (displayBreak > 0.04 || displayStream > 0.04 || c > 0.03)) {
+      if (!shardsBuilt && (displayBreak > 0.04 || displayStream > 0.04 || c > 0.03 || menuAbsorb > 0.02)) {
         buildShards();
       }
       shardMat.uniforms.uTime.value = t;
       shardMat.uniforms.uBreak.value = shardBreak;
       shardMat.uniforms.uStream.value = shardStream;
+      shardMat.uniforms.uMenuAbsorb.value = menuAbsorb;
       shardMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
       shardMat.uniforms.uCubeMat.value.copy(cubeGroup.matrixWorld);
     }
@@ -1071,16 +1217,15 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   };
 
   function captureMenuFrom() {
-    var heroX = MOBILE ? 0.3 : 0.4;
-    var heroY = MOBILE ? 0.54 : 0.7;
     var heroZ = 0.36;
     var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
     var sectionIdx = window.cosgralSectionSnap?.getIndex?.() ?? 0;
 
     menuFrom.offscreen = false;
     menuFrom.sideEntry = false;
+    menuFrom.galleryMenu = false;
 
-    if (sectionIdx === 0 && cubeGroup.visible) {
+    if (sectionIdx === 0) {
       menuFrom.px = cubeGroup.position.x;
       menuFrom.py = cubeGroup.position.y;
       menuFrom.pz = cubeGroup.position.z;
@@ -1095,11 +1240,14 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     menuFrom.sideEntry = true;
     menuFrom.visible = false;
     syncCamera();
-    var corner = getMenuCornerWorld(heroZ);
-    menuFrom.px = corner.x;
-    menuFrom.py = corner.y;
-    menuFrom.pz = corner.z;
-    if (cubeGroup.visible) {
+    menuFrom.galleryMenu = !!homeCubeVisible;
+    var entryPoint = homeCubeVisible
+      ? getMenuEntryStartWorld(heroZ)
+      : getMenuCornerWorld(heroZ);
+    menuFrom.px = entryPoint.x;
+    menuFrom.py = entryPoint.y;
+    menuFrom.pz = entryPoint.z;
+    if (cubeGroup.visible && sMat.uniforms.uFade.value > 0.12) {
       menuFrom.rx = cubeGroup.rotation.x;
       menuFrom.ry = cubeGroup.rotation.y;
       menuFrom.rz = cubeGroup.rotation.z;
@@ -1133,10 +1281,28 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     edges.material.opacity = 0.44;
   }
 
-  function getMenuFaceRect() {
-    if (menuBlend < 0.04 || !cubeGroup.visible) return null;
+  function syncMenuAnchorPose() {
+    var heroX = MOBILE ? 0.3 : 0.4;
+    var heroY = MOBILE ? 0.54 : 0.7;
+    var heroZ = 0.36;
+    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
+    var menuScale = heroScale * 1.14;
 
-    var faceIdx = getBestFaceIndex();
+    menuAnchorGroup.position.set(heroX, heroY, heroZ);
+    menuAnchorGroup.scale.set(menuScale, menuScale, menuScale);
+    if (menuFrom.qStart) {
+      _axisSpin.set(0.18, 1, 0.12).normalize();
+      _qFaceSpin.setFromAxisAngle(_axisSpin, Math.PI * 2);
+      menuAnchorGroup.quaternion.copy(menuFrom.qStart).multiply(_qFaceSpin);
+      menuAnchorGroup.rotation.setFromQuaternion(menuAnchorGroup.quaternion, "XYZ");
+    }
+    syncCamera();
+    applyMenuFaceOrientation(1, menuAnchorGroup);
+    menuAnchorGroup.updateMatrixWorld(true);
+  }
+
+  function computeFaceRectForGroup(poseGroup) {
+    var faceIdx = getBestFaceIndexFor(poseGroup);
     var corners = FACE_CORNERS[faceIdx];
     var minX = Infinity;
     var maxX = -Infinity;
@@ -1145,7 +1311,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
     for (var i = 0; i < corners.length; i++) {
       _faceVec.set(corners[i][0] * HALF, corners[i][1] * HALF, corners[i][2] * HALF);
-      cubeGroup.localToWorld(_faceVec);
+      poseGroup.localToWorld(_faceVec);
       _faceScreen.copy(_faceVec).project(camera);
       var sx = (_faceScreen.x * 0.5 + 0.5) * window.innerWidth;
       var sy = (-_faceScreen.y * 0.5 + 0.5) * window.innerHeight;
@@ -1161,13 +1327,49 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     return { x: cx, y: cy, size: size };
   }
 
+  function getMenuFaceAnchorRect() {
+    if (menuBlend < 0.04 || !menuFrom.galleryMenu) return null;
+    syncMenuAnchorPose();
+    return computeFaceRectForGroup(menuAnchorGroup);
+  }
+
+  function getMenuFaceRect() {
+    if (menuBlend < 0.04 || !cubeGroup.visible) return null;
+    return computeFaceRectForGroup(cubeGroup);
+  }
+
   var _faceVec = new THREE.Vector3();
   var _faceScreen = new THREE.Vector3();
+  var MENU_SEG_MIN_DUR = 0.14;
+
+  function resetHeroMenuCloseState() {
+    menuTween.blend = 0;
+    menuFrom.sideEntry = false;
+    menuFrom.galleryMenu = false;
+    menuTween.closing = false;
+    if (menuSandHold) {
+      displayBreak = menuSandHold.break;
+      displayStream = menuSandHold.stream;
+    }
+    menuSandHold = null;
+  }
+
+  function prepareHeroMenuOpenFromClosed() {
+    if (sandLineActive()) {
+      menuSandHold = { break: displayBreak, stream: displayStream };
+    } else {
+      menuSandHold = null;
+    }
+    if (!shardsBuilt && menuSandHold) buildShards();
+    captureMenuFrom();
+    snapMenuFromPose();
+  }
 
   window.cosgralCube = {
     group: cubeGroup,
     shards: shards,
     getMenuFaceRect: getMenuFaceRect,
+    getMenuFaceAnchorRect: getMenuFaceAnchorRect,
     getMenuBlend: function () {
       return menuBlend;
     },
@@ -1175,43 +1377,54 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       return menuFrom.sideEntry;
     },
     getMenuOpenDuration: function () {
+      if (menuFrom.galleryMenu) return MENU_OPEN_GALLERY_DUR;
       return menuFrom.sideEntry ? MENU_OPEN_SIDE_DUR : MENU_OPEN_HERO_DUR;
     },
     getMenuCloseDuration: function () {
+      if (menuFrom.galleryMenu) return MENU_CLOSE_GALLERY_DUR;
       return menuFrom.sideEntry ? MENU_CLOSE_SIDE_DUR : MENU_CLOSE_HERO_DUR;
     },
+    getMenuLinksDelay: getMenuLinksDelay,
+    getMenuLabelReveal: getMenuLabelReveal,
+    getMenuCubeDimMul: getMenuCubeDimMul,
     openMenu: function () {
-      captureMenuFrom();
-      snapMenuFromPose();
+      var freshOpen = menuTween.blend < 0.02;
+      if (freshOpen) prepareHeroMenuOpenFromClosed();
       menuTween.closing = false;
-      menuTween.blend = 0;
-      var dur = menuFrom.sideEntry ? MENU_OPEN_SIDE_DUR : MENU_OPEN_HERO_DUR;
+      var openDur = menuFrom.galleryMenu
+        ? MENU_OPEN_GALLERY_DUR
+        : menuFrom.sideEntry
+          ? MENU_OPEN_SIDE_DUR
+          : MENU_OPEN_HERO_DUR;
+      var remaining = Math.max(MENU_SEG_MIN_DUR, openDur * (1 - menuTween.blend));
       if (window.gsap) {
         gsap.killTweensOf(menuTween);
-        return gsap.to(menuTween, { blend: 1, duration: dur, ease: "power3.out" });
+        return gsap.to(menuTween, { blend: 1, duration: remaining, ease: "power3.out" });
       }
       menuTween.blend = 1;
       return null;
     },
     closeMenu: function () {
       menuTween.closing = true;
-      var dur = menuFrom.sideEntry ? MENU_CLOSE_SIDE_DUR : MENU_CLOSE_HERO_DUR;
+      var closeDur = menuFrom.galleryMenu
+        ? MENU_CLOSE_GALLERY_DUR
+        : menuFrom.sideEntry
+          ? MENU_CLOSE_SIDE_DUR
+          : MENU_CLOSE_HERO_DUR;
+      var remaining = Math.max(MENU_SEG_MIN_DUR, closeDur * menuTween.blend);
       if (window.gsap) {
         gsap.killTweensOf(menuTween);
         return gsap.to(menuTween, {
           blend: 0,
-          duration: dur,
+          duration: remaining,
           ease: "power3.out",
           onComplete: function () {
-            menuTween.blend = 0;
-            menuFrom.sideEntry = false;
-            menuTween.closing = false;
+            if (menuTween.blend > 0.02) return;
+            resetHeroMenuCloseState();
           },
         });
       }
-      menuTween.blend = 0;
-      menuFrom.sideEntry = false;
-      menuTween.closing = false;
+      resetHeroMenuCloseState();
       return null;
     },
   };

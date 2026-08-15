@@ -12,15 +12,20 @@
 <meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260814e" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260816at" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
-<link rel="stylesheet" href="service-panel.css?v=20260812a" />
+<link rel="stylesheet" href="service-panel.css?v=20260816at" />
 <script>
   (function () {
     var path = (location.pathname || "/").replace(/\/$/, "") || "/";
     var isHome = path === "/" || path.endsWith("/index.html");
     if (!isHome) return;
-    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    var isReload = nav && (nav.type === "reload" || nav.type === "back_forward");
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = isReload ? "auto" : "manual";
+    }
+    if (isReload) return;
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -41,8 +46,8 @@
 </script>
 <script src="service-themes.js?v=20260810l"></script>
 <script src="services-content.js?v=20260810m"></script>
-<script src="service-panel.js?v=20260812a"></script>
-<script src="page-transitions.js?v=20260816e"></script>
+<script src="service-panel.js?v=20260816at"></script>
+<script src="page-transitions.js?v=20260816at"></script>
 <script>
   (function () {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
@@ -106,7 +111,7 @@
       <ul class="nav-overlay__list">
         <li><a href="#top" data-nav-close data-i18n="nav.start">Start</a></li>
         <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
-        <li><a href="#uslugi" data-nav-close data-i18n="nav.services">Usługi</a></li>
+        <li><a href="#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
         <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
         <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
@@ -434,12 +439,12 @@
     <div class="footer-col" data-enter="top">
       <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
       <ul>
-        <li><a href="#uslugi" data-open-service="blue" data-i18n="footer.link_websites">Strony</a></li>
-        <li><a href="#uslugi" data-open-service="purple" data-i18n="services.card2">Aplikacje</a></li>
-        <li><a href="#uslugi" data-open-service="gold" data-i18n="services.card3">SEO / GEO</a></li>
-        <li><a href="#uslugi" data-open-service="orange" data-i18n="services.card4">Automatyzacje</a></li>
-        <li><a href="#uslugi" data-open-service="crimson" data-i18n="footer.link_crm">CRM</a></li>
-        <li><a href="#uslugi" data-open-service="green" data-i18n="footer.link_video">Wideo</a></li>
+        <li><a href="?service=blue" data-i18n="footer.link_websites">Strony</a></li>
+        <li><a href="?service=purple" data-i18n="services.card2">Aplikacje</a></li>
+        <li><a href="?service=gold" data-i18n="services.card3">SEO / GEO</a></li>
+        <li><a href="?service=orange" data-i18n="services.card4">Automatyzacje</a></li>
+        <li><a href="?service=crimson" data-i18n="footer.link_crm">CRM</a></li>
+        <li><a href="?service=green" data-i18n="footer.link_video">Wideo</a></li>
       </ul>
     </div>
     <div class="footer-col" data-enter="bottom">
@@ -480,16 +485,16 @@
 <script src="smooth-scroll.js?v=20260810g"></script>
 <script src="home-cursor-field.js?v=20260814i"></script>
 <script src="home-ambient-bg.js?v=20260814e"></script>
-<script type="module" src="home-hero-3d.js?v=20260816d"></script>
+<script type="module" src="home-hero-3d.js?v=20260816at"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260812c"></script>
-<script src="home-section-flow.js?v=20260810a"></script>
+<script src="home-section-flow.js?v=20260816f"></script>
 <script src="home-scroll-rail.js?v=20260810d"></script>
-<script src="home-section-stepper.js?v=20260816e"></script>
+<script src="home-section-stepper.js?v=20260816an"></script>
 <script src="home-director.js?v=20260815a"></script>
 <script src="home-tile-interact.js?v=20260814i"></script>
-<script defer src="home-nav-menu.js?v=20260812j"></script>
+<script defer src="home-nav-menu.js?v=20260816at"></script>
 </body>
 </html>

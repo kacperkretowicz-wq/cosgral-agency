@@ -20,6 +20,7 @@
     return c.id;
   });
   var GRAFIKI_IDX = SECTION_IDS.indexOf("grafiki");
+  var MONTAZ_IDX = SECTION_IDS.indexOf("montaz");
   var AUTO_IDX = SECTION_IDS.indexOf("automatyzacje");
 
   function footerHoldY() {
@@ -84,6 +85,7 @@
     if (holds.length < 2) return;
 
     var activeIndex = 0;
+    var portfolioBooted = false;
     var locked = false;
     var wheelAccum = 0;
     var wheelTimer = null;
@@ -199,6 +201,15 @@
       });
     }
 
+    function dispatchSectionStep(index) {
+      var detail = { index: index, id: HOLDS_CONFIG[index]?.id || null };
+      if (!portfolioBooted) {
+        detail.initial = true;
+        portfolioBooted = true;
+      }
+      window.dispatchEvent(new CustomEvent("cosgral:section-step", { detail: detail }));
+    }
+
     function afterGrafikiBeat(beat) {
       locked = false;
       beginCooldown();
@@ -213,7 +224,8 @@
     function isSceneJump(fromIndex, toIndex) {
       return (
         (fromIndex === GRAFIKI_IDX && toIndex === AUTO_IDX) ||
-        (fromIndex === AUTO_IDX && toIndex === GRAFIKI_IDX)
+        (fromIndex === AUTO_IDX && toIndex === GRAFIKI_IDX) ||
+        (fromIndex === GRAFIKI_IDX && toIndex === MONTAZ_IDX)
       );
     }
 
@@ -242,6 +254,16 @@
             var g = grafikiApi();
             if (g?.revealHold) g.revealHold(beat);
             else if (g?.snapToHold) g.snapToHold(beat);
+          } else if (fromIndex === GRAFIKI_IDX) {
+            document.body.classList.remove(
+              "is-grafiki-overlay-reveal",
+              "is-grafiki-cinema-end",
+              "is-grafiki-cinema-start",
+              "is-grafiki-cinema-animating",
+              "is-grafiki-light"
+            );
+            var leavingGrafiki = grafikiApi();
+            if (leavingGrafiki?.resetForReentry) leavingGrafiki.resetForReentry();
           }
           if (toPanel) {
             var scene = toPanel.closest(".portfolio-scene");
@@ -256,11 +278,7 @@
         locked = false;
         beginCooldown();
         if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
-        window.dispatchEvent(
-          new CustomEvent("cosgral:section-step", {
-            detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
-          })
-        );
+        dispatchSectionStep(index);
         return;
       }
 
@@ -269,11 +287,7 @@
           locked = false;
           beginCooldown();
           if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
-          window.dispatchEvent(
-            new CustomEvent("cosgral:section-step", {
-              detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
-            })
-          );
+          dispatchSectionStep(index);
         },
       });
 
@@ -325,16 +339,18 @@
           window.scrollTo(0, target);
           if (window.ScrollTrigger) ScrollTrigger.update();
         }
-        if (index === GRAFIKI_IDX && grafikiApi()?.snapToHold) {
-          grafikiApi().snapToHold(fromIndex > index ? 1 : 0);
+        if (index === GRAFIKI_IDX && grafikiApi()) {
+          var g = grafikiApi();
+          if (fromIndex < index && g.transitionToBeat) {
+            if (g.resetForReentry) g.resetForReentry();
+            if (!g.isAnimating?.()) g.transitionToBeat(1);
+          } else if (g.snapToHold) {
+            g.snapToHold(fromIndex > index ? 1 : 0);
+          }
         }
         if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
         if (onComplete) onComplete();
-        window.dispatchEvent(
-          new CustomEvent("cosgral:section-step", {
-            detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
-          })
-        );
+        dispatchSectionStep(index);
       });
     }
 
@@ -342,19 +358,7 @@
       if (!canStep()) return;
 
       if (activeIndex === GRAFIKI_IDX) {
-        var g = grafikiApi();
-        var beat = g?.getBeat?.() ?? 0;
-        var passUp = g?.getPassUp?.() ?? false;
-        if (beat === 1 && !passUp) {
-          locked = true;
-          g.transitionToBeat(0);
-          return;
-        }
-        if (activeIndex <= 0) {
-          goTo(0, SNAP_MS);
-          return;
-        }
-        goTo(activeIndex - 1, stepDurationUp(activeIndex, activeIndex - 1));
+        jumpTo(MONTAZ_IDX);
         return;
       }
 

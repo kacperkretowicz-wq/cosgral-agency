@@ -43,7 +43,20 @@
     document.documentElement.classList.toggle("is-service-panel-open", !!on);
   }
 
-  function buildInner(data) {
+  var SERVICE_PORTFOLIO = {
+    blue: "portfolio.html#strony",
+    purple: "portfolio.html",
+    gold: "portfolio.html",
+    orange: "portfolio.html#automatyzacje",
+    crimson: "portfolio.html#automatyzacje",
+    green: "portfolio.html#montaz",
+  };
+
+  function portfolioHrefForTheme(themeId) {
+    return SERVICE_PORTFOLIO[themeId] || "portfolio.html";
+  }
+
+  function buildInner(data, themeId) {
     var itemsHtml = data.items
       .map(function (item) {
         return "<li>" + item + "</li>";
@@ -68,15 +81,16 @@
     }
 
     var serviceLabel = panelT("panel.service_label") || "Usługa";
-    var whatWeDo = panelT("panel.what_we_do") || "Co robimy";
-    var forWho = panelT("panel.for_who") || "Dla kogo i jaki efekt";
+    var forWho = panelT("panel.for_who") || "Dla kogo";
     var cta = panelT("panel.cta") || "Zacznijmy od bezpłatnego audytu";
+    var portfolioCta = panelT("panel.portfolio_cta") || "Zobacz przykładowe realizacje";
+    var portfolioHref = portfolioHrefForTheme(themeId);
 
     return (
       '<header class="service-panel__head">' +
       '<p class="service-panel__num">' +
       data.num +
-      " — " +
+      " " +
       serviceLabel +
       "</p>" +
       '<h2 class="service-panel__title" id="service-panel-title">' +
@@ -84,9 +98,6 @@
       "</h2>" +
       "</header>" +
       '<section class="service-panel__col service-panel__col--list">' +
-      "<h3>" +
-      whatWeDo +
-      "</h3>" +
       "<ul>" +
       itemsHtml +
       "</ul>" +
@@ -101,9 +112,16 @@
       "</div>" +
       "</section>" +
       '<footer class="service-panel__foot">' +
+      '<div class="service-panel__actions">' +
       '<a class="service-panel__cta" href="#kontakt" data-panel-contact data-i18n="panel.cta">' +
       cta +
       "</a>" +
+      '<a class="service-panel__cta service-panel__cta--secondary" href="' +
+      portfolioHref +
+      '" data-panel-portfolio data-i18n="panel.portfolio_cta">' +
+      portfolioCta +
+      "</a>" +
+      "</div>" +
       "</footer>"
     );
   }
@@ -114,7 +132,7 @@
     var data = contentData(themeId);
     if (!data) return;
     var inner = openPanel.querySelector(".service-panel__inner");
-    if (inner) inner.innerHTML = buildInner(data);
+    if (inner) inner.innerHTML = buildInner(data, themeId);
     if (window.cosgralI18n?.applyLang) {
       window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
     }
@@ -171,7 +189,7 @@
       '<div class="service-panel__bg" aria-hidden="true"></div>' +
       '<div class="service-panel__scrim" aria-hidden="true"></div>' +
       '<div class="service-panel__inner">' +
-      buildInner(data) +
+      buildInner(data, themeId) +
       "</div></div>";
 
     var shell = panel.querySelector(".service-panel__shell");
@@ -216,6 +234,21 @@
     }, EXPAND_MS);
 
     return true;
+  }
+
+  function forceClosePanel() {
+    if (!openPanel) return;
+    var panel = openPanel;
+    var card = openCard;
+    panel.querySelectorAll("video").forEach(function (video) {
+      video.pause();
+    });
+    panel.remove();
+    setCardSourceHidden(card, false);
+    openPanel = null;
+    openCard = null;
+    closing = false;
+    lockScroll(false);
   }
 
   function closePanel(onClosed) {
@@ -263,6 +296,21 @@
     } else if (target) {
       target.scrollIntoView({ behavior: "smooth" });
     }
+  }
+
+  function onPortfolioCtaClick(e) {
+    var cta = e.target.closest("[data-panel-portfolio]");
+    if (!cta || !openPanel) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var href = cta.getAttribute("href");
+    closePanel(function () {
+      if (window.cosgralPageTransition?.navigate) {
+        window.cosgralPageTransition.navigate(href);
+        return;
+      }
+      window.location.href = href;
+    });
   }
 
   function onContactCtaClick(e) {
@@ -370,16 +418,6 @@
       },
       true
     );
-
-    document.querySelectorAll("[data-open-service]").forEach(function (el) {
-      el.addEventListener("click", function (e) {
-        var id = el.getAttribute("data-open-service");
-        if (!id) return;
-        e.preventDefault();
-        e.stopPropagation();
-        prepareAndOpen(id);
-      });
-    });
   }
 
   window.cosgralServicePanel = {
@@ -387,6 +425,7 @@
     openByTheme: openByTheme,
     prepareAndOpen: prepareAndOpen,
     close: closePanel,
+    forceClose: forceClosePanel,
     isOpen: function () {
       return !!openPanel;
     },
@@ -402,6 +441,7 @@
 
   document.addEventListener("keydown", onKeydown);
   document.addEventListener("click", onContactCtaClick, true);
+  document.addEventListener("click", onPortfolioCtaClick, true);
 
   function init() {
     bindCards();

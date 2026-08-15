@@ -54,8 +54,12 @@
   function lockSandStream() {
     document.documentElement.classList.add("is-sand-stream");
     window.cosgralSand = window.cosgralSand || {};
-    var c = window.cosgralSand.cinema || 0;
-    if (c < 0.96) return;
+    if ((window.cosgralSand.cinema || 0) < 0.96) {
+      window.cosgralSand.cinema = 0.96;
+      window.cosgralSand.motion = 0.96;
+      window.cosgralSand.break = 0.98;
+      window.cosgralSand.stream = 0.98;
+    }
     window.cosgralSand.locked = true;
     window.cosgralSand.break = Math.max(window.cosgralSand.break || 0, 0.98);
     window.cosgralSand.stream = Math.max(window.cosgralSand.stream || 0, 0.98);
@@ -300,7 +304,7 @@
           },
           onUpdate: function (self) {
             var p = self.progress;
-            setCinema(p * 0.8);
+            setCinema(p);
 
             var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
             var shatterProps = { autoAlpha: 1 - out };

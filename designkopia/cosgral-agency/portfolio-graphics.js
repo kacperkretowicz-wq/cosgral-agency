@@ -11,12 +11,30 @@
     triggers: [],
   };
 
+  function syncGrafikiCubeFade() {
+    if (!document.body.classList.contains("is-grafiki-zone")) return;
+    if (!window.cosgralCube?.setGrafikiFade) return;
+    window.cosgralCube.setGrafikiFade(0);
+  }
+
+  function restoreCubePortalOutsideGrafiki() {
+    var cube = grafikiMenuState.cube;
+    if (!cube) return;
+    if (window.gsap) {
+      gsap.set(cube, { clearProps: "opacity,visibility" });
+    } else {
+      cube.style.removeProperty("opacity");
+      cube.style.removeProperty("visibility");
+    }
+  }
+
   function refreshGrafikiBloomState() {
     if (!window.ScrollTrigger) return;
     grafikiMenuState.triggers.forEach(function (st) {
       if (st) st.update();
     });
     ScrollTrigger.update();
+    syncGrafikiCubeFade();
   }
 
   window.addEventListener("cosgral:cube-menu", function (e) {
@@ -83,6 +101,32 @@
   var FOCUS_FAR = [18, 19, 20, 21];
   var FOCUS_HERO_END = [0, 1, 2, 3, 18, 19, 22, 23];
   var EARLY_VISIBLE = [0, 1, 2, 3, 18, 19, 20, 21, 22, 23];
+  var INTRO_TILES = FOCUS_JUICY.slice();
+
+  function isLeftIntroTile(idx) {
+    return idx === 0 || idx === 1;
+  }
+
+  function findCinemaTile(tiles, idx) {
+    for (var i = 0; i < tiles.length; i++) {
+      if (Number(tiles[i].getAttribute("data-idx")) === idx) return tiles[i];
+    }
+    return null;
+  }
+
+  function resetCinemaTilesForBeat(tiles, beat) {
+    if (!window.gsap || !tiles.length) return;
+    tiles.forEach(function (tile) {
+      var idx = Number(tile.getAttribute("data-idx"));
+      var pos = WORLD[idx];
+      if (!pos) return;
+      if (beat === 0) {
+        gsap.set(tile, { opacity: 0, x: 0, scale: pos.s, rotation: pos.r });
+        return;
+      }
+      gsap.set(tile, { opacity: 1, x: 0, scale: pos.s, rotation: pos.r });
+    });
+  }
 
   function mediaMarkup(item, opts) {
     opts = opts || {};
@@ -256,7 +300,7 @@
       if (inner) inner.style.width = baseW * pos.w * m + "px";
       if (media) media.style.aspectRatio = String(pos.ar);
 
-      var visibleEarly = EARLY_VISIBLE.indexOf(idx) >= 0;
+      var visibleEarly = false;
       gsap.set(tile, {
         left: cx + pos.x * m * spread,
         top: cy + pos.y * m * spread,
@@ -265,6 +309,7 @@
         scale: pos.s,
         rotation: pos.r,
         opacity: visibleEarly ? 1 : 0,
+        x: 0,
         zIndex: Math.round(pos.s * 100) + idx,
       });
       if (media) gsap.set(media, { filter: "grayscale(0)" });
@@ -334,30 +379,60 @@
     var fullWide = cameraFocus(heroEnd, endScale);
 
     gsap.set(camera, start);
-    if (watermark) gsap.set(watermark, { opacity: 0.07, scale: 1 });
+    if (watermark) gsap.set(watermark, { opacity: 0, scale: 1 });
 
+    var introDur = mobile ? 0.14 : 0.16;
+    var sideX = mobile ? 540 : 780;
     var tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
-    tl.to(camera, Object.assign({ duration: 0.26, ease: "power1.inOut" }, act1), 0);
-    tl.to(camera, Object.assign({ duration: 0.34, ease: "power2.inOut" }, act2), 0.24);
+
+    INTRO_TILES.forEach(function (idx, i) {
+      var tile = findCinemaTile(tiles, idx);
+      var pos = WORLD[idx];
+      if (!tile || !pos) return;
+      var fromLeft = isLeftIntroTile(idx);
+      var enterX = fromLeft ? -sideX : sideX;
+      tl.fromTo(
+        tile,
+        {
+          opacity: 0,
+          x: enterX,
+          scale: pos.s * 0.76,
+          rotation: pos.r + (fromLeft ? -10 : 10),
+        },
+        {
+          opacity: 1,
+          x: 0,
+          scale: pos.s,
+          rotation: pos.r,
+          duration: 0.34,
+          ease: "power2.out",
+        },
+        i * 0.07
+      );
+    });
+
+    var t0 = introDur;
+    tl.to(camera, Object.assign({ duration: 0.26, ease: "power1.inOut" }, act1), t0);
+    tl.to(camera, Object.assign({ duration: 0.34, ease: "power2.inOut" }, act2), t0 + 0.24);
     /* Wolniejsze przejście widok → widok (~3–4 s odtwarzania) */
-    tl.to(camera, Object.assign({ duration: 0.24, ease: "sine.inOut" }, act2b), 0.5);
-    tl.to(camera, Object.assign({ duration: 0.4, ease: "power1.inOut" }, full), 0.62);
-    tl.to(camera, Object.assign({ duration: 0.36, ease: "power1.inOut" }, fullWide), 0.9);
+    tl.to(camera, Object.assign({ duration: 0.24, ease: "sine.inOut" }, act2b), t0 + 0.5);
+    tl.to(camera, Object.assign({ duration: 0.4, ease: "power1.inOut" }, full), t0 + 0.62);
+    tl.to(camera, Object.assign({ duration: 0.36, ease: "power1.inOut" }, fullWide), t0 + 0.9);
 
     if (watermark) {
-      tl.to(watermark, { opacity: 0.11, scale: 1.04, duration: 0.4, ease: "power2.inOut" }, 0.62);
+      tl.to(watermark, { opacity: 0.11, scale: 1.04, duration: 0.4, ease: "power2.inOut" }, t0 + 0.62);
     }
 
     tiles.forEach(function (tile) {
       var idx = Number(tile.getAttribute("data-idx"));
-      if (EARLY_VISIBLE.indexOf(idx) >= 0) return;
+      if (INTRO_TILES.indexOf(idx) >= 0) return;
       var pos = WORLD[idx];
       if (!pos) return;
       tl.fromTo(
         tile,
         { opacity: 0, scale: pos.s * 0.72 },
         { opacity: 1, scale: pos.s, duration: 0.26, ease: "power2.out" },
-        0.66 + (idx % 9) * 0.014
+        t0 + 0.66 + (idx % 9) * 0.014
       );
     });
 
@@ -368,7 +443,7 @@
     var overlay = section.querySelector(".graphics-stage__overlay");
     var overlayCopy = section.querySelector(".graphics-stage__copy");
     var overlayCta = section.querySelector(".graphics-collage__footer");
-    var CINEMA_MS = window.matchMedia("(max-width: 900px)").matches ? 6.12 : 7.08;
+    var CINEMA_MS = window.matchMedia("(max-width: 900px)").matches ? 7.55 : 8.65;
     var WHEEL_END = 52;
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
@@ -417,21 +492,56 @@
       clearCtaRevealTimer();
     }
 
-    function scheduleCtaReveal(immediate) {
+    function setOverlayRevealVisible(visible, immediate, opts) {
+      opts = opts || {};
+      var targets = [];
+      if (overlayCopy) targets.push(overlayCopy);
+      if (overlayCta) targets.push(overlayCta);
+      if (!targets.length) return;
+
       clearCtaRevealTimer();
-      ctaRevealTimer = window.setTimeout(function () {
-        ctaRevealTimer = null;
-        document.body.classList.add("is-grafiki-overlay-reveal");
-        setCtaVisible(true, !!immediate);
-      }, CTA_AFTER_COPY_S * 1000);
+
+      if (!visible) {
+        document.body.classList.remove("is-grafiki-overlay-reveal");
+        setOverlayVisible(false, immediate);
+        setCtaVisible(false, immediate);
+        return;
+      }
+
+      document.body.classList.add("is-grafiki-overlay-reveal");
+
+      if (!window.gsap || immediate) {
+        setOverlayVisible(true, true);
+        setCtaVisible(true, true);
+        return;
+      }
+
+      gsap.killTweensOf(targets);
+      if (overlay) overlay.classList.remove("is-overlay-hidden");
+      var nostalgic = opts.nostalgic === true;
+      gsap.fromTo(
+        targets,
+        { autoAlpha: 0, y: nostalgic ? 32 : 14, filter: nostalgic ? "blur(16px)" : "blur(8px)" },
+        {
+          autoAlpha: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: nostalgic ? 1.75 : 0.42,
+          delay: nostalgic ? 0.18 : 0,
+          ease: nostalgic ? "sine.inOut" : "power2.out",
+          overwrite: true,
+        }
+      );
+    }
+
+    function scheduleCtaReveal(immediate) {
+      setOverlayRevealVisible(true, !!immediate);
     }
 
     function revealOverlayBeforeEnd() {
       if (!animating || overlayRevealShown) return;
       overlayRevealShown = true;
-      document.body.classList.add("is-grafiki-overlay-reveal");
-      setOverlayVisible(true, false, { nostalgic: true });
-      scheduleCtaReveal(false);
+      setOverlayRevealVisible(true, false, { nostalgic: true });
     }
 
     function refreshHolds() {
@@ -606,28 +716,53 @@
       opts = opts || {};
       activeBeat = beat;
       cinemaTl.progress(beat === 0 ? 0 : 1);
+      resetCinemaTilesForBeat(section.querySelectorAll(".graphics-cinema__tile"), beat);
       setPassFlags(beat, opts);
       updateSectionUI();
       if (!animating) {
         if (beat === 1) {
-          setOverlayVisible(true, !!opts.fromBelow);
-          scheduleCtaReveal(!!opts.fromBelow);
+          setOverlayRevealVisible(true, !!opts.fromBelow, opts.fromBelow ? null : { nostalgic: false });
         } else {
           document.body.classList.remove("is-grafiki-overlay-reveal");
           clearCtaRevealTimer();
-          setOverlayVisible(false, true);
-          setCtaVisible(false, true);
+          setOverlayRevealVisible(false, true);
         }
       }
     }
 
-    function scheduleAutoCinema() {
+    function resetForReentry() {
+      clearSafetyTimer();
+      if (window.gsap) gsap.killTweensOf(cinemaTl);
+      animating = false;
+      locked = false;
+      cooldownUntil = 0;
+      activeBeat = 0;
+      passDown = false;
+      passUp = true;
+      overlayRevealShown = false;
+      wheelAccum = 0;
+      cinemaTl.pause();
+      cinemaTl.progress(0);
+      cinemaTl.timeScale(1);
+      resetCinemaTilesForBeat(section.querySelectorAll(".graphics-cinema__tile"), 0);
+      var stage = section.querySelector(".graphics-stage");
+      if (stage && window.gsap) {
+        gsap.set(stage, { autoAlpha: 1, scale: 1, filter: "blur(0px)", visibility: "visible" });
+      }
+      document.body.classList.remove(
+        "is-grafiki-overlay-reveal",
+        "is-grafiki-cinema-end",
+        "is-grafiki-cinema-animating"
+      );
+      setOverlayRevealVisible(false, true);
+      updateSectionUI();
+    }
+
+    function playAutoCinema() {
       if (document.documentElement.classList.contains("reduce-motion")) return;
-      window.setTimeout(function () {
-        if (animating || activeBeat !== 0 || passDown) return;
-        if (!inPinZone() || !atHoldPoint()) return;
-        transitionToBeat(1);
-      }, 160);
+      if (animating) return;
+      if (activeBeat !== 0 || passDown) resetForReentry();
+      transitionToBeat(1);
     }
 
     function snapToHold(beat, opts) {
@@ -650,7 +785,7 @@
           if (!opts.skipCooldown && beat === 1 && passDown) beginCooldown();
           if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
           if (beat === 0 && opts.autoPlay !== false && !opts.fromBelow && !opts.skipAutoPlay) {
-            scheduleAutoCinema();
+            playAutoCinema();
           }
         }, 24);
       });
@@ -673,13 +808,11 @@
       document.body.classList.remove("is-grafiki-overlay-reveal");
       if (beat === 1) {
         if (!overlayRevealShown) {
-          setOverlayVisible(true, false);
-          scheduleCtaReveal(false);
+          setOverlayRevealVisible(true, false, { nostalgic: true });
         }
       } else {
         clearCtaRevealTimer();
-        setOverlayVisible(false, true);
-        setCtaVisible(false, true);
+        setOverlayRevealVisible(false, true);
       }
       overlayRevealShown = false;
       beginCooldown();
@@ -692,6 +825,7 @@
 
     function transitionToBeat(beat) {
       if (animating || !canStep()) return;
+      if (beat === 1 && activeBeat !== 0) resetForReentry();
       if (beat === 1 && activeBeat !== 0) return;
       if (beat === 0 && activeBeat !== 1) return;
 
@@ -708,6 +842,7 @@
       clearCtaRevealTimer();
       setOverlayVisible(false, false);
       setCtaVisible(false, true);
+      resetCinemaTilesForBeat(section.querySelectorAll(".graphics-cinema__tile"), 0);
 
       cinemaTl.pause();
       cinemaTl.timeScale(1);
@@ -942,7 +1077,7 @@
 
     pinHandlers.onEnter = function () {
       if (animating || holdSuspended) return;
-      snapToHold(0, { autoPlay: true, skipCooldown: true });
+      playAutoCinema();
     };
     pinHandlers.onEnterBack = function () {
       if (holdSuspended) return;
@@ -957,7 +1092,11 @@
     refreshHolds();
     if (inPinZone()) {
       var fromBelow = window.scrollY > holdY + HOLD_TOLERANCE;
-      snapToHold(fromBelow ? 1 : 0, fromBelow ? { fromBelow: true, skipAutoPlay: true, skipCooldown: true } : { autoPlay: true, skipCooldown: true });
+      if (fromBelow) {
+        snapToHold(1, { fromBelow: true, skipAutoPlay: true, skipCooldown: true });
+      } else {
+        playAutoCinema();
+      }
     } else {
       setBeatState(0);
       setOverlayVisible(false, true);
@@ -980,6 +1119,7 @@
         snapToHold(beat, { fromBelow: beat === 1, skipAutoPlay: true, force: true, skipCooldown: true });
       },
       transitionToBeat: transitionToBeat,
+      resetForReentry: resetForReentry,
       getBeat: function () {
         return activeBeat;
       },
@@ -998,6 +1138,7 @@
       getHoldY: function () {
         return holdY;
       },
+      syncCubeFade: syncGrafikiCubeFade,
     };
   }
 
@@ -1175,7 +1316,6 @@
     gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
     gsap.set(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)" });
     gsap.set(blur, { opacity: 0.55 });
-    gsap.set(cube, { opacity: 0.68 });
     gsap.set(bloom, { opacity: 0 });
     var rail = getScrollRail();
     if (rail) gsap.set(rail, RAIL_LIGHT);
@@ -1192,6 +1332,7 @@
         endTrigger: cinema || section,
         end: "top 35%",
         scrub: scrubSpeed,
+        onUpdate: syncGrafikiCubeFade,
       },
     });
 
@@ -1200,25 +1341,21 @@
       .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.06)", ease: "none", duration: 0.28 }, 0)
       .to(ambient, { filter: "grayscale(0.88) contrast(1.04) brightness(0.86)", ease: "none", duration: 0.28 }, 0)
       .to(blur, { opacity: 0.56, ease: "none", duration: 0.28 }, 0)
-      .to(cube, { opacity: 0.6, ease: "none", duration: 0.28 }, 0)
 
       .to(bloom, { opacity: 0.1, ease: "none", duration: 0.24 }, 0.28)
       .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.16)", ease: "none", duration: 0.24 }, 0.28)
       .to(ambient, { filter: "grayscale(0.62) contrast(1.03) brightness(1.08)", ease: "none", duration: 0.24 }, 0.28)
       .to(blur, { opacity: 0.6, ease: "none", duration: 0.24 }, 0.28)
-      .to(cube, { opacity: 0.35, ease: "none", duration: 0.24 }, 0.28)
 
       .to(bloom, { opacity: 0.28, ease: "none", duration: 0.24 }, 0.52)
       .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.38)", ease: "none", duration: 0.24 }, 0.52)
       .to(ambient, { filter: "grayscale(0.32) contrast(1.02) brightness(1.42)", ease: "none", duration: 0.24 }, 0.52)
       .to(blur, { opacity: 0.66, ease: "none", duration: 0.24 }, 0.52)
-      .to(cube, { opacity: 0.12, ease: "none", duration: 0.24 }, 0.52)
 
       .to(bloom, { opacity: 0.56, ease: "none", duration: 0.24 }, 0.76)
       .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.66)", ease: "none", duration: 0.24 }, 0.76)
       .to(ambient, { filter: "grayscale(0.12) contrast(1.02) brightness(1.82)", ease: "none", duration: 0.24 }, 0.76)
-      .to(blur, { opacity: 0.72, ease: "none", duration: 0.24 }, 0.76)
-      .to(cube, { opacity: 0, ease: "none", duration: 0.24 }, 0.76);
+      .to(blur, { opacity: 0.72, ease: "none", duration: 0.24 }, 0.76);
 
     appendRailStage(bloomTl, RAIL_S1, 0, 0.28);
     appendRailStage(bloomTl, RAIL_S2, 0.28, 0.24);
@@ -1232,6 +1369,7 @@
         endTrigger: nextSection || section,
         end: "top 35%",
         scrub: scrubSpeed,
+        onUpdate: syncGrafikiCubeFade,
       },
     });
 
@@ -1240,25 +1378,21 @@
       .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.38)", ease: "none", duration: 0.24 }, 0)
       .to(ambient, { filter: "grayscale(0.32) contrast(1.02) brightness(1.42)", ease: "none", duration: 0.24 }, 0)
       .to(blur, { opacity: 0.66, ease: "none", duration: 0.24 }, 0)
-      .to(cube, { opacity: 0.12, ease: "none", duration: 0.24 }, 0)
 
       .to(bloom, { opacity: 0.1, ease: "none", duration: 0.24 }, 0.24)
       .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.16)", ease: "none", duration: 0.24 }, 0.24)
       .to(ambient, { filter: "grayscale(0.62) contrast(1.03) brightness(1.08)", ease: "none", duration: 0.24 }, 0.24)
       .to(blur, { opacity: 0.6, ease: "none", duration: 0.24 }, 0.24)
-      .to(cube, { opacity: 0.35, ease: "none", duration: 0.24 }, 0.24)
 
       .to(bloom, { opacity: 0.03, ease: "none", duration: 0.24 }, 0.48)
       .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.06)", ease: "none", duration: 0.24 }, 0.48)
       .to(ambient, { filter: "grayscale(0.88) contrast(1.04) brightness(0.86)", ease: "none", duration: 0.24 }, 0.48)
       .to(blur, { opacity: 0.56, ease: "none", duration: 0.24 }, 0.48)
-      .to(cube, { opacity: 0.6, ease: "none", duration: 0.24 }, 0.48)
 
       .to(bloom, { opacity: 0, ease: "none", duration: 0.28 }, 0.72)
       .to(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)", ease: "none", duration: 0.28 }, 0.72)
       .to(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)", ease: "none", duration: 0.28 }, 0.72)
-      .to(blur, { opacity: 0.55, ease: "none", duration: 0.28 }, 0.72)
-      .to(cube, { opacity: 0.68, ease: "none", duration: 0.28 }, 0.72);
+      .to(blur, { opacity: 0.55, ease: "none", duration: 0.28 }, 0.72);
 
     appendRailStage(darkenTl, RAIL_S3, 0, 0.24);
     appendRailStage(darkenTl, RAIL_S2, 0.24, 0.24);
@@ -1269,6 +1403,33 @@
     grafikiMenuState.bloomTl = bloomTl;
     grafikiMenuState.darkenTl = darkenTl;
     grafikiMenuState.triggers = [bloomTl.scrollTrigger, darkenTl.scrollTrigger].filter(Boolean);
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      endTrigger: grafikiCta || section,
+      end: "bottom top",
+      onEnter: function () {
+        document.body.classList.add("is-grafiki-zone");
+        window.cosgralCube?.setGrafikiMenuActive?.(true);
+        syncGrafikiCubeFade();
+      },
+      onLeave: function () {
+        document.body.classList.remove("is-grafiki-zone");
+        window.cosgralCube?.setGrafikiMenuActive?.(false);
+        restoreCubePortalOutsideGrafiki();
+      },
+      onEnterBack: function () {
+        document.body.classList.add("is-grafiki-zone");
+        window.cosgralCube?.setGrafikiMenuActive?.(true);
+        syncGrafikiCubeFade();
+      },
+      onLeaveBack: function () {
+        document.body.classList.remove("is-grafiki-zone");
+        window.cosgralCube?.setGrafikiMenuActive?.(false);
+        restoreCubePortalOutsideGrafiki();
+      },
+    });
 
     ScrollTrigger.create({
       trigger: section,
@@ -1288,6 +1449,8 @@
         document.body.classList.remove("is-grafiki-light");
       },
     });
+
+    syncGrafikiCubeFade();
   }
 
   function renderGallery(data) {

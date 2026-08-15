@@ -353,8 +353,9 @@
   "panel": {
     "service_label": { "pl": "Usługa", "en": "Service" },
     "what_we_do": { "pl": "Co robimy", "en": "What we do" },
-    "for_who": { "pl": "Dla kogo i jaki efekt", "en": "Who it's for & the outcome" },
-    "cta": { "pl": "Zacznijmy od bezpłatnego audytu", "en": "Let's start with a free audit" }
+    "for_who": { "pl": "Dla kogo", "en": "Who it's for" },
+    "cta": { "pl": "Zacznijmy od bezpłatnego audytu", "en": "Let's start with a free audit" },
+    "portfolio_cta": { "pl": "Zobacz przykładowe realizacje", "en": "See example projects" }
   },
   "portfolio": {
     "meta": {

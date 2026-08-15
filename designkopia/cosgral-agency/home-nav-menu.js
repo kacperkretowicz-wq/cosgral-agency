@@ -14,8 +14,165 @@
   var stage = overlay.querySelector(".nav-overlay__stage");
   var backdrop = overlay.querySelector("[data-nav-backdrop], .nav-overlay__backdrop");
   var isOpen = false;
-  var animating = false;
+  var servicesExpanded = false;
+  var menuTargetOpen = false;
+  var menuDriveToken = 0;
   var syncRaf = null;
+  var servicesLink = null;
+  var servicesItem = null;
+  var servicesSublist = null;
+  var subLinks = [];
+
+  var SERVICE_ITEMS = [
+    { theme: "blue", i18n: "services.card1" },
+    { theme: "purple", i18n: "services.card2" },
+    { theme: "gold", i18n: "services.card3" },
+    { theme: "orange", i18n: "services.card4" },
+    { theme: "crimson", i18n: "services.card5" },
+    { theme: "green", i18n: "services.card6" },
+  ];
+
+  function siteRoot() {
+    var path = window.location.pathname || "";
+    return path.indexOf("/uslugi/") !== -1 ? "../" : "";
+  }
+
+  function serviceHref(theme) {
+    if (document.body.classList.contains("home-page")) return "?service=" + theme;
+    return siteRoot() + "index.html?service=" + theme;
+  }
+
+  function findServicesLink() {
+    return Array.from(overlay.querySelectorAll(".nav-overlay__list a")).find(function (a) {
+      if (a.getAttribute("data-i18n") === "nav.services") return true;
+      if (a.hasAttribute("data-nav-services-toggle")) return true;
+      var href = a.getAttribute("href") || "";
+      return href === "#uslugi" || /#uslugi(?:$|[?#])/.test(href);
+    });
+  }
+
+  function setupServicesSubmenu() {
+    servicesLink = findServicesLink();
+    if (!servicesLink) return;
+
+    servicesItem = servicesLink.closest("li");
+    if (!servicesItem) return;
+
+    servicesItem.classList.add("nav-overlay__item--services");
+    servicesLink.setAttribute("data-nav-services-toggle", "");
+    servicesLink.setAttribute("data-no-transition", "");
+    servicesLink.setAttribute("aria-haspopup", "true");
+    servicesLink.setAttribute("aria-expanded", "false");
+
+    servicesSublist = document.createElement("ul");
+    servicesSublist.className = "nav-overlay__sublist";
+    servicesSublist.setAttribute("aria-hidden", "true");
+
+    SERVICE_ITEMS.forEach(function (item) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = serviceHref(item.theme);
+      a.setAttribute("data-service-theme", item.theme);
+      a.setAttribute("data-i18n", item.i18n);
+      a.setAttribute("data-nav-services-sub", "");
+      li.appendChild(a);
+      servicesSublist.appendChild(li);
+      subLinks.push(a);
+    });
+
+    servicesItem.appendChild(servicesSublist);
+    refreshServiceSubLabels();
+  }
+
+  function refreshServiceSubLabels() {
+    subLinks.forEach(function (a) {
+      var key = a.getAttribute("data-i18n");
+      var text = key && window.cosgralI18n?.t ? window.cosgralI18n.t(key) : a.textContent;
+      a.textContent = text;
+      a.href = serviceHref(a.getAttribute("data-service-theme"));
+    });
+  }
+
+  function refreshMainNavLinks() {
+    links = overlay.querySelectorAll(
+      ".nav-overlay__list > li:not(.nav-overlay__item--services) > a, .nav-overlay__item--services > a[data-nav-services-toggle]"
+    );
+  }
+
+  function setServicesExpanded(open, animate) {
+    servicesExpanded = open;
+    overlay.classList.toggle("is-services-expanded", open);
+    document.body.classList.toggle("is-nav-services-expanded", open);
+    if (servicesSublist) servicesSublist.setAttribute("aria-hidden", open ? "false" : "true");
+    if (servicesLink) {
+      servicesLink.setAttribute("aria-expanded", open ? "true" : "false");
+      servicesLink.classList.toggle("is-services-active", open);
+    }
+
+    if (REDUCED || !window.gsap || animate === false) return;
+
+    var otherItems = overlay.querySelectorAll(".nav-overlay__list > li:not(.nav-overlay__item--services)");
+    if (open) {
+      gsap.killTweensOf(otherItems);
+      gsap.killTweensOf(subLinks);
+      gsap.to(otherItems, {
+        opacity: 0,
+        y: -8,
+        duration: 0.24,
+        stagger: 0.018,
+        ease: "power2.in",
+        overwrite: true,
+      });
+      gsap.fromTo(
+        subLinks,
+        { opacity: 0, y: 10 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.3,
+          stagger: 0.04,
+          delay: 0.1,
+          ease: "power3.out",
+          overwrite: true,
+        }
+      );
+      if (backdrop) {
+        gsap.to(backdrop, { opacity: 1, duration: 0.34, ease: "power2.out", overwrite: true });
+      }
+      return;
+    }
+
+    gsap.killTweensOf(subLinks);
+    gsap.to(subLinks, {
+      opacity: 0,
+      y: 8,
+      duration: 0.16,
+      stagger: { each: 0.02, from: "end" },
+      ease: "power2.in",
+      overwrite: true,
+    });
+    gsap.to(otherItems, {
+      opacity: 1,
+      y: 0,
+      duration: 0.28,
+      stagger: 0.02,
+      delay: 0.06,
+      ease: "power3.out",
+      overwrite: true,
+    });
+  }
+
+  function toggleServicesSubmenu() {
+    setServicesExpanded(!servicesExpanded, true);
+  }
+
+  function collapseServicesSubmenu(instant) {
+    if (!servicesExpanded) return;
+    setServicesExpanded(false, instant === true ? false : true);
+  }
+
+  setupServicesSubmenu();
+  refreshMainNavLinks();
 
   var SECTION_INDEX = {
     top: 0,
@@ -57,15 +214,19 @@
 
   function syncStageToCube() {
     if (!isOpen || !stage) return;
-    var rect = window.cosgralCube?.getMenuFaceRect?.();
+
+    var rect =
+      window.cosgralCube?.getMenuFaceAnchorRect?.() ||
+      window.cosgralCube?.getMenuFaceRect?.();
     if (rect && rect.size > 40) {
       stage.style.left = rect.x + "px";
       stage.style.top = rect.y + "px";
       stage.style.width = rect.size + "px";
-      stage.style.height = rect.size + "px";
+      stage.style.height = servicesExpanded ? "auto" : rect.size + "px";
       stage.style.setProperty("--menu-face-size", rect.size + "px");
       stage.style.transform = "translate(-50%, -50%)";
     }
+
     syncRaf = window.requestAnimationFrame(syncStageToCube);
   }
 
@@ -91,25 +252,52 @@
       gsap.set(backdrop, { opacity: 1 });
     }
     if (open) startStageSync();
-    else stopStageSync();
+    else {
+      stopStageSync();
+      overlay.classList.remove("is-services-expanded");
+      document.body.classList.remove("is-nav-services-expanded");
+      servicesExpanded = false;
+      if (servicesLink) {
+        servicesLink.classList.remove("is-services-active");
+        servicesLink.setAttribute("aria-expanded", "false");
+      }
+      if (servicesSublist) servicesSublist.setAttribute("aria-hidden", "true");
+    }
   }
 
-  function animateLinksIn() {
-    if (REDUCED || !window.gsap) return;
-    var side = window.cosgralCube?.isSideEntry?.();
-    var chars = menuChars();
+  function bumpDriveToken() {
+    menuDriveToken += 1;
+    return menuDriveToken;
+  }
+
+  function linksDelayForBlend() {
     var openDur = window.cosgralCube?.getMenuOpenDuration?.() || 5.3;
-    var delay = side ? openDur * 0.187 : openDur * 0.128;
+    var fullDelay = window.cosgralCube?.getMenuLinksDelay?.() ?? openDur * 0.128;
+    var blend = window.cosgralCube?.getMenuBlend?.() ?? 0;
+    if (blend >= 0.98) return 0;
+    var linksThreshold = fullDelay / openDur;
+    if (blend >= linksThreshold) return 0;
+    return Math.max(0, fullDelay - blend * openDur);
+  }
+
+  function animateLinksForOpen() {
+    if (REDUCED || !window.gsap) return;
+    var chars = menuChars();
+    var delay = linksDelayForBlend();
 
     gsap.killTweensOf(links);
     gsap.killTweensOf(chars);
-    gsap.set(links, { opacity: 1, y: 0, scale: 1 });
+    gsap.set(links, { opacity: 0, clipPath: "inset(0 100% 0 0)" });
+    if (chars.length) {
+      gsap.set(chars, { opacity: 0, y: 12, filter: "blur(4px)" });
+    }
 
     gsap.fromTo(
       links,
-      { clipPath: "inset(0 100% 0 0)" },
+      { clipPath: "inset(0 100% 0 0)", opacity: 0 },
       {
         clipPath: "inset(0 0% 0 0)",
+        opacity: 1,
         duration: 0.38,
         stagger: 0.045,
         ease: "power3.out",
@@ -142,6 +330,20 @@
   function bindLinkHover() {
     if (REDUCED) return;
     links.forEach(function (a) {
+      a.addEventListener("mouseenter", function () {
+        a.classList.add("is-hovered");
+      });
+      a.addEventListener("mouseleave", function () {
+        a.classList.remove("is-hovered");
+      });
+      a.addEventListener("focus", function () {
+        a.classList.add("is-hovered");
+      });
+      a.addEventListener("blur", function () {
+        a.classList.remove("is-hovered");
+      });
+    });
+    subLinks.forEach(function (a) {
       a.addEventListener("mouseenter", function () {
         a.classList.add("is-hovered");
       });
@@ -241,11 +443,25 @@
     return null;
   }
 
-  function openNav() {
-    if (isOpen) return;
-    animating = true;
-    prepareNavLabels();
-    setOpenState(true);
+  function invokeCubeClose() {
+    return window.cosgralCube?.closeMenu?.() || null;
+  }
+
+  function driveMenuOpen() {
+    menuTargetOpen = true;
+    bumpDriveToken();
+
+    if (!isOpen) {
+      prepareNavLabels();
+      setOpenState(true);
+    }
+
+    if (backdrop && window.gsap) {
+      gsap.killTweensOf(backdrop);
+      gsap.to(backdrop, { opacity: 1, duration: 0.22, ease: "power2.out", overwrite: true });
+    }
+
+    animateLinksForOpen();
 
     var cubeTween = invokeCubeOpen();
     if (!cubeTween && !REDUCED) {
@@ -253,37 +469,18 @@
         "cosgral:cube-ready",
         function onCubeReady() {
           window.removeEventListener("cosgral:cube-ready", onCubeReady);
-          if (!isOpen) return;
-          var retryTween = invokeCubeOpen();
-          if (retryTween && retryTween.eventCallback) {
-            retryTween.eventCallback("onComplete", function () {
-              animating = false;
-            });
-          }
+          if (!menuTargetOpen) return;
+          invokeCubeOpen();
         },
         { once: true }
       );
     }
-    animateLinksIn();
-
-    var done = function () {
-      animating = false;
-    };
-    if (cubeTween && cubeTween.eventCallback) {
-      cubeTween.eventCallback("onComplete", done);
-    } else {
-      var openMs = (window.cosgralCube?.getMenuOpenDuration?.() || 5.3) * 1000 + 180;
-      window.setTimeout(done, REDUCED ? 0 : openMs);
-    }
   }
 
-  function closeNav(onComplete) {
-    if (!isOpen) {
-      if (onComplete) onComplete();
-      return;
-    }
-
-    animating = true;
+  function driveMenuClose(onComplete) {
+    menuTargetOpen = false;
+    var token = bumpDriveToken();
+    collapseServicesSubmenu(true);
 
     if (window.gsap) {
       gsap.killTweensOf(links);
@@ -296,50 +493,81 @@
       gsap.to(backdrop, { opacity: 0, duration: 0.26, ease: "power2.in", overwrite: true });
     }
 
-    var cubeTween = window.cosgralCube?.closeMenu?.();
+    var cubeTween = invokeCubeClose();
     var overlayDone = false;
 
     var finishOverlay = function () {
       if (overlayDone) return;
       overlayDone = true;
-      setOpenState(false);
       document.body.classList.remove("is-cube-menu-front", "is-cube-menu-passing");
-      document.documentElement.style.removeProperty("--menu-water-bend");
-      document.documentElement.style.removeProperty("--menu-wave-x");
-      document.documentElement.style.removeProperty("--menu-wave-y");
-      document.documentElement.style.removeProperty("--menu-wave-progress");
-      document.documentElement.style.removeProperty("--menu-wave-punch");
     };
 
     var finishAll = function () {
+      if (token !== menuDriveToken) return;
+      if (menuTargetOpen) return;
       finishOverlay();
-      animating = false;
+      setOpenState(false);
       if (onComplete) onComplete();
     };
 
-    var closeMs = (window.cosgralCube?.getMenuCloseDuration?.() || 1.95) * 1000 + 80;
+    var closeDur = window.cosgralCube?.getMenuCloseDuration?.() || 2.85;
+    var closeBlend = window.cosgralCube?.getMenuBlend?.() ?? (isOpen ? 1 : 0);
+    var closeMs = Math.max(80, closeDur * closeBlend * 1000 + 80);
     if (cubeTween && cubeTween.eventCallback) {
-      cubeTween.eventCallback("onUpdate", function () {
-        if (cubeTween.progress() >= 0.48) finishOverlay();
-      });
       cubeTween.eventCallback("onComplete", finishAll);
     } else {
       window.setTimeout(finishAll, REDUCED ? 0 : closeMs);
     }
   }
 
+  function openNav() {
+    driveMenuOpen();
+  }
+
+  function closeNav(onComplete) {
+    if (!isOpen && !menuTargetOpen) {
+      if (onComplete) onComplete();
+      return;
+    }
+    driveMenuClose(onComplete);
+  }
+
   toggle.addEventListener("click", function (e) {
     e.stopPropagation();
-    isOpen ? closeNav() : openNav();
+    menuTargetOpen ? driveMenuClose() : driveMenuOpen();
   });
 
   links.forEach(function (a) {
     a.addEventListener("click", function (e) {
+      if (a.hasAttribute("data-nav-services-toggle")) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleServicesSubmenu();
+        return;
+      }
+
       e.preventDefault();
       e.stopPropagation();
       var href = a.getAttribute("href");
+      collapseServicesSubmenu(true);
       closeNav(function () {
         navigateTo(href);
+      });
+    });
+  });
+
+  subLinks.forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var theme = a.getAttribute("data-service-theme");
+      collapseServicesSubmenu(true);
+      closeNav(function () {
+        if (window.cosgralPageTransition?.navigateService) {
+          window.cosgralPageTransition.navigateService(theme);
+          return;
+        }
+        navigateTo(a.getAttribute("href"));
       });
     });
   });
@@ -358,15 +586,25 @@
   });
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && isOpen) closeNav();
+    if (e.key === "Escape" && isOpen) {
+      if (servicesExpanded) {
+        collapseServicesSubmenu();
+        return;
+      }
+      closeNav();
+    }
   });
 
   window.addEventListener("cosgral:langchange", function () {
+    refreshServiceSubLabels();
     if (!isOpen) return;
     prepareNavLabels();
     if (!REDUCED && window.gsap) {
       gsap.set(menuChars(), { opacity: 1, y: 0, rotateX: 0, filter: "none" });
       gsap.set(links, { opacity: 1, clipPath: "inset(0 0% 0 0)" });
+      if (servicesExpanded) {
+        gsap.set(subLinks, { opacity: 1, y: 0 });
+      }
     }
   });
 
