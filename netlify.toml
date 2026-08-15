@@ -2,6 +2,9 @@
   publish = "designkopia/cosgral-agency"
   command = ""
 
+# Netlify site: cosgral-agency-preview (NOT cosgralhub — to jest aplikacja CRM).
+# Deploy: ./scripts/deploy-agency-preview.sh
+
 [build.environment]
   NODE_VERSION = "20"
 
