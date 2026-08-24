@@ -2,6 +2,7 @@
  * Shared pointer field — CSS vars + global state for ambient / tiles / 3D.
  * Mobile: gyro tilt from device orientation (iOS needs a user gesture).
  * Desktop: mouse.
+ * Works on home + all subpages that include this script.
  */
 (function () {
   "use strict";
@@ -12,6 +13,7 @@
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  var GYRO_KEY = "cosgral-gyro";
   var root = document.documentElement;
   var state = {
     x: window.innerWidth * 0.5,
@@ -81,6 +83,9 @@
     orient.tny = clamp(-db / ORIENT_BETA_RANGE, -1, 1);
     orient.active = true;
     state.fromOrientation = true;
+    try {
+      sessionStorage.setItem(GYRO_KEY, "1");
+    } catch (err) {}
     hideGate();
   }
 
@@ -107,9 +112,8 @@
     gateEl.type = "button";
     gateEl.className = "gyro-enable";
     gateEl.setAttribute("data-no-transition", "");
-    gateEl.innerHTML =
-      '<span class="gyro-enable__title">Włącz efekt 3D</span>' +
-      '<span class="gyro-enable__sub">Żyroskop — ruch telefonu</span>';
+    gateEl.setAttribute("aria-label", "TURN ON 3D");
+    gateEl.textContent = "TURN ON 3D";
     gateEl.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -134,6 +138,9 @@
         .then(function (result) {
           orient.permission = result;
           if (result === "granted") {
+            try {
+              sessionStorage.setItem(GYRO_KEY, "1");
+            } catch (err) {}
             enableOrientation();
             hideGate();
           } else {
@@ -149,6 +156,9 @@
 
     // Android / browsers without permission API
     orient.permission = "granted";
+    try {
+      sessionStorage.setItem(GYRO_KEY, "1");
+    } catch (err) {}
     enableOrientation();
     hideGate();
   }
@@ -207,8 +217,21 @@
       orient.baseGamma = null;
     });
 
+    var remembered = false;
+    try {
+      remembered = sessionStorage.getItem(GYRO_KEY) === "1";
+    } catch (err) {}
+
+    if (remembered) {
+      // Po wcześniejszym TURN ON 3D — od razu nasłuchuj na każdej podstronie.
+      enableOrientation();
+      window.setTimeout(function () {
+        if (!orient.active) showGate();
+      }, 2200);
+      return;
+    }
+
     if (needsIosPermission) {
-      // iOS: dopiero po geście — pokazujemy przycisk po starcie strony.
       var reveal = function () {
         if (!orient.active) showGate();
       };
@@ -224,7 +247,6 @@
         window.setTimeout(reveal, 4200);
       }
     } else {
-      // Android: od razu nasłuchuj; jeśli brak eventów, i tak pokaż bramkę po chwili.
       requestOrientationAccess(false);
       window.setTimeout(function () {
         if (!orient.active) showGate();

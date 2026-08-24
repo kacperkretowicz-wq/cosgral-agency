@@ -380,11 +380,7 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   will-change: transform;
 }
 .preloader__label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
+  display: none !important;
 }
 
 .site-nav {
@@ -2485,38 +2481,27 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
   transition: filter 0.45s var(--ease);
 }
 
-/* Mobile gyro permission gate (iOS requires a tap) */
+/* Mobile gyro permission gate (iOS requires a tap) — home + subpages */
 .gyro-enable {
   position: fixed;
   left: 50%;
   bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   z-index: 12000;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.7rem 1.15rem;
+  padding: 0.72rem 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
+  border-radius: 14px;
   background: rgba(8, 8, 8, 0.82);
   color: #f2f2f2;
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  font: inherit;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   cursor: pointer;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
-}
-.gyro-enable__title {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.gyro-enable__sub {
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.55);
+  transition: opacity 0.35s var(--ease, ease), transform 0.35s var(--ease, ease);
 }
 .gyro-enable.is-done {
   opacity: 0;
