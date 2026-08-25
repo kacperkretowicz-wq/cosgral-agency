@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Atelier Bloom  chatbot AI">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Atelier Bloom — chatbot AI">
   <defs>
     <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#121212"/>
@@ -9,15 +9,12 @@
   <rect x="120" y="36" width="400" height="288" rx="28" fill="#0c0c0c" stroke="rgba(255,255,255,0.14)"/>
   <rect x="148" y="58" width="120" height="10" rx="5" fill="rgba(255,255,255,0.16)"/>
   <circle cx="480" cy="63" r="6" fill="rgba(255,255,255,0.35)"/>
-  <!-- incoming -->
   <rect x="148" y="96" width="210" height="52" rx="16" fill="#161616" stroke="rgba(255,255,255,0.1)"/>
   <text x="168" y="118" fill="rgba(255,255,255,0.55)" font-family="Plus Jakarta Sans, sans-serif" font-size="13">Czy macie wolny termin</text>
-  <text x="168" y="136" fill="rgba(255,255,255,0.55)" font-family="Plus Jakarta Sans, sans-serif" font-size="13">w sobot?</text>
-  <!-- bot reply -->
+  <text x="168" y="136" fill="rgba(255,255,255,0.55)" font-family="Plus Jakarta Sans, sans-serif" font-size="13">w sobote?</text>
   <rect x="282" y="164" width="218" height="68" rx="16" fill="#1a1a1a" stroke="rgba(255,255,255,0.22)"/>
-  <text x="302" y="188" fill="#f5f5f5" font-family="Plus Jakarta Sans, sans-serif" font-size="13">Tak  11:00 i 14:30.</text>
-  <text x="302" y="208" fill="rgba(255,255,255,0.55)" font-family="Plus Jakarta Sans, sans-serif" font-size="13">Przekaza do rezerwacji?</text>
-  <!-- chips -->
+  <text x="302" y="188" fill="#f5f5f5" font-family="Plus Jakarta Sans, sans-serif" font-size="13">Tak — 11:00 i 14:30.</text>
+  <text x="302" y="208" fill="rgba(255,255,255,0.55)" font-family="Plus Jakarta Sans, sans-serif" font-size="13">Przekazac do rezerwacji?</text>
   <rect x="148" y="252" width="88" height="28" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/>
   <text x="192" y="270" text-anchor="middle" fill="#f0f0f0" font-family="IBM Plex Mono, monospace" font-size="10">FAQ</text>
   <rect x="248" y="252" width="110" height="28" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/>
