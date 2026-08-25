@@ -797,11 +797,17 @@ html.reduce-motion .nav-overlay__char {
   filter: brightness(1.12);
 }
 
-/* Footer */
+/* Footer — full-viewport closing section, content centered */
 .site-footer {
   position: relative;
   z-index: 1;
-  padding: clamp(3rem, 8vw, 5rem) 0 2rem;
+  box-sizing: border-box;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3rem) 0;
   border-top: 1px solid var(--border);
 }
 .footer-grid {
@@ -2388,8 +2394,11 @@ html.reduce-motion .portfolio-page .home-scroll-rail { display: none; }
 @media (max-width: 900px) {
   .site-footer {
     overflow: visible;
-    padding-top: clamp(0.55rem, 1.6vh, 1rem);
-    padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
+    min-height: 100svh;
+    min-height: 100dvh;
+    justify-content: center;
+    padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
   }
   .footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

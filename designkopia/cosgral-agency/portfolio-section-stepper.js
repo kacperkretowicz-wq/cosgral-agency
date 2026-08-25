@@ -27,20 +27,7 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    if (MOBILE) {
-      var viewH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-      var footerH = footer.offsetHeight;
-      /* Keep footer higher; leave room above home-indicator so bottom isn't clipped */
-      var topInset = 28;
-      var bottomInset = 104;
-      if (footerH + topInset + bottomInset <= viewH) {
-        var free = viewH - footerH;
-        var top = Math.min(topInset, Math.max(12, Math.round(free * 0.22)));
-        return Math.min(max, Math.max(0, footer.offsetTop - top));
-      }
-      return Math.min(max, Math.max(0, footer.offsetTop + footerH - viewH + bottomInset));
-    }
-    return Math.min(max, Math.max(0, footer.offsetTop - 234));
+    return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
   function sectionHoldY(selector) {
