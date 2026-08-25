@@ -1510,17 +1510,18 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   line-height: 1.15;
   margin-bottom: 0.75rem;
   text-align: center;
+  color: #f7f7f7;
 }
 .home-contact__lead {
   font-size: 0.95rem;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.78);
   text-align: center;
   margin: 0 0 0.65rem;
   line-height: 1.5;
 }
 .home-contact__social-label {
   font-size: 0.82rem;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.72);
   text-align: center;
   margin: 0 0 0.7rem;
   line-height: 1.4;
@@ -1536,6 +1537,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .home-contact__social .footer-social__link {
   width: 2.35rem;
   height: 2.35rem;
+  color: rgba(255, 255, 255, 0.88);
 }
 .home-contact__phones {
   display: flex;
@@ -1546,12 +1548,30 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 }
 .home-contact__phone {
   font-size: 1rem;
-  color: var(--ink);
+  color: #f2f2f2;
   text-decoration: none;
   letter-spacing: 0.01em;
   transition: opacity 0.2s ease;
 }
 .home-contact__phone:hover { opacity: 0.75; }
+.home-contact .audit-form__row label {
+  color: rgba(255, 255, 255, 0.7);
+}
+.home-contact .audit-form__row input,
+.home-contact .audit-form__row textarea {
+  color: #f5f5f5;
+}
+.home-contact .audit-form__row input::placeholder,
+.home-contact .audit-form__row textarea::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+@media (min-width: 901px) {
+  .home-contact.home-scene .home-contact__inner,
+  .home-contact.home-scene .home-scene__panel > .home-contact__inner {
+    transform: translateY(-1cm);
+  }
+}
 .audit-form { display: flex; flex-direction: column; gap: 1rem; text-align: left; }
 .audit-form__row label {
   display: block;
