@@ -226,7 +226,7 @@
       // Po wcześniejszym TURN ON 3D — od razu nasłuchuj na każdej podstronie.
       enableOrientation();
       window.setTimeout(function () {
-        if (!orient.active) showGate();
+        if (!orient.active && needsIosPermission) showGate();
       }, 2200);
       return;
     }
@@ -248,9 +248,6 @@
       }
     } else {
       requestOrientationAccess(false);
-      window.setTimeout(function () {
-        if (!orient.active) showGate();
-      }, 2600);
     }
   }
 

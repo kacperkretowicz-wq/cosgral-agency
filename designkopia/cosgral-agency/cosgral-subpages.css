@@ -955,6 +955,7 @@ html.reduce-motion .nav-overlay__char {
   padding: clamp(3rem, 8vh, 5rem) var(--gutter);
   border-top: 1px solid var(--border);
   text-align: center;
+  background: linear-gradient(180deg, rgba(3, 3, 3, 0.35) 0%, rgba(3, 3, 3, 0.72) 55%, rgba(3, 3, 3, 0.85) 100%);
 }
 .portfolio-contact-cta__inner {
   display: flex;
@@ -963,6 +964,11 @@ html.reduce-motion .nav-overlay__char {
   gap: 0.85rem;
   max-width: 36rem;
   margin: 0 auto;
+  padding: 1.25rem 1rem;
+  border-radius: 4px;
+  background: rgba(8, 8, 8, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .portfolio-contact-cta__title {
   font-family: var(--font-display);
@@ -1637,6 +1643,7 @@ body.is-grafiki-light #grafiki .graphics-collage__cta:hover {
   overflow: visible;
   align-items: flex-start;
   padding: clamp(1.25rem, 3vh, 2.25rem) 0 clamp(3.5rem, 9vh, 5.5rem);
+  background: linear-gradient(180deg, rgba(3, 3, 3, 0.2) 0%, rgba(3, 3, 3, 0.55) 40%, rgba(3, 3, 3, 0.35) 100%);
 }
 .portfolio-section--automatyzacje .portfolio-scene__panel {
   position: relative;
@@ -1666,9 +1673,11 @@ body.is-grafiki-light #grafiki .graphics-collage__cta:hover {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(10, 10, 10, 0.92);
   overflow: hidden;
   min-height: 100%;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 .portfolio-case-card__preview {
   position: relative;
