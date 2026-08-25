@@ -17,7 +17,7 @@
 <meta name="description" content="cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260825m" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260825n" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
 <script>
@@ -141,7 +141,7 @@
     <h1 class="home-hero__title" aria-label="COSGRAL">
       <span class="home-hero__letter">C</span><span class="home-hero__letter">O</span><span class="home-hero__letter">S</span><span class="home-hero__letter">G</span><span class="home-hero__letter">R</span><span class="home-hero__letter">A</span><span class="home-hero__letter">L</span>
     </h1>
-    <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">WE BUILD DIGITAL EXPERIENCES</p>
+    <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">Tworzymy cyfrowe doświadczenia</p>
   </div>
   <a href="#rozpad" class="home-hero__scroll">
     <span class="home-hero__scroll-line" aria-hidden="true"></span>
@@ -190,7 +190,7 @@
     <div class="services-fan__carousel" data-services-fan>
       <button type="button" class="services-fan__card" data-service-theme="blue" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="metadata" src="assets/stock/hero-abstract.mp4"></video>
+          <video muted loop playsinline preload="none" data-fan-video-src="assets/stock/hero-abstract.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
           <div class="services-fan__card-liquid"></div>
         </div>
@@ -199,7 +199,7 @@
       </button>
       <button type="button" class="services-fan__card" data-service-theme="purple" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="metadata" src="assets/services/aplikacje.mp4"></video>
+          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/aplikacje.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
           <div class="services-fan__card-liquid"></div>
         </div>
@@ -208,7 +208,7 @@
       </button>
       <button type="button" class="services-fan__card" data-service-theme="gold" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="metadata" src="assets/services/pozycjonowanie-seo.mp4"></video>
+          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/pozycjonowanie-seo.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
           <div class="services-fan__card-liquid"></div>
         </div>
@@ -217,7 +217,7 @@
       </button>
       <button type="button" class="services-fan__card" data-service-theme="orange" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="metadata" src="assets/services/automatyzacje.mp4"></video>
+          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/automatyzacje.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
           <div class="services-fan__card-liquid"></div>
         </div>
@@ -226,7 +226,7 @@
       </button>
       <button type="button" class="services-fan__card" data-service-theme="crimson" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="metadata" src="assets/services/crm.mp4"></video>
+          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/crm.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
           <div class="services-fan__card-liquid"></div>
         </div>
@@ -235,7 +235,7 @@
       </button>
       <button type="button" class="services-fan__card" data-service-theme="green" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="metadata" src="assets/services/grafika-montaz.mp4"></video>
+          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/grafika-montaz.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
           <div class="services-fan__card-liquid"></div>
         </div>
@@ -272,7 +272,7 @@
       </div>
       <div class="home-work__card-body">
         <span class="home-work__card-tag" data-i18n="bento.montaz">Montaż wideo</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Case study</span>
+        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
       </div>
     </a>
     <a class="home-work__card" href="portfolio.html#grafiki" data-tile-interact>
@@ -281,7 +281,7 @@
       </div>
       <div class="home-work__card-body">
         <span class="home-work__card-tag" data-i18n="bento.grafiki">Grafiki &amp; social</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Case study</span>
+        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
       </div>
     </a>
     <a class="home-work__card" href="portfolio.html#automatyzacje" data-tile-interact>
@@ -290,7 +290,7 @@
       </div>
       <div class="home-work__card-body">
         <span class="home-work__card-tag" data-i18n="work.card_automation">Systemy i automatyzacje</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Case study</span>
+        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
       </div>
     </a>
   </div>
@@ -314,28 +314,28 @@
       <span class="home-process__num">01</span>
       <div>
         <h3 class="home-process__step-title" data-i18n="process.step1_title">Audyt i analiza</h3>
-        <p class="home-process__step-body" data-i18n="process.step1_body">Diagnozujemy wąskie gardła w Twojej firmie.</p>
+        <p class="home-process__step-body" data-i18n="process.step1_body">Diagnozujemy wąskie gardła, cele i priorytety — żeby wiedzieć, co naprawdę warto zbudować.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="right">
       <span class="home-process__num">02</span>
       <div>
         <h3 class="home-process__step-title" data-i18n="process.step2_title">Strategia i architektura</h3>
-        <p class="home-process__step-body" data-i18n="process.step2_body">Dobieramy narzędzia i projektujemy przepływ pracy.</p>
+        <p class="home-process__step-body" data-i18n="process.step2_body">Dobieramy narzędzia, mapujemy przepływ pracy i ustalamy zakres przed startem kodu.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="left">
       <span class="home-process__num">03</span>
       <div>
         <h3 class="home-process__step-title" data-i18n="process.step3_title">Wdrożenie i rozwój</h3>
-        <p class="home-process__step-body" data-i18n="process.step3_body">Budujemy, kodujemy i integrujemy ekosystem.</p>
+        <p class="home-process__step-body" data-i18n="process.step3_body">Budujemy, integrujemy i testujemy — z regularnymi podglądami, nie z niespodzianką na finiszu.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="bottom">
       <span class="home-process__num">04</span>
       <div>
         <h3 class="home-process__step-title" data-i18n="process.step4_title">Optymalizacja i wsparcie</h3>
-        <p class="home-process__step-body" data-i18n="process.step4_body">Szkolimy i dbamy o bezawaryjne działanie.</p>
+        <p class="home-process__step-body" data-i18n="process.step4_body">Szkolimy zespół i zostajemy na wsparciu, żeby system działał spokojnie na co dzień.</p>
       </div>
     </div>
   </div>
@@ -351,7 +351,7 @@
       <span data-i18n="faq.q1">Ile kosztuje wdrożenie CRM lub nowej strony?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
     </button>
-    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a1">Zależy od skali projektu. Wycenę dostajesz po audycie — bez ukrytych kosztów.</p></div></div>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a1">Zależy od skali: landing, strona firmowa, CRM czy automatyzacja to inne zakresy. Po krótkim audycie dostajesz jasną wycenę i plan — bez ukrytych kosztów.</p></div></div>
   </div>
   <div class="faq-item" data-open="false" data-enter="right">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
@@ -385,8 +385,8 @@
     </div>
     <div class="home-contact__content" data-contact-content>
       <h2 class="home-contact__title" data-reveal-words data-i18n="contact.call_title">Kontakt</h2>
-      <p class="home-contact__lead" data-enter="right" data-i18n="contact.call_lead">Zadzwoń, lub zostaw nam wiadomość o Sobie</p>
-      <p class="home-contact__social-label" data-enter="bottom" data-i18n="contact.social_label">jesteśmy też na social mediach</p>
+      <p class="home-contact__lead" data-enter="right" data-i18n="contact.call_lead">Zadzwoń lub zostaw nam wiadomość o sobie</p>
+      <p class="home-contact__social-label" data-enter="bottom" data-i18n="contact.social_label">Jesteśmy też na social mediach</p>
       <div class="home-contact__social footer-social" role="list" data-enter="bottom">
         <a class="footer-social__link" href="https://www.facebook.com/people/cosgralagency/61591582027536/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" data-no-transition>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.027 4.388 11.026 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.099 24 18.1 24 12.073z"/></svg>
@@ -496,21 +496,21 @@
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="i18n.js?v=20260825e"></script>
+<script src="i18n.js?v=20260825n"></script>
 <script src="preloader.js?v=20260814e"></script>
 <script src="smooth-scroll.js?v=20260810g"></script>
 <script src="home-cursor-field.js?v=20260824c"></script>
-<script src="home-ambient-bg.js?v=20260814e"></script>
-<script type="module" src="home-hero-3d.js?v=20260816at"></script>
+<script src="home-ambient-bg.js?v=20260825n"></script>
+<script type="module" src="home-hero-3d.js?v=20260825n"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
-<script src="home-services-fan.js?v=20260825d"></script>
+<script src="home-services-fan.js?v=20260825n"></script>
 <script src="home-section-flow.js?v=20260816f"></script>
-<script src="home-scroll-rail.js?v=20260825m"></script>
-<script src="home-section-stepper.js?v=20260825m"></script>
+<script src="home-scroll-rail.js?v=20260825n"></script>
+<script src="home-section-stepper.js?v=20260825n"></script>
 <script src="home-director.js?v=20260815a"></script>
-<script src="home-tile-interact.js?v=20260824c"></script>
+<script src="home-tile-interact.js?v=20260825n"></script>
 <script defer src="home-nav-menu.js?v=20260816at"></script>
 </body>
 </html>

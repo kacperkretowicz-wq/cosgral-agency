@@ -83,12 +83,12 @@
   function frame(now) {
     if (!running) return;
 
-    if (MOBILE) {
-      frameSkip += 1;
-      if (frameSkip % 2 !== 0) {
-        requestAnimationFrame(frame);
-        return;
-      }
+    var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
+    var skipN = sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1;
+    frameSkip += 1;
+    if (skipN > 1 && frameSkip % skipN !== 0) {
+      requestAnimationFrame(frame);
+      return;
     }
 
     resize();

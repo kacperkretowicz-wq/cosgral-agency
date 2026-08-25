@@ -137,6 +137,14 @@
     return { x: home.x * 1.35, y: home.y * 1.3, scale: 0.1, rot: home.rot, opacity: 0, z: 1 };
   }
 
+  function ensureVideoSrc(video) {
+    if (!video || video.getAttribute("src")) return;
+    var src = video.getAttribute("data-fan-video-src");
+    if (!src) return;
+    video.setAttribute("src", src);
+    video.load();
+  }
+
   function layout(position) {
     var activeIndex = ((Math.round(wrapPos(position)) % total) + total) % total;
 
@@ -154,7 +162,7 @@
         t.rot.toFixed(2) + "deg) scale(" +
         t.scale.toFixed(3) + ")";
       card.style.opacity = String(clamp(t.opacity, 0, 1));
-      card.style.filter = i === activeIndex ? "none" : "brightness(0.55) saturate(0.7)";
+      card.style.filter = "";
 
       var isActive = i === activeIndex;
       card.classList.toggle("is-active", isActive);
@@ -165,8 +173,10 @@
 
       var video = card.querySelector("video");
       if (video) {
-        if (isActive) video.play().catch(function () {});
-        else video.pause();
+        if (isActive) {
+          ensureVideoSrc(video);
+          video.play().catch(function () {});
+        } else video.pause();
       }
     });
 
@@ -250,6 +260,7 @@
     var wrapped = ((nextIndex % total) + total) % total;
     if (wrapped === index && Math.abs(shortestDelta(displayPos, wrapped)) < 0.05) return;
     targetPos = wrapped;
+    scheduleTick();
   }
 
   function next() {
@@ -260,13 +271,24 @@
     goTo(index - 1);
   }
 
+  var ticking = false;
+  function scheduleTick() {
+    if (ticking || REDUCED) return;
+    ticking = true;
+    requestAnimationFrame(tick);
+  }
+
   function tick() {
+    ticking = false;
     var delta = shortestDelta(displayPos, targetPos);
     if (Math.abs(delta) > 0.01) {
       displayPos = wrapPos(displayPos + delta * LERP);
       layout(displayPos);
+      scheduleTick();
+    } else if (Math.abs(delta) > 0.0005) {
+      displayPos = targetPos;
+      layout(displayPos);
     }
-    requestAnimationFrame(tick);
   }
 
   // ——— Nawigacja: cała sekcja Usługi — lewa połowa = prev, prawa = next ———
@@ -443,7 +465,25 @@
   }
 
   layout(0);
-  tick();
+  scheduleTick();
+
+  // Warm video sources once Usługi is near the viewport
+  if ("IntersectionObserver" in window) {
+    var warmIo = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          cards.forEach(function (card) {
+            ensureVideoSrc(card.querySelector("video"));
+          });
+          warmIo.disconnect();
+        });
+      },
+      { rootMargin: "40% 0px", threshold: 0.01 }
+    );
+    warmIo.observe(section);
+  }
+
 
   window.cosgralServicesFan = {
     goToIndex: function (nextIndex) {

@@ -955,21 +955,38 @@ html.reduce-motion .nav-overlay__char {
   padding: clamp(6.5rem, 16vh, 8.5rem) var(--gutter) clamp(1.5rem, 4vh, 2.5rem);
 }
 .about-hero.portfolio-hero {
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: auto;
+  padding-bottom: clamp(1.25rem, 3vh, 2rem);
 }
-.about-hero .portfolio-hero__title { margin-bottom: 0; }
+.about-hero .portfolio-hero__title { margin-bottom: 0.75rem; }
+.about-hero__lead {
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: center;
+  font-size: clamp(0.95rem, 2.2vw, 1.08rem);
+  line-height: 1.55;
+  color: var(--muted);
+}
+.about-hero__cta {
+  display: inline-flex;
+  margin-top: 1.35rem;
+  align-self: center;
+}
+.about-hero .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+.about-team {
+  padding: 0 var(--gutter) clamp(2.5rem, 8vh, 4.5rem);
+}
 .gallery-hero {
   padding: clamp(6.5rem, 16vh, 8.5rem) var(--gutter) clamp(1.5rem, 4vh, 2.5rem);
 }
 .gallery-hero.portfolio-hero {
   min-height: 100vh;
   min-height: 100dvh;
-}
-
-.about-team {
-  padding: 0 var(--gutter) clamp(4rem, 12vh, 7rem);
 }
 .about-team__grid {
   display: flex;
@@ -1021,6 +1038,43 @@ html.reduce-motion .nav-overlay__char {
   letter-spacing: 0.02em;
   line-height: 1.15;
   color: var(--ink);
+}
+.about-team__role {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.privacy-page .privacy-content {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(6.5rem, 14vh, 8rem) var(--gutter) clamp(3rem, 10vh, 6rem);
+}
+.privacy-page .privacy-content h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin-bottom: 0.5rem;
+}
+.privacy-page .privacy-content__updated {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+.privacy-page .privacy-content__intro {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 1.75rem;
+}
+.privacy-page .privacy-content h2 {
+  font-size: 1.05rem;
+  margin: 1.35rem 0 0.45rem;
+}
+.privacy-page .privacy-content p {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--muted);
 }
 
 .portfolio-hero {
@@ -1547,7 +1601,7 @@ body.is-grafiki-light #grafiki .graphics-collage__cta:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
-/* Systemy i Automatyzacje — kinowa scena (jak FAQ na homepage) */
+/* Systemy i Automatyzacje — kinowa scena + case cards */
 .portfolio-section--automatyzacje {
   min-height: 100vh;
   min-height: 100dvh;
@@ -1562,17 +1616,110 @@ body.is-grafiki-light #grafiki .graphics-collage__cta:hover {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   padding: clamp(0.85rem, 1.8vh, 1.35rem) 0 clamp(3rem, 8vh, 5rem);
   transform-origin: center center;
   will-change: transform, opacity, filter;
 }
 .portfolio-section--automatyzacje .portfolio-section__head {
-  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: clamp(1.25rem, 3.5vw, 2rem);
 }
 .portfolio-section--automatyzacje .portfolio-section__spacer {
   min-height: clamp(42vh, 58vh, 72vh);
   pointer-events: none;
+}
+.portfolio-case-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.85rem, 2.2vw, 1.35rem);
+}
+.portfolio-case-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  min-height: 100%;
+}
+.portfolio-case-card__preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(ellipse 70% 80% at 20% 80%, rgba(255, 255, 255, 0.1), transparent 55%),
+    linear-gradient(160deg, #121212 0%, #070707 100%);
+}
+.portfolio-case-card--crm .portfolio-case-card__preview {
+  background:
+    radial-gradient(ellipse 65% 70% at 78% 20%, rgba(255, 255, 255, 0.09), transparent 52%),
+    linear-gradient(155deg, #141414 0%, #080808 100%);
+}
+.portfolio-case-card--bot .portfolio-case-card__preview {
+  background:
+    radial-gradient(ellipse 60% 65% at 50% 30%, rgba(255, 255, 255, 0.08), transparent 50%),
+    linear-gradient(150deg, #101010 0%, #060606 100%);
+}
+.portfolio-case-card--flow .portfolio-case-card__preview {
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 25%, rgba(255, 255, 255, 0.07), transparent 48%),
+    linear-gradient(165deg, #131313 0%, #070707 100%);
+}
+.portfolio-case-card__glyph {
+  font-family: var(--font-mono);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.portfolio-case-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: clamp(0.85rem, 2vw, 1.15rem);
+}
+.portfolio-case-card__tag {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.portfolio-case-card__client {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.02em;
+}
+.portfolio-case-card__title {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.portfolio-case-card__desc {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .portfolio-case-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .portfolio-section--automatyzacje .portfolio-scene__panel {
+    justify-content: flex-start;
+    padding-top: clamp(1rem, 3vh, 1.75rem);
+    padding-bottom: clamp(2rem, 6vh, 3.5rem);
+  }
+  .portfolio-case-card__preview {
+    aspect-ratio: 2.2 / 1;
+  }
+  .portfolio-case-card__desc {
+    font-size: 0.76rem;
+  }
 }
 html.reduce-motion .portfolio-scene__panel {
   opacity: 1 !important;

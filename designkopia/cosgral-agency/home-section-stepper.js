@@ -276,7 +276,7 @@
       });
 
       if (fromPanel && toPanel && fromPanel !== toPanel) {
-        tl.to(fromPanel, { autoAlpha: 0, filter: "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
+        tl.to(fromPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
       }
       if (curtain) {
         tl.to(curtain, { autoAlpha: 0.88, duration: 0.38, ease: "power2.in" }, 0);
@@ -293,13 +293,13 @@
         if (toPanel) {
           var scene = toPanel.closest(".home-scene");
           if (scene) scene.classList.add("is-entered", "is-visible");
-          gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: "blur(0px)", y: 0 });
+          gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0 });
         }
       }, 0.4);
 
       if (toPanel) {
-        gsap.set(toPanel, { autoAlpha: 0, filter: "blur(12px)" });
-        tl.to(toPanel, { autoAlpha: 1, filter: "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.44);
+        gsap.set(toPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(12px)" });
+        tl.to(toPanel, { autoAlpha: 1, filter: MOBILE ? "none" : "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.44);
       }
       if (curtain) {
         tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);

@@ -143,6 +143,10 @@ main.home-film > .home-scene {
   transform-style: preserve-3d;
   perspective: 1200px;
   transform-origin: center center;
+}
+.home-scene.is-visible .home-scene__panel,
+.home-scene.is-in-view .home-scene__panel,
+.home-scene.is-entered .home-scene__panel {
   will-change: transform, opacity, filter;
 }
 html.reduce-motion .home-scene__panel {
@@ -2446,6 +2450,11 @@ html.has-global-tilt:not(.reduce-motion) .home-scroll-rail {
 html.has-global-tilt:not(.reduce-motion) body.home-page .home-scene.is-in-view > .home-scene__panel > * {
   transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
   transform-origin: 50vw 50vh;
+}
+@media (max-width: 900px) {
+  html.has-global-tilt:not(.reduce-motion) body.home-page .home-scene.is-in-view > .home-scene__panel > * {
+    transform: none;
+  }
 }
 
 body.is-nav-menu-open.is-cube-menu-front .nav-overlay__list a {

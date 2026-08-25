@@ -13,7 +13,7 @@
     for (var i = 0; i < scripts.length; i++) {
       var src = scripts[i].getAttribute("src") || "";
       if (src.indexOf("i18n.js") !== -1) {
-        return src.replace(/i18n\.js(\?.*)?$/, "i18n/copy.json");
+        return src.replace(/i18n\.js(\?.*)?$/, "i18n/copy.json$1");
       }
     }
     return "i18n/copy.json";
