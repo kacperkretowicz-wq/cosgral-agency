@@ -207,5 +207,16 @@
     },
   };
 
+  function getContent(id, lang) {
+    var entry = DATA[id];
+    if (!entry) return null;
+    return entry[lang] || entry.pl || null;
+  }
+
+  window.cosgralServicesContent = {
+    get: getContent,
+    all: DATA,
+  };
+
   window.COSGRAL_SERVICES = DATA;
 })();
