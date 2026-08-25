@@ -65,8 +65,8 @@
       "en": "Selected work"
     },
     "title": {
-      "pl": "Sygnatury, które wysłaliśmy w świat.",
-      "en": "Signatures we've sent into the world."
+      "pl": "Wybrane realizacje",
+      "en": "Selected work"
     },
     "visit": {
       "pl": "Zobacz live",
@@ -78,8 +78,8 @@
       "en": "Systems & automation"
     },
     "bentoLead": {
-      "pl": "Montaż, produkty cyfrowe i kreacja — w jednej sygnaturze.",
-      "en": "Video, digital products and creative — one signature."
+      "pl": "Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.",
+      "en": "Video editing, digital products and creative — in one portfolio."
     },
     "caseStudy": { "pl": "Zobacz realizacje", "en": "View work" },
     "featured": { "pl": "Wyróżnione", "en": "Featured" },
@@ -138,8 +138,8 @@
       "en": "FAQ"
     },
     "title": {
-      "pl": "Pytania, które i tak zadasz",
-      "en": "Questions you'll ask anyway"
+      "pl": "Najczęstsze pytania",
+      "en": "Frequently asked questions"
     },
     "q1": { "pl": "Ile kosztuje wdrożenie CRM lub nowej strony?", "en": "How much does a CRM or new website cost?" },
     "a1": { "pl": "Zależy od skali: landing, strona firmowa, CRM czy automatyzacja to inne zakresy. Po krótkim audycie dostajesz jasną wycenę i plan — bez ukrytych kosztów.", "en": "It depends on scope: a landing page, company site, CRM or automation are different ranges. After a short audit you get a clear quote and plan — no hidden fees." },
@@ -170,8 +170,8 @@
       "en": "Send"
     },
     "placeholder_message": {
-      "pl": "Cześć! Opowiedz nam o swoim projekcie…",
-      "en": "Hi! Tell us about your project…"
+      "pl": "Opisz krótko projekt, cele i termin — wrócimy z propozycją kolejnych kroków.",
+      "en": "Briefly describe the project, goals and timeline — we'll reply with next steps."
     },
     "placeholder_email": {
       "pl": "jan@firma.pl",
@@ -249,8 +249,8 @@
       "en": "Contact"
     },
     "call_lead": {
-      "pl": "Zadzwoń lub zostaw nam wiadomość o sobie",
-      "en": "Call us or leave a short message about your project"
+      "pl": "Zadzwoń lub napisz — odpowiadamy zwykle w ciągu jednego dnia roboczego.",
+      "en": "Call or write us — we usually reply within one business day."
     },
     "social_label": {
       "pl": "Jesteśmy też na social mediach",
@@ -272,25 +272,33 @@
         "en": "About us — cosgral.agency"
       },
       "description": {
-        "pl": "COSGRAL — agencja cyfrowa. Strony, aplikacje, CRM, automatyzacje, SEO i kreacja wideo.",
-        "en": "COSGRAL — digital agency. Websites, apps, CRM, automation, SEO and video creative."
+        "pl": "Poznaj zespół COSGRAL — Jakub Gral i Kacper Kosikowski. Programiści łączący frontend, design, aplikacje i systemy dla firm.",
+        "en": "Meet the COSGRAL team — Jakub Gral and Kacper Kosikowski. Engineers combining frontend, design, apps and systems for businesses."
       }
     },
     "title": {
-      "pl": "Kim jesteśmy?",
-      "en": "Who are we?"
+      "pl": "Kim jesteśmy",
+      "en": "Who we are"
     },
     "lead": {
-      "pl": "Jesteśmy dwuosobowym studio, które łączy produkt cyfrowy, systemy i kreację. Budujemy strony, aplikacje, CRM i automatyzacje tak, żeby klient od razu rozumiał, co dostaje — i po co.",
-      "en": "We are a two-person studio that combines digital product, systems and creative. We build websites, apps, CRM and automation so clients immediately understand what they get — and why."
+      "pl": "Jesteśmy dwuosobowym zespołem programistów łączącym inżynierię oprogramowania z designem i kreacją. Budujemy strony, aplikacje, CRM i automatyzacje — od architektury po wdrożenie i utrzymanie.",
+      "en": "We are a two-person team of engineers combining software development with design and creative. We build websites, apps, CRM and automation — from architecture through launch and ongoing support."
     },
     "role_jakub": {
-      "pl": "Produkt, design i rozwój",
-      "en": "Product, design & development"
+      "pl": "Frontend, design i automatyzacje",
+      "en": "Frontend, design & automation"
+    },
+    "bio_jakub": {
+      "pl": "Programista i projektant. W COSGRAL odpowiada za frontend, design, kreację, montaż wideo, grafikę oraz budowę aplikacji i automatyzacji dla firm. Wcześniej jako kierownik działu w firmie IT — dostarczającej oprogramowanie oraz serwis i helpdesk urządzeń — zautomatyzował łańcuch dostaw i na bieżąco rozwijał systemy CRM oraz intranet firmowy.",
+      "en": "Software engineer and designer. At COSGRAL he leads frontend, design, creative, video editing, graphics, plus building apps and automation for companies. Previously a department manager at an IT firm delivering software as well as device service and helpdesk — where he automated the supply chain and continuously improved CRM systems and the company intranet."
     },
     "role_kacper": {
-      "pl": "Systemy, automatyzacje i wzrost",
-      "en": "Systems, automation & growth"
+      "pl": "Aplikacje i systemy",
+      "en": "Applications & systems"
+    },
+    "bio_kacper": {
+      "pl": "Programista specjalizujący się w aplikacjach i systemach. Pracuje w korporacji zajmującej się rozwojem produktów cyfrowych; w COSGRAL projektuje i wdraża rozwiązania systemowe oraz aplikacje dopasowane do procesów klienta.",
+      "en": "Software engineer focused on applications and systems. He works at a corporation developing digital products; at COSGRAL he designs and ships system solutions and applications tailored to client workflows."
     },
     "cta": {
       "pl": "Porozmawiajmy o projekcie",
@@ -447,8 +455,8 @@
       "en": "Store panel & price monitoring"
     },
     "auto1_desc": {
-      "pl": "Aplikacja dla multi-kanałowego sprzedawcy fashion: stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznego sprawdzania — szybsza reakcja na dumping.",
-      "en": "An app for a multi-channel fashion seller: stock levels, marketplace price checks and markdown alerts. Less manual checking — faster reaction to undercutting."
+      "pl": "Aplikacja dla wielokanałowego sprzedawcy fashion: stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.",
+      "en": "An app for a multi-channel fashion seller: stock levels, marketplace price checks and markdown alerts. Less manual control — faster response to price changes."
     },
     "auto2_tag": { "pl": "CRM", "en": "CRM" },
     "auto2_client": { "pl": "Northline Studio", "en": "Northline Studio" },
@@ -457,8 +465,8 @@
       "en": "CRM for leads, deals & company ops"
     },
     "auto2_desc": {
-      "pl": "CRM dla zespołu B2B: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Nic nie ginie między handlowcami — sprzedaż ma porządek.",
-      "en": "A B2B team CRM: leads → deals → pipeline, notes, statuses and reminders in one place. Nothing gets lost between salespeople — the pipeline stays clear."
+      "pl": "CRM dla zespołu B2B: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów między handlowcami.",
+      "en": "A B2B team CRM: leads → deals → pipeline, notes, statuses and reminders in one place. Full contact history without leads getting lost between salespeople."
     },
     "auto3_tag": { "pl": "Automatyzacja", "en": "Automation" },
     "auto3_client": { "pl": "Atelier Bloom", "en": "Atelier Bloom" },
@@ -467,8 +475,8 @@
       "en": "AI chatbot for customer messages"
     },
     "auto3_desc": {
-      "pl": "Bot AI odpisujący na wiadomości z IG, FB i WWW — FAQ, godziny, wyceny wstępne i płynne przekazanie do człowieka. Pierwsza odpowiedź 24/7 bez copy-paste.",
-      "en": "An AI bot answering IG, FB and web messages — FAQ, hours, rough quotes and a clean handoff to a human. First reply 24/7 without copy-paste."
+      "pl": "Bot AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny, wstępne wyceny i płynne przekazanie do konsultanta. Pierwsza odpowiedź 24/7 bez ręcznego kopiowania treści.",
+      "en": "An AI bot answering Instagram, Facebook and web messages — FAQ, hours, rough quotes and a clean handoff to a consultant. First reply 24/7 without manual copy-paste."
     },
     "auto4_tag": { "pl": "Automatyzacja", "en": "Automation" },
     "auto4_client": { "pl": "Parcel & Co.", "en": "Parcel & Co." },
@@ -477,8 +485,8 @@
       "en": "Order → invoice → parcel status"
     },
     "auto4_desc": {
-      "pl": "Workflow e-commerce: nowe zamówienie uruchamia export pod fakturę, aktualizację statusu paczki i powiadomienie klienta (mail/Slack). Godziny tygodniowo mniej na klejenie Exceli.",
-      "en": "An e-commerce workflow: a new order triggers invoice-ready export, parcel status updates and a customer ping (email/Slack). Hours a week saved on spreadsheet glue."
+      "pl": "Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta (e-mail/Slack). Mniej ręcznej pracy przy obsłudze zamówień.",
+      "en": "An e-commerce workflow: a new order triggers invoice-ready export, parcel status updates and a customer notification (email/Slack). Less manual work in order operations."
     },
     "view_all": { "pl": "Zobacz wszystko →", "en": "View all →" },
     "view_site": { "pl": "Zobacz stronę →", "en": "View site →" },
