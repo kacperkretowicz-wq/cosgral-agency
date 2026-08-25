@@ -191,8 +191,7 @@ html[data-theme="light"] .home-process__num {
 html[data-theme="light"] .home-work__card,
 html[data-theme="light"] .services-fan__card,
 html[data-theme="light"] .portfolio-web-card,
-html[data-theme="light"] .reels-tiles__card,
-html[data-theme="light"] .home-process.home-scene .home-process__step {
+html[data-theme="light"] .reels-tiles__card {
   border-color: rgba(0, 0, 0, 0.12);
   background: rgba(255, 255, 255, 0.72);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
