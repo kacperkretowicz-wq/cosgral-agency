@@ -374,6 +374,10 @@
       "pl": "Jesteśmy dwuosobowym zespołem programistów łączącym inżynierię oprogramowania z designem i kreacją. Budujemy strony, aplikacje, CRM i automatyzacje — od architektury po wdrożenie i utrzymanie.",
       "en": "We are a two-person team of engineers combining software development with design and creative. We build websites, apps, CRM and automation — from architecture through launch and ongoing support."
     },
+    "scroll_hint": {
+      "pl": "Przewiń w dół",
+      "en": "Scroll down"
+    },
     "role_jakub": {
       "pl": "CEO & Founder",
       "en": "CEO & Founder"
@@ -473,6 +477,20 @@
     "s5_body": {
       "pl": "Masz prawo dostępu, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu oraz skargi do Prezesa UODO. W sprawach danych napisz na kontakt@cosgral.pl.",
       "en": "You have the right to access, rectify, erase, restrict processing, object, and lodge a complaint with the supervisory authority. For data requests email kontakt@cosgral.pl."
+    }
+  },
+  "theme": {
+    "toggle": {
+      "pl": "Motyw",
+      "en": "Theme"
+    },
+    "dark": {
+      "pl": "Tryb ciemny",
+      "en": "Dark mode"
+    },
+    "light": {
+      "pl": "Tryb jasny",
+      "en": "Light mode"
     }
   },
   "common": {

@@ -12,7 +12,16 @@
 <meta name="description" content="Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260825x" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260825z" />
+<link rel="stylesheet" href="theme-mode.css?v=20260825z" />
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("cosgral-theme");
+      if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+    } catch (e) {}
+  })();
+</script>
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
   (function () {
@@ -186,5 +195,6 @@
 <script src="portfolio-video.js?v=20260807ag"></script>
 <script src="portfolio-color-zone.js?v=20260814e"></script>
 <script src="portfolio-graphics.js?v=20260825p"></script>
+<script src="theme-mode.js?v=20260825z"></script>
 </body>
 </html>
