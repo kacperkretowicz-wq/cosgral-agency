@@ -2157,33 +2157,110 @@ html.reduce-motion .home-scroll-rail { display: none; }
   #realizacje.home-work.home-scene,
   #proces.home-process.home-scene {
     justify-content: flex-start;
-    padding-block: clamp(5.85rem, 13dvh, 7.35rem) clamp(3.25rem, 8dvh, 4.75rem);
+    padding-block: clamp(4.85rem, 11dvh, 5.65rem) clamp(1rem, 2.5dvh, 1.5rem);
+    overflow: hidden;
+  }
+
+  #proces.home-process.home-scene .home-scene__panel {
+    justify-content: flex-start;
+    gap: 0;
+    min-height: 0;
+  }
+
+  #proces .section-label {
+    margin-bottom: 0.3rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+  }
+
+  #proces .home-services__title {
+    font-size: clamp(1.45rem, 6.2vw, 1.85rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+
+  #proces .home-process__lead {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    line-height: 1.42;
+    max-width: 26rem;
+    text-wrap: pretty;
   }
 
   .home-process.home-scene .home-process__steps {
     display: grid;
-    grid-template-columns: 1fr;
-    column-gap: 0;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0.55rem;
+    row-gap: 0.55rem;
     max-width: none;
+    margin-top: 0.75rem;
   }
   .home-process.home-scene .home-process__step {
-    grid-template-columns: 2.75rem 1fr;
-    gap: 0.65rem;
-    padding: 0.95rem 0;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    padding: 0.62rem 0.58rem;
+    align-items: stretch;
+    border-bottom: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    min-height: 0;
   }
   .home-process__num {
-    font-size: clamp(1.35rem, 4.8vw, 1.85rem);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.72);
   }
   .home-process__step-title {
-    font-size: clamp(0.95rem, 3.1vw, 1.12rem);
-    margin-bottom: 0.35rem;
-    line-height: 1.2;
+    font-size: clamp(0.76rem, 2.8vw, 0.88rem);
+    margin-bottom: 0.15rem;
+    line-height: 1.18;
+    text-wrap: balance;
   }
   .home-process__step-body {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.72rem;
+    line-height: 1.42;
     max-width: none;
+    color: rgba(255, 255, 255, 0.78);
+    text-wrap: pretty;
+  }
+
+  html[data-theme="light"] .home-process.home-scene .home-process__step {
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.025);
+  }
+
+  html[data-theme="light"] .home-process__num,
+  html[data-theme="light"] .home-process__step-body {
+    color: rgba(0, 0, 0, 0.72);
+  }
+
+  @media (max-height: 760px) {
+    #proces.home-process.home-scene {
+      padding-block: clamp(4.35rem, 10dvh, 5rem) 0.85rem;
+    }
+    #proces .home-services__title {
+      font-size: clamp(1.3rem, 5.8vw, 1.55rem);
+    }
+    #proces .home-process__lead {
+      font-size: 0.74rem;
+      line-height: 1.38;
+    }
+    .home-process.home-scene .home-process__steps {
+      margin-top: 0.55rem;
+      row-gap: 0.45rem;
+      column-gap: 0.45rem;
+    }
+    .home-process.home-scene .home-process__step {
+      padding: 0.5rem 0.48rem;
+    }
+    .home-process__step-body {
+      font-size: 0.68rem;
+      line-height: 1.38;
+    }
   }
 
   .home-work .home-scene__panel {
