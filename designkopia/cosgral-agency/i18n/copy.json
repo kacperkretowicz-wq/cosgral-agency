@@ -34,10 +34,6 @@
       "pl": "FAQ",
       "en": "FAQ"
     },
-    "team": {
-      "pl": "Zespół",
-      "en": "Team"
-    },
     "contact": {
       "pl": "Kontakt",
       "en": "Contact"
@@ -58,49 +54,9 @@
       "pl": "Przewiń",
       "en": "Scroll"
     },
-    "act1_lead": {
-      "pl": "Twój biznes zasługuje na sygnał.",
-      "en": "Your business deserves the signal."
-    },
-    "act1_sub": {
-      "pl": "Strony, systemy, kreacja i wzrost — zaprojektowane jako jeden ekosystem.",
-      "en": "Websites, systems, creative and growth — designed as one ecosystem."
-    },
-    "act2_lead": {
-      "pl": "Tworzymy strony i produkty,<br />które wyglądają jak dzieła.",
-      "en": "We build websites and products<br />that feel like art."
-    },
-    "act3_lead": {
-      "pl": "Automatyzujemy ecommerce.<br />CRM, który pracuje za Ciebie.",
-      "en": "We automate ecommerce.<br />CRM that works for you."
-    },
-    "act4_lead": {
-      "pl": "Grafika. Montaż. Social.<br />Treści, które zatrzymują scroll.",
-      "en": "Design. Edit. Social.<br />Content that stops the scroll."
-    },
-    "act5_lead": {
-      "pl": "SEO, GEO, Meta Ads, Google Ads.<br />Wzrost mierzony danymi.",
-      "en": "SEO, GEO, Meta Ads, Google Ads.<br />Growth measured in data."
-    },
-    "act6_lead": {
-      "pl": "Zacznijmy od bezpłatnego audytu.",
-      "en": "Let's start with a free audit."
-    },
-    "act4_sub": {
-      "pl": "Pozwól technologii pracować za Ciebie, podczas gdy Ty skupisz się na biznesie.",
-      "en": "Let technology work for you while you focus on the business."
-    },
     "monopo_tagline": {
       "pl": "Tworzymy cyfrowe doświadczenia",
       "en": "We build digital experiences"
-    },
-    "monopo_eyebrow": {
-      "pl": "Agencja kreatywna oparta na designie",
-      "en": "Design-led creative agency"
-    },
-    "watchReel": {
-      "pl": "Obejrzyj reel",
-      "en": "Watch reel"
     }
   },
   "work": {
@@ -112,27 +68,20 @@
       "pl": "Sygnatury, które wysłaliśmy w świat.",
       "en": "Signatures we've sent into the world."
     },
-    "lead": {
-      "pl": "Marki, którym dostarczamy social, wideo i kreację — od briefu po publikację.",
-      "en": "Brands we deliver social, video and creative for — from brief to publish."
-    },
     "visit": {
       "pl": "Zobacz live",
       "en": "View live"
     },
-    "visualTitle": { "pl": "Wybrane sygnatury.", "en": "Selected signatures." },
     "fullPortfolio": { "pl": "Pełne portfolio", "en": "Discover all projects" },
     "card_automation": {
       "pl": "Systemy i automatyzacje",
       "en": "Systems & automation"
     },
-    "bentoTitle": { "pl": "Recent work", "en": "Recent work" },
     "bentoLead": {
       "pl": "Montaż, produkty cyfrowe i kreacja — w jednej sygnaturze.",
       "en": "Video, digital products and creative — one signature."
     },
     "caseStudy": { "pl": "Zobacz realizacje", "en": "View work" },
-    "viewWork": { "pl": "Zobacz realizacje", "en": "View work" },
     "featured": { "pl": "Wyróżnione", "en": "Featured" },
     "statsLabel": { "pl": "zaufali nam", "en": "trusted us" }
   },
@@ -199,20 +148,6 @@
     "q3": { "pl": "Czy muszę znać się na technologii?", "en": "Do I need to be tech-savvy?" },
     "a3": { "pl": "Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje prostym językiem.", "en": "No — we handle the technical side. We explain decisions in plain language." }
   },
-  "team": {
-    "title": {
-      "pl": "Zespół cosgral.agency",
-      "en": "The cosgral.agency team"
-    },
-    "decor1": {
-      "pl": "Kod, kadr",
-      "en": "Code, frame"
-    },
-    "decor2": {
-      "pl": "i motion w jednym studio",
-      "en": "and motion in one studio"
-    }
-  },
   "form": {
     "name": {
       "pl": "Imię",
@@ -237,6 +172,10 @@
     "placeholder_message": {
       "pl": "Cześć! Opowiedz nam o swoim projekcie…",
       "en": "Hi! Tell us about your project…"
+    },
+    "placeholder_email": {
+      "pl": "jan@firma.pl",
+      "en": "you@company.com"
     },
     "error_email": {
       "pl": "Podaj adres email.",
@@ -453,6 +392,10 @@
     "hero_lead": {
       "pl": "Zobacz, co tworzymy i co możemy stworzyć wspólnie",
       "en": "See what we build and what we can create together"
+    },
+    "cta_lead": {
+      "pl": "Masz podobny brief? Napisz — wrócimy z jasnym planem i wyceną.",
+      "en": "Got a similar brief? Write us — we'll come back with a clear plan and quote."
     },
     "web_title": { "pl": "Strony internetowe", "en": "Websites" },
     "web_lead": {

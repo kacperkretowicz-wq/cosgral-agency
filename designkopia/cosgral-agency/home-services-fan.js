@@ -282,12 +282,16 @@
     ticking = false;
     var delta = shortestDelta(displayPos, targetPos);
     if (Math.abs(delta) > 0.01) {
+      fan.classList.add("is-animating");
       displayPos = wrapPos(displayPos + delta * LERP);
       layout(displayPos);
       scheduleTick();
     } else if (Math.abs(delta) > 0.0005) {
       displayPos = targetPos;
       layout(displayPos);
+      fan.classList.remove("is-animating");
+    } else {
+      fan.classList.remove("is-animating");
     }
   }
 

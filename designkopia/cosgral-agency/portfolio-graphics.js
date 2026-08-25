@@ -519,13 +519,14 @@
       gsap.killTweensOf(targets);
       if (overlay) overlay.classList.remove("is-overlay-hidden");
       var nostalgic = opts.nostalgic === true;
+      var mobileBlurOff = window.matchMedia("(max-width: 900px)").matches;
       gsap.fromTo(
         targets,
-        { autoAlpha: 0, y: nostalgic ? 32 : 14, filter: nostalgic ? "blur(16px)" : "blur(8px)" },
+        { autoAlpha: 0, y: nostalgic ? 32 : 14, filter: mobileBlurOff ? "none" : nostalgic ? "blur(16px)" : "blur(8px)" },
         {
           autoAlpha: 1,
           y: 0,
-          filter: "blur(0px)",
+          filter: "none",
           duration: nostalgic ? 1.75 : 0.42,
           delay: nostalgic ? 0.18 : 0,
           ease: nostalgic ? "sine.inOut" : "power2.out",
@@ -637,11 +638,11 @@
       if (visible) {
         gsap.fromTo(
           overlayCta,
-          { autoAlpha: 0, y: 18, filter: "blur(8px)" },
+          { autoAlpha: 0, y: 18, filter: window.matchMedia("(max-width: 900px)").matches ? "none" : "blur(8px)" },
           {
             autoAlpha: 1,
             y: 0,
-            filter: "blur(0px)",
+            filter: "none",
             duration: 0.42,
             delay: 0,
             ease: "power2.out",
@@ -685,13 +686,14 @@
       if (visible) {
         if (overlay) overlay.classList.remove("is-overlay-hidden");
         var nostalgic = opts.nostalgic === true;
+        var mobileBlurOff = window.matchMedia("(max-width: 900px)").matches;
         gsap.fromTo(
           targets,
-          { autoAlpha: 0, y: nostalgic ? 32 : 12, filter: nostalgic ? "blur(16px)" : "blur(6px)" },
+          { autoAlpha: 0, y: nostalgic ? 32 : 12, filter: mobileBlurOff ? "none" : nostalgic ? "blur(16px)" : "blur(6px)" },
           {
             autoAlpha: 1,
             y: 0,
-            filter: "blur(0px)",
+            filter: "none",
             duration: nostalgic ? 1.75 : 0.29,
             delay: nostalgic ? 0.18 : 0.04,
             ease: nostalgic ? "sine.inOut" : "power2.out",
@@ -704,7 +706,7 @@
         gsap.to(targets, {
           autoAlpha: 0,
           y: -14,
-          filter: "blur(8px)",
+          filter: window.matchMedia("(max-width: 900px)").matches ? "none" : "blur(8px)",
           duration: 0.42,
           ease: "power2.in",
           overwrite: true,

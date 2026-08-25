@@ -35,8 +35,8 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var lenis = new Lenis({
-    lerp: 0.08,
-    duration: 1.2,
+    lerp: MOBILE ? 0.14 : 0.08,
+    duration: MOBILE ? 0.95 : 1.2,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: false,
     smoothTouch: false,
@@ -69,9 +69,10 @@
   gsap.ticker.add(function (time) {
     lenis.raf(time * 1000);
   });
-  gsap.ticker.lagSmoothing(0);
+  /* Allow mild catch-up on mobile under GPU load; keep tight on desktop */
+  gsap.ticker.lagSmoothing(MOBILE ? 500 : 0);
 
-  var SECTION_IDS = ["top", "rozpad", "uslugi", "proces", "faq", "kontakt"];
+  var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "proces", "faq", "kontakt"];
 
   document.querySelectorAll('a[href^="#"]').forEach(function (link) {
     link.addEventListener("click", function (e) {

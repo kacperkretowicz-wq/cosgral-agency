@@ -98,6 +98,12 @@ body.home-page::after {
   opacity: 0.55;
   mix-blend-mode: screen;
 }
+@media (max-width: 900px) {
+  .home-ambient__blur {
+    filter: blur(24px);
+    opacity: 0.4;
+  }
+}
 .home-ambient__shade {
   position: fixed;
   inset: 0;
@@ -287,6 +293,11 @@ html.is-shattering .home-cube-portal {
   display: block;
 }
 .home-scene [data-enter] {
+  will-change: auto;
+}
+.home-scene.is-visible [data-enter],
+.home-scene.is-in-view [data-enter],
+.home-scene.is-entered [data-enter] {
   will-change: transform, opacity, filter;
 }
 html.reduce-motion .home-scene [data-enter] {
@@ -982,7 +993,6 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: var(--bg-card);
   overflow: hidden;
-  will-change: transform, opacity;
   pointer-events: auto;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
   --lx: 50%;
@@ -1006,8 +1016,11 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   z-index: 0;
   overflow: hidden;
   transition: transform 0.25s var(--ease);
-  will-change: transform;
   transform-style: preserve-3d;
+}
+.services-fan__card.is-active .services-fan__card-media,
+.services-fan.is-animating .services-fan__card-media {
+  will-change: transform;
 }
 .services-fan__card-media video {
   width: 100%;

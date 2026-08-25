@@ -273,14 +273,14 @@
             opacity: 0,
             y: i % 2 === 0 ? 72 : -56,
             x: i % 2 === 0 ? -36 : 36,
-            filter: "blur(12px)",
+            filter: MOBILE ? "none" : "blur(12px)",
             rotateZ: i % 2 === 0 ? -2 : 2,
           },
           {
             opacity: 1,
             y: 0,
             x: 0,
-            filter: "blur(0px)",
+            filter: MOBILE ? "none" : "blur(0px)",
             rotateZ: 0,
             stagger: 0.08,
             ease: "power3.out",
@@ -333,14 +333,14 @@
       bound = true;
       gsap.fromTo(
         nodes,
-        Object.assign({ opacity: 0, filter: "blur(8px)" }, opts.from),
+        Object.assign({ opacity: 0, filter: MOBILE ? "none" : "blur(8px)" }, opts.from),
         {
           opacity: 1,
           y: 0,
           x: 0,
           rotateZ: 0,
           scale: 1,
-          filter: "blur(0px)",
+          filter: MOBILE ? "none" : "blur(0px)",
           stagger: opts.stagger || 0.08,
           ease: "power3.out",
           scrollTrigger: {

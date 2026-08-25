@@ -949,8 +949,38 @@ html.reduce-motion .nav-overlay__char {
 .footer-bottom a:hover,
 .footer-bottom a:focus-visible { color: var(--ink); }
 
-/* Portfolio */
-.portfolio-page { color: var(--ink); }
+.portfolio-contact-cta {
+  position: relative;
+  z-index: 2;
+  padding: clamp(3rem, 8vh, 5rem) var(--gutter);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.portfolio-contact-cta__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+.portfolio-contact-cta__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 1.9rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.portfolio-contact-cta__lead {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+}
+.portfolio-contact-cta .glass-btn {
+  margin-top: 0.35rem;
+}
 .about-hero {
   padding: clamp(6.5rem, 16vh, 8.5rem) var(--gutter) clamp(1.5rem, 4vh, 2.5rem);
 }
@@ -2121,6 +2151,12 @@ body.is-lightbox-open {
   --tile-blur: 0;
   --tile-opacity: 1;
   --tile-z: 4;
+}
+@media (max-width: 900px) {
+  .reels-tiles__card--far,
+  .reels-tiles__card--mid {
+    --tile-blur: 0;
+  }
 }
 .reels-tiles__card:hover,
 .reels-tiles__card:focus-visible {
