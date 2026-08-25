@@ -58,13 +58,21 @@
     return st.start + (st.end - st.start) * hold;
   }
 
-  function isFanHorizontalWheel(e) {
+  function fanStageRect() {
     var stage = document.querySelector("[data-fan-stage]");
     var section = document.getElementById("uslugi");
-    if (!stage || !section || !section.classList.contains("is-in-view")) return false;
-    var rect = stage.getBoundingClientRect();
-    if (e.clientY < rect.top || e.clientY > rect.bottom) return false;
-    if (e.clientX < rect.left || e.clientX > rect.right) return false;
+    if (!stage || !section || !section.classList.contains("is-in-view")) return null;
+    return stage.getBoundingClientRect();
+  }
+
+  function pointInFanStage(x, y) {
+    var rect = fanStageRect();
+    if (!rect) return false;
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+  }
+
+  function isFanHorizontalWheel(e) {
+    if (!pointInFanStage(e.clientX, e.clientY)) return false;
     var dx = Math.abs(e.deltaX);
     var dy = Math.abs(e.deltaY);
     if (e.shiftKey && dy > dx) dx = dy;
@@ -105,6 +113,10 @@
     var WHEEL_END = 52;
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
+    // Mobile: dużo wyższy próg — inaczej swipe po kafelkach Usług od razu zmienia sekcję.
+    var TOUCH_STEP_MIN = MOBILE ? 92 : 28;
+    var TOUCH_FAN_STEP_MIN = 140;
+    var TOUCH_AXIS_LOCK_PX = 12;
     var HOLD_COOLDOWN_MS = 100;
     var SECTION_READY_MS = 1000;
     var SECTION_REACH_PX = 16;
@@ -468,18 +480,24 @@
       stepUp();
     }
 
+    var touchStartX = 0;
     var touchStartY = 0;
     var touchLastY = 0;
     var touchAccum = 0;
     var touchActive = false;
+    var touchAxis = null; // "x" | "y" | null
+    var touchOnFan = false;
 
     window.addEventListener(
       "touchstart",
       function (e) {
         if (!e.touches[0] || REDUCED || shouldIgnore()) return;
+        touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchLastY = touchStartY;
         touchAccum = 0;
+        touchAxis = null;
+        touchOnFan = pointInFanStage(touchStartX, touchStartY);
         touchActive = true;
       },
       { passive: true, capture: true }
@@ -489,7 +507,29 @@
       "touchmove",
       function (e) {
         if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
+        var x = e.touches[0].clientX;
         var y = e.touches[0].clientY;
+        var dx = x - touchStartX;
+        var dy = y - touchStartY;
+
+        if (!touchAxis) {
+          if (Math.abs(dx) < TOUCH_AXIS_LOCK_PX && Math.abs(dy) < TOUCH_AXIS_LOCK_PX) return;
+          // Na Usługach lekko faworyzuj gest poziomy (zmiana kafelka).
+          var xBias = touchOnFan ? 0.85 : 1.1;
+          touchAxis = Math.abs(dx) > Math.abs(dy) * xBias ? "x" : "y";
+        }
+
+        // Swipe w lewo/prawo po karuzeli — nie bierz do zmiany sekcji.
+        if (touchAxis === "x" && touchOnFan) {
+          touchAccum = 0;
+          return;
+        }
+        if (touchAxis === "x" && !touchOnFan) {
+          // Poziomy gest poza fanem — nie zmieniaj sekcji przypadkiem.
+          touchAccum = 0;
+          return;
+        }
+
         touchAccum += touchLastY - y;
         touchLastY = y;
         e.preventDefault();
@@ -504,18 +544,28 @@
         touchActive = false;
         if (REDUCED || shouldIgnore()) {
           touchAccum = 0;
+          touchAxis = null;
+          return;
+        }
+        if (touchAxis === "x") {
+          touchAccum = 0;
+          touchAxis = null;
           return;
         }
         if (!canStep()) {
           touchAccum = 0;
+          touchAxis = null;
           return;
         }
-        if (Math.abs(touchAccum) < WHEEL_MIN) {
+        var min = touchOnFan ? TOUCH_FAN_STEP_MIN : TOUCH_STEP_MIN;
+        if (Math.abs(touchAccum) < min) {
           touchAccum = 0;
+          touchAxis = null;
           return;
         }
         var dir = touchAccum > 0 ? 1 : -1;
         touchAccum = 0;
+        touchAxis = null;
         if (dir > 0) stepDown();
         else stepUp();
       },
@@ -527,6 +577,8 @@
       function () {
         touchActive = false;
         touchAccum = 0;
+        touchAxis = null;
+        touchOnFan = false;
       },
       { passive: true, capture: true }
     );

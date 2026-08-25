@@ -25,6 +25,10 @@
   var CENTER_SCALE = MOBILE ? 1.05 : 1.1;
   var touchStartX = 0;
   var touchStartY = 0;
+  var touchAxis = null;
+  var touchTracking = false;
+  var SWIPE_MIN_DX = MOBILE ? 36 : 40;
+  var SWIPE_AXIS_LOCK = 10;
   var hintHidden = false;
   var tapHintTimer = null;
   var tapHintVisible = false;
@@ -285,21 +289,60 @@
       if (!e.touches[0]) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      touchAxis = null;
+      touchTracking = true;
     },
     { passive: true }
   );
 
   stage.addEventListener(
+    "touchmove",
+    function (e) {
+      if (!touchTracking || !e.touches[0]) return;
+      var dx = e.touches[0].clientX - touchStartX;
+      var dy = e.touches[0].clientY - touchStartY;
+      if (!touchAxis) {
+        if (Math.abs(dx) < SWIPE_AXIS_LOCK && Math.abs(dy) < SWIPE_AXIS_LOCK) return;
+        // Lekko faworyzuj poziom — zmiana kafelka zamiast scrolla sekcji.
+        touchAxis = Math.abs(dx) > Math.abs(dy) * 0.85 ? "x" : "y";
+      }
+      if (touchAxis === "x") {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    { passive: false }
+  );
+
+  stage.addEventListener(
     "touchend",
     function (e) {
-      if (!e.changedTouches[0]) return;
+      if (!touchTracking || !e.changedTouches[0]) {
+        touchTracking = false;
+        touchAxis = null;
+        return;
+      }
       var dx = e.changedTouches[0].clientX - touchStartX;
       var dy = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+      var axis = touchAxis;
+      touchTracking = false;
+      touchAxis = null;
+      if (axis === "y") return;
+      if (Math.abs(dx) < SWIPE_MIN_DX) return;
+      if (axis !== "x" && Math.abs(dx) < Math.abs(dy)) return;
       hideHint();
       hideTapHint();
       if (dx < 0) next();
       else prev();
+    },
+    { passive: true }
+  );
+
+  stage.addEventListener(
+    "touchcancel",
+    function () {
+      touchTracking = false;
+      touchAxis = null;
     },
     { passive: true }
   );
