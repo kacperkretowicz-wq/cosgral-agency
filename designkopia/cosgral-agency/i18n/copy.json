@@ -1,12 +1,12 @@
 {
   "meta": {
     "title": {
-      "pl": "COSGRAL — strony, CRM, automatyzacje, SEO i kreacja",
-      "en": "COSGRAL — websites, CRM, automation, SEO and creative"
+      "pl": "COSGRAL — agencja cyfrowa | strony, aplikacje, CRM, automatyzacje",
+      "en": "COSGRAL — digital agency | websites, apps, CRM, automation"
     },
     "description": {
-      "pl": "cosgral.agency — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo. Budujemy cyfrowe produkty i ekosystemy dla firm.",
-      "en": "cosgral.agency — websites, apps, CRM, automation, SEO/GEO, design and video editing. We build digital products and ecosystems for businesses."
+      "pl": "COSGRAL — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo. Budujemy produkty cyfrowe i systemy dla firm.",
+      "en": "COSGRAL — websites, apps, CRM, automation, SEO/GEO, graphics and video editing. We build digital products and systems for businesses."
     }
   },
   "nav": {
@@ -55,8 +55,8 @@
       "en": "Scroll"
     },
     "monopo_tagline": {
-      "pl": "Tworzymy cyfrowe doświadczenia",
-      "en": "We build digital experiences"
+      "pl": "Projektujemy i wdrażamy produkty cyfrowe dla firm",
+      "en": "We design and ship digital products for businesses"
     }
   },
   "work": {
@@ -69,10 +69,13 @@
       "en": "Selected work"
     },
     "visit": {
-      "pl": "Zobacz live",
-      "en": "View live"
+      "pl": "Zobacz stronę",
+      "en": "View site"
     },
-    "fullPortfolio": { "pl": "Pełne portfolio", "en": "Discover all projects" },
+    "fullPortfolio": {
+      "pl": "Zobacz pełne portfolio",
+      "en": "View full portfolio"
+    },
     "card_automation": {
       "pl": "Systemy i automatyzacje",
       "en": "Systems & automation"
@@ -81,14 +84,32 @@
       "pl": "Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.",
       "en": "Video editing, digital products and creative — in one portfolio."
     },
-    "caseStudy": { "pl": "Zobacz realizacje", "en": "View work" },
-    "featured": { "pl": "Wyróżnione", "en": "Featured" },
-    "statsLabel": { "pl": "zaufali nam", "en": "trusted us" }
+    "caseStudy": {
+      "pl": "Zobacz realizacje",
+      "en": "View work"
+    },
+    "featured": {
+      "pl": "Wyróżnione",
+      "en": "Featured"
+    },
+    "statsLabel": {
+      "pl": "zaufali nam",
+      "en": "trusted us"
+    }
   },
   "bento": {
-    "montaz": { "pl": "Montaż wideo", "en": "Video editing" },
-    "grafiki": { "pl": "Grafiki & social", "en": "Graphics & social" },
-    "strony": { "pl": "Strony internetowe", "en": "Websites" }
+    "montaz": {
+      "pl": "Montaż wideo",
+      "en": "Video editing"
+    },
+    "grafiki": {
+      "pl": "Grafiki & social",
+      "en": "Graphics & social"
+    },
+    "strony": {
+      "pl": "Strony internetowe",
+      "en": "Websites"
+    }
   },
   "services": {
     "eyebrow": {
@@ -103,34 +124,76 @@
       "pl": "Przesuń w lewo lub prawo — touchpad, palec lub strzałki",
       "en": "Swipe left or right — touchpad, finger or arrow keys"
     },
-    "card1": { "pl": "Strony internetowe", "en": "Websites" },
-    "card2": { "pl": "Aplikacje", "en": "Applications" },
-    "card3": { "pl": "Pozycjonowanie SEO & GEO", "en": "SEO & GEO positioning" },
-    "card4": { "pl": "Automatyzacje", "en": "Automation" },
-    "card5": { "pl": "Systemy CRM", "en": "CRM systems" },
-    "card6": { "pl": "Grafika i montaż wideo", "en": "Graphics & video editing" }
+    "card1": {
+      "pl": "Strony internetowe",
+      "en": "Websites"
+    },
+    "card2": {
+      "pl": "Aplikacje",
+      "en": "Applications"
+    },
+    "card3": {
+      "pl": "Pozycjonowanie SEO & GEO",
+      "en": "SEO & GEO positioning"
+    },
+    "card4": {
+      "pl": "Automatyzacje",
+      "en": "Automation"
+    },
+    "card5": {
+      "pl": "Systemy CRM",
+      "en": "CRM systems"
+    },
+    "card6": {
+      "pl": "Grafika i montaż wideo",
+      "en": "Graphics & video editing"
+    }
   },
   "process": {
     "eyebrow": {
-      "pl": "Jak pracujemy?",
+      "pl": "Jak pracujemy",
       "en": "How we work"
     },
     "title": {
-      "pl": "Transparentny proces",
-      "en": "Transparent process"
+      "pl": "Proces współpracy",
+      "en": "How collaboration works"
     },
     "lead": {
-      "pl": "Od audytu po wdrożenie — bez niedomówień.",
-      "en": "From audit to launch — no guesswork."
+      "pl": "Od audytu po wdrożenie — jasny zakres, terminy i odpowiedzialności.",
+      "en": "From audit to launch — clear scope, timelines and ownership."
     },
-    "step1_title": { "pl": "Audyt i analiza", "en": "Audit & analysis" },
-    "step1_body": { "pl": "Diagnozujemy wąskie gardła, cele i priorytety — żeby wiedzieć, co naprawdę warto zbudować.", "en": "We diagnose bottlenecks, goals and priorities — so we know what is actually worth building." },
-    "step2_title": { "pl": "Strategia i architektura", "en": "Strategy & architecture" },
-    "step2_body": { "pl": "Dobieramy narzędzia, mapujemy przepływ pracy i ustalamy zakres przed startem kodu.", "en": "We select tools, map the workflow and lock scope before any code starts." },
-    "step3_title": { "pl": "Wdrożenie i rozwój", "en": "Implementation & development" },
-    "step3_body": { "pl": "Budujemy, integrujemy i testujemy — z regularnymi podglądami, nie z niespodzianką na finiszu.", "en": "We build, integrate and test — with regular previews, not a surprise at the finish line." },
-    "step4_title": { "pl": "Optymalizacja i wsparcie", "en": "Optimization & support" },
-    "step4_body": { "pl": "Szkolimy zespół i zostajemy na wsparciu, żeby system działał spokojnie na co dzień.", "en": "We train your team and stay on support so the system runs calmly day to day." }
+    "step1_title": {
+      "pl": "Audyt i analiza",
+      "en": "Audit & analysis"
+    },
+    "step1_body": {
+      "pl": "Analizujemy cele biznesowe, procesy i ograniczenia, aby dobrać zakres, który realnie wspiera sprzedaż i operacje.",
+      "en": "We analyze business goals, processes and constraints to define a scope that actually supports sales and operations."
+    },
+    "step2_title": {
+      "pl": "Strategia i architektura",
+      "en": "Strategy & architecture"
+    },
+    "step2_body": {
+      "pl": "Ustalamy architekturę rozwiązania, integracje i plan wdrożenia — zanim zacznie się produkcja.",
+      "en": "We define solution architecture, integrations and an implementation plan — before production starts."
+    },
+    "step3_title": {
+      "pl": "Wdrożenie i rozwój",
+      "en": "Implementation & development"
+    },
+    "step3_body": {
+      "pl": "Budujemy, integrujemy i testujemy iteracyjnie, z regularnymi przeglądami postępu i jakości.",
+      "en": "We build, integrate and test iteratively, with regular progress and quality reviews."
+    },
+    "step4_title": {
+      "pl": "Optymalizacja i wsparcie",
+      "en": "Optimization & support"
+    },
+    "step4_body": {
+      "pl": "Szkolimy zespół, przekazujemy dokumentację i zapewniamy wsparcie po wdrożeniu.",
+      "en": "We train your team, hand over documentation and provide post-launch support."
+    }
   },
   "faq": {
     "eyebrow": {
@@ -141,12 +204,30 @@
       "pl": "Najczęstsze pytania",
       "en": "Frequently asked questions"
     },
-    "q1": { "pl": "Ile kosztuje wdrożenie CRM lub nowej strony?", "en": "How much does a CRM or new website cost?" },
-    "a1": { "pl": "Zależy od skali: landing, strona firmowa, CRM czy automatyzacja to inne zakresy. Po krótkim audycie dostajesz jasną wycenę i plan — bez ukrytych kosztów.", "en": "It depends on scope: a landing page, company site, CRM or automation are different ranges. After a short audit you get a clear quote and plan — no hidden fees." },
-    "q2": { "pl": "Ile potrwa realizacja?", "en": "How long will it take?" },
-    "a2": { "pl": "Landing: 2–3 tygodnie. Strona firmowa: 4–6 tygodni. CRM/automatyzacja: 3–8 tygodni.", "en": "Landing page: 2–3 weeks. Company site: 4–6 weeks. CRM/automation: 3–8 weeks." },
-    "q3": { "pl": "Czy muszę znać się na technologii?", "en": "Do I need to be tech-savvy?" },
-    "a3": { "pl": "Nie — technikalia bierzemy na siebie. Tłumaczymy decyzje prostym językiem.", "en": "No — we handle the technical side. We explain decisions in plain language." }
+    "q1": {
+      "pl": "Ile kosztuje wdrożenie CRM lub nowej strony?",
+      "en": "How much does a CRM or new website cost?"
+    },
+    "a1": {
+      "pl": "Koszt zależy od zakresu: landing page, strona firmowa, CRM lub automatyzacja mają inną skalę. Po krótkim audycie otrzymujesz wycenę i plan realizacji.",
+      "en": "Cost depends on scope: a landing page, company website, CRM or automation differ in scale. After a short audit you receive a quote and delivery plan."
+    },
+    "q2": {
+      "pl": "Ile potrwa realizacja?",
+      "en": "How long will it take?"
+    },
+    "a2": {
+      "pl": "Landing page: ok. 2–3 tygodnie. Strona firmowa: ok. 4–6 tygodni. CRM lub automatyzacja: zwykle 3–8 tygodni — zależnie od integracji i złożoności.",
+      "en": "Landing page: about 2–3 weeks. Company website: about 4–6 weeks. CRM or automation: usually 3–8 weeks — depending on integrations and complexity."
+    },
+    "q3": {
+      "pl": "Czy muszę znać się na technologii?",
+      "en": "Do I need to be tech-savvy?"
+    },
+    "a3": {
+      "pl": "Nie. Po stronie klienta wystarczą cele biznesowe i decyzje. Stronę techniczną prowadzimy my i komunikujemy ją jasno.",
+      "en": "No. On your side, business goals and decisions are enough. We handle the technical side and communicate it clearly."
+    }
   },
   "form": {
     "name": {
@@ -239,9 +320,18 @@
       "pl": "© 2026 cosgral agency",
       "en": "© 2026 cosgral agency"
     },
-    "link_websites": { "pl": "Strony", "en": "Websites" },
-    "link_video": { "pl": "Wideo", "en": "Video" },
-    "link_crm": { "pl": "CRM", "en": "CRM" }
+    "link_websites": {
+      "pl": "Strony",
+      "en": "Websites"
+    },
+    "link_video": {
+      "pl": "Wideo",
+      "en": "Video"
+    },
+    "link_crm": {
+      "pl": "CRM",
+      "en": "CRM"
+    }
   },
   "contact": {
     "call_title": {
@@ -253,12 +343,12 @@
       "en": "Call or write us — we usually reply within one business day."
     },
     "social_label": {
-      "pl": "Jesteśmy też na social mediach",
-      "en": "We're also on social media"
+      "pl": "Social media",
+      "en": "Social media"
     },
     "phone_kuba": {
-      "pl": "Kuba · +48 533 790 518",
-      "en": "Kuba · +48 533 790 518"
+      "pl": "Jakub · +48 533 790 518",
+      "en": "Jakub · +48 533 790 518"
     },
     "phone_kacper": {
       "pl": "Kacper · +48 571 798 397",
@@ -272,8 +362,8 @@
         "en": "About us — cosgral.agency"
       },
       "description": {
-        "pl": "Poznaj zespół COSGRAL — Jakub Gral i Kacper Kosikowski. Programiści łączący frontend, design, aplikacje i systemy dla firm.",
-        "en": "Meet the COSGRAL team — Jakub Gral and Kacper Kosikowski. Engineers combining frontend, design, apps and systems for businesses."
+        "pl": "Poznaj zespół COSGRAL — Jakub Gral (CEO & Founder) i Kacper Kosikowski (COO & Founder). Programiści łączący frontend, design, aplikacje i systemy.",
+        "en": "Meet the COSGRAL team — Jakub Gral (CEO & Founder) and Kacper Kosikowski (COO & Founder). Engineers combining frontend, design, apps and systems."
       }
     },
     "title": {
@@ -325,161 +415,287 @@
       "en": "Last updated: August 2026"
     },
     "intro": {
-      "pl": "Dbamy o Twoje dane. Poniżej krótko opisujemy, co zbieramy i po co — bez zbędnego żargonu.",
-      "en": "We take your data seriously. Below is a short plain-language summary of what we collect and why."
+      "pl": "Poniżej opisujemy, jakie dane kontaktowe zbieramy i w jakim celu je przetwarzamy.",
+      "en": "Below we describe what contact data we collect and why we process it."
     },
-    "s1_title": { "pl": "Administrator", "en": "Controller" },
+    "s1_title": {
+      "pl": "Administrator",
+      "en": "Controller"
+    },
     "s1_body": {
       "pl": "Administratorem danych jest cosgral.agency (kontakt: kontakt@cosgral.pl).",
       "en": "The data controller is cosgral.agency (contact: kontakt@cosgral.pl)."
     },
-    "s2_title": { "pl": "Jakie dane zbieramy", "en": "What we collect" },
+    "s2_title": {
+      "pl": "Jakie dane zbieramy",
+      "en": "What we collect"
+    },
     "s2_body": {
       "pl": "Przez formularz kontaktowy lub e-mail możemy otrzymać imię, adres e-mail, nazwę firmy oraz treść wiadomości. Telefony podane na stronie służą wyłącznie do kontaktu biznesowego.",
       "en": "Via the contact form or email we may receive your name, email address, company name and message content. Phone numbers listed on the site are for business contact only."
     },
-    "s3_title": { "pl": "Cel i podstawa", "en": "Purpose & basis" },
+    "s3_title": {
+      "pl": "Cel i podstawa",
+      "en": "Purpose & basis"
+    },
     "s3_body": {
       "pl": "Dane przetwarzamy, aby odpowiedzieć na zapytanie i prowadzić rozmowę o współpracy (art. 6 ust. 1 lit. b lub f RODO — wykonanie działań przed umową / prawnie uzasadniony interes).",
       "en": "We process data to reply to your inquiry and discuss a potential collaboration (GDPR Art. 6(1)(b) or (f) — pre-contract steps / legitimate interest)."
     },
-    "s4_title": { "pl": "Jak długo przechowujemy", "en": "Retention" },
+    "s4_title": {
+      "pl": "Jak długo przechowujemy",
+      "en": "Retention"
+    },
     "s4_body": {
       "pl": "Korespondencję trzymamy tak długo, jak jest potrzebna do obsługi zapytania i ewentualnej współpracy, a potem usuwamy lub archiwizujemy zgodnie z obowiązującymi przepisami.",
       "en": "We keep correspondence only as long as needed to handle the inquiry and any collaboration, then delete or archive it as required by law."
     },
-    "s5_title": { "pl": "Twoje prawa", "en": "Your rights" },
+    "s5_title": {
+      "pl": "Twoje prawa",
+      "en": "Your rights"
+    },
     "s5_body": {
       "pl": "Masz prawo dostępu, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu oraz skargi do Prezesa UODO. W sprawach danych napisz na kontakt@cosgral.pl.",
       "en": "You have the right to access, rectify, erase, restrict processing, object, and lodge a complaint with the supervisory authority. For data requests email kontakt@cosgral.pl."
     }
   },
   "common": {
-    "skip": { "pl": "Przejdź do treści", "en": "Skip to content" },
-    "lang": { "pl": "Język", "en": "Language" },
-    "logo_aria": { "pl": "COSGRAL — strona główna", "en": "COSGRAL — homepage" },
-    "portfolio_eyebrow": { "pl": "Portfolio", "en": "Portfolio" }
+    "skip": {
+      "pl": "Przejdź do treści",
+      "en": "Skip to content"
+    },
+    "lang": {
+      "pl": "Język",
+      "en": "Language"
+    },
+    "logo_aria": {
+      "pl": "COSGRAL — strona główna",
+      "en": "COSGRAL — homepage"
+    },
+    "portfolio_eyebrow": {
+      "pl": "Portfolio",
+      "en": "Portfolio"
+    }
   },
   "rail": {
-    "aria": { "pl": "Postęp sekcji", "en": "Section progress" },
-    "footer": { "pl": "Stopka", "en": "Footer" },
-    "prev": { "pl": "Poprzednia sekcja", "en": "Previous section" },
-    "next": { "pl": "Następna sekcja", "en": "Next section" },
-    "portfolio_aria": { "pl": "Postęp sekcji portfolio", "en": "Portfolio section progress" }
+    "aria": {
+      "pl": "Postęp sekcji",
+      "en": "Section progress"
+    },
+    "footer": {
+      "pl": "Stopka",
+      "en": "Footer"
+    },
+    "prev": {
+      "pl": "Poprzednia sekcja",
+      "en": "Previous section"
+    },
+    "next": {
+      "pl": "Następna sekcja",
+      "en": "Next section"
+    },
+    "portfolio_aria": {
+      "pl": "Postęp sekcji portfolio",
+      "en": "Portfolio section progress"
+    }
   },
   "panel": {
-    "service_label": { "pl": "Usługa", "en": "Service" },
-    "what_we_do": { "pl": "Co robimy", "en": "What we do" },
-    "for_who": { "pl": "Dla kogo", "en": "Who it's for" },
-    "cta": { "pl": "Zacznijmy od bezpłatnego audytu", "en": "Let's start with a free audit" },
-    "portfolio_cta": { "pl": "Zobacz przykładowe realizacje", "en": "See example projects" }
+    "service_label": {
+      "pl": "Usługa",
+      "en": "Service"
+    },
+    "what_we_do": {
+      "pl": "Co robimy",
+      "en": "What we do"
+    },
+    "for_who": {
+      "pl": "Dla kogo",
+      "en": "Who it's for"
+    },
+    "cta": {
+      "pl": "Umów bezpłatny audyt",
+      "en": "Book a free audit"
+    },
+    "portfolio_cta": {
+      "pl": "Zobacz realizacje",
+      "en": "View our work"
+    }
   },
   "portfolio": {
     "meta": {
-      "title": { "pl": "Portfolio — cosgral.agency", "en": "Portfolio — cosgral.agency" },
+      "title": {
+        "pl": "Portfolio — cosgral.agency",
+        "en": "Portfolio — cosgral.agency"
+      },
       "description": {
         "pl": "Realizacje COSGRAL — strony internetowe, montaż wideo, grafiki, systemy CRM i automatyzacje.",
         "en": "COSGRAL work — websites, video editing, graphics, CRM systems and automation."
       }
     },
     "montaz_meta": {
-      "title": { "pl": "Montaż wideo — Portfolio COSGRAL", "en": "Video editing — COSGRAL portfolio" },
+      "title": {
+        "pl": "Montaż wideo — Portfolio COSGRAL",
+        "en": "Video editing — COSGRAL portfolio"
+      },
       "description": {
         "pl": "Rolki i montaż wideo COSGRAL — Orlińscy, Far East, Anna Jarosik, BTS i więcej.",
         "en": "COSGRAL video reels and editing — Orlińscy, Far East, Anna Jarosik, BTS and more."
       }
     },
     "grafiki_meta": {
-      "title": { "pl": "Grafiki — Portfolio COSGRAL", "en": "Graphics — COSGRAL portfolio" },
+      "title": {
+        "pl": "Grafiki — Portfolio COSGRAL",
+        "en": "Graphics — COSGRAL portfolio"
+      },
       "description": {
         "pl": "Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej.",
         "en": "COSGRAL graphics gallery — Juicy Events, Far East, Safe Grant, BTS and more."
       }
     },
-    "hero_title": { "pl": "Realizacje", "en": "Selected work" },
+    "hero_title": {
+      "pl": "Realizacje",
+      "en": "Selected work"
+    },
     "hero_lead": {
-      "pl": "Zobacz, co tworzymy i co możemy stworzyć wspólnie",
-      "en": "See what we build and what we can create together"
+      "pl": "Wybrane projekty stron, wideo, grafiki oraz systemów i automatyzacji.",
+      "en": "Selected website, video, graphics, systems and automation projects."
     },
     "cta_lead": {
-      "pl": "Masz podobny brief? Napisz — wrócimy z jasnym planem i wyceną.",
-      "en": "Got a similar brief? Write us — we'll come back with a clear plan and quote."
+      "pl": "Masz podobny projekt? Napisz — przygotujemy zakres, plan i wycenę.",
+      "en": "Have a similar project? Write us — we will prepare scope, plan and quote."
     },
-    "web_title": { "pl": "Strony internetowe", "en": "Websites" },
+    "web_title": {
+      "pl": "Strony internetowe",
+      "en": "Websites"
+    },
     "web_lead": {
-      "pl": "Projekty web — od landingów po rozbudowane serwisy marek.",
-      "en": "Web projects — from landing pages to full brand websites."
+      "pl": "Od landing page po serwisy firmowe i sklepy — projekt i wdrożenie pod cele biznesowe.",
+      "en": "From landing pages to company sites and stores — design and delivery aligned to business goals."
     },
-    "web_service": { "pl": "Usługa: strony internetowe →", "en": "Service: websites →" },
-    "mj_title": { "pl": "Landing content creatora", "en": "Content creator landing page" },
+    "web_service": {
+      "pl": "Usługa: strony internetowe →",
+      "en": "Service: websites →"
+    },
+    "mj_title": {
+      "pl": "Landing page content creatora",
+      "en": "Content creator landing page"
+    },
     "mj_desc": {
-      "pl": "Strona marki osobistej dla content creatora — oferta usług, portfolio i kontakt w autentycznym tonie. Zaprojektowana tak, by przyciągać klientów z social mediów i prowadzić ich prosto do zapytania.",
-      "en": "A personal-brand site for a content creator — services, portfolio and contact in an authentic tone. Built to pull clients from social and guide them straight to an inquiry."
+      "pl": "Strona marki osobistej content creatora: oferta usług, portfolio i kontakt. Zaprojektowana tak, aby prowadzić odbiorców z social mediów do zapytania ofertowego.",
+      "en": "A personal-brand website for a content creator: services, portfolio and contact. Designed to guide social audiences toward a project inquiry."
     },
-    "trove_title": { "pl": "E-commerce vintage fashion", "en": "Vintage fashion e-commerce" },
+    "trove_title": {
+      "pl": "E-commerce vintage fashion",
+      "en": "Vintage fashion e-commerce"
+    },
     "trove_desc": {
-      "pl": "Sklep online dla klientki sprzedającej ubrania vintage luxury — katalog, koszyk i checkout w estetyce mindful luxury. Dzięki przejrzystemu flow zakupowemu łatwiej domykać sprzedaż i budować zaufanie do marki.",
-      "en": "An online store for a client selling vintage luxury clothing — catalog, cart and checkout in a mindful luxury aesthetic. A clearer purchase flow that makes it easier to close sales and build brand trust."
+      "pl": "Sklep online z odzieżą vintage luxury: katalog, koszyk i checkout. Przejrzysty proces zakupowy wspierający konwersję i wizerunek marki premium.",
+      "en": "An online store for vintage luxury clothing: catalog, cart and checkout. A clear purchase flow that supports conversion and a premium brand image."
     },
-    "montaz_title": { "pl": "Montaż wideo", "en": "Video editing" },
+    "montaz_title": {
+      "pl": "Montaż wideo",
+      "en": "Video editing"
+    },
     "montaz_lead": {
-      "pl": "Rolki, reklamy, BTS — od surowego materiału po gotowy format pod social.",
-      "en": "Reels, ads, BTS — from raw footage to social-ready formats."
+      "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
+      "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
     },
-    "montaz_service": { "pl": "Usługa: montaż i wideo →", "en": "Service: video editing →" },
-    "montaz_page_title": { "pl": "Montaż wideo", "en": "Video editing" },
+    "montaz_service": {
+      "pl": "Usługa: montaż i wideo →",
+      "en": "Service: video editing →"
+    },
+    "montaz_page_title": {
+      "pl": "Montaż wideo",
+      "en": "Video editing"
+    },
     "montaz_page_lead": {
-      "pl": "Rolki, reklamy i BTS — od surowego materiału po gotowy format pod social.",
-      "en": "Reels, ads and BTS — from raw footage to social-ready formats."
+      "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
+      "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
     },
-    "grafiki_title": { "pl": "Grafiki", "en": "Graphics" },
+    "grafiki_title": {
+      "pl": "Grafiki",
+      "en": "Graphics"
+    },
     "grafiki_lead": {
-      "pl": "Posty, stories i key visuale — kreacja pod social i kampanie.",
-      "en": "Posts, stories and key visuals — creative for social and campaigns."
+      "pl": "Kreacje do social mediów i kampanii: posty, stories i key visuale.",
+      "en": "Creative for social and campaigns: posts, stories and key visuals."
     },
     "grafiki_page_lead": {
-      "pl": "Posty, stories i key visuale — od Juicy Events przez Far East po Safe Grant i BTS.",
-      "en": "Posts, stories and key visuals — from Juicy Events to Far East, Safe Grant and BTS."
+      "pl": "Wybrane realizacje graficzne dla marek i wydarzeń — m.in. Juicy Events, Far East, Safe Grant i BTS.",
+      "en": "Selected graphic work for brands and events — including Juicy Events, Far East, Safe Grant and BTS."
     },
-    "grafiki_service": { "pl": "Usługa: grafika i wideo →", "en": "Service: design & video →" },
-    "automation_title": { "pl": "Systemy i Automatyzacje", "en": "Systems & automation" },
+    "grafiki_service": {
+      "pl": "Usługa: grafika i wideo →",
+      "en": "Service: design & video →"
+    },
+    "automation_title": {
+      "pl": "Systemy i automatyzacje",
+      "en": "Systems & automation"
+    },
     "automation_lead": {
-      "pl": "Aplikacje, CRM i workflowy, które porządkują sprzedaż, ceny i komunikację z klientem.",
-      "en": "Apps, CRM and workflows that organize sales, pricing and customer communication."
+      "pl": "Aplikacje, CRM i procesy automatyczne, które porządkują sprzedaż, operacje i komunikację z klientem.",
+      "en": "Apps, CRM and automated processes that organize sales, operations and customer communication."
     },
-    "automation_service": { "pl": "Usługa: automatyzacje →", "en": "Service: automation →" },
-    "auto1_tag": { "pl": "Aplikacja", "en": "Application" },
-    "auto1_client": { "pl": "ShelfSync", "en": "ShelfSync" },
+    "automation_service": {
+      "pl": "Usługa: automatyzacje →",
+      "en": "Service: automation →"
+    },
+    "auto1_tag": {
+      "pl": "Aplikacja",
+      "en": "Application"
+    },
+    "auto1_client": {
+      "pl": "ShelfSync",
+      "en": "ShelfSync"
+    },
     "auto1_title": {
-      "pl": "Panel sklepu i pilnowanie cen",
+      "pl": "Panel sklepu i monitoring cen",
       "en": "Store panel & price monitoring"
     },
     "auto1_desc": {
       "pl": "Aplikacja dla wielokanałowego sprzedawcy fashion: stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.",
       "en": "An app for a multi-channel fashion seller: stock levels, marketplace price checks and markdown alerts. Less manual control — faster response to price changes."
     },
-    "auto2_tag": { "pl": "CRM", "en": "CRM" },
-    "auto2_client": { "pl": "Northline Studio", "en": "Northline Studio" },
+    "auto2_tag": {
+      "pl": "CRM",
+      "en": "CRM"
+    },
+    "auto2_client": {
+      "pl": "Northline Studio",
+      "en": "Northline Studio"
+    },
     "auto2_title": {
-      "pl": "CRM leadów, dealów i ekosystemu firmy",
-      "en": "CRM for leads, deals & company ops"
+      "pl": "CRM leadów, dealów i operacji sprzedażowych",
+      "en": "CRM for leads, deals and sales operations"
     },
     "auto2_desc": {
       "pl": "CRM dla zespołu B2B: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów między handlowcami.",
       "en": "A B2B team CRM: leads → deals → pipeline, notes, statuses and reminders in one place. Full contact history without leads getting lost between salespeople."
     },
-    "auto3_tag": { "pl": "Automatyzacja", "en": "Automation" },
-    "auto3_client": { "pl": "Atelier Bloom", "en": "Atelier Bloom" },
+    "auto3_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "auto3_client": {
+      "pl": "Atelier Bloom",
+      "en": "Atelier Bloom"
+    },
     "auto3_title": {
       "pl": "Chatbot AI do wiadomości klientów",
       "en": "AI chatbot for customer messages"
     },
     "auto3_desc": {
-      "pl": "Bot AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny, wstępne wyceny i płynne przekazanie do konsultanta. Pierwsza odpowiedź 24/7 bez ręcznego kopiowania treści.",
-      "en": "An AI bot answering Instagram, Facebook and web messages — FAQ, hours, rough quotes and a clean handoff to a consultant. First reply 24/7 without manual copy-paste."
+      "pl": "Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź dostępna 24/7.",
+      "en": "An AI assistant answering Instagram, Facebook and website messages — FAQ, opening hours, preliminary quotes and handoff to a consultant. First reply available 24/7."
     },
-    "auto4_tag": { "pl": "Automatyzacja", "en": "Automation" },
-    "auto4_client": { "pl": "Parcel & Co.", "en": "Parcel & Co." },
+    "auto4_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "auto4_client": {
+      "pl": "Parcel & Co.",
+      "en": "Parcel & Co."
+    },
     "auto4_title": {
       "pl": "Zamówienie → faktura → status paczki",
       "en": "Order → invoice → parcel status"
@@ -488,20 +704,65 @@
       "pl": "Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta (e-mail/Slack). Mniej ręcznej pracy przy obsłudze zamówień.",
       "en": "An e-commerce workflow: a new order triggers invoice-ready export, parcel status updates and a customer notification (email/Slack). Less manual work in order operations."
     },
-    "view_all": { "pl": "Zobacz wszystko →", "en": "View all →" },
-    "view_site": { "pl": "Zobacz stronę →", "en": "View site →" },
-    "back_portfolio": { "pl": "← Wróć do portfolio", "en": "← Back to portfolio" },
-    "lightbox_reel": { "pl": "Podgląd rolki", "en": "Reel preview" },
-    "lightbox_graphic": { "pl": "Podgląd grafiki", "en": "Graphic preview" },
-    "lightbox_close": { "pl": "Zamknij", "en": "Close" },
-    "lightbox_prev_reel": { "pl": "Poprzednia rolka", "en": "Previous reel" },
-    "lightbox_next_reel": { "pl": "Następna rolka", "en": "Next reel" },
-    "lightbox_prev_graphic": { "pl": "Poprzednia grafika", "en": "Previous graphic" },
-    "lightbox_next_graphic": { "pl": "Następna grafika", "en": "Next graphic" },
-    "rail_portfolio": { "pl": "Portfolio", "en": "Portfolio" },
-    "rail_strony": { "pl": "Strony", "en": "Websites" },
-    "rail_montaz": { "pl": "Montaż", "en": "Video" },
-    "rail_grafiki": { "pl": "Grafiki", "en": "Graphics" },
-    "rail_automation": { "pl": "Automatyzacje", "en": "Automation" }
+    "view_all": {
+      "pl": "Zobacz wszystko →",
+      "en": "View all →"
+    },
+    "view_site": {
+      "pl": "Zobacz stronę →",
+      "en": "View site →"
+    },
+    "back_portfolio": {
+      "pl": "← Wróć do portfolio",
+      "en": "← Back to portfolio"
+    },
+    "lightbox_reel": {
+      "pl": "Podgląd rolki",
+      "en": "Reel preview"
+    },
+    "lightbox_graphic": {
+      "pl": "Podgląd grafiki",
+      "en": "Graphic preview"
+    },
+    "lightbox_close": {
+      "pl": "Zamknij",
+      "en": "Close"
+    },
+    "lightbox_prev_reel": {
+      "pl": "Poprzednia rolka",
+      "en": "Previous reel"
+    },
+    "lightbox_next_reel": {
+      "pl": "Następna rolka",
+      "en": "Next reel"
+    },
+    "lightbox_prev_graphic": {
+      "pl": "Poprzednia grafika",
+      "en": "Previous graphic"
+    },
+    "lightbox_next_graphic": {
+      "pl": "Następna grafika",
+      "en": "Next graphic"
+    },
+    "rail_portfolio": {
+      "pl": "Portfolio",
+      "en": "Portfolio"
+    },
+    "rail_strony": {
+      "pl": "Strony",
+      "en": "Websites"
+    },
+    "rail_montaz": {
+      "pl": "Montaż",
+      "en": "Video"
+    },
+    "rail_grafiki": {
+      "pl": "Grafiki",
+      "en": "Graphics"
+    },
+    "rail_automation": {
+      "pl": "Automatyzacje",
+      "en": "Automation"
+    }
   }
 }
