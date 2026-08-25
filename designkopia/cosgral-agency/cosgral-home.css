@@ -1515,15 +1515,34 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   font-size: 0.95rem;
   color: var(--muted);
   text-align: center;
-  margin: 0 0 1.25rem;
+  margin: 0 0 0.65rem;
   line-height: 1.5;
+}
+.home-contact__social-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+  margin: 0 0 0.7rem;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+.home-contact__social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.25rem;
+}
+.home-contact__social .footer-social__link {
+  width: 2.35rem;
+  height: 2.35rem;
 }
 .home-contact__phones {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: center;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.5rem;
 }
 .home-contact__phone {
   font-size: 1rem;
@@ -2186,12 +2205,29 @@ html.reduce-motion .home-scroll-rail { display: none; }
   .home-contact__lead {
     font-size: 0.72rem;
     line-height: 1.38;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.45rem;
     padding-inline: 0.15rem;
+  }
+  .home-contact__social-label {
+    font-size: 0.64rem;
+    margin-bottom: 0.45rem;
+    padding-inline: 0.15rem;
+  }
+  .home-contact__social {
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+  .home-contact__social .footer-social__link {
+    width: 2rem;
+    height: 2rem;
+  }
+  .home-contact__social .footer-social__link svg {
+    width: 15px;
+    height: 15px;
   }
   .home-contact__phones {
     gap: 0.3rem;
-    margin-bottom: 0.95rem;
+    margin-bottom: 0.75rem;
   }
   .home-contact__phone {
     font-size: 0.76rem;

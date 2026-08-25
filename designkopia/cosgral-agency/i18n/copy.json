@@ -305,12 +305,16 @@
   },
   "contact": {
     "call_title": {
-      "pl": "Zadzwoń",
-      "en": "Call us"
+      "pl": "Kontakt",
+      "en": "Contact"
     },
     "call_lead": {
-      "pl": "Zadzwoń na te numery, lub zostaw nam wiadomość o sobie.",
-      "en": "Call us on these numbers, or leave us a message about yourself."
+      "pl": "Zadzwoń, lub zostaw nam wiadomość o Sobie",
+      "en": "Call us, or leave us a message about yourself"
+    },
+    "social_label": {
+      "pl": "jesteśmy też na social mediach",
+      "en": "we're also on social media"
     },
     "phone_kuba": {
       "pl": "Kuba · +48 533 790 518",
