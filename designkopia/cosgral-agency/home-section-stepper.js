@@ -482,7 +482,6 @@
     var touchActive = false;
     var touchIgnoreStep = false; // poziomy swipe w Usługach — tylko kafelki
     var touchFromUslugi = false;
-    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
 
     window.addEventListener(
       "touchstart",
