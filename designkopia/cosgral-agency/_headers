@@ -11,11 +11,11 @@
 /*.js
   Cache-Control: no-cache, must-revalidate
 
-/portfolio/reels/manifest.json
+/portfolio-media/reels/manifest.json
   Cache-Control: no-cache, must-revalidate
 
-/portfolio/reels/*.json
+/portfolio-media/reels/*.json
   Cache-Control: no-cache, must-revalidate
 
-/portfolio/reels/*
+/portfolio-media/reels/*
   Cache-Control: public, max-age=3600

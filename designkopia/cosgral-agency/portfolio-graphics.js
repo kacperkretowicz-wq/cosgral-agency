@@ -1532,7 +1532,7 @@
 
   bindLightboxUi();
 
-  fetch("portfolio/graphics/manifest.json?v=20260807ai")
+  fetch("portfolio-media/graphics/manifest.json?v=20260807ai")
     .then(function (r) {
       return r.json();
     })

@@ -17,14 +17,14 @@
       "descEn": "Summer Instagram campaign — posts and stories for events and ticket sales.",
       "servicesPl": ["Social media", "Kreacja graficzna", "Instagram"],
       "servicesEn": ["Social media", "Graphic design", "Instagram"],
-      "cover": "portfolio/clients/juicy-events/cover.jpg",
+      "cover": "portfolio-media/clients/juicy-events/cover.jpg",
       "gallery": [
-        "portfolio/clients/juicy-events/gallery/1.jpg",
-        "portfolio/clients/juicy-events/gallery/2.jpg",
-        "portfolio/clients/juicy-events/gallery/3.jpg",
-        "portfolio/clients/juicy-events/gallery/4.jpg",
-        "portfolio/clients/juicy-events/gallery/5.jpg",
-        "portfolio/clients/juicy-events/gallery/6.jpg"
+        "portfolio-media/clients/juicy-events/gallery/1.jpg",
+        "portfolio-media/clients/juicy-events/gallery/2.jpg",
+        "portfolio-media/clients/juicy-events/gallery/3.jpg",
+        "portfolio-media/clients/juicy-events/gallery/4.jpg",
+        "portfolio-media/clients/juicy-events/gallery/5.jpg",
+        "portfolio-media/clients/juicy-events/gallery/6.jpg"
       ],
       "mediaType": "gallery"
     },
@@ -39,8 +39,8 @@
       "descEn": "Social motion graphics — fast formats with a consistent brand visual language.",
       "servicesPl": ["Motion design", "Social media", "Montaż"],
       "servicesEn": ["Motion design", "Social media", "Editing"],
-      "cover": "portfolio/clients/far-east/cover.jpg",
-      "previewVideo": "portfolio/clients/far-east/preview.mp4",
+      "cover": "portfolio-media/clients/far-east/cover.jpg",
+      "previewVideo": "portfolio-media/clients/far-east/preview.mp4",
       "mediaType": "video"
     },
     {
