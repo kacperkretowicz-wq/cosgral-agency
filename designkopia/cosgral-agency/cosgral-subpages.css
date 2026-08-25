@@ -1074,11 +1074,13 @@ html.reduce-motion .nav-overlay__char {
 .about-team__role {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: clamp(0.62rem, 1.4vw, 0.7rem);
   color: rgba(255, 255, 255, 0.62);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-align: center;
+  max-width: 22rem;
+  line-height: 1.45;
 }
 .about-team__bio {
   margin: 0.55rem 0 0;
