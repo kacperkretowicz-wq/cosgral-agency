@@ -59,10 +59,9 @@
   }
 
   function fanStageRect() {
-    var stage = document.querySelector("[data-fan-stage]");
     var section = document.getElementById("uslugi");
-    if (!stage || !section || !section.classList.contains("is-in-view")) return null;
-    return stage.getBoundingClientRect();
+    if (!section || !section.classList.contains("is-in-view")) return null;
+    return section.getBoundingClientRect();
   }
 
   function pointInFanStage(x, y) {

@@ -185,7 +185,7 @@
   }
 
   function isPointerOverStage(e) {
-    var rect = stage.getBoundingClientRect();
+    var rect = section.getBoundingClientRect();
     return (
       e.clientX >= rect.left &&
       e.clientX <= rect.right &&
@@ -269,21 +269,24 @@
     requestAnimationFrame(tick);
   }
 
-  // ——— Nawigacja ———
-  stage.addEventListener("click", function (e) {
-    if (e.target.closest(".services-fan__card.is-active")) return;
-    var rect = stage.getBoundingClientRect();
+  // ——— Nawigacja: cała sekcja Usługi — lewa połowa = prev, prawa = next ———
+  function sideFromEvent(e) {
+    var rect = section.getBoundingClientRect();
     var x = e.clientX - rect.left;
-    if (x < rect.width * 0.28) {
-      hideTapHint();
-      prev();
-    } else if (x > rect.width * 0.72) {
-      hideTapHint();
-      next();
-    }
+    return x < rect.width * 0.5 ? -1 : 1;
+  }
+
+  section.addEventListener("click", function (e) {
+    // Środkowy aktywny kafelek nadal otwiera panel usługi.
+    if (e.target.closest(".services-fan__card.is-active")) return;
+    if (e.target.closest("a")) return;
+    hideHint();
+    hideTapHint();
+    if (sideFromEvent(e) < 0) prev();
+    else next();
   });
 
-  stage.addEventListener(
+  section.addEventListener(
     "touchstart",
     function (e) {
       if (!e.touches[0]) return;
@@ -295,7 +298,7 @@
     { passive: true }
   );
 
-  stage.addEventListener(
+  section.addEventListener(
     "touchmove",
     function (e) {
       if (!touchTracking || !e.touches[0]) return;
@@ -303,7 +306,6 @@
       var dy = e.touches[0].clientY - touchStartY;
       if (!touchAxis) {
         if (Math.abs(dx) < SWIPE_AXIS_LOCK && Math.abs(dy) < SWIPE_AXIS_LOCK) return;
-        // Lekko faworyzuj poziom — zmiana kafelka zamiast scrolla sekcji.
         touchAxis = Math.abs(dx) > Math.abs(dy) * 0.85 ? "x" : "y";
       }
       if (touchAxis === "x") {
@@ -314,7 +316,7 @@
     { passive: false }
   );
 
-  stage.addEventListener(
+  section.addEventListener(
     "touchend",
     function (e) {
       if (!touchTracking || !e.changedTouches[0]) {
@@ -325,8 +327,28 @@
       var dx = e.changedTouches[0].clientX - touchStartX;
       var dy = e.changedTouches[0].clientY - touchStartY;
       var axis = touchAxis;
+      var endX = e.changedTouches[0].clientX;
+      var endY = e.changedTouches[0].clientY;
       touchTracking = false;
       touchAxis = null;
+
+      // Krótki tap (bez swipe) — lewa/prawa połowa sekcji.
+      if (!axis || (Math.abs(dx) < SWIPE_MIN_DX && Math.abs(dy) < SWIPE_MIN_DX)) {
+        var active = section.querySelector(".services-fan__card.is-active");
+        if (active) {
+          var r = active.getBoundingClientRect();
+          if (endX >= r.left && endX <= r.right && endY >= r.top && endY <= r.bottom) {
+            return; // tap w kafelek → zostaw klikowi otwarcie panelu
+          }
+        }
+        hideHint();
+        hideTapHint();
+        var rect = section.getBoundingClientRect();
+        if (endX - rect.left < rect.width * 0.5) prev();
+        else next();
+        return;
+      }
+
       if (axis === "y") return;
       if (Math.abs(dx) < SWIPE_MIN_DX) return;
       if (axis !== "x" && Math.abs(dx) < Math.abs(dy)) return;
@@ -338,7 +360,7 @@
     { passive: true }
   );
 
-  stage.addEventListener(
+  section.addEventListener(
     "touchcancel",
     function () {
       touchTracking = false;
