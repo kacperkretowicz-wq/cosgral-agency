@@ -107,6 +107,9 @@
     var WHEEL_END = 52;
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
+    // Tylko w Usługach: większy gest pionowy, żeby dało się zmieniać kafelki bez skoku sekcji.
+    var TOUCH_USLUGI_STEP_MIN = 96;
+    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
     var HOLD_COOLDOWN_MS = 100;
     var SECTION_READY_MS = 1000;
     var SECTION_REACH_PX = 16;
@@ -437,7 +440,8 @@
 
       wheelAccum += e.deltaY;
 
-      if (Math.abs(wheelAccum) >= WHEEL_INSTANT) {
+      var instant = activeIndex === uslugiIdx ? 48 : WHEEL_INSTANT;
+      if (Math.abs(wheelAccum) >= instant) {
         if (wheelTimer) window.clearTimeout(wheelTimer);
         commitWheel();
         return;
@@ -454,7 +458,8 @@
         return;
       }
 
-      if (Math.abs(wheelAccum) < WHEEL_MIN) {
+      var min = activeIndex === uslugiIdx ? 36 : WHEEL_MIN;
+      if (Math.abs(wheelAccum) < min) {
         wheelAccum = 0;
         return;
       }
@@ -476,6 +481,8 @@
     var touchAccum = 0;
     var touchActive = false;
     var touchIgnoreStep = false; // poziomy swipe w Usługach — tylko kafelki
+    var touchFromUslugi = false;
+    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
 
     window.addEventListener(
       "touchstart",
@@ -486,6 +493,8 @@
         touchLastY = touchStartY;
         touchAccum = 0;
         touchIgnoreStep = false;
+        touchFromUslugi =
+          activeIndex === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
         touchActive = true;
       },
       { passive: true, capture: true }
@@ -500,21 +509,20 @@
         var dx = x - touchStartX;
         var dy = y - touchStartY;
 
-        // Tylko w Usługach: wyraźny gest poziomy = zmiana kafelka, nie sekcji.
-        // Poza Usługami zachowanie jak wcześniej (pauzy / tempo scrolla).
+        // Usługi: tylko wyraźny gest w poziomie = kafelki (nie sekcja).
+        // Pion zawsze jak wcześniej: preventDefault + snap do holdów.
         if (
+          touchFromUslugi &&
           !touchIgnoreStep &&
-          pointInUslugiSection(touchStartX, touchStartY) &&
-          Math.abs(dx) > 14 &&
-          Math.abs(dx) > Math.abs(dy) * 1.25
+          Math.abs(dx) > 18 &&
+          Math.abs(dx) > Math.abs(dy) * 1.45
         ) {
           touchIgnoreStep = true;
           touchAccum = 0;
-        }
-
-        if (touchIgnoreStep) {
           return;
         }
+
+        if (touchIgnoreStep) return;
 
         touchAccum += touchLastY - y;
         touchLastY = y;
@@ -531,18 +539,23 @@
         if (REDUCED || shouldIgnore() || touchIgnoreStep) {
           touchAccum = 0;
           touchIgnoreStep = false;
+          touchFromUslugi = false;
           return;
         }
         if (!canStep()) {
           touchAccum = 0;
+          touchFromUslugi = false;
           return;
         }
-        if (Math.abs(touchAccum) < WHEEL_MIN) {
+        var min = touchFromUslugi ? TOUCH_USLUGI_STEP_MIN : WHEEL_MIN;
+        if (Math.abs(touchAccum) < min) {
           touchAccum = 0;
+          touchFromUslugi = false;
           return;
         }
         var dir = touchAccum > 0 ? 1 : -1;
         touchAccum = 0;
+        touchFromUslugi = false;
         if (dir > 0) stepDown();
         else stepUp();
       },
@@ -555,6 +568,7 @@
         touchActive = false;
         touchAccum = 0;
         touchIgnoreStep = false;
+        touchFromUslugi = false;
       },
       { passive: true, capture: true }
     );

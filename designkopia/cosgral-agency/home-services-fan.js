@@ -306,7 +306,8 @@
       var dy = e.touches[0].clientY - touchStartY;
       if (!touchAxis) {
         if (Math.abs(dx) < SWIPE_AXIS_LOCK && Math.abs(dy) < SWIPE_AXIS_LOCK) return;
-        touchAxis = Math.abs(dx) > Math.abs(dy) * 0.85 ? "x" : "y";
+        // Wyraźny poziom = kafelki; pion zostawiamy scrollowi sekcji.
+        touchAxis = Math.abs(dx) > Math.abs(dy) * 1.35 ? "x" : "y";
       }
       if (touchAxis === "x") {
         e.preventDefault();
