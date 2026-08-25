@@ -2,12 +2,17 @@
 <html lang="pl" data-i18n-meta="portfolio.grafiki_meta">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="site.webmanifest" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Grafiki — Portfolio COSGRAL</title>
 <meta name="description" content="Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260816at" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260825w" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
   (function () {
@@ -84,6 +89,14 @@
   <div id="graphics-gallery" class="graphics-gallery" aria-live="polite"></div>
 </main>
 
+<section class="portfolio-contact-cta" aria-label="Kontakt">
+  <div class="container portfolio-contact-cta__inner">
+    <h2 class="portfolio-contact-cta__title" data-i18n="panel.cta">Umów bezpłatny audyt</h2>
+    <p class="portfolio-contact-cta__lead" data-i18n="portfolio.cta_lead">Masz podobny projekt? Napisz — przygotujemy zakres, plan i wycenę.</p>
+    <a class="glass-btn" href="index.html#kontakt" data-i18n="about.cta">Porozmawiajmy o projekcie</a>
+  </div>
+</section>
+
 <div class="graphics-lightbox" id="graphics-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" data-i18n-aria-label="portfolio.lightbox_graphic" aria-label="Podgląd grafiki">
   <button type="button" class="graphics-lightbox__backdrop" data-lightbox-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij"></button>
   <figure class="graphics-lightbox__figure">
@@ -150,18 +163,18 @@
     </div>
     <div class="footer-bottom">
       <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
-      <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
+      <a href="privacy-policy.html" data-i18n="footer.privacy">Polityka prywatności</a>
     </div>
   </div>
 </footer>
 
-<script src="i18n.js"></script>
+<script src="i18n.js?v=20260825w"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="home-cursor-field.js?v=20260814i"></script>
+<script src="home-cursor-field.js?v=20260825s"></script>
 <script src="home-cursor.js?v=20260812a"></script>
-<script src="home-tile-interact.js?v=20260814i"></script>
+<script src="home-tile-interact.js?v=20260825n"></script>
 <script src="subpage-ambient-bg.js?v=20260814e"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
 <script type="module" src="subpage-cube.js?v=20260816at"></script>
@@ -172,6 +185,6 @@
 <script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
 <script src="portfolio-video.js?v=20260807ag"></script>
 <script src="portfolio-color-zone.js?v=20260814e"></script>
-<script src="portfolio-graphics.js?v=20260814e"></script>
+<script src="portfolio-graphics.js?v=20260825p"></script>
 </body>
 </html>

@@ -11,8 +11,11 @@
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
-  var TILT_PITCH = 5.8;
-  var TILT_YAW = 7.5;
+  var TILT_PITCH = MOBILE ? 3.2 : 5.8;
+  var TILT_YAW = MOBILE ? 4.0 : 7.5;
+  var tiltFrame = 0;
+  var lastTiltX = "";
+  var lastTiltY = "";
 
   function applyGlobalTilt() {
     var ptr = window.cosgralPointer;
@@ -21,12 +24,24 @@
       return;
     }
 
+    tiltFrame += 1;
+    if (MOBILE && tiltFrame % 2 !== 0) {
+      requestAnimationFrame(applyGlobalTilt);
+      return;
+    }
+
     var root = document.documentElement;
     var lx = ((ptr.x / Math.max(window.innerWidth, 1)) * 100).toFixed(1) + "%";
     var ly = ((ptr.y / Math.max(window.innerHeight, 1)) * 100).toFixed(1) + "%";
+    var tx = (ptr.ny * TILT_PITCH).toFixed(2) + "deg";
+    var ty = (ptr.nx * TILT_YAW).toFixed(2) + "deg";
 
-    root.style.setProperty("--global-tilt-x", (ptr.ny * TILT_PITCH).toFixed(2) + "deg");
-    root.style.setProperty("--global-tilt-y", (ptr.nx * TILT_YAW).toFixed(2) + "deg");
+    if (tx !== lastTiltX || ty !== lastTiltY) {
+      lastTiltX = tx;
+      lastTiltY = ty;
+      root.style.setProperty("--global-tilt-x", tx);
+      root.style.setProperty("--global-tilt-y", ty);
+    }
     root.style.setProperty("--lx", lx);
     root.style.setProperty("--ly", ly);
 

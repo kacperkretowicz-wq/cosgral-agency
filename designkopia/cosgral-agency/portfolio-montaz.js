@@ -355,7 +355,7 @@
 
   bindLightboxUi();
 
-  fetch("portfolio/reels/manifest.json?v=20260814g")
+  fetch("portfolio-media/reels/manifest.json?v=20260814g")
     .then(function (r) {
       return r.json();
     })

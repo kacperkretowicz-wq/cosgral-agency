@@ -25,6 +25,10 @@
   var CENTER_SCALE = MOBILE ? 1.05 : 1.1;
   var touchStartX = 0;
   var touchStartY = 0;
+  var touchAxis = null;
+  var touchTracking = false;
+  var SWIPE_MIN_DX = MOBILE ? 36 : 40;
+  var SWIPE_AXIS_LOCK = 10;
   var hintHidden = false;
   var tapHintTimer = null;
   var tapHintVisible = false;
@@ -133,6 +137,14 @@
     return { x: home.x * 1.35, y: home.y * 1.3, scale: 0.1, rot: home.rot, opacity: 0, z: 1 };
   }
 
+  function ensureVideoSrc(video) {
+    if (!video || video.getAttribute("src")) return;
+    var src = video.getAttribute("data-fan-video-src");
+    if (!src) return;
+    video.setAttribute("src", src);
+    video.load();
+  }
+
   function layout(position) {
     var activeIndex = ((Math.round(wrapPos(position)) % total) + total) % total;
 
@@ -150,7 +162,7 @@
         t.rot.toFixed(2) + "deg) scale(" +
         t.scale.toFixed(3) + ")";
       card.style.opacity = String(clamp(t.opacity, 0, 1));
-      card.style.filter = i === activeIndex ? "none" : "brightness(0.55) saturate(0.7)";
+      card.style.filter = "";
 
       var isActive = i === activeIndex;
       card.classList.toggle("is-active", isActive);
@@ -161,8 +173,10 @@
 
       var video = card.querySelector("video");
       if (video) {
-        if (isActive) video.play().catch(function () {});
-        else video.pause();
+        if (isActive) {
+          ensureVideoSrc(video);
+          video.play().catch(function () {});
+        } else video.pause();
       }
     });
 
@@ -181,7 +195,7 @@
   }
 
   function isPointerOverStage(e) {
-    var rect = stage.getBoundingClientRect();
+    var rect = section.getBoundingClientRect();
     return (
       e.clientX >= rect.left &&
       e.clientX <= rect.right &&
@@ -246,6 +260,7 @@
     var wrapped = ((nextIndex % total) + total) % total;
     if (wrapped === index && Math.abs(shortestDelta(displayPos, wrapped)) < 0.05) return;
     targetPos = wrapped;
+    scheduleTick();
   }
 
   function next() {
@@ -256,50 +271,127 @@
     goTo(index - 1);
   }
 
-  function tick() {
-    var delta = shortestDelta(displayPos, targetPos);
-    if (Math.abs(delta) > 0.01) {
-      displayPos = wrapPos(displayPos + delta * LERP);
-      layout(displayPos);
-    }
+  var ticking = false;
+  function scheduleTick() {
+    if (ticking || REDUCED) return;
+    ticking = true;
     requestAnimationFrame(tick);
   }
 
-  // ——— Nawigacja ———
-  stage.addEventListener("click", function (e) {
-    if (e.target.closest(".services-fan__card.is-active")) return;
-    var rect = stage.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    if (x < rect.width * 0.28) {
-      hideTapHint();
-      prev();
-    } else if (x > rect.width * 0.72) {
-      hideTapHint();
-      next();
+  function tick() {
+    ticking = false;
+    var delta = shortestDelta(displayPos, targetPos);
+    if (Math.abs(delta) > 0.01) {
+      fan.classList.add("is-animating");
+      displayPos = wrapPos(displayPos + delta * LERP);
+      layout(displayPos);
+      scheduleTick();
+    } else if (Math.abs(delta) > 0.0005) {
+      displayPos = targetPos;
+      layout(displayPos);
+      fan.classList.remove("is-animating");
+    } else {
+      fan.classList.remove("is-animating");
     }
+  }
+
+  // ——— Nawigacja: cała sekcja Usługi — lewa połowa = prev, prawa = next ———
+  function sideFromEvent(e) {
+    var rect = section.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    return x < rect.width * 0.5 ? -1 : 1;
+  }
+
+  section.addEventListener("click", function (e) {
+    // Środkowy aktywny kafelek nadal otwiera panel usługi.
+    if (e.target.closest(".services-fan__card.is-active")) return;
+    if (e.target.closest("a")) return;
+    hideHint();
+    hideTapHint();
+    if (sideFromEvent(e) < 0) prev();
+    else next();
   });
 
-  stage.addEventListener(
+  section.addEventListener(
     "touchstart",
     function (e) {
       if (!e.touches[0]) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      touchAxis = null;
+      touchTracking = true;
     },
     { passive: true }
   );
 
-  stage.addEventListener(
+  section.addEventListener(
+    "touchmove",
+    function (e) {
+      if (!touchTracking || !e.touches[0]) return;
+      var dx = e.touches[0].clientX - touchStartX;
+      var dy = e.touches[0].clientY - touchStartY;
+      if (!touchAxis) {
+        if (Math.abs(dx) < SWIPE_AXIS_LOCK && Math.abs(dy) < SWIPE_AXIS_LOCK) return;
+        // Wyraźny poziom = kafelki; pion zostawiamy scrollowi sekcji.
+        touchAxis = Math.abs(dx) > Math.abs(dy) * 1.35 ? "x" : "y";
+      }
+      if (touchAxis === "x") {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    { passive: false }
+  );
+
+  section.addEventListener(
     "touchend",
     function (e) {
-      if (!e.changedTouches[0]) return;
+      if (!touchTracking || !e.changedTouches[0]) {
+        touchTracking = false;
+        touchAxis = null;
+        return;
+      }
       var dx = e.changedTouches[0].clientX - touchStartX;
       var dy = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+      var axis = touchAxis;
+      var endX = e.changedTouches[0].clientX;
+      var endY = e.changedTouches[0].clientY;
+      touchTracking = false;
+      touchAxis = null;
+
+      // Krótki tap (bez swipe) — lewa/prawa połowa sekcji.
+      if (!axis || (Math.abs(dx) < SWIPE_MIN_DX && Math.abs(dy) < SWIPE_MIN_DX)) {
+        var active = section.querySelector(".services-fan__card.is-active");
+        if (active) {
+          var r = active.getBoundingClientRect();
+          if (endX >= r.left && endX <= r.right && endY >= r.top && endY <= r.bottom) {
+            return; // tap w kafelek → zostaw klikowi otwarcie panelu
+          }
+        }
+        hideHint();
+        hideTapHint();
+        var rect = section.getBoundingClientRect();
+        if (endX - rect.left < rect.width * 0.5) prev();
+        else next();
+        return;
+      }
+
+      if (axis === "y") return;
+      if (Math.abs(dx) < SWIPE_MIN_DX) return;
+      if (axis !== "x" && Math.abs(dx) < Math.abs(dy)) return;
       hideHint();
       hideTapHint();
       if (dx < 0) next();
       else prev();
+    },
+    { passive: true }
+  );
+
+  section.addEventListener(
+    "touchcancel",
+    function () {
+      touchTracking = false;
+      touchAxis = null;
     },
     { passive: true }
   );
@@ -377,7 +469,25 @@
   }
 
   layout(0);
-  tick();
+  scheduleTick();
+
+  // Warm video sources once Usługi is near the viewport
+  if ("IntersectionObserver" in window) {
+    var warmIo = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          cards.forEach(function (card) {
+            ensureVideoSrc(card.querySelector("video"));
+          });
+          warmIo.disconnect();
+        });
+      },
+      { rootMargin: "40% 0px", threshold: 0.01 }
+    );
+    warmIo.observe(section);
+  }
+
 
   window.cosgralServicesFan = {
     goToIndex: function (nextIndex) {

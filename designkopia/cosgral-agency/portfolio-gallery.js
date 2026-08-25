@@ -235,7 +235,7 @@
     animateReveal();
   }
 
-  fetch("portfolio/portfolio.json")
+  fetch("portfolio-media/portfolio.json")
     .then(function (r) {
       return r.json();
     })

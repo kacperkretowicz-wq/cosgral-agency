@@ -2,12 +2,51 @@
 <html lang="pl" data-i18n-meta="about.meta">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="site.webmanifest" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>O nas — cosgral.agency</title>
-<meta name="description" content="Kim jesteśmy — cosgral.agency, agencja cyfrowa." />
+<meta name="description" content="Poznaj zespół COSGRAL — Jakub Gral (CEO &amp; Founder) i Kacper Kosikowski (COO &amp; Founder). Programiści łączący frontend, design, aplikacje i systemy." />
+<link rel="canonical" href="https://cosgral.pl/o-nas.html" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pl_PL" />
+<meta property="og:url" content="https://cosgral.pl/o-nas.html" />
+<meta property="og:title" content="O nas — cosgral.agency" />
+<meta property="og:description" content="Poznaj zespół COSGRAL — Jakub Gral (CEO &amp; Founder) i Kacper Kosikowski (COO &amp; Founder). Programiści łączący frontend, design, aplikacje i systemy." />
+<meta property="og:image" content="https://cosgral.pl/og-cover.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#050505" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "O nas — COSGRAL",
+  "url": "https://cosgral.pl/o-nas.html",
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "COSGRAL",
+    "url": "https://cosgral.pl/",
+    "employee": [
+      {
+        "@type": "Person",
+        "name": "Jakub Gral",
+        "jobTitle": "CEO & Founder"
+      },
+      {
+        "@type": "Person",
+        "name": "Kacper Kosikowski",
+        "jobTitle": "COO & Founder"
+      }
+    ]
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260816at" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260825u" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
   (function () {
@@ -75,7 +114,11 @@
 
 <main id="main">
   <header class="portfolio-hero about-hero">
-    <h1 class="portfolio-hero__title" data-i18n="about.title">Kim jesteśmy?</h1>
+    <div class="container">
+      <h1 class="portfolio-hero__title" data-i18n="about.title">Kim jesteśmy</h1>
+      <p class="about-hero__lead" data-i18n="about.lead">Jesteśmy dwuosobowym zespołem programistów łączącym inżynierię oprogramowania z designem i kreacją. Budujemy strony, aplikacje, CRM i automatyzacje — od architektury po wdrożenie i utrzymanie.</p>
+      <a class="glass-btn about-hero__cta" href="index.html#kontakt" data-i18n="about.cta">Porozmawiajmy o projekcie</a>
+    </div>
   </header>
 
   <section class="about-team" aria-label="Zespół">
@@ -93,6 +136,8 @@
           />
         </div>
         <figcaption class="about-team__name">Jakub Gral</figcaption>
+        <p class="about-team__role" data-i18n="about.role_jakub">CEO &amp; Founder · Frontend, design i automatyzacje</p>
+        <p class="about-team__bio" data-i18n="about.bio_jakub">Współzałożyciel COSGRAL. Programista i projektant — odpowiada za frontend, design, kreację, montaż wideo, grafikę oraz budowę aplikacji i automatyzacji dla firm. Wcześniej jako kierownik działu w firmie IT — dostarczającej oprogramowanie oraz serwis i helpdesk urządzeń — zautomatyzował łańcuch dostaw i na bieżąco rozwijał systemy CRM oraz intranet firmowy.</p>
       </figure>
       <figure class="about-team__member">
         <div class="about-team__photo about-team__photo--kacper">
@@ -107,6 +152,8 @@
           />
         </div>
         <figcaption class="about-team__name">Kacper Kosikowski</figcaption>
+        <p class="about-team__role" data-i18n="about.role_kacper">COO &amp; Founder · Aplikacje i systemy</p>
+        <p class="about-team__bio" data-i18n="about.bio_kacper">Współzałożyciel COSGRAL. Programista specjalizujący się w aplikacjach i systemach. Pracuje w korporacji zajmującej się rozwojem produktów cyfrowych; w COSGRAL projektuje i wdraża rozwiązania systemowe oraz aplikacje dopasowane do procesów klienta.</p>
       </figure>
     </div>
   </section>
@@ -164,19 +211,18 @@
     </div>
     <div class="footer-bottom">
       <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
-      <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
+      <a href="privacy-policy.html" data-i18n="footer.privacy">Polityka prywatności</a>
     </div>
   </div>
 </footer>
 
-<script src="i18n.js"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
+<script src="i18n.js?v=20260825w"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="home-cursor-field.js?v=20260814i"></script>
+<script src="home-cursor-field.js?v=20260825s"></script>
 <script src="home-cursor.js?v=20260812a"></script>
-<script src="home-tile-interact.js?v=20260814i"></script>
+<script src="home-tile-interact.js?v=20260825n"></script>
 <script src="subpage-ambient-bg.js?v=20260814e"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
 <script type="module" src="subpage-cube.js?v=20260816at"></script>

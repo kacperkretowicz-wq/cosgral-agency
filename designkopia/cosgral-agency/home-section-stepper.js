@@ -21,20 +21,8 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    if (MOBILE) {
-      var viewH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-      var footerH = footer.offsetHeight;
-      var topInset = 64;
-      var bottomInset = 12;
-      if (footerH + topInset + bottomInset <= viewH) {
-        return Math.min(max, Math.max(0, footer.offsetTop - topInset));
-      }
-      return Math.min(
-        max,
-        Math.max(0, footer.offsetTop + footerH - viewH + bottomInset)
-      );
-    }
-    return Math.min(max, Math.max(0, footer.offsetTop - 234));
+    /* Full-viewport footer section — pin its top to the viewport top */
+    return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
   function buildHolds() {
@@ -58,13 +46,15 @@
     return st.start + (st.end - st.start) * hold;
   }
 
-  function isFanHorizontalWheel(e) {
-    var stage = document.querySelector("[data-fan-stage]");
+  function pointInUslugiSection(x, y) {
     var section = document.getElementById("uslugi");
-    if (!stage || !section || !section.classList.contains("is-in-view")) return false;
-    var rect = stage.getBoundingClientRect();
-    if (e.clientY < rect.top || e.clientY > rect.bottom) return false;
-    if (e.clientX < rect.left || e.clientX > rect.right) return false;
+    if (!section || !section.classList.contains("is-in-view")) return false;
+    var rect = section.getBoundingClientRect();
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+  }
+
+  function isFanHorizontalWheel(e) {
+    if (!pointInUslugiSection(e.clientX, e.clientY)) return false;
     var dx = Math.abs(e.deltaX);
     var dy = Math.abs(e.deltaY);
     if (e.shiftKey && dy > dx) dx = dy;
@@ -105,6 +95,9 @@
     var WHEEL_END = 52;
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
+    // Tylko w Usługach: większy gest pionowy, żeby dało się zmieniać kafelki bez skoku sekcji.
+    var TOUCH_USLUGI_STEP_MIN = 96;
+    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
     var HOLD_COOLDOWN_MS = 100;
     var SECTION_READY_MS = 1000;
     var SECTION_REACH_PX = 16;
@@ -283,7 +276,7 @@
       });
 
       if (fromPanel && toPanel && fromPanel !== toPanel) {
-        tl.to(fromPanel, { autoAlpha: 0, filter: "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
+        tl.to(fromPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
       }
       if (curtain) {
         tl.to(curtain, { autoAlpha: 0.88, duration: 0.38, ease: "power2.in" }, 0);
@@ -300,13 +293,13 @@
         if (toPanel) {
           var scene = toPanel.closest(".home-scene");
           if (scene) scene.classList.add("is-entered", "is-visible");
-          gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: "blur(0px)", y: 0 });
+          gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0 });
         }
       }, 0.4);
 
       if (toPanel) {
-        gsap.set(toPanel, { autoAlpha: 0, filter: "blur(12px)" });
-        tl.to(toPanel, { autoAlpha: 1, filter: "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.44);
+        gsap.set(toPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(12px)" });
+        tl.to(toPanel, { autoAlpha: 1, filter: MOBILE ? "none" : "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.44);
       }
       if (curtain) {
         tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);
@@ -435,7 +428,8 @@
 
       wheelAccum += e.deltaY;
 
-      if (Math.abs(wheelAccum) >= WHEEL_INSTANT) {
+      var instant = activeIndex === uslugiIdx ? 48 : WHEEL_INSTANT;
+      if (Math.abs(wheelAccum) >= instant) {
         if (wheelTimer) window.clearTimeout(wheelTimer);
         commitWheel();
         return;
@@ -452,7 +446,8 @@
         return;
       }
 
-      if (Math.abs(wheelAccum) < WHEEL_MIN) {
+      var min = activeIndex === uslugiIdx ? 36 : WHEEL_MIN;
+      if (Math.abs(wheelAccum) < min) {
         wheelAccum = 0;
         return;
       }
@@ -468,18 +463,25 @@
       stepUp();
     }
 
+    var touchStartX = 0;
     var touchStartY = 0;
     var touchLastY = 0;
     var touchAccum = 0;
     var touchActive = false;
+    var touchIgnoreStep = false; // poziomy swipe w Usługach — tylko kafelki
+    var touchFromUslugi = false;
 
     window.addEventListener(
       "touchstart",
       function (e) {
         if (!e.touches[0] || REDUCED || shouldIgnore()) return;
+        touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchLastY = touchStartY;
         touchAccum = 0;
+        touchIgnoreStep = false;
+        touchFromUslugi =
+          activeIndex === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
         touchActive = true;
       },
       { passive: true, capture: true }
@@ -489,7 +491,26 @@
       "touchmove",
       function (e) {
         if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
+        var x = e.touches[0].clientX;
         var y = e.touches[0].clientY;
+        var dx = x - touchStartX;
+        var dy = y - touchStartY;
+
+        // Usługi: tylko wyraźny gest w poziomie = kafelki (nie sekcja).
+        // Pion zawsze jak wcześniej: preventDefault + snap do holdów.
+        if (
+          touchFromUslugi &&
+          !touchIgnoreStep &&
+          Math.abs(dx) > 18 &&
+          Math.abs(dx) > Math.abs(dy) * 1.45
+        ) {
+          touchIgnoreStep = true;
+          touchAccum = 0;
+          return;
+        }
+
+        if (touchIgnoreStep) return;
+
         touchAccum += touchLastY - y;
         touchLastY = y;
         e.preventDefault();
@@ -502,20 +523,26 @@
       function () {
         if (!touchActive) return;
         touchActive = false;
-        if (REDUCED || shouldIgnore()) {
+        if (REDUCED || shouldIgnore() || touchIgnoreStep) {
           touchAccum = 0;
+          touchIgnoreStep = false;
+          touchFromUslugi = false;
           return;
         }
         if (!canStep()) {
           touchAccum = 0;
+          touchFromUslugi = false;
           return;
         }
-        if (Math.abs(touchAccum) < WHEEL_MIN) {
+        var min = touchFromUslugi ? TOUCH_USLUGI_STEP_MIN : WHEEL_MIN;
+        if (Math.abs(touchAccum) < min) {
           touchAccum = 0;
+          touchFromUslugi = false;
           return;
         }
         var dir = touchAccum > 0 ? 1 : -1;
         touchAccum = 0;
+        touchFromUslugi = false;
         if (dir > 0) stepDown();
         else stepUp();
       },
@@ -527,6 +554,8 @@
       function () {
         touchActive = false;
         touchAccum = 0;
+        touchIgnoreStep = false;
+        touchFromUslugi = false;
       },
       { passive: true, capture: true }
     );

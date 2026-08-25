@@ -32,118 +32,29 @@
     });
   }
 
-  function setAutoPanel(panel, showAmt) {
-    gsap.set(panel, {
-      autoAlpha: showAmt,
-      scale: (MOBILE ? 0.96 : 0.94) + showAmt * (MOBILE ? 0.04 : 0.06),
-      filter: MOBILE ? "none" : "blur(" + (1 - showAmt) * 14 + "px)",
-    });
-  }
-
-  /** Pin + fade przez ciemność — jak wireScene na homepage (proces → FAQ). */
-  function wirePortfolioScene(section, panel, opts) {
-    if (!section || !panel || REDUCED) {
-      if (section) section.classList.add("is-entered", "is-visible");
-      return null;
-    }
-
-    opts = opts || {};
-    var curtain = getCurtain();
-    var pinLen = opts.pin || (MOBILE ? "+=76%" : "+=94%");
-    var fadeOut = opts.fadeOut !== false;
-    var skipFadeIn = opts.skipFadeIn === true;
-
-    if (!skipFadeIn) {
+  function revealAutoSection(auto) {
+    if (!auto) return;
+    auto.classList.add("is-entered", "is-visible");
+    var panel = auto.querySelector(".portfolio-scene__panel");
+    if (panel && window.gsap) {
       gsap.set(panel, {
-        autoAlpha: 0,
-        scale: MOBILE ? 1.04 : 1.07,
-        filter: MOBILE ? "none" : "blur(14px)",
-      });
-    } else {
-      gsap.set(panel, {
-        autoAlpha: 0,
-        scale: MOBILE ? 0.96 : 0.94,
-        filter: MOBILE ? "none" : "blur(14px)",
+        autoAlpha: 1,
+        scale: 1,
+        filter: "none",
+        visibility: "visible",
+        clearProps: "transform",
       });
     }
-
-    var tl = gsap.timeline({
-      scrollTrigger: {
-        id: opts.id || section.id,
-        trigger: section,
-        start: "top top",
-        end: pinLen,
-        pin: true,
-        pinSpacing: true,
-        scrub: MOBILE ? 1.2 : 1.5,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        refreshPriority: opts.priority || 0,
-        onEnter: function () {
-          section.classList.add("is-entered", "is-visible");
-        },
-        onEnterBack: function () {
-          section.classList.add("is-entered", "is-visible");
-        },
-        onLeave: function () {
-          section.classList.remove("is-visible");
-        },
-        onLeaveBack: function () {
-          section.classList.remove("is-visible");
-        },
-      },
-    });
-
-    if (skipFadeIn) {
-      tl.to({}, { duration: 0.84, ease: "none" }, 0);
-    } else {
-      tl.to(
-        panel,
-        {
-          autoAlpha: 1,
-          scale: 1,
-          filter: MOBILE ? "none" : "blur(0px)",
-          duration: 0.12,
-          ease: "power3.out",
-        },
-        0
-      );
-
-      if (curtain) {
-        tl.to(curtain, { autoAlpha: 0.78, duration: 0.05, ease: "power1.in" }, 0).to(
-          curtain,
-          { autoAlpha: 0, duration: 0.1, ease: "power2.out" },
-          0.05
-        );
-      }
-
-      tl.to(panel, { autoAlpha: 1, scale: 1, duration: 0.72, ease: "none" }, 0.12);
+    if (window.gsap) {
+      gsap.set(auto.querySelectorAll(".portfolio-case-card"), {
+        autoAlpha: 1,
+        clearProps: "transform,filter",
+      });
     }
-
-    if (fadeOut) {
-      tl.to(
-        panel,
-        {
-          autoAlpha: 0,
-          scale: MOBILE ? 0.96 : 0.94,
-          filter: MOBILE ? "none" : "blur(12px)",
-          duration: 0.16,
-          ease: "power3.in",
-        },
-        0.84
-      );
-      if (curtain) {
-        tl.to(curtain, { autoAlpha: 0.88, duration: 0.12, ease: "power3.in" }, 0.88);
-      }
-    } else {
-      tl.to(panel, { autoAlpha: 1, duration: 0.16, ease: "none" }, 0.84);
-    }
-
-    return tl;
   }
 
-  /** Dwukierunkowy most Grafiki ↔ Automatyzacje przez ciemność. */
-  function initGrafikiAutoBridge(curtain, grafiki, auto, panel) {
+  /** Delikatne wyjście z Grafik pod koniec pinu — bez pinowania Automatyzacji. */
+  function initGrafikiExitFade(curtain, grafiki) {
     if (ScrollTrigger.getById("grafiki-auto-bridge")) return;
 
     var stage = grafiki.querySelector(".graphics-stage");
@@ -155,41 +66,25 @@
       start: function () {
         var pin = ScrollTrigger.getById("grafiki-pin");
         if (!pin) return "top bottom";
-        return pin.start + (pin.end - pin.start) * 0.76;
+        return pin.start + (pin.end - pin.start) * 0.82;
       },
       end: function () {
-        var autoPin = ScrollTrigger.getById("scene-automatyzacje");
-        if (!autoPin) {
-          var gPin = ScrollTrigger.getById("grafiki-pin");
-          return gPin ? gPin.end + 120 : "bottom top";
-        }
-        return autoPin.start + (autoPin.end - autoPin.start) * 0.14;
+        var pin = ScrollTrigger.getById("grafiki-pin");
+        return pin ? pin.end : "bottom top";
       },
-      scrub: MOBILE ? 1.25 : 1.55,
+      scrub: MOBILE ? 1.15 : 1.4,
       invalidateOnRefresh: true,
-      onEnter: function () {
-        document.body.classList.add("is-portfolio-scene-bridge");
-      },
-      onEnterBack: function () {
-        document.body.classList.add("is-portfolio-scene-bridge");
-      },
-      onLeave: function () {
-        document.body.classList.remove("is-portfolio-scene-bridge");
-      },
       onLeaveBack: function () {
         document.body.classList.remove("is-portfolio-scene-bridge");
         resetGrafikiStage(grafiki);
-        gsap.set(panel, { autoAlpha: 0, visibility: "hidden" });
         if (curtain) gsap.set(curtain, { autoAlpha: 0 });
       },
       onUpdate: function (self) {
         var p = self.progress;
-        var grafikiHide = smoothstep(0, 0.46, p);
-        var autoShow = smoothstep(0.54, 1, p);
-        var curtainAmt = Math.sin(p * Math.PI) * 0.88;
+        var grafikiHide = smoothstep(0, 1, p);
+        var curtainAmt = Math.sin(p * Math.PI) * 0.55;
 
         setGrafikiStage(stage, grafikiHide);
-        setAutoPanel(panel, autoShow);
 
         if (curtain) {
           gsap.set(curtain, {
@@ -198,10 +93,10 @@
           });
         }
 
+        if (p > 0.2) document.body.classList.add("is-portfolio-scene-bridge");
+        else document.body.classList.remove("is-portfolio-scene-bridge");
+
         if (p < 0.04) resetGrafikiStage(grafiki);
-        if (p > 0.96) {
-          gsap.set(panel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", visibility: "visible" });
-        }
       },
     });
   }
@@ -212,21 +107,15 @@
     var pin = ScrollTrigger.getById("grafiki-pin");
     var auto = document.getElementById("automatyzacje");
     var grafiki = document.getElementById("grafiki");
-    var panel = auto && auto.querySelector(".portfolio-scene__panel");
-    if (!pin || !auto || !grafiki || !panel) return;
+    if (!pin || !auto || !grafiki) return;
 
     sceneBridgeReady = true;
 
     var curtain = getCurtain();
     if (curtain) gsap.set(curtain, { autoAlpha: 0, visibility: "hidden" });
 
-    initGrafikiAutoBridge(curtain, grafiki, auto, panel);
-    wirePortfolioScene(auto, panel, {
-      id: "scene-automatyzacje",
-      pin: MOBILE ? "+=76%" : "+=94%",
-      fadeOut: true,
-      skipFadeIn: true,
-    });
+    revealAutoSection(auto);
+    initGrafikiExitFade(curtain, grafiki);
 
     ScrollTrigger.refresh();
   }
@@ -236,13 +125,15 @@
 
     gsap.registerPlugin(ScrollTrigger);
 
-    document.querySelectorAll("[data-portfolio-section]").forEach(function (section, i) {
-      if (section.id === "automatyzacje") return;
+    var auto = document.getElementById("automatyzacje");
+    if (auto) revealAutoSection(auto);
 
+    document.querySelectorAll("[data-portfolio-section]").forEach(function (section, i) {
       var head = section.querySelector("[data-portfolio-head]");
       var body = section.querySelector("[data-portfolio-body]");
       var curtain = section.querySelector(".portfolio-section__curtain");
-      var staticMobileSection = MOBILE && (section.id === "strony" || section.id === "montaz");
+      var staticMobileSection =
+        MOBILE && (section.id === "strony" || section.id === "montaz" || section.id === "automatyzacje");
 
       if (staticMobileSection && window.gsap) {
         if (head) gsap.set(head.children, { clearProps: "opacity,transform,filter" });
@@ -273,14 +164,14 @@
             opacity: 0,
             y: i % 2 === 0 ? 72 : -56,
             x: i % 2 === 0 ? -36 : 36,
-            filter: "blur(12px)",
+            filter: MOBILE ? "none" : "blur(12px)",
             rotateZ: i % 2 === 0 ? -2 : 2,
           },
           {
             opacity: 1,
             y: 0,
             x: 0,
-            filter: "blur(0px)",
+            filter: MOBILE ? "none" : "blur(0px)",
             rotateZ: 0,
             stagger: 0.08,
             ease: "power3.out",
@@ -319,6 +210,10 @@
         from: { y: 90, rotateZ: -6, scale: 0.9 },
         stagger: 0.12,
       });
+      bindTileMotion("#automatyzacje .portfolio-case-card", {
+        from: { y: 64, rotateZ: -2, scale: 0.96 },
+        stagger: 0.1,
+      });
     }
 
     ScrollTrigger.refresh();
@@ -333,14 +228,14 @@
       bound = true;
       gsap.fromTo(
         nodes,
-        Object.assign({ opacity: 0, filter: "blur(8px)" }, opts.from),
+        Object.assign({ opacity: 0, filter: MOBILE ? "none" : "blur(8px)" }, opts.from),
         {
           opacity: 1,
           y: 0,
           x: 0,
           rotateZ: 0,
           scale: 1,
-          filter: "blur(0px)",
+          filter: MOBILE ? "none" : "blur(0px)",
           stagger: opts.stagger || 0.08,
           ease: "power3.out",
           scrollTrigger: {

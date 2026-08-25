@@ -1173,25 +1173,27 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     }
 
     // Portal stays visible for sand ribbon after cube exits
+    var sandOn =
+      menuBlend > 0.02 ||
+      sandLocked ||
+      displayStream > 0.32 ||
+      displayBreak > 0.4 ||
+      tm > 0.08;
+    var portalOp = sandOn
+      ? 1
+      : tilesOp > 0.45
+        ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
+        : 0.68;
     if (canvas.parentElement) {
-      var sandOn =
-        menuBlend > 0.02 ||
-        sandLocked ||
-        displayStream > 0.32 ||
-        displayBreak > 0.4 ||
-        tm > 0.08;
-      var portalOp = sandOn
-        ? 1
-        : tilesOp > 0.45
-          ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
-          : 0.68;
       canvas.parentElement.style.opacity = String(portalOp);
       canvas.parentElement.style.visibility = portalOp > 0.05 ? "visible" : "hidden";
     }
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);
-    renderer.render(scene, camera);
+    if (portalOp > 0.05 || sandOn || menuBlend > 0.001) {
+      renderer.render(scene, camera);
+    }
   }
 
   if (canvas.parentElement) {

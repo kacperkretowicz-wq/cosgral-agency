@@ -1,0 +1,14 @@
+# COSGRAL — LiteSpeed / Apache (SEOHOST)
+Options -Indexes
+
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # /portfolio and /portfolio/ → page (keep /portfolio-media/reels|graphics|… assets)
+  RewriteRule ^portfolio/?$ /portfolio.html [R=301,L]
+
+  # Pretty URLs for other HTML pages
+  RewriteRule ^o-nas/?$ /o-nas.html [R=301,L]
+</IfModule>

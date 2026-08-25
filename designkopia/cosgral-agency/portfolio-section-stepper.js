@@ -11,7 +11,7 @@
     { id: "strony", selector: "#strony" },
     { id: "montaz", selector: "#montaz" },
     { stId: "grafiki-pin", hold: 0, id: "grafiki" },
-    { stId: "scene-automatyzacje", hold: 0.48, id: "automatyzacje" },
+    { id: "automatyzacje", selector: "#automatyzacje" },
     { id: "footer", footer: true },
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) {
@@ -27,17 +27,7 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    if (MOBILE) {
-      var viewH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-      var footerH = footer.offsetHeight;
-      var topInset = 64;
-      var bottomInset = 12;
-      if (footerH + topInset + bottomInset <= viewH) {
-        return Math.min(max, Math.max(0, footer.offsetTop - topInset));
-      }
-      return Math.min(max, Math.max(0, footer.offsetTop + footerH - viewH + bottomInset));
-    }
-    return Math.min(max, Math.max(0, footer.offsetTop - 234));
+    return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
   function sectionHoldY(selector) {
@@ -163,7 +153,28 @@
       }
       var section = document.getElementById(cfg.id) || document.querySelector(cfg.selector);
       if (!section) return null;
+      if (cfg.id === "automatyzacje") return section;
       return section.querySelector(".portfolio-scene__panel") || section;
+    }
+
+    function autoFreeRange() {
+      var auto = document.getElementById("automatyzacje");
+      var footer = document.querySelector(".site-footer");
+      if (!auto) return null;
+      var start = Math.max(0, auto.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
+      var end = footer
+        ? Math.max(0, footer.offsetTop)
+        : window.ScrollTrigger
+          ? ScrollTrigger.maxScroll(window)
+          : document.documentElement.scrollHeight;
+      return { start: start, end: end };
+    }
+
+    function inAutoFreeZone(y) {
+      var r = autoFreeRange();
+      if (!r) return false;
+      if (y == null) y = window.scrollY;
+      return y >= r.start - 24 && y < r.end - 36;
     }
 
     function setScrollY(target, onDone) {
@@ -229,6 +240,26 @@
       );
     }
 
+    function ensureAutoVisible() {
+      var auto = document.getElementById("automatyzacje");
+      if (!auto || !window.gsap) return;
+      auto.classList.add("is-entered", "is-visible");
+      var panel = auto.querySelector(".portfolio-scene__panel");
+      if (panel) {
+        gsap.set(panel, {
+          autoAlpha: 1,
+          scale: 1,
+          filter: "none",
+          visibility: "visible",
+          y: 0,
+        });
+      }
+      gsap.set(auto.querySelectorAll(".portfolio-case-card"), {
+        autoAlpha: 1,
+        clearProps: "transform,filter",
+      });
+    }
+
     function jumpTo(index) {
       holds = buildHolds();
       index = clamp(index, 0, holds.length - 1);
@@ -268,7 +299,10 @@
           if (toPanel) {
             var scene = toPanel.closest(".portfolio-scene");
             if (scene) scene.classList.add("is-entered", "is-visible");
-            gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0, visibility: "visible" });
+            if (index === AUTO_IDX) ensureAutoVisible();
+            else {
+              gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0, visibility: "visible" });
+            }
           }
         });
       }
@@ -292,7 +326,10 @@
       });
 
       if (fromPanel && toPanel && fromPanel !== toPanel) {
-        tl.to(fromPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
+        var fromIsAuto = fromPanel.id === "automatyzacje" || !!fromPanel.closest?.("#automatyzacje");
+        if (!fromIsAuto) {
+          tl.to(fromPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
+        }
       }
       if (curtain) {
         tl.to(curtain, { autoAlpha: 0.88, duration: 0.38, ease: "power2.in", visibility: "visible" }, 0);
@@ -301,10 +338,20 @@
       tl.add(commitScroll, 0.36);
 
       if (toPanel) {
-        gsap.set(toPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(12px)" });
-        tl.to(toPanel, { autoAlpha: 1, filter: MOBILE ? "none" : "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.4);
-      }
-      if (curtain) {
+        var toIsAuto = toPanel.id === "automatyzacje" || !!toPanel.closest?.("#automatyzacje");
+        if (toIsAuto) {
+          ensureAutoVisible();
+          if (curtain) {
+            tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);
+          }
+        } else {
+          gsap.set(toPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(12px)" });
+          tl.to(toPanel, { autoAlpha: 1, filter: MOBILE ? "none" : "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.4);
+          if (curtain) {
+            tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);
+          }
+        }
+      } else if (curtain) {
         tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);
       }
     }
@@ -339,6 +386,7 @@
           window.scrollTo(0, target);
           if (window.ScrollTrigger) ScrollTrigger.update();
         }
+        if (index === AUTO_IDX) ensureAutoVisible();
         if (index === GRAFIKI_IDX && grafikiApi()) {
           var g = grafikiApi();
           if (fromIndex < index && g.transitionToBeat) {
@@ -363,6 +411,15 @@
       }
 
       if (activeIndex === AUTO_IDX) {
+        var rangeUp = autoFreeRange();
+        if (rangeUp && window.scrollY > rangeUp.start + 12) {
+          scrollToY(rangeUp.start, SNAP_MS, false, function () {
+            activeIndex = AUTO_IDX;
+            syncStepView(AUTO_IDX);
+            ensureAutoVisible();
+          });
+          return;
+        }
         jumpTo(GRAFIKI_IDX);
         return;
       }
@@ -390,6 +447,23 @@
         return;
       }
 
+      if (activeIndex === AUTO_IDX) {
+        var rangeDown = autoFreeRange();
+        if (rangeDown && window.scrollY < rangeDown.end - 48) {
+          var nextY = Math.min(rangeDown.end - 8, window.scrollY + Math.round(window.innerHeight * 0.72));
+          locked = true;
+          scrollToY(nextY, SNAP_MS * 0.85, false, function () {
+            locked = false;
+            beginCooldown();
+            activeIndex = AUTO_IDX;
+            syncStepView(AUTO_IDX);
+            ensureAutoVisible();
+            if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
+          });
+          return;
+        }
+      }
+
       if (activeIndex >= holds.length - 1) {
         goTo(activeIndex, SNAP_MS);
         return;
@@ -401,6 +475,14 @@
       if (locked || Date.now() < cooldownUntil) return;
       if (grafikiApi()?.isAnimating?.()) return;
       holds = buildHolds();
+
+      if (inAutoFreeZone()) {
+        activeIndex = AUTO_IDX;
+        syncStepView(AUTO_IDX);
+        ensureAutoVisible();
+        return;
+      }
+
       var idx = nearestIndex(window.scrollY);
       var dist = Math.abs(window.scrollY - holds[idx]);
       if (dist > 2) {
@@ -417,6 +499,33 @@
 
     function onWheel(e) {
       if (REDUCED || shouldIgnore()) return;
+
+      var range = autoFreeRange();
+      if (range && (activeIndex === AUTO_IDX || inAutoFreeZone())) {
+        var y = window.scrollY;
+        var atTop = y <= range.start + 10;
+        var atBottom = y >= range.end - 40;
+
+        if (e.deltaY < 0 && atTop) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!canStep()) return;
+          jumpTo(GRAFIKI_IDX);
+          return;
+        }
+        if (e.deltaY > 0 && atBottom) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!canStep()) return;
+          goTo(holds.length - 1);
+          return;
+        }
+
+        activeIndex = AUTO_IDX;
+        syncStepView(AUTO_IDX);
+        ensureAutoVisible();
+        return;
+      }
 
       e.preventDefault();
       e.stopPropagation();
@@ -476,8 +585,25 @@
       function (e) {
         if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
         var y = e.touches[0].clientY;
-        touchAccum += touchLastY - y;
+        var dy = touchLastY - y;
+        touchAccum += dy;
         touchLastY = y;
+
+        var range = autoFreeRange();
+        if (range && (activeIndex === AUTO_IDX || inAutoFreeZone())) {
+          var scrollY = window.scrollY;
+          var atTop = scrollY <= range.start + 10;
+          var atBottom = scrollY >= range.end - 40;
+          if ((dy < 0 && atTop) || (dy > 0 && atBottom)) {
+            e.preventDefault();
+          } else {
+            activeIndex = AUTO_IDX;
+            syncStepView(AUTO_IDX);
+            ensureAutoVisible();
+          }
+          return;
+        }
+
         e.preventDefault();
       },
       { passive: false, capture: true }
@@ -492,6 +618,28 @@
           touchAccum = 0;
           return;
         }
+
+        var range = autoFreeRange();
+        if (range && (activeIndex === AUTO_IDX || inAutoFreeZone())) {
+          var scrollY = window.scrollY;
+          var atTop = scrollY <= range.start + 10;
+          var atBottom = scrollY >= range.end - 40;
+          if (touchAccum < -WHEEL_MIN && atTop) {
+            touchAccum = 0;
+            jumpTo(GRAFIKI_IDX);
+            return;
+          }
+          if (touchAccum > WHEEL_MIN && atBottom) {
+            touchAccum = 0;
+            goTo(holds.length - 1);
+            return;
+          }
+          touchAccum = 0;
+          activeIndex = AUTO_IDX;
+          syncStepView(AUTO_IDX);
+          return;
+        }
+
         if (Math.abs(touchAccum) < WHEEL_MIN) {
           touchAccum = 0;
           return;
@@ -574,7 +722,7 @@
     if (!document.body.classList.contains("portfolio-page")) return;
     if (window.cosgralPortfolioStepper) return;
     if (!window.ScrollTrigger || !window.gsap) return;
-    if (!ScrollTrigger.getById("grafiki-pin") || !ScrollTrigger.getById("scene-automatyzacje")) return;
+    if (!ScrollTrigger.getById("grafiki-pin")) return;
     init();
   }
 
