@@ -24,10 +24,13 @@
     if (MOBILE) {
       var viewH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
       var footerH = footer.offsetHeight;
-      var topInset = 64;
-      var bottomInset = 12;
+      /* Keep footer higher; leave room above home-indicator so bottom isn't clipped */
+      var topInset = 28;
+      var bottomInset = 104;
       if (footerH + topInset + bottomInset <= viewH) {
-        return Math.min(max, Math.max(0, footer.offsetTop - topInset));
+        var free = viewH - footerH;
+        var top = Math.min(topInset, Math.max(12, Math.round(free * 0.22)));
+        return Math.min(max, Math.max(0, footer.offsetTop - top));
       }
       return Math.min(
         max,

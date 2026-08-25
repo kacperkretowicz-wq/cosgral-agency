@@ -2388,12 +2388,14 @@ html.reduce-motion .portfolio-page .home-scroll-rail { display: none; }
 @media (max-width: 900px) {
   .site-footer {
     overflow: visible;
-    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+    padding-top: clamp(0.55rem, 1.6vh, 1rem);
+    padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
   }
   .footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.7rem 0.6rem;
-    padding-bottom: 0.85rem;
+    padding-bottom: 0.55rem;
+    margin-bottom: 0;
   }
   .footer-cta,
   .footer-col--social,
@@ -2651,10 +2653,15 @@ html.reduce-motion .portfolio-page .home-scroll-rail { display: none; }
 
 /* Subtle pointer / gyro tilt — never transform scroll-pinned sections or nav-overlay stage */
 html.has-global-tilt:not(.reduce-motion) .site-nav,
-html.has-global-tilt:not(.reduce-motion) .site-footer,
 html.has-global-tilt:not(.reduce-motion) .home-scroll-rail {
   transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
   transform-origin: 50vw 50vh;
+}
+@media (min-width: 901px) {
+  html.has-global-tilt:not(.reduce-motion) .site-footer {
+    transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
+    transform-origin: 50vw 50vh;
+  }
 }
 
 /* About — visible blocks only (jak homepage .home-scene.is-in-view) */
