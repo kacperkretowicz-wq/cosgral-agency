@@ -46,6 +46,14 @@
       document.title = t(metaKey + ".title");
       var metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) metaDesc.setAttribute("content", t(metaKey + ".description"));
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute("content", t(metaKey + ".title"));
+      var ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute("content", t(metaKey + ".description"));
+      var twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) twTitle.setAttribute("content", t(metaKey + ".title"));
+      var twDesc = document.querySelector('meta[name="twitter:description"]');
+      if (twDesc) twDesc.setAttribute("content", t(metaKey + ".description"));
     }
 
     document.querySelectorAll("[data-i18n]").forEach(function (el) {

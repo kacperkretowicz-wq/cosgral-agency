@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="ShelfSync  panel cen i stanów">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#141414"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg1)"/>
+  <rect x="36" y="40" width="568" height="280" rx="18" fill="#0c0c0c" stroke="rgba(255,255,255,0.12)"/>
+  <rect x="56" y="62" width="140" height="14" rx="7" fill="rgba(255,255,255,0.18)"/>
+  <rect x="56" y="88" width="90" height="8" rx="4" fill="rgba(255,255,255,0.08)"/>
+  <!-- price cards -->
+  <rect x="56" y="120" width="160" height="96" rx="12" fill="#121212" stroke="rgba(255,255,255,0.1)"/>
+  <text x="76" y="148" fill="rgba(255,255,255,0.45)" font-family="IBM Plex Mono, monospace" font-size="11">STOCK</text>
+  <text x="76" y="178" fill="#f5f5f5" font-family="Plus Jakarta Sans, sans-serif" font-size="28" font-weight="600">248</text>
+  <text x="76" y="198" fill="rgba(255,255,255,0.4)" font-family="IBM Plex Mono, monospace" font-size="10">SKU live</text>
+  <rect x="240" y="120" width="160" height="96" rx="12" fill="#121212" stroke="rgba(255,255,255,0.1)"/>
+  <text x="260" y="148" fill="rgba(255,255,255,0.45)" font-family="IBM Plex Mono, monospace" font-size="11">PRICE WATCH</text>
+  <text x="260" y="178" fill="#f5f5f5" font-family="Plus Jakarta Sans, sans-serif" font-size="28" font-weight="600">12%</text>
+  <text x="260" y="198" fill="rgba(255,255,255,0.4)" font-family="IBM Plex Mono, monospace" font-size="10">vs marketplace</text>
+  <rect x="424" y="120" width="160" height="96" rx="12" fill="#121212" stroke="rgba(255,255,255,0.14)"/>
+  <text x="444" y="148" fill="rgba(255,255,255,0.45)" font-family="IBM Plex Mono, monospace" font-size="11">ALERT</text>
+  <circle cx="456" cy="172" r="5" fill="#fff"/>
+  <text x="470" y="176" fill="#f5f5f5" font-family="Plus Jakarta Sans, sans-serif" font-size="14">3 dumping</text>
+  <text x="444" y="198" fill="rgba(255,255,255,0.4)" font-family="IBM Plex Mono, monospace" font-size="10">push notify</text>
+  <!-- chart bars -->
+  <rect x="56" y="244" width="28" height="48" rx="4" fill="rgba(255,255,255,0.12)"/>
+  <rect x="96" y="228" width="28" height="64" rx="4" fill="rgba(255,255,255,0.22)"/>
+  <rect x="136" y="236" width="28" height="56" rx="4" fill="rgba(255,255,255,0.16)"/>
+  <rect x="176" y="214" width="28" height="78" rx="4" fill="rgba(255,255,255,0.32)"/>
+  <rect x="216" y="248" width="28" height="44" rx="4" fill="rgba(255,255,255,0.14)"/>
+  <rect x="256" y="232" width="28" height="60" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="480" y="280" fill="rgba(255,255,255,0.35)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="end">ShelfSync</text>
+</svg>
