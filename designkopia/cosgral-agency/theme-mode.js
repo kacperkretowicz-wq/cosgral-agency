@@ -98,9 +98,6 @@
     var stored = getStored();
     if (stored === "light") applyTheme("light", false);
     bindToggle();
-    if (window.cosgralI18n?.applyLang) {
-      window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
-    }
   }
 
   window.cosgralTheme = {

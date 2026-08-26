@@ -74,7 +74,7 @@
     if (isReload) return;
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
     if (location.hash) {
       history.replaceState(null, "", location.pathname + location.search);
     }
@@ -538,7 +538,7 @@
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js?v=20260825z"></script>
-<script src="theme-mode.js?v=20260825ab"></script>
+<script src="theme-mode.js?v=20260826b"></script>
 <script src="preloader.js?v=20260814e"></script>
 <script src="smooth-scroll.js?v=20260825p"></script>
 <script src="home-cursor-field.js?v=20260825s"></script>
@@ -549,7 +549,7 @@
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260825p"></script>
 <script src="home-section-flow.js?v=20260816f"></script>
-<script src="home-scroll-rail.js?v=20260825n"></script>
+<script src="home-scroll-rail.js?v=20260826b"></script>
 <script src="home-section-stepper.js?v=20260825p"></script>
 <script src="home-director.js?v=20260815a"></script>
 <script src="home-tile-interact.js?v=20260825n"></script>

@@ -193,14 +193,11 @@
       }
     }
 
+    // Rail nodes are created with data-i18n* attrs — one applyLang refreshes them.
+    // Do NOT listen for cosgral:langchange → applyLang (infinite loop).
     if (window.cosgralI18n?.applyLang) {
       window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
     }
-    window.addEventListener("cosgral:langchange", function () {
-      if (window.cosgralI18n?.applyLang) {
-        window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
-      }
-    });
 
     function refreshMetrics() {
       maxScroll = ScrollTrigger.maxScroll(window) || 1;
