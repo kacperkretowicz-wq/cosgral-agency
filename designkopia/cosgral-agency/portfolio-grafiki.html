@@ -12,7 +12,16 @@
 <meta name="description" content="Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260825x" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260825z" />
+<link rel="stylesheet" href="theme-mode.css?v=20260825ab" />
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("cosgral-theme");
+      if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+    } catch (e) {}
+  })();
+</script>
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
   (function () {
@@ -51,6 +60,10 @@
     <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <div class="site-nav__actions">
+    <button type="button" class="theme-switch" data-theme-toggle data-no-transition aria-pressed="false" aria-label="Tryb ciemny">
+      <span class="theme-switch__track" aria-hidden="true"><span class="theme-switch__thumb"></span></span>
+      <span class="theme-switch__label" data-i18n="theme.toggle">Motyw</span>
+    </button>
     <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
       <button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button>
       <button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button>
@@ -186,5 +199,6 @@
 <script src="portfolio-video.js?v=20260807ag"></script>
 <script src="portfolio-color-zone.js?v=20260814e"></script>
 <script src="portfolio-graphics.js?v=20260825p"></script>
+<script src="theme-mode.js?v=20260826b"></script>
 </body>
 </html>

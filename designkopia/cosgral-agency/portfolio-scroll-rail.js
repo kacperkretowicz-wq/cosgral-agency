@@ -24,10 +24,23 @@
     return scene.label;
   }
 
-  function applyI18n() {
-    if (window.cosgralI18n?.applyLang) {
-      window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
-    }
+  function refreshRailLabels(ui) {
+    if (!ui) return;
+    SCENES.forEach(function (scene, i) {
+      var label = sceneLabel(scene);
+      var title = ui.rail.querySelector('[data-scroll-rail-title="' + scene.id + '"]');
+      if (title) {
+        title.textContent = label;
+        title.setAttribute("aria-label", label);
+      }
+      var dot = ui.dots[i];
+      if (dot) {
+        dot.setAttribute("aria-label", label);
+        dot.title = label;
+      }
+    });
+    var aria = window.cosgralI18n?.t?.("rail.aria");
+    if (aria) ui.rail.setAttribute("aria-label", aria);
   }
 
   function sceneY(selector) {
@@ -101,9 +114,17 @@
     var holdPositions = [];
     var lastIndex = -1;
 
-    applyI18n();
-    window.addEventListener("cosgral:langchange", applyI18n);
-    window.addEventListener("cosgral:i18n-ready", applyI18n);
+    // One applyLang after building dynamic rail nodes with data-i18n*.
+    // Do NOT re-enter applyLang on cosgral:langchange (stack overflow).
+    if (window.cosgralI18n?.applyLang) {
+      window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
+    }
+    window.addEventListener("cosgral:langchange", function () {
+      refreshRailLabels(ui);
+    });
+    window.addEventListener("cosgral:i18n-ready", function () {
+      refreshRailLabels(ui);
+    });
 
     function revealTitle(index) {
       var scene = SCENES[index];

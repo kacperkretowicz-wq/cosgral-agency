@@ -49,9 +49,18 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260825q" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260826a" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
+<link rel="stylesheet" href="theme-mode.css?v=20260825ab" />
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("cosgral-theme");
+      if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+    } catch (e) {}
+  })();
+</script>
 <script>
   (function () {
     var path = (location.pathname || "/").replace(/\/$/, "") || "/";
@@ -65,7 +74,7 @@
     if (isReload) return;
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
     if (location.hash) {
       history.replaceState(null, "", location.pathname + location.search);
     }
@@ -82,8 +91,8 @@
   })();
 </script>
 <script src="service-themes.js?v=20260810l"></script>
-<script src="services-content.js?v=20260825w"></script>
-<script src="service-panel.js?v=20260816at"></script>
+<script src="services-content.js?v=20260825y"></script>
+<script src="service-panel.js?v=20260825y"></script>
 <script src="page-transitions.js?v=20260816at"></script>
 <script>
   (function () {
@@ -129,6 +138,10 @@
     <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <div class="site-nav__actions">
+    <button type="button" class="theme-switch" data-theme-toggle data-no-transition aria-pressed="false" aria-label="Tryb ciemny">
+      <span class="theme-switch__track" aria-hidden="true"><span class="theme-switch__thumb"></span></span>
+      <span class="theme-switch__label" data-i18n="theme.toggle">Motyw</span>
+    </button>
     <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
       <button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button>
       <button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button>
@@ -524,7 +537,8 @@
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="i18n.js?v=20260825x"></script>
+<script src="i18n.js?v=20260825z"></script>
+<script src="theme-mode.js?v=20260826b"></script>
 <script src="preloader.js?v=20260814e"></script>
 <script src="smooth-scroll.js?v=20260825p"></script>
 <script src="home-cursor-field.js?v=20260825s"></script>
@@ -535,7 +549,7 @@
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260825p"></script>
 <script src="home-section-flow.js?v=20260816f"></script>
-<script src="home-scroll-rail.js?v=20260825n"></script>
+<script src="home-scroll-rail.js?v=20260826b"></script>
 <script src="home-section-stepper.js?v=20260825p"></script>
 <script src="home-director.js?v=20260815a"></script>
 <script src="home-tile-interact.js?v=20260825n"></script>

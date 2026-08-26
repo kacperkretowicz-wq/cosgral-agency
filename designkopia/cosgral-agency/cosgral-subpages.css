@@ -988,13 +988,46 @@ html.reduce-motion .nav-overlay__char {
   margin-top: 0.35rem;
 }
 .about-hero {
-  padding: clamp(6.5rem, 16vh, 8.5rem) var(--gutter) clamp(1.5rem, 4vh, 2.5rem);
+  padding:
+    calc(5.5rem + env(safe-area-inset-top, 0px))
+    var(--gutter)
+    clamp(2rem, 6vh, 3.5rem);
 }
 .about-hero.portfolio-hero {
-  min-height: auto;
-  padding-bottom: clamp(1.25rem, 3vh, 2rem);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: clamp(2.5rem, 7vh, 4rem);
+  justify-content: center;
 }
 .about-hero .portfolio-hero__title { margin-bottom: 0.75rem; }
+.about-hero__scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.5rem, 4vh, 2.75rem);
+  translate: -50% 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.75;
+  animation: about-scroll-hint 2.4s ease-in-out infinite;
+}
+@keyframes about-scroll-hint {
+  0%, 100% { transform: translateY(0); opacity: 0.45; }
+  50% { transform: translateY(6px); opacity: 0.9; }
+}
+.about-bridge {
+  height: clamp(22vh, 32vh, 40vh);
+  pointer-events: none;
+}
+body.is-about-scene-bridge [data-about-scene-curtain] {
+  visibility: visible;
+}
+html.reduce-motion .about-hero__scroll-hint {
+  animation: none;
+}
 .about-hero__lead {
   max-width: 42rem;
   margin: 0 auto;
@@ -1015,15 +1048,19 @@ html.reduce-motion .nav-overlay__char {
 }
 
 .about-team {
-  padding: 0 var(--gutter) clamp(2.5rem, 8vh, 4.5rem);
+  padding:
+    clamp(4.5rem, 12vh, 7rem)
+    var(--gutter)
+    clamp(3rem, 10vh, 5.5rem);
+  scroll-margin-top: calc(5.5rem + env(safe-area-inset-top, 0px));
 }
 .about-team__grid {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: center;
-  gap: clamp(2.5rem, 8vw, 5.5rem);
-  max-width: 58rem;
+  gap: clamp(4rem, 12vw, 8rem);
+  max-width: 62rem;
   margin: 0 auto;
 }
 .about-team__member {
@@ -1031,20 +1068,20 @@ html.reduce-motion .nav-overlay__char {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.45rem;
+  gap: clamp(0.55rem, 1.6vw, 0.85rem);
   text-align: center;
   flex: 1 1 16rem;
-  max-width: 26rem;
+  max-width: 28rem;
 }
 .about-team__photo {
-  width: clamp(9.5rem, 22vw, 13.5rem);
-  height: clamp(9.5rem, 22vw, 13.5rem);
+  width: clamp(10rem, 24vw, 14.5rem);
+  height: clamp(10rem, 24vw, 14.5rem);
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.04);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
-  margin-bottom: 0.7rem;
+  margin-bottom: clamp(1.25rem, 3.5vw, 2.25rem);
 }
 .about-team__img {
   width: 100%;
@@ -1091,15 +1128,15 @@ html.reduce-motion .nav-overlay__char {
 .about-team__bios {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 0.75rem;
+  gap: clamp(1rem, 2.5vw, 1.4rem);
+  margin-top: clamp(1.25rem, 3vw, 2rem);
   width: 100%;
-  max-width: 24rem;
+  max-width: 26rem;
 }
 .about-team__bio {
   margin: 0;
   font-size: clamp(0.9rem, 1.8vw, 0.98rem);
-  line-height: 1.62;
+  line-height: 1.68;
   color: rgba(255, 255, 255, 0.72);
   text-align: center;
 }
@@ -1113,12 +1150,14 @@ html.reduce-motion .nav-overlay__char {
   }
   .about-hero {
     padding:
-      calc(5.75rem + env(safe-area-inset-top, 0px))
+      calc(5.25rem + env(safe-area-inset-top, 0px))
       1.35rem
-      2rem;
+      2.5rem;
   }
   .about-hero.portfolio-hero {
-    padding-bottom: 2rem;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: 2.75rem;
   }
   .about-hero .container {
     padding-inline: 0;
@@ -1145,12 +1184,16 @@ html.reduce-motion .nav-overlay__char {
     margin-top: 1.5rem;
   }
   .about-team {
-    padding: 0.5rem 1.35rem calc(3.5rem + env(safe-area-inset-bottom, 0px));
+    padding:
+      clamp(3.5rem, 10vh, 5rem)
+      1.35rem
+      calc(4rem + env(safe-area-inset-bottom, 0px));
+    scroll-margin-top: calc(4.75rem + env(safe-area-inset-top, 0px));
   }
   .about-team__grid {
     flex-direction: column;
     align-items: center;
-    gap: 3rem;
+    gap: clamp(3.5rem, 12vw, 4.5rem);
     max-width: 22.5rem;
   }
   .about-team__member {
