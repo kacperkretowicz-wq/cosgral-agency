@@ -41,6 +41,31 @@
   var HORIZONTAL_RATIO = 2.4;
   var wheelDecayTimer = null;
 
+  function isUslugiActive() {
+    var snapIdx = window.cosgralSectionSnap?.getIndex?.();
+    if (snapIdx === 1) return true;
+    if (section.classList.contains("is-in-view")) return true;
+    if (section.classList.contains("is-visible") || section.classList.contains("is-entered")) {
+      var rect = section.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      return rect.top < vh * 0.62 && rect.bottom > vh * 0.28;
+    }
+    return false;
+  }
+
+  function setUslugiActive(active) {
+    section.classList.toggle("is-in-view", !!active);
+    if (active) {
+      document.documentElement.classList.add("is-sand-stream");
+      showTapHint();
+    }
+  }
+
+  window.addEventListener("cosgral:section-step", function (e) {
+    var id = e.detail && e.detail.id;
+    setUslugiActive(id === "uslugi");
+  });
+
   var HOMES = [
     { x: -0.72, y: 0.48, scale: 0.28, rot: -14 },
     { x: 0.74, y: -0.42, scale: 0.24, rot: 17 },
@@ -397,14 +422,14 @@
   );
 
   document.addEventListener("keydown", function (e) {
-    if (!section.classList.contains("is-in-view")) return;
+    if (!isUslugiActive()) return;
     if (e.key === "ArrowRight") { e.preventDefault(); next(); }
     if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
   });
 
   // ——— Touchpad: tylko wyraźny gest w lewo / prawo ———
   function onWheel(e) {
-    if (!section.classList.contains("is-in-view")) return;
+    if (!isUslugiActive()) return;
     if (!isPointerOverStage(e)) return;
 
     var dx = e.deltaX;
@@ -492,6 +517,20 @@
   window.cosgralServicesFan = {
     goToIndex: function (nextIndex) {
       goTo(nextIndex);
+    },
+    stepFromWheel: function (deltaY) {
+      if (!isUslugiActive() || !canNavigate()) return false;
+      wheelAccumX += deltaY;
+      scheduleWheelDecay();
+      if (Math.abs(wheelAccumX) < 32) return false;
+      var dir = wheelAccumX > 0 ? 1 : -1;
+      wheelAccumX = 0;
+      lastNavAt = Date.now();
+      hideHint();
+      hideTapHint();
+      if (dir > 0) next();
+      else prev();
+      return true;
     },
     goToTheme: function (themeId, done) {
       var idx = -1;

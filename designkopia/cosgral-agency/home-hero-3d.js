@@ -1211,13 +1211,6 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     bindScroll();
   })();
 
-  window.cosgralCube = {
-    introDone: function () {
-      return introDone;
-    },
-    forceIntro: startIntro,
-  };
-
   function captureMenuFrom() {
     var heroZ = 0.36;
     var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
@@ -1370,6 +1363,10 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   window.cosgralCube = {
     group: cubeGroup,
     shards: shards,
+    introDone: function () {
+      return introDone;
+    },
+    forceIntro: startIntro,
     getMenuFaceRect: getMenuFaceRect,
     getMenuFaceAnchorRect: getMenuFaceAnchorRect,
     getMenuBlend: function () {

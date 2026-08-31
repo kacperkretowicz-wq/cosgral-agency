@@ -42,6 +42,85 @@
     },
   };
 
+  var enteredScenes = new WeakSet();
+
+  function enterFrom(dir) {
+    switch (dir) {
+      case "left":
+        return { x: -42, y: 0 };
+      case "right":
+        return { x: 42, y: 0 };
+      case "top":
+        return { x: 0, y: -32 };
+      default:
+        return { x: 0, y: 32 };
+    }
+  }
+
+  function sceneEnterTargets(scene) {
+    var panel = panelOf(scene);
+    if (!panel) return [];
+    return Array.prototype.slice.call(panel.querySelectorAll("[data-enter], .reveal-word > span"));
+  }
+
+  function ensureScenePanelVisible(scene) {
+    if (!scene || REDUCED) return;
+    var panel = panelOf(scene);
+    if (!panel || !window.gsap) return;
+    gsap.set(panel, {
+      autoAlpha: 1,
+      scale: 1,
+      filter: MOBILE ? "none" : "blur(0px)",
+    });
+    scene.classList.add("is-entered", "is-visible");
+  }
+
+  function playSceneEnters(scene, opts) {
+    if (!scene || REDUCED || !window.gsap) return;
+    opts = opts || {};
+    if (!opts.force && enteredScenes.has(scene)) return;
+    enteredScenes.add(scene);
+
+    var targets = sceneEnterTargets(scene);
+    if (!targets.length) return;
+
+    gsap.killTweensOf(targets);
+    targets.forEach(function (el, i) {
+      var dir =
+        el.getAttribute("data-enter") ||
+        (el.parentElement && el.parentElement.getAttribute("data-enter")) ||
+        "bottom";
+      var from = enterFrom(dir);
+      gsap.fromTo(
+        el,
+        {
+          autoAlpha: 0,
+          x: from.x,
+          y: from.y,
+          filter: MOBILE ? "none" : "blur(8px)",
+        },
+        {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          filter: "none",
+          duration: 0.82,
+          ease: "power3.out",
+          delay: opts.stagger === false ? 0 : i * 0.055,
+          overwrite: true,
+        }
+      );
+    });
+  }
+
+  window.cosgralSceneEnters = {
+    play: playSceneEnters,
+    ensurePanel: ensureScenePanelVisible,
+    reset: function (scene) {
+      if (scene) enteredScenes.delete(scene);
+    },
+  };
+
   function panelOf(scene) {
     return scene.querySelector(".home-scene__panel") || scene;
   }
@@ -84,6 +163,25 @@
     }
   }
 
+  window.cosgralSceneFlow = {
+    setCinema: setCinema,
+    animateCinemaTo: function (target, duration) {
+      if (REDUCED || !window.gsap) {
+        setCinema(target);
+        return null;
+      }
+      var tween = { value: window.cosgralSand?.cinema || 0 };
+      return gsap.to(tween, {
+        value: target,
+        duration: duration || 2.2,
+        ease: "power2.inOut",
+        onUpdate: function () {
+          setCinema(tween.value);
+        },
+      });
+    },
+  };
+
   /** Pinowana scena: ciemność → zoom in → długa pauza → ciemność */
   function wireScene(scene, opts) {
     if (!scene || REDUCED) {
@@ -116,10 +214,12 @@
         refreshPriority: opts.priority || 1,
         onEnter: function () {
           scene.classList.add("is-entered", "is-visible");
+          playSceneEnters(scene, { stagger: true });
           if (opts.onEnter) opts.onEnter();
         },
         onEnterBack: function () {
           scene.classList.add("is-entered", "is-visible");
+          playSceneEnters(scene, { stagger: true, force: true });
           if (opts.onEnterBack) opts.onEnterBack();
         },
         onLeave: function () {
@@ -199,6 +299,8 @@
 
     await window.cosgralSmoothScroll?.ready;
 
+    document.querySelectorAll("[data-reveal-words]").forEach(buildRevealWords);
+
     if (curtain) gsap.set(curtain, { autoAlpha: 0 });
 
     var hero = document.getElementById("top");
@@ -222,6 +324,13 @@
       var heroScroll = hero.querySelector(".home-hero__scroll");
       hero.classList.add("is-entered", "is-visible");
       gsap.set(panelOf(hero), { autoAlpha: 1 });
+      window.addEventListener(
+        "cosgral:cube-intro-done",
+        function () {
+          playSceneEnters(hero, { stagger: true, force: true });
+        },
+        { once: true }
+      );
 
       gsap
         .timeline({

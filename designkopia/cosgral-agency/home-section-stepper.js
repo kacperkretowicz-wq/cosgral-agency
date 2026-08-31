@@ -48,7 +48,14 @@
 
   function pointInUslugiSection(x, y) {
     var section = document.getElementById("uslugi");
-    if (!section || !section.classList.contains("is-in-view")) return false;
+    if (!section) return false;
+    var snapIdx = window.cosgralSectionSnap?.getIndex?.();
+    var active =
+      snapIdx === 1 ||
+      section.classList.contains("is-in-view") ||
+      section.classList.contains("is-visible") ||
+      section.classList.contains("is-entered");
+    if (!active) return false;
     var rect = section.getBoundingClientRect();
     return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
   }
@@ -103,9 +110,12 @@
     var SECTION_REACH_PX = 16;
     var lastCommitDir = 0;
     var cooldownUntil = 0;
-    var formFocusLock = false;
+    var fanVerticalAccum = 0;
+    var FAN_WHEEL_CARD_MIN = 32;
+    var FAN_WHEEL_SECTION_MIN = 140;
     var scrollUnlockTimer = null;
     var scrollUnlockRaf = 0;
+    var formFocusLock = false;
 
     function beginCooldown() {
       cooldownUntil = Date.now() + HOLD_COOLDOWN_MS;
@@ -180,7 +190,28 @@
       if (Math.abs(lenis.scroll - target) > 2) {
         lenis.scrollTo(target, { immediate: true });
       }
+      ensureScenePanelVisible(activeIndex);
       if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+    }
+
+    function ensureScenePanelVisible(index) {
+      var cfg = HOLDS_CONFIG[index];
+      if (!cfg || cfg.footer) return;
+      var section = document.getElementById(cfg.id);
+      if (!section) return;
+      if (window.cosgralSceneEnters?.ensurePanel) {
+        window.cosgralSceneEnters.ensurePanel(section);
+      } else if (window.gsap) {
+        var panel = section.querySelector(".home-scene__panel") || section;
+        window.gsap.set(panel, {
+          autoAlpha: 1,
+          scale: 1,
+          filter: MOBILE ? "none" : "blur(0px)",
+        });
+      }
+      if (window.cosgralSceneEnters?.play) {
+        window.cosgralSceneEnters.play(section, { stagger: true });
+      }
     }
 
     function watchScrollUnlock(target) {
@@ -237,7 +268,9 @@
         window.cosgralSand.stream = 0;
         window.cosgralSand.motionTail = 0;
         window.cosgralSand.resetCube = true;
-        document.documentElement.classList.remove("is-sand-stream");
+        document.documentElement.classList.remove("is-sand-stream", "is-shattering");
+        var shatter = document.getElementById("rozpad");
+        if (shatter) shatter.classList.remove("is-active");
         return;
       }
       window.cosgralSand.cinema = 1;
@@ -246,12 +279,41 @@
       window.cosgralSand.break = 0.98;
       window.cosgralSand.stream = 0.98;
       document.documentElement.classList.add("is-sand-stream");
+      document.documentElement.classList.remove("is-shattering");
+      var shatterDone = document.getElementById("rozpad");
+      if (shatterDone) shatterDone.classList.remove("is-active");
+    }
+
+    function syncSectionFocus(index) {
+      document.querySelectorAll(".home-scene").forEach(function (scene) {
+        scene.classList.remove("is-in-view");
+      });
+      var cfg = HOLDS_CONFIG[index];
+      if (!cfg || cfg.footer) return;
+      var section = document.getElementById(cfg.id);
+      if (!section) return;
+      section.classList.add("is-in-view", "is-entered", "is-visible");
+      if (window.cosgralSceneEnters?.ensurePanel) {
+        window.cosgralSceneEnters.ensurePanel(section);
+      }
+    }
+
+    function playHeroToServicesHandoff(duration) {
+      var shatter = document.getElementById("rozpad");
+      if (shatter) shatter.classList.add("is-active");
+      document.documentElement.classList.add("is-shattering");
+      if (window.cosgralSceneFlow?.animateCinemaTo) {
+        window.cosgralSceneFlow.animateCinemaTo(1, duration || 2.4);
+      } else {
+        syncSandForJump(1);
+      }
     }
 
     function jumpTo(index) {
       holds = buildHolds();
       index = clamp(index, 0, holds.length - 1);
       var target = holds[index];
+      var fromIndex = activeIndex;
 
       if (index === activeIndex && Math.abs(lenis.scroll - target) < 4) return;
 
@@ -287,13 +349,23 @@
         if (window.ScrollTrigger) ScrollTrigger.update();
         activeIndex = index;
         syncStepView(index);
-        syncSandForJump(index);
-        if (index === 0 && window.cosgralRestoreHero) window.cosgralRestoreHero();
+        syncSectionFocus(index);
+        if (index === 0) {
+          syncSandForJump(0);
+          if (window.cosgralRestoreHero) window.cosgralRestoreHero();
+        } else if (fromIndex === 0) {
+          playHeroToServicesHandoff(1.8);
+        } else {
+          syncSandForJump(index);
+        }
 
         if (toPanel) {
           var scene = toPanel.closest(".home-scene");
           if (scene) scene.classList.add("is-entered", "is-visible");
           gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0 });
+          if (scene && window.cosgralSceneEnters?.play) {
+            window.cosgralSceneEnters.play(scene, { stagger: true, force: true });
+          }
         }
       }, 0.4);
 
@@ -327,14 +399,18 @@
       locked = true;
       activeIndex = index;
       syncStepView(index);
-      if (index === 0 && fromIndex !== 0) {
-        syncSandForJump(0);
-      } else if (index >= 1 && fromIndex >= 1) {
-        syncSandForJump(index);
-      }
+      syncSectionFocus(index);
       clearScrollUnlockWatch();
 
       var scrollDuration = immediate ? 0 : duration != null ? duration : stepDurationDown(fromIndex, index);
+
+      if (index === 0 && fromIndex !== 0) {
+        syncSandForJump(0);
+      } else if (fromIndex === 0 && index >= 1) {
+        playHeroToServicesHandoff(scrollDuration > 0.05 ? scrollDuration * 0.42 : 2.2);
+      } else if (index >= 1 && fromIndex >= 1) {
+        syncSandForJump(index);
+      }
 
       lenis.scrollTo(target, {
         immediate: !!immediate,
@@ -417,6 +493,28 @@
     function onWheel(e) {
       if (REDUCED || shouldIgnore()) return;
       if (isFanHorizontalWheel(e)) return;
+
+      // Desktop: w sekcji Usługi kółko pionowe przewija kafelki (jak tap/swipe na mobile).
+      if (activeIndex === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
+        e.preventDefault();
+        e.stopPropagation();
+        fanVerticalAccum += e.deltaY;
+        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN && window.cosgralServicesFan?.stepFromWheel) {
+          if (window.cosgralServicesFan.stepFromWheel(fanVerticalAccum)) {
+            fanVerticalAccum = 0;
+            return;
+          }
+        }
+        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_SECTION_MIN) {
+          wheelAccum = fanVerticalAccum;
+          fanVerticalAccum = 0;
+          commitWheel();
+          return;
+        }
+        return;
+      }
+
+      fanVerticalAccum = 0;
 
       e.preventDefault();
       e.stopPropagation();
@@ -608,6 +706,7 @@
     var bootIndex = bootSectionIndex();
     activeIndex = bootIndex;
     syncStepView(bootIndex);
+    syncSectionFocus(bootIndex);
     syncSandForJump(bootIndex);
     goTo(bootIndex, 0, true);
     beginCooldown();
@@ -670,7 +769,7 @@
     });
 
     if (window.ScrollTrigger) ScrollTrigger.refresh();
-    if (MOBILE && !isHomeReload()) {
+    if (!isHomeReload()) {
       await new Promise(function (resolve) {
         if (window.cosgralCube?.introDone?.()) {
           resolve();
@@ -680,7 +779,7 @@
           resolve();
         };
         window.addEventListener("cosgral:cube-intro-done", done, { once: true });
-        window.setTimeout(done, 3800);
+        window.setTimeout(done, MOBILE ? 3800 : 5200);
       });
     }
     init();

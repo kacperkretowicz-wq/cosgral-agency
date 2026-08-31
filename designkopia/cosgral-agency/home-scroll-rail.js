@@ -193,14 +193,28 @@
       }
     }
 
-    if (window.cosgralI18n?.applyLang) {
-      window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
+    function refreshRailI18n() {
+      if (!window.cosgralI18n?.t) return;
+      SCENES.forEach(function (scene, i) {
+        if (!scene.i18n) return;
+        var label = window.cosgralI18n.t(scene.i18n) || scene.label;
+        var dot = ui.dots[i];
+        if (dot) {
+          dot.setAttribute("aria-label", label);
+          dot.title = label;
+        }
+        var li = dot && dot.closest ? dot.closest(".home-scroll-rail__item") : null;
+        var titleBtn = li ? li.querySelector("[data-scroll-rail-title]") : null;
+        if (titleBtn) {
+          titleBtn.textContent = label;
+          if (!titleBtn.disabled) titleBtn.setAttribute("aria-label", label);
+        }
+      });
+      var railAria = window.cosgralI18n.t("rail.aria");
+      if (railAria) ui.rail.setAttribute("aria-label", railAria);
     }
-    window.addEventListener("cosgral:langchange", function () {
-      if (window.cosgralI18n?.applyLang) {
-        window.cosgralI18n.applyLang(window.cosgralI18n.getLang());
-      }
-    });
+
+    window.addEventListener("cosgral:langchange", refreshRailI18n);
 
     function refreshMetrics() {
       maxScroll = ScrollTrigger.maxScroll(window) || 1;
