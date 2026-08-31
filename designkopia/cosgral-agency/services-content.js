@@ -208,4 +208,13 @@
   };
 
   window.COSGRAL_SERVICES = DATA;
+
+  window.cosgralServicesContent = {
+    get: function (id, lang) {
+      var node = DATA[id];
+      if (!node) return null;
+      var pick = lang === "en" ? "en" : "pl";
+      return node[pick] || node.pl;
+    },
+  };
 })();
