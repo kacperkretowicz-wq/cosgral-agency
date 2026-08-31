@@ -126,21 +126,20 @@
       var video = card.querySelector("video");
       if (!video) return;
 
-      if (MOBILE) {
-        video.muted = true;
-        video.setAttribute("playsinline", "");
-        var io = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) video.play().catch(function () {});
-              else video.pause();
-            });
-          },
-          { threshold: 0.28, rootMargin: "8% 0px" }
-        );
-        io.observe(card);
-        if (card.getBoundingClientRect().height > 0) video.play().catch(function () {});
-      }
+      video.muted = true;
+      video.setAttribute("playsinline", "");
+
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) video.play().catch(function () {});
+            else video.pause();
+          });
+        },
+        { threshold: MOBILE ? 0.28 : 0.42, rootMargin: "8% 0px" }
+      );
+      io.observe(card);
+      if (card.getBoundingClientRect().height > 0) video.play().catch(function () {});
     });
   }
 

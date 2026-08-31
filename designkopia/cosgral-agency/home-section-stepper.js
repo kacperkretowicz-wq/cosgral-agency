@@ -180,7 +180,28 @@
       if (Math.abs(lenis.scroll - target) > 2) {
         lenis.scrollTo(target, { immediate: true });
       }
+      ensureScenePanelVisible(activeIndex);
       if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+    }
+
+    function ensureScenePanelVisible(index) {
+      var cfg = HOLDS_CONFIG[index];
+      if (!cfg || cfg.footer) return;
+      var section = document.getElementById(cfg.id);
+      if (!section) return;
+      if (window.cosgralSceneEnters?.ensurePanel) {
+        window.cosgralSceneEnters.ensurePanel(section);
+      } else if (window.gsap) {
+        var panel = section.querySelector(".home-scene__panel") || section;
+        window.gsap.set(panel, {
+          autoAlpha: 1,
+          scale: 1,
+          filter: MOBILE ? "none" : "blur(0px)",
+        });
+      }
+      if (window.cosgralSceneEnters?.play) {
+        window.cosgralSceneEnters.play(section, { stagger: true });
+      }
     }
 
     function watchScrollUnlock(target) {
@@ -294,6 +315,9 @@
           var scene = toPanel.closest(".home-scene");
           if (scene) scene.classList.add("is-entered", "is-visible");
           gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0 });
+          if (scene && window.cosgralSceneEnters?.play) {
+            window.cosgralSceneEnters.play(scene, { stagger: true, force: true });
+          }
         }
       }, 0.4);
 
@@ -670,7 +694,7 @@
     });
 
     if (window.ScrollTrigger) ScrollTrigger.refresh();
-    if (MOBILE && !isHomeReload()) {
+    if (!isHomeReload()) {
       await new Promise(function (resolve) {
         if (window.cosgralCube?.introDone?.()) {
           resolve();
@@ -680,7 +704,7 @@
           resolve();
         };
         window.addEventListener("cosgral:cube-intro-done", done, { once: true });
-        window.setTimeout(done, 3800);
+        window.setTimeout(done, MOBILE ? 3800 : 5200);
       });
     }
     init();

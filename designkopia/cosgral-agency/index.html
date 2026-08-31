@@ -87,9 +87,14 @@
 <script src="page-transitions.js?v=20260816at"></script>
 <script>
   (function () {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || new URLSearchParams(location.search).has("reduceMotion")) {
+    if (new URLSearchParams(location.search).has("reduceMotion")) {
       document.documentElement.classList.add("reduce-motion");
+      return;
     }
+    if (new URLSearchParams(location.search).has("forceMotion")) return;
+    if (typeof window.matchMedia !== "function") return;
+    var mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) document.documentElement.classList.add("reduce-motion");
   })();
 </script>
 </head>
@@ -534,11 +539,11 @@
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260825p"></script>
-<script src="home-section-flow.js?v=20260816f"></script>
+<script src="home-section-flow.js?v=20260831a"></script>
 <script src="home-scroll-rail.js?v=20260825n"></script>
-<script src="home-section-stepper.js?v=20260825p"></script>
+<script src="home-section-stepper.js?v=20260831a"></script>
 <script src="home-director.js?v=20260815a"></script>
-<script src="home-tile-interact.js?v=20260825n"></script>
+<script src="home-tile-interact.js?v=20260831a"></script>
 <script defer src="home-nav-menu.js?v=20260816at"></script>
 </body>
 </html>
