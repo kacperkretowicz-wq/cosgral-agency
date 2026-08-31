@@ -163,6 +163,25 @@
     }
   }
 
+  window.cosgralSceneFlow = {
+    setCinema: setCinema,
+    animateCinemaTo: function (target, duration) {
+      if (REDUCED || !window.gsap) {
+        setCinema(target);
+        return null;
+      }
+      var tween = { value: window.cosgralSand?.cinema || 0 };
+      return gsap.to(tween, {
+        value: target,
+        duration: duration || 2.2,
+        ease: "power2.inOut",
+        onUpdate: function () {
+          setCinema(tween.value);
+        },
+      });
+    },
+  };
+
   /** Pinowana scena: ciemność → zoom in → długa pauza → ciemność */
   function wireScene(scene, opts) {
     if (!scene || REDUCED) {
