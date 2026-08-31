@@ -9,6 +9,20 @@
       "en": "COSGRAL — websites, apps, CRM, automation, SEO/GEO, graphics and video editing. We build digital products and systems for businesses."
     }
   },
+  "theme": {
+    "toggle": {
+      "pl": "Motyw",
+      "en": "Theme"
+    },
+    "light": {
+      "pl": "Tryb jasny",
+      "en": "Light mode"
+    },
+    "dark": {
+      "pl": "Tryb ciemny",
+      "en": "Dark mode"
+    }
+  },
   "nav": {
     "menu": {
       "pl": "Menu",
