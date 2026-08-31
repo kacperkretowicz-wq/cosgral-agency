@@ -12,6 +12,7 @@ export function CustomCursor() {
 
   useEffect(() => {
     // tylko desktop z myszą
+    if (typeof window.matchMedia !== "function") return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     document.body.dataset.customCursor = "on";
     const move = (e: MouseEvent) => {
