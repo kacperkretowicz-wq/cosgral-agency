@@ -65,7 +65,7 @@
     if (isReload) return;
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
     if (location.hash) {
       history.replaceState(null, "", location.pathname + location.search);
     }
@@ -530,18 +530,18 @@
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js?v=20260825x"></script>
-<script src="preloader.js?v=20260814e"></script>
+<script src="preloader.js?v=20260831c"></script>
 <script src="smooth-scroll.js?v=20260825p"></script>
 <script src="home-cursor-field.js?v=20260825s"></script>
 <script src="home-ambient-bg.js?v=20260825n"></script>
-<script type="module" src="home-hero-3d.js?v=20260825n"></script>
+<script type="module" src="home-hero-3d.js?v=20260831c"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260831b"></script>
 <script src="home-section-flow.js?v=20260831b"></script>
-<script src="home-scroll-rail.js?v=20260825n"></script>
-<script src="home-section-stepper.js?v=20260831b"></script>
+<script src="home-scroll-rail.js?v=20260831c"></script>
+<script src="home-section-stepper.js?v=20260831c"></script>
 <script src="home-director.js?v=20260815a"></script>
 <script src="home-tile-interact.js?v=20260831b"></script>
 <script defer src="home-nav-menu.js?v=20260816at"></script>

@@ -4,7 +4,8 @@
 (function () {
   "use strict";
 
-  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var FORCE_MOTION = new URLSearchParams(location.search).has("forceMotion");
+  var REDUCED = FORCE_MOTION ? false : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
   var shell = document.getElementById("preloader");
   var bar = document.getElementById("preloader-bar");

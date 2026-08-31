@@ -115,6 +115,7 @@
     var FAN_WHEEL_SECTION_MIN = 140;
     var scrollUnlockTimer = null;
     var scrollUnlockRaf = 0;
+    var formFocusLock = false;
 
     function beginCooldown() {
       cooldownUntil = Date.now() + HOLD_COOLDOWN_MS;
