@@ -4,7 +4,13 @@
 (function () {
   "use strict";
 
-  var FORCE_MOTION = new URLSearchParams(location.search).has("forceMotion");
+  var DESKTOP_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var FORCE_MOTION =
+    new URLSearchParams(location.search).has("forceMotion") ||
+    DESKTOP_POINTER ||
+    (function () {
+      try { return localStorage.getItem("cosgral-force-motion") === "1"; } catch (e) { return false; }
+    })();
   var REDUCED = FORCE_MOTION ? false : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
   var shell = document.getElementById("preloader");

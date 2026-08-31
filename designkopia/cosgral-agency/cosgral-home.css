@@ -155,6 +155,11 @@ main.home-film > .home-scene {
 .home-scene.is-entered .home-scene__panel {
   will-change: transform, opacity, filter;
 }
+/* Gdy stepper ustawi is-in-view, panel musi być widoczny mimo inline opacity z GSAP */
+.home-scene.is-in-view > .home-scene__panel {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
 html.reduce-motion .home-scene__panel {
   opacity: 1 !important;
   transform: none !important;
