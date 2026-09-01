@@ -44,8 +44,8 @@
     lerp: MOBILE ? 0.14 : 0.08,
     duration: MOBILE ? 0.95 : 1.2,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
-    smoothWheel: false,
-    smoothTouch: false,
+    smoothWheel: true,
+    smoothTouch: MOBILE,
     touchMultiplier: 1,
     wheelMultiplier: 1,
   });

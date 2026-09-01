@@ -8,13 +8,6 @@
   if (!canvas) return;
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
-  // Homepage already runs full-screen Three.js (cube + sand). A second WebGL
-  // pass here doubles GPU cost and is barely visible under the hero portal.
-  if (document.body.classList.contains("home-page")) {
-    canvas.remove();
-    return;
-  }
-
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
@@ -77,8 +70,8 @@
   var frameSkip = 0;
 
   // Pełna jakość na tier 0 — cięcia dopiero, gdy sterownik zgłosi gubione klatki.
-  var DPR_BY_TIER = MOBILE ? [1, 0.9, 0.8] : [1.2, 1.05, 0.9];
-  var SKIP_BY_TIER = MOBILE ? [3, 4, 5] : [2, 3, 4];
+  var DPR_BY_TIER = MOBILE ? [1.1, 1, 0.85] : [1.5, 1.25, 1];
+  var SKIP_BY_TIER = MOBILE ? [2, 3, 4] : [1, 2, 3];
   var dprCap = DPR_BY_TIER[0];
   var tierSkip = SKIP_BY_TIER[0];
 
@@ -106,21 +99,8 @@
   function frame(now) {
     if (!running) return;
 
-    var sectionIdx = window.cosgralSectionSnap?.getIndex?.();
-    if (typeof sectionIdx === "number" && sectionIdx >= 3) {
-      requestAnimationFrame(frame);
-      return;
-    }
-
-    var sandHeavy =
-      document.documentElement.classList.contains("is-sand-stream") ||
-      document.documentElement.classList.contains("is-shattering");
-    if (sandHeavy) {
-      requestAnimationFrame(frame);
-      return;
-    }
-
-    var skipN = Math.max(tierSkip, MOBILE ? 2 : 1);
+    var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
+    var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
     frameSkip += 1;
     if (skipN > 1 && frameSkip % skipN !== 0) {
       requestAnimationFrame(frame);

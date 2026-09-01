@@ -6,7 +6,6 @@
 
   if (window.matchMedia("(max-width: 900px)").matches) return;
   if (document.documentElement.classList.contains("reduce-motion")) return;
-  if (document.body.classList.contains("home-page")) return;
 
   var root = document.querySelector("[data-cursor]");
   if (!root) {
@@ -23,11 +22,8 @@
   var dot = root.querySelector(".home-cursor__dot");
   var ring = root.querySelector(".home-cursor__ring");
   var cx = 0, cy = 0, rx = 0, ry = 0;
-  var lastMoveAt = performance.now();
-  var IDLE_MS = 140;
 
   document.addEventListener("mousemove", function (e) {
-    lastMoveAt = performance.now();
     cx = e.clientX;
     cy = e.clientY;
   });
@@ -49,11 +45,7 @@
     el.addEventListener("mouseleave", function () { root.classList.remove("is-hover"); });
   });
 
-  function tick(now) {
-    if (now - lastMoveAt > IDLE_MS) {
-      requestAnimationFrame(tick);
-      return;
-    }
+  function tick() {
     rx += (cx - rx) * 0.12;
     ry += (cy - ry) * 0.12;
     if (dot) {
