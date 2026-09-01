@@ -2686,3 +2686,50 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   CZYTELNOSC I CELE DOTYKOWE NA MALYCH EKRANACH
+   Zmierzone na iPhonie 14 (390 px): najmniejsze etykiety schodzily do 8,0 px,
+   a czesc kontrolek miala 14-20 px wysokosci obszaru dotyku.
+   ========================================================================== */
+
+/* Male, rozstrzelone etykiety mono to swiadomy element stylu strony i zostaja.
+   Podnosimy wylacznie te, ktore schodzily ponizej ~11 px — przy odstepie
+   0,2-0,3em na telefonie byly juz nie do przeczytania. Reszta skali bez zmian. */
+@media (max-width: 900px) {
+  .home-hero__tagline {
+    font-size: clamp(0.7rem, 2.9vw, 0.78rem);
+    letter-spacing: 0.24em;
+  }
+  .services-fan__hint-text {
+    font-size: 0.7rem;
+  }
+  .home-work__card-tag {
+    font-size: clamp(0.72rem, 2.6vw, 0.86rem);
+  }
+  .home-work__card-cta {
+    font-size: 0.66rem;
+  }
+}
+
+/* Cele dotykowe. WCAG 2.2 (kryterium 2.5.8) wymaga minimum 24x24 px; ponizej
+   sa te kontrolki, ktore tego nie spelnialy. Powiekszamy sam obszar dotyku
+   przez padding i min-height — to, co widac, zostaje tej samej wielkosci.
+   Linki w stopce dostaja wiekszy odstep zamiast wiekszego pudelka, bo maja
+   podkreslenie w ::after zaczepione o dol linku i padding by je odsunal. */
+@media (hover: none) and (pointer: coarse) {
+  .site-nav__toggle {
+    min-height: 44px;
+    padding-block: 0.75rem;
+  }
+  .home-contact__phone,
+  .home-contact__mail {
+    display: inline-block;
+    padding-block: 0.55rem;
+  }
+  /* Specyficznosc musi dorownac regule .site-footer .footer-col ul li z bloku
+     mobilnego wyzej (0,0,3), inaczej tamta wygrywa mimo pozniejszej pozycji. */
+  .site-footer .footer-col ul li {
+    margin-bottom: 0.95rem;
+  }
+}
