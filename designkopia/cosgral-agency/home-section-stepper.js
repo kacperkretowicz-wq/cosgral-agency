@@ -61,11 +61,15 @@
   }
 
   function isFanHorizontalWheel(e) {
-    if (!pointInUslugiSection(e.clientX, e.clientY)) return false;
+    // Najpierw test osi (czysta arytmetyka), dopiero potem trafienie w sekcję.
+    // pointInUslugiSection() woła getBoundingClientRect, czyli wymusza layout —
+    // przy scrollu gładzikiem to setki wymuszonych reflow na sekundę, na
+    // ścieżce krytycznej wejścia. Zwykły scroll w pionie odpada już tutaj.
     var dx = Math.abs(e.deltaX);
     var dy = Math.abs(e.deltaY);
     if (e.shiftKey && dy > dx) dx = dy;
-    return dx > 4 && dx > dy * 2.2;
+    if (!(dx > 4 && dx > dy * 2.2)) return false;
+    return pointInUslugiSection(e.clientX, e.clientY);
   }
 
   function shouldIgnore() {

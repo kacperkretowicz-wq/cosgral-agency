@@ -69,8 +69,14 @@
   var start = performance.now();
   var frameSkip = 0;
 
+  // Pełna jakość na tier 0 — cięcia dopiero, gdy sterownik zgłosi gubione klatki.
+  var DPR_BY_TIER = MOBILE ? [1.1, 1, 0.85] : [1.5, 1.25, 1];
+  var SKIP_BY_TIER = MOBILE ? [2, 3, 4] : [1, 2, 3];
+  var dprCap = DPR_BY_TIER[0];
+  var tierSkip = SKIP_BY_TIER[0];
+
   function resize() {
-    var dpr = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.1 : 1.5);
+    var dpr = Math.min(window.devicePixelRatio || 1, dprCap);
     var w = Math.round(window.innerWidth * dpr);
     var h = Math.round(window.innerHeight * dpr);
     if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
@@ -80,18 +86,26 @@
     }
   }
 
+  if (window.cosgralPerf) {
+    window.cosgralPerf.subscribe(function (t) {
+      tierSkip = SKIP_BY_TIER[t] || SKIP_BY_TIER[0];
+      var cap = DPR_BY_TIER[t] || DPR_BY_TIER[0];
+      if (cap === dprCap) return;
+      dprCap = cap;
+      resize();
+    });
+  }
+
   function frame(now) {
     if (!running) return;
 
     var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
-    var skipN = sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1;
+    var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
     frameSkip += 1;
     if (skipN > 1 && frameSkip % skipN !== 0) {
       requestAnimationFrame(frame);
       return;
     }
-
-    resize();
 
     var ptr = window.cosgralPointer;
     if (ptr) {

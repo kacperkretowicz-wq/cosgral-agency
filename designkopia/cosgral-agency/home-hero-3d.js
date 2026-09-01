@@ -717,7 +717,27 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   var lastPortalOp = null;
   var lastPortalVis = null;
   var offZoneTick = 0;
-  var OUT_OF_ZONE_EVERY = LOW_PERF ? 4 : 3;
+  // Poza strefą sześcianu na ekranie zostaje wolno dryfujące pole piasku.
+  // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
+  // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
+  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [2, 1.5, 1.25];
+  var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
+  var dprCap = DPR_CAP_BY_TIER[0];
+  var introDprDone = false;
+
+  function applyPerfTier(t) {
+    outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[t] || OFF_ZONE_EVERY_BY_TIER[0];
+    var cap = DPR_CAP_BY_TIER[t] || DPR_CAP_BY_TIER[0];
+    if (cap === dprCap) return;
+    dprCap = cap;
+    // Przed końcem intro DPR jest celowo zaniżony — nie nadpisujemy go tutaj.
+    if (!introDprDone) return;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, dprCap));
+    resize();
+  }
+
+  if (window.cosgralPerf) window.cosgralPerf.subscribe(applyPerfTier);
   (function watchCubeZone() {
     var zones = [document.getElementById("top"), document.getElementById("rozpad")].filter(Boolean);
     if (!zones.length || typeof IntersectionObserver !== "function") return;
@@ -740,7 +760,8 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   })();
 
   function restoreRendererDpr() {
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.25 : 2));
+    introDprDone = true;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, dprCap));
     resize();
   }
   window.addEventListener("cosgral:cube-intro-done", restoreRendererDpr, { once: true });
@@ -1242,12 +1263,10 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
     if (!needsScene) return;
 
-    // Poza hero/rozpadem na ekranie zostaje już tylko wolno dryfujące pole
-    // piasku — pełne 60 fps jest tam niepotrzebne, a scena kosztuje najwięcej
-    // GPU na stronie. W strefie sześcianu (i przy otwartym menu) renderujemy
-    // każdą klatkę, poza nią co OUT_OF_ZONE_EVERY-tą.
+    // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
+    // Poza nią częstotliwość ustala sterownik jakości (na tier 0 też co klatkę).
     var fullRate = zoneVisible || menuBlend > 0.001;
-    if (!fullRate && offZoneTick++ % OUT_OF_ZONE_EVERY !== 0) return;
+    if (!fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);
