@@ -99,6 +99,12 @@
   function frame(now) {
     if (!running) return;
 
+    var sectionIdx = window.cosgralSectionSnap?.getIndex?.();
+    if (typeof sectionIdx === "number" && sectionIdx >= 3) {
+      requestAnimationFrame(frame);
+      return;
+    }
+
     var sandHeavy =
       document.documentElement.classList.contains("is-sand-stream") ||
       document.documentElement.classList.contains("is-shattering");

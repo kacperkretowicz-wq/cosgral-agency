@@ -101,16 +101,16 @@
     var wheelAccum = 0;
     var wheelTimer = null;
     var guardTimer = null;
-    var STEP_MS = MOBILE ? 0.95 : 1.15;
-    var SNAP_MS = 0.42;
-    var WHEEL_END = 36;
+    var STEP_MS = 2.6;
+    var SNAP_MS = 0.9;
+    var WHEEL_END = 44;
     var WHEEL_MIN = 6;
-    var WHEEL_INSTANT = 14;
+    var WHEEL_INSTANT = 16;
     // Tylko w Usługach: większy gest pionowy, żeby dało się zmieniać kafelki bez skoku sekcji.
-    var TOUCH_USLUGI_STEP_MIN = 72;
+    var TOUCH_USLUGI_STEP_MIN = 88;
     var uslugiIdx = SECTION_IDS.indexOf("uslugi");
-    var HOLD_COOLDOWN_MS = 60;
-    var SECTION_READY_MS = 180;
+    var HOLD_COOLDOWN_MS = 100;
+    var SECTION_READY_MS = 450;
     var SECTION_REACH_PX = 16;
     var lastCommitDir = 0;
     var cooldownUntil = 0;
@@ -162,17 +162,17 @@
     }
 
     function stepDurationDown(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 1.45;
-      if (fromIndex === 1 && toIndex > fromIndex) return STEP_MS * 0.72;
-      if (fromIndex >= 1 && toIndex > fromIndex) return STEP_MS * 0.82;
-      return STEP_MS;
+      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 1.75;
+      if (fromIndex === 1 && toIndex > fromIndex) return STEP_MS / 2.8;
+      if (fromIndex >= 1 && toIndex > fromIndex) return STEP_MS / 2.2;
+      return STEP_MS / 1.8;
     }
 
     function stepDurationUp(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 1.45;
-      if (fromIndex === 1 && toIndex < fromIndex) return STEP_MS * 0.72;
-      if (fromIndex >= 1 && toIndex < fromIndex) return STEP_MS * 0.82;
-      return STEP_MS * 0.82;
+      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 1.75;
+      if (fromIndex === 1 && toIndex < fromIndex) return STEP_MS / 2.8;
+      if (fromIndex >= 1 && toIndex < fromIndex) return STEP_MS / 2.2;
+      return STEP_MS / 2.2;
     }
 
     function clearScrollUnlockWatch() {
@@ -482,7 +482,7 @@
       var idx = nearestIndex(lenis.scroll);
       var dist = Math.abs(lenis.scroll - holds[idx]);
       // Tylko wyraźny dryf — nie walcz z użytkownikiem przy drobnych odchyłkach.
-      if (dist > 48) {
+      if (dist > 24) {
         goTo(idx, SNAP_MS);
       } else {
         activeIndex = idx;
@@ -492,7 +492,7 @@
     function scheduleGuard() {
       if (guardTimer) window.clearTimeout(guardTimer);
       if (formFocusLock) return;
-      guardTimer = window.setTimeout(enforceHold, 220);
+      guardTimer = window.setTimeout(enforceHold, 140);
     }
 
     function onWheel(e) {

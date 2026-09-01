@@ -16,6 +16,8 @@
   var tiltFrame = 0;
   var lastTiltX = "";
   var lastTiltY = "";
+  var lastLx = "";
+  var lastLy = "";
 
   function applyGlobalTilt() {
     var ptr = window.cosgralPointer;
@@ -36,12 +38,16 @@
     var tx = (ptr.ny * TILT_PITCH).toFixed(2) + "deg";
     var ty = (ptr.nx * TILT_YAW).toFixed(2) + "deg";
 
-    if (tx !== lastTiltX || ty !== lastTiltY) {
-      lastTiltX = tx;
-      lastTiltY = ty;
-      root.style.setProperty("--global-tilt-x", tx);
-      root.style.setProperty("--global-tilt-y", ty);
+    if (tx === lastTiltX && ty === lastTiltY && lx === lastLx && ly === lastLy) {
+      requestAnimationFrame(applyGlobalTilt);
+      return;
     }
+    lastTiltX = tx;
+    lastTiltY = ty;
+    lastLx = lx;
+    lastLy = ly;
+    root.style.setProperty("--global-tilt-x", tx);
+    root.style.setProperty("--global-tilt-y", ty);
     root.style.setProperty("--lx", lx);
     root.style.setProperty("--ly", ly);
 

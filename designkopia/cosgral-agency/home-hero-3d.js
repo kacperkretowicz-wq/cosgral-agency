@@ -19,7 +19,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
   var HALF = 1.35;
   var CUBE_SCALE = 0.5;
-  var SHARDS = LOW_PERF ? 220 : 520;
+  var SHARDS = LOW_PERF ? 260 : 900;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
   var streamAmt = 0;
@@ -720,7 +720,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   // Poza strefą sześcianu na ekranie zostaje wolno dryfujące pole piasku.
   // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
   // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
-  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
+  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 5] : [2, 3, 4];
   var DPR_CAP_BY_TIER = LOW_PERF ? [1.1, 1, 0.9] : [1.35, 1.2, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
@@ -855,12 +855,27 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
+
+    var sandExt = window.cosgralSand;
+    var sectionIdx = window.cosgralSectionSnap?.getIndex?.();
+    var pastHeroZone =
+      !zoneVisible &&
+      typeof sectionIdx === "number" &&
+      sectionIdx > 1 &&
+      menuTween.blend < 0.001;
+    if (
+      pastHeroZone &&
+      sandExt &&
+      (sandExt.locked || (sandExt.cinema || 0) > 0.9)
+    ) {
+      if (cardSampleTick++ % 6 !== 0) return;
+    }
+
     var t = clock.getElapsedTime();
     syncPointer();
     mouse.x += (mouse.tx - mouse.x) * 0.06;
     mouse.y += (mouse.ty - mouse.y) * 0.06;
 
-    var sandExt = window.cosgralSand;
     var sm = 0;
     var tm = 0;
     var cinema = 0;

@@ -163,9 +163,13 @@
     hideGate();
   }
 
+  var lastMoveAt = performance.now();
+  var IDLE_MS = 140;
+
   document.addEventListener(
     "mousemove",
     function (e) {
+      lastMoveAt = performance.now();
       setTarget(e.clientX, e.clientY);
     },
     { passive: true }
@@ -190,22 +194,25 @@
     root.style.setProperty("--pointer-ny", state.ny.toFixed(4));
   }
 
-  function tick() {
-    if (orient.active || orient.listening) {
-      state.tnx += (orient.tnx - state.tnx) * 0.16;
-      state.tny += (orient.tny - state.tny) * 0.16;
-      state.nx += (state.tnx - state.nx) * 0.16;
-      state.ny += (state.tny - state.ny) * 0.16;
-      state.x = (state.nx * 0.5 + 0.5) * window.innerWidth;
-      state.y = (-state.ny * 0.5 + 0.5) * window.innerHeight;
-      state.fromOrientation = orient.active;
-    } else if (!MOBILE) {
-      state.x += (state.tx - state.x) * 0.08;
-      state.y += (state.ty - state.y) * 0.08;
-      state.nx += (state.tnx - state.nx) * 0.08;
-      state.ny += (state.tny - state.ny) * 0.08;
+  function tick(now) {
+    var idle = !orient.active && !orient.listening && now - lastMoveAt > IDLE_MS;
+    if (!idle) {
+      if (orient.active || orient.listening) {
+        state.tnx += (orient.tnx - state.tnx) * 0.16;
+        state.tny += (orient.tny - state.tny) * 0.16;
+        state.nx += (state.tnx - state.nx) * 0.16;
+        state.ny += (state.tny - state.ny) * 0.16;
+        state.x = (state.nx * 0.5 + 0.5) * window.innerWidth;
+        state.y = (-state.ny * 0.5 + 0.5) * window.innerHeight;
+        state.fromOrientation = orient.active;
+      } else if (!MOBILE) {
+        state.x += (state.tx - state.x) * 0.08;
+        state.y += (state.ty - state.y) * 0.08;
+        state.nx += (state.tnx - state.nx) * 0.08;
+        state.ny += (state.tny - state.ny) * 0.08;
+      }
+      applyPointer();
     }
-    applyPointer();
     requestAnimationFrame(tick);
   }
 

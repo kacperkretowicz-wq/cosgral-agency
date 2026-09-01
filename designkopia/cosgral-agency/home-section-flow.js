@@ -338,10 +338,10 @@
             id: "hero-pin",
             trigger: hero,
             start: "top top",
-            end: MOBILE ? "+=58%" : "+=72%",
+            end: MOBILE ? "+=72%" : "+=95%",
             pin: true,
             pinSpacing: true,
-            scrub: MOBILE ? 0.85 : 1.0,
+            scrub: MOBILE ? 1.15 : 1.4,
             anticipatePin: 1,
             onEnterBack: function () {
               if (window.cosgralRestoreHero) window.cosgralRestoreHero();
@@ -376,10 +376,10 @@
           id: "shatter-beat",
           trigger: shatter,
           start: "top top",
-          end: MOBILE ? "+=128%" : "+=148%",
+          end: MOBILE ? "+=218%" : "+=272%",
           pin: true,
           pinSpacing: true,
-          scrub: MOBILE ? 1.1 : 1.25,
+          scrub: MOBILE ? 1.85 : 2.15,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 5,
@@ -430,7 +430,7 @@
     // ——— 3–6: kinowe sceny (pin + fade) ———
     wireScene(services, {
       id: "scene-uslugi",
-      pin: MOBILE ? "+=72%" : "+=88%",
+      pin: MOBILE ? "+=95%" : "+=118%",
       priority: 2,
       onEnter: function () {
         lockSandStream();
@@ -470,7 +470,7 @@
 
     wireScene(work, {
       id: "scene-realizacje",
-      pin: MOBILE ? "+=68%" : "+=82%",
+      pin: MOBILE ? "+=88%" : "+=108%",
       priority: 2,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
@@ -478,19 +478,19 @@
 
     wireScene(process, {
       id: "scene-proces",
-      pin: MOBILE ? "+=64%" : "+=78%",
+      pin: MOBILE ? "+=82%" : "+=102%",
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
     });
     wireScene(faq, {
       id: "scene-faq",
-      pin: MOBILE ? "+=60%" : "+=72%",
+      pin: MOBILE ? "+=76%" : "+=94%",
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
     });
     wireScene(contact, {
       id: "scene-kontakt",
-      pin: MOBILE ? "+=66%" : "+=80%",
+      pin: MOBILE ? "+=84%" : "+=104%",
       fadeOut: false,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,

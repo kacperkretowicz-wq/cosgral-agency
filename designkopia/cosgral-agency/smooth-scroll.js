@@ -41,8 +41,8 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var lenis = new Lenis({
-    lerp: MOBILE ? 0.18 : 0.14,
-    duration: MOBILE ? 0.72 : 0.85,
+    lerp: MOBILE ? 0.14 : 0.1,
+    duration: MOBILE ? 0.95 : 1.1,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: false,
     smoothTouch: false,
