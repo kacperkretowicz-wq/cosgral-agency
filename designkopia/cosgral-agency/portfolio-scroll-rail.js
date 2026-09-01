@@ -101,8 +101,12 @@
     var holdPositions = [];
     var lastIndex = -1;
 
+    // Uwaga: NIE podpinamy sie pod "cosgral:langchange". To zdarzenie emituje samo
+    // applyLang(), a applyI18n() wywoluje applyLang() — podpiete razem daly
+    // nieskonczona rekurencje (RangeError: Maximum call stack size exceeded).
+    // Nie jest zreszta potrzebne: kropki i tytuly szyny maja atrybuty data-i18n,
+    // data-i18n-aria-label i data-i18n-title, wiec applyLang aktualizuje je sam.
     applyI18n();
-    window.addEventListener("cosgral:langchange", applyI18n);
     window.addEventListener("cosgral:i18n-ready", applyI18n);
 
     function revealTitle(index) {

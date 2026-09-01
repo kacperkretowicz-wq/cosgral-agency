@@ -47,6 +47,13 @@
   "description": "Agencja cyfrowa — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo."
 }
 </script>
+<link rel="preconnect" href="https://unpkg.com" crossorigin />
+<!-- Jedyne miejsce z adresem three.js. Aby przejsc na wlasny hosting (szybciej
+     i bez zaleznosci od cudzego CDN-u): ./scripts/vendor-libs.sh — pobierze
+     biblioteki do /vendor i przestawi ta mape na sciezki lokalne. -->
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.170.0/build/three.module.js"}}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="cosgral-home.css?v=20260831e" />
@@ -525,7 +532,7 @@
 <script src="smooth-scroll.js?v=20260831e"></script>
 <script src="cosgral-perf.js?v=20260901a"></script>
 <script src="home-cursor-field.js?v=20260825s"></script>
-<script type="module" src="home-hero-3d.js?v=20260831c"></script>
+<script type="module" src="three-lazy.js?v=20260901b"></script>
 <script src="home-cursor.js"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>

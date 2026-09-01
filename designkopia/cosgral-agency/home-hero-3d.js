@@ -2,7 +2,7 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
 (function () {
@@ -19,7 +19,9 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
   var HALF = 1.35;
   var CUBE_SCALE = 0.5;
-  var SHARDS = LOW_PERF ? 280 : 1600;
+  // 1600 odlamkow na desktopie bylo gestsze, niz oko rozroznia przy tej skali
+  // i rozmyciu ruchu — 900 daje ten sam obraz przy ~44% mniej geometrii.
+  var SHARDS = LOW_PERF ? 260 : 900;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
   var streamAmt = 0;
@@ -342,7 +344,9 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 2));
+  // DPR 2 + MSAA to na Retinie 4x pikseli i jeszcze wielopróbkowanie na wierzchu.
+  // 1,5 z antyaliasingiem wyglada tak samo, a kosztuje ok. 1,8x mniej fragmentow.
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.5));
   renderer.setClearColor(0x000000, 0);
 
   var scene = new THREE.Scene();
@@ -721,7 +725,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
   // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
   var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
-  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [2, 1.5, 1.25];
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1.15, 1, 0.9] : [1.5, 1.25, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;

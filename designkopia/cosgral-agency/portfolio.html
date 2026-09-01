@@ -34,6 +34,13 @@
   "about": "Wybrane realizacje agencji COSGRAL — strony, wideo, grafiki i automatyzacje."
 }
 </script>
+<link rel="preconnect" href="https://unpkg.com" crossorigin />
+<!-- Jedyne miejsce z adresem three.js. Aby przejsc na wlasny hosting (szybciej
+     i bez zaleznosci od cudzego CDN-u): ./scripts/vendor-libs.sh — pobierze
+     biblioteki do /vendor i przestawi ta mape na sciezki lokalne. -->
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.170.0/build/three.module.js"}}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="cosgral-subpages.css?v=20260825x" />
@@ -341,8 +348,7 @@
 <script src="home-cursor.js?v=20260812a"></script>
 <script src="home-tile-interact.js?v=20260825n"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
-<script type="module" src="subpage-cube.js?v=20260816at"></script>
-<script type="module" src="portfolio-hero-sand.js?v=20260816at"></script>
+<script type="module" src="three-lazy.js?v=20260901b"></script>
 <script defer src="home-nav-menu.js?v=20260816at"></script>
 <script src="sections.js?v=20260814e"></script>
 <script src="portfolio-lightbox-nav.js?v=20260807ak"></script>

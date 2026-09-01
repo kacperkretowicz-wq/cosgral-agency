@@ -1,7 +1,7 @@
 /**
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 import { createIntactCubeParts } from "./cube-shape.js";
 
 (function () {

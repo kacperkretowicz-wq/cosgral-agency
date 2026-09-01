@@ -1,7 +1,7 @@
 /**
  * Shared rounded cube geometry for homepage + subpages.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "three";
 
 var EDGE_RADIUS_RATIO = 0.2;
 var EDGE_SEGMENTS = 5;
