@@ -17,6 +17,16 @@
   var lastTiltX = "";
   var lastTiltY = "";
 
+  /* --lx / --ly byly tu zapisywane na <html> co klatke, a karmily wylacznie
+     .services-fan__card-liquid i .home-process__step::before — oba wlaczane klasa
+     .is-cursor-active, ktora w calym kodzie jest tylko USUWANA, nigdy dodawana.
+     Czyli: uniewaznianie stylu calego dokumentu 60x na sekunde dla dwoch gradientow
+     z opacity: 0. Zapisy usuniete, wartosci domyslne z CSS zostaja.
+
+     --global-tilt-x/y zostaje (napedza realne rotateX/rotateY na nawigacji, szynie
+     i panelach), ale petla usypia, gdy przechyl przestaje sie zmieniac. */
+  var running = false;
+
   function applyGlobalTilt() {
     var ptr = window.cosgralPointer;
     if (!ptr) {
@@ -30,21 +40,35 @@
       return;
     }
 
-    var root = document.documentElement;
-    var lx = ((ptr.x / Math.max(window.innerWidth, 1)) * 100).toFixed(1) + "%";
-    var ly = ((ptr.y / Math.max(window.innerHeight, 1)) * 100).toFixed(1) + "%";
     var tx = (ptr.ny * TILT_PITCH).toFixed(2) + "deg";
     var ty = (ptr.nx * TILT_YAW).toFixed(2) + "deg";
 
     if (tx !== lastTiltX || ty !== lastTiltY) {
       lastTiltX = tx;
       lastTiltY = ty;
+      var root = document.documentElement;
       root.style.setProperty("--global-tilt-x", tx);
       root.style.setProperty("--global-tilt-y", ty);
+      idleFrames = 0;
+    } else {
+      idleFrames += 1;
     }
-    root.style.setProperty("--lx", lx);
-    root.style.setProperty("--ly", ly);
 
+    // Kursor stoi od pol sekundy — nie ma czego przeliczac, spimy do ruchu myszy.
+    if (idleFrames > 30) {
+      running = false;
+      return;
+    }
+
+    requestAnimationFrame(applyGlobalTilt);
+  }
+
+  var idleFrames = 0;
+
+  function wakeTilt() {
+    idleFrames = 0;
+    if (running) return;
+    running = true;
     requestAnimationFrame(applyGlobalTilt);
   }
 
@@ -147,7 +171,9 @@
     document.documentElement.classList.add("has-global-tilt");
     bindWorkCardVideos();
     watchVisibleScenes();
-    requestAnimationFrame(applyGlobalTilt);
+    document.addEventListener("mousemove", wakeTilt, { passive: true });
+    window.addEventListener("deviceorientation", wakeTilt, { passive: true });
+    wakeTilt();
 
     if (!MOBILE) {
       bindHoverTargets();

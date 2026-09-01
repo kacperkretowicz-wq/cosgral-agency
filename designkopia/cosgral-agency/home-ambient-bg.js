@@ -69,9 +69,13 @@
   var start = performance.now();
   var frameSkip = 0;
 
-  // Pełna jakość na tier 0 — cięcia dopiero, gdy sterownik zgłosi gubione klatki.
-  var DPR_BY_TIER = MOBILE ? [1.1, 1, 0.85] : [1.5, 1.25, 1];
-  var SKIP_BY_TIER = MOBILE ? [2, 3, 4] : [1, 2, 3];
+  // Tło to wolno płynąca, rozmyta, mocno zwinietowana szarość. Renderowanie jej
+  // w 1.5× DPR i 60 fps kosztowało ~2.9 mln fragmentów na klatkę (pętla 4 iteracji
+  // sin/cos na fragment) — a różnicy nie widać. 1× DPR + 30 fps to ~4.5× mniej
+  // pracy GPU przy tym samym obrazie; cienkie rozbłyski grzbietów fal nadal wypadają
+  // w natywnej rozdzielczości, więc nie ma schodków.
+  var DPR_BY_TIER = MOBILE ? [0.85, 0.75, 0.65] : [1, 0.85, 0.75];
+  var SKIP_BY_TIER = MOBILE ? [3, 4, 5] : [2, 3, 4];
   var dprCap = DPR_BY_TIER[0];
   var tierSkip = SKIP_BY_TIER[0];
 

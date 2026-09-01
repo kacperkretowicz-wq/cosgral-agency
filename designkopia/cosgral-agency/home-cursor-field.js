@@ -54,6 +54,7 @@
   function setTarget(clientX, clientY) {
     state.tx = clientX;
     state.ty = clientY;
+    wake();
     if (!MOBILE && !orient.active) {
       state.tnx = (clientX / window.innerWidth) * 2 - 1;
       state.tny = -((clientY / window.innerHeight) * 2 - 1);
@@ -83,6 +84,7 @@
     orient.tny = clamp(-db / ORIENT_BETA_RANGE, -1, 1);
     orient.active = true;
     state.fromOrientation = true;
+    wake();
     try {
       sessionStorage.setItem(GYRO_KEY, "1");
     } catch (err) {}
@@ -92,6 +94,7 @@
   function enableOrientation() {
     if (orient.listening) return;
     orient.listening = true;
+    wake();
     window.addEventListener("deviceorientation", onDeviceOrientation, true);
     window.addEventListener("deviceorientationabsolute", onDeviceOrientation, true);
   }
@@ -180,14 +183,51 @@
     { passive: true }
   );
 
-  function applyPointer() {
-    var px = (state.x / window.innerWidth) * 100;
-    var py = (state.y / window.innerHeight) * 100;
+  /* Warstwy welonu, ktore podazaja za kursorem. Zamiast pisac --pointer-x/y na
+     <html> (co uniewaznia style CALEGO dokumentu przy kazdym ruchu myszy),
+     ustawiamy przesuniecie bezposrednio na tych kilku elementach. Sam element
+     ma juz transform: translate3d(...), wiec przegladarka tylko przesuwa gotowa
+     warstwe na GPU. */
+  var veils = null;
 
-    root.style.setProperty("--pointer-x", px.toFixed(2) + "%");
-    root.style.setProperty("--pointer-y", py.toFixed(2) + "%");
-    root.style.setProperty("--pointer-nx", state.nx.toFixed(4));
-    root.style.setProperty("--pointer-ny", state.ny.toFixed(4));
+  function collectVeils() {
+    veils = document.querySelectorAll(".home-ambient__blur, .subpage-ambient__blur");
+  }
+
+  var lastVeilX = null;
+  var lastVeilY = null;
+
+  function applyPointer() {
+    if (veils === null) collectVeils();
+    if (!veils.length) return;
+
+    // Pol piksela to ponizej progu widocznosci — nie ma po co ruszac warstwa.
+    var vx = Math.round(state.x);
+    var vy = Math.round(state.y);
+    if (vx === lastVeilX && vy === lastVeilY) return;
+    lastVeilX = vx;
+    lastVeilY = vy;
+
+    for (var i = 0; i < veils.length; i++) {
+      veils[i].style.setProperty("--veil-x", vx + "px");
+      veils[i].style.setProperty("--veil-y", vy + "px");
+    }
+  }
+
+  /* Petla chodzi tylko wtedy, gdy jest co animowac. Gdy kursor stoi, a wygladzanie
+     doszlo do celu — usypiamy ja calkowicie (zero pracy przy nieruchomej myszy)
+     i budzimy z powrotem przy najblizszym ruchu. */
+  var running = false;
+
+  function settled() {
+    if (orient.active || orient.listening) return false;
+    if (MOBILE) return true;
+    return (
+      Math.abs(state.tx - state.x) < 0.2 &&
+      Math.abs(state.ty - state.y) < 0.2 &&
+      Math.abs(state.tnx - state.nx) < 0.0005 &&
+      Math.abs(state.tny - state.ny) < 0.0005
+    );
   }
 
   function tick() {
@@ -206,6 +246,23 @@
       state.ny += (state.tny - state.ny) * 0.08;
     }
     applyPointer();
+
+    if (settled()) {
+      // Dociagnij do celu i zasnij.
+      state.x = state.tx;
+      state.y = state.ty;
+      state.nx = state.tnx;
+      state.ny = state.tny;
+      applyPointer();
+      running = false;
+      return;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function wake() {
+    if (running) return;
+    running = true;
     requestAnimationFrame(tick);
   }
 
@@ -252,5 +309,24 @@
   }
 
   armMobileGyro();
-  requestAnimationFrame(tick);
+
+  function boot() {
+    collectVeils();
+    lastVeilX = null;
+    lastVeilY = null;
+    wake();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  window.addEventListener("resize", function () {
+    // Welon jest wymiarowany w vmax — po zmianie okna wymus jedno odswiezenie.
+    lastVeilX = null;
+    lastVeilY = null;
+    wake();
+  });
 })();

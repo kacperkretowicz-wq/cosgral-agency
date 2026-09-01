@@ -82,25 +82,39 @@ body.home-page::after {
   background:
     radial-gradient(ellipse 140% 90% at 50% 38%, #161616 0%, #0a0a0a 42%, #030303 100%);
 }
+/* Welon podążający za kursorem.
+   Kiedyś: gradient pozycjonowany przez var(--pointer-x/y) + filter: blur(52px)
+   na warstwie na całe okno. Każdy ruch myszy = przemalowanie całego ekranu
+   z 52-pikselowym rozmyciem, czyli ~50 ms na klatkę.
+   Teraz: warstwa o stałym rozmiarze z wypaloną miękkością gradientu, przesuwana
+   wyłącznie przez transform. GPU trzyma ją jako gotową teksturę i tylko ją
+   przesuwa — zero przemalowań, wygląd bez zmian. */
 .home-ambient__blur {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 64vmax;
+  height: 64vmax;
+  margin: -32vmax 0 0 -32vmax;
   z-index: 0;
   pointer-events: none;
   background:
     radial-gradient(
-      circle 32vmax at var(--pointer-x) var(--pointer-y),
+      closest-side circle,
       rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.04) 30%,
-      transparent 65%
+      rgba(255, 255, 255, 0.075) 16%,
+      rgba(255, 255, 255, 0.042) 34%,
+      rgba(255, 255, 255, 0.016) 52%,
+      rgba(255, 255, 255, 0.004) 68%,
+      transparent 82%
     );
-  filter: blur(52px);
   opacity: 0.55;
   mix-blend-mode: screen;
+  transform: translate3d(var(--veil-x, 50vw), var(--veil-y, 50vh), 0);
+  will-change: transform;
 }
 @media (max-width: 900px) {
   .home-ambient__blur {
-    filter: blur(24px);
     opacity: 0.4;
   }
 }
