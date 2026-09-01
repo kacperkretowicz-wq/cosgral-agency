@@ -13,6 +13,7 @@
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  var HOME_PAGE = document.body.classList.contains("home-page");
   var GYRO_KEY = "cosgral-gyro";
   var root = document.documentElement;
   var state = {

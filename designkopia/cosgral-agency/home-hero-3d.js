@@ -19,7 +19,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
   var HALF = 1.35;
   var CUBE_SCALE = 0.5;
-  var SHARDS = LOW_PERF ? 260 : 900;
+  var SHARDS = LOW_PERF ? 220 : 600;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
   var streamAmt = 0;
@@ -342,7 +342,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.25));
   renderer.setClearColor(0x000000, 0);
 
   var scene = new THREE.Scene();
@@ -720,8 +720,8 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   // Poza strefą sześcianu na ekranie zostaje wolno dryfujące pole piasku.
   // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
   // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
-  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 5] : [2, 3, 4];
-  var DPR_CAP_BY_TIER = LOW_PERF ? [1.1, 1, 0.9] : [1.35, 1.2, 1];
+  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [3, 4, 6] : [2, 4, 6];
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1, 0.9, 0.85] : [1.25, 1.1, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;
@@ -868,7 +868,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       sandExt &&
       (sandExt.locked || (sandExt.cinema || 0) > 0.9)
     ) {
-      if (cardSampleTick++ % 6 !== 0) return;
+      if (cardSampleTick++ % 10 !== 0) return;
     }
 
     var t = clock.getElapsedTime();
@@ -1244,7 +1244,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
     if (displayStream > 0.15 || sandLocked) {
       // Próbkuj rzadziej — getBoundingClientRect wymusza reflow.
-      if (cardSampleTick++ % 12 === 0) sampleCards();
+      if (cardSampleTick++ % 20 === 0) sampleCards();
     }
 
     // Portal stays visible for sand ribbon after cube exits

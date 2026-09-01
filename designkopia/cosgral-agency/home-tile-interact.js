@@ -153,7 +153,10 @@
     document.documentElement.classList.add("has-global-tilt");
     bindWorkCardVideos();
     watchVisibleScenes();
-    requestAnimationFrame(applyGlobalTilt);
+
+    if (!document.body.classList.contains("home-page")) {
+      requestAnimationFrame(applyGlobalTilt);
+    }
 
     if (!MOBILE) {
       bindHoverTargets();

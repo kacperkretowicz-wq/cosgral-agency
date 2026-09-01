@@ -6,6 +6,7 @@
 
   if (window.matchMedia("(max-width: 900px)").matches) return;
   if (document.documentElement.classList.contains("reduce-motion")) return;
+  if (document.body.classList.contains("home-page")) return;
 
   var root = document.querySelector("[data-cursor]");
   if (!root) {

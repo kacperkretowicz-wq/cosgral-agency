@@ -101,16 +101,16 @@
     var wheelAccum = 0;
     var wheelTimer = null;
     var guardTimer = null;
-    var STEP_MS = 2.6;
-    var SNAP_MS = 0.9;
-    var WHEEL_END = 44;
+    var STEP_MS = 5.28;
+    var SNAP_MS = 1.44;
+    var WHEEL_END = 52;
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
     // Tylko w Usługach: większy gest pionowy, żeby dało się zmieniać kafelki bez skoku sekcji.
-    var TOUCH_USLUGI_STEP_MIN = 88;
+    var TOUCH_USLUGI_STEP_MIN = 96;
     var uslugiIdx = SECTION_IDS.indexOf("uslugi");
     var HOLD_COOLDOWN_MS = 100;
-    var SECTION_READY_MS = 450;
+    var SECTION_READY_MS = 1000;
     var SECTION_REACH_PX = 16;
     var lastCommitDir = 0;
     var cooldownUntil = 0;
@@ -162,17 +162,17 @@
     }
 
     function stepDurationDown(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 1.75;
-      if (fromIndex === 1 && toIndex > fromIndex) return STEP_MS / 2.8;
-      if (fromIndex >= 1 && toIndex > fromIndex) return STEP_MS / 2.2;
-      return STEP_MS / 1.8;
+      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 2;
+      if (fromIndex === 1 && toIndex > fromIndex) return STEP_MS / 4.2;
+      if (fromIndex >= 1 && toIndex > fromIndex) return STEP_MS / 3;
+      return STEP_MS;
     }
 
     function stepDurationUp(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 1.75;
-      if (fromIndex === 1 && toIndex < fromIndex) return STEP_MS / 2.8;
-      if (fromIndex >= 1 && toIndex < fromIndex) return STEP_MS / 2.2;
-      return STEP_MS / 2.2;
+      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 2;
+      if (fromIndex === 1 && toIndex < fromIndex) return STEP_MS / 4.2;
+      if (fromIndex >= 1 && toIndex < fromIndex) return STEP_MS / 3;
+      return STEP_MS / 3;
     }
 
     function clearScrollUnlockWatch() {
@@ -306,8 +306,9 @@
       var shatter = document.getElementById("rozpad");
       if (shatter) shatter.classList.add("is-active");
       document.documentElement.classList.add("is-shattering");
+      var cinemaDur = Math.max(duration || 0, 4.2);
       if (window.cosgralSceneFlow?.animateCinemaTo) {
-        window.cosgralSceneFlow.animateCinemaTo(1, duration || 2.4);
+        window.cosgralSceneFlow.animateCinemaTo(1, cinemaDur);
       } else {
         syncSandForJump(1);
       }
@@ -358,7 +359,7 @@
           syncSandForJump(0);
           if (window.cosgralRestoreHero) window.cosgralRestoreHero();
         } else if (fromIndex === 0) {
-          playHeroToServicesHandoff(1.8);
+          playHeroToServicesHandoff(STEP_MS * 2 * 0.42);
         } else {
           syncSandForJump(index);
         }
@@ -411,7 +412,9 @@
       if (index === 0 && fromIndex !== 0) {
         syncSandForJump(0);
       } else if (fromIndex === 0 && index >= 1) {
-        playHeroToServicesHandoff(scrollDuration > 0.05 ? scrollDuration * 0.42 : 2.2);
+        playHeroToServicesHandoff(
+          scrollDuration > 0.05 ? Math.max(scrollDuration * 0.42, 4.2) : 4.4
+        );
       } else if (index >= 1 && fromIndex >= 1) {
         syncSandForJump(index);
       }

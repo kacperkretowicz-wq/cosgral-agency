@@ -41,8 +41,8 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var lenis = new Lenis({
-    lerp: MOBILE ? 0.14 : 0.1,
-    duration: MOBILE ? 0.95 : 1.1,
+    lerp: MOBILE ? 0.14 : 0.08,
+    duration: MOBILE ? 0.95 : 1.2,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: false,
     smoothTouch: false,
@@ -77,8 +77,8 @@
   gsap.ticker.add(function (time) {
     lenis.raf(time * 1000);
   });
-  /* Mild catch-up under GPU load — avoids stutter spikes on both platforms */
-  gsap.ticker.lagSmoothing(MOBILE ? 500 : 250);
+  /* Allow mild catch-up on mobile under GPU load; keep tight on desktop */
+  gsap.ticker.lagSmoothing(MOBILE ? 500 : 0);
 
   var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "proces", "faq", "kontakt"];
 

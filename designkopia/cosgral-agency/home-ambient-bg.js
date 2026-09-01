@@ -8,6 +8,13 @@
   if (!canvas) return;
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
+  // Homepage already runs full-screen Three.js (cube + sand). A second WebGL
+  // pass here doubles GPU cost and is barely visible under the hero portal.
+  if (document.body.classList.contains("home-page")) {
+    canvas.remove();
+    return;
+  }
+
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
