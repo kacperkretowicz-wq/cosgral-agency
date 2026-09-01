@@ -96,11 +96,28 @@
     return o;
   }
 
+  // stageSize() było czytane raz na kartę wewnątrz pętli, która w tym samym
+  // przebiegu zapisuje card.style.transform — każdy odczyt po zapisie wymuszał
+  // synchroniczny reflow. Trzymamy wynik w cache, unieważnianym przy resize.
+  var stageCache = null;
   function stageSize() {
-    return {
-      w: stage.clientWidth || window.innerWidth,
-      h: stage.clientHeight || window.innerHeight * 0.55,
-    };
+    if (!stageCache) {
+      stageCache = {
+        w: stage.clientWidth || window.innerWidth,
+        h: stage.clientHeight || window.innerHeight * 0.55,
+      };
+    }
+    return stageCache;
+  }
+  function invalidateStage() {
+    stageCache = null;
+  }
+  window.addEventListener("resize", invalidateStage, { passive: true });
+  if (typeof ResizeObserver === "function") {
+    // Łapie też zmiany wysokości sceny bez resize okna (np. po doładowaniu fontów).
+    new ResizeObserver(invalidateStage).observe(stage);
+  } else {
+    window.addEventListener("load", invalidateStage);
   }
 
   function lerp(a, b, t) {
