@@ -498,22 +498,40 @@
       if (REDUCED || shouldIgnore()) return;
       if (isFanHorizontalWheel(e)) return;
 
-      // Desktop: w sekcji Usługi kółko pionowe przewija kafelki (jak tap/swipe na mobile).
+      // Desktop: w sekcji Usługi kółko pionowe przewija kafelki (jak tap/swipe na
+      // mobile), a na ostatnim kafelku w danym kierunku wyprowadza z sekcji.
+      //
+      // Wczesniej o tym, czy gest zostaje w karuzeli, decydowalo to, czy
+      // stepFromWheel akurat zdazylo przeskoczyc karte — a to zalezy od jego
+      // wewnetrznego cooldownu (620 ms). Efekt byl zalezny od rytmu scrollowania
+      // i obciazenia maszyny: przy szybkich machnieciach pierwszy gest wynosil
+      // ze sekcji, zanim uzytkownik zobaczyl kafelki (zmierzone: wyjscie po
+      // 1 gescie, karuzela na kafelku 1 z 6); przy wolniejszych, na dlawionym
+      // watku, sekcji nie dalo sie opuscic wcale (8 gestow, karty w kolko).
+      // Teraz decyduje stan karuzeli, nie zegar: dopoki sa kafelki w te strone,
+      // gest nalezy do karuzeli; na ostatnim — wyprowadza z sekcji.
       if (activeIndex === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
         e.preventDefault();
         e.stopPropagation();
         fanVerticalAccum += e.deltaY;
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN && window.cosgralServicesFan?.stepFromWheel) {
-          if (window.cosgralServicesFan.stepFromWheel(fanVerticalAccum)) {
-            fanVerticalAccum = 0;
-            return;
+
+        var fan = window.cosgralServicesFan;
+        var fanDir = fanVerticalAccum > 0 ? 1 : -1;
+        // Brak atEdge (starsza wersja skryptu) traktujemy jak kraniec — lepiej
+        // przepuscic gest dalej, niz uwiezic uzytkownika w sekcji.
+        var fanAtEdge = fan?.atEdge ? fan.atEdge(fanDir) : true;
+
+        if (!fanAtEdge) {
+          if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN && fan?.stepFromWheel) {
+            if (fan.stepFromWheel(fanVerticalAccum)) fanVerticalAccum = 0;
           }
+          return;
         }
+
         if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_SECTION_MIN) {
           wheelAccum = fanVerticalAccum;
           fanVerticalAccum = 0;
           commitWheel();
-          return;
         }
         return;
       }
@@ -714,6 +732,44 @@
     syncSandForJump(bootIndex);
     goTo(bootIndex, 0, true);
     beginCooldown();
+
+    /* KLAWIATURA. Kolko jest przechwycone przez stepper, a zadnej obslugi
+       klawiszy nie bylo — natywne przewijanie od razu wracalo na miejsce przez
+       straznika. Zmierzone: PageDown przesuwal strone o 1 px, strzalka w dol
+       nie robila nic. Dla korzystajacych z klawiatury strona byla wiec
+       nieprzewijalna (WCAG 2.1.1). Strzalki lewo/prawo zostawiamy karuzeli
+       Uslug, ktora juz ich uzywa. */
+    document.addEventListener("keydown", function (e) {
+      if (REDUCED || shouldIgnore()) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(t.tagName))) return;
+
+      switch (e.key) {
+        case "ArrowDown":
+        case "PageDown":
+          stepDown();
+          break;
+        case "ArrowUp":
+        case "PageUp":
+          stepUp();
+          break;
+        case " ":
+        case "Spacebar":
+          if (e.shiftKey) stepUp();
+          else stepDown();
+          break;
+        case "Home":
+          goTo(0);
+          break;
+        case "End":
+          goTo(holds.length - 1);
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+    });
 
     window.cosgralSectionSnap = {
       holds: holds,

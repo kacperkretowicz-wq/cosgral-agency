@@ -535,13 +535,23 @@
     goToIndex: function (nextIndex) {
       goTo(nextIndex);
     },
+    /* Czy karuzela jest na krancu w danym kierunku — czyli czy kolejny gest
+       kolkiem powinien juz wyprowadzic ze sekcji, zamiast przewijac karty.
+       Klikniecie strzalka i swipe nadal zawijaja (goTo liczy modulo);
+       to ograniczenie dotyczy wylacznie scrolla. */
+    atEdge: function (dir) {
+      if (!total) return true;
+      return dir > 0 ? index >= total - 1 : index <= 0;
+    },
     stepFromWheel: function (deltaY) {
       if (!isUslugiActive() || !canNavigate()) return false;
-      wheelAccumX += deltaY;
-      scheduleWheelDecay();
-      if (Math.abs(wheelAccumX) < 32) return false;
-      var dir = wheelAccumX > 0 ? 1 : -1;
-      wheelAccumX = 0;
+      // Licznik prowadzi stepper (to on zbiera zdarzenia kolka) — nie dokladamy
+      // tu wlasnego. Wczesniej ta metoda dopisywala przekazana juz zsumowana
+      // wartosc do wheelAccumX, czyli do akumulatora scrolla POZIOMEGO: gest
+      // pionowy zaburzal prog nawigacji poziomej i odwrotnie.
+      if (Math.abs(deltaY) < 32) return false;
+      var dir = deltaY > 0 ? 1 : -1;
+      if (dir > 0 ? index >= total - 1 : index <= 0) return false;
       lastNavAt = Date.now();
       hideHint();
       hideTapHint();
