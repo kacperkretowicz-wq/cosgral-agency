@@ -416,11 +416,7 @@
             setCinema(p);
 
             var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
-            var shatterProps = { autoAlpha: 1 - out };
-            if (!MOBILE) {
-              shatterProps.filter = out ? "blur(" + out * 8 + "px)" : "blur(0px)";
-            }
-            gsap.set(shatterPanel, shatterProps);
+            gsap.set(shatterPanel, { autoAlpha: 1 - out });
 
             if (curtain) {
               var c = p > 0.78 ? (p - 0.78) / 0.22 : 0.5 * (1 - p / 0.78);

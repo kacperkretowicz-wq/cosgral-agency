@@ -476,17 +476,36 @@
       lastCommitDir = 1;
     }
 
+    function activeSceneIndex() {
+      var best = -1;
+      var bestDist = Infinity;
+      HOLDS_CONFIG.forEach(function (cfg, i) {
+        if (cfg.footer) return;
+        var st = ScrollTrigger.getById(cfg.stId);
+        if (!st || !st.isActive) return;
+        if (st.progress < 0.06 || st.progress > 0.94) return;
+        var dist = Math.abs(st.progress - cfg.hold);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      if (best >= 0) return best;
+      return nearestIndex(lenis.scroll);
+    }
+
     function syncActiveFromScroll() {
       if (locked || formFocusLock) return;
       holds = buildHolds();
-      var idx = nearestIndex(lenis.scroll);
+      var idx = activeSceneIndex();
       if (idx === activeIndex) return;
       var prev = activeIndex;
       activeIndex = idx;
       syncStepView(idx);
-      syncSectionFocus(idx);
-      if (idx === 0) {
-        if (prev !== 0 && window.cosgralRestoreHero) window.cosgralRestoreHero();
+      // Widoczność paneli steruje ScrollTrigger (scrub) + IO w home-services-fan —
+      // nie nadpisuj is-in-view tutaj, bo psuje sekcję Usługi przy wolnym scrollu.
+      if (idx === 0 && prev !== 0 && window.cosgralRestoreHero) {
+        window.cosgralRestoreHero();
       }
       window.dispatchEvent(
         new CustomEvent("cosgral:section-step", {
@@ -501,8 +520,30 @@
       scrollSyncTimer = window.setTimeout(function () {
         scrollSyncTimer = null;
         syncActiveFromScroll();
-      }, 120);
+      }, 80);
     }
+
+    // W sekcji Usługi: pionowe kółko przewija kafelki (bez blokady całej strony).
+    function onUslugiWheel(e) {
+      if (REDUCED || shouldIgnore()) return;
+      if (isFanHorizontalWheel(e)) return;
+      var st = ScrollTrigger.getById("scene-uslugi");
+      if (!st || !st.isActive || st.progress < 0.1 || st.progress > 0.86) return;
+      if (!pointInUslugiSection(e.clientX, e.clientY)) return;
+
+      fanVerticalAccum += e.deltaY;
+      if (
+        Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN &&
+        window.cosgralServicesFan?.stepFromWheel &&
+        window.cosgralServicesFan.stepFromWheel(fanVerticalAccum)
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        fanVerticalAccum = 0;
+      }
+    }
+
+    window.addEventListener("wheel", onUslugiWheel, { passive: false, capture: true });
 
     lenis.on("scroll", function () {
       if (!locked) scheduleScrollSync();
@@ -550,7 +591,7 @@
     var bootIndex = bootSectionIndex();
     activeIndex = bootIndex;
     syncStepView(bootIndex);
-    syncSectionFocus(bootIndex);
+    if (bootIndex !== 0) syncSectionFocus(bootIndex);
     if (bootIndex === 0) syncSandForJump(0);
     goTo(bootIndex, 0, true);
     beginCooldown();
