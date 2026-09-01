@@ -710,6 +710,35 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   window.addEventListener("resize", resize);
   resize();
 
+  // Canvas żyje w #home-cube-portal (position: fixed), więc geometrycznie nigdy
+  // nie schodzi z ekranu — obserwujemy sekcje, w których sześcian jest naprawdę
+  // potrzebny, żeby nie renderować sceny przez całą długość strony.
+  var zoneVisible = true;
+  var lastPortalOp = null;
+  var lastPortalVis = null;
+  var offZoneTick = 0;
+  var OUT_OF_ZONE_EVERY = LOW_PERF ? 4 : 3;
+  (function watchCubeZone() {
+    var zones = [document.getElementById("top"), document.getElementById("rozpad")].filter(Boolean);
+    if (!zones.length || typeof IntersectionObserver !== "function") return;
+    var seen = new WeakSet();
+    var io = new IntersectionObserver(
+      function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting) seen.add(entries[i].target);
+          else seen.delete(entries[i].target);
+        }
+        zoneVisible = zones.some(function (z) {
+          return seen.has(z);
+        });
+      },
+      { rootMargin: "20% 0px" }
+    );
+    zones.forEach(function (z) {
+      io.observe(z);
+    });
+  })();
+
   function restoreRendererDpr() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.25 : 2));
     resize();
@@ -730,9 +759,18 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     mouse.ty = ptr.tny;
   }
 
+  var cardNodes = null;
+  window.addEventListener("resize", function () {
+    cardNodes = null;
+  });
+
   function sampleCards() {
     if (!shardMat) return;
-    var nodes = document.querySelectorAll(".services-fan__card");
+    // Karty są statyczne w DOM — odpytujemy raz, nie przy każdym próbkowaniu.
+    var nodes = cardNodes;
+    if (!nodes || !nodes.length) {
+      nodes = cardNodes = document.querySelectorAll(".services-fan__card");
+    }
     var n = 0;
     var w = window.innerWidth || 1;
     var h = window.innerHeight || 1;
@@ -1169,7 +1207,9 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     }
 
     if (displayStream > 0.15 || sandLocked) {
-      if (!LOW_PERF || cardSampleTick++ % 3 === 0) sampleCards();
+      // Każde sampleCards() to wymuszony reflow (getBoundingClientRect na kartach),
+      // więc próbkujemy co 3. klatkę niezależnie od klasy urządzenia.
+      if (cardSampleTick++ % 3 === 0) sampleCards();
     }
 
     // Portal stays visible for sand ribbon after cube exits
@@ -1184,16 +1224,34 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       : tilesOp > 0.45
         ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
         : 0.68;
+    var needsScene = portalOp > 0.05 || sandOn || menuBlend > 0.001;
+
     if (canvas.parentElement) {
-      canvas.parentElement.style.opacity = String(portalOp);
-      canvas.parentElement.style.visibility = portalOp > 0.05 ? "visible" : "hidden";
+      var op = String(portalOp);
+      var vis = portalOp > 0.05 ? "visible" : "hidden";
+      // Zapisy stylu unieważniają styl całego poddrzewa — piszemy tylko przy zmianie.
+      if (op !== lastPortalOp) {
+        canvas.parentElement.style.opacity = op;
+        lastPortalOp = op;
+      }
+      if (vis !== lastPortalVis) {
+        canvas.parentElement.style.visibility = vis;
+        lastPortalVis = vis;
+      }
     }
+
+    if (!needsScene) return;
+
+    // Poza hero/rozpadem na ekranie zostaje już tylko wolno dryfujące pole
+    // piasku — pełne 60 fps jest tam niepotrzebne, a scena kosztuje najwięcej
+    // GPU na stronie. W strefie sześcianu (i przy otwartym menu) renderujemy
+    // każdą klatkę, poza nią co OUT_OF_ZONE_EVERY-tą.
+    var fullRate = zoneVisible || menuBlend > 0.001;
+    if (!fullRate && offZoneTick++ % OUT_OF_ZONE_EVERY !== 0) return;
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);
-    if (portalOp > 0.05 || sandOn || menuBlend > 0.001) {
-      renderer.render(scene, camera);
-    }
+    renderer.render(scene, camera);
   }
 
   if (canvas.parentElement) {
