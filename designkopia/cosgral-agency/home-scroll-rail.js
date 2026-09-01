@@ -333,7 +333,6 @@
     }
 
     function update() {
-      refreshMetrics();
       var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
       var current = activeScene();
       var fillPct = fillHeightForScroll(scroll, current);
@@ -386,7 +385,10 @@
       });
     });
 
-    ScrollTrigger.addEventListener("refresh", update);
+    ScrollTrigger.addEventListener("refresh", function () {
+      refreshMetrics();
+      update();
+    });
     if (window.cosgralSmoothScroll?.lenis) {
       window.cosgralSmoothScroll.lenis.on("scroll", update);
     } else {
@@ -403,7 +405,8 @@
     });
 
     update();
-    window.cosgralScrollRail = { refresh: update, scenes: SCENES, revealTitle: revealTitle };
+    refreshMetrics();
+    window.cosgralScrollRail = { refresh: function () { refreshMetrics(); update(); }, scenes: SCENES, revealTitle: revealTitle };
   }
 
   (async function () {

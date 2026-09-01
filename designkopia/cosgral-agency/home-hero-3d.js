@@ -19,7 +19,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
   var HALF = 1.35;
   var CUBE_SCALE = 0.5;
-  var SHARDS = LOW_PERF ? 280 : 1600;
+  var SHARDS = LOW_PERF ? 220 : 520;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
   var streamAmt = 0;
@@ -721,7 +721,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
   // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
   var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
-  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [2, 1.5, 1.25];
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1.1, 1, 0.9] : [1.35, 1.2, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;
@@ -1228,9 +1228,8 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     }
 
     if (displayStream > 0.15 || sandLocked) {
-      // Każde sampleCards() to wymuszony reflow (getBoundingClientRect na kartach),
-      // więc próbkujemy co 3. klatkę niezależnie od klasy urządzenia.
-      if (cardSampleTick++ % 3 === 0) sampleCards();
+      // Próbkuj rzadziej — getBoundingClientRect wymusza reflow.
+      if (cardSampleTick++ % 12 === 0) sampleCards();
     }
 
     // Portal stays visible for sand ribbon after cube exits

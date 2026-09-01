@@ -70,8 +70,8 @@
   var frameSkip = 0;
 
   // Pełna jakość na tier 0 — cięcia dopiero, gdy sterownik zgłosi gubione klatki.
-  var DPR_BY_TIER = MOBILE ? [1.1, 1, 0.85] : [1.5, 1.25, 1];
-  var SKIP_BY_TIER = MOBILE ? [2, 3, 4] : [1, 2, 3];
+  var DPR_BY_TIER = MOBILE ? [1, 0.9, 0.8] : [1.2, 1.05, 0.9];
+  var SKIP_BY_TIER = MOBILE ? [3, 4, 5] : [2, 3, 4];
   var dprCap = DPR_BY_TIER[0];
   var tierSkip = SKIP_BY_TIER[0];
 
@@ -99,8 +99,15 @@
   function frame(now) {
     if (!running) return;
 
-    var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
-    var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
+    var sandHeavy =
+      document.documentElement.classList.contains("is-sand-stream") ||
+      document.documentElement.classList.contains("is-shattering");
+    if (sandHeavy) {
+      requestAnimationFrame(frame);
+      return;
+    }
+
+    var skipN = Math.max(tierSkip, MOBILE ? 2 : 1);
     frameSkip += 1;
     if (skipN > 1 && frameSkip % skipN !== 0) {
       requestAnimationFrame(frame);

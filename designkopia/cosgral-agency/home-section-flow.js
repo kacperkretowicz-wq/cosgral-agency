@@ -338,10 +338,10 @@
             id: "hero-pin",
             trigger: hero,
             start: "top top",
-            end: MOBILE ? "+=72%" : "+=95%",
+            end: MOBILE ? "+=58%" : "+=72%",
             pin: true,
             pinSpacing: true,
-            scrub: MOBILE ? 1.15 : 1.4,
+            scrub: MOBILE ? 0.85 : 1.0,
             anticipatePin: 1,
             onEnterBack: function () {
               if (window.cosgralRestoreHero) window.cosgralRestoreHero();
@@ -376,10 +376,10 @@
           id: "shatter-beat",
           trigger: shatter,
           start: "top top",
-          end: MOBILE ? "+=218%" : "+=272%",
+          end: MOBILE ? "+=128%" : "+=148%",
           pin: true,
           pinSpacing: true,
-          scrub: MOBILE ? 1.85 : 2.15,
+          scrub: MOBILE ? 1.1 : 1.25,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 5,
@@ -416,11 +416,7 @@
             setCinema(p);
 
             var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
-            var shatterProps = { autoAlpha: 1 - out };
-            if (!MOBILE) {
-              shatterProps.filter = out ? "blur(" + out * 8 + "px)" : "blur(0px)";
-            }
-            gsap.set(shatterPanel, shatterProps);
+            gsap.set(shatterPanel, { autoAlpha: 1 - out });
 
             if (curtain) {
               var c = p > 0.78 ? (p - 0.78) / 0.22 : 0.5 * (1 - p / 0.78);
@@ -434,7 +430,7 @@
     // ——— 3–6: kinowe sceny (pin + fade) ———
     wireScene(services, {
       id: "scene-uslugi",
-      pin: MOBILE ? "+=95%" : "+=118%",
+      pin: MOBILE ? "+=72%" : "+=88%",
       priority: 2,
       onEnter: function () {
         lockSandStream();
@@ -474,7 +470,7 @@
 
     wireScene(work, {
       id: "scene-realizacje",
-      pin: MOBILE ? "+=88%" : "+=108%",
+      pin: MOBILE ? "+=68%" : "+=82%",
       priority: 2,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
@@ -482,19 +478,19 @@
 
     wireScene(process, {
       id: "scene-proces",
-      pin: MOBILE ? "+=82%" : "+=102%",
+      pin: MOBILE ? "+=64%" : "+=78%",
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
     });
     wireScene(faq, {
       id: "scene-faq",
-      pin: MOBILE ? "+=76%" : "+=94%",
+      pin: MOBILE ? "+=60%" : "+=72%",
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
     });
     wireScene(contact, {
       id: "scene-kontakt",
-      pin: MOBILE ? "+=84%" : "+=104%",
+      pin: MOBILE ? "+=66%" : "+=80%",
       fadeOut: false,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
