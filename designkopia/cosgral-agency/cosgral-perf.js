@@ -78,7 +78,14 @@
     last = now;
     requestAnimationFrame(tick);
   }
-  requestAnimationFrame(tick);
+
+  if (window.gsap && window.gsap.ticker) {
+    window.gsap.ticker.add(function (_time, deltaTime) {
+      sample(deltaTime * 1000);
+    });
+  } else {
+    requestAnimationFrame(tick);
+  }
 
   document.addEventListener("visibilitychange", function () {
     // Po powrocie do karty pierwsza klatka jest zawsze długa — nie licz jej.

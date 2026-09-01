@@ -13,6 +13,8 @@
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  var HOME_PAGE = document.body.classList.contains("home-page");
+  var tickFrame = 0;
   var GYRO_KEY = "cosgral-gyro";
   var root = document.documentElement;
   var state = {
@@ -190,7 +192,12 @@
     root.style.setProperty("--pointer-ny", state.ny.toFixed(4));
   }
 
-  function tick() {
+  function tick(now) {
+    tickFrame += 1;
+    if (HOME_PAGE && tickFrame % 2 !== 0) {
+      requestAnimationFrame(tick);
+      return;
+    }
     if (orient.active || orient.listening) {
       state.tnx += (orient.tnx - state.tnx) * 0.16;
       state.tny += (orient.tny - state.tny) * 0.16;

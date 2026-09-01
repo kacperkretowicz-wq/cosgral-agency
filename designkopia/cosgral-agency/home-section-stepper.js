@@ -476,197 +476,78 @@
       lastCommitDir = 1;
     }
 
-    function enforceHold() {
-      if (locked || formFocusLock || Date.now() < cooldownUntil) return;
+    function activeSceneIndex() {
+      var best = -1;
+      var bestDist = Infinity;
+      HOLDS_CONFIG.forEach(function (cfg, i) {
+        if (cfg.footer) return;
+        var st = ScrollTrigger.getById(cfg.stId);
+        if (!st || !st.isActive) return;
+        if (st.progress < 0.06 || st.progress > 0.94) return;
+        var dist = Math.abs(st.progress - cfg.hold);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      if (best >= 0) return best;
+      return nearestIndex(lenis.scroll);
+    }
+
+    function syncActiveFromScroll() {
+      if (locked || formFocusLock) return;
       holds = buildHolds();
-      var idx = nearestIndex(lenis.scroll);
-      var dist = Math.abs(lenis.scroll - holds[idx]);
-      if (dist > 2) {
-        goTo(idx, SNAP_MS);
-      } else {
-        activeIndex = idx;
+      var idx = activeSceneIndex();
+      if (idx === activeIndex) return;
+      var prev = activeIndex;
+      activeIndex = idx;
+      syncStepView(idx);
+      // Widoczność paneli steruje ScrollTrigger (scrub) + IO w home-services-fan —
+      // nie nadpisuj is-in-view tutaj, bo psuje sekcję Usługi przy wolnym scrollu.
+      if (idx === 0 && prev !== 0 && window.cosgralRestoreHero) {
+        window.cosgralRestoreHero();
       }
+      window.dispatchEvent(
+        new CustomEvent("cosgral:section-step", {
+          detail: { index: idx, id: HOLDS_CONFIG[idx]?.id || null },
+        })
+      );
     }
 
-    function scheduleGuard() {
-      if (guardTimer) window.clearTimeout(guardTimer);
-      if (formFocusLock) return;
-      guardTimer = window.setTimeout(enforceHold, 32);
+    var scrollSyncTimer = null;
+    function scheduleScrollSync() {
+      if (scrollSyncTimer) window.clearTimeout(scrollSyncTimer);
+      scrollSyncTimer = window.setTimeout(function () {
+        scrollSyncTimer = null;
+        syncActiveFromScroll();
+      }, 80);
     }
 
-    function onWheel(e) {
+    // W sekcji Usługi: pionowe kółko przewija kafelki (bez blokady całej strony).
+    function onUslugiWheel(e) {
       if (REDUCED || shouldIgnore()) return;
       if (isFanHorizontalWheel(e)) return;
+      var st = ScrollTrigger.getById("scene-uslugi");
+      if (!st || !st.isActive || st.progress < 0.1 || st.progress > 0.86) return;
+      if (!pointInUslugiSection(e.clientX, e.clientY)) return;
 
-      // Desktop: w sekcji Usługi kółko pionowe przewija kafelki (jak tap/swipe na mobile).
-      if (activeIndex === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
+      fanVerticalAccum += e.deltaY;
+      if (
+        Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN &&
+        window.cosgralServicesFan?.stepFromWheel &&
+        window.cosgralServicesFan.stepFromWheel(fanVerticalAccum)
+      ) {
         e.preventDefault();
         e.stopPropagation();
-        fanVerticalAccum += e.deltaY;
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN && window.cosgralServicesFan?.stepFromWheel) {
-          if (window.cosgralServicesFan.stepFromWheel(fanVerticalAccum)) {
-            fanVerticalAccum = 0;
-            return;
-          }
-        }
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_SECTION_MIN) {
-          wheelAccum = fanVerticalAccum;
-          fanVerticalAccum = 0;
-          commitWheel();
-          return;
-        }
-        return;
+        fanVerticalAccum = 0;
       }
-
-      fanVerticalAccum = 0;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (!canStep()) {
-        wheelAccum = 0;
-        return;
-      }
-
-      wheelAccum += e.deltaY;
-
-      var instant = activeIndex === uslugiIdx ? 48 : WHEEL_INSTANT;
-      if (Math.abs(wheelAccum) >= instant) {
-        if (wheelTimer) window.clearTimeout(wheelTimer);
-        commitWheel();
-        return;
-      }
-
-      if (wheelTimer) window.clearTimeout(wheelTimer);
-      wheelTimer = window.setTimeout(commitWheel, WHEEL_END);
     }
 
-    function commitWheel() {
-      wheelTimer = null;
-      if (!canStep()) {
-        wheelAccum = 0;
-        return;
-      }
-
-      var min = activeIndex === uslugiIdx ? 36 : WHEEL_MIN;
-      if (Math.abs(wheelAccum) < min) {
-        wheelAccum = 0;
-        return;
-      }
-
-      var dir = wheelAccum > 0 ? 1 : -1;
-      wheelAccum = 0;
-
-      if (dir > 0) {
-        stepDown();
-        return;
-      }
-
-      stepUp();
-    }
-
-    var touchStartX = 0;
-    var touchStartY = 0;
-    var touchLastY = 0;
-    var touchAccum = 0;
-    var touchActive = false;
-    var touchIgnoreStep = false; // poziomy swipe w Usługach — tylko kafelki
-    var touchFromUslugi = false;
-
-    window.addEventListener(
-      "touchstart",
-      function (e) {
-        if (!e.touches[0] || REDUCED || shouldIgnore()) return;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        touchLastY = touchStartY;
-        touchAccum = 0;
-        touchIgnoreStep = false;
-        touchFromUslugi =
-          activeIndex === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
-        touchActive = true;
-      },
-      { passive: true, capture: true }
-    );
-
-    window.addEventListener(
-      "touchmove",
-      function (e) {
-        if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
-        var x = e.touches[0].clientX;
-        var y = e.touches[0].clientY;
-        var dx = x - touchStartX;
-        var dy = y - touchStartY;
-
-        // Usługi: tylko wyraźny gest w poziomie = kafelki (nie sekcja).
-        // Pion zawsze jak wcześniej: preventDefault + snap do holdów.
-        if (
-          touchFromUslugi &&
-          !touchIgnoreStep &&
-          Math.abs(dx) > 18 &&
-          Math.abs(dx) > Math.abs(dy) * 1.45
-        ) {
-          touchIgnoreStep = true;
-          touchAccum = 0;
-          return;
-        }
-
-        if (touchIgnoreStep) return;
-
-        touchAccum += touchLastY - y;
-        touchLastY = y;
-        e.preventDefault();
-      },
-      { passive: false, capture: true }
-    );
-
-    window.addEventListener(
-      "touchend",
-      function () {
-        if (!touchActive) return;
-        touchActive = false;
-        if (REDUCED || shouldIgnore() || touchIgnoreStep) {
-          touchAccum = 0;
-          touchIgnoreStep = false;
-          touchFromUslugi = false;
-          return;
-        }
-        if (!canStep()) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var min = touchFromUslugi ? TOUCH_USLUGI_STEP_MIN : WHEEL_MIN;
-        if (Math.abs(touchAccum) < min) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var dir = touchAccum > 0 ? 1 : -1;
-        touchAccum = 0;
-        touchFromUslugi = false;
-        if (dir > 0) stepDown();
-        else stepUp();
-      },
-      { passive: true, capture: true }
-    );
-
-    window.addEventListener(
-      "touchcancel",
-      function () {
-        touchActive = false;
-        touchAccum = 0;
-        touchIgnoreStep = false;
-        touchFromUslugi = false;
-      },
-      { passive: true, capture: true }
-    );
+    window.addEventListener("wheel", onUslugiWheel, { passive: false, capture: true });
 
     lenis.on("scroll", function () {
-      if (!locked) scheduleGuard();
+      if (!locked) scheduleScrollSync();
     });
-
-    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
 
     document.querySelectorAll('a[href^="#"]').forEach(function (link) {
       link.addEventListener(
@@ -710,8 +591,8 @@
     var bootIndex = bootSectionIndex();
     activeIndex = bootIndex;
     syncStepView(bootIndex);
-    syncSectionFocus(bootIndex);
-    syncSandForJump(bootIndex);
+    if (bootIndex !== 0) syncSectionFocus(bootIndex);
+    if (bootIndex === 0) syncSandForJump(0);
     goTo(bootIndex, 0, true);
     beginCooldown();
 

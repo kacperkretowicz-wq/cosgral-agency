@@ -50,6 +50,8 @@
     wheelMultiplier: 1,
   });
 
+  document.documentElement.classList.add("lenis");
+
   window.cosgralSmoothScroll.lenis = lenis;
 
   ScrollTrigger.scrollerProxy(document.documentElement, {
