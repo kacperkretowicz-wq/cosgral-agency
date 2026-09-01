@@ -14,7 +14,12 @@
 
   var VERT = "\n    attribute vec2 aPos;\n    void main() { gl_Position = vec4(aPos, 0.0, 1.0); }\n  ";
 
-  var FRAG = "\n    precision mediump float;\n    uniform vec2 uRes;\n    uniform float uTime;\n    uniform vec2 uMouse;\n\n    float wave(vec2 p, float t) {\n      float w = 0.0;\n      float amp = 1.0;\n      for (int i = 0; i < 4; i++) {\n        float fi = float(i);\n        p.x += sin(p.y * (1.4 + fi * 0.35) + t * 0.7) * 0.18;\n        w += sin(p.x * (1.8 + fi * 0.7) + p.y * 1.1 + t * (0.5 + fi * 0.08)) * amp;\n        amp *= 0.58;\n      }\n      return w * 0.5 + 0.5;\n    }\n\n    void main() {\n      vec2 uv = gl_FragCoord.xy / uRes.xy;\n      vec2 m = uMouse * 0.5 + 0.5;\n      vec2 toM = uv - m;\n      float mDist = length(toM);\n      float mForce = smoothstep(0.62, 0.0, mDist);\n\n      vec2 p = uv * vec2(2.8, 2.0);\n      p += normalize(toM + 0.0001) * mForce * 0.17 * sin(uTime * 1.7 + mDist * 13.0);\n      p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;\n\n      float t = uTime * 0.14;\n      float w = wave(p, t);\n      float ridge = pow(1.0 - abs(sin(w * 4.2 + t * 0.25)), 6.0);\n\n      vec3 base = vec3(0.055, 0.055, 0.055);\n      vec3 dim = vec3(0.24, 0.24, 0.24);\n      vec3 mid = vec3(0.58, 0.58, 0.58);\n      vec3 hi = vec3(1.0, 1.0, 1.0);\n\n      vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);\n      ribbon = mix(ribbon, hi, ridge * 0.52);\n\n      vec3 col = base;\n      col = mix(col, ribbon, smoothstep(0.08, 0.88, ridge) * 0.58);\n      col += hi * pow(ridge, 14.0) * 0.32;\n      col += mid * mForce * 0.16;\n      col += hi * mForce * ridge * 0.12;\n\n      float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));\n      col *= 0.58 + vignette * 0.42;\n\n      gl_FragColor = vec4(col, 1.0);\n    }\n  ";
+  // uGrade = korekcja barwna przeniesiona z CSS `filter` na .home-ambient
+  // (x = kontrast, y = jasność). Shader i tak zwraca czystą szarość, więc
+  // grayscale(1) był tam pełnoekranowym passem kompozytora bez żadnego efektu,
+  // a contrast/brightness to tutaj jedno mnożenie na piksel.
+  // pow(x, 6) i pow(x, 14) rozpisane na mnożenia — wynik ten sam, koszt niższy.
+  var FRAG = "\n    precision mediump float;\n    uniform vec2 uRes;\n    uniform float uTime;\n    uniform vec2 uMouse;\n    uniform vec2 uGrade;\n\n    float wave(vec2 p, float t) {\n      float w = 0.0;\n      float amp = 1.0;\n      for (int i = 0; i < 4; i++) {\n        float fi = float(i);\n        p.x += sin(p.y * (1.4 + fi * 0.35) + t * 0.7) * 0.18;\n        w += sin(p.x * (1.8 + fi * 0.7) + p.y * 1.1 + t * (0.5 + fi * 0.08)) * amp;\n        amp *= 0.58;\n      }\n      return w * 0.5 + 0.5;\n    }\n\n    void main() {\n      vec2 uv = gl_FragCoord.xy / uRes.xy;\n      vec2 m = uMouse * 0.5 + 0.5;\n      vec2 toM = uv - m;\n      float mDist = length(toM);\n      float mForce = smoothstep(0.62, 0.0, mDist);\n\n      vec2 p = uv * vec2(2.8, 2.0);\n      p += (toM / max(mDist, 0.0001)) * mForce * 0.17 * sin(uTime * 1.7 + mDist * 13.0);\n      p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;\n\n      float t = uTime * 0.14;\n      float w = wave(p, t);\n      float r1 = 1.0 - abs(sin(w * 4.2 + t * 0.25));\n      float r2 = r1 * r1;\n      float r3 = r2 * r1;\n      float ridge = r3 * r3;\n      float ridge2 = ridge * ridge;\n      float ridge4 = ridge2 * ridge2;\n      float ridge14 = ridge4 * ridge4 * ridge4 * ridge2;\n\n      vec3 base = vec3(0.055, 0.055, 0.055);\n      vec3 dim = vec3(0.24, 0.24, 0.24);\n      vec3 mid = vec3(0.58, 0.58, 0.58);\n      vec3 hi = vec3(1.0, 1.0, 1.0);\n\n      vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);\n      ribbon = mix(ribbon, hi, ridge * 0.52);\n\n      vec3 col = base;\n      col = mix(col, ribbon, smoothstep(0.08, 0.88, ridge) * 0.58);\n      col += hi * ridge14 * 0.32;\n      col += mid * mForce * 0.16;\n      col += hi * mForce * ridge * 0.12;\n\n      float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));\n      col *= 0.58 + vignette * 0.42;\n\n      col = clamp((col - 0.5) * uGrade.x + 0.5, 0.0, 1.0) * uGrade.y;\n\n      gl_FragColor = vec4(col, 1.0);\n    }\n  ";
 
   var gl =
     canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" }) ||
@@ -63,6 +68,22 @@
   var uRes = gl.getUniformLocation(program, "uRes");
   var uTime = gl.getUniformLocation(program, "uTime");
   var uMouse = gl.getUniformLocation(program, "uMouse");
+  var uGrade = gl.getUniformLocation(program, "uGrade");
+
+  // Odpowiednik dawnego CSS-owego `filter` na .home-ambient, teraz liczony
+  // w shaderze. Wartości 1:1 z cosgral-home.css / theme-mode.css.
+  var GRADE_DARK = [1.04, 0.78];
+  var GRADE_LIGHT = [1.02, 1.08];
+
+  function applyGrade() {
+    var light = document.documentElement.getAttribute("data-theme") === "light";
+    var g = light ? GRADE_LIGHT : GRADE_DARK;
+    gl.uniform2f(uGrade, g[0], g[1]);
+  }
+  window.addEventListener("cosgral:themechange", function () {
+    applyGrade();
+    frameSkip = 0; // wymuś odrysowanie przy najbliższej klatce
+  });
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
@@ -139,6 +160,7 @@
   gl.uniform2f(uRes, canvas.width, canvas.height);
   gl.uniform1f(uTime, 0);
   gl.uniform2f(uMouse, 0, 0);
+  applyGrade();
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   play();
 

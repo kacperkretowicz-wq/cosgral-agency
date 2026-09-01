@@ -104,11 +104,17 @@ html[data-theme="light"] body.subpage::after {
   mix-blend-mode: multiply;
 }
 
+/* .home-ambient: korekcja barwna motywu jasnego siedzi teraz w shaderze
+   (GRADE_LIGHT w home-ambient-bg.js). .subpage-ambient ma własny skrypt bez
+   tej ścieżki, więc na podstronach filtr zostaje. */
 html[data-theme="light"] .home-ambient,
 html[data-theme="light"] .subpage-ambient {
-  filter: grayscale(1) contrast(1.02) brightness(1.08);
   background:
     radial-gradient(ellipse 140% 90% at 50% 38%, #ececea 0%, #f5f5f0 42%, #fafaf8 100%);
+}
+
+html[data-theme="light"] .subpage-ambient {
+  filter: grayscale(1) contrast(1.02) brightness(1.08);
 }
 
 html[data-theme="light"] .home-ambient__shade,

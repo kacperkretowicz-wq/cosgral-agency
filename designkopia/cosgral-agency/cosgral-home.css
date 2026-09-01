@@ -78,7 +78,10 @@ body.home-page::after {
   height: 100%;
   pointer-events: none;
   opacity: 1;
-  filter: grayscale(1) contrast(1.04) brightness(0.78);
+  /* Korekcja barwna (dawniej: filter: grayscale(1) contrast(1.04) brightness(0.78))
+     jest teraz liczona w shaderze — patrz uGrade w home-ambient-bg.js. Filtr CSS
+     na animowanym canvasie na cały ekran to osobny pass kompozytora w każdej
+     klatce, a grayscale i tak nie robił nic: shader zwraca czystą szarość. */
   background:
     radial-gradient(ellipse 140% 90% at 50% 38%, #161616 0%, #0a0a0a 42%, #030303 100%);
 }
@@ -87,20 +90,24 @@ body.home-page::after {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* Dawniej: ten sam gradient + filter: blur(52px). Środek gradientu jedzie za
+     kursorem przez --pointer-x/y aktualizowane w pętli rAF, więc blur na cały
+     ekran przeliczał się 60 razy na sekundę. Rozmycie gładkiego gradientu
+     radialnego to jednak prawie zmiana jego stopni — więc gradient jest tu od
+     razu miękki, a splot znika. */
   background:
     radial-gradient(
-      circle 32vmax at var(--pointer-x) var(--pointer-y),
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.04) 30%,
-      transparent 65%
+      circle 34vmax at var(--pointer-x) var(--pointer-y),
+      rgba(255, 255, 255, 0.098) 0%,
+      rgba(255, 255, 255, 0.055) 22%,
+      rgba(255, 255, 255, 0.022) 45%,
+      transparent 72%
     );
-  filter: blur(52px);
   opacity: 0.55;
   mix-blend-mode: screen;
 }
 @media (max-width: 900px) {
   .home-ambient__blur {
-    filter: blur(24px);
     opacity: 0.4;
   }
 }
