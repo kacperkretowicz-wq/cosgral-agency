@@ -69,7 +69,10 @@ body.home-page::after {
   background-size: 280px;
 }
 
-/* AMBIENT — liquid WebGL + cursor blur veil */
+/* AMBIENT — statyczne tlo (dawniej shader WebGL) + welon za kursorem.
+   filter: grayscale/contrast/brightness zniknal: sluzyl do ujednolicenia obrazu
+   z canvasa, a byl liczony przy kazdym zlozeniu warstwy. Teraz jasnosci sa
+   wpisane wprost w kolory gradientu. */
 .home-ambient {
   position: fixed;
   inset: 0;
@@ -77,11 +80,39 @@ body.home-page::after {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  overflow: hidden;
   opacity: 1;
-  filter: grayscale(1) contrast(1.04) brightness(0.78);
   background:
-    radial-gradient(ellipse 140% 90% at 50% 38%, #161616 0%, #0a0a0a 42%, #030303 100%);
+    radial-gradient(ellipse 140% 90% at 50% 38%, #111111 0%, #080808 42%, #020202 100%);
 }
+/* Wlokna — jedna statyczna warstwa wektorowa (ambient-filaments.svg, 2,3 kB).
+   Dryf to wylacznie transform, wiec przegladarka przesuwa gotowa teksture na GPU
+   i nie przemalowuje niczego. Kiedys bylo tu pelnoekranowe WebGL liczace 4 iteracje
+   sin/cos na kazdy fragment, 60 razy na sekunde. */
+.home-ambient::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background: url("ambient-filaments.svg") center / cover no-repeat;
+  opacity: 0.62;
+  transform: translate3d(0, 0, 0) scale(1.04);
+  will-change: transform;
+  animation: ambient-drift 72s ease-in-out infinite alternate;
+}
+.home-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 100% at 50% 45%, transparent 30%, rgba(3, 3, 3, 0.55) 100%);
+}
+@keyframes ambient-drift {
+  from { transform: translate3d(-1.4%, -0.8%, 0) scale(1.04); }
+  to   { transform: translate3d(1.4%, 1.1%, 0) scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-ambient::before { animation: none; }
+}
+
 /* Welon podążający za kursorem.
    Kiedyś: gradient pozycjonowany przez var(--pointer-x/y) + filter: blur(52px)
    na warstwie na całe okno. Każdy ruch myszy = przemalowanie całego ekranu

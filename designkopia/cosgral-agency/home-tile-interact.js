@@ -17,6 +17,25 @@
   var lastTiltX = "";
   var lastTiltY = "";
 
+  /* Przechyl byl zapisywany na <html>, przez co KAZDY ruch myszy uniewazniał styl
+     calego dokumentu — zmierzone 6,9 ms na jedno przeliczenie, ok. 1000 ms na 4 s
+     ruchu kursorem. Zmienna trafia teraz tylko na elementy, ktore ja czytaja
+     (albo sa przodkami czytajacych), wiec przeliczaja sie ich poddrzewa, a nie cala
+     strona. Domyslne 0deg zostaje w :root, wiec nic nie znika, gdy ktoregos zabraknie. */
+  var TILT_TARGETS =
+    ".site-nav, .home-scroll-rail, .site-footer, " +
+    ".home-scene.is-in-view, #main > .is-in-view, " +
+    ".portfolio-hero.is-in-view, [data-portfolio-section].is-in-view";
+  var tiltTargets = null;
+
+  function refreshTiltTargets() {
+    tiltTargets = document.querySelectorAll(TILT_TARGETS);
+    // Nowo dolaczony element startuje bez zmiennej — wymus jeden zapis.
+    lastTiltX = "";
+    lastTiltY = "";
+    return tiltTargets;
+  }
+
   /* --lx / --ly byly tu zapisywane na <html> co klatke, a karmily wylacznie
      .services-fan__card-liquid i .home-process__step::before — oba wlaczane klasa
      .is-cursor-active, ktora w calym kodzie jest tylko USUWANA, nigdy dodawana.
@@ -40,15 +59,26 @@
       return;
     }
 
-    var tx = (ptr.ny * TILT_PITCH).toFixed(2) + "deg";
-    var ty = (ptr.nx * TILT_YAW).toFixed(2) + "deg";
+    // Krok 0,1 stopnia: przy zakresie +/-5,8 stopnia to niewidoczne, a kilkukrotnie
+    // zmniejsza liczbe zapisow (a wiec i przeliczen stylu).
+    var tx = (ptr.ny * TILT_PITCH).toFixed(1) + "deg";
+    var ty = (ptr.nx * TILT_YAW).toFixed(1) + "deg";
+
+    if (document.documentElement.classList.contains("is-nav-menu-open")) {
+      // Regula CSS zerujaca przechyl przy otwartym menu siedziala na :root, a wartosc
+      // ustawiona na elemencie by ja przeslonila — wiec zerujemy tutaj.
+      tx = "0deg";
+      ty = "0deg";
+    }
 
     if (tx !== lastTiltX || ty !== lastTiltY) {
       lastTiltX = tx;
       lastTiltY = ty;
-      var root = document.documentElement;
-      root.style.setProperty("--global-tilt-x", tx);
-      root.style.setProperty("--global-tilt-y", ty);
+      var targets = tiltTargets || refreshTiltTargets();
+      for (var i = 0; i < targets.length; i++) {
+        targets[i].style.setProperty("--global-tilt-x", tx);
+        targets[i].style.setProperty("--global-tilt-y", ty);
+      }
       idleFrames = 0;
     } else {
       idleFrames += 1;
@@ -78,9 +108,17 @@
 
     var io = new IntersectionObserver(
       function (entries) {
+        var changed = false;
         entries.forEach(function (entry) {
-          entry.target.classList.toggle("is-in-view", entry.isIntersecting && entry.intersectionRatio >= 0.35);
+          var next = entry.isIntersecting && entry.intersectionRatio >= 0.35;
+          if (entry.target.classList.contains("is-in-view") !== next) changed = true;
+          entry.target.classList.toggle("is-in-view", next);
         });
+        // Zmienil sie zbior widocznych sekcji — przeadresuj zapisy przechylu.
+        if (changed) {
+          refreshTiltTargets();
+          wakeTilt();
+        }
       },
       { threshold: [0.2, 0.35, 0.5, 0.65] }
     );
@@ -171,6 +209,7 @@
     document.documentElement.classList.add("has-global-tilt");
     bindWorkCardVideos();
     watchVisibleScenes();
+    refreshTiltTargets();
     document.addEventListener("mousemove", wakeTilt, { passive: true });
     window.addEventListener("deviceorientation", wakeTilt, { passive: true });
     wakeTilt();

@@ -159,6 +159,7 @@ body.subpage::after {
 body.service-page .subpage-ambient {
   display: none !important;
 }
+
 .service-page-video {
   position: fixed;
   inset: 0;
@@ -201,7 +202,9 @@ html.reduce-motion .service-page-video__tint {
   opacity: 1;
 }
 
-/* Ambient background layers */
+/* Ambient background layers — statyczne tlo (dawniej shader WebGL).
+   filter: grayscale/contrast/brightness usuniety: ujednolical obraz z canvasa,
+   a byl przeliczany przy kazdym zlozeniu warstwy. Jasnosci sa teraz w kolorach. */
 .subpage-ambient {
   position: fixed;
   inset: 0;
@@ -209,10 +212,37 @@ html.reduce-motion .service-page-video__tint {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  overflow: hidden;
   opacity: 1;
-  filter: grayscale(1) contrast(1.04) brightness(0.78);
   background:
-    radial-gradient(ellipse 140% 90% at 50% 38%, #161616 0%, #0a0a0a 42%, #030303 100%);
+    radial-gradient(ellipse 140% 90% at 50% 38%, #111111 0%, #080808 42%, #020202 100%);
+}
+/* Wlokna — jedna statyczna warstwa wektorowa (ambient-filaments.svg, 2,3 kB).
+   Dryf to wylacznie transform, wiec GPU przesuwa gotowa teksture i nic sie nie
+   przemalowuje. Kiedys bylo tu pelnoekranowe WebGL liczace 4 iteracje sin/cos
+   na kazdy fragment, 60 razy na sekunde. */
+.subpage-ambient::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background: url("ambient-filaments.svg") center / cover no-repeat;
+  opacity: 0.62;
+  transform: translate3d(0, 0, 0) scale(1.04);
+  will-change: transform;
+  animation: ambient-drift 72s ease-in-out infinite alternate;
+}
+.subpage-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 100% at 50% 45%, transparent 30%, rgba(3, 3, 3, 0.55) 100%);
+}
+@keyframes ambient-drift {
+  from { transform: translate3d(-1.4%, -0.8%, 0) scale(1.04); }
+  to   { transform: translate3d(1.4%, 1.1%, 0) scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .subpage-ambient::before { animation: none; }
 }
 .subpage-ambient--themed {
   filter: contrast(1.08) brightness(0.92) saturate(1.15);
