@@ -194,6 +194,16 @@
       if (e.detail && e.detail.index === 0) restoreHeroUi();
     });
 
+    /* Kolor docelowy liter bierzemy z motywu. GSAP potrzebuje konkretnej
+       wartosci — nie animuje do var(--...) — wiec odczytujemy ja tuz przed
+       animacja. */
+    function heroLetterInk() {
+      var v = getComputedStyle(document.documentElement)
+        .getPropertyValue("--hero-letter-ink")
+        .trim();
+      return v || "rgba(255,255,255,1)";
+    }
+
     function heroIntro() {
       var title = document.querySelector(".home-hero__title");
       var letters = gsap.utils.toArray(".home-hero__letter");
@@ -244,7 +254,7 @@
         .to(
           letters,
           {
-            color: "rgba(255,255,255,1)",
+            color: heroLetterInk(),
             textShadow: "0 0 28px rgba(255,255,255,0.12), 0 8px 30px rgba(0,0,0,0.5)",
             duration: 1.1,
             stagger: { each: 0.08, from: "start" },

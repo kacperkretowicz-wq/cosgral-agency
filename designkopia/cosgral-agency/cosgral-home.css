@@ -24,6 +24,10 @@
   --pointer-ny: 0;
   --global-tilt-x: 0deg;
   --global-tilt-y: 0deg;
+  /* Kolor liter napisu hero. Musi byc zmienna, bo intro animuje go GSAP-em
+     i zapisuje jako styl inline — a styl inline wygrywa z kazda regula CSS,
+     wiec bez tego jasny motyw nie mial jak go nadpisac. */
+  --hero-letter-ink: rgba(255, 255, 255, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

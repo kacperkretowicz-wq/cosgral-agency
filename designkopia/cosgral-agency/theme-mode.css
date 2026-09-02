@@ -122,6 +122,30 @@ html[data-theme="light"] .subpage-ambient__blur {
   opacity: 0.28;
 }
 
+/* Litery napisu COSGRAL maja wlasny kolor rgba(255,255,255,0.92) i nie
+   dziedziczyly go po .home-hero__title (ktory w jasnym motywie jest juz
+   ciemny) — w efekcie najwiekszy element strony byl w jasnym motywie bialy
+   na prawie bialym tle, czyli niewidoczny.
+   Sama regula CSS nie wystarcza: intro animuje kolor GSAP-em i zostawia go
+   jako styl inline. Stad zmienna --hero-letter-ink, ktora czyta home-director.js,
+   plus czyszczenie stylu inline przy przelaczeniu motywu (theme-mode.js). */
+html[data-theme="light"] {
+  --hero-letter-ink: rgba(10, 10, 10, 0.95);
+}
+html[data-theme="light"] .home-hero__letter {
+  color: rgba(10, 10, 10, 0.92);
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Wlokna tla sa rysowane na bialo (patrz ambient-filaments.svg) — na jasnym
+   tle znikaja. Odwracamy je do ciemnych i przyciemniamy, zeby dawaly ten sam
+   delikatny rysunek co w ciemnym motywie. */
+html[data-theme="light"] .home-ambient::before,
+html[data-theme="light"] .subpage-ambient::before {
+  filter: invert(1);
+  opacity: 0.18;
+}
+
 html[data-theme="light"] .home-sand,
 html[data-theme="light"] .home-cube-portal,
 html[data-theme="light"] .subpage-cube-portal,

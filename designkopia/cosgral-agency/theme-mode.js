@@ -43,6 +43,16 @@
 
     if (persist) setStored(isLight ? "light" : "dark");
 
+    /* Intro hero animuje kolor liter GSAP-em, ktory zapisuje go jako styl
+       inline — a ten wygrywa z kazda regula CSS. Po zmianie motywu litery
+       zostawaly wiec w kolorze poprzedniego (w jasnym: biale na prawie bialym,
+       czyli niewidoczne). Czyscimy sam kolor i cien, reszty stylu inline nie
+       ruszamy, zeby nie zepsuc pozycji ustawionej przez animacje. */
+    document.querySelectorAll(".home-hero__letter").forEach(function (el) {
+      el.style.removeProperty("color");
+      el.style.removeProperty("text-shadow");
+    });
+
     var btn = document.querySelector("[data-theme-toggle]");
     if (btn) {
       btn.setAttribute("aria-pressed", isLight ? "true" : "false");
