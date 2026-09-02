@@ -2775,3 +2775,16 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
     transform: translate(-50%, -50%);
   }
 }
+
+/* Najdluzsza etykieta w stopce ("Pozycjonowanie SEO & GEO") nie miesci sie
+   w kolumnie ponizej ok. 340 px, a regula .site-footer .footer-col a ma
+   white-space: nowrap — wiec zamiast sie zawinac, uciekala poza ekran
+   (zmierzone: 18 px za krawedzia przy 320 px; przy 360 i 390 px jest dobrze).
+   Pozwalamy jej zawinac sie na spacji. hyphens: none i word-break: keep-all
+   z tamtej reguly zostaja w mocy, wiec nadal nie ma dzielenia wyrazow —
+   a o to chodzilo w nowrap. */
+@media (max-width: 340px) {
+  .site-footer .footer-col a {
+    white-space: normal;
+  }
+}
