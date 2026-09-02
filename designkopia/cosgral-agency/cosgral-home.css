@@ -2737,3 +2737,41 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
     margin-bottom: 0.95rem;
   }
 }
+
+/* --- druga tura, po audycie na 12 szerokosciach (320-1920 px) ---
+   Ponizsze schodzily jeszcze ponizej progu czytelnosci albo trafialnosci.
+   Specyficznosc musi dorownac regulom z bloku mobilnego wyzej
+   (.site-footer .footer-col__title to 0,0,3), stad prefiksy. */
+@media (max-width: 900px) {
+  .site-footer .footer-col__title {
+    font-size: 0.7rem;          /* bylo 0.58rem = 9,3 px */
+    letter-spacing: 0.14em;
+  }
+  .site-footer .footer-bottom {
+    font-size: 0.7rem;          /* bylo 9,0 px */
+  }
+}
+
+/* Kropki szyny sekcji maja 7x7 px — to swiadomy, minimalistyczny detal i
+   zostaje taki, jaki jest. Na ekranie dotykowym palec potrzebuje jednak
+   wiecej niz 9 px, wiec powiekszamy sam OBSZAR DOTYKU przez przezroczysty
+   pseudoelement. Nic sie przez to nie przesuwa i nic nie widac.
+   To samo dla etykiet przy kropkach (mialy 34x13 px). */
+@media (hover: none) and (pointer: coarse) {
+  .home-scroll-rail__dot,
+  .home-scroll-rail__title,
+  .footer-bottom a {
+    position: relative;
+  }
+  .home-scroll-rail__dot::after,
+  .home-scroll-rail__title::after,
+  .footer-bottom a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
