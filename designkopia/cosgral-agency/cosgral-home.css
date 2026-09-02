@@ -111,23 +111,16 @@ body.home-page::after {
   pointer-events: none;
   background: rgba(3, 3, 3, 0.28);
 }
-.home-sand {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
 html.reduce-motion .home-ambient,
 html.reduce-motion .home-ambient__blur,
-html.reduce-motion .home-ambient__shade,
-html.reduce-motion .home-sand { display: none; }
+html.reduce-motion .home-ambient__shade { display: none; }
 html.reduce-motion body.home-page { background: var(--bg); }
 
 main { position: relative; z-index: 1; }
-main.home-film > .home-scene {
+/* UWAGA: bez „>". ScrollTrigger owija pinowaną sekcję w .pin-spacer, więc przy
+   selektorze bezpośredniego dziecka sekcja traciła cały ten layout dokładnie
+   w chwili przypięcia — stąd „rozjeżdżanie się" scen. */
+main.home-film .home-scene {
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
@@ -175,10 +168,7 @@ html.reduce-motion .home-scene__panel {
   background:
     radial-gradient(ellipse 90% 80% at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.94) 100%);
 }
-html.is-shattering .home-scene-curtain,
-html.is-sand-stream .home-scene-curtain {
-  visibility: visible;
-}
+/* Wolne miejsce po kostce 3D — gotowy portal pod nową implementację. */
 .home-cube-portal {
   position: fixed;
   inset: 0;
@@ -192,12 +182,6 @@ html.is-sand-stream .home-scene-curtain {
   width: 100%;
   height: 100%;
   display: block;
-}
-html.is-sand-stream .home-cube-portal,
-html.is-shattering .home-cube-portal {
-  z-index: 4;
-  opacity: 1;
-  visibility: visible;
 }
 #uslugi.is-visible.home-scene {
   position: relative;
@@ -214,7 +198,6 @@ html.is-shattering .home-cube-portal {
   position: relative;
   z-index: 5;
 }
-/* stage stays under sand portal (z:4) — see html.is-sand-stream .home-cube-portal */
 
 .home-thump {
   position: fixed;
@@ -264,33 +247,6 @@ html.is-shattering .home-cube-portal {
   display: block;
 }
 
-/* SHATTER — dedicated cube → sand beat */
-.home-shatter.home-scene {
-  padding-block: 0;
-  justify-content: center;
-  overflow: visible;
-  background: transparent;
-  pointer-events: none;
-}
-.home-shatter .home-scene__panel {
-  min-height: 100dvh;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 0 var(--gutter) clamp(2.5rem, 6vh, 4rem);
-  box-sizing: border-box;
-}
-.home-shatter__caption {
-  font-family: var(--font-mono);
-  font-size: clamp(0.58rem, 1vw, 0.72rem);
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  text-align: center;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 2;
-}
 .home-hero .home-scene__panel {
   position: relative;
   min-height: 100dvh;

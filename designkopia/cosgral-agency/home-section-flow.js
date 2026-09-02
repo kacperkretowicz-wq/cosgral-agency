@@ -1,5 +1,9 @@
 /**
- * Kinowe sceny: pin + fade przez ciemność + zoom. Nie zwykłe przewijanie.
+ * Kinowe sceny: pin + fade przez ciemność + zoom.
+ *
+ * Scroll jest zwykły — sceny tylko reagują na jego postęp (scrub). Nie ma tu
+ * żadnego dopasowywania pozycji ani sterowania kostką 3D: obie te rzeczy
+ * zostały usunięte.
  */
 (function () {
   "use strict";
@@ -125,78 +129,63 @@
     return scene.querySelector(".home-scene__panel") || scene;
   }
 
-  function setCurtain(amount) {
-    if (!curtain) return;
-    gsap.set(curtain, { autoAlpha: amount });
-  }
-
   /**
-   * Rail sekcji (home-section-stepper) prowadzi kostkę bezpośrednio z pozycji
-   * scrolla — bez scruba, klatka w klatkę. Gdy to robi, scrubowane triggery nie
-   * mogą nadpisywać `cinema` starą wartością, bo kostka zostaje w tyle za
-   * scrollem. Po dojechaniu przejścia do końca (cinema ≈ 1) blokada strumienia
-   * piasku znów jest ich, żeby dalsze sekcje trzymały stan bez zmian.
+   * Kurtyna ma JEDNEGO właściciela.
+   *
+   * Wcześniej każda pinowana scena animowała ją własnym scrubem, a resetowała ją
+   * przy okazji scena rozpadu. Po jej usunięciu osie czasu zaczęły sobie
+   * nadpisywać wartość i czerń zostawała na ekranie także na postoju w sekcji.
+   * Teraz zaciemnienie liczymy w jednym miejscu, wprost z postępu przypiętej
+   * sceny: ciemno tylko na styku scen, jasno w środku każdej z nich.
    */
-  function cinemaDrivenByRail() {
-    var sand = window.cosgralSand;
-    return !!(sand && sand.cinemaDriven);
-  }
+  var CURTAIN_SCENES = [
+    { id: "hero-pin", fadeIn: false },
+    { id: "scene-uslugi", fadeIn: true },
+    { id: "scene-realizacje", fadeIn: true },
+    { id: "scene-proces", fadeIn: true },
+    { id: "scene-faq", fadeIn: true },
+    { id: "scene-kontakt", fadeIn: true },
+  ];
+  var CURTAIN_IN_END = 0.14;
+  var CURTAIN_OUT_START = 0.84;
+  var curtainSuspended = 0;
 
-  function railHoldsCinema() {
-    return cinemaDrivenByRail() && (window.cosgralSand.cinema || 0) < 0.96;
-  }
-
-  function lockSandStream() {
-    if (railHoldsCinema()) return;
-    document.documentElement.classList.add("is-sand-stream");
-    window.cosgralSand = window.cosgralSand || {};
-    if ((window.cosgralSand.cinema || 0) < 0.96) {
-      window.cosgralSand.cinema = 0.96;
-      window.cosgralSand.motion = 0.96;
-      window.cosgralSand.break = 0.98;
-      window.cosgralSand.stream = 0.98;
-    }
-    window.cosgralSand.locked = true;
-    window.cosgralSand.break = Math.max(window.cosgralSand.break || 0, 0.98);
-    window.cosgralSand.stream = Math.max(window.cosgralSand.stream || 0, 0.98);
-  }
-
-  function setCinema(value) {
-    window.cosgralSand = window.cosgralSand || {};
-    var c = Math.max(0, Math.min(1, value));
-    window.cosgralSand.cinema = c;
-    window.cosgralSand.motion = c;
-    window.cosgralSand.break = smooth01(0.08, 0.58, c) * 0.52;
-    window.cosgralSand.stream = smooth01(0.2, 0.94, c) * 0.96;
-
-    if (c >= 0.96) {
-      lockSandStream();
-    } else if (c <= 0.04) {
-      window.cosgralSand.locked = false;
-      document.documentElement.classList.remove("is-sand-stream");
-    } else {
-      window.cosgralSand.locked = false;
-      document.documentElement.classList.add("is-sand-stream");
-    }
-  }
-
-  window.cosgralSceneFlow = {
-    setCinema: setCinema,
-    animateCinemaTo: function (target, duration) {
-      if (REDUCED || !window.gsap) {
-        setCinema(target);
-        return null;
+  function curtainAmount() {
+    var dark = 0;
+    for (var i = 0; i < CURTAIN_SCENES.length; i++) {
+      var cfg = CURTAIN_SCENES[i];
+      var st = ScrollTrigger.getById(cfg.id);
+      if (!st || !st.isActive) continue;
+      var p = st.progress;
+      if (cfg.fadeIn && p < CURTAIN_IN_END) {
+        dark = Math.max(dark, (1 - p / CURTAIN_IN_END) * 0.72);
       }
-      var tween = { value: window.cosgralSand?.cinema || 0 };
-      return gsap.to(tween, {
-        value: target,
-        duration: duration || 2.2,
-        ease: "power2.inOut",
-        onUpdate: function () {
-          setCinema(tween.value);
-        },
-      });
+      if (p > CURTAIN_OUT_START) {
+        dark = Math.max(dark, ((p - CURTAIN_OUT_START) / (1 - CURTAIN_OUT_START)) * 0.85);
+      }
+    }
+    return dark;
+  }
+
+  /* Malujemy od razu w obsłudze scrolla: Lenis woła ją raz na klatkę, już po
+     ScrollTrigger.update, więc postępy scen są aktualne. Odkładanie tego na
+     osobny rAF potrafiło zostawić na ekranie czerń z poprzedniej klatki. */
+  function scheduleCurtain() {
+    if (!curtain || curtainSuspended) return;
+    gsap.set(curtain, { autoAlpha: curtainAmount() });
+  }
+
+  /* Twarde cięcie (menu, przejścia między stronami) przejmuje kurtynę na chwilę
+     dla siebie — patrz home-section-nav.js. */
+  window.cosgralSceneCurtain = {
+    suspend: function () {
+      curtainSuspended += 1;
     },
+    resume: function () {
+      curtainSuspended = Math.max(0, curtainSuspended - 1);
+      scheduleCurtain();
+    },
+    refresh: scheduleCurtain,
   };
 
   /** Pinowana scena: ciemność → zoom in → długa pauza → ciemność */
@@ -209,12 +198,32 @@
     opts = opts || {};
     var panel = panelOf(scene);
     var pinLen = opts.pin || (MOBILE ? "+=88%" : "+=108%");
-    var fadeOut = opts.fadeOut !== false;
 
     gsap.set(panel, {
       autoAlpha: 0,
       scale: MOBILE ? 1.04 : 1.07,
       filter: MOBILE ? "none" : "blur(14px)",
+    });
+
+    /* Wejście sceny gra na DOJEŹDZIE do ekranu, nie dopiero po przypięciu.
+       Wcześniej robiły to pierwsze 12% osi czasu pinu — przy dopasowywanym
+       scrollu to nie miało znaczenia, bo do sekcji się skakało. Przy zwykłym
+       scrollu sekcja wisiała rozmyta przez cały ekran, zanim pin ruszył. */
+    gsap.to(panel, {
+      autoAlpha: 1,
+      scale: 1,
+      filter: MOBILE ? "none" : "blur(0px)",
+      ease: "power2.out",
+      immediateRender: false,
+      scrollTrigger: {
+        id: (opts.id || scene.id) + "-approach",
+        trigger: scene,
+        start: "top bottom",
+        end: "top top",
+        scrub: MOBILE ? 0.4 : 0.5,
+        invalidateOnRefresh: true,
+        refreshPriority: opts.priority,
+      },
     });
 
     var tl = gsap.timeline({
@@ -228,7 +237,7 @@
         scrub: MOBILE ? 0.5 : 0.55,
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        refreshPriority: opts.priority || 1,
+        refreshPriority: opts.priority,
         onEnter: function () {
           scene.classList.add("is-entered", "is-visible");
           playSceneEnters(scene, { stagger: true });
@@ -250,57 +259,12 @@
       },
     });
 
-    // 0–12%: szybki wjazd z ciemności
-    tl.to(
-      panel,
-      {
-        autoAlpha: 1,
-        scale: 1,
-        filter: MOBILE ? "none" : "blur(0px)",
-        duration: 0.12,
-        ease: "power3.out",
-      },
-      0
-    );
-
-    if (curtain) {
-      tl.to(curtain, { autoAlpha: 0.78, duration: 0.05, ease: "power1.in" }, 0)
-        .to(curtain, { autoAlpha: 0, duration: 0.1, ease: "power2.out" }, 0.05);
-    }
-
-    // 12–84%: długa pauza na treści
-    tl.to(panel, { autoAlpha: 1, scale: 1, duration: 0.72, ease: "none" }, 0.12);
-
-    if (fadeOut) {
-      // 84–100%: szybki zjazd w ciemność
-      tl.to(
-        panel,
-        {
-          autoAlpha: 0,
-          scale: MOBILE ? 0.96 : 0.94,
-          filter: MOBILE ? "none" : "blur(12px)",
-          duration: 0.16,
-          ease: "power3.in",
-        },
-        0.84
-      );
-      if (curtain) {
-        tl.to(curtain, { autoAlpha: 0.88, duration: 0.12, ease: "power3.in" }, 0.88);
-      }
-    } else {
-      tl.to(panel, { autoAlpha: 1, duration: 0.16, ease: "none" }, 0.84);
-    }
+    /* Pin to sam postój na treści: panel jest już ostry, nic tu nie gaśnie.
+       Po odpięciu sekcja odjeżdża widoczna — gdy gasła do czerni, między
+       scenami zostawał pusty ekran. */
+    tl.to(panel, { autoAlpha: 1, scale: 1, duration: 1, ease: "none" }, 0);
 
     return tl;
-  }
-
-  function holdScroll(st, hold) {
-    return st.start + (st.end - st.start) * hold;
-  }
-
-  function smooth01(a, b, x) {
-    var t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-    return t * t * (3 - 2 * t);
   }
 
   (async function () {
@@ -321,7 +285,6 @@
     if (curtain) gsap.set(curtain, { autoAlpha: 0 });
 
     var hero = document.getElementById("top");
-    var shatter = document.getElementById("rozpad");
     var services = document.getElementById("uslugi");
     var work = document.getElementById("realizacje");
     var process = document.getElementById("proces");
@@ -329,7 +292,7 @@
     var contact = document.getElementById("kontakt");
 
     if (REDUCED) {
-      [hero, shatter, services, work, process, faq, contact].forEach(function (s) {
+      [hero, services, work, process, faq, contact].forEach(function (s) {
         if (s) s.classList.add("is-entered", "is-visible");
       });
       return;
@@ -341,13 +304,7 @@
       var heroScroll = hero.querySelector(".home-hero__scroll");
       hero.classList.add("is-entered", "is-visible");
       gsap.set(panelOf(hero), { autoAlpha: 1 });
-      window.addEventListener(
-        "cosgral:cube-intro-done",
-        function () {
-          playSceneEnters(hero, { stagger: true, force: true });
-        },
-        { once: true }
-      );
+      playSceneEnters(hero, { stagger: true, force: true });
 
       gsap
         .timeline({
@@ -360,6 +317,10 @@
             pinSpacing: true,
             scrub: MOBILE ? 0.45 : 0.5,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
+            /* Piny muszą się odświeżać w kolejności występowania na stronie —
+               patrz PIN_PRIORITY niżej. */
+            refreshPriority: 6,
             onEnterBack: function () {
               if (window.cosgralRestoreHero) window.cosgralRestoreHero();
             },
@@ -378,145 +339,17 @@
           },
           0.66
         )
-        .to(heroScroll, { autoAlpha: 0, duration: 0.2, ease: "none" }, 0.62)
-        .to(curtain, { autoAlpha: 0.65, duration: 0.18, ease: "power3.in" }, 0.72);
+        .to(heroScroll, { autoAlpha: 0, duration: 0.2, ease: "none" }, 0.62);
     }
 
-    // ——— 2. SHATTER ———
-    if (shatter) {
-      var shatterPanel = panelOf(shatter);
-      gsap.set(shatterPanel, { autoAlpha: 1 });
-      gsap.set(shatter, { autoAlpha: 1 });
+    // ——— 2–5: kinowe sceny (pin + fade) ———
+    wireScene(services, { id: "scene-uslugi", pin: MOBILE ? "+=95%" : "+=118%", priority: 5 });
 
-      gsap.timeline({
-        scrollTrigger: {
-          id: "shatter-beat",
-          trigger: shatter,
-          start: "top top",
-          end: MOBILE ? "+=218%" : "+=272%",
-          pin: true,
-          pinSpacing: true,
-          scrub: MOBILE ? 0.5 : 0.55,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          refreshPriority: 5,
-          onEnter: function () {
-            shatter.classList.add("is-active");
-            document.documentElement.classList.add("is-shattering");
-            document.documentElement.classList.remove("is-sand-stream");
-            gsap.set(shatter, { autoAlpha: 1, visibility: "visible" });
-            gsap.set(shatterPanel, { autoAlpha: 1, clearProps: "filter" });
-            gsap.set(curtain, { autoAlpha: 0.55 });
-          },
-          onEnterBack: function () {
-            shatter.classList.add("is-active");
-            document.documentElement.classList.add("is-shattering");
-            document.documentElement.classList.remove("is-sand-stream");
-            gsap.set(shatter, { autoAlpha: 1, visibility: "visible" });
-            gsap.set(shatterPanel, { autoAlpha: 1 });
-          },
-          onLeave: function () {
-            shatter.classList.remove("is-active");
-            document.documentElement.classList.remove("is-shattering");
-            if (!cinemaDrivenByRail()) setCinema(1);
-            gsap.set(shatterPanel, { autoAlpha: 0 });
-            gsap.set(shatter, { autoAlpha: 0, visibility: "hidden" });
-          },
-          onLeaveBack: function () {
-            shatter.classList.add("is-active");
-            document.documentElement.classList.remove("is-shattering");
-            gsap.set(shatter, { autoAlpha: 1, visibility: "visible" });
-            gsap.set(shatterPanel, { autoAlpha: 1 });
-          },
-          onUpdate: function (self) {
-            var p = cinemaDrivenByRail() ? window.cosgralSand.cinema || 0 : self.progress;
-            if (!cinemaDrivenByRail()) setCinema(p);
+    wireScene(work, { id: "scene-realizacje", pin: MOBILE ? "+=88%" : "+=108%", priority: 4 });
 
-            var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
-            var shatterProps = { autoAlpha: 1 - out };
-            if (!MOBILE) {
-              shatterProps.filter = out ? "blur(" + out * 8 + "px)" : "blur(0px)";
-            }
-            gsap.set(shatterPanel, shatterProps);
-
-            if (curtain) {
-              var c = p > 0.78 ? (p - 0.78) / 0.22 : 0.5 * (1 - p / 0.78);
-              gsap.set(curtain, { autoAlpha: Math.min(0.9, c) });
-            }
-          },
-        },
-      });
-    }
-
-    // ——— 3–6: kinowe sceny (pin + fade) ———
-    wireScene(services, {
-      id: "scene-uslugi",
-      pin: MOBILE ? "+=95%" : "+=118%",
-      priority: 2,
-      onEnter: function () {
-        lockSandStream();
-        window.cosgralSand.servicesVisible = true;
-      },
-      onEnterBack: function () {
-        lockSandStream();
-        window.cosgralSand.servicesVisible = true;
-      },
-      onLeave: function () {
-        lockSandStream();
-        if (window.cosgralSand) window.cosgralSand.servicesVisible = false;
-      },
-      onLeaveBack: function () {
-        lockSandStream();
-        window.cosgralSand.servicesVisible = true;
-      },
-    });
-
-    if (services) {
-      ScrollTrigger.create({
-        id: "cube-motion-tail",
-        trigger: services,
-        start: "top bottom",
-        end: "top 22%",
-        scrub: MOBILE ? 0.6 : 0.7,
-        onUpdate: function (self) {
-          if (cinemaDrivenByRail()) return;
-          var q = self.progress;
-          var tail = 1 - Math.pow(1 - q, 1.12);
-          window.cosgralSand = window.cosgralSand || {};
-          window.cosgralSand.motionTail = tail;
-          setCinema(Math.min(1, 0.8 + tail * 0.2));
-          window.cosgralSand.servicesVisible = q > 0.06;
-        },
-      });
-    }
-
-    wireScene(work, {
-      id: "scene-realizacje",
-      pin: MOBILE ? "+=88%" : "+=108%",
-      priority: 2,
-      onEnter: lockSandStream,
-      onEnterBack: lockSandStream,
-    });
-
-    wireScene(process, {
-      id: "scene-proces",
-      pin: MOBILE ? "+=82%" : "+=102%",
-      onEnter: lockSandStream,
-      onEnterBack: lockSandStream,
-    });
-    wireScene(faq, {
-      id: "scene-faq",
-      pin: MOBILE ? "+=76%" : "+=94%",
-      onEnter: lockSandStream,
-      onEnterBack: lockSandStream,
-    });
-    wireScene(contact, {
-      id: "scene-kontakt",
-      pin: MOBILE ? "+=84%" : "+=104%",
-      fadeOut: false,
-      onEnter: lockSandStream,
-      onEnterBack: lockSandStream,
-    });
+    wireScene(process, { id: "scene-proces", pin: MOBILE ? "+=82%" : "+=102%", priority: 3 });
+    wireScene(faq, { id: "scene-faq", pin: MOBILE ? "+=76%" : "+=94%", priority: 2 });
+    wireScene(contact, { id: "scene-kontakt", pin: MOBILE ? "+=84%" : "+=104%", priority: 1 });
 
     gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
       gsap.from(el, {
@@ -534,7 +367,15 @@
       });
     });
 
+    if (window.cosgralSmoothScroll?.lenis) {
+      window.cosgralSmoothScroll.lenis.on("scroll", scheduleCurtain);
+    } else {
+      window.addEventListener("scroll", scheduleCurtain, { passive: true });
+    }
+    ScrollTrigger.addEventListener("refresh", scheduleCurtain);
+
     ScrollTrigger.refresh();
+    scheduleCurtain();
     window.dispatchEvent(new CustomEvent("cosgral:sections-ready"));
   })();
 })();

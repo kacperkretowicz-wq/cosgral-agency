@@ -99,8 +99,7 @@
   function frame(now) {
     if (!running) return;
 
-    var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
-    var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
+    var skipN = Math.max(tierSkip, MOBILE ? 2 : 1);
     frameSkip += 1;
     if (skipN > 1 && frameSkip % skipN !== 0) {
       requestAnimationFrame(frame);

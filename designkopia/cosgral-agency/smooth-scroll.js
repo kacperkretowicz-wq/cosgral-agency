@@ -44,7 +44,9 @@
     lerp: MOBILE ? 0.14 : 0.08,
     duration: MOBILE ? 0.95 : 1.2,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
-    smoothWheel: false,
+    /* Kółko było wcześniej przechwytywane przez rail sekcji — teraz scroll jest
+       zwykły, więc inercję Lenisa włączamy z powrotem. */
+    smoothWheel: true,
     smoothTouch: false,
     touchMultiplier: 1,
     wheelMultiplier: 1,
@@ -78,7 +80,7 @@
   /* Allow mild catch-up on mobile under GPU load; keep tight on desktop */
   gsap.ticker.lagSmoothing(MOBILE ? 500 : 0);
 
-  var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "proces", "faq", "kontakt"];
+  var SECTION_IDS = ["top", "uslugi", "realizacje", "proces", "faq", "kontakt"];
 
   document.querySelectorAll('a[href^="#"]').forEach(function (link) {
     link.addEventListener("click", function (e) {

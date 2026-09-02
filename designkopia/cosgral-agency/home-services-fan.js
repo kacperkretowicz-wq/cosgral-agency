@@ -1,5 +1,6 @@
 /**
- * Usługi — interaktywna karuzela (klik / swipe), bez zmiany kafelków scrollem.
+ * Usługi — interaktywna karuzela: klik w lewą/prawą połowę, swipe, kółko w poziomie.
+ * Scroll w pionie należy do strony — karuzela go nie przechwytuje.
  */
 (function () {
   "use strict";
@@ -55,10 +56,7 @@
 
   function setUslugiActive(active) {
     section.classList.toggle("is-in-view", !!active);
-    if (active) {
-      document.documentElement.classList.add("is-sand-stream");
-      showTapHint();
-    }
+    if (active) showTapHint();
   }
 
   window.addEventListener("cosgral:section-step", function (e) {
@@ -486,23 +484,14 @@
 
   stage.addEventListener("wheel", onWheel, { passive: false });
 
-  // Piasek tylko gdy sekcja w kadrze
+  // Podpowiedź nawigacji tylko gdy sekcja jest w kadrze
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
           section.classList.toggle("is-in-view", entry.isIntersecting);
-          if (entry.isIntersecting) {
-            document.documentElement.classList.add("is-sand-stream");
-            showTapHint();
-          } else {
-            hideTapHint();
-            if (!(window.cosgralSand && window.cosgralSand.locked)) {
-              if (!document.getElementById("rozpad")?.classList.contains("is-active")) {
-                document.documentElement.classList.remove("is-sand-stream");
-              }
-            }
-          }
+          if (entry.isIntersecting) showTapHint();
+          else hideTapHint();
         });
       },
       { threshold: 0.35 }
@@ -540,19 +529,6 @@
     },
     goToIndex: function (nextIndex) {
       goTo(nextIndex);
-    },
-    /* Krok kafelka wymuszony przez rail sekcji: każde „kliknięcie" kółka ma dać
-       widoczną reakcję, więc omijamy cooldown (rail sam dawkuje kroki). */
-    stepCards: function (dir) {
-      if (!isUslugiActive()) return false;
-      lastNavAt = Date.now();
-      wheelAccumX = 0;
-      hideHint();
-      hideTapHint();
-      /* Liczymy od celu, nie od kafelka aktualnie na ekranie — przy szybkich
-         kliknięciach kółka `index` jeszcze nie dogonił i krok by przepadł. */
-      goTo(Math.round(targetPos) + (dir > 0 ? 1 : -1));
-      return true;
     },
     goToTheme: function (themeId, done) {
       var idx = -1;

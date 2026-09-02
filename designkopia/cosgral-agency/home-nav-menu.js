@@ -212,8 +212,14 @@
     return overlay.querySelectorAll(".nav-overlay__char");
   }
 
+  /* Na stronie głównej nie ma już kostki 3D. Bez niej menu nie ma się do czego
+     synchronizować ani na co czekać — dostaje własne, krótkie tempo. */
+  function hasCube() {
+    return !!(window.cosgralCube && window.cosgralCube.getMenuBlend);
+  }
+
   function syncStageToCube() {
-    if (!isOpen || !stage) return;
+    if (!isOpen || !stage || !hasCube()) return;
 
     var rect =
       window.cosgralCube?.getMenuFaceAnchorRect?.() ||
@@ -271,6 +277,7 @@
   }
 
   function linksDelayForBlend() {
+    if (!hasCube()) return 0;
     var openDur = window.cosgralCube?.getMenuOpenDuration?.() || 5.3;
     var fullDelay = window.cosgralCube?.getMenuLinksDelay?.() ?? openDur * 0.128;
     var blend = window.cosgralCube?.getMenuBlend?.() ?? 0;
@@ -464,7 +471,7 @@
     animateLinksForOpen();
 
     var cubeTween = invokeCubeOpen();
-    if (!cubeTween && !REDUCED) {
+    if (!cubeTween && !REDUCED && hasCube()) {
       window.addEventListener(
         "cosgral:cube-ready",
         function onCubeReady() {
@@ -512,7 +519,7 @@
 
     var closeDur = window.cosgralCube?.getMenuCloseDuration?.() || 2.85;
     var closeBlend = window.cosgralCube?.getMenuBlend?.() ?? (isOpen ? 1 : 0);
-    var closeMs = Math.max(80, closeDur * closeBlend * 1000 + 80);
+    var closeMs = hasCube() ? Math.max(80, closeDur * closeBlend * 1000 + 80) : 340;
     if (cubeTween && cubeTween.eventCallback) {
       cubeTween.eventCallback("onComplete", finishAll);
     } else {
