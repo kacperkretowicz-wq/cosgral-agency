@@ -30,6 +30,16 @@
   [headers.values]
     Cache-Control = "no-cache, must-revalidate"
 
+# Biblioteki w /vendor sa przypiete wersjami (three 0.170.0, gsap 3.15.0,
+# lenis 1.1.18) i nigdy nie zmieniaja tresci pod tym samym adresem — podmiana
+# wersji to nowy plik przez ./scripts/vendor-libs.sh. Reguly wyzej nie mozna
+# dziedziczyc, bo "no-cache" kazaloby przegladarce odpytywac o nie za kazdym
+# wejsciem, mimo ze i tak dostanie 304.
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
 [[headers]]
   for = "/portfolio/*"
   [headers.values]

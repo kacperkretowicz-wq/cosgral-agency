@@ -44,12 +44,11 @@
   }
 }
 </script>
-<link rel="preconnect" href="https://unpkg.com" crossorigin />
 <!-- Jedyne miejsce z adresem three.js. Aby przejsc na wlasny hosting (szybciej
      i bez zaleznosci od cudzego CDN-u): ./scripts/vendor-libs.sh — pobierze
      biblioteki do /vendor i przestawi ta mape na sciezki lokalne. -->
 <script type="importmap">
-{"imports":{"three":"https://unpkg.com/three@0.170.0/build/three.module.js"}}
+{"imports":{"three":"/vendor/three.module.js"}}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -228,8 +227,8 @@
 </footer>
 
 <script src="i18n.js?v=20260825x"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script src="/vendor/gsap.min.js"></script>
+<script src="/vendor/ScrollTrigger.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="home-cursor-field.js?v=20260825s"></script>
 <script src="home-cursor.js?v=20260812a"></script>
