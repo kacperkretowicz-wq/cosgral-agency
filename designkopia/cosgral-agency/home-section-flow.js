@@ -130,8 +130,23 @@
     gsap.set(curtain, { autoAlpha: amount });
   }
 
+  /* Uchwyt do trwajacej animacji rozpadu kostki (hero -> Uslugi). */
+  var tweenRozpadu = null;
+
+  function rozpadTrwa() {
+    return !!(tweenRozpadu && tweenRozpadu.isActive && tweenRozpadu.isActive());
+  }
+
+  /* Wymusza koncowy stan piasku. Jest podpiete pod onEnter/onEnterBack kilku
+     ScrollTriggerow, wiec odpala sie, gdy tylko scroll ruszy w strone kolejnej
+     sceny — czyli praktycznie natychmiast po rozpoczeciu przejscia z hero.
+     Deptalo to animacje rozpadu: kostka zamiast rozsypywac sie przez ~1,4 s
+     przeskakiwala do stanu koncowego w mniej niz 0,4 s i po prostu znikala.
+     Dopoki rozpad trwa, oddajemy mu pierwszenstwo — sam dojdzie do 1.0
+     i wtedy setCinema wywola lockSandStream ponownie. */
   function lockSandStream() {
     document.documentElement.classList.add("is-sand-stream");
+    if (rozpadTrwa()) return;
     window.cosgralSand = window.cosgralSand || {};
     if ((window.cosgralSand.cinema || 0) < 0.96) {
       window.cosgralSand.cinema = 0.96;
@@ -171,14 +186,21 @@
         return null;
       }
       var tween = { value: window.cosgralSand?.cinema || 0 };
-      return gsap.to(tween, {
+      if (tweenRozpadu && tweenRozpadu.kill) tweenRozpadu.kill();
+      tweenRozpadu = gsap.to(tween, {
         value: target,
         duration: duration || 2.2,
         ease: "power2.inOut",
         onUpdate: function () {
           setCinema(tween.value);
         },
+        onComplete: function () {
+          tweenRozpadu = null;
+          // Domkniecie: teraz stan koncowy moze juz zostac zatrzasniety.
+          if (target >= 0.96) lockSandStream();
+        },
       });
+      return tweenRozpadu;
     },
   };
 

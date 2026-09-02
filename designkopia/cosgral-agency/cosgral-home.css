@@ -424,6 +424,12 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   top: 0;
   width: 64px;
   height: 64px;
+  /* Plik logo ma 679x1024 (pionowy), a pudelko jest kwadratowe — bez tego
+     obrazek byl sciskany w poziomie i rozciagany w pionie. Logo w nawigacji
+     radzi sobie inaczej (width: 48px; height: auto), ale tutaj kwadratowe
+     pudelko musi zostac: na jego srodku oparta jest geometria lotu kostki
+     w preloader.js (measureFlight liczy srodek .preloader__cube-slot). */
+  object-fit: contain;
   margin: 0;
   pointer-events: none;
   transform: translate3d(var(--cube-x, 0px), var(--cube-y, 0px), 0)
