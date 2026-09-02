@@ -36,7 +36,7 @@
   var wheelAccumX = 0;
   var wheelCooldown = false;
   var lastNavAt = 0;
-  var NAV_COOLDOWN_MS = 620;
+  var NAV_COOLDOWN_MS = 300;
   var WHEEL_THRESHOLD = 165;
   var HORIZONTAL_RATIO = 2.4;
   var wheelDecayTimer = null;
@@ -532,21 +532,26 @@
 
 
   window.cosgralServicesFan = {
+    count: function () {
+      return total;
+    },
+    getIndex: function () {
+      return index;
+    },
     goToIndex: function (nextIndex) {
       goTo(nextIndex);
     },
-    stepFromWheel: function (deltaY) {
-      if (!isUslugiActive() || !canNavigate()) return false;
-      wheelAccumX += deltaY;
-      scheduleWheelDecay();
-      if (Math.abs(wheelAccumX) < 32) return false;
-      var dir = wheelAccumX > 0 ? 1 : -1;
-      wheelAccumX = 0;
+    /* Krok kafelka wymuszony przez rail sekcji: każde „kliknięcie" kółka ma dać
+       widoczną reakcję, więc omijamy cooldown (rail sam dawkuje kroki). */
+    stepCards: function (dir) {
+      if (!isUslugiActive()) return false;
       lastNavAt = Date.now();
+      wheelAccumX = 0;
       hideHint();
       hideTapHint();
-      if (dir > 0) next();
-      else prev();
+      /* Liczymy od celu, nie od kafelka aktualnie na ekranie — przy szybkich
+         kliknięciach kółka `index` jeszcze nie dogonił i krok by przepadł. */
+      goTo(Math.round(targetPos) + (dir > 0 ? 1 : -1));
       return true;
     },
     goToTheme: function (themeId, done) {

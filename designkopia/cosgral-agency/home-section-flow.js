@@ -130,7 +130,24 @@
     gsap.set(curtain, { autoAlpha: amount });
   }
 
+  /**
+   * Rail sekcji (home-section-stepper) prowadzi kostkę bezpośrednio z pozycji
+   * scrolla — bez scruba, klatka w klatkę. Gdy to robi, scrubowane triggery nie
+   * mogą nadpisywać `cinema` starą wartością, bo kostka zostaje w tyle za
+   * scrollem. Po dojechaniu przejścia do końca (cinema ≈ 1) blokada strumienia
+   * piasku znów jest ich, żeby dalsze sekcje trzymały stan bez zmian.
+   */
+  function cinemaDrivenByRail() {
+    var sand = window.cosgralSand;
+    return !!(sand && sand.cinemaDriven);
+  }
+
+  function railHoldsCinema() {
+    return cinemaDrivenByRail() && (window.cosgralSand.cinema || 0) < 0.96;
+  }
+
   function lockSandStream() {
+    if (railHoldsCinema()) return;
     document.documentElement.classList.add("is-sand-stream");
     window.cosgralSand = window.cosgralSand || {};
     if ((window.cosgralSand.cinema || 0) < 0.96) {
@@ -208,7 +225,7 @@
         end: pinLen,
         pin: true,
         pinSpacing: true,
-        scrub: MOBILE ? 1.2 : 1.5,
+        scrub: MOBILE ? 0.5 : 0.55,
         anticipatePin: 1,
         invalidateOnRefresh: true,
         refreshPriority: opts.priority || 1,
@@ -341,7 +358,7 @@
             end: MOBILE ? "+=72%" : "+=95%",
             pin: true,
             pinSpacing: true,
-            scrub: MOBILE ? 1.15 : 1.4,
+            scrub: MOBILE ? 0.45 : 0.5,
             anticipatePin: 1,
             onEnterBack: function () {
               if (window.cosgralRestoreHero) window.cosgralRestoreHero();
@@ -379,7 +396,7 @@
           end: MOBILE ? "+=218%" : "+=272%",
           pin: true,
           pinSpacing: true,
-          scrub: MOBILE ? 1.85 : 2.15,
+          scrub: MOBILE ? 0.5 : 0.55,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 5,
@@ -401,7 +418,7 @@
           onLeave: function () {
             shatter.classList.remove("is-active");
             document.documentElement.classList.remove("is-shattering");
-            setCinema(1);
+            if (!cinemaDrivenByRail()) setCinema(1);
             gsap.set(shatterPanel, { autoAlpha: 0 });
             gsap.set(shatter, { autoAlpha: 0, visibility: "hidden" });
           },
@@ -412,8 +429,8 @@
             gsap.set(shatterPanel, { autoAlpha: 1 });
           },
           onUpdate: function (self) {
-            var p = self.progress;
-            setCinema(p);
+            var p = cinemaDrivenByRail() ? window.cosgralSand.cinema || 0 : self.progress;
+            if (!cinemaDrivenByRail()) setCinema(p);
 
             var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
             var shatterProps = { autoAlpha: 1 - out };
@@ -460,8 +477,9 @@
         trigger: services,
         start: "top bottom",
         end: "top 22%",
-        scrub: MOBILE ? 2.4 : 2.85,
+        scrub: MOBILE ? 0.6 : 0.7,
         onUpdate: function (self) {
+          if (cinemaDrivenByRail()) return;
           var q = self.progress;
           var tail = 1 - Math.pow(1 - q, 1.12);
           window.cosgralSand = window.cosgralSand || {};

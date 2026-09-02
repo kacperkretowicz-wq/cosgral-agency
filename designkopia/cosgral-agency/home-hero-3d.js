@@ -824,15 +824,15 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       end: "bottom top",
       scrub: 1.1,
       onUpdate: function (self) {
-        var cur = window.cosgralSand || {};
+        var cur = (window.cosgralSand = window.cosgralSand || {});
         if ((cur.cinema || 0) >= 0.96) {
-          window.cosgralSand = {
-            break: Math.max(cur.break || 0, 0.98),
-            stream: Math.max(cur.stream || 0, 0.85 + self.progress * 0.15),
-            cinema: Math.max(cur.cinema || 0, 1),
-            locked: true,
-            motion: 1,
-          };
+          // Mutujemy w miejscu — podmiana całego obiektu gubiła flagi railu
+          // (cinemaDriven, motionTail), przez co kostka wracała pod scruba.
+          cur.break = Math.max(cur.break || 0, 0.98);
+          cur.stream = Math.max(cur.stream || 0, 0.85 + self.progress * 0.15);
+          cur.cinema = Math.max(cur.cinema || 0, 1);
+          cur.locked = true;
+          cur.motion = 1;
           document.documentElement.classList.add("is-sand-stream");
         }
       },

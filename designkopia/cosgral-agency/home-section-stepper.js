@@ -1,5 +1,15 @@
 /**
- * Slideshow scroll — jeden gest = jedna sekcja (kropka). Nigdy nie zatrzymuje między.
+ * Analogowy rail sekcji — każdy ruch scrolla ma wartość.
+ *
+ * Zamiast „jeden gest = jeden skok o sekcję" trzymamy ciągłą pozycję w
+ * jednostkach sekcji (0 = hero, 1 = usługi, …). Każde zdarzenie kółka/dotyku
+ * przesuwa ją proporcjonalnie, a strona — scroll, rozpad kostki, panele —
+ * idzie za nią klatka po klatce. Kilka kliknięć kółka przewija kostkę kawałek
+ * po kawałku; po zakończeniu gestu pozycja dojeżdża do sekcji, na której
+ * stoimy, albo do następnej, jeśli przejechaliśmy próg COMMIT.
+ *
+ * Kostka nie jest już sterowana scrubem (scrub = celowe opóźnienie), tylko
+ * bezpośrednio z pozycji scrolla — dzięki temu reaguje w tej samej klatce.
  */
 (function () {
   "use strict";
@@ -16,6 +26,36 @@
     { id: "footer", footer: true },
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) { return !c.footer; }).map(function (c) { return c.id; });
+
+  /* ——— czułość: ile „kliknięć” kółka na jedno przejście ——— */
+  var NOTCH_PX = 100;                // referencyjny skok kółka myszy
+  var NOTCHES_HERO = 8;              // hero → usługi: pełny rozpad kostki
+  var NOTCHES_DEFAULT = 5;           // pozostałe przejścia
+  var COMMIT = 0.24;                 // ułamek przejścia, po którym gest się zatwierdza
+  var SETTLE_MS = 140;               // cisza po geście → decyzja commit / powrót
+  var LEAD_MAX = 2;                  // jak daleko cel może uciec przed obrazem
+  var EASE = MOBILE ? 0.2 : 0.17;    // dociąganie obrazu do celu (na klatkę 60 Hz)
+  var MAX_UNITS_PER_FRAME = 1 / 30;  // limit prędkości: pełne przejście ≈ 0.7 s
+  var FRAME_MS = 1000 / 60;
+  var MAX_FRAME_STEP = 4;            // po zgubionych klatkach nie nadrabiamy skokiem
+  var WHEEL_EVENT_CAP = 400;         // jedno zdarzenie nie teleportuje przez sekcje
+  var SETTLED_EPS = 0.0008;
+  var EXTERNAL_SCROLL_EPS = 6;
+
+  /* Przejście hero → usługi ma trzy takty; podział 8 kliknięć między nie:
+     1 na wyjście z hero, 5 na rozpad kostki, 2 na wjazd w Usługi. Dzięki temu
+     „powoli przewijam kostkę" to realnie 5 kliknięć, a nie 2 z ośmiu. */
+  var HERO_LEAD_F = 1 / NOTCHES_HERO;
+  var HERO_TAIL_F = 2 / NOTCHES_HERO;
+
+  /* ——— Usługi: kółko najpierw przerzuca kafelki, dopiero nadmiar rusza sekcję ——— */
+  var FAN_CARD_MIN = 32;              // tyle pikseli gestu = jeden kafelek
+  var FAN_DECAY_MS = 420;             // przerwa w geście zeruje licznik kafelków
+  var FAN_MAX_CARDS_PER_GESTURE = 2;  // po tylu kafelkach kółko wraca do railu
+
+  /* ——— dotyk ——— */
+  var TOUCH_SECTION_RATIO = 0.45;    // ile wysokości ekranu = jedno przejście
+  var TOUCH_USLUGI_MUL = 1.7;        // w Usługach gest musi być wyraźniejszy
 
   function footerHoldY() {
     var footer = document.querySelector(".site-footer");
@@ -74,10 +114,18 @@
 
   function shouldIgnore() {
     if (!document.body.classList.contains("is-ready")) return true;
+    if (document.documentElement.classList.contains("is-nav-menu-open")) return true;
     if (document.querySelector(".nav-overlay.is-open")) return true;
     if (document.documentElement.classList.contains("is-service-panel-open")) return true;
     if (document.documentElement.classList.contains("is-form-focus")) return true;
     return false;
+  }
+
+  function isTypingTarget(el) {
+    if (!el || el === document.body) return false;
+    if (el.isContentEditable) return true;
+    var tag = el.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
   }
 
   function isHomeReload() {
@@ -89,6 +137,13 @@
     return !!sessionStorage.getItem("cosgral-scroll-target");
   }
 
+  function wheelPixels(e) {
+    var d = e.deltaY;
+    if (e.deltaMode === 1) d *= 16;
+    else if (e.deltaMode === 2) d *= window.innerHeight || 800;
+    return clamp(d, -WHEEL_EVENT_CAP, WHEEL_EVENT_CAP);
+  }
+
   function init() {
     var lenis = window.cosgralSmoothScroll?.lenis;
     if (!lenis || !window.ScrollTrigger) return;
@@ -96,106 +151,184 @@
     var holds = buildHolds();
     if (holds.length < 2) return;
 
+    var lastIdx = holds.length - 1;
+
+    /* pos = dokąd zaprowadził gest, render = co realnie widać, commitBase = ostatnia zatwierdzona sekcja */
+    var pos = 0;
+    var render = 0;
+    var commitBase = 0;
     var activeIndex = 0;
-    var locked = false;
-    var wheelAccum = 0;
-    var wheelTimer = null;
-    var guardTimer = null;
-    var STEP_MS = 5.28;
-    var SNAP_MS = 1.44;
-    var WHEEL_END = 52;
-    var WHEEL_MIN = 6;
-    var WHEEL_INSTANT = 16;
-    // Tylko w Usługach: większy gest pionowy, żeby dało się zmieniać kafelki bez skoku sekcji.
-    var TOUCH_USLUGI_STEP_MIN = 96;
-    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
-    var HOLD_COOLDOWN_MS = 100;
-    var SECTION_READY_MS = 1000;
-    var SECTION_REACH_PX = 16;
-    var lastCommitDir = 0;
-    var cooldownUntil = 0;
-    var fanVerticalAccum = 0;
-    var FAN_WHEEL_CARD_MIN = 32;
-    var FAN_WHEEL_SECTION_MIN = 140;
-    var scrollUnlockTimer = null;
-    var scrollUnlockRaf = 0;
+
+    var driverRaf = 0;
+    var driverLastAt = 0;
+    var settleTimer = null;
+    var driving = false;          // trwa nasz własny zapis scrolla
+    var refreshing = false;       // ScrollTrigger przelicza pozycje pinów
+    var lastAppliedY = -1;
     var formFocusLock = false;
 
-    function beginCooldown() {
-      cooldownUntil = Date.now() + HOLD_COOLDOWN_MS;
+    var fanAccum = 0;
+    var fanLap = 0;
+    var fanDecayTimer = null;
+
+    /* ————————————————— mapowanie pozycja ↔ scroll ————————————————— */
+
+    /* Punkty kontrolne odcinka: [ułamek gestu → pozycja scrolla]. Zwykły odcinek
+       jest liniowy; hero → usługi dzieli się na takty wokół sceny rozpadu. */
+    function segmentStops(i) {
+      if (i !== 0) return null;
+      var st = ScrollTrigger.getById("shatter-beat");
+      if (!st) return null;
+      var a = holds[0];
+      var b = holds[1];
+      var s0 = st.start;
+      var s1 = st.end;
+      if (!(s0 > a + 1) || !(s1 > s0 + 1) || !(b > s1 + 1)) return null;
+      return [
+        { f: 0, y: a },
+        { f: HERO_LEAD_F, y: s0 },
+        { f: 1 - HERO_TAIL_F, y: s1 },
+        { f: 1, y: b },
+      ];
     }
 
-    function canStep() {
-      if (locked) return false;
-      if (formFocusLock) return false;
-      if (Date.now() < cooldownUntil) return false;
-      return true;
-    }
-
-    function setFormFocusLock(on) {
-      formFocusLock = !!on;
-      document.documentElement.classList.toggle("is-form-focus", formFocusLock);
-    }
-
-    function nearestIndex(scroll) {
-      var best = 0;
-      var dist = Infinity;
-      for (var i = 0; i < holds.length; i++) {
-        var d = Math.abs(scroll - holds[i]);
-        if (d < dist) {
-          dist = d;
-          best = i;
+    function yFor(p) {
+      if (p <= 0) return holds[0];
+      if (p >= lastIdx) return holds[lastIdx];
+      var i = Math.floor(p);
+      var f = p - i;
+      var stops = segmentStops(i);
+      if (!stops) return holds[i] + (holds[i + 1] - holds[i]) * f;
+      for (var k = 1; k < stops.length; k++) {
+        if (f <= stops[k].f) {
+          var f0 = stops[k - 1].f;
+          var span = stops[k].f - f0;
+          var t = span > 0 ? (f - f0) / span : 0;
+          return stops[k - 1].y + (stops[k].y - stops[k - 1].y) * t;
         }
       }
-      return best;
+      return stops[stops.length - 1].y;
     }
 
-    function easeOutCubic(t) {
-      return 1 - Math.pow(1 - t, 3);
-    }
-
-    function isHeroHandoff(fromIndex, toIndex) {
-      return (
-        (fromIndex === 0 && toIndex === 1) ||
-        (fromIndex === 1 && toIndex === 0)
-      );
-    }
-
-    function stepDurationDown(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 2;
-      if (fromIndex === 1 && toIndex > fromIndex) return STEP_MS / 4.2;
-      if (fromIndex >= 1 && toIndex > fromIndex) return STEP_MS / 3;
-      return STEP_MS;
-    }
-
-    function stepDurationUp(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS * 2;
-      if (fromIndex === 1 && toIndex < fromIndex) return STEP_MS / 4.2;
-      if (fromIndex >= 1 && toIndex < fromIndex) return STEP_MS / 3;
-      return STEP_MS / 3;
-    }
-
-    function clearScrollUnlockWatch() {
-      if (scrollUnlockTimer) {
-        window.clearTimeout(scrollUnlockTimer);
-        scrollUnlockTimer = null;
+    function posInSegment(i, y) {
+      var stops = segmentStops(i);
+      if (!stops) {
+        var span = holds[i + 1] - holds[i];
+        return span > 0 ? (y - holds[i]) / span : 0;
       }
-      if (scrollUnlockRaf) {
-        window.cancelAnimationFrame(scrollUnlockRaf);
-        scrollUnlockRaf = 0;
+      for (var k = 1; k < stops.length; k++) {
+        if (y <= stops[k].y) {
+          var y0 = stops[k - 1].y;
+          var dy = stops[k].y - y0;
+          var t = dy > 0 ? (y - y0) / dy : 0;
+          return stops[k - 1].f + (stops[k].f - stops[k - 1].f) * t;
+        }
       }
+      return 1;
     }
 
-    function finishScrollStep(target) {
-      if (!locked) return;
-      clearScrollUnlockWatch();
-      locked = false;
-      beginCooldown();
-      if (Math.abs(lenis.scroll - target) > 2) {
-        lenis.scrollTo(target, { immediate: true });
+    function posFor(y) {
+      if (y <= holds[0]) return 0;
+      if (y >= holds[lastIdx]) return lastIdx;
+      for (var i = 0; i < lastIdx; i++) {
+        if (y <= holds[i + 1]) return i + posInSegment(i, y);
       }
-      ensureScenePanelVisible(activeIndex);
-      if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+      return lastIdx;
+    }
+
+    function segmentPixels(p) {
+      var i = clamp(Math.floor(p), 0, Math.max(0, lastIdx - 1));
+      return NOTCH_PX * (i === 0 ? NOTCHES_HERO : NOTCHES_DEFAULT);
+    }
+
+    /* ————————————————— kostka: bez scrubu, prosto ze scrolla ————————————————— */
+
+    function progressOfTrigger(id, y) {
+      var st = ScrollTrigger.getById(id);
+      if (!st) return null;
+      var span = st.end - st.start;
+      if (!(span > 0)) return y >= st.end ? 1 : 0;
+      return clamp((y - st.start) / span, 0, 1);
+    }
+
+    function cinemaForScroll(y) {
+      var p = progressOfTrigger("shatter-beat", y);
+      if (p != null) return p;
+      /* bez sceny rozpadu: hero = 0, wszystko dalej = pełny strumień piasku */
+      return y >= holds[1] - 2 ? 1 : clamp((y - holds[0]) / Math.max(1, holds[1] - holds[0]), 0, 1);
+    }
+
+    function tailForScroll(y) {
+      var q = progressOfTrigger("cube-motion-tail", y);
+      if (q == null) return cinemaForScroll(y) >= 0.999 ? 1 : 0;
+      return 1 - Math.pow(1 - q, 1.12);
+    }
+
+    function driveSand(y) {
+      var sand = (window.cosgralSand = window.cosgralSand || {});
+      /* sygnał dla home-section-flow: scrubowane triggery nie nadpisują kostki */
+      sand.cinemaDriven = true;
+
+      var cin = cinemaForScroll(y);
+      if (window.cosgralSceneFlow?.setCinema) {
+        window.cosgralSceneFlow.setCinema(cin);
+      } else {
+        sand.cinema = cin;
+        sand.motion = cin;
+      }
+      sand.motionTail = tailForScroll(y);
+      sand.servicesVisible = cin > 0.9;
+    }
+
+    function resetCubeToHero() {
+      var sand = (window.cosgralSand = window.cosgralSand || {});
+      sand.resetCube = true;
+      sand.locked = false;
+      sand.cinema = 0;
+      sand.motion = 0;
+      sand.break = 0;
+      sand.stream = 0;
+      sand.motionTail = 0;
+      document.documentElement.classList.remove("is-sand-stream", "is-shattering");
+      var shatter = document.getElementById("rozpad");
+      if (shatter) shatter.classList.remove("is-active");
+    }
+
+    /* ————————————————— widok sekcji ————————————————— */
+
+    function syncStepView(index) {
+      var isFooter = index === lastIdx;
+      document.documentElement.classList.toggle("is-footer-step", isFooter);
+      if (isFooter && window.gsap) {
+        window.gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
+          window.gsap.set(el, { autoAlpha: 1, y: 0, clearProps: "filter" });
+        });
+      }
+      var contact = document.getElementById("kontakt");
+      if (contact) contact.classList.toggle("is-footer-handoff", isFooter);
+    }
+
+    function scenePanel(index) {
+      var cfg = HOLDS_CONFIG[index];
+      if (!cfg) return null;
+      if (cfg.footer) return document.querySelector(".site-footer");
+      var section = document.getElementById(cfg.id);
+      if (!section) return null;
+      return section.querySelector(".home-scene__panel") || section;
+    }
+
+    function syncSectionFocus(index) {
+      document.querySelectorAll(".home-scene").forEach(function (scene) {
+        scene.classList.remove("is-in-view");
+      });
+      var cfg = HOLDS_CONFIG[index];
+      if (!cfg || cfg.footer) return;
+      var section = document.getElementById(cfg.id);
+      if (!section) return;
+      section.classList.add("is-in-view", "is-entered", "is-visible");
+      if (window.cosgralSceneEnters?.ensurePanel) {
+        window.cosgralSceneEnters.ensurePanel(section);
+      }
     }
 
     function ensureScenePanelVisible(index) {
@@ -218,360 +351,281 @@
       }
     }
 
-    function watchScrollUnlock(target) {
-      clearScrollUnlockWatch();
-      var reachedAt = 0;
-
-      function tryScheduleUnlock() {
-        if (!locked || reachedAt) return;
-        if (Math.abs(lenis.scroll - target) > SECTION_REACH_PX) return;
-        reachedAt = Date.now();
-        scrollUnlockTimer = window.setTimeout(function () {
-          finishScrollStep(target);
-        }, SECTION_READY_MS);
-      }
-
-      function tick() {
-        if (!locked) return;
-        tryScheduleUnlock();
-        if (!locked) return;
-        scrollUnlockRaf = window.requestAnimationFrame(tick);
-      }
-
-      scrollUnlockRaf = window.requestAnimationFrame(tick);
-    }
-
-    function syncStepView(index) {
-      var isFooter = index === holds.length - 1;
-      document.documentElement.classList.toggle("is-footer-step", isFooter);
-      if (isFooter && window.gsap) {
-        window.gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
-          window.gsap.set(el, { autoAlpha: 1, y: 0, clearProps: "filter" });
-        });
-      }
-      var contact = document.getElementById("kontakt");
-      if (contact) contact.classList.toggle("is-footer-handoff", isFooter);
-    }
-
-    function scenePanel(index) {
-      var cfg = HOLDS_CONFIG[index];
-      if (!cfg) return null;
-      if (cfg.footer) return document.querySelector(".site-footer");
-      var section = document.getElementById(cfg.id);
-      if (!section) return null;
-      return section.querySelector(".home-scene__panel") || section;
-    }
-
-    function syncSandForJump(index) {
-      window.cosgralSand = window.cosgralSand || {};
-      if (index === 0) {
-        window.cosgralSand.locked = false;
-        window.cosgralSand.cinema = 0;
-        window.cosgralSand.motion = 0;
-        window.cosgralSand.break = 0;
-        window.cosgralSand.stream = 0;
-        window.cosgralSand.motionTail = 0;
-        window.cosgralSand.resetCube = true;
-        document.documentElement.classList.remove("is-sand-stream", "is-shattering");
-        var shatter = document.getElementById("rozpad");
-        if (shatter) shatter.classList.remove("is-active");
-        return;
-      }
-      window.cosgralSand.cinema = 1;
-      window.cosgralSand.motion = 1;
-      window.cosgralSand.locked = true;
-      window.cosgralSand.break = 0.98;
-      window.cosgralSand.stream = 0.98;
-      document.documentElement.classList.add("is-sand-stream");
-      document.documentElement.classList.remove("is-shattering");
-      var shatterDone = document.getElementById("rozpad");
-      if (shatterDone) shatterDone.classList.remove("is-active");
-    }
-
-    function syncSectionFocus(index) {
-      document.querySelectorAll(".home-scene").forEach(function (scene) {
-        scene.classList.remove("is-in-view");
-      });
-      var cfg = HOLDS_CONFIG[index];
-      if (!cfg || cfg.footer) return;
-      var section = document.getElementById(cfg.id);
-      if (!section) return;
-      section.classList.add("is-in-view", "is-entered", "is-visible");
-      if (window.cosgralSceneEnters?.ensurePanel) {
-        window.cosgralSceneEnters.ensurePanel(section);
-      }
-    }
-
-    function playHeroToServicesHandoff(duration) {
-      var shatter = document.getElementById("rozpad");
-      if (shatter) shatter.classList.add("is-active");
-      document.documentElement.classList.add("is-shattering");
-      if (window.cosgralSceneFlow?.animateCinemaTo) {
-        window.cosgralSceneFlow.animateCinemaTo(1, duration || 2.4);
-      } else {
-        syncSandForJump(1);
-      }
-    }
-
-    function jumpTo(index) {
-      holds = buildHolds();
-      index = clamp(index, 0, holds.length - 1);
-      var target = holds[index];
-      var fromIndex = activeIndex;
-
-      if (index === activeIndex && Math.abs(lenis.scroll - target) < 4) return;
-
-      if (!window.gsap) {
-        goTo(index, 0, true);
-        return;
-      }
-
-      var fromPanel = scenePanel(activeIndex);
-      var toPanel = scenePanel(index);
-      var curtain = document.querySelector("[data-scene-curtain]");
-
-      locked = true;
-      wheelAccum = 0;
-
-      var tl = gsap.timeline({
-        onComplete: function () {
-          locked = false;
-          beginCooldown();
-          if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
-        },
-      });
-
-      if (fromPanel && toPanel && fromPanel !== toPanel) {
-        tl.to(fromPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
-      }
-      if (curtain) {
-        tl.to(curtain, { autoAlpha: 0.88, duration: 0.38, ease: "power2.in" }, 0);
-      }
-
-      tl.add(function () {
-        lenis.scrollTo(target, { immediate: true });
-        if (window.ScrollTrigger) ScrollTrigger.update();
-        activeIndex = index;
-        syncStepView(index);
-        syncSectionFocus(index);
-        if (index === 0) {
-          syncSandForJump(0);
-          if (window.cosgralRestoreHero) window.cosgralRestoreHero();
-        } else if (fromIndex === 0) {
-          playHeroToServicesHandoff(1.8);
-        } else {
-          syncSandForJump(index);
-        }
-
-        if (toPanel) {
-          var scene = toPanel.closest(".home-scene");
-          if (scene) scene.classList.add("is-entered", "is-visible");
-          gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0 });
-          if (scene && window.cosgralSceneEnters?.play) {
-            window.cosgralSceneEnters.play(scene, { stagger: true, force: true });
-          }
-        }
-      }, 0.4);
-
-      if (toPanel) {
-        gsap.set(toPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(12px)" });
-        tl.to(toPanel, { autoAlpha: 1, filter: MOBILE ? "none" : "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.44);
-      }
-      if (curtain) {
-        tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);
-      }
-
-      tl.add(function () {
-        window.dispatchEvent(
-          new CustomEvent("cosgral:section-step", {
-            detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
-          })
-        );
-      });
-    }
-
-    function goTo(index, duration, immediate) {
-      holds = buildHolds();
-      index = clamp(index, 0, holds.length - 1);
-      var target = holds[index];
-      var fromIndex = activeIndex;
-
-      if (!immediate && index === activeIndex && Math.abs(lenis.scroll - target) < 4) {
-        return;
-      }
-
-      locked = true;
-      activeIndex = index;
-      syncStepView(index);
-      syncSectionFocus(index);
-      clearScrollUnlockWatch();
-
-      var scrollDuration = immediate ? 0 : duration != null ? duration : stepDurationDown(fromIndex, index);
-
-      if (index === 0 && fromIndex !== 0) {
-        syncSandForJump(0);
-      } else if (fromIndex === 0 && index >= 1) {
-        playHeroToServicesHandoff(scrollDuration > 0.05 ? scrollDuration * 0.42 : 2.2);
-      } else if (index >= 1 && fromIndex >= 1) {
-        syncSandForJump(index);
-      }
-
-      lenis.scrollTo(target, {
-        immediate: !!immediate,
-        duration: scrollDuration,
-        easing: easeOutCubic,
-        lock: true,
-        onComplete: function () {
-          if (Math.abs(lenis.scroll - target) > 2) {
-            lenis.scrollTo(target, { immediate: true });
-          }
-          if (index >= 1) syncSandForJump(index);
-          if (immediate || scrollDuration <= 0.05) {
-            finishScrollStep(target);
-            return;
-          }
-          if (!locked) {
-            if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
-            return;
-          }
-          if (scrollUnlockTimer) return;
-          finishScrollStep(target);
-        },
-      });
-
-      if (!immediate && scrollDuration > 0.05) {
-        watchScrollUnlock(target);
-      }
-
+    function announce(index) {
       window.dispatchEvent(
         new CustomEvent("cosgral:section-step", {
           detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
         })
       );
-
-      if (index === 0 && fromIndex !== 0 && window.cosgralRestoreHero) {
-        window.cosgralRestoreHero();
-      }
     }
 
-    function stepUp() {
-      if (!canStep()) return;
-      if (activeIndex <= 0) {
-        goTo(0, SNAP_MS);
+    /* Sekcja przełącza się dopiero gdy realnie przy niej jesteśmy — inaczej
+       wachlarz Usług przechwytywałby kółko w połowie przejścia. */
+    function syncActive(force) {
+      var k = clamp(Math.round(render), 0, lastIdx);
+      if (!force && (k === activeIndex || Math.abs(render - k) > 0.34)) return;
+      if (k === activeIndex && !force) return;
+      activeIndex = k;
+      resetFan();
+      syncStepView(k);
+      syncSectionFocus(k);
+      ensureScenePanelVisible(k);
+      announce(k);
+      if (k === 0 && window.cosgralRestoreHero) window.cosgralRestoreHero();
+      if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+    }
+
+    /* ————————————————— pętla ————————————————— */
+
+    function applyRender() {
+      var y = yFor(render);
+      if (Math.abs(lenis.scroll - y) > 0.5) {
+        driving = true;
+        lenis.scrollTo(y, { immediate: true, force: true });
+        driving = false;
+      }
+      lastAppliedY = y;
+      driveSand(y);
+      syncActive(false);
+    }
+
+    function frame(now) {
+      driverRaf = 0;
+      if (formFocusLock || shouldIgnore()) {
+        /* ktoś inny rządzi scrollem (menu, panel usługi, formularz) — nie walczymy */
+        lastAppliedY = lenis.scroll;
+        driverLastAt = 0;
         return;
       }
-      var target = activeIndex - 1;
-      if (target === 0) syncSandForJump(0);
-      goTo(target, stepDurationUp(activeIndex, target));
-      lastCommitDir = -1;
-    }
 
-    function stepDown() {
-      if (!canStep()) return;
-      if (activeIndex >= holds.length - 1) {
-        goTo(activeIndex, SNAP_MS);
+      /* Ruch liczony w czasie, nie w klatkach — na tej stronie scena 3D potrafi
+         zejść poniżej 60 Hz, a przejście ma trwać tyle samo niezależnie od fps. */
+      var frames = driverLastAt ? clamp((now - driverLastAt) / FRAME_MS, 0.5, MAX_FRAME_STEP) : 1;
+      driverLastAt = now;
+
+      var delta = pos - render;
+      var abs = Math.abs(delta);
+      if (abs < SETTLED_EPS) {
+        render = pos;
+        driverLastAt = 0;
+        applyRender();
         return;
       }
-      goTo(activeIndex + 1);
-      lastCommitDir = 1;
+
+      var k = 1 - Math.pow(1 - EASE, frames);
+      var step = delta * k;
+      var cap = MAX_UNITS_PER_FRAME * frames;
+      if (Math.abs(step) > cap) step = step > 0 ? cap : -cap;
+      if (Math.abs(step) > abs) step = delta;
+      render += step;
+      applyRender();
+      driverRaf = window.requestAnimationFrame(frame);
     }
 
-    function enforceHold() {
-      if (locked || formFocusLock || Date.now() < cooldownUntil) return;
+    function startDriver() {
+      if (driverRaf) return;
+      driverLastAt = 0;
+      driverRaf = window.requestAnimationFrame(frame);
+    }
+
+    /* ————————————————— zatwierdzanie gestu ————————————————— */
+
+    function commitTarget() {
+      var d = pos - commitBase;
+      var n = 0;
+      if (d > 0) {
+        var whole = Math.floor(d);
+        n = whole + (d - whole >= COMMIT ? 1 : 0);
+      } else if (d < 0) {
+        var a = -d;
+        var wholeUp = Math.floor(a);
+        n = -(wholeUp + (a - wholeUp >= COMMIT ? 1 : 0));
+      }
+      return clamp(commitBase + n, 0, lastIdx);
+    }
+
+    function settle() {
+      settleTimer = null;
+      var target = commitTarget();
+      commitBase = target;
+      pos = target;
+      startDriver();
+    }
+
+    function scheduleSettle() {
+      if (settleTimer) window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(settle, SETTLE_MS);
+    }
+
+    function cancelSettle() {
+      if (settleTimer) {
+        window.clearTimeout(settleTimer);
+        settleTimer = null;
+      }
+    }
+
+    /* Po menu / panelu usługi / natywnym skoku strona mogła stanąć gdzie indziej,
+       niż pamięta rail. Zanim doliczymy gest, bierzemy realną pozycję za swoją —
+       inaczej pierwszy ruch kółka szarpnąłby stroną z powrotem. */
+    function resyncIfDrifted() {
+      if (driverRaf || settleTimer || touchActive || refreshing) return;
+      if (lastAppliedY < 0) return;
+      if (Math.abs(lenis.scroll - yFor(render)) < EXTERNAL_SCROLL_EPS) return;
+      render = posFor(lenis.scroll);
+      pos = render;
+      commitBase = clamp(Math.round(render), 0, lastIdx);
+      lastAppliedY = lenis.scroll;
+    }
+
+    /* Każdy piksel gestu przesuwa rail — to jest sedno „analogowego” scrolla. */
+    function applyScrollPixels(px) {
+      if (!px || formFocusLock) return;
+      resyncIfDrifted();
+      var next = pos + px / segmentPixels(pos);
+      next = clamp(next, render - LEAD_MAX, render + LEAD_MAX);
+      pos = clamp(next, 0, lastIdx);
+      scheduleSettle();
+      startDriver();
+    }
+
+    function commitTo(index, immediate) {
       holds = buildHolds();
-      var idx = nearestIndex(lenis.scroll);
-      var dist = Math.abs(lenis.scroll - holds[idx]);
-      if (dist > 2) {
-        goTo(idx, SNAP_MS);
-      } else {
-        activeIndex = idx;
+      lastIdx = holds.length - 1;
+      index = clamp(index, 0, lastIdx);
+      cancelSettle();
+      resyncIfDrifted();
+      var wasIndex = activeIndex;
+      commitBase = index;
+      pos = index;
+      resetFan();
+
+      if (immediate) {
+        render = index;
+        applyRender();
+        /* po applyRender: ScrollTrigger zdążył już przeliczyć sceny, więc reset
+           kostki nie zostaje nadpisany przez onLeaveBack sceny rozpadu */
+        if (index === 0 && wasIndex !== 0) resetCubeToHero();
+        syncActive(true);
+        return;
       }
+      startDriver();
     }
 
-    function scheduleGuard() {
-      if (guardTimer) window.clearTimeout(guardTimer);
-      if (formFocusLock) return;
-      guardTimer = window.setTimeout(enforceHold, 32);
+    /* ————————————————— wejścia ————————————————— */
+
+    function resetFan() {
+      fanAccum = 0;
+      fanLap = 0;
+    }
+
+    function scheduleFanDecay() {
+      if (fanDecayTimer) window.clearTimeout(fanDecayTimer);
+      fanDecayTimer = window.setTimeout(function () {
+        fanDecayTimer = null;
+        resetFan();
+      }, FAN_DECAY_MS);
+    }
+
+    function fanBudget() {
+      var n = window.cosgralServicesFan?.count?.();
+      if (!(n > 1)) n = 6;
+      return Math.min(n - 1, FAN_MAX_CARDS_PER_GESTURE);
+    }
+
+    /**
+     * Usługi: pierwsze kliknięcia gestu przerzucają kafelki (jak swipe na mobile),
+     * reszta należy do railu. Każde kliknięcie coś robi — albo przewija kafelek,
+     * albo rusza sekcję — i nie da się utknąć kręcąc karuzelę w kółko. Przerwa
+     * w geście (FAN_DECAY_MS) zeruje licznik, więc spokojne przeglądanie kafelków
+     * działa jak wcześniej.
+     */
+    function handleUslugiWheel(px) {
+      if (fanAccum !== 0 && (px > 0) !== (fanAccum > 0)) resetFan();
+      scheduleFanDecay();
+
+      if (fanLap < fanBudget() && window.cosgralServicesFan?.stepCards) {
+        fanAccum += px;
+        /* gładzik sypie drobnymi zdarzeniami — zbieramy je na pełny kafelek */
+        if (Math.abs(fanAccum) < FAN_CARD_MIN) return;
+        var dir = fanAccum > 0 ? 1 : -1;
+        fanAccum = 0;
+        if (window.cosgralServicesFan.stepCards(dir)) {
+          fanLap++;
+          return;
+        }
+      }
+
+      fanAccum = 0;
+      applyScrollPixels(px);
     }
 
     function onWheel(e) {
       if (REDUCED || shouldIgnore()) return;
       if (isFanHorizontalWheel(e)) return;
 
-      // Desktop: w sekcji Usługi kółko pionowe przewija kafelki (jak tap/swipe na mobile).
-      if (activeIndex === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
-        e.preventDefault();
-        e.stopPropagation();
-        fanVerticalAccum += e.deltaY;
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN && window.cosgralServicesFan?.stepFromWheel) {
-          if (window.cosgralServicesFan.stepFromWheel(fanVerticalAccum)) {
-            fanVerticalAccum = 0;
-            return;
-          }
-        }
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_SECTION_MIN) {
-          wheelAccum = fanVerticalAccum;
-          fanVerticalAccum = 0;
-          commitWheel();
-          return;
-        }
-        return;
-      }
-
-      fanVerticalAccum = 0;
-
       e.preventDefault();
       e.stopPropagation();
 
-      if (!canStep()) {
-        wheelAccum = 0;
+      if (formFocusLock) return;
+
+      var px = wheelPixels(e);
+      if (!px) return;
+
+      if (activeIndex === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
+        handleUslugiWheel(px);
         return;
       }
 
-      wheelAccum += e.deltaY;
-
-      var instant = activeIndex === uslugiIdx ? 48 : WHEEL_INSTANT;
-      if (Math.abs(wheelAccum) >= instant) {
-        if (wheelTimer) window.clearTimeout(wheelTimer);
-        commitWheel();
-        return;
-      }
-
-      if (wheelTimer) window.clearTimeout(wheelTimer);
-      wheelTimer = window.setTimeout(commitWheel, WHEEL_END);
+      resetFan();
+      applyScrollPixels(px);
     }
 
-    function commitWheel() {
-      wheelTimer = null;
-      if (!canStep()) {
-        wheelAccum = 0;
-        return;
+    function onKey(e) {
+      if (REDUCED || shouldIgnore() || formFocusLock) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (isTypingTarget(e.target)) return;
+
+      var handled = true;
+      switch (e.key) {
+        case "ArrowDown":
+        case "PageDown":
+          commitTo(activeIndex + 1);
+          break;
+        case "ArrowUp":
+        case "PageUp":
+          commitTo(activeIndex - 1);
+          break;
+        case " ":
+        case "Spacebar":
+          /* spacja na przycisku/linku należy do niego, nie do railu */
+          if (e.target?.closest?.('button, a, summary, [role="button"]')) return;
+          commitTo(activeIndex + (e.shiftKey ? -1 : 1));
+          break;
+        case "Home":
+          commitTo(0);
+          break;
+        case "End":
+          commitTo(lastIdx);
+          break;
+        default:
+          handled = false;
       }
-
-      var min = activeIndex === uslugiIdx ? 36 : WHEEL_MIN;
-      if (Math.abs(wheelAccum) < min) {
-        wheelAccum = 0;
-        return;
-      }
-
-      var dir = wheelAccum > 0 ? 1 : -1;
-      wheelAccum = 0;
-
-      if (dir > 0) {
-        stepDown();
-        return;
-      }
-
-      stepUp();
+      if (handled) e.preventDefault();
     }
+
+    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
 
     var touchStartX = 0;
     var touchStartY = 0;
     var touchLastY = 0;
-    var touchAccum = 0;
     var touchActive = false;
     var touchIgnoreStep = false; // poziomy swipe w Usługach — tylko kafelki
     var touchFromUslugi = false;
+
+    function touchSectionPx() {
+      var base = (window.innerHeight || 800) * TOUCH_SECTION_RATIO;
+      return touchFromUslugi ? base * TOUCH_USLUGI_MUL : base;
+    }
 
     window.addEventListener(
       "touchstart",
@@ -580,11 +634,11 @@
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
         touchLastY = touchStartY;
-        touchAccum = 0;
         touchIgnoreStep = false;
         touchFromUslugi =
           activeIndex === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
         touchActive = true;
+        cancelSettle();
       },
       { passive: true, capture: true }
     );
@@ -599,7 +653,6 @@
         var dy = y - touchStartY;
 
         // Usługi: tylko wyraźny gest w poziomie = kafelki (nie sekcja).
-        // Pion zawsze jak wcześniej: preventDefault + snap do holdów.
         if (
           touchFromUslugi &&
           !touchIgnoreStep &&
@@ -607,66 +660,116 @@
           Math.abs(dx) > Math.abs(dy) * 1.45
         ) {
           touchIgnoreStep = true;
-          touchAccum = 0;
           return;
         }
 
         if (touchIgnoreStep) return;
 
-        touchAccum += touchLastY - y;
-        touchLastY = y;
         e.preventDefault();
+        var moved = touchLastY - y;
+        touchLastY = y;
+        if (!moved) return;
+        /* palec ciągnie rail 1:1 — bez progu, bez czekania na koniec gestu */
+        var next = pos + (moved / touchSectionPx());
+        next = clamp(next, render - LEAD_MAX, render + LEAD_MAX);
+        pos = clamp(next, 0, lastIdx);
+        cancelSettle();
+        startDriver();
       },
       { passive: false, capture: true }
     );
 
-    window.addEventListener(
-      "touchend",
-      function () {
-        if (!touchActive) return;
-        touchActive = false;
-        if (REDUCED || shouldIgnore() || touchIgnoreStep) {
-          touchAccum = 0;
-          touchIgnoreStep = false;
-          touchFromUslugi = false;
-          return;
-        }
-        if (!canStep()) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var min = touchFromUslugi ? TOUCH_USLUGI_STEP_MIN : WHEEL_MIN;
-        if (Math.abs(touchAccum) < min) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var dir = touchAccum > 0 ? 1 : -1;
-        touchAccum = 0;
-        touchFromUslugi = false;
-        if (dir > 0) stepDown();
-        else stepUp();
-      },
-      { passive: true, capture: true }
-    );
+    function endTouch() {
+      if (!touchActive) return;
+      touchActive = false;
+      touchIgnoreStep = false;
+      touchFromUslugi = false;
+      if (REDUCED || shouldIgnore() || formFocusLock) return;
+      scheduleSettle();
+    }
 
-    window.addEventListener(
-      "touchcancel",
-      function () {
-        touchActive = false;
-        touchAccum = 0;
-        touchIgnoreStep = false;
-        touchFromUslugi = false;
-      },
-      { passive: true, capture: true }
-    );
-
-    lenis.on("scroll", function () {
-      if (!locked) scheduleGuard();
-    });
+    window.addEventListener("touchend", endTouch, { passive: true, capture: true });
+    window.addEventListener("touchcancel", endTouch, { passive: true, capture: true });
 
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    window.addEventListener("keydown", onKey, { capture: true });
+
+    /* Scroll spoza railu (przywrócenie pozycji, focus, natywny skok) — przejmujemy
+       go zamiast z nim walczyć. Bez tego wracał stary błąd „strona sama skacze”. */
+    lenis.on("scroll", function () {
+      if (driving || refreshing || driverRaf || settleTimer || touchActive) return;
+      if (formFocusLock || shouldIgnore()) {
+        lastAppliedY = lenis.scroll;
+        return;
+      }
+      if (lastAppliedY < 0 || Math.abs(lenis.scroll - lastAppliedY) < EXTERNAL_SCROLL_EPS) return;
+      render = posFor(lenis.scroll);
+      pos = render;
+      commitBase = clamp(Math.round(render), 0, lastIdx);
+      lastAppliedY = lenis.scroll;
+      scheduleSettle();
+      startDriver();
+    });
+
+    /* ————————————————— nawigacja skokowa ————————————————— */
+
+    function jumpTo(index) {
+      holds = buildHolds();
+      lastIdx = holds.length - 1;
+      index = clamp(index, 0, lastIdx);
+      if (!window.gsap) {
+        commitTo(index, true);
+        return;
+      }
+
+      var fromPanel = scenePanel(activeIndex);
+      var toPanel = scenePanel(index);
+      var curtain = document.querySelector("[data-scene-curtain]");
+
+      cancelSettle();
+      var tl = gsap.timeline();
+
+      if (fromPanel && toPanel && fromPanel !== toPanel) {
+        tl.to(fromPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(10px)", duration: 0.34, ease: "power2.in" }, 0);
+      }
+      if (curtain) {
+        tl.to(curtain, { autoAlpha: 0.88, duration: 0.3, ease: "power2.in" }, 0);
+      }
+
+      tl.add(function () {
+        commitTo(index, true);
+        if (window.ScrollTrigger) ScrollTrigger.update();
+        if (toPanel) {
+          var scene = toPanel.closest(".home-scene");
+          if (scene) scene.classList.add("is-entered", "is-visible");
+          gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0 });
+          if (scene && window.cosgralSceneEnters?.play) {
+            window.cosgralSceneEnters.play(scene, { stagger: true, force: true });
+          }
+        }
+      }, 0.32);
+
+      if (curtain) {
+        tl.to(curtain, { autoAlpha: 0, duration: 0.4, ease: "power2.out" }, 0.36);
+      }
+    }
+
+    function setFormFocusLock(on) {
+      formFocusLock = !!on;
+      document.documentElement.classList.toggle("is-form-focus", formFocusLock);
+      if (formFocusLock) {
+        cancelSettle();
+        return;
+      }
+      /* Podczas pisania pole samo dosuwa widok (home-director) — po wyjściu
+         z formularza bierzemy tę pozycję za swoją i dociągamy do sekcji. */
+      render = posFor(lenis.scroll);
+      pos = render;
+      commitBase = clamp(Math.round(render), 0, lastIdx);
+      lastAppliedY = lenis.scroll;
+      scheduleSettle();
+      startDriver();
+    }
 
     document.querySelectorAll('a[href^="#"]').forEach(function (link) {
       link.addEventListener(
@@ -681,7 +784,7 @@
           if (cfgIdx < 0) return;
           e.preventDefault();
           e.stopImmediatePropagation();
-          goTo(cfgIdx);
+          commitTo(cfgIdx);
         },
         true
       );
@@ -701,7 +804,7 @@
       }
 
       if (isHomeReload()) {
-        return nearestIndex(lenis.scroll);
+        return clamp(Math.round(posFor(lenis.scroll)), 0, lastIdx);
       }
 
       return 0;
@@ -709,38 +812,56 @@
 
     var bootIndex = bootSectionIndex();
     activeIndex = bootIndex;
-    syncStepView(bootIndex);
-    syncSectionFocus(bootIndex);
-    syncSandForJump(bootIndex);
-    goTo(bootIndex, 0, true);
-    beginCooldown();
+    commitTo(bootIndex, true);
 
     window.cosgralSectionSnap = {
       holds: holds,
       refreshHolds: buildHolds,
       goTo: function (index, duration, immediate) {
-        goTo(index, duration, immediate);
+        commitTo(index, !!immediate);
       },
-      stepUp: stepUp,
-      stepDown: stepDown,
+      stepUp: function () {
+        commitTo(activeIndex - 1);
+      },
+      stepDown: function () {
+        commitTo(activeIndex + 1);
+      },
       setFormFocusLock: setFormFocusLock,
-      jumpTo: function (index) {
-        jumpTo(index);
-      },
+      jumpTo: jumpTo,
       goToY: function (y) {
-        goTo(nearestIndex(y));
+        commitTo(Math.round(posFor(y)));
       },
       goToFooter: function () {
-        goTo(holds.length - 1);
+        commitTo(lastIdx);
       },
       getIndex: function () {
         return activeIndex;
       },
+      getPosition: function () {
+        return render;
+      },
+      getTarget: function () {
+        return pos;
+      },
     };
+
+    /* W trakcie odświeżania ScrollTrigger sam przestawia scroll (przelicza piny).
+       Gdybyśmy to przejęli jako „scroll spoza railu", resize wyrzucałby stronę na
+       hero. Pozycję logiczną trzymamy, po przeliczeniu wracamy na nią w pikselach. */
+    ScrollTrigger.addEventListener("refreshInit", function () {
+      refreshing = true;
+    });
 
     ScrollTrigger.addEventListener("refresh", function () {
       holds = buildHolds();
+      lastIdx = holds.length - 1;
       window.cosgralSectionSnap.holds = holds;
+      pos = clamp(pos, 0, lastIdx);
+      render = clamp(render, 0, lastIdx);
+      commitBase = clamp(commitBase, 0, lastIdx);
+      /* pozycja logiczna zostaje ta sama — przeliczamy tylko piksele */
+      applyRender();
+      refreshing = false;
     });
   }
 
