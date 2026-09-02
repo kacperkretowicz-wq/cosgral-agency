@@ -201,7 +201,12 @@
         { threshold: MOBILE ? 0.28 : 0.42, rootMargin: "8% 0px" }
       );
       io.observe(card);
-      if (card.getBoundingClientRect().height > 0) video.play().catch(function () {});
+      // Tu bylo bezwarunkowe video.play() dla kazdej karty, ktora ma wysokosc —
+      // a wysokosc w ukladzie ma KAZDA, takze ta kilka ekranow nizej. Odtwarzanie
+      // przewaza preload="metadata" i sciaga caly plik, wiec strona pobierala
+      // wszystkie filmy realizacji juz przy wejsciu (zmierzone: 6,8 MB, zanim
+      // ktokolwiek cokolwiek przewinal). Obserwator powyzej i tak wlacza film,
+      // gdy karta wejdzie w kadr — i tylko wtedy.
     });
   }
 

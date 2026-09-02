@@ -53,11 +53,33 @@
     return false;
   }
 
+  function playActiveCardVideo() {
+    var card = cards[index];
+    var video = card && card.querySelector("video");
+    if (!video) return;
+
+    var pierwszePodpiecie = !video.getAttribute("src");
+    ensureVideoSrc(video);
+
+    function start() {
+      video.play().catch(function () {});
+    }
+    // ensureVideoSrc() wola load(), ktore przerywa trwajace play(). Wczesniej nie
+    // bylo to widoczne, bo layout() krecil sie w kolko i kolejny obrot ponawial
+    // odtwarzanie; teraz wolamy to raz, wiec przy pierwszym podpieciu zrodla
+    // czekamy, az element bedzie mial dane.
+    if (pierwszePodpiecie) video.addEventListener("loadeddata", start, { once: true });
+    start();
+  }
+
   function setUslugiActive(active) {
     section.classList.toggle("is-in-view", !!active);
     if (active) {
       document.documentElement.classList.add("is-sand-stream");
       showTapHint();
+      // layout() samo z siebie moze sie juz nie wykonac, a film ma ruszyc
+      // dokladnie wtedy, gdy sekcja wchodzi w kadr.
+      playActiveCardVideo();
     }
   }
 
@@ -215,7 +237,11 @@
 
       var video = card.querySelector("video");
       if (video) {
-        if (isActive) {
+        // Film aktywnej karty startowal juz przy inicjalizacji karuzeli, czyli
+        // zanim ktokolwiek zobaczyl sekcje Uslugi (jest druga w kolejnosci).
+        // Odtwarzanie przewaza preload="none" i sciaga caly plik — zmierzone
+        // 3,9 MB przy samym wejsciu na strone.
+        if (isActive && isUslugiActive()) {
           ensureVideoSrc(video);
           video.play().catch(function () {});
         } else video.pause();
@@ -495,6 +521,7 @@
           if (entry.isIntersecting) {
             document.documentElement.classList.add("is-sand-stream");
             showTapHint();
+            playActiveCardVideo();
           } else {
             hideTapHint();
             if (!(window.cosgralSand && window.cosgralSand.locked)) {
