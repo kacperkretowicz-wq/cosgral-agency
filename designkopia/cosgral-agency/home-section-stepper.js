@@ -1,5 +1,26 @@
 /**
- * Slideshow scroll — jeden gest = jedna sekcja (kropka). Nigdy nie zatrzymuje między.
+ * Slideshow scroll — jeden gest = jedna sekcja.
+ *
+ * CALY STAN TO CZTERY RZECZY:
+ *   sekcja  — numer sekcji, na ktorej stoimy;
+ *   gestOd  — znacznik czasu, od ktorego przyjmujemy kolejny gest;
+ *   ruchDo  — znacznik czasu, do ktorego trwa ruch (straznik ma nie ruszac);
+ *   holds   — pozycje sekcji w pikselach (cache).
+ *
+ * REGULY:
+ *   1. Jeden gest = jeden krok, zawsze o jedna sekcje. Nigdy o dwie.
+ *   2. Gest z pierwszych 70% kroku jest odrzucany (nie kolejkowany i nie
+ *      przerywajacy przejscia skokiem — stad braly sie "latajace" sekcje).
+ *      W ostatnich 30% kolejny gest jest juz przyjmowany i plynnie przestawia
+ *      cel, wiec szybkie scrollowanie nie odbija sie od sciany.
+ *   3. Przejscie ma z gory znana dlugosc i JEDNA sciezke zakonczenia (timer).
+ *      onComplete Lenisa jest niewiarygodny — proxy ScrollTriggera przerywa
+ *      animacje i odpala je za wczesnie — wiec nie sluzy tu do niczego.
+ *   4. Straznik tylko koryguje dryf. Sekcje zmienia wylacznie gest albo jawne
+ *      goTo (kotwica, nawigacja, kropki paska).
+ *   5. Rozpad kostki nie blokuje scrolla: warstwa piasku jest position:fixed
+ *      i widac ja w kazdej sekcji, wiec animacja moze spokojnie trwac dalej,
+ *      kiedy uzytkownik jest juz w Uslugach.
  */
 (function () {
   "use strict";
@@ -17,11 +38,45 @@
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) { return !c.footer; }).map(function (c) { return c.id; });
 
+  /* ——— czasy (sekundy / milisekundy) ———
+     Kazdy krok trwa tyle samo. Rowne czasy to warunek tego, zeby scroll byl
+     przewidywalny: uzytkownik po jednym przejsciu wie, ile trwa kazde nastepne.
+     Wyjatek to przejscie hero <-> Uslugi, ktore pokonuje ~4 ekrany (pinowana
+     sekcja rozpadu), wiec dostaje troche wiecej czasu — ale nadal liczonego
+     w sekundach, nie w dziesiatkach sekund jak wczesniej. */
+  var STEP_S = 1.0;
+  var HERO_STEP_S = 1.6;
+  var SNAP_S = 0.5;
+  /* Rozpad kostki jest niezalezny od dlugosci kroku — patrz regula 5. */
+  var SHATTER_S = 3.2;
+  var RETURN_S = 1.2;
+  /* Przerwa po zakonczeniu kroku, zanim przyjmiemy kolejny gest. */
+  var GEST_GAP_MS = 160;
+  /* Ulamek kroku, po ktorym wolno juz przyjac nastepny gest. Ponizej tego
+     progu gest przepada — inaczej jedno machniecie potrafiloby przeskoczyc
+     dwie sekcje. Powyzej: cel przestawia sie plynnie, bez skoku. */
+  var GEST_TAIL = 0.7;
+  /* Cisza, po ktorej uznajemy machniecie kolkiem za zakonczone. Dobrana
+     pomiedzy odstep zdarzen gladzika (~16 ms, tez w bezwladnym ogonie) a odstep
+     zabkow myszy (~130 ms): jedno machniecie gladzikiem = jeden krok, a kazdy
+     zabek myszy liczy sie osobno (i tak ogranicza go gestOd). */
+  var WHEEL_QUIET_MS = 90;
+  /* Prog jednego gestu. Celowo wysoki: zabek myszy to ~100 px, machniecie
+     gladzikiem 300-700 px, a bezwladny ogon machniecia dostarcza juz tylko
+     1-3 px na zdarzenie. Nizszy prog (mielismy 6, potem 24) powodowal, ze
+     sam ogon jednego machniecia zbieral sie na drugi krok — i uzytkownik
+     przeskakiwal dwie sekcje naraz, widzac te posrednia tylko przez chwile. */
+  var WHEEL_MIN = 80;
+  var FAN_WHEEL_CARD_MIN = 32;
+  var FAN_WHEEL_SECTION_MIN = 140;
+  var TOUCH_MIN = 24;
+  var TOUCH_MIN_USLUGI = 96;
+
   function footerHoldY() {
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    /* Full-viewport footer section — pin its top to the viewport top */
+    /* Sekcja stopki jest na caly ekran — przypinamy jej gore do gory okna. */
     return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
@@ -33,7 +88,7 @@
         return;
       }
       var st = ScrollTrigger.getById(cfg.stId);
-      if (st) holds.push(holdY(st, cfg.hold));
+      if (st) holds.push(st.start + (st.end - st.start) * cfg.hold);
     });
     return holds;
   }
@@ -42,8 +97,8 @@
     return Math.min(max, Math.max(min, n));
   }
 
-  function holdY(st, hold) {
-    return st.start + (st.end - st.start) * hold;
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
   }
 
   function pointInUslugiSection(x, y) {
@@ -61,10 +116,10 @@
   }
 
   function isFanHorizontalWheel(e) {
-    // Najpierw test osi (czysta arytmetyka), dopiero potem trafienie w sekcję.
-    // pointInUslugiSection() woła getBoundingClientRect, czyli wymusza layout —
-    // przy scrollu gładzikiem to setki wymuszonych reflow na sekundę, na
-    // ścieżce krytycznej wejścia. Zwykły scroll w pionie odpada już tutaj.
+    // Najpierw test osi (czysta arytmetyka), dopiero potem trafienie w sekcje.
+    // pointInUslugiSection() wola getBoundingClientRect, czyli wymusza layout —
+    // przy scrollu gladzikiem to setki wymuszonych reflow na sekunde, na
+    // sciezce krytycznej wejscia. Zwykly scroll w pionie odpada juz tutaj.
     var dx = Math.abs(e.deltaX);
     var dy = Math.abs(e.deltaY);
     if (e.shiftKey && dy > dx) dx = dy;
@@ -93,60 +148,22 @@
     var lenis = window.cosgralSmoothScroll?.lenis;
     if (!lenis || !window.ScrollTrigger) return;
 
+    /* holds przeliczamy TYLKO przy refreshu ScrollTriggera (ten sam refresh
+       obsluguje resize). Wczesniej buildHolds() wolal footer.offsetTop przy
+       kazdym tiku straznika, czyli wymuszal reflow kilkadziesiat razy na
+       sekunde w trakcie scrollowania — to byla czesc "lagowania". */
     var holds = buildHolds();
     if (holds.length < 2) return;
 
-    var activeIndex = 0;
-    var locked = false;
-    var wheelAccum = 0;
-    var wheelTimer = null;
-    var guardTimer = null;
-    var STEP_MS = 5.28;
-    var SNAP_MS = 1.44;
-    var WHEEL_END = 52;
-    var WHEEL_MIN = 6;
-    var WHEEL_INSTANT = 16;
-    // Tylko w Usługach: większy gest pionowy, żeby dało się zmieniać kafelki bez skoku sekcji.
-    var TOUCH_USLUGI_STEP_MIN = 96;
-    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
-    var HOLD_COOLDOWN_MS = 100;
-    // Po dojechaniu do sekcji strona czekala jeszcze pelna sekunde, zanim
-    // przyjela kolejny gest — to widoczna czesc wrazenia "nie reaguje".
-    // 250 ms wystarcza, zeby wejscia elementow ruszyly, a scroll juz odpowiada.
-    var SECTION_READY_MS = 250;
-    var SECTION_REACH_PX = 16;
-    var lastCommitDir = 0;
-    var cooldownUntil = 0;
-    var fanVerticalAccum = 0;
-    var FAN_WHEEL_CARD_MIN = 32;
-    var FAN_WHEEL_SECTION_MIN = 140;
-    var scrollUnlockTimer = null;
-    var scrollUnlockRaf = 0;
+    var sekcja = 0;
+    var gestOd = 0;
+    var ruchDo = 0;
+    var krokTimer = null;
     var formFocusLock = false;
+    var uslugiIdx = SECTION_IDS.indexOf("uslugi");
 
-    /* PRZERYWANIE PRZEJSCIA I KOLEJKA GESTU
-       Do tej pory kazdy gest, ktory trafil w trwajace przejscie, byl po cichu
-       wyrzucany (canStep() -> false, wheelAccum = 0). Zmierzone czasy blokady:
-       hero -> Uslugi 10,4 s, Uslugi -> hero 10,9 s, Realizacje -> Proces 2,9 s,
-       Uslugi -> Realizacje 0,5 s. Stad wrazenie, ze strona raz reaguje, raz nie,
-       i ze czasem nie da sie wrocic do poprzedniej sekcji — przez ponad 10 sekund
-       faktycznie sie nie dalo.
-
-       Teraz gest w trakcie przejscia domyka je natychmiast (scena laduje w stanie
-       koncowym, wiec nic nie zostaje w polowie) i zostaje zapamietany jako
-       zamiar — wykonuje sie zaraz po odblokowaniu. Zaden gest nie przepada. */
-    var celKroku = null;
-    var zamiar = 0;
-
-    function beginCooldown() {
-      cooldownUntil = Date.now() + HOLD_COOLDOWN_MS;
-    }
-
-    function canStep() {
-      if (locked) return false;
-      if (formFocusLock) return false;
-      if (Date.now() < cooldownUntil) return false;
-      return true;
+    function trwaRuch() {
+      return Date.now() < ruchDo;
     }
 
     function setFormFocusLock(on) {
@@ -167,103 +184,41 @@
       return best;
     }
 
-    function easeOutCubic(t) {
-      return 1 - Math.pow(1 - t, 3);
+    // ——————————————————————————————————————————————— scena
+
+    function scenePanel(index) {
+      var cfg = HOLDS_CONFIG[index];
+      if (!cfg) return null;
+      if (cfg.footer) return document.querySelector(".site-footer");
+      var section = document.getElementById(cfg.id);
+      if (!section) return null;
+      return section.querySelector(".home-scene__panel") || section;
     }
 
-    function isHeroHandoff(fromIndex, toIndex) {
-      return (
-        (fromIndex === 0 && toIndex === 1) ||
-        (fromIndex === 1 && toIndex === 0)
-      );
-    }
-
-    /* Przejscie hero <-> Uslugi trwalo STEP_MS * 2, czyli 10,56 s. Przez ten czas
-       scroll byl martwy (zmierzone: 10,4 s w dol, 10,9 s w gore) — to glowne
-       zrodlo wrazenia, ze strona nie reaguje i ze nie da sie wrocic. Poza tym
-       nikt nie oglada rozpadu kostki do konca: kazdy scrolluje ponownie, wiec
-       animacja i tak byla urywana i kostka "nagle znikala".
-       STEP_MS / 1.6 to ok. 3,3 s — rozpad dostaje 1,4 s (0,42 * czas), czyli
-       nadal peIna, czytelna sekwencja, ale bez trzymania uzytkownika. */
-    function stepDurationDown(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS / 1.6;
-      if (fromIndex === 1 && toIndex > fromIndex) return STEP_MS / 4.2;
-      if (fromIndex >= 1 && toIndex > fromIndex) return STEP_MS / 3;
-      return STEP_MS;
-    }
-
-    function stepDurationUp(fromIndex, toIndex) {
-      if (isHeroHandoff(fromIndex, toIndex)) return STEP_MS / 1.6;
-      if (fromIndex === 1 && toIndex < fromIndex) return STEP_MS / 4.2;
-      if (fromIndex >= 1 && toIndex < fromIndex) return STEP_MS / 3;
-      return STEP_MS / 3;
-    }
-
-    function clearScrollUnlockWatch() {
-      if (scrollUnlockTimer) {
-        window.clearTimeout(scrollUnlockTimer);
-        scrollUnlockTimer = null;
+    function syncStepView(index) {
+      var isFooter = index === holds.length - 1;
+      document.documentElement.classList.toggle("is-footer-step", isFooter);
+      if (isFooter && window.gsap) {
+        window.gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
+          window.gsap.set(el, { autoAlpha: 1, y: 0, clearProps: "filter" });
+        });
       }
-      if (scrollUnlockRaf) {
-        window.cancelAnimationFrame(scrollUnlockRaf);
-        scrollUnlockRaf = 0;
-      }
+      var contact = document.getElementById("kontakt");
+      if (contact) contact.classList.toggle("is-footer-handoff", isFooter);
     }
 
-    function finishScrollStep(target) {
-      if (!locked) return;
-      clearScrollUnlockWatch();
-      locked = false;
-      celKroku = null;
-      beginCooldown();
-      if (Math.abs(lenis.scroll - target) > 2) {
-        lenis.scrollTo(target, { immediate: true });
+    function syncSectionFocus(index) {
+      document.querySelectorAll(".home-scene").forEach(function (scene) {
+        scene.classList.remove("is-in-view");
+      });
+      var cfg = HOLDS_CONFIG[index];
+      if (!cfg || cfg.footer) return;
+      var section = document.getElementById(cfg.id);
+      if (!section) return;
+      section.classList.add("is-in-view", "is-entered", "is-visible");
+      if (window.cosgralSceneEnters?.ensurePanel) {
+        window.cosgralSceneEnters.ensurePanel(section);
       }
-      ensureScenePanelVisible(activeIndex);
-      if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
-      wykonajZamiar();
-    }
-
-    /* Domyka trwajace przejscie tu i teraz: dociaga pozycje do celu, ustawia
-       scene w stanie koncowym (syncSandForJump robi to samo, co zrobiloby
-       dojechanie do konca) i zdejmuje blokade. */
-    function domknijPrzejscie() {
-      if (!locked || celKroku == null) return false;
-      var cel = celKroku;
-      lenis.scrollTo(cel, { immediate: true });
-      if (window.ScrollTrigger) ScrollTrigger.update();
-      syncSandForJump(activeIndex, true);
-      finishScrollStep(cel);
-      return true;
-    }
-
-    /* Gest, ktory przyszedl w trakcie przejscia, czeka tu na swoja kolej.
-       Tuz po domknieciu kroku trwa jeszcze 100 ms cooldownu — bez ponowienia
-       zamiar wpadalby dokladnie w to okno i przepadal (zmierzone: dwa gesty
-       dawaly jedna sekcje zamiast dwoch). Ponawiamy do skutku, ale nie dluzej
-       niz ZAMIAR_OKNO_MS, zeby zamiar nie wisial w nieskonczonosc. */
-    var ZAMIAR_OKNO_MS = 2000;
-    var zamiarDo = 0;
-    var zamiarTimer = null;
-
-    function wykonajZamiar() {
-      if (!zamiar) return;
-      if (Date.now() > zamiarDo) {
-        zamiar = 0;
-        return;
-      }
-      if (!canStep()) {
-        if (zamiarTimer) window.clearTimeout(zamiarTimer);
-        zamiarTimer = window.setTimeout(
-          wykonajZamiar,
-          Math.max(20, Math.min(200, cooldownUntil - Date.now() + 10))
-        );
-        return;
-      }
-      var kierunek = zamiar;
-      zamiar = 0;
-      if (kierunek > 0) stepDown();
-      else stepUp();
     }
 
     function ensureScenePanelVisible(index) {
@@ -286,62 +241,71 @@
       }
     }
 
-    function watchScrollUnlock(target) {
-      clearScrollUnlockWatch();
-      var reachedAt = 0;
+    // ——————————————————————————————————————————————— kostka
 
-      function tryScheduleUnlock() {
-        if (!locked || reachedAt) return;
-        if (Math.abs(lenis.scroll - target) > SECTION_REACH_PX) return;
-        reachedAt = Date.now();
-        scrollUnlockTimer = window.setTimeout(function () {
-          finishScrollStep(target);
-        }, SECTION_READY_MS);
-      }
+    /* Uchwyt do animacji rozpadu. Rozpad jest prowadzony w CZASIE, nie pozycja
+       scrolla: jego dlugosc (SHATTER_S) nie ma nic wspolnego z tym, jak szybko
+       przewinela sie strona. Wczesniej bylo odwrotnie — rozpad dostawal
+       "czas kroku * 0,42", wiec kazde skrocenie kroku skracalo tez rozpad
+       i kostka odlatywala tym szybciej, im plynniej dzialal scroll. */
+    var rozpad = null;
 
-      function tick() {
-        if (!locked) return;
-        tryScheduleUnlock();
-        if (!locked) return;
-        scrollUnlockRaf = window.requestAnimationFrame(tick);
-      }
-
-      scrollUnlockRaf = window.requestAnimationFrame(tick);
+    function rozpadTrwa() {
+      return !!(rozpad && rozpad.isActive && rozpad.isActive());
     }
 
-    function syncStepView(index) {
-      var isFooter = index === holds.length - 1;
-      document.documentElement.classList.toggle("is-footer-step", isFooter);
-      if (isFooter && window.gsap) {
-        window.gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
-          window.gsap.set(el, { autoAlpha: 1, y: 0, clearProps: "filter" });
-        });
+    function przerwijRozpad() {
+      if (rozpad && rozpad.kill) rozpad.kill();
+      rozpad = null;
+    }
+
+    function graRozpad(duration) {
+      var shatter = document.getElementById("rozpad");
+      if (shatter) shatter.classList.add("is-active");
+      document.documentElement.classList.add("is-shattering");
+      if (!window.cosgralSceneFlow?.animateCinemaTo) {
+        syncSandForJump(1);
+        return;
       }
-      var contact = document.getElementById("kontakt");
-      if (contact) contact.classList.toggle("is-footer-handoff", isFooter);
+      rozpad = window.cosgralSceneFlow.animateCinemaTo(1, duration);
+      dopiszDomkniecie(function () {});
     }
 
-    function scenePanel(index) {
-      var cfg = HOLDS_CONFIG[index];
-      if (!cfg) return null;
-      if (cfg.footer) return document.querySelector(".site-footer");
-      var section = document.getElementById(cfg.id);
-      if (!section) return null;
-      return section.querySelector(".home-scene__panel") || section;
+    /* animateCinemaTo ma wlasne domkniecie (zatrzasniecie stanu koncowego
+       piasku). Nie nadpisujemy go — dowieszamy sie za nim. */
+    function dopiszDomkniecie(potem) {
+      if (!rozpad || !rozpad.eventCallback) return;
+      var wlasne = rozpad.eventCallback("onComplete");
+      rozpad.eventCallback("onComplete", function () {
+        rozpad = null;
+        if (wlasne) wlasne.call(this);
+        potem();
+      });
     }
 
-    /* Ustawia scene w stanie koncowym danej sekcji — skokowo.
-       Wywolanie z onComplete Lenisa przychodzilo ZA WCZESNIE (proxy
-       ScrollTriggera przerywa animacje kroku i odpala onComplete od razu),
-       przez co rozpad kostki, ktory ma trwac 1,4 s, byl deptany w mniej niz
-       0,4 s i kostka po prostu znikala. Dopoki animacja rozpadu zyje, nie
-       ruszamy piasku; kto naprawde chce stan koncowy natychmiast (przerwanie
-       przejscia gestem), wola z wymus = true. */
-    function syncSandForJump(index, wymus) {
-      if (!wymus && index >= 1 && rozpadTrwa()) return;
-      if (wymus) przerwijRozpad();
+    function graPowrot() {
+      /* Droga powrotna: kostka sklada sie w czasie, tak samo jak sie rozpada.
+         Twardy reset (resetCube) dopiero na koncu — inaczej kostka wracalaby
+         skokiem, jeszcze zanim hero pojawi sie na ekranie. */
+      przerwijRozpad();
+      document.documentElement.classList.remove("is-shattering");
+      var shatter = document.getElementById("rozpad");
+      if (shatter) shatter.classList.remove("is-active");
+      if (!window.cosgralSceneFlow?.animateCinemaTo) {
+        syncSandForJump(0);
+        return;
+      }
+      rozpad = window.cosgralSceneFlow.animateCinemaTo(0, RETURN_S);
+      dopiszDomkniecie(function () {
+        syncSandForJump(0);
+      });
+    }
+
+    /* Ustawia scene w stanie koncowym danej sekcji — skokowo. */
+    function syncSandForJump(index) {
       window.cosgralSand = window.cosgralSand || {};
       if (index === 0) {
+        przerwijRozpad();
         window.cosgralSand.locked = false;
         window.cosgralSand.cinema = 0;
         window.cosgralSand.motion = 0;
@@ -354,6 +318,9 @@
         if (shatter) shatter.classList.remove("is-active");
         return;
       }
+      /* Dopoki rozpad trwa, nie ruszamy piasku — inaczej zadeptalibysmy
+         animacje i kostka po prostu znikalaby w polowie. */
+      if (rozpadTrwa()) return;
       window.cosgralSand.cinema = 1;
       window.cosgralSand.motion = 1;
       window.cosgralSand.locked = true;
@@ -365,73 +332,153 @@
       if (shatterDone) shatterDone.classList.remove("is-active");
     }
 
-    function syncSectionFocus(index) {
-      document.querySelectorAll(".home-scene").forEach(function (scene) {
-        scene.classList.remove("is-in-view");
-      });
-      var cfg = HOLDS_CONFIG[index];
-      if (!cfg || cfg.footer) return;
-      var section = document.getElementById(cfg.id);
-      if (!section) return;
-      section.classList.add("is-in-view", "is-entered", "is-visible");
-      if (window.cosgralSceneEnters?.ensurePanel) {
-        window.cosgralSceneEnters.ensurePanel(section);
+    function syncCube(from, to) {
+      if (to === 0 && from !== 0) {
+        graPowrot();
+        if (window.cosgralRestoreHero) window.cosgralRestoreHero();
+        return;
       }
-    }
-
-    /* Animacja rozpadu kostki. Trzymamy do niej uchwyt, bo inaczej zostaje
-       natychmiast zadeptana — patrz komentarz przy syncSandForJump. */
-    var animacjaRozpadu = null;
-
-    function playHeroToServicesHandoff(duration) {
-      var shatter = document.getElementById("rozpad");
-      if (shatter) shatter.classList.add("is-active");
-      document.documentElement.classList.add("is-shattering");
-      if (window.cosgralSceneFlow?.animateCinemaTo) {
-        animacjaRozpadu = window.cosgralSceneFlow.animateCinemaTo(1, duration || 2.4);
-        if (animacjaRozpadu && animacjaRozpadu.eventCallback) {
-          animacjaRozpadu.eventCallback("onComplete", function () {
-            animacjaRozpadu = null;
-          });
-        }
-      } else {
-        syncSandForJump(1);
+      if (to === 0) return;
+      if (from === 0) {
+        graRozpad(SHATTER_S);
+        return;
       }
+      /* Uzytkownik poszedl dalej niz Uslugi — rozpadu i tak juz nie oglada,
+         a scena 3D chodzi przez ten czas na pelnej czestotliwosci. Domykamy. */
+      if (to >= 2) przerwijRozpad();
+      syncSandForJump(to);
     }
 
-    function rozpadTrwa() {
-      return !!(animacjaRozpadu && animacjaRozpadu.isActive && animacjaRozpadu.isActive());
+    // ——————————————————————————————————————————————— krok
+
+    function czasKroku(from, to) {
+      return from === 0 || to === 0 ? HERO_STEP_S : STEP_S;
     }
 
-    function przerwijRozpad() {
-      if (animacjaRozpadu && animacjaRozpadu.kill) animacjaRozpadu.kill();
-      animacjaRozpadu = null;
-    }
-
-    function jumpTo(index) {
-      holds = buildHolds();
+    /**
+     * Jedyne miejsce, ktore zmienia sekcje. Zawsze konczy sie dokladnie jedna
+     * animacja i dokladnie jednym timerem odblokowania.
+     */
+    function goTo(index, duration, immediate) {
       index = clamp(index, 0, holds.length - 1);
-      var target = holds[index];
-      var fromIndex = activeIndex;
+      var from = sekcja;
+      var y = holds[index];
+      if (y == null) return;
 
-      if (index === activeIndex && Math.abs(lenis.scroll - target) < 4) return;
+      var czas = immediate ? 0 : duration != null ? duration : czasKroku(from, index);
+
+      sekcja = index;
+      var teraz = Date.now();
+      ruchDo = teraz + czas * 1000 + GEST_GAP_MS;
+      gestOd = teraz + czas * 1000 * GEST_TAIL + GEST_GAP_MS;
+
+      syncStepView(index);
+      syncSectionFocus(index);
+      syncCube(from, index);
+
+      lenis.scrollTo(y, {
+        immediate: !!immediate,
+        duration: czas,
+        easing: easeOutCubic,
+        lock: true,
+      });
+
+      window.dispatchEvent(
+        new CustomEvent("cosgral:section-step", {
+          detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
+        })
+      );
+
+      if (krokTimer) window.clearTimeout(krokTimer);
+      krokTimer = window.setTimeout(function () {
+        krokTimer = null;
+        dojechal(y);
+      }, czas * 1000 + 40);
+    }
+
+    /** Domkniecie kroku: dociagniecie pozycji i wejscia elementow sekcji. */
+    function dojechal(y) {
+      if (Math.abs(lenis.scroll - y) > 2) {
+        lenis.scrollTo(y, { immediate: true });
+      }
+      ensureScenePanelVisible(sekcja);
+      if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+    }
+
+    /** Wejscie dla wszystkich gestow: kolko, dotyk, klawiatura. */
+    function krok(dir) {
+      if (formFocusLock || Date.now() < gestOd) return;
+      var cel = clamp(sekcja + dir, 0, holds.length - 1);
+      if (cel === sekcja) {
+        /* Kraniec listy — nie ma dokad isc, ale gest byl, wiec go zuzywamy. */
+        gestOd = Date.now() + GEST_GAP_MS;
+        return;
+      }
+      goTo(cel);
+    }
+
+    // ——————————————————————————————————————————————— straznik
+
+    /* Straznik pilnuje wylacznie tego, zeby strona nie stala miedzy sekcjami.
+       Nie przypisuje sekcji na nowo — to robi gest albo jawne goTo. Wyjatkiem
+       jest dryf wiekszy niz pol ekranu, ktory moze pochodzic tylko z zewnatrz
+       (pasek przewijania, "znajdz na stronie", kotwica z innej strony). */
+    var guardTimer = null;
+
+    function scheduleGuard() {
+      if (formFocusLock) return;
+      if (guardTimer) window.clearTimeout(guardTimer);
+      guardTimer = window.setTimeout(guard, 180);
+    }
+
+    function guard() {
+      guardTimer = null;
+      if (formFocusLock || trwaRuch()) return;
+      var y = holds[sekcja];
+      if (y == null) return;
+      var d = Math.abs(lenis.scroll - y);
+      if (d < 2) return;
+      if (d > window.innerHeight * 0.5) {
+        goTo(nearestIndex(lenis.scroll), SNAP_S);
+        return;
+      }
+      lenis.scrollTo(y, { duration: SNAP_S, easing: easeOutCubic, lock: true });
+      ruchDo = Date.now() + SNAP_S * 1000 + GEST_GAP_MS;
+      gestOd = Date.now() + SNAP_S * 1000 * GEST_TAIL + GEST_GAP_MS;
+    }
+
+    // ——————————————————————————————————————————————— przejscie z zaslona
+
+    /* Uzywane przez nawigacje i pasek kropek: skok o wiele sekcji naraz, wiec
+       zamiast przewijac przez wszystko po drodze — sciemnienie, przeskok,
+       rozjasnienie. */
+    function jumpTo(index) {
+      index = clamp(index, 0, holds.length - 1);
+      var y = holds[index];
+      if (y == null) return;
+      if (index === sekcja && Math.abs(lenis.scroll - y) < 4) return;
 
       if (!window.gsap) {
         goTo(index, 0, true);
         return;
       }
 
-      var fromPanel = scenePanel(activeIndex);
+      var from = sekcja;
+      var fromPanel = scenePanel(from);
       var toPanel = scenePanel(index);
       var curtain = document.querySelector("[data-scene-curtain]");
+      var CZAS = 1.36;
 
-      locked = true;
-      wheelAccum = 0;
+      sekcja = index;
+      ruchDo = Date.now() + CZAS * 1000 + GEST_GAP_MS;
+      gestOd = ruchDo;
+      if (krokTimer) {
+        window.clearTimeout(krokTimer);
+        krokTimer = null;
+      }
 
       var tl = gsap.timeline({
         onComplete: function () {
-          locked = false;
-          beginCooldown();
           if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
         },
       });
@@ -444,17 +491,18 @@
       }
 
       tl.add(function () {
-        lenis.scrollTo(target, { immediate: true });
+        lenis.scrollTo(y, { immediate: true });
         if (window.ScrollTrigger) ScrollTrigger.update();
-        activeIndex = index;
         syncStepView(index);
         syncSectionFocus(index);
-        if (index === 0) {
+        /* Skok z zaslona: kostka nie ma czasu na pelny rozpad, wiec dostaje
+           krotsza wersje — uzytkownik i tak patrzy na ciemny ekran. */
+        if (index === 0 && from !== 0) {
           syncSandForJump(0);
           if (window.cosgralRestoreHero) window.cosgralRestoreHero();
-        } else if (fromIndex === 0) {
-          playHeroToServicesHandoff(1.8);
-        } else {
+        } else if (from === 0 && index >= 1) {
+          graRozpad(1.4);
+        } else if (index >= 1) {
           syncSandForJump(index);
         }
 
@@ -485,257 +533,95 @@
       });
     }
 
-    function goTo(index, duration, immediate) {
-      holds = buildHolds();
-      index = clamp(index, 0, holds.length - 1);
-      var target = holds[index];
-      var fromIndex = activeIndex;
+    // ——————————————————————————————————————————————— kolko
 
-      if (!immediate && index === activeIndex && Math.abs(lenis.scroll - target) < 4) {
-        return;
+    /* Jedno machniecie = jeden krok, niezaleznie od tego, ile zdarzen wchodzi
+       w sklad machniecia i jak obciazony jest watek glowny. Kolko uzbraja sie
+       ponownie dopiero wtedy, gdy od poprzedniego zdarzenia minelo
+       WHEEL_QUIET_MS — czyli gdy wygasl tez bezwladny ogon gladzika. Wczesniej o liczbie krokow decydowal wyscig
+       progu z cooldownem — stad "raz reaguje, raz nie" i przeskoki o dwie
+       sekcje naraz. */
+    var wheelAccum = 0;
+    var wheelArmed = true;
+    var wheelLast = 0;
+    var fanAccum = 0;
+
+    /* Uzbrojenie kolka to zwykle porownanie znacznikow czasu — bez zadnego
+       timera. Timer ustawiany przy KAZDYM zdarzeniu kolka to kilkaset
+       niepotrzebnych zadan na jedno przewiniecie strony, w dodatku dokladnie
+       na sciezce obslugi wejscia. */
+    function wheelTick(teraz) {
+      if (teraz - wheelLast > WHEEL_QUIET_MS) {
+        wheelArmed = true;
+        wheelAccum = 0;
+        fanAccum = 0;
       }
-
-      locked = true;
-      celKroku = target;
-      activeIndex = index;
-      syncStepView(index);
-      syncSectionFocus(index);
-      clearScrollUnlockWatch();
-
-      var scrollDuration = immediate ? 0 : duration != null ? duration : stepDurationDown(fromIndex, index);
-
-      if (index === 0 && fromIndex !== 0) {
-        syncSandForJump(0);
-      } else if (fromIndex === 0 && index >= 1) {
-        playHeroToServicesHandoff(scrollDuration > 0.05 ? scrollDuration * 0.42 : 2.2);
-      } else if (index >= 1 && fromIndex >= 1) {
-        syncSandForJump(index);
-      }
-
-      lenis.scrollTo(target, {
-        immediate: !!immediate,
-        duration: scrollDuration,
-        easing: easeOutCubic,
-        lock: true,
-        onComplete: function () {
-          if (Math.abs(lenis.scroll - target) > 2) {
-            lenis.scrollTo(target, { immediate: true });
-          }
-          if (index >= 1) syncSandForJump(index);
-          if (immediate || scrollDuration <= 0.05) {
-            finishScrollStep(target);
-            return;
-          }
-          if (!locked) {
-            if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
-            return;
-          }
-          if (scrollUnlockTimer) return;
-          finishScrollStep(target);
-        },
-      });
-
-      if (!immediate && scrollDuration > 0.05) {
-        watchScrollUnlock(target);
-      }
-
-      window.dispatchEvent(
-        new CustomEvent("cosgral:section-step", {
-          detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
-        })
-      );
-
-      if (index === 0 && fromIndex !== 0 && window.cosgralRestoreHero) {
-        window.cosgralRestoreHero();
-      }
-    }
-
-    /* Wspolne dla wszystkich wejsc (kolko, dotyk, klawiatura): gest w trakcie
-       przejscia domyka je i zostaje zapamietany, zamiast wpasc do kosza. */
-    function przyjmijGest(kierunek) {
-      if (canStep()) return true;
-      if (formFocusLock) return false;
-      zamiar = kierunek;
-      zamiarDo = Date.now() + ZAMIAR_OKNO_MS;
-      domknijPrzejscie();
-      return false;
-    }
-
-    function stepUp() {
-      if (!przyjmijGest(-1)) return;
-      if (activeIndex <= 0) {
-        goTo(0, SNAP_MS);
-        return;
-      }
-      var target = activeIndex - 1;
-      if (target === 0) syncSandForJump(0);
-      goTo(target, stepDurationUp(activeIndex, target));
-      lastCommitDir = -1;
-    }
-
-    function stepDown() {
-      if (!przyjmijGest(1)) return;
-      if (activeIndex >= holds.length - 1) {
-        goTo(activeIndex, SNAP_MS);
-        return;
-      }
-      goTo(activeIndex + 1);
-      lastCommitDir = 1;
-    }
-
-    /* Straznik pozycji. Jego zadaniem jest KOREKTA DRYFU w obrebie biezacej
-       sekcji, a nie przypisywanie sekcji na nowo.
-
-       Wczesniej bral nearestIndex(lenis.scroll) bez zastrzezen i potrafil
-       przeciagnac uzytkownika do innej sekcji niz ta, do ktorej wlasnie szedl:
-       buildHolds() czyta pozycje ze ScrollTriggera, a te tuz po skroceniu
-       przejscia bywaja jeszcze nieodswiezone. Zmierzony slad: uzytkownik daje
-       gest w dol (goTo 0->1), a 1,9 s pozniej enforceHold robi goTo 1->0
-       i wyrzuca go z powrotem na hero. Stad wrazenie, ze strona zyje wlasnym
-       zyciem i ze "czasem nie da sie przejsc dalej".
-
-       Teraz zmiana sekcji przez straznika jest dopuszczalna tylko wtedy, gdy
-       pozycja naprawde odjechala od biezacej sekcji o ponad pol ekranu — czyli
-       gdy scroll przyszedl z zewnatrz (kotwica, pasek przewijania, znajdz na
-       stronie). W kazdym innym przypadku straznik dociaga do sekcji, w ktorej
-       uzytkownik faktycznie jest. */
-    var ostatniScrollStraznika = null;
-
-    function enforceHold() {
-      if (locked || formFocusLock || Date.now() < cooldownUntil) return;
-
-      /* Straznik ma prawo ruszyc pozycje tylko wtedy, gdy ta stoi. Flaga `locked`
-         tego nie gwarantuje: proxy ScrollTriggera ustawia pozycje przez
-         lenis.scrollTo(..., immediate), co przerywa animacje kroku i odpala jej
-         onComplete za wczesnie — blokada schodzi w polowie przejazdu. Straznik
-         budzil sie wtedy w srodku 10-sekundowego przejscia hero -> Uslugi, liczyl
-         najblizsza sekcje od pozycji POSREDNIEJ i ciagnal uzytkownika z powrotem.
-         Jesli pozycja wciaz sie zmienia, odkladamy decyzje do momentu, az stanie. */
-      var teraz = lenis.scroll;
-      if (ostatniScrollStraznika !== null && Math.abs(teraz - ostatniScrollStraznika) > 2) {
-        ostatniScrollStraznika = teraz;
-        scheduleGuard();
-        return;
-      }
-      ostatniScrollStraznika = teraz;
-
-      holds = buildHolds();
-
-      var idx = nearestIndex(lenis.scroll);
-      var celBiezacej = holds[activeIndex];
-      if (
-        idx !== activeIndex &&
-        celBiezacej != null &&
-        Math.abs(lenis.scroll - celBiezacej) < window.innerHeight * 0.5
-      ) {
-        idx = activeIndex;
-      }
-
-      var dist = Math.abs(lenis.scroll - holds[idx]);
-      if (dist > 2) {
-        goTo(idx, SNAP_MS);
-      } else {
-        activeIndex = idx;
-      }
-    }
-
-    function scheduleGuard() {
-      if (guardTimer) window.clearTimeout(guardTimer);
-      if (formFocusLock) return;
-      guardTimer = window.setTimeout(enforceHold, 32);
+      wheelLast = teraz;
     }
 
     function onWheel(e) {
       if (REDUCED || shouldIgnore()) return;
       if (isFanHorizontalWheel(e)) return;
 
-      // Desktop: w sekcji Usługi kółko pionowe przewija kafelki (jak tap/swipe na
-      // mobile), a na ostatnim kafelku w danym kierunku wyprowadza z sekcji.
-      //
-      // Wczesniej o tym, czy gest zostaje w karuzeli, decydowalo to, czy
-      // stepFromWheel akurat zdazylo przeskoczyc karte — a to zalezy od jego
-      // wewnetrznego cooldownu (620 ms). Efekt byl zalezny od rytmu scrollowania
-      // i obciazenia maszyny: przy szybkich machnieciach pierwszy gest wynosil
-      // ze sekcji, zanim uzytkownik zobaczyl kafelki (zmierzone: wyjscie po
-      // 1 gescie, karuzela na kafelku 1 z 6); przy wolniejszych, na dlawionym
-      // watku, sekcji nie dalo sie opuscic wcale (8 gestow, karty w kolko).
-      // Teraz decyduje stan karuzeli, nie zegar: dopoki sa kafelki w te strone,
-      // gest nalezy do karuzeli; na ostatnim — wyprowadza z sekcji.
-      if (activeIndex === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
-        e.preventDefault();
-        e.stopPropagation();
-        fanVerticalAccum += e.deltaY;
+      e.preventDefault();
+      e.stopPropagation();
+      wheelTick(Date.now());
+
+      /* Uslugi: kolko pionowe przewija kafelki karuzeli, a na ostatnim kafelku
+         w danym kierunku wyprowadza z sekcji. O tym, czy gest nalezy do
+         karuzeli, decyduje jej stan (atEdge), nie zegar. */
+      if (sekcja === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
+        /* Karuzela podlega tej samej zasadzie co sekcje: jedno machniecie =
+           jeden kafelek. Bez tego ogon machniecia, ktore dopiero WESZLO
+           w Uslugi, od razu przewijal kafelki — a wtedy powrot w gore nie
+           wychodzil z sekcji, tylko cofal karty, wiec wygladalo to jak
+           "nie da sie wrocic". */
+        if (!wheelArmed) return;
 
         var fan = window.cosgralServicesFan;
-        var fanDir = fanVerticalAccum > 0 ? 1 : -1;
+        fanAccum += e.deltaY;
+        var dirFan = fanAccum > 0 ? 1 : -1;
         // Brak atEdge (starsza wersja skryptu) traktujemy jak kraniec — lepiej
         // przepuscic gest dalej, niz uwiezic uzytkownika w sekcji.
-        var fanAtEdge = fan?.atEdge ? fan.atEdge(fanDir) : true;
+        var naKrancu = fan?.atEdge ? fan.atEdge(dirFan) : true;
 
-        if (!fanAtEdge) {
-          if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN && fan?.stepFromWheel) {
-            if (fan.stepFromWheel(fanVerticalAccum)) fanVerticalAccum = 0;
+        if (!naKrancu) {
+          if (Math.abs(fanAccum) < FAN_WHEEL_CARD_MIN || !fan?.stepFromWheel) return;
+          if (fan.stepFromWheel(fanAccum)) {
+            fanAccum = 0;
+            wheelArmed = false;
           }
           return;
         }
 
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_SECTION_MIN) {
-          wheelAccum = fanVerticalAccum;
-          fanVerticalAccum = 0;
-          commitWheel();
-        }
+        if (Math.abs(fanAccum) < FAN_WHEEL_SECTION_MIN) return;
+        var dirOut = fanAccum > 0 ? 1 : -1;
+        fanAccum = 0;
+        wheelArmed = false;
+        krok(dirOut);
         return;
       }
 
-      fanVerticalAccum = 0;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (!canStep()) {
-        wheelAccum = 0;
-        return;
-      }
+      fanAccum = 0;
+      if (!wheelArmed) return;
 
       wheelAccum += e.deltaY;
-
-      var instant = activeIndex === uslugiIdx ? 48 : WHEEL_INSTANT;
-      if (Math.abs(wheelAccum) >= instant) {
-        if (wheelTimer) window.clearTimeout(wheelTimer);
-        commitWheel();
-        return;
-      }
-
-      if (wheelTimer) window.clearTimeout(wheelTimer);
-      wheelTimer = window.setTimeout(commitWheel, WHEEL_END);
-    }
-
-    function commitWheel() {
-      wheelTimer = null;
-
-      var min = activeIndex === uslugiIdx ? 36 : WHEEL_MIN;
-      if (Math.abs(wheelAccum) < min) {
-        wheelAccum = 0;
-        return;
-      }
+      if (Math.abs(wheelAccum) < WHEEL_MIN) return;
 
       var dir = wheelAccum > 0 ? 1 : -1;
       wheelAccum = 0;
-
-      if (dir > 0) {
-        stepDown();
-        return;
-      }
-
-      stepUp();
+      wheelArmed = false;
+      krok(dir);
     }
+
+    // ——————————————————————————————————————————————— dotyk
 
     var touchStartX = 0;
     var touchStartY = 0;
     var touchLastY = 0;
     var touchAccum = 0;
     var touchActive = false;
-    var touchIgnoreStep = false; // poziomy swipe w Usługach — tylko kafelki
+    var touchIgnoreStep = false; // poziomy swipe w Uslugach — tylko kafelki
     var touchFromUslugi = false;
 
     window.addEventListener(
@@ -747,8 +633,7 @@
         touchLastY = touchStartY;
         touchAccum = 0;
         touchIgnoreStep = false;
-        touchFromUslugi =
-          activeIndex === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
+        touchFromUslugi = sekcja === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
         touchActive = true;
       },
       { passive: true, capture: true }
@@ -763,8 +648,7 @@
         var dx = x - touchStartX;
         var dy = y - touchStartY;
 
-        // Usługi: tylko wyraźny gest w poziomie = kafelki (nie sekcja).
-        // Pion zawsze jak wcześniej: preventDefault + snap do holdów.
+        // Uslugi: tylko wyrazny gest w poziomie = kafelki (nie sekcja).
         if (
           touchFromUslugi &&
           !touchIgnoreStep &&
@@ -790,28 +674,15 @@
       function () {
         if (!touchActive) return;
         touchActive = false;
-        if (REDUCED || shouldIgnore() || touchIgnoreStep) {
-          touchAccum = 0;
-          touchIgnoreStep = false;
-          touchFromUslugi = false;
-          return;
-        }
-        if (!canStep()) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var min = touchFromUslugi ? TOUCH_USLUGI_STEP_MIN : WHEEL_MIN;
-        if (Math.abs(touchAccum) < min) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var dir = touchAccum > 0 ? 1 : -1;
+        var accum = touchAccum;
+        var zUslug = touchFromUslugi;
+        var pomin = touchIgnoreStep;
         touchAccum = 0;
+        touchIgnoreStep = false;
         touchFromUslugi = false;
-        if (dir > 0) stepDown();
-        else stepUp();
+        if (REDUCED || shouldIgnore() || pomin) return;
+        if (Math.abs(accum) < (zUslug ? TOUCH_MIN_USLUGI : TOUCH_MIN)) return;
+        krok(accum > 0 ? 1 : -1);
       },
       { passive: true, capture: true }
     );
@@ -827,8 +698,47 @@
       { passive: true, capture: true }
     );
 
+    // ——————————————————————————————————————————————— klawiatura
+
+    /* Kolko jest przechwycone przez stepper, a zadnej obslugi klawiszy nie
+       bylo — natywne przewijanie od razu wracalo na miejsce przez straznika.
+       Dla korzystajacych z klawiatury strona byla nieprzewijalna (WCAG 2.1.1).
+       Strzalki lewo/prawo zostawiamy karuzeli Uslug, ktora juz ich uzywa. */
+    document.addEventListener("keydown", function (e) {
+      if (REDUCED || shouldIgnore()) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(t.tagName))) return;
+
+      switch (e.key) {
+        case "ArrowDown":
+        case "PageDown":
+          krok(1);
+          break;
+        case "ArrowUp":
+        case "PageUp":
+          krok(-1);
+          break;
+        case " ":
+        case "Spacebar":
+          krok(e.shiftKey ? -1 : 1);
+          break;
+        case "Home":
+          goTo(0);
+          break;
+        case "End":
+          goTo(holds.length - 1);
+          break;
+        default:
+          return;
+      }
+      e.preventDefault();
+    });
+
+    // ——————————————————————————————————————————————— podpiecia
+
     lenis.on("scroll", function () {
-      if (!locked) scheduleGuard();
+      if (!trwaRuch()) scheduleGuard();
     });
 
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
@@ -852,6 +762,13 @@
       );
     });
 
+    ScrollTrigger.addEventListener("refresh", function () {
+      holds = buildHolds();
+      if (window.cosgralSectionSnap) window.cosgralSectionSnap.holds = holds;
+    });
+
+    // ——————————————————————————————————————————————— start
+
     function bootSectionIndex() {
       if (hasStoredHashNav()) return 0;
 
@@ -865,86 +782,29 @@
         }
       }
 
-      if (isHomeReload()) {
-        return nearestIndex(lenis.scroll);
-      }
-
+      if (isHomeReload()) return nearestIndex(lenis.scroll);
       return 0;
     }
-
-    var bootIndex = bootSectionIndex();
-    activeIndex = bootIndex;
-    syncStepView(bootIndex);
-    syncSectionFocus(bootIndex);
-    syncSandForJump(bootIndex);
-    goTo(bootIndex, 0, true);
-    beginCooldown();
-
-    /* KLAWIATURA. Kolko jest przechwycone przez stepper, a zadnej obslugi
-       klawiszy nie bylo — natywne przewijanie od razu wracalo na miejsce przez
-       straznika. Zmierzone: PageDown przesuwal strone o 1 px, strzalka w dol
-       nie robila nic. Dla korzystajacych z klawiatury strona byla wiec
-       nieprzewijalna (WCAG 2.1.1). Strzalki lewo/prawo zostawiamy karuzeli
-       Uslug, ktora juz ich uzywa. */
-    document.addEventListener("keydown", function (e) {
-      if (REDUCED || shouldIgnore()) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      var t = e.target;
-      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(t.tagName))) return;
-
-      switch (e.key) {
-        case "ArrowDown":
-        case "PageDown":
-          stepDown();
-          break;
-        case "ArrowUp":
-        case "PageUp":
-          stepUp();
-          break;
-        case " ":
-        case "Spacebar":
-          if (e.shiftKey) stepUp();
-          else stepDown();
-          break;
-        case "Home":
-          goTo(0);
-          break;
-        case "End":
-          goTo(holds.length - 1);
-          break;
-        default:
-          return;
-      }
-      e.preventDefault();
-    });
 
     window.cosgralSectionSnap = {
       holds: holds,
       refreshHolds: buildHolds,
-      goTo: function (index, duration, immediate) {
-        goTo(index, duration, immediate);
-      },
-      stepUp: stepUp,
-      stepDown: stepDown,
+      goTo: goTo,
+      stepUp: function () { krok(-1); },
+      stepDown: function () { krok(1); },
       setFormFocusLock: setFormFocusLock,
-      jumpTo: function (index) {
-        jumpTo(index);
-      },
-      goToY: function (y) {
-        goTo(nearestIndex(y));
-      },
-      goToFooter: function () {
-        goTo(holds.length - 1);
-      },
-      getIndex: function () {
-        return activeIndex;
-      },
+      jumpTo: jumpTo,
+      goToY: function (y) { goTo(nearestIndex(y)); },
+      goToFooter: function () { goTo(holds.length - 1); },
+      getIndex: function () { return sekcja; },
     };
 
-    ScrollTrigger.addEventListener("refresh", function () {
-      holds = buildHolds();
-      window.cosgralSectionSnap.holds = holds;
-    });
+    var bootIndex = bootSectionIndex();
+    sekcja = bootIndex;
+    syncStepView(bootIndex);
+    syncSectionFocus(bootIndex);
+    syncSandForJump(bootIndex);
+    goTo(bootIndex, 0, true);
   }
 
   (async function () {

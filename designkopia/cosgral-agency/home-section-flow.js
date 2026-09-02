@@ -178,6 +178,17 @@
     }
   }
 
+  /* Rozpad kostki ma DWA zrodla: scrub ScrollTriggera (pozycja) i tween
+     z animateCinemaTo (czas). Kiedy prowadzi go tween, scrub nie ma prawa go
+     nadpisywac — inaczej krok scrolla, ktory pokonuje cala pinowana sekcje
+     rozpadu w ~1,5 s, przewijal animacje do konca i kostka "odlatywala"
+     szybciej, niz ktokolwiek zdazyl ja zobaczyc. Najbrutalniej robilo to
+     onLeave, ktore ustawialo setCinema(1) jednym skokiem. */
+  function setCinemaZeScrolla(value) {
+    if (rozpadTrwa()) return;
+    setCinema(value);
+  }
+
   window.cosgralSceneFlow = {
     setCinema: setCinema,
     animateCinemaTo: function (target, duration) {
@@ -423,7 +434,7 @@
           onLeave: function () {
             shatter.classList.remove("is-active");
             document.documentElement.classList.remove("is-shattering");
-            setCinema(1);
+            setCinemaZeScrolla(1);
             gsap.set(shatterPanel, { autoAlpha: 0 });
             gsap.set(shatter, { autoAlpha: 0, visibility: "hidden" });
           },
@@ -435,7 +446,7 @@
           },
           onUpdate: function (self) {
             var p = self.progress;
-            setCinema(p);
+            setCinemaZeScrolla(p);
 
             var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
             var shatterProps = { autoAlpha: 1 - out };
@@ -488,7 +499,7 @@
           var tail = 1 - Math.pow(1 - q, 1.12);
           window.cosgralSand = window.cosgralSand || {};
           window.cosgralSand.motionTail = tail;
-          setCinema(Math.min(1, 0.8 + tail * 0.2));
+          setCinemaZeScrolla(Math.min(1, 0.8 + tail * 0.2));
           window.cosgralSand.servicesVisible = q > 0.06;
         },
       });
