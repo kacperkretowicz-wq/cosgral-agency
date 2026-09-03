@@ -106,7 +106,8 @@
     var WHEEL_END = 52;
     var WHEEL_MIN = 6;
     var WHEEL_INSTANT = 16;
-    // Tylko w Usługach: większy gest pionowy, żeby dało się zmieniać kafelki bez skoku sekcji.
+    // Na dotyku w Usługach zostaje większy próg pionowy: tam swipe w bok zmienia
+    // kafelki, więc luźny gest po skosie nie powinien od razu przeskakiwać sekcji.
     var TOUCH_USLUGI_STEP_MIN = 96;
     var uslugiIdx = SECTION_IDS.indexOf("uslugi");
     var HOLD_COOLDOWN_MS = 100;
@@ -114,9 +115,10 @@
     var SECTION_REACH_PX = 16;
     var lastCommitDir = 0;
     var cooldownUntil = 0;
-    var fanVerticalAccum = 0;
-    var FAN_WHEEL_CARD_MIN = 32;
-    var FAN_WHEEL_SECTION_MIN = 140;
+    var wheelHeldSince = 0;
+    // Liczone od OSTATNIEGO kliknieca, nie od pierwszego: dopoki uzytkownik
+    // krecil, gest zyje przez cala animacje; gdy przestanie, wygasa.
+    var WHEEL_HOLD_MAX_MS = 1200;
     var scrollUnlockTimer = null;
     var scrollUnlockRaf = 0;
     var formFocusLock = false;
@@ -498,39 +500,26 @@
       if (REDUCED || shouldIgnore()) return;
       if (isFanHorizontalWheel(e)) return;
 
-      // Desktop: w sekcji Usługi kółko pionowe przewija kafelki (jak tap/swipe na mobile).
-      if (activeIndex === uslugiIdx && pointInUslugiSection(e.clientX, e.clientY)) {
-        e.preventDefault();
-        e.stopPropagation();
-        fanVerticalAccum += e.deltaY;
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_CARD_MIN && window.cosgralServicesFan?.stepFromWheel) {
-          if (window.cosgralServicesFan.stepFromWheel(fanVerticalAccum)) {
-            fanVerticalAccum = 0;
-            return;
-          }
-        }
-        if (Math.abs(fanVerticalAccum) >= FAN_WHEEL_SECTION_MIN) {
-          wheelAccum = fanVerticalAccum;
-          fanVerticalAccum = 0;
-          commitWheel();
-          return;
-        }
-        return;
-      }
-
-      fanVerticalAccum = 0;
+      /* Kółko pionowe zawsze przewija sekcje — dokładnie jak swipe w pionie na
+         mobile. Kafelki Usług zmienia się poziomo, strzałkami, przyciskami,
+         tapnięciem lub swipe'em w bok. Wcześniej kółko w Usługach przewijało
+         kafelki i strona stała w miejscu przez kilka kliknięć. */
 
       e.preventDefault();
       e.stopPropagation();
 
+      wheelAccum += e.deltaY;
+
+      /* Gest w trakcie przejścia sekcji: nie gubimy go, tylko czekamy na
+         odblokowanie. Zerowanie tutaj sprawiało, że kliknięcia oddane podczas
+         długiej animacji hero→usługi przepadały bez śladu. */
       if (!canStep()) {
-        wheelAccum = 0;
+        wheelHeldSince = Date.now();
+        holdWheel();
         return;
       }
 
-      wheelAccum += e.deltaY;
-
-      var instant = activeIndex === uslugiIdx ? 48 : WHEEL_INSTANT;
+      var instant = WHEEL_INSTANT;
       if (Math.abs(wheelAccum) >= instant) {
         if (wheelTimer) window.clearTimeout(wheelTimer);
         commitWheel();
@@ -541,14 +530,28 @@
       wheelTimer = window.setTimeout(commitWheel, WHEEL_END);
     }
 
+    /* Przytrzymuje gest, dopóki stepper jest zablokowany animacją, i próbuje
+       ponownie. Po WHEEL_HOLD_MAX_MS odpuszcza, żeby zaległe kliknięcie nie
+       wystrzeliło długo po tym, jak użytkownik przestał kręcić. */
+    function holdWheel() {
+      if (wheelTimer) window.clearTimeout(wheelTimer);
+      wheelTimer = window.setTimeout(commitWheel, WHEEL_END);
+    }
+
     function commitWheel() {
       wheelTimer = null;
       if (!canStep()) {
-        wheelAccum = 0;
+        if (wheelHeldSince && Date.now() - wheelHeldSince > WHEEL_HOLD_MAX_MS) {
+          wheelHeldSince = 0;
+          wheelAccum = 0;
+          return;
+        }
+        holdWheel();
         return;
       }
+      wheelHeldSince = 0;
 
-      var min = activeIndex === uslugiIdx ? 36 : WHEEL_MIN;
+      var min = WHEEL_MIN;
       if (Math.abs(wheelAccum) < min) {
         wheelAccum = 0;
         return;
