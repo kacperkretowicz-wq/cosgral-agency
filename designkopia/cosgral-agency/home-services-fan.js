@@ -313,6 +313,13 @@
     goTo(index - 1);
   }
 
+  /* Skrajny kafelek w danym kierunku? Liczymy po targetPos, bo index nadąża
+     dopiero za animacją i przy szybkim geście pokazywałby poprzednią kartę. */
+  function atEdge(dir) {
+    var pos = Math.round(targetPos);
+    return dir > 0 ? pos >= total - 1 : pos <= 0;
+  }
+
   var ticking = false;
   function scheduleTick() {
     if (ticking || REDUCED) return;
@@ -541,6 +548,13 @@
       scheduleWheelDecay();
       if (Math.abs(wheelAccumX) < 32) return false;
       var dir = wheelAccumX > 0 ? 1 : -1;
+      /* Na ostatnim kafelku nie zawijamy — oddajemy gest stepperowi, żeby
+         kółko wyprowadziło stronę z Usług. Zawijanie zostaje dla kliknięć
+         i swipe'a, gdzie użytkownik nie próbuje przewijać strony. */
+      if (atEdge(dir)) {
+        wheelAccumX = 0;
+        return false;
+      }
       wheelAccumX = 0;
       lastNavAt = Date.now();
       hideHint();

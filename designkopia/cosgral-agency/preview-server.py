@@ -14,6 +14,8 @@ REDIRECTS = {
     "/portfolio/": "/portfolio.html",
     "/o-nas": "/o-nas.html",
     "/o-nas/": "/o-nas.html",
+    "/privacy-policy": "/privacy-policy.html",
+    "/privacy-policy/": "/privacy-policy.html",
 }
 
 

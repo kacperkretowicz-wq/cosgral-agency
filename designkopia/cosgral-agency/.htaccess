@@ -11,4 +11,5 @@ DirectoryIndex index.html
 
   # Pretty URLs for other HTML pages
   RewriteRule ^o-nas/?$ /o-nas.html [R=301,L]
+  RewriteRule ^privacy-policy/?$ /privacy-policy.html [R=301,L]
 </IfModule>
