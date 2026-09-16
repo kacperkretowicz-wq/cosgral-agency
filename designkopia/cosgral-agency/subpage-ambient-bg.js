@@ -330,8 +330,10 @@
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
     function resize() {
-      var cap = themeId !== "default" ? (MOBILE ? 1.1 : 1.35) : 1.5;
-      var dpr = Math.min(window.devicePixelRatio || 1, cap);
+      // Jak home-ambient-bg.js: fale są miękkie, więc renderujemy w ułamku
+      // pikseli CSS (kompozytor skaluje bilinearnie) zamiast w DPR do 1.5 —
+      // ~2–5× mniej fragmentów na klatkę bez widocznej różnicy.
+      var dpr = MOBILE ? 0.75 : 0.66;
       var w = Math.round(window.innerWidth * dpr);
       var h = Math.round(window.innerHeight * dpr);
       if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {

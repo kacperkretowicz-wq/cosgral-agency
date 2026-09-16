@@ -14,7 +14,6 @@
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var GYRO_KEY = "cosgral-gyro";
-  var root = document.documentElement;
   var state = {
     x: window.innerWidth * 0.5,
     y: window.innerHeight * 0.5,
@@ -180,14 +179,34 @@
     { passive: true }
   );
 
-  function applyPointer() {
-    var px = (state.x / window.innerWidth) * 100;
-    var py = (state.y / window.innerHeight) * 100;
+  // Jedynym konsumentem pozycji kursora w CSS była poświata (.home-ambient__blur /
+  // .subpage-ambient__blur). Dawniej szła przez --pointer-x/y na <html>, co
+  // unieważniało styl całego dokumentu w każdej klatce, a warstwa z blur(52px)
+  // przemalowywała cały viewport. Teraz przesuwamy mały element transformem
+  // (compositor-only) i piszemy tylko, gdy pozycja realnie się zmieniła.
+  // Stan liczbowy dla skryptów (hero 3D, ambient, tilt) zostaje w window.cosgralPointer.
+  var veils = null;
+  var lastVeilX = null;
+  var lastVeilY = null;
 
-    root.style.setProperty("--pointer-x", px.toFixed(2) + "%");
-    root.style.setProperty("--pointer-y", py.toFixed(2) + "%");
-    root.style.setProperty("--pointer-nx", state.nx.toFixed(4));
-    root.style.setProperty("--pointer-ny", state.ny.toFixed(4));
+  function veilNodes() {
+    if (veils) return veils;
+    veils = Array.prototype.slice.call(
+      document.querySelectorAll(".home-ambient__blur, .subpage-ambient__blur")
+    );
+    return veils;
+  }
+
+  function applyPointer() {
+    var nodes = veilNodes();
+    if (!nodes.length) return;
+    var x = Math.round(state.x * 2) / 2;
+    var y = Math.round(state.y * 2) / 2;
+    if (x === lastVeilX && y === lastVeilY) return;
+    lastVeilX = x;
+    lastVeilY = y;
+    var tf = "translate3d(" + x + "px, " + y + "px, 0)";
+    for (var i = 0; i < nodes.length; i++) nodes[i].style.transform = tf;
   }
 
   function tick() {
@@ -252,5 +271,6 @@
   }
 
   armMobileGyro();
+  applyPointer();
   requestAnimationFrame(tick);
 })();

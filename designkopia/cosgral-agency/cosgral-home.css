@@ -78,29 +78,46 @@ body.home-page::after {
   height: 100%;
   pointer-events: none;
   opacity: 1;
-  filter: grayscale(1) contrast(1.04) brightness(0.78);
+  /* Dawny `filter: grayscale(1) contrast(1.04) brightness(0.78)` liczy teraz
+     shader w home-ambient-bg.js — CSS filter na pełnoekranowym, animowanym
+     canvasie kosztował osobny pass kompozytora w każdej klatce. Fallback
+     gradientu (gdy WebGL nie wstanie) ma wpisane te same przyciemnione wartości. */
   background:
-    radial-gradient(ellipse 140% 90% at 50% 38%, #161616 0%, #0a0a0a 42%, #030303 100%);
+    radial-gradient(ellipse 140% 90% at 50% 38%, #0e0e0e 0%, #040404 42%, #000 100%);
 }
+/* Poświata kursora: kiedyś pełnoekranowa warstwa z gradientem pozycjonowanym
+   przez --pointer-x/y + filter: blur(52px) — każda zmiana pozycji kursora
+   przemalowywała i rozmywała cały viewport. Teraz to mały, stały element
+   (kwadrat 80vmax) przesuwany tylko przez transform z home-cursor-field.js
+   (compositor-only, zero repaintu). Miękki spad gradientu odtwarza wygląd
+   rozmytego okręgu 32vmax; screen z czystą bielą ≡ normal, więc blend zbędny. */
 .home-ambient__blur {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: 0;
+  width: 80vmax;
+  height: 80vmax;
+  margin: -40vmax 0 0 -40vmax;
   pointer-events: none;
   background:
     radial-gradient(
-      circle 32vmax at var(--pointer-x) var(--pointer-y),
+      circle closest-side,
       rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.085) 10%,
+      rgba(255, 255, 255, 0.055) 22%,
       rgba(255, 255, 255, 0.04) 30%,
-      transparent 65%
+      rgba(255, 255, 255, 0.028) 40%,
+      rgba(255, 255, 255, 0.012) 50%,
+      rgba(255, 255, 255, 0.004) 58%,
+      transparent 66%
     );
-  filter: blur(52px);
   opacity: 0.55;
-  mix-blend-mode: screen;
+  transform: translate3d(50vw, 50vh, 0);
+  will-change: transform;
 }
 @media (max-width: 900px) {
   .home-ambient__blur {
-    filter: blur(24px);
     opacity: 0.4;
   }
 }

@@ -217,31 +217,48 @@ html.reduce-motion .service-page-video__tint {
 .subpage-ambient--themed {
   filter: contrast(1.08) brightness(0.92) saturate(1.15);
 }
+/* Poświata kursora — jak .home-ambient__blur: mały element przesuwany przez
+   transform (home-cursor-field.js) zamiast pełnoekranowej warstwy z blur(52px)
+   przemalowywanej przy każdym ruchu kursora. */
 body.service-page .subpage-ambient__blur {
   background:
     radial-gradient(
-      circle 32vmax at var(--pointer-x, 50%) var(--pointer-y, 50%),
+      circle closest-side,
       color-mix(in srgb, var(--service-highlight) 28%, transparent) 0%,
+      color-mix(in srgb, var(--service-highlight) 22%, transparent) 12%,
+      color-mix(in srgb, var(--service-accent) 14%, transparent) 28%,
       color-mix(in srgb, var(--service-accent) 12%, transparent) 32%,
-      transparent 68%
+      color-mix(in srgb, var(--service-accent) 7%, transparent) 45%,
+      color-mix(in srgb, var(--service-accent) 3%, transparent) 58%,
+      transparent 70%
     );
   opacity: 0.62;
+  mix-blend-mode: screen;
 }
 .subpage-ambient__blur {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: 0;
+  width: 80vmax;
+  height: 80vmax;
+  margin: -40vmax 0 0 -40vmax;
   pointer-events: none;
   background:
     radial-gradient(
-      circle 32vmax at var(--pointer-x, 50%) var(--pointer-y, 50%),
+      circle closest-side,
       rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.085) 10%,
+      rgba(255, 255, 255, 0.055) 22%,
       rgba(255, 255, 255, 0.04) 30%,
-      transparent 65%
+      rgba(255, 255, 255, 0.028) 40%,
+      rgba(255, 255, 255, 0.012) 50%,
+      rgba(255, 255, 255, 0.004) 58%,
+      transparent 66%
     );
-  filter: blur(52px);
   opacity: 0.55;
-  mix-blend-mode: screen;
+  transform: translate3d(50vw, 50vh, 0);
+  will-change: transform;
 }
 body.service-page .subpage-ambient__shade {
   background: color-mix(in srgb, var(--service-bg) 72%, transparent);

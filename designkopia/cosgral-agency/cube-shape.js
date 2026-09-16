@@ -153,6 +153,13 @@ export function createIntactCubeParts(half) {
   return { boxGeo, shell, wire: null, edges, setWireOpacity };
 }
 
+/**
+ * Shard = instancja ~3–6 px na ekranie (aSize0 ≈ 0.016–0.036 j. świata przy
+ * ~170 px/j.). Zaokrąglenie 7×7 segmentów na ścianę dawało 1764 wierzchołków
+ * na instancję → przy 1600 shardach ~2,8 mln wierzchołków na klatkę przez
+ * ciężki vertex shader, dla detalu niewidocznego w tej skali. Zwykły box
+ * (24 wierzchołki, indeksowany) wygląda identycznie, a kosztuje ~70× mniej.
+ */
 export function createShardGeometry() {
-  return createRoundedBoxGeometry(0.5, 0.16, 3);
+  return new THREE.BoxGeometry(1, 1, 1);
 }

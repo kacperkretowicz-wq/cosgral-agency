@@ -45,16 +45,28 @@
     el.addEventListener("mouseleave", function () { root.classList.remove("is-hover"); });
   });
 
+  // Transform wpisujemy wprost (zamiast --cx/--cy → var() w CSS): jedna
+  // właściwość na compositorze, bez pośredniego przeliczenia zmiennych; zapis
+  // tylko gdy pozycja realnie się zmieniła (po zatrzymaniu myszy pierścień
+  // dojeżdża i pętla przestaje dotykać DOM).
+  var lastDot = "";
+  var lastRing = "";
   function tick() {
     rx += (cx - rx) * 0.12;
     ry += (cy - ry) * 0.12;
     if (dot) {
-      dot.style.setProperty("--cx", cx + "px");
-      dot.style.setProperty("--cy", cy + "px");
+      var d = "translate3d(" + cx + "px, " + cy + "px, 0)";
+      if (d !== lastDot) {
+        lastDot = d;
+        dot.style.transform = d;
+      }
     }
     if (ring) {
-      ring.style.setProperty("--rx", rx + "px");
-      ring.style.setProperty("--ry", ry + "px");
+      var r = "translate3d(" + (Math.round(rx * 10) / 10) + "px, " + (Math.round(ry * 10) / 10) + "px, 0)";
+      if (r !== lastRing) {
+        lastRing = r;
+        ring.style.transform = r;
+      }
     }
     requestAnimationFrame(tick);
   }

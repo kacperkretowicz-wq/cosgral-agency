@@ -3,6 +3,7 @@
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 import { createIntactCubeParts } from "./cube-shape.js";
+import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (function () {
   "use strict";
@@ -1548,9 +1549,16 @@ import { createIntactCubeParts } from "./cube-shape.js";
     return computeFaceRectForGroup(getMenuPoseGroup());
   }
 
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Jak home-hero-3d.js: MSAA na pełnoekranowym canvasie z 2800 addytywnymi
+  // sprite'ami kosztowało na desktopowym iGPU ~8–10 ms/klatkę — krawędzie
+  // wygładza tam tani pass FXAA (three-fxaa-pass.js). Na mobile (GPU kafelkowe,
+  // MSAA prawie darmowe) zostaje MSAA jak dotąd. Cap DPR 1.5 zamiast 2:
+  // miękkie cząstki nie zyskują na wyższym DPR, a fill-rate spada o ~44%.
+  var USE_FXAA = !MOBILE;
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: MOBILE, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
+  var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
 
   var scene = new THREE.Scene();
   var root = new THREE.Group();
@@ -1638,6 +1646,7 @@ import { createIntactCubeParts } from "./cube-shape.js";
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (fxaa) fxaa.resize();
   }
 
   function onScroll() {
@@ -1843,7 +1852,8 @@ import { createIntactCubeParts } from "./cube-shape.js";
         sMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
       }
       cubeGroup.updateMatrixWorld(true);
-      renderer.render(scene, camera);
+      if (fxaa) fxaa.render(scene, camera);
+      else renderer.render(scene, camera);
     } catch (err) {
       console.error("[subpage-cube]", err);
     }

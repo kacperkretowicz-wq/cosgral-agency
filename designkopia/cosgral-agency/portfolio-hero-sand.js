@@ -121,13 +121,16 @@ import { createShardGeometry } from "./cube-shape.js";
   }
 
   function buildLayer(canvas, count, layerOpts) {
+    // Warstwa to wyłącznie pył (shardy 3–6 px) — MSAA nic tu nie wygładza,
+    // a na pełnoekranowym canvasie kosztowało clear+resolve 4 sampli co klatkę
+    // (×2 warstwy). DPR cap 1.5 zamiast 1.75: pył i tak jest podpikselowy.
     var renderer = new THREE.WebGLRenderer({
       canvas: canvas,
       alpha: true,
-      antialias: !MOBILE,
+      antialias: false,
       powerPreference: "high-performance",
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MOBILE ? 1.25 : 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MOBILE ? 1.25 : 1.5));
     renderer.setClearColor(0x000000, 0);
 
     var scene = new THREE.Scene();

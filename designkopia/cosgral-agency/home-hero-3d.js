@@ -4,6 +4,7 @@
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
+import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (function () {
   "use strict";
@@ -336,14 +337,29 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     window.setTimeout(kick, LOW_PERF ? 2600 : 4200);
   }
 
+  // MSAA 4× (antialias: true) był najdroższym elementem sceny: każdy piksel
+  // dużych, addytywnych sprite'ów punktów i shardów to 4 blendowane sample —
+  // na iGPU (Intel HD) sama chmura punktów kosztowała ~8–10 ms/klatkę wobec
+  // ~2,5 ms bez MSAA. Krawędzie sześcianu wygładzamy zamiast tego FXAA
+  // (render do render-targetu + jeden tani pełnoekranowy pass), które na
+  // desktopie kosztuje ułamek tego. Na LOW_PERF MSAA i tak było wyłączone,
+  // więc tam renderujemy bezpośrednio, bez dodatkowego passu.
+  var USE_FXAA = !LOW_PERF;
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: !LOW_PERF,
+    antialias: false,
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.5));
   renderer.setClearColor(0x000000, 0);
+
+  var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
+
+  function renderScene() {
+    if (fxaa) fxaa.render(scene, camera);
+    else renderer.render(scene, camera);
+  }
 
   var scene = new THREE.Scene();
   var root = new THREE.Group();
@@ -705,6 +721,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (fxaa) fxaa.resize();
   }
 
   window.addEventListener("resize", resize);
@@ -721,7 +738,9 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
   // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
   var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
-  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [2, 1.5, 1.25];
+  // Miękkie, addytywne cząstki nie zyskują na DPR 2 — cap 1.5 tnie fill-rate
+  // o ~44% na ekranach hi-DPI bez widocznej różnicy.
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [1.5, 1.25, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;
@@ -841,6 +860,27 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
   var clock = new THREE.Clock();
   var cardSampleTick = 0;
+  // GSAP zapisuje autoAlpha jako inline `opacity`, więc czytamy style.opacity —
+  // gsap.getProperty() (getComputedStyle) co klatkę wymuszało przeliczenie
+  // stylu całego dokumentu. Jedyny przypadek, gdy wartość obliczona różni się
+  // od inline, to `.home-scene.is-in-view > .home-scene__panel { opacity: 1
+  // !important }` — odtwarzamy go tanim classList.contains.
+  var uslugiSection = null;
+  var uslugiPanel = null;
+  var uslugiLooked = false;
+  function readUslugiPanelOpacity() {
+    if (!uslugiLooked) {
+      uslugiLooked = true;
+      uslugiSection = document.getElementById("uslugi");
+      uslugiPanel = uslugiSection && uslugiSection.querySelector(".home-scene__panel");
+    }
+    if (!uslugiPanel) return 0;
+    if (uslugiSection.classList.contains("is-in-view")) return 1;
+    var raw = uslugiPanel.style.opacity;
+    if (raw === "") return 1;
+    var v = parseFloat(raw);
+    return v === v ? v : 0;
+  }
 
   function sandLineActive() {
     return sandLocked || displayStream > 0.18 || displayBreak > 0.12;
@@ -1109,11 +1149,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
     var cubeVisible = depart < 0.93;
 
-    var uslugiPanel = document.querySelector("#uslugi .home-scene__panel");
-    var tilesOp = 0;
-    if (uslugiPanel && window.gsap) {
-      tilesOp = parseFloat(gsap.getProperty(uslugiPanel, "opacity")) || 0;
-    }
+    var tilesOp = readUslugiPanelOpacity();
 
     if (menuBlend > 0.001) {
       mobileDriftSpinReady = false;
@@ -1219,6 +1255,11 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
       if (!shardsBuilt && (displayBreak > 0.04 || displayStream > 0.04 || c > 0.03 || menuAbsorb > 0.02)) {
         buildShards();
       }
+      // vAlpha w shaderze zależy wyłącznie od uBreak > aDelay — przy uBreak≈0
+      // każda instancja i tak kończy na `discard`, ale vertex shader dla
+      // wszystkich SHARDS liczył się co klatkę. W hero (nienaruszony sześcian)
+      // to czysta strata, więc gasimy mesh.
+      if (shards) shards.visible = shardBreak > 0.002;
       shardMat.uniforms.uTime.value = t;
       shardMat.uniforms.uBreak.value = shardBreak;
       shardMat.uniforms.uStream.value = shardStream;
@@ -1270,7 +1311,7 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);
-    renderer.render(scene, camera);
+    renderScene();
   }
 
   if (canvas.parentElement) {
@@ -1440,6 +1481,8 @@ import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
   window.cosgralCube = {
     group: cubeGroup,
     shards: shards,
+    // Uchwyty diagnostyczne (benchmark kosztu klatki: renderFrame + gl.readPixels).
+    debug: { renderer: renderer, scene: scene, camera: camera, surfacePoints: sMat, renderFrame: renderScene, fxaa: USE_FXAA },
     introDone: function () {
       return introDone;
     },

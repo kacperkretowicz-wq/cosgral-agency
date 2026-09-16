@@ -14,8 +14,33 @@
   var TILT_PITCH = MOBILE ? 3.2 : 5.8;
   var TILT_YAW = MOBILE ? 4.0 : 7.5;
   var tiltFrame = 0;
-  var lastTiltX = "";
-  var lastTiltY = "";
+
+  // --global-tilt-x/y czytają tylko: .site-nav, .home-scroll-rail, .site-footer
+  // oraz bloki z klasą .is-in-view (i ich potomkowie — zmienna dziedziczy).
+  // Zapis na <html> unieważniał styl całego dokumentu w każdej klatce ruchu
+  // kursora; zapis na tych kilku hostach ogranicza przeliczenie do ich poddrzew.
+  // Żywe HTMLCollection łapią też elementy dodawane później (np. scroll rail).
+  var tiltHostLists = [
+    document.getElementsByClassName("site-nav"),
+    document.getElementsByClassName("home-scroll-rail"),
+    document.getElementsByClassName("site-footer"),
+    document.getElementsByClassName("is-in-view"),
+  ];
+
+  // Odczyt inline style nie wymusza przeliczenia stylu, więc porównanie co
+  // klatkę jest tanie — a łapie hosty, które właśnie dostały .is-in-view
+  // z innego skryptu (services-fan, stepper) albo dopiero powstały (rail).
+  function writeTilt(tx, ty) {
+    for (var l = 0; l < tiltHostLists.length; l++) {
+      var list = tiltHostLists[l];
+      for (var i = 0; i < list.length; i++) {
+        var st = list[i].style;
+        if (st.getPropertyValue("--global-tilt-x") === tx && st.getPropertyValue("--global-tilt-y") === ty) continue;
+        st.setProperty("--global-tilt-x", tx);
+        st.setProperty("--global-tilt-y", ty);
+      }
+    }
+  }
 
   function applyGlobalTilt() {
     var ptr = window.cosgralPointer;
@@ -30,20 +55,12 @@
       return;
     }
 
-    var root = document.documentElement;
-    var lx = ((ptr.x / Math.max(window.innerWidth, 1)) * 100).toFixed(1) + "%";
-    var ly = ((ptr.y / Math.max(window.innerHeight, 1)) * 100).toFixed(1) + "%";
     var tx = (ptr.ny * TILT_PITCH).toFixed(2) + "deg";
     var ty = (ptr.nx * TILT_YAW).toFixed(2) + "deg";
-
-    if (tx !== lastTiltX || ty !== lastTiltY) {
-      lastTiltX = tx;
-      lastTiltY = ty;
-      root.style.setProperty("--global-tilt-x", tx);
-      root.style.setProperty("--global-tilt-y", ty);
-    }
-    root.style.setProperty("--lx", lx);
-    root.style.setProperty("--ly", ly);
+    writeTilt(tx, ty);
+    // --lx/--ly (poświata .services-fan__card-liquid) — efekt nigdy nie był
+    // aktywowany (.is-cursor-active tylko usuwane), a .home-process__step
+    // nadpisuje zmienną lokalnie; zapis co klatkę był czystym kosztem.
 
     requestAnimationFrame(applyGlobalTilt);
   }
