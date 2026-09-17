@@ -172,10 +172,76 @@ main.home-film > .home-scene {
 .home-scene.is-entered .home-scene__panel {
   will-change: transform, opacity, filter;
 }
-/* Gdy stepper ustawi is-in-view, panel musi być widoczny mimo inline opacity z GSAP */
-.home-scene.is-in-view > .home-scene__panel {
+/* Snap mode: is-in-view wymusza panel mimo inline opacity z GSAP.
+   Free scroll: zostaw scrubowane fade'y ScrollTrigger — bez !important. */
+html:not(.is-free-scroll) .home-scene.is-in-view > .home-scene__panel {
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+/* Depth stack — sticky warstwy (Lenis + natywny scroll, bez GSAP pin) */
+html.is-free-scroll body.home-page {
+  overflow-x: clip;
+}
+html.is-free-scroll main.home-film > .home-scene.home-depth {
+  position: sticky;
+  top: 0;
+  z-index: var(--depth-z, 10) !important;
+  /* Bez kryjącego tła — rozmazana sekcja z tyłu ma prześwitywać */
+  background: transparent;
+}
+html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone .home-scene__panel,
+html.is-free-scroll #uslugi.is-depth-gone,
+html.is-free-scroll #uslugi.is-depth-gone .home-scene__panel,
+html.is-free-scroll #uslugi.is-depth-gone .services-fan__stage {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+/* Tor pod swipe — legacy; Proces wrócił do stacku po FAQ */
+html.is-free-scroll #proces.home-swipe-runway {
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
+  height: 100vh;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+}
+html.is-free-scroll .home-scene.is-swipe-layer {
+  will-change: transform;
+}
+html.is-free-scroll .home-scene.is-swipe-enter {
+  z-index: var(--depth-z, 40) !important;
+}
+/* Depth stack — Usługi zostaje pod Realizacjami (niższy z-index) */
+html.is-free-scroll #uslugi.home-depth,
+html.is-free-scroll #uslugi.is-visible.home-scene {
+  z-index: 20 !important;
+}
+/* Kontakt: nie sticky — wjeżdża od dołu nad Proces, z kryjącym tłem
+   (sticky + transparent powodowało nachodzenie formularza na Proces). */
+html.is-free-scroll #kontakt.home-depth {
+  position: relative !important;
+  z-index: 60 !important;
+  background: var(--bg, #030303);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+html.is-free-scroll #proces.home-depth {
+  z-index: 50 !important;
+}
+.home-scene.is-depth-active {
+  z-index: var(--depth-z, 20);
+}
+.home-scene.is-depth-active.is-visible {
+  z-index: var(--depth-z, 24);
 }
 html.reduce-motion .home-scene__panel {
   opacity: 1 !important;
@@ -203,7 +269,7 @@ html.is-sand-stream .home-scene-curtain {
   pointer-events: none;
   display: grid;
   place-items: center;
-  opacity: 0.68;
+  opacity: 1;
 }
 .home-cube-portal .home-hero__canvas {
   width: 100%;
@@ -216,9 +282,9 @@ html.is-shattering .home-cube-portal {
   opacity: 1;
   visibility: visible;
 }
+/* Nie ustawiaj position:relative — psuje GSAP pin (Lenis + transform). */
 #uslugi.is-visible.home-scene {
-  position: relative;
-  z-index: 10;
+  z-index: 14;
 }
 #uslugi.is-visible .home-scene__panel,
 #uslugi.is-visible .services-fan__stage {
@@ -281,21 +347,40 @@ html.is-shattering .home-cube-portal {
   display: block;
 }
 
-/* SHATTER — dedicated cube → sand beat */
+/* SHATTER marker 0px + jawny tor .cube-runway (bez GSAP pin-spacera) */
 .home-shatter.home-scene {
   padding-block: 0;
-  justify-content: center;
-  overflow: visible;
+  overflow: hidden;
   background: transparent;
   pointer-events: none;
 }
+html.is-free-scroll #rozpad.home-shatter.home-scene,
+html.is-free-scroll #rozpad.home-shatter.home-scene .home-scene__panel {
+  min-height: 0 !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden;
+}
+html.is-free-scroll .cube-runway {
+  height: 50vh;
+  height: 50dvh;
+  pointer-events: none;
+  visibility: hidden;
+}
+@media (max-width: 900px) {
+  html.is-free-scroll .cube-runway {
+    height: 40vh;
+    height: 40dvh;
+  }
+}
 .home-shatter .home-scene__panel {
-  min-height: 100dvh;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 0 var(--gutter) clamp(2.5rem, 6vh, 4rem);
-  box-sizing: border-box;
+  min-height: 0;
+  display: block;
+  padding: 0;
 }
 .home-shatter__caption {
   font-family: var(--font-mono);
@@ -330,7 +415,7 @@ html.reduce-motion .home-scene [data-enter] {
 .site-footer {
   position: relative;
   z-index: 2;
-  background: transparent;
+  background: var(--bg, #030303);
   overflow: hidden;
   box-sizing: border-box;
   min-height: 100svh;
@@ -341,12 +426,25 @@ html.reduce-motion .home-scene [data-enter] {
   padding: clamp(1.5rem, 4vh, 2.75rem) var(--gutter) clamp(1.75rem, 5vh, 3rem);
 }
 
-/* Stopka — bez dublowania audytu z #kontakt */
-html.is-footer-step #kontakt,
-html.is-footer-step #kontakt.is-footer-handoff {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+/* Wolny dojazd Kontakt → stopka */
+html.is-free-scroll .footer-runway {
+  height: 110vh;
+  height: 110dvh;
+  pointer-events: none;
+  visibility: hidden;
+}
+@media (max-width: 900px) {
+  html.is-free-scroll .footer-runway {
+    height: 90vh;
+    height: 90dvh;
+  }
+}
+
+/* Stopka — miękki handoff (opacity steruje JS, bez twardego cuta) */
+html.is-free-scroll #kontakt.home-depth,
+html.is-free-scroll #kontakt.is-footer-handoff {
+  transition: opacity 0.05s linear;
+  will-change: opacity;
 }
 html.is-footer-step .site-footer {
   position: relative;
@@ -676,6 +774,9 @@ html.reduce-motion .nav-overlay__char {
   width: 100%;
   max-width: calc(100vw - 2 * var(--gutter));
   margin: 0 auto;
+  /* kompensata trailing letter-spacing — optyczne wyśrodkowanie */
+  padding-left: 0.28em;
+  box-sizing: border-box;
   font-family: var(--font-display);
   font-size: clamp(2.75rem, calc((100vw - 2 * var(--gutter)) / 8), calc((100vw - 2 * var(--gutter)) / 8));
   font-weight: 700;
@@ -767,7 +868,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 /* SERVICES FAN */
 /* SERVICES FAN */
 .services-fan.is-services-rising {
-  /* legacy class cleared by JS — keep inert */
+  /* legacy — bez overlay / tła */
 }
 .services-fan.home-scene {
   overflow: visible !important;
@@ -1189,7 +1290,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   text-transform: uppercase;
 }
 
-/* REALIZACJE */
+/* REALIZACJE — bento grid */
 .home-work.home-scene {
   padding-block: clamp(5rem, 10dvh, 6.75rem);
   justify-content: center;
@@ -2468,13 +2569,26 @@ html.reduce-motion .home-scroll-rail { display: none; }
   .services-fan__hint { display: none; }
 }
 
-/* Subtle pointer / gyro tilt — never transform scroll-pinned sections or nav-overlay stage */
+/* Subtle pointer / gyro tilt — warstwa .home-tilt-layer obejmuje całe sekcje
+   (napisy + zdjęcia + kafelki). Nie transformujemy sticky section / GSAP panel. */
+.home-tilt-layer {
+  width: 100%;
+  transform-style: preserve-3d;
+}
+.home-scene__panel > .home-tilt-layer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: inherit;
+  align-items: inherit;
+  min-height: 0;
+  height: 100%;
+}
 html.has-global-tilt:not(.reduce-motion) .site-nav,
 html.has-global-tilt:not(.reduce-motion) .home-scroll-rail {
   transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
   transform-origin: 50vw 50vh;
 }
-/* Footer tilt only on desktop — on mobile it clips the bottom */
 @media (min-width: 901px) {
   html.has-global-tilt:not(.reduce-motion) .site-footer {
     transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
@@ -2482,14 +2596,10 @@ html.has-global-tilt:not(.reduce-motion) .home-scroll-rail {
   }
 }
 
-html.has-global-tilt:not(.reduce-motion) body.home-page .home-scene.is-in-view > .home-scene__panel > * {
+html.has-global-tilt:not(.reduce-motion) body.home-page .home-scene.is-in-view:not(.home-hero) > .home-scene__panel > .home-tilt-layer {
   transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
   transform-origin: 50vw 50vh;
-}
-@media (max-width: 900px) {
-  html.has-global-tilt:not(.reduce-motion) body.home-page .home-scene.is-in-view > .home-scene__panel > * {
-    transform: none;
-  }
+  will-change: transform;
 }
 
 body.is-nav-menu-open.is-cube-menu-front .nav-overlay__list a {

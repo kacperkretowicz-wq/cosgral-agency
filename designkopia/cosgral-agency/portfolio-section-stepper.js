@@ -1,11 +1,14 @@
 /**
- * Portfolio — slideshow scroll: jeden gest = jedna sekcja (kropka w kropkę).
+ * Portfolio — wolny ciągły scroll (jak homepage).
+ * Snap „jeden gest = jedna sekcja” wyłączony (FREE_SCROLL).
  */
 (function () {
   "use strict";
 
+  var FREE_SCROLL = true;
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
+  if (FREE_SCROLL) document.documentElement.classList.add("is-free-scroll");
   var HOLDS_CONFIG = [
     { id: "portfolio-top", selector: ".portfolio-hero" },
     { id: "strony", selector: "#strony" },
@@ -180,9 +183,17 @@
     function setScrollY(target, onDone) {
       var g = grafikiApi();
       if (g?.suspendHold) g.suspendHold(true);
-      window.scrollTo(0, target);
-      window.requestAnimationFrame(function () {
+      if (window.cosgralSmoothScroll?.lenis) {
+        window.cosgralSmoothScroll.lenis.scrollTo(target, { immediate: true });
+      } else {
         window.scrollTo(0, target);
+      }
+      window.requestAnimationFrame(function () {
+        if (window.cosgralSmoothScroll?.lenis) {
+          window.cosgralSmoothScroll.lenis.scrollTo(target, { immediate: true });
+        } else {
+          window.scrollTo(0, target);
+        }
         if (window.ScrollTrigger) ScrollTrigger.update();
         if (g?.suspendHold) g.suspendHold(false);
         if (onDone) onDone();
@@ -191,12 +202,24 @@
 
     function scrollToY(target, duration, immediate, onComplete) {
       if (scrollTween) scrollTween.kill();
+      if (window.cosgralSmoothScroll?.scrollTo && !immediate) {
+        var g = grafikiApi();
+        if (g?.suspendHold) g.suspendHold(true);
+        window.cosgralSmoothScroll.scrollTo(target, {
+          duration: duration || 1.1,
+          onComplete: function () {
+            if (g?.suspendHold) g.suspendHold(false);
+            if (onComplete) onComplete();
+          },
+        });
+        return;
+      }
       if (immediate || !duration) {
         setScrollY(target, onComplete);
         return;
       }
-      var g = grafikiApi();
-      if (g?.suspendHold) g.suspendHold(true);
+      var g2 = grafikiApi();
+      if (g2?.suspendHold) g2.suspendHold(true);
       var obj = { y: window.scrollY };
       scrollTween = gsap.to(obj, {
         y: target,
@@ -492,13 +515,26 @@
       }
     }
 
+    function syncIndexFromScroll() {
+      if (locked) return;
+      var y = window.cosgralSmoothScroll?.lenis
+        ? window.cosgralSmoothScroll.lenis.scroll
+        : window.scrollY || window.pageYOffset || 0;
+      var idx = nearestIndex(y);
+      if (idx !== activeIndex) {
+        activeIndex = idx;
+        syncStepView(activeIndex);
+      }
+    }
+
     function scheduleGuard() {
+      if (FREE_SCROLL) return;
       if (guardTimer) window.clearTimeout(guardTimer);
       guardTimer = window.setTimeout(enforceHold, 32);
     }
 
     function onWheel(e) {
-      if (REDUCED || shouldIgnore()) return;
+      if (FREE_SCROLL || REDUCED || shouldIgnore()) return;
 
       var range = autoFreeRange();
       if (range && (activeIndex === AUTO_IDX || inAutoFreeZone())) {
@@ -571,7 +607,7 @@
     window.addEventListener(
       "touchstart",
       function (e) {
-        if (!e.touches[0] || REDUCED || shouldIgnore()) return;
+        if (FREE_SCROLL || !e.touches[0] || REDUCED || shouldIgnore()) return;
         touchStartY = e.touches[0].clientY;
         touchLastY = touchStartY;
         touchAccum = 0;
@@ -583,7 +619,7 @@
     window.addEventListener(
       "touchmove",
       function (e) {
-        if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
+        if (FREE_SCROLL || !touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
         var y = e.touches[0].clientY;
         var dy = touchLastY - y;
         touchAccum += dy;
@@ -612,7 +648,7 @@
     window.addEventListener(
       "touchend",
       function () {
-        if (!touchActive) return;
+        if (FREE_SCROLL || !touchActive) return;
         touchActive = false;
         if (REDUCED || shouldIgnore() || !canStep()) {
           touchAccum = 0;
@@ -661,11 +697,21 @@
       { passive: true, capture: true }
     );
 
-    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
-
-    window.addEventListener("scroll", function () {
-      if (!locked) scheduleGuard();
-    }, { passive: true });
+    if (!FREE_SCROLL) {
+      window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (!locked) scheduleGuard();
+        },
+        { passive: true }
+      );
+    } else {
+      document.documentElement.classList.add("is-free-scroll");
+      var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+      if (lenis && lenis.on) lenis.on("scroll", syncIndexFromScroll);
+      else window.addEventListener("scroll", syncIndexFromScroll, { passive: true });
+    }
 
     window.addEventListener("cosgral:grafiki-beat", function (e) {
       afterGrafikiBeat(e.detail?.beat);
@@ -692,12 +738,13 @@
 
     activeIndex = nearestIndex(window.scrollY);
     syncStepView(activeIndex);
-    goTo(activeIndex, 0, true);
+    if (!FREE_SCROLL) goTo(activeIndex, 0, true);
     beginCooldown();
 
     window.cosgralPortfolioStepper = {
       holds: holds,
       refreshHolds: buildHolds,
+      freeScroll: FREE_SCROLL,
       goTo: function (index) {
         if (isSceneJump(activeIndex, index)) jumpTo(index);
         else goTo(index);

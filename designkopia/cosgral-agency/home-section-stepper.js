@@ -1,17 +1,20 @@
 /**
- * Slideshow scroll — jeden gest = jedna sekcja (kropka). Nigdy nie zatrzymuje między.
+ * Homepage scroll — wolny ciągły scroll (pin+scrub GSAP).
+ * Snap „jeden gest = jedna sekcja” wyłączony (FREE_SCROLL).
+ * API cosgralSectionSnap zostaje dla menu / rail / paneli.
  */
 (function () {
   "use strict";
 
+  var FREE_SCROLL = true;
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
   var HOLDS_CONFIG = [
     { stId: "hero-pin", hold: 0.52, id: "top" },
     { stId: "scene-uslugi", hold: 0.48, id: "uslugi" },
     { stId: "scene-realizacje", hold: 0.48, id: "realizacje" },
-    { stId: "scene-proces", hold: 0.48, id: "proces" },
     { stId: "scene-faq", hold: 0.48, id: "faq" },
+    { stId: "scene-proces", hold: 0.48, id: "proces" },
     { stId: "scene-kontakt", hold: 0.48, id: "kontakt" },
     { id: "footer", footer: true },
   ];
@@ -25,12 +28,32 @@
     return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
+  /** Stabilny top layoutu (sticky psuje offsetTop). */
+  function sectionLayoutTop(el) {
+    if (!el) return 0;
+    var parent = el.parentElement;
+    if (!parent) return Math.max(0, el.offsetTop || 0);
+    var y = 0;
+    for (var child = parent.firstElementChild; child && child !== el; child = child.nextElementSibling) {
+      y += child.offsetHeight || 0;
+    }
+    return y;
+  }
+
   function buildHolds() {
     var holds = [];
     HOLDS_CONFIG.forEach(function (cfg) {
       if (cfg.footer) {
         holds.push(footerHoldY());
         return;
+      }
+      /* Free-scroll + depth sticky: sumuj wysokości siblingów zamiast offsetTop/ST. */
+      if (FREE_SCROLL && cfg.id) {
+        var el = document.getElementById(cfg.id);
+        if (el) {
+          holds.push(Math.max(0, sectionLayoutTop(el)));
+          return;
+        }
       }
       var st = ScrollTrigger.getById(cfg.stId);
       if (st) holds.push(holdY(st, cfg.hold));
@@ -199,6 +222,7 @@
     }
 
     function ensureScenePanelVisible(index) {
+      if (FREE_SCROLL) return;
       var cfg = HOLDS_CONFIG[index];
       if (!cfg || cfg.footer) return;
       var section = document.getElementById(cfg.id);
@@ -242,15 +266,25 @@
     }
 
     function syncStepView(index) {
-      var isFooter = index === holds.length - 1;
-      document.documentElement.classList.toggle("is-footer-step", isFooter);
-      if (isFooter && window.gsap) {
+      var footer = document.querySelector(".site-footer");
+      var contact = document.getElementById("kontakt");
+      if (!footer) return;
+
+      var vh = window.innerHeight || 1;
+      var footerTop = footer.getBoundingClientRect().top;
+      var p = 1 - Math.max(0, Math.min(1, footerTop / vh));
+      var fade = p * p * (3 - 2 * p);
+
+      /* Opacity prowadzi footer-handoff w section-flow; tu tylko klasy / enter */
+      if (contact) contact.classList.toggle("is-footer-handoff", fade > 0.08);
+
+      var footerDominant = fade > 0.45;
+      document.documentElement.classList.toggle("is-footer-step", footerDominant);
+      if (footerDominant && window.gsap) {
         window.gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
           window.gsap.set(el, { autoAlpha: 1, y: 0, clearProps: "filter" });
         });
       }
-      var contact = document.getElementById("kontakt");
-      if (contact) contact.classList.toggle("is-footer-handoff", isFooter);
     }
 
     function scenePanel(index) {
@@ -297,6 +331,8 @@
       var section = document.getElementById(cfg.id);
       if (!section) return;
       section.classList.add("is-in-view", "is-entered", "is-visible");
+      /* Free scroll: nie ruszaj transformów panelu — depth scrub w section-flow */
+      if (FREE_SCROLL) return;
       if (window.cosgralSceneEnters?.ensurePanel) {
         window.cosgralSceneEnters.ensurePanel(section);
       }
@@ -320,6 +356,36 @@
       var fromIndex = activeIndex;
 
       if (index === activeIndex && Math.abs(lenis.scroll - target) < 4) return;
+
+      /* Free scroll: płynny dojazd bez kurtyny — cinema scrubuje się po drodze.
+         Natychmiastowy skok (brak GSAP) nadal synchronizuje sand. */
+      if (FREE_SCROLL) {
+        if (!window.gsap) {
+          goTo(index, 0, true);
+          return;
+        }
+        locked = true;
+        wheelAccum = 0;
+        activeIndex = index;
+        syncStepView(index);
+        syncSectionFocus(index);
+        lenis.scrollTo(target, {
+          duration: MOBILE ? 0.95 : 1.15,
+          easing: easeOutCubic,
+          onComplete: function () {
+            locked = false;
+            beginCooldown();
+            if (index === 0 && window.cosgralRestoreHero) window.cosgralRestoreHero();
+            if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+          },
+        });
+        window.dispatchEvent(
+          new CustomEvent("cosgral:section-step", {
+            detail: { index: index, id: HOLDS_CONFIG[index]?.id || null },
+          })
+        );
+        return;
+      }
 
       if (!window.gsap) {
         goTo(index, 0, true);
@@ -367,8 +433,13 @@
           var scene = toPanel.closest(".home-scene");
           if (scene) scene.classList.add("is-entered", "is-visible");
           gsap.set(toPanel, { autoAlpha: 1, scale: 1, filter: MOBILE ? "none" : "blur(0px)", y: 0 });
-          if (scene && window.cosgralSceneEnters?.play) {
-            window.cosgralSceneEnters.play(scene, { stagger: true, force: true });
+          if (scene && window.cosgralSceneEnters) {
+            if (index > fromIndex) {
+              window.cosgralSceneEnters.reset(scene);
+              window.cosgralSceneEnters.play(scene, { stagger: true, force: true });
+            } else if (window.cosgralSceneEnters.snap) {
+              window.cosgralSceneEnters.snap(scene);
+            }
           }
         }
       }, 0.4);
@@ -400,19 +471,25 @@
         return;
       }
 
-      locked = true;
       activeIndex = index;
       syncStepView(index);
       syncSectionFocus(index);
       clearScrollUnlockWatch();
 
-      var scrollDuration = immediate ? 0 : duration != null ? duration : stepDurationDown(fromIndex, index);
+      var scrollDuration = immediate ? 0 : duration != null ? duration : (FREE_SCROLL ? 1.1 : stepDurationDown(fromIndex, index));
 
-      if (index === 0 && fromIndex !== 0) {
-        syncSandForJump(0);
-      } else if (fromIndex === 0 && index >= 1) {
-        playHeroToServicesHandoff(scrollDuration > 0.05 ? scrollDuration * 0.42 : 2.2);
-      } else if (index >= 1 && fromIndex >= 1) {
+      /* Free scroll: nie forsuj cinema — ScrollTrigger (#rozpad) scrubuje sześcian.
+         Tylko immediate (boot / hash) ustawia stan sand od razu. */
+      if (!FREE_SCROLL) {
+        locked = true;
+        if (index === 0 && fromIndex !== 0) {
+          syncSandForJump(0);
+        } else if (fromIndex === 0 && index >= 1) {
+          playHeroToServicesHandoff(scrollDuration > 0.05 ? scrollDuration * 0.42 : 2.2);
+        } else if (index >= 1 && fromIndex >= 1) {
+          syncSandForJump(index);
+        }
+      } else if (immediate) {
         syncSandForJump(index);
       }
 
@@ -420,8 +497,12 @@
         immediate: !!immediate,
         duration: scrollDuration,
         easing: easeOutCubic,
-        lock: true,
+        lock: FREE_SCROLL ? false : true,
         onComplete: function () {
+          if (FREE_SCROLL) {
+            if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+            return;
+          }
           if (Math.abs(lenis.scroll - target) > 2) {
             lenis.scrollTo(target, { immediate: true });
           }
@@ -439,7 +520,7 @@
         },
       });
 
-      if (!immediate && scrollDuration > 0.05) {
+      if (!FREE_SCROLL && !immediate && scrollDuration > 0.05) {
         watchScrollUnlock(target);
       }
 
@@ -449,7 +530,7 @@
         })
       );
 
-      if (index === 0 && fromIndex !== 0 && window.cosgralRestoreHero) {
+      if (index === 0 && fromIndex !== 0 && window.cosgralRestoreHero && (FREE_SCROLL ? immediate : true)) {
         window.cosgralRestoreHero();
       }
     }
@@ -457,26 +538,27 @@
     function stepUp() {
       if (!canStep()) return;
       if (activeIndex <= 0) {
-        goTo(0, SNAP_MS);
+        goTo(0, FREE_SCROLL ? 0.9 : SNAP_MS);
         return;
       }
       var target = activeIndex - 1;
-      if (target === 0) syncSandForJump(0);
-      goTo(target, stepDurationUp(activeIndex, target));
+      if (!FREE_SCROLL && target === 0) syncSandForJump(0);
+      goTo(target, FREE_SCROLL ? 0.95 : stepDurationUp(activeIndex, target));
       lastCommitDir = -1;
     }
 
     function stepDown() {
       if (!canStep()) return;
       if (activeIndex >= holds.length - 1) {
-        goTo(activeIndex, SNAP_MS);
+        goTo(activeIndex, FREE_SCROLL ? 0.9 : SNAP_MS);
         return;
       }
-      goTo(activeIndex + 1);
+      goTo(activeIndex + 1, FREE_SCROLL ? 1.05 : undefined);
       lastCommitDir = 1;
     }
 
     function enforceHold() {
+      if (FREE_SCROLL) return;
       if (locked || formFocusLock || Date.now() < cooldownUntil) return;
       holds = buildHolds();
       var idx = nearestIndex(lenis.scroll);
@@ -489,12 +571,30 @@
     }
 
     function scheduleGuard() {
+      if (FREE_SCROLL) return;
       if (guardTimer) window.clearTimeout(guardTimer);
       if (formFocusLock) return;
       guardTimer = window.setTimeout(enforceHold, 32);
     }
 
+    function syncIndexFromScroll() {
+      holds = buildHolds();
+      var idx = nearestIndex(lenis.scroll);
+      /* Zawsze odśwież handoff stopki (zależny od rect, nie tylko indeksu). */
+      syncStepView(idx);
+      if (idx === activeIndex) return;
+      activeIndex = idx;
+      syncSectionFocus(idx);
+      window.dispatchEvent(
+        new CustomEvent("cosgral:section-step", {
+          detail: { index: idx, id: HOLDS_CONFIG[idx]?.id || null },
+        })
+      );
+      if (window.cosgralScrollRail?.refresh) window.cosgralScrollRail.refresh();
+    }
+
     function onWheel(e) {
+      if (FREE_SCROLL) return;
       if (REDUCED || shouldIgnore()) return;
       if (isFanHorizontalWheel(e)) return;
 
@@ -573,100 +673,105 @@
     var touchIgnoreStep = false; // poziomy swipe w Usługach — tylko kafelki
     var touchFromUslugi = false;
 
-    window.addEventListener(
-      "touchstart",
-      function (e) {
-        if (!e.touches[0] || REDUCED || shouldIgnore()) return;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        touchLastY = touchStartY;
-        touchAccum = 0;
-        touchIgnoreStep = false;
-        touchFromUslugi =
-          activeIndex === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
-        touchActive = true;
-      },
-      { passive: true, capture: true }
-    );
-
-    window.addEventListener(
-      "touchmove",
-      function (e) {
-        if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
-        var x = e.touches[0].clientX;
-        var y = e.touches[0].clientY;
-        var dx = x - touchStartX;
-        var dy = y - touchStartY;
-
-        // Usługi: tylko wyraźny gest w poziomie = kafelki (nie sekcja).
-        // Pion zawsze jak wcześniej: preventDefault + snap do holdów.
-        if (
-          touchFromUslugi &&
-          !touchIgnoreStep &&
-          Math.abs(dx) > 18 &&
-          Math.abs(dx) > Math.abs(dy) * 1.45
-        ) {
-          touchIgnoreStep = true;
+    if (!FREE_SCROLL) {
+      window.addEventListener(
+        "touchstart",
+        function (e) {
+          if (!e.touches[0] || REDUCED || shouldIgnore()) return;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          touchLastY = touchStartY;
           touchAccum = 0;
-          return;
-        }
+          touchIgnoreStep = false;
+          touchFromUslugi =
+            activeIndex === uslugiIdx || pointInUslugiSection(touchStartX, touchStartY);
+          touchActive = true;
+        },
+        { passive: true, capture: true }
+      );
 
-        if (touchIgnoreStep) return;
+      window.addEventListener(
+        "touchmove",
+        function (e) {
+          if (!touchActive || !e.touches[0] || REDUCED || shouldIgnore()) return;
+          var x = e.touches[0].clientX;
+          var y = e.touches[0].clientY;
+          var dx = x - touchStartX;
+          var dy = y - touchStartY;
 
-        touchAccum += touchLastY - y;
-        touchLastY = y;
-        e.preventDefault();
-      },
-      { passive: false, capture: true }
-    );
+          if (
+            touchFromUslugi &&
+            !touchIgnoreStep &&
+            Math.abs(dx) > 18 &&
+            Math.abs(dx) > Math.abs(dy) * 1.45
+          ) {
+            touchIgnoreStep = true;
+            touchAccum = 0;
+            return;
+          }
 
-    window.addEventListener(
-      "touchend",
-      function () {
-        if (!touchActive) return;
-        touchActive = false;
-        if (REDUCED || shouldIgnore() || touchIgnoreStep) {
+          if (touchIgnoreStep) return;
+
+          touchAccum += touchLastY - y;
+          touchLastY = y;
+          e.preventDefault();
+        },
+        { passive: false, capture: true }
+      );
+
+      window.addEventListener(
+        "touchend",
+        function () {
+          if (!touchActive) return;
+          touchActive = false;
+          if (REDUCED || shouldIgnore() || touchIgnoreStep) {
+            touchAccum = 0;
+            touchIgnoreStep = false;
+            touchFromUslugi = false;
+            return;
+          }
+          if (!canStep()) {
+            touchAccum = 0;
+            touchFromUslugi = false;
+            return;
+          }
+          var min = touchFromUslugi ? TOUCH_USLUGI_STEP_MIN : WHEEL_MIN;
+          if (Math.abs(touchAccum) < min) {
+            touchAccum = 0;
+            touchFromUslugi = false;
+            return;
+          }
+          var dir = touchAccum > 0 ? 1 : -1;
+          touchAccum = 0;
+          touchFromUslugi = false;
+          if (dir > 0) stepDown();
+          else stepUp();
+        },
+        { passive: true, capture: true }
+      );
+
+      window.addEventListener(
+        "touchcancel",
+        function () {
+          touchActive = false;
           touchAccum = 0;
           touchIgnoreStep = false;
           touchFromUslugi = false;
-          return;
-        }
-        if (!canStep()) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var min = touchFromUslugi ? TOUCH_USLUGI_STEP_MIN : WHEEL_MIN;
-        if (Math.abs(touchAccum) < min) {
-          touchAccum = 0;
-          touchFromUslugi = false;
-          return;
-        }
-        var dir = touchAccum > 0 ? 1 : -1;
-        touchAccum = 0;
-        touchFromUslugi = false;
-        if (dir > 0) stepDown();
-        else stepUp();
-      },
-      { passive: true, capture: true }
-    );
+        },
+        { passive: true, capture: true }
+      );
 
-    window.addEventListener(
-      "touchcancel",
-      function () {
-        touchActive = false;
-        touchAccum = 0;
-        touchIgnoreStep = false;
-        touchFromUslugi = false;
-      },
-      { passive: true, capture: true }
-    );
+      window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    }
 
-    lenis.on("scroll", function () {
-      if (!locked) scheduleGuard();
-    });
-
-    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    if (FREE_SCROLL) {
+      document.documentElement.classList.add("is-free-scroll");
+      lenis.on("scroll", syncIndexFromScroll);
+    } else {
+      lenis.on("scroll", function () {
+        if (!locked) scheduleGuard();
+      });
+    }
 
     document.querySelectorAll('a[href^="#"]').forEach(function (link) {
       link.addEventListener(
@@ -717,6 +822,7 @@
 
     window.cosgralSectionSnap = {
       holds: holds,
+      freeScroll: FREE_SCROLL,
       refreshHolds: buildHolds,
       goTo: function (index, duration, immediate) {
         goTo(index, duration, immediate);
@@ -728,6 +834,10 @@
         jumpTo(index);
       },
       goToY: function (y) {
+        if (FREE_SCROLL) {
+          lenis.scrollTo(y, { duration: 1.0, easing: easeOutCubic });
+          return;
+        }
         goTo(nearestIndex(y));
       },
       goToFooter: function () {

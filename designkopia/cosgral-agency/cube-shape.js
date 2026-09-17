@@ -130,7 +130,7 @@ export function createIntactCubeParts(half) {
   var shellMat = new THREE.MeshBasicMaterial({
     color: 0x080808,
     transparent: true,
-    opacity: 0.62,
+    opacity: 0.35,
     depthWrite: true,
     polygonOffset: true,
     polygonOffsetFactor: 1,
@@ -144,7 +144,7 @@ export function createIntactCubeParts(half) {
     new THREE.LineBasicMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.44,
+      opacity: 0.95,
       depthWrite: false,
     })
   );

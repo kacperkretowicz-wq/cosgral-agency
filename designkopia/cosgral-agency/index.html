@@ -11,8 +11,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="cosgral-build" content="20260916a" />
-<script src="site-cache-bust.js?v=20260831e"></script>
+<meta name="cosgral-build" content="20260917ag" />
+<script src="site-cache-bust.js?v=20260917ad"></script>
 <title>COSGRAL — agencja cyfrowa | strony, aplikacje, CRM, automatyzacje</title>
 <meta name="description" content="COSGRAL — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo. Budujemy produkty cyfrowe i systemy dla firm." />
 <link rel="canonical" href="https://cosgral.pl/" />
@@ -49,7 +49,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260916a" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260917ag" />
 <link rel="stylesheet" href="theme-mode.css?v=20260831f" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
@@ -144,8 +144,8 @@
         <li><a href="#top" data-nav-close data-i18n="nav.start">Start</a></li>
         <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
         <li><a href="#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
-        <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
         <li><a href="#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
       </ul>
@@ -178,12 +178,13 @@
   </div>
 </section>
 
-<!-- 2. ROZPAD — tylko przejście sześcian → piasek (bez treści UI) -->
-<section id="rozpad" class="home-shatter home-scene" aria-label="Rozpad formy" aria-hidden="true">
+<!-- 2. Tor animacji sześcianu → Usługi zaraz potem -->
+<section id="rozpad" class="home-shatter home-scene" aria-hidden="true">
   <div class="home-scene__panel"></div>
 </section>
+<div class="cube-runway" id="cube-runway" aria-hidden="true"></div>
 
-<!-- 3. USŁUGI — kafelki z oddali -->
+<!-- 3. USŁUGI -->
 <section id="uslugi" class="services-fan home-scene">
   <div class="home-scene__panel">
   <div class="container services-fan__head">
@@ -275,7 +276,7 @@
   </div>
 </section>
 
-<!-- 4. REALIZACJE — podgląd + link do portfolio -->
+<!-- 4. REALIZACJE -->
 <section id="realizacje" class="home-work home-scene">
   <div class="home-scene__panel">
   <div class="container home-work__head">
@@ -329,7 +330,35 @@
   </div>
 </section>
 
-<!-- 5. WORKFLOW -->
+<!-- 5. FAQ -->
+<section id="faq" class="home-faq home-scene">
+  <div class="home-scene__panel">
+  <h2 class="home-faq__title" data-reveal-words data-i18n="faq.title">Najczęstsze pytania</h2>
+  <div class="faq-item" data-open="false" data-enter="left">
+    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
+      <span data-i18n="faq.q1">Ile kosztuje wdrożenie CRM lub nowej strony?</span>
+      <span class="faq-item__icon" aria-hidden="true">+</span>
+    </button>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a1">Koszt zależy od zakresu: landing page, strona firmowa, CRM lub automatyzacja mają inną skalę. Po krótkim audycie otrzymujesz wycenę i plan realizacji.</p></div></div>
+  </div>
+  <div class="faq-item" data-open="false" data-enter="right">
+    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
+      <span data-i18n="faq.q2">Ile potrwa realizacja?</span>
+      <span class="faq-item__icon" aria-hidden="true">+</span>
+    </button>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a2">Landing page: ok. 2–3 tygodnie. Strona firmowa: ok. 4–6 tygodni. CRM lub automatyzacja: zwykle 3–8 tygodni — zależnie od integracji i złożoności.</p></div></div>
+  </div>
+  <div class="faq-item" data-open="false" data-enter="bottom">
+    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
+      <span data-i18n="faq.q3">Czy muszę znać się na technologii?</span>
+      <span class="faq-item__icon" aria-hidden="true">+</span>
+    </button>
+    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a3">Nie. Po stronie klienta wystarczą cele biznesowe i decyzje. Stronę techniczną prowadzimy my i komunikujemy ją jasno.</p></div></div>
+  </div>
+  </div>
+</section>
+
+<!-- 6. WORKFLOW -->
 <section id="proces" class="home-process home-scene">
   <div class="home-scene__panel">
   <div class="container">
@@ -366,34 +395,6 @@
         <p class="home-process__step-body" data-i18n="process.step4_body">Szkolimy zespół, przekazujemy dokumentację i zapewniamy wsparcie po wdrożeniu.</p>
       </div>
     </div>
-  </div>
-  </div>
-</section>
-
-<!-- 6. FAQ -->
-<section id="faq" class="home-faq home-scene">
-  <div class="home-scene__panel">
-  <h2 class="home-faq__title" data-reveal-words data-i18n="faq.title">Najczęstsze pytania</h2>
-  <div class="faq-item" data-open="false" data-enter="left">
-    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-      <span data-i18n="faq.q1">Ile kosztuje wdrożenie CRM lub nowej strony?</span>
-      <span class="faq-item__icon" aria-hidden="true">+</span>
-    </button>
-    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a1">Koszt zależy od zakresu: landing page, strona firmowa, CRM lub automatyzacja mają inną skalę. Po krótkim audycie otrzymujesz wycenę i plan realizacji.</p></div></div>
-  </div>
-  <div class="faq-item" data-open="false" data-enter="right">
-    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-      <span data-i18n="faq.q2">Ile potrwa realizacja?</span>
-      <span class="faq-item__icon" aria-hidden="true">+</span>
-    </button>
-    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a2">Landing page: ok. 2–3 tygodnie. Strona firmowa: ok. 4–6 tygodni. CRM lub automatyzacja: zwykle 3–8 tygodni — zależnie od integracji i złożoności.</p></div></div>
-  </div>
-  <div class="faq-item" data-open="false" data-enter="bottom">
-    <button class="faq-item__q" data-faq-toggle aria-expanded="false">
-      <span data-i18n="faq.q3">Czy muszę znać się na technologii?</span>
-      <span class="faq-item__icon" aria-hidden="true">+</span>
-    </button>
-    <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a3">Nie. Po stronie klienta wystarczą cele biznesowe i decyzje. Stronę techniczną prowadzimy my i komunikujemy ją jasno.</p></div></div>
   </div>
   </div>
 </section>
@@ -457,6 +458,8 @@
 
 </main>
 
+<div class="footer-runway" id="footer-runway" aria-hidden="true"></div>
+
 <footer class="site-footer">
   <div class="site-footer__ambient" aria-hidden="true"></div>
   <div class="site-footer__rule" aria-hidden="true"><span></span></div>
@@ -470,8 +473,8 @@
         <li><a href="#top" data-i18n="nav.start">Start</a></li>
         <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
         <li><a href="#uslugi" data-i18n="nav.services">Usługi</a></li>
-        <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
         <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
         <li><a href="o-nas.html" data-i18n="nav.about">O nas</a></li>
         <li><a href="#kontakt" data-i18n="nav.contact">Kontakt</a></li>
       </ul>
@@ -522,20 +525,20 @@
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js?v=20260825x"></script>
 <script src="preloader.js?v=20260831c"></script>
-<script src="smooth-scroll.js?v=20260831e"></script>
+<script src="smooth-scroll.js?v=20260917ad"></script>
 <script src="cosgral-perf.js?v=20260901a"></script>
-<script src="home-cursor-field.js?v=20260916a"></script>
-<script src="home-ambient-bg.js?v=20260916a"></script>
-<script type="module" src="home-hero-3d.js?v=20260916a"></script>
-<script src="home-cursor.js?v=20260916a"></script>
+<script src="home-cursor-field.js?v=20260917ad"></script>
+<script src="home-ambient-bg.js?v=20260917ad"></script>
+<script type="module" src="home-hero-3d.js?v=20260917ad"></script>
+<script src="home-cursor.js?v=20260917ad"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
 <script src="home-services-fan.js?v=20260831b"></script>
-<script src="home-section-flow.js?v=20260831b"></script>
-<script src="home-scroll-rail.js?v=20260831c"></script>
-<script src="home-section-stepper.js?v=20260831c"></script>
+<script src="home-section-flow.js?v=20260917ad"></script>
+<script src="home-scroll-rail.js?v=20260917ad"></script>
+<script src="home-section-stepper.js?v=20260917ad"></script>
 <script src="home-director.js?v=20260815a"></script>
-<script src="home-tile-interact.js?v=20260916a"></script>
+<script src="home-tile-interact.js?v=20260917ag"></script>
 <script defer src="home-nav-menu.js?v=20260816at"></script>
 </body>
 </html>

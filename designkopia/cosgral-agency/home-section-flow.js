@@ -67,6 +67,11 @@
     if (!scene || REDUCED) return;
     var panel = panelOf(scene);
     if (!panel || !window.gsap) return;
+    /* Free-scroll depth stack: nie nadpisuj scrubowanych scale/blur/y */
+    if (document.documentElement.classList.contains("is-free-scroll")) {
+      scene.classList.add("is-entered", "is-visible");
+      return;
+    }
     gsap.set(panel, {
       autoAlpha: 1,
       scale: 1,
@@ -113,12 +118,47 @@
     });
   }
 
+  function snapSceneEntersVisible(scene) {
+    if (!scene || !window.gsap) return;
+    enteredScenes.add(scene);
+    var targets = sceneEnterTargets(scene);
+    if (!targets.length) return;
+    gsap.killTweensOf(targets);
+    gsap.set(targets, {
+      autoAlpha: 1,
+      x: 0,
+      y: 0,
+      filter: "none",
+    });
+  }
+
+  function resetSceneEnters(scene) {
+    if (!scene) return;
+    enteredScenes.delete(scene);
+    if (!window.gsap || REDUCED) return;
+    var targets = sceneEnterTargets(scene);
+    if (!targets.length) return;
+    gsap.killTweensOf(targets);
+    targets.forEach(function (el) {
+      var dir =
+        el.getAttribute("data-enter") ||
+        (el.parentElement && el.parentElement.getAttribute("data-enter")) ||
+        "bottom";
+      var from = enterFrom(dir);
+      gsap.set(el, {
+        autoAlpha: 0,
+        x: from.x,
+        y: from.y,
+        filter: MOBILE ? "none" : "blur(8px)",
+      });
+    });
+  }
+
   window.cosgralSceneEnters = {
     play: playSceneEnters,
+    snap: snapSceneEntersVisible,
+    reset: resetSceneEnters,
     ensurePanel: ensureScenePanelVisible,
-    reset: function (scene) {
-      if (scene) enteredScenes.delete(scene);
-    },
   };
 
   function panelOf(scene) {
@@ -182,7 +222,14 @@
     },
   };
 
-  /** Pinowana scena: ciemność → zoom in → długa pauza → ciemność */
+  /**
+   * Warstwowy stack od Usług (sticky, bez GSAP pin):
+   * sekcja trzyma się top:0, kolejna wjeżdża od dołu z wyższym z-index.
+   * Blur/scale = scrub 1:1 do pozycji następnej (cover 0→1).
+   * Scroll w górę = ten sam scrub wstecz — bez teleportów / klonów.
+   */
+  var depthStackIndex = 0;
+
   function wireScene(scene, opts) {
     if (!scene || REDUCED) {
       if (scene) scene.classList.add("is-entered", "is-visible");
@@ -191,90 +238,225 @@
 
     opts = opts || {};
     var panel = panelOf(scene);
-    var pinLen = opts.pin || (MOBILE ? "+=88%" : "+=108%");
     var fadeOut = opts.fadeOut !== false;
+    var depth = opts.depth !== false;
+    var next = opts.next || null;
+    var stackZ = 20 + depthStackIndex++ * 10;
+    var holdEnd = 0.04;
+    /* Do końca cover → znika w oddali (scale↓ blur↑ alpha→0), żeby nie zostawała pod kolejną */
+    var exitScale = opts.exitScale != null ? opts.exitScale : MOBILE ? 0.78 : 0.68;
+    var exitBlur = opts.exitBlur != null ? opts.exitBlur : MOBILE ? 10 : 20;
+    var exitAlpha = opts.exitAlpha != null ? opts.exitAlpha : 0;
+    var exitY = opts.exitY != null ? opts.exitY : MOBILE ? -4 : -8;
+    var hideWhenGone = opts.hideWhenGone !== false;
+
+    scene.classList.add("home-depth");
+    scene.style.setProperty("--depth-z", String(stackZ));
+    scene.style.zIndex = String(stackZ);
+
+    function easeInOut(t) {
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+
+    function coverAmount() {
+      if (!next) return 0;
+      var top = next.getBoundingClientRect().top;
+      var vh = window.innerHeight || 1;
+      /* next już na górze lub wyżej = pełne przykrycie */
+      if (top <= 0) return 1;
+      return 1 - Math.max(0, Math.min(1, top / vh));
+    }
+
+    function applyPose(p) {
+      p = Math.max(0, Math.min(1, p));
+      if (!depth || !fadeOut) {
+        gsap.set(panel, {
+          autoAlpha: 1,
+          yPercent: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          force3D: true,
+        });
+        scene.classList.toggle("is-depth-recessed", false);
+        return;
+      }
+      if (p <= holdEnd) {
+        gsap.set(panel, {
+          autoAlpha: 1,
+          yPercent: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          force3D: true,
+        });
+        gsap.set(scene, { autoAlpha: 1 });
+        scene.classList.remove("is-depth-recessed", "is-depth-gone");
+        scene.style.pointerEvents = "";
+        return;
+      }
+      var u = easeInOut((p - holdEnd) / Math.max(1 - holdEnd, 0.001));
+      /* Pod koniec przyspiesz zanik — w połowie jeszcze widać, przy cover=1 już nie */
+      var fade = u * u;
+      gsap.set(panel, {
+        autoAlpha: 1 - (1 - exitAlpha) * fade,
+        yPercent: exitY * u,
+        scale: 1 - (1 - exitScale) * u,
+        filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
+        force3D: true,
+      });
+      scene.classList.add("is-depth-recessed");
+      if (hideWhenGone && u >= 0.98) {
+        scene.classList.add("is-depth-gone");
+        scene.style.pointerEvents = "none";
+        gsap.set(scene, { autoAlpha: 0 });
+        gsap.set(panel, { autoAlpha: 0, filter: "blur(0px)" });
+      } else {
+        scene.classList.remove("is-depth-gone");
+        gsap.set(scene, { autoAlpha: 1 });
+        scene.style.pointerEvents = u > 0.9 ? "none" : "";
+      }
+    }
 
     gsap.set(panel, {
-      autoAlpha: 0,
-      scale: MOBILE ? 1.04 : 1.07,
-      filter: MOBILE ? "none" : "blur(14px)",
+      autoAlpha: 1,
+      yPercent: 0,
+      scale: 1,
+      filter: "blur(0px)",
+      transformOrigin: "50% 42%",
+      force3D: true,
     });
+    /* Start ukryty — animacja tylko przy pierwszym wjeździe w dół */
+    resetSceneEnters(scene);
 
-    var tl = gsap.timeline({
-      scrollTrigger: {
-        id: opts.id || scene.id,
-        trigger: scene,
-        start: "top top",
-        end: pinLen,
-        pin: true,
-        pinSpacing: true,
-        scrub: MOBILE ? 1.2 : 1.5,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        refreshPriority: opts.priority || 1,
-        onEnter: function () {
-          scene.classList.add("is-entered", "is-visible");
-          playSceneEnters(scene, { stagger: true });
-          if (opts.onEnter) opts.onEnter();
-        },
-        onEnterBack: function () {
-          scene.classList.add("is-entered", "is-visible");
-          playSceneEnters(scene, { stagger: true, force: true });
-          if (opts.onEnterBack) opts.onEnterBack();
-        },
-        onLeave: function () {
-          scene.classList.remove("is-visible");
-          if (opts.onLeave) opts.onLeave();
-        },
-        onLeaveBack: function () {
-          scene.classList.remove("is-visible");
-          if (opts.onLeaveBack) opts.onLeaveBack();
-        },
+    /* Wejście w viewport — bez pina */
+    ScrollTrigger.create({
+      id: opts.id || scene.id,
+      trigger: scene,
+      start: opts.enterStart || "top 92%",
+      end: "bottom top",
+      invalidateOnRefresh: true,
+      refreshPriority: opts.priority || 1,
+      onEnter: function () {
+        scene.classList.add("is-entered", "is-visible", "is-depth-active");
+        playSceneEnters(scene, { stagger: true });
+        if (opts.onEnter) opts.onEnter();
+      },
+      onEnterBack: function () {
+        /* Scroll w górę: bez animacji, od razu stan końcowy */
+        scene.classList.add("is-entered", "is-visible", "is-depth-active");
+        snapSceneEntersVisible(scene);
+        if (opts.onEnterBack) opts.onEnterBack();
+      },
+      onLeave: function () {
+        scene.classList.remove("is-depth-active");
+        if (opts.onLeave) opts.onLeave();
+      },
+      onLeaveBack: function () {
+        scene.classList.remove("is-visible", "is-depth-active");
+        resetSceneEnters(scene);
+        applyPose(0);
+        if (opts.onLeaveBack) opts.onLeaveBack();
       },
     });
 
-    // 0–12%: szybki wjazd z ciemności
-    tl.to(
-      panel,
-      {
-        autoAlpha: 1,
-        scale: 1,
-        filter: MOBILE ? "none" : "blur(0px)",
-        duration: 0.12,
-        ease: "power3.out",
-      },
-      0
-    );
-
-    if (curtain) {
-      tl.to(curtain, { autoAlpha: 0.78, duration: 0.05, ease: "power1.in" }, 0)
-        .to(curtain, { autoAlpha: 0, duration: 0.1, ease: "power2.out" }, 0.05);
-    }
-
-    // 12–84%: długa pauza na treści
-    tl.to(panel, { autoAlpha: 1, scale: 1, duration: 0.72, ease: "none" }, 0.12);
-
-    if (fadeOut) {
-      // 84–100%: szybki zjazd w ciemność
-      tl.to(
-        panel,
-        {
-          autoAlpha: 0,
-          scale: MOBILE ? 0.96 : 0.94,
-          filter: MOBILE ? "none" : "blur(12px)",
-          duration: 0.16,
-          ease: "power3.in",
-        },
-        0.84
-      );
-      if (curtain) {
-        tl.to(curtain, { autoAlpha: 0.88, duration: 0.12, ease: "power3.in" }, 0.88);
+    /* Recess z live rect następnej — pełny zakres scrolla, bo sticky psuje
+       start/end ST i zostawiał lukę (Kontakt na ostrym Procesie). */
+    if (fadeOut && next) {
+      function syncCover() {
+        var amt = coverAmount();
+        applyPose(amt);
+        if (opts.onUpdate) opts.onUpdate({ progress: amt });
       }
-    } else {
-      tl.to(panel, { autoAlpha: 1, duration: 0.16, ease: "none" }, 0.84);
+      ScrollTrigger.create({
+        id: (opts.id || scene.id) + "-cover",
+        start: 0,
+        end: "max",
+        invalidateOnRefresh: true,
+        refreshPriority: (opts.priority || 1) + 1,
+        onUpdate: syncCover,
+        onRefresh: syncCover,
+      });
+    }
+  }
+
+  /**
+   * Horizontal swipe: leaveLayers lecą w lewo, enter wjeżdża z prawej (scrub 1:1).
+   * progress z live getBoundingClientRect — odporne na offset ST/Lenis.
+   */
+  function wireHorizontalSwipe(opts) {
+    opts = opts || {};
+    var leave = (opts.leave || []).filter(Boolean);
+    var enter = opts.enter;
+    var runway = opts.runway || null;
+    if (!enter || !leave.length || REDUCED) return;
+
+    if (runway) {
+      runway.classList.add("home-swipe-runway");
+      runway.classList.remove("home-depth");
     }
 
-    return tl;
+    leave.forEach(function (el) {
+      el.classList.add("is-swipe-layer");
+    });
+    enter.classList.add("home-depth", "is-swipe-layer", "is-swipe-enter");
+    if (!enter.style.getPropertyValue("--depth-z")) {
+      var z = 20 + depthStackIndex++ * 10;
+      enter.style.setProperty("--depth-z", String(z));
+      enter.style.zIndex = String(z);
+    }
+
+    var travel = window.innerHeight;
+    function measureTravel() {
+      travel = window.innerHeight || 1;
+    }
+
+    function swipeProgress() {
+      var workEl = leave[leave.length - 1];
+      var workTop = workEl.getBoundingClientRect().top;
+      var faqTop = enter.getBoundingClientRect().top;
+      var vh = window.innerHeight || 1;
+      /* Czekaj aż Realizacje dojdą do góry — potem faqTop: vh→0 */
+      if (workTop > 2) return 0;
+      return 1 - Math.max(0, Math.min(1, faqTop / vh));
+    }
+
+    function applySwipe(p) {
+      p = Math.max(0, Math.min(1, p));
+      var ease = p; /* liniowo = synchroniczny swipe ze scrollem */
+      var w = window.innerWidth;
+      leave.forEach(function (el) {
+        gsap.set(el, { x: -ease * w, force3D: true });
+      });
+      gsap.set(enter, { x: (1 - ease) * w, force3D: true });
+      if (p > 0.08) {
+        enter.classList.add("is-entered", "is-visible", "is-depth-active");
+      }
+      if (p > 0.15) playSceneEnters(enter, { stagger: true });
+      if (p < 0.05) {
+        enter.classList.remove("is-depth-active");
+      }
+      if (opts.onUpdate) opts.onUpdate(p);
+    }
+
+    gsap.set(leave, { x: 0, force3D: true });
+    gsap.set(enter, { x: window.innerWidth, force3D: true });
+    measureTravel();
+
+    ScrollTrigger.create({
+      id: opts.id || "swipe-horizontal",
+      trigger: leave[leave.length - 1],
+      start: "top bottom",
+      endTrigger: enter,
+      end: "top top-=80%",
+      invalidateOnRefresh: true,
+      refreshPriority: 5,
+      onRefresh: function () {
+        measureTravel();
+        applySwipe(swipeProgress());
+      },
+      onUpdate: function () {
+        applySwipe(swipeProgress());
+      },
+    });
   }
 
   function holdScroll(st, hold) {
@@ -343,8 +525,11 @@
             pinSpacing: true,
             scrub: MOBILE ? 1.15 : 1.4,
             anticipatePin: 1,
+            refreshPriority: 10,
             onEnterBack: function () {
               if (window.cosgralRestoreHero) window.cosgralRestoreHero();
+              setCinema(0);
+              document.documentElement.classList.remove("is-shattering", "is-sand-stream");
             },
           },
         })
@@ -365,91 +550,108 @@
         .to(curtain, { autoAlpha: 0.65, duration: 0.18, ease: "power3.in" }, 0.72);
     }
 
-    // ——— 2. SHATTER ———
-    if (shatter) {
-      var shatterPanel = panelOf(shatter);
-      gsap.set(shatterPanel, { autoAlpha: 1 });
-      gsap.set(shatter, { autoAlpha: 1 });
+    // ——— 2. CUBE RUNWAY — cinema od wejścia toru (koniec hero) do Usługi top ———
+    var runway = document.getElementById("cube-runway") || document.querySelector(".cube-runway");
+    if (runway || shatter) {
+      var shatterPanel = shatter ? panelOf(shatter) : null;
+      if (shatterPanel) {
+        gsap.set(shatterPanel, { autoAlpha: 1 });
+        gsap.set(shatter, { autoAlpha: 1 });
+      }
 
-      gsap.timeline({
-        scrollTrigger: {
-          id: "shatter-beat",
-          trigger: shatter,
-          start: "top top",
-          end: MOBILE ? "+=218%" : "+=272%",
-          pin: true,
-          pinSpacing: true,
-          scrub: MOBILE ? 1.85 : 2.15,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          refreshPriority: 5,
-          onEnter: function () {
-            shatter.classList.add("is-active");
-            document.documentElement.classList.add("is-shattering");
-            document.documentElement.classList.remove("is-sand-stream");
-            gsap.set(shatter, { autoAlpha: 1, visibility: "visible" });
-            gsap.set(shatterPanel, { autoAlpha: 1, clearProps: "filter" });
-            gsap.set(curtain, { autoAlpha: 0.55 });
-          },
-          onEnterBack: function () {
-            shatter.classList.add("is-active");
-            document.documentElement.classList.add("is-shattering");
-            document.documentElement.classList.remove("is-sand-stream");
-            gsap.set(shatter, { autoAlpha: 1, visibility: "visible" });
-            gsap.set(shatterPanel, { autoAlpha: 1 });
-          },
-          onLeave: function () {
-            shatter.classList.remove("is-active");
-            document.documentElement.classList.remove("is-shattering");
-            setCinema(1);
-            gsap.set(shatterPanel, { autoAlpha: 0 });
-            gsap.set(shatter, { autoAlpha: 0, visibility: "hidden" });
-          },
-          onLeaveBack: function () {
-            shatter.classList.add("is-active");
-            document.documentElement.classList.remove("is-shattering");
-            gsap.set(shatter, { autoAlpha: 1, visibility: "visible" });
-            gsap.set(shatterPanel, { autoAlpha: 1 });
-          },
-          onUpdate: function (self) {
+      /* start = koniec hero-pin (jawnie); end = Usługi top — bez luki i bez overlapu hero */
+      ScrollTrigger.create({
+        id: "shatter-beat",
+        trigger: runway || shatter,
+        start: function () {
+          var heroSt = ScrollTrigger.getById("hero-pin");
+          if (heroSt && isFinite(heroSt.end)) return heroSt.end;
+          var el = runway || shatter;
+          return Math.max(0, (el ? el.offsetTop : 0) - window.innerHeight);
+        },
+        end: function () {
+          if (services) {
+            /* sticky offsetTop bywa mylący — bierzemy layout top względem dokumentu */
+            var y = services.getBoundingClientRect().top + window.scrollY;
+            var heroSt = ScrollTrigger.getById("hero-pin");
+            var startY = heroSt && isFinite(heroSt.end) ? heroSt.end : Math.max(0, (runway || shatter).offsetTop - window.innerHeight);
+            return Math.max(startY + window.innerHeight * 0.5, y);
+          }
+          return "+=" + Math.round(window.innerHeight * (MOBILE ? 0.4 : 0.5));
+        },
+        scrub: MOBILE ? 1.45 : 1.65,
+        invalidateOnRefresh: true,
+        refreshPriority: 4,
+        onEnter: function () {
+          if (shatter) shatter.classList.add("is-active");
+          document.documentElement.classList.add("is-shattering");
+          document.documentElement.classList.remove("is-sand-stream");
+          window.cosgralSand = window.cosgralSand || {};
+          window.cosgralSand.locked = false;
+          if (curtain) gsap.set(curtain, { autoAlpha: 0.55 });
+        },
+        onEnterBack: function () {
+          if (shatter) shatter.classList.add("is-active");
+          document.documentElement.classList.add("is-shattering");
+          document.documentElement.classList.remove("is-sand-stream");
+          window.cosgralSand = window.cosgralSand || {};
+          window.cosgralSand.locked = false;
+        },
+        onLeave: function () {
+          if (shatter) shatter.classList.remove("is-active");
+          document.documentElement.classList.remove("is-shattering");
+          setCinema(1);
+          lockSandStream();
+          if (curtain) gsap.set(curtain, { autoAlpha: 0 });
+        },
+        onLeaveBack: function () {
+          if (shatter) shatter.classList.remove("is-active");
+          document.documentElement.classList.remove("is-shattering");
+          document.documentElement.classList.remove("is-sand-stream");
+          window.cosgralSand = window.cosgralSand || {};
+          window.cosgralSand.locked = false;
+          setCinema(0);
+        },
+        onUpdate: function (self) {
+          setCinema(self.progress);
+          if (curtain) {
             var p = self.progress;
-            setCinema(p);
-
-            var out = p > 0.86 ? (p - 0.86) / 0.14 : 0;
-            var shatterProps = { autoAlpha: 1 - out };
-            if (!MOBILE) {
-              shatterProps.filter = out ? "blur(" + out * 8 + "px)" : "blur(0px)";
-            }
-            gsap.set(shatterPanel, shatterProps);
-
-            if (curtain) {
-              var c = p > 0.78 ? (p - 0.78) / 0.22 : 0.5 * (1 - p / 0.78);
-              gsap.set(curtain, { autoAlpha: Math.min(0.9, c) });
-            }
-          },
+            var c = p > 0.78 ? (p - 0.78) / 0.22 : 0.5 * (1 - p / 0.78);
+            gsap.set(curtain, { autoAlpha: Math.min(0.9, c) });
+          }
         },
       });
     }
 
-    // ——— 3–6: kinowe sceny (pin + fade) ———
+    // ——— Depth stack: Usługi → Realizacje → FAQ → Proces → Kontakt ———
     wireScene(services, {
       id: "scene-uslugi",
-      pin: MOBILE ? "+=95%" : "+=118%",
+      next: work,
       priority: 2,
+      exitAlpha: 0,
+      exitScale: MOBILE ? 0.8 : 0.7,
+      exitBlur: MOBILE ? 10 : 18,
+      hideWhenGone: true,
       onEnter: function () {
-        lockSandStream();
+        /* Nie lockuj cinema wcześnie — shatter-beat prowadzi do Usługi top */
+        window.cosgralSand = window.cosgralSand || {};
         window.cosgralSand.servicesVisible = true;
+        if ((window.cosgralSand.cinema || 0) >= 0.94) lockSandStream();
+        if (curtain && (window.cosgralSand.cinema || 0) >= 0.85) {
+          gsap.set(curtain, { autoAlpha: 0 });
+        }
       },
       onEnterBack: function () {
-        lockSandStream();
+        window.cosgralSand = window.cosgralSand || {};
         window.cosgralSand.servicesVisible = true;
+        if ((window.cosgralSand.cinema || 0) >= 0.94) lockSandStream();
       },
       onLeave: function () {
         lockSandStream();
         if (window.cosgralSand) window.cosgralSand.servicesVisible = false;
       },
       onLeaveBack: function () {
-        lockSandStream();
+        window.cosgralSand = window.cosgralSand || {};
         window.cosgralSand.servicesVisible = true;
       },
     });
@@ -458,47 +660,106 @@
       ScrollTrigger.create({
         id: "cube-motion-tail",
         trigger: services,
-        start: "top bottom",
-        end: "top 22%",
-        scrub: MOBILE ? 2.4 : 2.85,
+        start: "top 28%",
+        end: "top top",
+        scrub: MOBILE ? 2.0 : 2.3,
         onUpdate: function (self) {
+          var shatterSt = ScrollTrigger.getById("shatter-beat");
+          if (shatterSt && shatterSt.progress < 0.97) {
+            window.cosgralSand = window.cosgralSand || {};
+            window.cosgralSand.servicesVisible = self.progress > 0.02;
+            return;
+          }
           var q = self.progress;
           var tail = 1 - Math.pow(1 - q, 1.12);
           window.cosgralSand = window.cosgralSand || {};
           window.cosgralSand.motionTail = tail;
-          setCinema(Math.min(1, 0.8 + tail * 0.2));
-          window.cosgralSand.servicesVisible = q > 0.06;
+          window.cosgralSand.servicesVisible = true;
         },
       });
     }
 
     wireScene(work, {
       id: "scene-realizacje",
-      pin: MOBILE ? "+=88%" : "+=108%",
-      priority: 2,
+      next: faq,
+      priority: 3,
+      exitAlpha: 0,
+      exitScale: MOBILE ? 0.8 : 0.7,
+      exitBlur: MOBILE ? 10 : 18,
+      hideWhenGone: true,
+      onEnter: function () {
+        lockSandStream();
+        if (curtain) gsap.set(curtain, { autoAlpha: 0 });
+      },
+      onEnterBack: lockSandStream,
+      onLeave: lockSandStream,
+      onLeaveBack: lockSandStream,
+    });
+
+    wireScene(faq, {
+      id: "scene-faq",
+      next: process,
+      priority: 4,
+      exitAlpha: 0,
+      exitScale: MOBILE ? 0.8 : 0.7,
+      exitBlur: MOBILE ? 10 : 18,
+      hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
+      onLeave: lockSandStream,
+      onLeaveBack: lockSandStream,
     });
 
     wireScene(process, {
       id: "scene-proces",
-      pin: MOBILE ? "+=82%" : "+=102%",
+      next: contact,
+      priority: 5,
+      exitAlpha: 0,
+      exitScale: MOBILE ? 0.8 : 0.7,
+      exitBlur: MOBILE ? 10 : 18,
+      hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
+      onLeave: lockSandStream,
+      onLeaveBack: lockSandStream,
     });
-    wireScene(faq, {
-      id: "scene-faq",
-      pin: MOBILE ? "+=76%" : "+=94%",
-      onEnter: lockSandStream,
-      onEnterBack: lockSandStream,
-    });
+
     wireScene(contact, {
       id: "scene-kontakt",
-      pin: MOBILE ? "+=84%" : "+=104%",
+      next: null,
+      priority: 6,
       fadeOut: false,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
+      onLeave: lockSandStream,
+      onLeaveBack: lockSandStream,
     });
+
+    /* Wolny crossfade Kontakt → stopka (niezależnie od stepper sync) */
+    if (contact && document.querySelector(".site-footer")) {
+      ScrollTrigger.create({
+        id: "footer-handoff",
+        trigger: ".site-footer",
+        start: "top bottom",
+        end: "top top",
+        scrub: MOBILE ? 1.1 : 1.35,
+        onUpdate: function (self) {
+          var fade = self.progress;
+          var eased = fade * fade * (3 - 2 * fade);
+          gsap.set(contact, {
+            autoAlpha: 1 - eased,
+            pointerEvents: eased > 0.82 ? "none" : "auto",
+          });
+          document.documentElement.classList.toggle("is-footer-step", eased > 0.45);
+          contact.classList.toggle("is-footer-handoff", eased > 0.08);
+        },
+        onLeaveBack: function () {
+          gsap.set(contact, { autoAlpha: 1, clearProps: "pointerEvents" });
+          contact.classList.remove("is-footer-handoff");
+          document.documentElement.classList.remove("is-footer-step");
+        },
+      });
+    }
 
     gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
       gsap.from(el, {
@@ -517,6 +778,9 @@
     });
 
     ScrollTrigger.refresh();
+    requestAnimationFrame(function () {
+      ScrollTrigger.refresh();
+    });
     window.dispatchEvent(new CustomEvent("cosgral:sections-ready"));
   })();
 })();

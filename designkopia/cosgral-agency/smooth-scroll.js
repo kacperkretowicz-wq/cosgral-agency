@@ -41,13 +41,14 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var lenis = new Lenis({
-    lerp: MOBILE ? 0.14 : 0.08,
-    duration: MOBILE ? 0.95 : 1.2,
+    /* Wolny scroll: lekka inercja — szybka reakcja, bez ciężkiego lag-smooth */
+    lerp: MOBILE ? 0.16 : 0.12,
+    duration: MOBILE ? 0.85 : 1.0,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
-    smoothWheel: false,
+    smoothWheel: true,
     smoothTouch: false,
-    touchMultiplier: 1,
-    wheelMultiplier: 1,
+    touchMultiplier: 1.15,
+    wheelMultiplier: 0.92,
   });
 
   window.cosgralSmoothScroll.lenis = lenis;
@@ -67,8 +68,10 @@
         height: window.innerHeight,
       };
     },
-    pinType: document.documentElement.style.transform ? "transform" : "fixed",
+    /* Lenis tu używa natywnego scrolla (bez transform na html) → pin: fixed */
+    pinType: "fixed",
   });
+  ScrollTrigger.defaults({ pinType: "fixed" });
 
   lenis.on("scroll", ScrollTrigger.update);
 
@@ -78,7 +81,7 @@
   /* Allow mild catch-up on mobile under GPU load; keep tight on desktop */
   gsap.ticker.lagSmoothing(MOBILE ? 500 : 0);
 
-  var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "proces", "faq", "kontakt"];
+  var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "faq", "proces", "kontakt"];
 
   document.querySelectorAll('a[href^="#"]').forEach(function (link) {
     link.addEventListener("click", function (e) {

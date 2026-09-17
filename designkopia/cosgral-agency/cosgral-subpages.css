@@ -1590,6 +1590,75 @@ html.reduce-motion .nav-overlay__char {
   text-align: center;
   pointer-events: none;
 }
+/* Frames end-title: GRAFIKI + CTA — ten sam język typografii co reszta strony */
+.graphics-stage__overlay::after {
+  content: "";
+  position: absolute;
+  inset: 16% 10%;
+  z-index: 0;
+  border-radius: 40%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.28) 48%,
+    rgba(0, 0, 0, 0) 74%
+  );
+  pointer-events: none;
+}
+.graphics-frames-cta {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.1rem, 2.4vw, 1.6rem);
+  text-decoration: none;
+  color: var(--ink);
+}
+.graphics-frames-cta__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 8vw, 5.5rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
+}
+.graphics-frames-cta__more.glass-btn,
+.graphics-frames-cta__more {
+  display: inline-block;
+  padding: 0.55rem 1.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border: 0;
+  border-radius: 999px;
+  background: rgba(8, 8, 10, 0.42);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.3s var(--ease), filter 0.2s ease;
+}
+.graphics-frames-cta:hover .graphics-frames-cta__more,
+.graphics-frames-cta:focus-visible .graphics-frames-cta__more {
+  transform: scale(1.04);
+  filter: brightness(1.12);
+}
+.graphics-frames-cta:focus-visible {
+  outline: none;
+}
+.graphics-frames-cta:focus-visible .graphics-frames-cta__title {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 6px;
+}
 .graphics-stage__overlay::before {
   content: none;
   display: none;
@@ -1711,19 +1780,29 @@ body.is-grafiki-overlay-reveal #grafiki .graphics-collage__footer {
 }
 .graphics-cinema__tile-inner {
   display: block;
-  border-radius: 3px;
+  border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
   transition:
     border-color 0.35s var(--ease),
-    box-shadow 0.35s var(--ease);
+    box-shadow 0.35s var(--ease),
+    transform 0.45s var(--ease);
+}
+#grafiki.is-grafiki-frames .graphics-cinema__tile-inner {
+  border-radius: 16px;
+  background: #0a0a0a;
 }
 .graphics-cinema__tile:hover .graphics-cinema__tile-inner,
 .graphics-cinema__tile:focus-visible .graphics-cinema__tile-inner {
-  border-color: rgba(0, 0, 0, 0.16);
+  border-color: rgba(255, 255, 255, 0.32);
   outline: none;
-  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.24);
+  box-shadow:
+    0 22px 56px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px) scale(1.015);
 }
 .graphics-cinema__media {
   display: block;
@@ -3013,7 +3092,19 @@ html.reduce-motion .portfolio-page .home-scroll-rail { display: none; }
   }
 }
 
-/* Subtle pointer / gyro tilt — never transform scroll-pinned sections or nav-overlay stage */
+/* Subtle pointer / gyro tilt — .home-tilt-layer obejmuje całą widoczną sekcję */
+.home-tilt-layer {
+  width: 100%;
+  transform-style: preserve-3d;
+}
+body.portfolio-page [data-portfolio-section],
+body.portfolio-page .portfolio-hero,
+body.about-page #main > header,
+body.about-page #main > section,
+body.graphics-gallery-page #main > .is-in-view,
+body.reels-gallery-page #main > .is-in-view {
+  perspective: 1200px;
+}
 html.has-global-tilt:not(.reduce-motion) .site-nav,
 html.has-global-tilt:not(.reduce-motion) .home-scroll-rail {
   transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
@@ -3026,33 +3117,14 @@ html.has-global-tilt:not(.reduce-motion) .home-scroll-rail {
   }
 }
 
-/* About — visible blocks only (jak homepage .home-scene.is-in-view) */
-html.has-global-tilt:not(.reduce-motion) body.about-page #main > .is-in-view,
-html.has-global-tilt:not(.reduce-motion) body.about-page #main > .is-in-view > * {
+html.has-global-tilt:not(.reduce-motion) body.about-page #main > .is-in-view > .home-tilt-layer,
+html.has-global-tilt:not(.reduce-motion) body.portfolio-page .portfolio-hero.is-in-view > .home-tilt-layer,
+html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view > .home-tilt-layer,
+html.has-global-tilt:not(.reduce-motion) body.graphics-gallery-page #main > .is-in-view > .home-tilt-layer,
+html.has-global-tilt:not(.reduce-motion) body.reels-gallery-page #main > .is-in-view > .home-tilt-layer {
   transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
   transform-origin: 50vw 50vh;
-}
-
-/* Portfolio — inner content only when section visible (nie pinujemy [data-portfolio-section]) */
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page .portfolio-hero.is-in-view > *,
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view [data-portfolio-head],
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view [data-portfolio-head] > *,
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view [data-portfolio-body],
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view [data-portfolio-body] > *,
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view .graphics-stage__overlay,
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view .graphics-stage__overlay > *,
-html.has-global-tilt:not(.reduce-motion) body.portfolio-page [data-portfolio-section].is-in-view .portfolio-scene__panel > * {
-  transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
-  transform-origin: 50vw 50vh;
-}
-
-/* Gallery subpages */
-html.has-global-tilt:not(.reduce-motion) body.graphics-gallery-page #main > .is-in-view,
-html.has-global-tilt:not(.reduce-motion) body.graphics-gallery-page #main > .is-in-view > *,
-html.has-global-tilt:not(.reduce-motion) body.reels-gallery-page #main > .is-in-view,
-html.has-global-tilt:not(.reduce-motion) body.reels-gallery-page #main > .is-in-view > * {
-  transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
-  transform-origin: 50vw 50vh;
+  will-change: transform;
 }
 
 body.is-nav-menu-open.is-cube-menu-front .nav-overlay__list a {

@@ -354,85 +354,80 @@
     document.dispatchEvent(new CustomEvent("portfolio:media-ready", { detail: { type: "graphics" } }));
   }
 
+  /**
+   * Frames scrub: kafelki wlatują i układają się, kamera odjeżdża.
+   */
   function buildCinemaTimeline(camera, watermark, tiles) {
     var mobile = window.matchMedia("(max-width: 900px)").matches;
-    var juicy = clusterCenter(FOCUS_JUICY);
-    var far = clusterCenter(FOCUS_FAR);
+    var heroEnd = clusterCenter(FOCUS_HERO_END);
     var m = mobile ? 0.68 : 1;
     var spread = mobile ? 1.02 : 1.14;
-    juicy = { x: juicy.x * m * spread, y: juicy.y * m * spread };
-    far = { x: far.x * m * spread, y: far.y * m * spread };
-
-    var z1 = mobile ? 2.35 : 2.85;
-    var z2 = mobile ? 2.15 : 2.55;
-    var z3 = mobile ? 0.72 : 0.88;
-
-    var start = cameraFocus(juicy, mobile ? 1.28 : 1.48);
-    var act1 = cameraFocus(juicy, z1);
-    var act2 = cameraFocus(far, z2);
-    var act2b = { x: act2.x - (mobile ? 18 : 42), y: act2.y + (mobile ? 10 : 22), scale: z2 + 0.06 };
-    var full = { x: 0, y: 0, scale: z3 };
-
-    var heroEnd = clusterCenter(FOCUS_HERO_END);
-    heroEnd = { x: heroEnd.x * m * spread, y: heroEnd.y * m * spread - (mobile ? 60 : 100) };
-    var endScale = mobile ? 0.82 : 1.02;
-    var fullWide = cameraFocus(heroEnd, endScale);
+    heroEnd = { x: heroEnd.x * m * spread, y: heroEnd.y * m * spread - (mobile ? 40 : 80) };
+    var endScale = mobile ? 0.78 : 0.92;
+    var startScale = mobile ? 1.55 : 1.85;
+    var start = cameraFocus(clusterCenter(FOCUS_JUICY), startScale);
+    var mid = cameraFocus(clusterCenter(FOCUS_FAR), mobile ? 1.15 : 1.28);
+    var full = cameraFocus(heroEnd, endScale);
 
     gsap.set(camera, start);
-    if (watermark) gsap.set(watermark, { opacity: 0, scale: 1 });
+    if (watermark) gsap.set(watermark, { opacity: 0, scale: 0.92 });
 
-    var introDur = mobile ? 0.14 : 0.16;
-    var sideX = mobile ? 540 : 780;
+    var tileArr = Array.prototype.slice.call(tiles);
+    tileArr.forEach(function (tile, i) {
+      var idx = Number(tile.getAttribute("data-idx"));
+      var pos = WORLD[idx] || { s: 1, r: 0 };
+      var fromLeft = i % 2 === 0;
+      gsap.set(tile, {
+        opacity: 0,
+        x: fromLeft ? -(mobile ? 120 : 220) : mobile ? 120 : 220,
+        y: (i % 5) * (mobile ? 18 : 28) - 40,
+        scale: pos.s * 0.42,
+        rotation: pos.r + (fromLeft ? -18 : 18),
+        transformOrigin: "50% 50%",
+      });
+    });
+
     var tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
 
-    INTRO_TILES.forEach(function (idx, i) {
-      var tile = findCinemaTile(tiles, idx);
-      var pos = WORLD[idx];
-      if (!tile || !pos) return;
-      var fromLeft = isLeftIntroTile(idx);
-      var enterX = fromLeft ? -sideX : sideX;
-      tl.fromTo(
+    tileArr.forEach(function (tile, i) {
+      var idx = Number(tile.getAttribute("data-idx"));
+      var pos = WORLD[idx] || { s: 1, r: 0 };
+      tl.to(
         tile,
-        {
-          opacity: 0,
-          x: enterX,
-          scale: pos.s * 0.76,
-          rotation: pos.r + (fromLeft ? -10 : 10),
-        },
         {
           opacity: 1,
           x: 0,
+          y: 0,
           scale: pos.s,
           rotation: pos.r,
-          duration: 0.34,
-          ease: "power2.out",
+          duration: 0.55,
+          ease: "power3.out",
         },
-        i * 0.07
+        i * 0.018
       );
     });
 
-    var t0 = introDur;
-    tl.to(camera, Object.assign({ duration: 0.26, ease: "power1.inOut" }, act1), t0);
-    tl.to(camera, Object.assign({ duration: 0.34, ease: "power2.inOut" }, act2), t0 + 0.24);
-    /* Wolniejsze przejście widok → widok (~3–4 s odtwarzania) */
-    tl.to(camera, Object.assign({ duration: 0.24, ease: "sine.inOut" }, act2b), t0 + 0.5);
-    tl.to(camera, Object.assign({ duration: 0.4, ease: "power1.inOut" }, full), t0 + 0.62);
-    tl.to(camera, Object.assign({ duration: 0.36, ease: "power1.inOut" }, fullWide), t0 + 0.9);
+    tl.to(camera, Object.assign({ duration: 0.7, ease: "power2.inOut" }, mid), 0.35);
+    tl.to(camera, Object.assign({ duration: 0.85, ease: "power1.inOut" }, full), 0.85);
 
     if (watermark) {
-      tl.to(watermark, { opacity: 0.11, scale: 1.04, duration: 0.4, ease: "power2.inOut" }, t0 + 0.62);
+      tl.to(watermark, { opacity: 0.08, scale: 1, duration: 0.6, ease: "power2.out" }, 0.9);
     }
 
-    tiles.forEach(function (tile) {
+    tileArr.forEach(function (tile, i) {
       var idx = Number(tile.getAttribute("data-idx"));
-      if (INTRO_TILES.indexOf(idx) >= 0) return;
       var pos = WORLD[idx];
       if (!pos) return;
-      tl.fromTo(
+      tl.to(
         tile,
-        { opacity: 0, scale: pos.s * 0.72 },
-        { opacity: 1, scale: pos.s, duration: 0.26, ease: "power2.out" },
-        t0 + 0.66 + (idx % 9) * 0.014
+        {
+          scale: pos.s * 1.02,
+          duration: 0.35,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: 1,
+        },
+        1.35 + (i % 7) * 0.02
       );
     });
 
@@ -1155,6 +1150,7 @@
     var watermark = cinema.querySelector(".graphics-cinema__watermark");
     var tiles = cinema.querySelectorAll(".graphics-cinema__tile");
     var mobile = window.matchMedia("(max-width: 900px)").matches;
+    var freeScroll = true;
 
     if (reduced || !window.gsap || !window.ScrollTrigger) {
       cinema.classList.add("is-static");
@@ -1163,11 +1159,36 @@
     }
 
     gsap.registerPlugin(ScrollTrigger);
-
     placeTilesOnWorld(world, tiles, mobile);
+    section.classList.add("is-grafiki-frames");
 
     var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
-    var pinLen = mobile ? "+=72%" : "+=80%";
+    var pinLen = freeScroll ? (mobile ? "+=180%" : "+=240%") : mobile ? "+=72%" : "+=80%";
+
+    var overlay = section.querySelector(".graphics-stage__overlay");
+    var framesCta = section.querySelector("[data-graphics-frames-cta]");
+
+    function setOverlay(p) {
+      /* Napis mocniej i wcześniej widoczny */
+      var show = p > 0.48;
+      var amt = Math.max(0, Math.min(1, (p - 0.48) / 0.22));
+      if (overlay) {
+        overlay.setAttribute("aria-hidden", show ? "false" : "true");
+        gsap.set(overlay, { autoAlpha: show ? amt : 0 });
+      }
+      if (framesCta) {
+        gsap.set(framesCta, {
+          autoAlpha: show ? amt : 0,
+          y: (1 - amt) * 20,
+          scale: 0.94 + amt * 0.06,
+        });
+      }
+      section.classList.toggle("is-cinema-done", p > 0.85);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.48);
+    }
+
+    if (overlay) gsap.set(overlay, { autoAlpha: 0 });
+    if (framesCta) gsap.set(framesCta, { autoAlpha: 0, y: 20, scale: 0.94 });
 
     var pinHandlers = {};
 
@@ -1178,7 +1199,8 @@
       end: pinLen,
       pin: true,
       pinSpacing: true,
-      anticipatePin: 1,
+      scrub: freeScroll ? true : false,
+      anticipatePin: 0.35,
       invalidateOnRefresh: true,
       refreshPriority: -1,
       onEnter: function () {
@@ -1188,11 +1210,53 @@
         if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
       },
       onUpdate: function (self) {
+        if (freeScroll) {
+          cinemaTl.progress(self.progress);
+          setOverlay(self.progress);
+        }
         if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
+      },
+      onRefresh: function (self) {
+        if (freeScroll) {
+          cinemaTl.progress(self.progress || 0);
+          setOverlay(self.progress || 0);
+        }
       },
     });
 
-    initGrafikiStepper(section, cinemaTl, pinST, pinHandlers);
+    if (freeScroll) {
+      window.cosgralGrafikiStepper = {
+        refresh: function () {
+          if (pinST) pinST.refresh();
+        },
+        snapToHold: function () {},
+        revealHold: function () {},
+        transitionToBeat: function () {},
+        resetForReentry: function () {
+          cinemaTl.progress(0);
+          setOverlay(0);
+        },
+        getBeat: function () {
+          return pinST && pinST.progress > 0.55 ? 1 : 0;
+        },
+        isAnimating: function () {
+          return false;
+        },
+        getPassDown: function () {
+          return true;
+        },
+        getPassUp: function () {
+          return true;
+        },
+        suspendHold: function () {},
+        getHoldY: function () {
+          return pinST ? pinST.start : 0;
+        },
+      };
+    } else {
+      initGrafikiStepper(section, cinemaTl, pinST, pinHandlers);
+    }
+
     collageRoot.classList.add("is-ready");
     section.classList.add("is-cinema-ready");
 
@@ -1314,12 +1378,13 @@
     var shade = document.querySelector(".subpage-ambient__shade");
     var cube = document.querySelector(".subpage-cube-portal");
     var bloom = document.getElementById("grafiki-bloom");
+    var rail = getScrollRail();
 
+    grafikiMenuState.cube = cube;
     gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
     gsap.set(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)" });
     gsap.set(blur, { opacity: 0.55 });
     gsap.set(bloom, { opacity: 0 });
-    var rail = getScrollRail();
     if (rail) gsap.set(rail, RAIL_LIGHT);
 
     var cinema = document.querySelector(".graphics-cinema");

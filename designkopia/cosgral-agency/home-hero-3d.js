@@ -3,7 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
-import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js";
+import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260917k";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (function () {
@@ -428,7 +428,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
         gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);
         gl_Position = projectionMatrix * mv;
-        vAlpha = (0.14 + smoothstep(2.8, 0.0, dist) * 0.38) * uFade;
+        vAlpha = (0.42 + smoothstep(2.8, 0.0, dist) * 0.7) * uFade;
       }
     `,
     fragmentShader: `
@@ -875,9 +875,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       uslugiPanel = uslugiSection && uslugiSection.querySelector(".home-scene__panel");
     }
     if (!uslugiPanel) return 0;
+    /* Panel ma często opacity:1 z GSAP nawet gdy Usługi są daleko pod foldem —
+       to fałszywie gasiło portal sześcianu do 0.15 już w hero. */
+    var top = uslugiSection.getBoundingClientRect().top;
+    var vh = window.innerHeight || 1;
+    if (top > vh * 0.92) return 0;
     if (uslugiSection.classList.contains("is-in-view")) return 1;
     var raw = uslugiPanel.style.opacity;
-    if (raw === "") return 1;
+    if (raw === "") return top < vh * 0.55 ? 1 : 0;
     var v = parseFloat(raw);
     return v === v ? v : 0;
   }
@@ -1066,9 +1071,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       rotX = flyStartRx + (idleRotX - flyStartRx) * introT;
       rotY = flyStartRy + (idleRotY - flyStartRy) * introT;
       rotZ = flyStartRz + (idleRotZ - flyStartRz) * introT;
-      introDim = introActive
-        ? Math.min(1, introTween.progress * 3.2)
-        : 1;
+      introDim = 1;
 
       if (introLanding) {
         var landT = introEase01(introSettle);
@@ -1092,7 +1095,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       rotX = 0.52;
       rotY = -1.18;
       rotZ = 0.32;
-      introDim = 0;
+      introDim = 1;
     } else if (scrollHandoff && leavingHero) {
       var handoffT = smooth01(0.01, 0.26, motion);
       posX = scrollHandoff.px + (scrollPosX - scrollHandoff.px) * handoffT;
@@ -1213,21 +1216,17 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
 
       cubeVisible = true;
       sMat.uniforms.uFade.value = cubeDim;
-      setWireOpacity(wire, 0.1 * cubeDim);
-      shell.material.opacity = 0.62 * cubeDim;
-      edges.material.opacity = 0.44 * cubeDim;
+      setWireOpacity(wire, 0.35 * cubeDim);
+      shell.material.opacity = 0.35 * cubeDim;
+      edges.material.opacity = 0.95 * cubeDim;
     } else {
-      var fade = introActive || introLanding || (!introStarted && motion < 0.01 && menuBlend < 0.001)
-        ? introDim
-        : cubeVisible
-          ? 1
-          : 0;
+      var fade = cubeVisible ? 1 : 0;
       sMat.uniforms.uFade.value = fade;
-      shell.material.opacity = 0.62 * fade;
-      setWireOpacity(wire, 0.1 * fade);
-      edges.material.opacity = 0.44 * fade;
+      shell.material.opacity = 0.35 * fade;
+      setWireOpacity(wire, 0.35 * fade);
+      edges.material.opacity = 0.95 * fade;
       if (introActive || introLanding || (!introStarted && motion < 0.01 && menuBlend < 0.001)) {
-        cubeVisible = fade > 0.02;
+        cubeVisible = true;
       }
     }
 
@@ -1281,11 +1280,11 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       displayStream > 0.32 ||
       displayBreak > 0.4 ||
       tm > 0.08;
-    var portalOp = sandOn
+    var portalOp = sandOn || inHero || motion < 0.08
       ? 1
       : tilesOp > 0.45
         ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
-        : 0.68;
+        : 1;
     var needsScene = portalOp > 0.05 || sandOn || menuBlend > 0.001;
 
     if (canvas.parentElement) {
@@ -1315,7 +1314,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   }
 
   if (canvas.parentElement) {
-    canvas.parentElement.style.opacity = "0.68";
+    canvas.parentElement.style.opacity = "1";
     canvas.parentElement.style.visibility = "visible";
   }
 
@@ -1389,9 +1388,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     }
     cubeGroup.visible = true;
     sMat.uniforms.uFade.value = 1;
-    shell.material.opacity = 0.62;
-    setWireOpacity(wire, 0.1);
-    edges.material.opacity = 0.44;
+    shell.material.opacity = 0.35;
+    setWireOpacity(wire, 0.35);
+    edges.material.opacity = 0.95;
   }
 
   function syncMenuAnchorPose() {

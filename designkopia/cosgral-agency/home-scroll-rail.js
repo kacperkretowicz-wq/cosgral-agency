@@ -30,20 +30,20 @@
       showTitle: true,
     },
     {
-      id: "proces",
-      stId: "scene-proces",
-      label: "Proces",
-      i18n: "nav.process",
+      id: "faq",
+      stId: "scene-faq",
+      label: "FAQ",
+      i18n: "nav.faq",
       hold: 0.48,
       holdStart: 0.14,
       holdEnd: 0.82,
       showTitle: true,
     },
     {
-      id: "faq",
-      stId: "scene-faq",
-      label: "FAQ",
-      i18n: "nav.faq",
+      id: "proces",
+      stId: "scene-proces",
+      label: "Proces",
+      i18n: "nav.process",
       hold: 0.48,
       holdStart: 0.14,
       holdEnd: 0.82,
@@ -67,6 +67,17 @@
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : 1;
     if (!footer) return max;
     return Math.min(max, Math.max(0, footer.offsetTop));
+  }
+
+  function sectionLayoutTop(el) {
+    if (!el) return 0;
+    var parent = el.parentElement;
+    if (!parent) return Math.max(0, el.offsetTop || 0);
+    var y = 0;
+    for (var child = parent.firstElementChild; child && child !== el; child = child.nextElementSibling) {
+      y += child.offsetHeight || 0;
+    }
+    return y;
   }
 
   function holdScroll(st, hold) {
@@ -227,6 +238,15 @@
           holdPositions.push(footerY);
           snapPoints.push(footerY / maxScroll);
           return;
+        }
+        if (document.documentElement.classList.contains("is-free-scroll") && scene.id) {
+          var el = document.getElementById(scene.id);
+          if (el) {
+            var y = Math.max(0, sectionLayoutTop(el));
+            holdPositions.push(y);
+            snapPoints.push(y / maxScroll);
+            return;
+          }
         }
         var st = ScrollTrigger.getById(scene.stId);
         if (!st) {

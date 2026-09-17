@@ -1,6 +1,7 @@
 /**
- * Subtle global pointer tilt — CSS vars + visible-section targeting.
- * Never transforms #main (breaks scroll-snap layout).
+ * Subtle global pointer / gyro tilt — CSS vars on visible hosts.
+ * Tilt lives on a dedicated .home-tilt-layer so card/GSAP transforms
+ * compose inside it (images + tiles tilt with the section, not only copy).
  */
 (function () {
   "use strict";
@@ -15,21 +16,14 @@
   var TILT_YAW = MOBILE ? 4.0 : 7.5;
   var tiltFrame = 0;
 
-  // --global-tilt-x/y czytają tylko: .site-nav, .home-scroll-rail, .site-footer
-  // oraz bloki z klasą .is-in-view (i ich potomkowie — zmienna dziedziczy).
-  // Zapis na <html> unieważniał styl całego dokumentu w każdej klatce ruchu
-  // kursora; zapis na tych kilku hostach ogranicza przeliczenie do ich poddrzew.
-  // Żywe HTMLCollection łapią też elementy dodawane później (np. scroll rail).
   var tiltHostLists = [
     document.getElementsByClassName("site-nav"),
     document.getElementsByClassName("home-scroll-rail"),
     document.getElementsByClassName("site-footer"),
     document.getElementsByClassName("is-in-view"),
+    document.getElementsByClassName("home-tilt-layer"),
   ];
 
-  // Odczyt inline style nie wymusza przeliczenia stylu, więc porównanie co
-  // klatkę jest tanie — a łapie hosty, które właśnie dostały .is-in-view
-  // z innego skryptu (services-fan, stepper) albo dopiero powstały (rail).
   function writeTilt(tx, ty) {
     for (var l = 0; l < tiltHostLists.length; l++) {
       var list = tiltHostLists[l];
@@ -58,11 +52,58 @@
     var tx = (ptr.ny * TILT_PITCH).toFixed(2) + "deg";
     var ty = (ptr.nx * TILT_YAW).toFixed(2) + "deg";
     writeTilt(tx, ty);
-    // --lx/--ly (poświata .services-fan__card-liquid) — efekt nigdy nie był
-    // aktywowany (.is-cursor-active tylko usuwane), a .home-process__step
-    // nadpisuje zmienną lokalnie; zapis co klatkę był czystym kosztem.
 
     requestAnimationFrame(applyGlobalTilt);
+  }
+
+  function wrapChildren(host, skipSelector) {
+    if (!host || host.querySelector(":scope > .home-tilt-layer")) return null;
+    var layer = document.createElement("div");
+    layer.className = "home-tilt-layer";
+    var skip = skipSelector ? host.querySelectorAll(":scope > " + skipSelector) : null;
+    var skipSet = skip && skip.length ? Array.prototype.slice.call(skip) : [];
+    var nodes = Array.prototype.slice.call(host.childNodes);
+    nodes.forEach(function (node) {
+      if (node.nodeType === 1 && skipSet.indexOf(node) !== -1) return;
+      layer.appendChild(node);
+    });
+    if (!layer.childNodes.length) return null;
+    host.appendChild(layer);
+    return layer;
+  }
+
+  function ensureTiltLayers() {
+    document.querySelectorAll(".home-scene > .home-scene__panel").forEach(function (panel) {
+      /* Hero: absolute content + fixed cube — bez warstwy (psuje centrówanie napisu) */
+      if (panel.closest(".home-hero")) return;
+      wrapChildren(panel);
+    });
+
+    document.querySelectorAll("[data-portfolio-section]").forEach(function (section) {
+      wrapChildren(section, ".portfolio-section__curtain");
+    });
+
+    if (document.body.classList.contains("about-page")) {
+      document.querySelectorAll("#main > header, #main > section").forEach(function (block) {
+        wrapChildren(block);
+      });
+    }
+
+    if (
+      document.body.classList.contains("graphics-gallery-page") ||
+      document.body.classList.contains("reels-gallery-page")
+    ) {
+      document
+        .querySelectorAll(
+          "#main > header, #main > .graphics-gallery, #main > .reels-gallery, #graphics-gallery, #reels-gallery"
+        )
+        .forEach(function (block) {
+          if (block) wrapChildren(block);
+        });
+    }
+
+    var hero = document.querySelector(".portfolio-hero");
+    if (hero) wrapChildren(hero);
   }
 
   function watchVisibleScenes() {
@@ -72,10 +113,13 @@
     var io = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          entry.target.classList.toggle("is-in-view", entry.isIntersecting && entry.intersectionRatio >= 0.35);
+          entry.target.classList.toggle(
+            "is-in-view",
+            entry.isIntersecting && entry.intersectionRatio >= 0.28
+          );
         });
       },
-      { threshold: [0.2, 0.35, 0.5, 0.65] }
+      { threshold: [0.15, 0.28, 0.45, 0.65] }
     );
 
     scenes.forEach(function (scene) {
@@ -92,9 +136,13 @@
       document.body.classList.contains("graphics-gallery-page") ||
       document.body.classList.contains("reels-gallery-page")
     ) {
-      document.querySelectorAll("#main > header, #main > .graphics-gallery, #main > .reels-gallery, #graphics-gallery, #reels-gallery").forEach(function (block) {
-        if (block) io.observe(block);
-      });
+      document
+        .querySelectorAll(
+          "#main > header, #main > .graphics-gallery, #main > .reels-gallery, #graphics-gallery, #reels-gallery"
+        )
+        .forEach(function (block) {
+          if (block) io.observe(block);
+        });
     }
   }
 
@@ -162,6 +210,7 @@
 
   function init() {
     document.documentElement.classList.add("has-global-tilt");
+    ensureTiltLayers();
     bindWorkCardVideos();
     watchVisibleScenes();
     requestAnimationFrame(applyGlobalTilt);
