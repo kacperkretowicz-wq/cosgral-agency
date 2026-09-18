@@ -450,6 +450,12 @@ html.is-footer-step .site-footer {
   position: relative;
   z-index: 8;
 }
+html.is-footer-step .home-cube-portal,
+html.is-footer-step .home-sand {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}
 
 .home-cursor { position: fixed; top: 0; left: 0; z-index: 10001; pointer-events: none; mix-blend-mode: difference; }
 .home-cursor__dot { position: fixed; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #fff; transform: translate(var(--cx,0), var(--cy,0)); }

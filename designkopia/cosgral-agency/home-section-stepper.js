@@ -184,7 +184,7 @@
       var y = lenis.scroll;
       var down = y >= lastScrollY - 0.5;
       lastScrollY = y;
-      var enter = down ? 0.4 : 0.58;
+      var enter = down ? 0.28 : 0.52;
 
       if (footerEl) {
         var ft = footerEl.getBoundingClientRect().top;
