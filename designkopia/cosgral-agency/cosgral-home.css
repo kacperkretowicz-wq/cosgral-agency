@@ -189,6 +189,15 @@ html.is-free-scroll main.home-film > .home-scene.home-depth {
   z-index: var(--depth-z, 10) !important;
   /* Bez kryjącego tła — rozmazana sekcja z tyłu ma prześwitywać */
   background: transparent;
+  /* Extra scroll zanim kolejna warstwa zacznie przykrywać — dłuższy dwell */
+  margin-bottom: 26vh;
+  margin-bottom: 26dvh;
+}
+@media (max-width: 900px) {
+  html.is-free-scroll main.home-film > .home-scene.home-depth {
+    margin-bottom: 18vh;
+    margin-bottom: 18dvh;
+  }
 }
 html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone {
   visibility: hidden !important;
@@ -225,14 +234,11 @@ html.is-free-scroll #uslugi.home-depth,
 html.is-free-scroll #uslugi.is-visible.home-scene {
   z-index: 20 !important;
 }
-/* Kontakt: nie sticky — wjeżdża od dołu nad Proces, z kryjącym tłem
-   (sticky + transparent powodowało nachodzenie formularza na Proces). */
+/* Kontakt: sticky jak reszta stacku, nieprzezroczyste tło (formularz nie nachodzi na Proces).
+   Stopka (sibling main, wyższy stacking) przykrywa Kontakt tym samym coverem co inne sceny. */
 html.is-free-scroll #kontakt.home-depth {
-  position: relative !important;
   z-index: 60 !important;
   background: var(--bg, #030303);
-  min-height: 100vh;
-  min-height: 100dvh;
 }
 html.is-free-scroll #proces.home-depth {
   z-index: 50 !important;
@@ -414,7 +420,7 @@ html.reduce-motion .home-scene [data-enter] {
 }
 .site-footer {
   position: relative;
-  z-index: 2;
+  z-index: 8;
   background: var(--bg, #030303);
   overflow: hidden;
   box-sizing: border-box;
@@ -426,36 +432,23 @@ html.reduce-motion .home-scene [data-enter] {
   padding: clamp(1.5rem, 4vh, 2.75rem) var(--gutter) clamp(1.75rem, 5vh, 3rem);
 }
 
-/* Wolny dojazd Kontakt → stopka */
+/* Kontakt → stopka: bez pustego pasa (runway dawał czarną dziurę i skok raila) */
 html.is-free-scroll .footer-runway {
-  height: 110vh;
-  height: 110dvh;
+  height: 0 !important;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   pointer-events: none;
   visibility: hidden;
 }
-@media (max-width: 900px) {
-  html.is-free-scroll .footer-runway {
-    height: 90vh;
-    height: 90dvh;
-  }
-}
 
-/* Stopka — miękki handoff (opacity steruje JS, bez twardego cuta) */
-html.is-free-scroll #kontakt.home-depth,
-html.is-free-scroll #kontakt.is-footer-handoff {
-  transition: opacity 0.05s linear;
-  will-change: opacity;
+/* Stopka — miękki handoff (opacity/cover steruje JS, bez zmiany layoutu) */
+html.is-free-scroll #kontakt.home-depth {
+  will-change: transform, opacity, filter;
 }
 html.is-footer-step .site-footer {
   position: relative;
-  z-index: 2;
-  min-height: 100svh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-top: clamp(1.25rem, 3.5vh, 2.5rem);
-  padding-bottom: clamp(1.25rem, 3.5vh, 2.5rem);
+  z-index: 8;
 }
 
 .home-cursor { position: fixed; top: 0; left: 0; z-index: 10001; pointer-events: none; mix-blend-mode: difference; }
@@ -2551,11 +2544,8 @@ html.reduce-motion .home-scroll-rail { display: none; }
     white-space: nowrap;
   }
   html.is-footer-step .site-footer {
-    min-height: 100svh;
-    min-height: 100dvh;
-    justify-content: center;
-    padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
+    /* tylko warstwa wizualna — bez zmiany paddingu/min-height (to skakało) */
+    z-index: 8;
   }
   .site-footer [data-enter] {
     opacity: 1 !important;

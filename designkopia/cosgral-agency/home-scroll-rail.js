@@ -319,48 +319,35 @@
       return (index / (n - 1)) * 100;
     }
 
-    function fillHeightForScroll(scroll, current) {
-      var snapIdx = window.cosgralSectionSnap?.getIndex?.();
-      var idx = snapIdx != null && snapIdx >= 0 ? snapIdx : current ? current.index : 0;
-
-      if (current && current.st && current.st.isActive) {
-        return dotPercent(current.index);
+    function fillHeightForScroll(scroll) {
+      if (holdPositions.length < 2) return 0;
+      var last = holdPositions.length - 1;
+      if (scroll <= holdPositions[0]) return 0;
+      if (scroll >= holdPositions[last]) return 100;
+      for (var i = 0; i < last; i++) {
+        var start = holdPositions[i];
+        var end = holdPositions[i + 1];
+        if (scroll > end) continue;
+        var span = end - start;
+        var t = span <= 0 ? 1 : (scroll - start) / span;
+        t = Math.min(1, Math.max(0, t));
+        return dotPercent(i) + t * (dotPercent(i + 1) - dotPercent(i));
       }
-
-      if (holdPositions.length < 2) return dotPercent(idx);
-
-      var start = holdPositions[idx] ?? 0;
-      var end = holdPositions[idx + 1];
-
-      if (end == null) {
-        return dotPercent(idx);
-      }
-
-      if (scroll <= start + 4) {
-        return dotPercent(idx);
-      }
-
-      if (scroll >= end - 4) {
-        return dotPercent(Math.min(idx + 1, SCENES.length - 1));
-      }
-
-      var span = end - start;
-      if (span <= 0) return dotPercent(idx);
-
-      var t = (scroll - start) / span;
-      t = Math.min(1, Math.max(0, t));
-      return dotPercent(idx) + t * (dotPercent(idx + 1) - dotPercent(idx));
+      return 100;
     }
 
-    function update() {
-      refreshMetrics();
+    function update(opts) {
+      if (!opts || opts.metrics !== false) refreshMetrics();
       var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
-      var current = activeScene();
-      var fillPct = fillHeightForScroll(scroll, current);
+      var fillPct = fillHeightForScroll(scroll);
       ui.fill.style.height = fillPct.toFixed(2) + "%";
 
       var snapIdx = window.cosgralSectionSnap?.getIndex?.();
-      var currentIndex = snapIdx != null && snapIdx >= 0 ? snapIdx : current ? current.index : -1;
+      var currentIndex = snapIdx != null && snapIdx >= 0 ? snapIdx : -1;
+      if (currentIndex < 0) {
+        var current = activeScene();
+        currentIndex = current ? current.index : -1;
+      }
 
       if (currentIndex >= 0 && currentIndex !== lastIndex) {
         revealTitle(currentIndex);
@@ -406,11 +393,21 @@
       });
     });
 
-    ScrollTrigger.addEventListener("refresh", update);
+    ScrollTrigger.addEventListener("refresh", function () {
+      update();
+    });
     if (window.cosgralSmoothScroll?.lenis) {
-      window.cosgralSmoothScroll.lenis.on("scroll", update);
+      window.cosgralSmoothScroll.lenis.on("scroll", function () {
+        update({ metrics: false });
+      });
     } else {
-      window.addEventListener("scroll", update, { passive: true });
+      window.addEventListener(
+        "scroll",
+        function () {
+          update({ metrics: false });
+        },
+        { passive: true }
+      );
     }
 
     window.addEventListener("cosgral:section-step", function (e) {
