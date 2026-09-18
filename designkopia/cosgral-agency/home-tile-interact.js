@@ -37,6 +37,7 @@
   }
 
   function applyGlobalTilt() {
+    if (MOBILE) return;
     var ptr = window.cosgralPointer;
     if (!ptr) {
       requestAnimationFrame(applyGlobalTilt);
@@ -44,7 +45,7 @@
     }
 
     tiltFrame += 1;
-    if (MOBILE && tiltFrame % 2 !== 0) {
+    if (tiltFrame % 2 !== 0) {
       requestAnimationFrame(applyGlobalTilt);
       return;
     }
@@ -193,6 +194,12 @@
 
       video.muted = true;
       video.setAttribute("playsinline", "");
+      /* Mobile: poster only — dekoder wielu video = główne źródło przycinania */
+      if (MOBILE) {
+        video.removeAttribute("autoplay");
+        video.pause();
+        return;
+      }
 
       var io = new IntersectionObserver(
         function (entries) {
@@ -201,7 +208,7 @@
             else video.pause();
           });
         },
-        { threshold: MOBILE ? 0.28 : 0.42, rootMargin: "8% 0px" }
+        { threshold: 0.42, rootMargin: "8% 0px" }
       );
       io.observe(card);
       if (card.getBoundingClientRect().height > 0) video.play().catch(function () {});
@@ -209,16 +216,15 @@
   }
 
   function init() {
-    document.documentElement.classList.add("has-global-tilt");
-    ensureTiltLayers();
-    bindWorkCardVideos();
-    watchVisibleScenes();
-    requestAnimationFrame(applyGlobalTilt);
-
     if (!MOBILE) {
+      document.documentElement.classList.add("has-global-tilt");
+      ensureTiltLayers();
+      requestAnimationFrame(applyGlobalTilt);
       bindHoverTargets();
       observeDynamicTiles();
     }
+    bindWorkCardVideos();
+    watchVisibleScenes();
   }
 
   if (document.readyState === "loading") {
