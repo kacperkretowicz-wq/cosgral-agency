@@ -2665,9 +2665,10 @@ html.reduce-motion .home-scroll-rail { display: none; }
     white-space: nowrap;
   }
   html.is-footer-step .site-footer {
-    min-height: 100svh;
-    min-height: 100dvh;
-    justify-content: center;
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+    justify-content: flex-start;
     padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
   }
