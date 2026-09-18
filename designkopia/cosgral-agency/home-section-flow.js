@@ -241,18 +241,18 @@
 
     opts = opts || {};
     var panel = panelOf(scene);
-    /* Mobile: bez sticky depth + blur scrub — natywny scroll i pełna treść. */
-    var fadeOut = MOBILE ? false : opts.fadeOut !== false;
-    var depth = MOBILE ? false : opts.depth !== false;
-    var next = MOBILE ? null : opts.next || null;
+    var fadeOut = opts.fadeOut !== false;
+    var depth = opts.depth !== false;
+    var next = opts.next || null;
     var stackZ = 20 + depthStackIndex++ * 10;
     var holdEnd = 0.04;
     /* Do końca cover → znika w oddali (scale↓ blur↑ alpha→0), żeby nie zostawała pod kolejną */
     var exitScale = opts.exitScale != null ? opts.exitScale : MOBILE ? 0.78 : 0.68;
-    var exitBlur = opts.exitBlur != null ? opts.exitBlur : MOBILE ? 10 : 20;
+    /* Mobile: bez CSS filter blur (koszt GPU) — zostaje scale + fade */
+    var exitBlur = opts.exitBlur != null ? opts.exitBlur : MOBILE ? 0 : 20;
     var exitAlpha = opts.exitAlpha != null ? opts.exitAlpha : 0;
     var exitY = opts.exitY != null ? opts.exitY : MOBILE ? -4 : -8;
-    var hideWhenGone = MOBILE ? false : opts.hideWhenGone !== false;
+    var hideWhenGone = opts.hideWhenGone !== false;
 
     scene.classList.add("home-depth");
     scene.style.setProperty("--depth-z", String(stackZ));
@@ -634,7 +634,7 @@
       priority: 2,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: function () {
         /* Nie lockuj cinema wcześnie — shatter-beat prowadzi do Usługi top */
@@ -689,7 +689,7 @@
       priority: 3,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: function () {
         lockSandStream();
@@ -706,7 +706,7 @@
       priority: 4,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
@@ -720,7 +720,7 @@
       priority: 5,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
