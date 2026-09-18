@@ -331,23 +331,38 @@
     if (footerCover >= 0) {
       var contact = document.getElementById("kontakt");
       var eased = footerCover * footerCover * (3 - 2 * footerCover);
-      document.documentElement.classList.toggle("is-footer-step", eased > 0.45);
+      var covered = footerCover >= 0.985;
+      var root = document.documentElement;
+      /* is-footer-step = wejścia stopki (od połowy covera);
+         is-footer-covered = portal sześcianu/piasku całkiem pod stopką → można
+         przestać go renderować (home-hero-3d czyta cosgralSand.portalCovered). */
+      root.classList.toggle("is-footer-step", eased > 0.45);
+      if (covered !== lastFooterCovered) {
+        lastFooterCovered = covered;
+        root.classList.toggle("is-footer-covered", covered);
+      }
+      window.cosgralSand = window.cosgralSand || {};
+      window.cosgralSand.portalCovered = covered;
       if (contact) contact.classList.toggle("is-footer-handoff", eased > 0.08);
     }
   }
 
+  var lastFooterCovered = false;
+
+  /* Ticker wisi bezpośrednio na scrollu Lenisa + refresh ST — nie na ScrollTriggerze
+     0→"max": jego `end` zamrażał się przy refreshu sprzed zmian layoutu (is-free-scroll,
+     marginesy dwell) i poniżej starego maxa cover Kontaktu przestawał się aktualizować. */
   function bindDepthTicker() {
-    if (depthTickerBound || !window.ScrollTrigger) return;
+    if (depthTickerBound) return;
     depthTickerBound = true;
-    ScrollTrigger.create({
-      id: "depth-cover-ticker",
-      start: 0,
-      end: "max",
-      invalidateOnRefresh: true,
-      refreshPriority: 20,
-      onUpdate: tickDepthCovers,
-      onRefresh: tickDepthCovers,
-    });
+    var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+    if (lenis && lenis.on) {
+      lenis.on("scroll", tickDepthCovers);
+    } else {
+      window.addEventListener("scroll", tickDepthCovers, { passive: true });
+    }
+    if (window.ScrollTrigger) ScrollTrigger.addEventListener("refresh", tickDepthCovers);
+    window.addEventListener("resize", tickDepthCovers);
   }
 
   function wireScene(scene, opts) {

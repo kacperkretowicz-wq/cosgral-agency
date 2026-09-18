@@ -1,5 +1,6 @@
 /* COSGRAL HOME — dark minimal + globe 3D */
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&family=Stack+Sans+Notch:wght@400;500;600;700&display=swap");
+/* Fonty: <link rel="stylesheet"> w <head> index.html (równolegle z tym plikiem,
+   @import tutaj ładował je dopiero po pobraniu i sparsowaniu całego CSS). */
 
 :root {
   --bg: #030303;
@@ -189,14 +190,44 @@ html.is-free-scroll main.home-film > .home-scene.home-depth {
   z-index: var(--depth-z, 10) !important;
   /* Bez kryjącego tła — rozmazana sekcja z tyłu ma prześwitywać */
   background: transparent;
-  /* Extra scroll zanim kolejna warstwa zacznie przykrywać — dłuższy dwell */
-  margin-bottom: 26vh;
-  margin-bottom: 26dvh;
+  /* Extra scroll zanim kolejna warstwa zacznie przykrywać — dłuższy dwell.
+     UWAGA: sectionLayoutTop() w stepperze/railu musi liczyć te marginesy. */
+  margin-bottom: var(--depth-dwell);
+}
+html.is-free-scroll main.home-film {
+  --depth-dwell: 26vh;
+}
+@supports (height: 1dvh) {
+  html.is-free-scroll main.home-film {
+    --depth-dwell: 26dvh;
+  }
+}
+/* Tor pod stopkę WEWNĄTRZ main: ostatnie sticky dziecko (Kontakt) trzyma się
+   top:0 tylko dopóki kontener trwa — spacer daje mu dwell + pełny cover, a stopka
+   (sibling main, z-index 8 > main 1) wjeżdża z ujemnym marginesem nad Kontakt
+   dokładnie tak, jak każda kolejna scena nad poprzednią. Bez luki, bez prześwitu. */
+html.is-free-scroll main.home-film::after {
+  content: "";
+  display: block;
+  height: calc(100vh + var(--depth-dwell));
+  height: calc(100dvh + var(--depth-dwell));
+  pointer-events: none;
+}
+html.is-free-scroll main.home-film > #kontakt.home-depth {
+  margin-bottom: 0;
+}
+html.is-free-scroll .site-footer {
+  margin-top: -100vh;
+  margin-top: -100dvh;
 }
 @media (max-width: 900px) {
-  html.is-free-scroll main.home-film > .home-scene.home-depth {
-    margin-bottom: 18vh;
-    margin-bottom: 18dvh;
+  html.is-free-scroll main.home-film {
+    --depth-dwell: 18vh;
+  }
+  @supports (height: 1dvh) {
+    html.is-free-scroll main.home-film {
+      --depth-dwell: 18dvh;
+    }
   }
 }
 html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone {
@@ -432,28 +463,15 @@ html.reduce-motion .home-scene [data-enter] {
   padding: clamp(1.5rem, 4vh, 2.75rem) var(--gutter) clamp(1.75rem, 5vh, 3rem);
 }
 
-/* Kontakt → stopka: bez pustego pasa (runway dawał czarną dziurę i skok raila) */
-html.is-free-scroll .footer-runway {
-  height: 0 !important;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-/* Stopka — miękki handoff (opacity/cover steruje JS, bez zmiany layoutu) */
-html.is-free-scroll #kontakt.home-depth {
-  will-change: transform, opacity, filter;
-}
-html.is-footer-step .site-footer {
-  position: relative;
-  z-index: 8;
-}
-html.is-footer-step .home-cube-portal,
-html.is-footer-step .home-sand {
+/* Stopka — cover Kontaktu prowadzi depth ticker (section-flow), bez zmiany layoutu.
+   is-footer-step (cover > 0.45) odpala wejścia stopki; is-footer-covered (cover ≥ 0.985)
+   chowa portal sześcianu/piasku dopiero, gdy stopka zakrywa go w całości — wcześniej
+   piasek nad górną, jeszcze widoczną częścią Kontaktu znikałby skokiem. */
+html.is-footer-covered .home-cube-portal,
+html.is-footer-covered .home-sand {
   opacity: 0 !important;
-  visibility: hidden;
+  /* !important — home-hero-3d pisze visibility inline; menu (niżej w pliku) i tak nadpisuje */
+  visibility: hidden !important;
   pointer-events: none;
 }
 
@@ -486,9 +504,13 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
 .preloader__cube {
   position: absolute;
   left: 0;
-  top: 0;
+  /* Plik logo ma pionowy kanwas 679×1024 (sześcian w środku) — wymuszone 64×64
+     rozciągało go 1,5× w poziomie. Naturalne proporcje + wycentrowanie w slocie;
+     `translate` składa się z transformem lotu, środek obrazka = środek slotu. */
+  top: 50%;
+  translate: 0 -50%;
   width: 64px;
-  height: 64px;
+  height: auto;
   margin: 0;
   pointer-events: none;
   transform: translate3d(var(--cube-x, 0px), var(--cube-y, 0px), 0)
@@ -2548,10 +2570,6 @@ html.reduce-motion .home-scroll-rail { display: none; }
     font-size: 0.56rem;
     letter-spacing: 0.03em;
     white-space: nowrap;
-  }
-  html.is-footer-step .site-footer {
-    /* tylko warstwa wizualna — bez zmiany paddingu/min-height (to skakało) */
-    z-index: 8;
   }
   .site-footer [data-enter] {
     opacity: 1 !important;

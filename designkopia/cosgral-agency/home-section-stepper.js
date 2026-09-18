@@ -20,6 +20,11 @@
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) { return !c.footer; }).map(function (c) { return c.id; });
 
+  /* Klasa od razu przy ewaluacji (jak portfolio-section-stepper): layout free-scroll
+     (sticky, marginesy dwell, tor stopki) musi istnieć ZANIM section-flow zrobi
+     ScrollTrigger.refresh() — inaczej start/end triggerów liczą się dla innego dokumentu. */
+  if (FREE_SCROLL && !REDUCED) document.documentElement.classList.add("is-free-scroll");
+
   function footerHoldY() {
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
@@ -28,16 +33,22 @@
     return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
-  /** Stabilny top layoutu (sticky psuje offsetTop). */
+  function verticalMargins(el) {
+    var cs = window.getComputedStyle(el);
+    return (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+  }
+
+  /** Stabilny top layoutu (sticky psuje offsetTop). offsetHeight nie obejmuje
+      marginesów, a sceny depth mają margin-bottom (dwell) — liczymy je jawnie. */
   function sectionLayoutTop(el) {
     if (!el) return 0;
     var parent = el.parentElement;
     if (!parent) return Math.max(0, el.offsetTop || 0);
     var y = 0;
     for (var child = parent.firstElementChild; child && child !== el; child = child.nextElementSibling) {
-      y += child.offsetHeight || 0;
+      y += (child.offsetHeight || 0) + verticalMargins(child);
     }
-    return y;
+    return y + (parseFloat(window.getComputedStyle(el).marginTop) || 0);
   }
 
   function buildHolds() {
@@ -778,7 +789,6 @@
     }
 
     if (FREE_SCROLL) {
-      document.documentElement.classList.add("is-free-scroll");
       lenis.on("scroll", syncIndexFromScroll);
     } else {
       lenis.on("scroll", function () {

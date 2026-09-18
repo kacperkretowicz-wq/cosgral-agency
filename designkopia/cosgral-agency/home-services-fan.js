@@ -179,6 +179,9 @@
     return { x: home.x * 1.35, y: home.y * 1.3, scale: 0.1, rot: home.rot, opacity: 0, z: 1 };
   }
 
+  /* Usługi w kadrze (IO threshold 0.35) — bramka odtwarzania wideo w layout(). */
+  var videoZoneVisible = false;
+
   function ensureVideoSrc(video) {
     if (!video || video.getAttribute("src")) return;
     var src = video.getAttribute("data-fan-video-src");
@@ -215,7 +218,10 @@
 
       var video = card.querySelector("video");
       if (video) {
-        if (isActive) {
+        /* Odtwarzaj tylko, gdy Usługi są w kadrze — wcześniej aktywna karta grała
+           od załadowania strony (4 MB + dekodowanie w tle przez całe intro hero).
+           Wejście sekcji w kadr woła layout() ponownie (IntersectionObserver niżej). */
+        if (isActive && videoZoneVisible) {
           ensureVideoSrc(video);
           video.play().catch(function () {});
         } else video.pause();
@@ -492,6 +498,10 @@
       function (entries) {
         entries.forEach(function (entry) {
           section.classList.toggle("is-in-view", entry.isIntersecting);
+          if (videoZoneVisible !== entry.isIntersecting) {
+            videoZoneVisible = entry.isIntersecting;
+            layout(displayPos);
+          }
           if (entry.isIntersecting) {
             document.documentElement.classList.add("is-sand-stream");
             showTapHint();
@@ -513,7 +523,9 @@
   layout(0);
   scheduleTick();
 
-  // Warm video sources once Usługi is near the viewport
+  // Warm video sources once Usługi is near the viewport (40% vh before).
+  // preload="none" + src nic nie pobiera, więc aktywnej karcie podnosimy preload
+  // do "auto" — ma zbuforowany start zanim sekcja wejdzie w kadr i play() ruszy od razu.
   if ("IntersectionObserver" in window) {
     var warmIo = new IntersectionObserver(
       function (entries) {
@@ -522,6 +534,9 @@
           cards.forEach(function (card) {
             ensureVideoSrc(card.querySelector("video"));
           });
+          var activeCard = cards[((Math.round(wrapPos(displayPos)) % total) + total) % total];
+          var activeVideo = activeCard && activeCard.querySelector("video");
+          if (activeVideo) activeVideo.preload = "auto";
           warmIo.disconnect();
         });
       },

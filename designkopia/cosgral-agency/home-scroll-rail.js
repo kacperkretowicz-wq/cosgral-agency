@@ -69,15 +69,22 @@
     return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
+  function verticalMargins(el) {
+    var cs = window.getComputedStyle(el);
+    return (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+  }
+
+  /* Jak w home-section-stepper: sticky psuje offsetTop, a offsetHeight nie liczy
+     marginesów (dwell scen depth) — sumujemy rodzeństwo z marginesami. */
   function sectionLayoutTop(el) {
     if (!el) return 0;
     var parent = el.parentElement;
     if (!parent) return Math.max(0, el.offsetTop || 0);
     var y = 0;
     for (var child = parent.firstElementChild; child && child !== el; child = child.nextElementSibling) {
-      y += child.offsetHeight || 0;
+      y += (child.offsetHeight || 0) + verticalMargins(child);
     }
-    return y;
+    return y + (parseFloat(window.getComputedStyle(el).marginTop) || 0);
   }
 
   function holdScroll(st, hold) {

@@ -2,9 +2,9 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
-import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260917k";
-import { createFxaaPass } from "./three-fxaa-pass.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
+import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260918d";
+import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
 (function () {
   "use strict";
@@ -843,15 +843,15 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       end: "bottom top",
       scrub: 1.1,
       onUpdate: function (self) {
-        var cur = window.cosgralSand || {};
+        var cur = window.cosgralSand || (window.cosgralSand = {});
         if ((cur.cinema || 0) >= 0.96) {
-          window.cosgralSand = {
-            break: Math.max(cur.break || 0, 0.98),
-            stream: Math.max(cur.stream || 0, 0.85 + self.progress * 0.15),
-            cinema: Math.max(cur.cinema || 0, 1),
-            locked: true,
-            motion: 1,
-          };
+          // Mutacja, nie nowy obiekt — inni piszą tu własne pola (servicesVisible,
+          // motionTail, portalCovered) i podmiana kasowała je co tick scruba.
+          cur.break = Math.max(cur.break || 0, 0.98);
+          cur.stream = Math.max(cur.stream || 0, 0.85 + self.progress * 0.15);
+          cur.cinema = Math.max(cur.cinema || 0, 1);
+          cur.locked = true;
+          cur.motion = 1;
           document.documentElement.classList.add("is-sand-stream");
         }
       },
@@ -1302,6 +1302,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     }
 
     if (!needsScene) return;
+    // Stopka zakrywa portal w całości (section-flow: is-footer-covered) — kadr i tak
+    // niewidoczny, więc nie palimy GPU; menu nad stopką nadal renderuje.
+    if (sandExt && sandExt.portalCovered && menuBlend <= 0.001) return;
 
     // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
     // Poza nią częstotliwość ustala sterownik jakości (na tier 0 też co klatkę).
