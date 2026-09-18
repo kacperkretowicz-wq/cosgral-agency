@@ -2274,7 +2274,11 @@ html.reduce-motion .home-scroll-rail { display: none; }
   html.is-mobile-flow #kontakt.home-scene {
     min-height: auto;
     justify-content: flex-start;
-    padding-block: clamp(5.5rem, 12dvh, 7rem) clamp(3.5rem, 9dvh, 5.5rem);
+    padding-block: clamp(5.5rem, 12dvh, 7rem) clamp(4.25rem, 11dvh, 6.5rem);
+    margin: 0;
+  }
+  html.is-mobile-flow main.home-film > .home-scene.home-depth + .home-scene.home-depth {
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
   }
   html.is-mobile-flow #uslugi.home-scene,
   html.is-mobile-flow #top.home-scene {
