@@ -40,10 +40,63 @@
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
+  /* Touch / Android: natywny scroll — Lenis + scrollerProxy tnie FPS i gubi gesty. */
+  if (MOBILE) {
+    document.documentElement.classList.add("is-native-scroll");
+    try {
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    } catch (e) {}
+    if (!new URLSearchParams(location.search).has("service")) {
+      window.scrollTo(0, 0);
+    }
+
+    var nativeApi = {
+      scroll: 0,
+      resize: function () {},
+      on: function () {},
+      raf: function () {},
+      scrollTo: function (target, opts) {
+        opts = opts || {};
+        var y = typeof target === "number" ? target : 0;
+        if (opts.immediate) {
+          window.scrollTo(0, y);
+          if (opts.onComplete) opts.onComplete();
+          return;
+        }
+        window.scrollTo({ top: y, behavior: "smooth" });
+        if (opts.onComplete) {
+          window.setTimeout(opts.onComplete, Math.max(280, (opts.duration || 0.9) * 650));
+        }
+      },
+    };
+    window.cosgralSmoothScroll.lenis = nativeApi;
+    window.cosgralSmoothScroll.scrollTo = function (target, opts) {
+      opts = opts || {};
+      if (typeof target === "number") {
+        nativeApi.scrollTo(target, opts);
+        return;
+      }
+      if (target && target.getBoundingClientRect) {
+        var y = target.getBoundingClientRect().top + window.pageYOffset + (opts.offset || 0);
+        nativeApi.scrollTo(y, opts);
+      }
+    };
+    var syncNative = function () {
+      nativeApi.scroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+    };
+    window.addEventListener("scroll", syncNative, { passive: true });
+    syncNative();
+    requestAnimationFrame(function () {
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+      readyResolve(nativeApi);
+    });
+    return;
+  }
+
   var lenis = new Lenis({
     /* Wolny scroll: lekka inercja — szybka reakcja, bez ciężkiego lag-smooth */
-    lerp: MOBILE ? 0.16 : 0.12,
-    duration: MOBILE ? 0.85 : 1.0,
+    lerp: 0.12,
+    duration: 1.0,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: true,
     smoothTouch: false,
@@ -78,8 +131,7 @@
   gsap.ticker.add(function (time) {
     lenis.raf(time * 1000);
   });
-  /* Allow mild catch-up on mobile under GPU load; keep tight on desktop */
-  gsap.ticker.lagSmoothing(MOBILE ? 500 : 0);
+  gsap.ticker.lagSmoothing(0);
 
   var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "faq", "proces", "kontakt"];
 

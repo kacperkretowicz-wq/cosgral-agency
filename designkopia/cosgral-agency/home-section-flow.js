@@ -5,9 +5,12 @@
   "use strict";
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
-  var MOBILE = window.matchMedia("(max-width: 900px)").matches;
+  var MOBILE =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var CYCLE = ["left", "right", "top", "bottom"];
   var curtain = document.querySelector("[data-scene-curtain]");
+  if (MOBILE) document.documentElement.classList.add("is-mobile-flow");
 
   function buildRevealWords(el) {
     if (!el) return;
@@ -245,7 +248,8 @@
     var holdEnd = 0.04;
     /* Do końca cover → znika w oddali (scale↓ blur↑ alpha→0), żeby nie zostawała pod kolejną */
     var exitScale = opts.exitScale != null ? opts.exitScale : MOBILE ? 0.78 : 0.68;
-    var exitBlur = opts.exitBlur != null ? opts.exitBlur : MOBILE ? 10 : 20;
+    /* Mobile: bez CSS filter blur (koszt GPU) — zostaje scale + fade */
+    var exitBlur = opts.exitBlur != null ? opts.exitBlur : MOBILE ? 0 : 20;
     var exitAlpha = opts.exitAlpha != null ? opts.exitAlpha : 0;
     var exitY = opts.exitY != null ? opts.exitY : MOBILE ? -4 : -8;
     var hideWhenGone = opts.hideWhenGone !== false;
@@ -520,10 +524,10 @@
             id: "hero-pin",
             trigger: hero,
             start: "top top",
-            end: MOBILE ? "+=72%" : "+=95%",
+            end: MOBILE ? "+=48%" : "+=95%",
             pin: true,
             pinSpacing: true,
-            scrub: MOBILE ? 1.15 : 1.4,
+            scrub: MOBILE ? 0.85 : 1.4,
             anticipatePin: 1,
             refreshPriority: 10,
             onEnterBack: function () {
@@ -539,15 +543,15 @@
           heroContent,
           {
             autoAlpha: 0,
-            y: -48,
-            filter: MOBILE ? "none" : "blur(10px)",
+            y: MOBILE ? -28 : -48,
+            filter: "none",
             ease: "power3.in",
             duration: 0.22,
           },
           0.66
         )
         .to(heroScroll, { autoAlpha: 0, duration: 0.2, ease: "none" }, 0.62)
-        .to(curtain, { autoAlpha: 0.65, duration: 0.18, ease: "power3.in" }, 0.72);
+        .to(curtain, { autoAlpha: MOBILE ? 0.35 : 0.65, duration: 0.18, ease: "power3.in" }, 0.72);
     }
 
     // ——— 2. CUBE RUNWAY — cinema od wejścia toru (koniec hero) do Usługi top ———
@@ -630,7 +634,7 @@
       priority: 2,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: function () {
         /* Nie lockuj cinema wcześnie — shatter-beat prowadzi do Usługi top */
@@ -685,7 +689,7 @@
       priority: 3,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: function () {
         lockSandStream();
@@ -702,7 +706,7 @@
       priority: 4,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
@@ -716,7 +720,7 @@
       priority: 5,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 18,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,

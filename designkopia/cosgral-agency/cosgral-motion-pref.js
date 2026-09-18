@@ -5,6 +5,12 @@
 (function () {
   "use strict";
 
+  var mobile =
+    typeof window.matchMedia === "function" &&
+    (window.matchMedia("(max-width: 900px)").matches ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches);
+  if (mobile) document.documentElement.classList.add("is-mobile-flow");
+
   var params = new URLSearchParams(location.search);
   if (params.has("reduceMotion")) {
     document.documentElement.classList.add("reduce-motion");

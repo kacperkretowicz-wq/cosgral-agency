@@ -2236,6 +2236,44 @@ html.reduce-motion .home-scroll-rail { display: none; }
 
   body.home-page { cursor: auto; }
   .home-cursor { display: none; }
+
+  /*
+   * Mobile: animacje sticky depth ZOSTAJĄ.
+   * Tylko #proces rośnie z treścią — wolny scroll przez kroki, potem Kontakt przykrywa.
+   * Ambient WebGL wyłączony (perf Android).
+   */
+  html.is-free-scroll #proces.home-process.home-scene.home-depth {
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+    justify-content: flex-start;
+    padding-block: clamp(5.85rem, 13dvh, 7.35rem) clamp(3.5rem, 9dvh, 5.5rem);
+  }
+  html.is-free-scroll #proces.home-process .home-scene__panel {
+    overflow: visible;
+    max-height: none;
+    height: auto;
+    justify-content: flex-start;
+  }
+  html.is-free-scroll #proces.home-process .home-process__intro,
+  html.is-free-scroll #proces.home-process .home-process__title,
+  html.is-free-scroll #proces.home-process .home-process__lead {
+    text-align: center;
+    margin-inline: auto;
+  }
+  html.is-mobile-flow .home-ambient,
+  html.is-mobile-flow .home-ambient__blur,
+  html.is-ambient-off .home-ambient,
+  html.is-ambient-off .home-ambient__blur {
+    display: none !important;
+  }
+  html.is-mobile-flow body.home-page,
+  html.is-ambient-off body.home-page {
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 18%, rgba(40, 40, 40, 0.45), transparent 62%),
+      var(--bg, #030303);
+  }
+
   .home-scroll-rail {
     right: 0.5rem;
     height: auto;
@@ -2551,9 +2589,10 @@ html.reduce-motion .home-scroll-rail { display: none; }
     white-space: nowrap;
   }
   html.is-footer-step .site-footer {
-    min-height: 100svh;
-    min-height: 100dvh;
-    justify-content: center;
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+    justify-content: flex-start;
     padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
   }
