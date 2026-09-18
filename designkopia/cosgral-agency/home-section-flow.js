@@ -227,8 +227,143 @@
    * sekcja trzyma się top:0, kolejna wjeżdża od dołu z wyższym z-index.
    * Blur/scale = scrub 1:1 do pozycji następnej (cover 0→1).
    * Scroll w górę = ten sam scrub wstecz — bez teleportów / klonów.
+   *
+   * Cover idzie przez JEDEN ticker (nie N× ScrollTrigger 0→max):
+   * pomija offscreen i mikrodelty, zapisuje transform/filter bezpośrednio.
    */
   var depthStackIndex = 0;
+  var depthCovers = [];
+  var depthTickerBound = false;
+  var DEPTH_HOLD = MOBILE ? 0.18 : 0.22;
+  var DEPTH_EPS = 0.003;
+
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  }
+
+  function poseRest(item) {
+    var panel = item.panel;
+    var scene = item.scene;
+    var st = panel.style;
+    st.opacity = "1";
+    st.visibility = "visible";
+    st.transform = "translate3d(0,0,0) scale(1)";
+    st.filter = "none";
+    scene.style.opacity = "1";
+    scene.style.visibility = "visible";
+    scene.style.pointerEvents = "";
+    scene.classList.remove("is-depth-recessed", "is-depth-gone");
+    item.lastP = 0;
+    item.lastGone = false;
+  }
+
+  function poseCover(item, p) {
+    var holdEnd = item.holdEnd;
+    if (p <= holdEnd) {
+      if (item.lastP !== 0 || item.lastGone) poseRest(item);
+      else item.lastP = 0;
+      return;
+    }
+
+    var u = easeInOutCubic((p - holdEnd) / Math.max(1 - holdEnd, 0.001));
+    var fade = u * u;
+    var alpha = 1 - (1 - item.exitAlpha) * fade;
+    var scale = 1 - (1 - item.exitScale) * u;
+    var y = item.exitY * u;
+    var blur = item.exitBlur * u;
+    var gone = item.hideWhenGone && u >= 0.98;
+    var panel = item.panel;
+    var scene = item.scene;
+    var st = panel.style;
+
+    scene.classList.add("is-depth-recessed");
+    if (gone) {
+      if (!item.lastGone) {
+        scene.classList.add("is-depth-gone");
+        scene.style.pointerEvents = "none";
+        scene.style.opacity = "0";
+        scene.style.visibility = "hidden";
+        st.opacity = "0";
+        st.filter = "none";
+        st.transform = "translate3d(0," + y.toFixed(2) + "%,0) scale(" + scale.toFixed(4) + ")";
+        item.lastGone = true;
+      }
+    } else {
+      if (item.lastGone) {
+        scene.classList.remove("is-depth-gone");
+        scene.style.visibility = "visible";
+        scene.style.opacity = "1";
+      }
+      scene.style.pointerEvents = u > 0.9 ? "none" : "";
+      st.opacity = alpha.toFixed(3);
+      st.visibility = alpha < 0.02 ? "hidden" : "visible";
+      st.transform = "translate3d(0," + y.toFixed(2) + "%,0) scale(" + scale.toFixed(4) + ")";
+      st.filter = blur > 0.08 ? "blur(" + blur.toFixed(2) + "px)" : "none";
+      item.lastGone = false;
+    }
+    item.lastP = p;
+  }
+
+  function tickDepthCovers() {
+    var vh = window.innerHeight || 1;
+    var i;
+    var footerCover = -1;
+    for (i = 0; i < depthCovers.length; i++) {
+      var item = depthCovers[i];
+      if (!item.next) continue;
+      var top = item.next.getBoundingClientRect().top;
+      var p;
+      if (top >= vh + 2) p = 0;
+      else if (top <= 0) p = 1;
+      else p = 1 - top / vh;
+
+      if (item.isFooter) footerCover = p;
+
+      if (p === 0) {
+        if (item.lastP !== 0 || item.lastGone) poseRest(item);
+        continue;
+      }
+      if (Math.abs(p - item.lastP) < DEPTH_EPS && (p < 1 || item.lastGone === (p >= 0.98))) continue;
+      poseCover(item, p);
+      if (item.onUpdate) item.onUpdate({ progress: p });
+    }
+
+    if (footerCover >= 0) {
+      var contact = document.getElementById("kontakt");
+      var eased = footerCover * footerCover * (3 - 2 * footerCover);
+      var covered = footerCover >= 0.985;
+      var root = document.documentElement;
+      /* is-footer-step = wejścia stopki (od połowy covera);
+         is-footer-covered = portal sześcianu/piasku całkiem pod stopką → można
+         przestać go renderować (home-hero-3d czyta cosgralSand.portalCovered). */
+      root.classList.toggle("is-footer-step", eased > 0.45);
+      if (covered !== lastFooterCovered) {
+        lastFooterCovered = covered;
+        root.classList.toggle("is-footer-covered", covered);
+      }
+      window.cosgralSand = window.cosgralSand || {};
+      window.cosgralSand.portalCovered = covered;
+      if (contact) contact.classList.toggle("is-footer-handoff", eased > 0.08);
+    }
+  }
+
+  var lastFooterCovered = false;
+
+  /* Ticker wisi bezpośrednio na scrollu Lenisa + refresh ST — nie na ScrollTriggerze
+     0→"max": jego `end` zamrażał się przy refreshu sprzed zmian layoutu (is-free-scroll,
+     marginesy dwell) i poniżej starego maxa cover Kontaktu przestawał się aktualizować. */
+  function bindDepthTicker() {
+    if (depthTickerBound) return;
+    depthTickerBound = true;
+    var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+    if (lenis && lenis.on) {
+      lenis.on("scroll", tickDepthCovers);
+    } else {
+      window.addEventListener("scroll", tickDepthCovers, { passive: true });
+    }
+    if (window.ScrollTrigger) ScrollTrigger.addEventListener("refresh", tickDepthCovers);
+    window.addEventListener("resize", tickDepthCovers);
+  }
 
   function wireScene(scene, opts) {
     if (!scene || REDUCED) {
@@ -242,7 +377,7 @@
     var depth = opts.depth !== false;
     var next = opts.next || null;
     var stackZ = 20 + depthStackIndex++ * 10;
-    var holdEnd = 0.04;
+    var holdEnd = opts.holdEnd != null ? opts.holdEnd : DEPTH_HOLD;
     /* Do końca cover → znika w oddali (scale↓ blur↑ alpha→0), żeby nie zostawała pod kolejną */
     var exitScale = opts.exitScale != null ? opts.exitScale : MOBILE ? 0.78 : 0.68;
     var exitBlur = opts.exitBlur != null ? opts.exitBlur : MOBILE ? 10 : 20;
@@ -254,76 +389,42 @@
     scene.style.setProperty("--depth-z", String(stackZ));
     scene.style.zIndex = String(stackZ);
 
-    function easeInOut(t) {
-      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    }
-
-    function coverAmount() {
-      if (!next) return 0;
-      var top = next.getBoundingClientRect().top;
-      var vh = window.innerHeight || 1;
-      /* next już na górze lub wyżej = pełne przykrycie */
-      if (top <= 0) return 1;
-      return 1 - Math.max(0, Math.min(1, top / vh));
-    }
+    var coverItem = {
+      scene: scene,
+      panel: panel,
+      next: next,
+      holdEnd: holdEnd,
+      exitScale: exitScale,
+      exitBlur: exitBlur,
+      exitAlpha: exitAlpha,
+      exitY: exitY,
+      hideWhenGone: hideWhenGone,
+      isFooter: !!(next && next.classList && next.classList.contains("site-footer")),
+      lastP: -1,
+      lastGone: false,
+      onUpdate: opts.onUpdate || null,
+    };
 
     function applyPose(p) {
-      p = Math.max(0, Math.min(1, p));
       if (!depth || !fadeOut) {
-        gsap.set(panel, {
-          autoAlpha: 1,
-          yPercent: 0,
-          scale: 1,
-          filter: "blur(0px)",
-          force3D: true,
-        });
-        scene.classList.toggle("is-depth-recessed", false);
+        poseRest(coverItem);
         return;
       }
-      if (p <= holdEnd) {
-        gsap.set(panel, {
-          autoAlpha: 1,
-          yPercent: 0,
-          scale: 1,
-          filter: "blur(0px)",
-          force3D: true,
-        });
-        gsap.set(scene, { autoAlpha: 1 });
-        scene.classList.remove("is-depth-recessed", "is-depth-gone");
-        scene.style.pointerEvents = "";
-        return;
-      }
-      var u = easeInOut((p - holdEnd) / Math.max(1 - holdEnd, 0.001));
-      /* Pod koniec przyspiesz zanik — w połowie jeszcze widać, przy cover=1 już nie */
-      var fade = u * u;
-      gsap.set(panel, {
-        autoAlpha: 1 - (1 - exitAlpha) * fade,
-        yPercent: exitY * u,
-        scale: 1 - (1 - exitScale) * u,
-        filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
-        force3D: true,
-      });
-      scene.classList.add("is-depth-recessed");
-      if (hideWhenGone && u >= 0.98) {
-        scene.classList.add("is-depth-gone");
-        scene.style.pointerEvents = "none";
-        gsap.set(scene, { autoAlpha: 0 });
-        gsap.set(panel, { autoAlpha: 0, filter: "blur(0px)" });
-      } else {
-        scene.classList.remove("is-depth-gone");
-        gsap.set(scene, { autoAlpha: 1 });
-        scene.style.pointerEvents = u > 0.9 ? "none" : "";
-      }
+      p = Math.max(0, Math.min(1, p));
+      if (p <= holdEnd) poseRest(coverItem);
+      else poseCover(coverItem, p);
     }
 
     gsap.set(panel, {
       autoAlpha: 1,
       yPercent: 0,
       scale: 1,
-      filter: "blur(0px)",
+      filter: "none",
       transformOrigin: "50% 42%",
       force3D: true,
     });
+    panel.style.transform = "translate3d(0,0,0) scale(1)";
+    panel.style.filter = "none";
     /* Start ukryty — animacja tylko przy pierwszym wjeździe w dół */
     resetSceneEnters(scene);
 
@@ -358,23 +459,9 @@
       },
     });
 
-    /* Recess z live rect następnej — pełny zakres scrolla, bo sticky psuje
-       start/end ST i zostawiał lukę (Kontakt na ostrym Procesie). */
-    if (fadeOut && next) {
-      function syncCover() {
-        var amt = coverAmount();
-        applyPose(amt);
-        if (opts.onUpdate) opts.onUpdate({ progress: amt });
-      }
-      ScrollTrigger.create({
-        id: (opts.id || scene.id) + "-cover",
-        start: 0,
-        end: "max",
-        invalidateOnRefresh: true,
-        refreshPriority: (opts.priority || 1) + 1,
-        onUpdate: syncCover,
-        onRefresh: syncCover,
-      });
+    if (fadeOut && next && depth) {
+      depthCovers.push(coverItem);
+      bindDepthTicker();
     }
   }
 
@@ -724,42 +811,22 @@
       onLeaveBack: lockSandStream,
     });
 
+    var footer = document.querySelector(".site-footer");
     wireScene(contact, {
       id: "scene-kontakt",
-      next: null,
+      next: footer,
       priority: 6,
-      fadeOut: false,
+      fadeOut: true,
+      holdEnd: MOBILE ? 0.26 : 0.34,
+      exitAlpha: 0,
+      exitScale: MOBILE ? 0.84 : 0.78,
+      exitBlur: MOBILE ? 8 : 14,
+      hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
       onLeave: lockSandStream,
       onLeaveBack: lockSandStream,
     });
-
-    /* Wolny crossfade Kontakt → stopka (niezależnie od stepper sync) */
-    if (contact && document.querySelector(".site-footer")) {
-      ScrollTrigger.create({
-        id: "footer-handoff",
-        trigger: ".site-footer",
-        start: "top bottom",
-        end: "top top",
-        scrub: MOBILE ? 1.1 : 1.35,
-        onUpdate: function (self) {
-          var fade = self.progress;
-          var eased = fade * fade * (3 - 2 * fade);
-          gsap.set(contact, {
-            autoAlpha: 1 - eased,
-            pointerEvents: eased > 0.82 ? "none" : "auto",
-          });
-          document.documentElement.classList.toggle("is-footer-step", eased > 0.45);
-          contact.classList.toggle("is-footer-handoff", eased > 0.08);
-        },
-        onLeaveBack: function () {
-          gsap.set(contact, { autoAlpha: 1, clearProps: "pointerEvents" });
-          contact.classList.remove("is-footer-handoff");
-          document.documentElement.classList.remove("is-footer-step");
-        },
-      });
-    }
 
     gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
       gsap.from(el, {

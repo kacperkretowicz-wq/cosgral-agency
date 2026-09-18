@@ -108,7 +108,8 @@
   }
 
   function logoSrc() {
-    return siteRoot() + "images/cosgral-agency/brand/cosgral-logo-cube-transparent.png";
+    /* 192 px = 4× DPR przy 48 px; oryginał 679×1024 (80 KB) zostaje dla większych użyć */
+    return siteRoot() + "images/cosgral-agency/brand/cosgral-logo-cube-192.png";
   }
 
   function normalizePath(pathname) {

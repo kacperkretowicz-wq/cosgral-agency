@@ -20,6 +20,11 @@
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) { return !c.footer; }).map(function (c) { return c.id; });
 
+  /* Klasa od razu przy ewaluacji (jak portfolio-section-stepper): layout free-scroll
+     (sticky, marginesy dwell, tor stopki) musi istnieć ZANIM section-flow zrobi
+     ScrollTrigger.refresh() — inaczej start/end triggerów liczą się dla innego dokumentu. */
+  if (FREE_SCROLL && !REDUCED) document.documentElement.classList.add("is-free-scroll");
+
   function footerHoldY() {
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
@@ -28,16 +33,22 @@
     return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
-  /** Stabilny top layoutu (sticky psuje offsetTop). */
+  function verticalMargins(el) {
+    var cs = window.getComputedStyle(el);
+    return (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+  }
+
+  /** Stabilny top layoutu (sticky psuje offsetTop). offsetHeight nie obejmuje
+      marginesów, a sceny depth mają margin-bottom (dwell) — liczymy je jawnie. */
   function sectionLayoutTop(el) {
     if (!el) return 0;
     var parent = el.parentElement;
     if (!parent) return Math.max(0, el.offsetTop || 0);
     var y = 0;
     for (var child = parent.firstElementChild; child && child !== el; child = child.nextElementSibling) {
-      y += child.offsetHeight || 0;
+      y += (child.offsetHeight || 0) + verticalMargins(child);
     }
-    return y;
+    return y + (parseFloat(window.getComputedStyle(el).marginTop) || 0);
   }
 
   function buildHolds() {
@@ -173,6 +184,32 @@
       return best;
     }
 
+    var lastScrollY = 0;
+    var footerEl = document.querySelector(".site-footer");
+
+    /* Aktywna sekcja z viewportu, nie z najbliższego holda.
+       Sticky Kontakt ma top=0 gdy stopka już wjeżdża — nearest-hold
+       przełączał rail za wcześnie i powodował skok klas. */
+    function indexFromViewport() {
+      var vh = window.innerHeight || 1;
+      var y = lenis.scroll;
+      var down = y >= lastScrollY - 0.5;
+      lastScrollY = y;
+      var enter = down ? 0.28 : 0.52;
+
+      if (footerEl) {
+        var ft = footerEl.getBoundingClientRect().top;
+        if (ft <= vh * enter) return holds.length - 1;
+      }
+
+      for (var i = SECTION_IDS.length - 1; i >= 0; i--) {
+        var el = document.getElementById(SECTION_IDS[i]);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= vh * enter) return i;
+      }
+      return 0;
+    }
+
     function easeOutCubic(t) {
       return 1 - Math.pow(1 - t, 3);
     }
@@ -266,20 +303,9 @@
     }
 
     function syncStepView(index) {
-      var footer = document.querySelector(".site-footer");
-      var contact = document.getElementById("kontakt");
+      var footer = footerEl || document.querySelector(".site-footer");
       if (!footer) return;
-
-      var vh = window.innerHeight || 1;
-      var footerTop = footer.getBoundingClientRect().top;
-      var p = 1 - Math.max(0, Math.min(1, footerTop / vh));
-      var fade = p * p * (3 - 2 * p);
-
-      /* Opacity prowadzi footer-handoff w section-flow; tu tylko klasy / enter */
-      if (contact) contact.classList.toggle("is-footer-handoff", fade > 0.08);
-
-      var footerDominant = fade > 0.45;
-      document.documentElement.classList.toggle("is-footer-step", footerDominant);
+      var footerDominant = index === holds.length - 1;
       if (footerDominant && window.gsap) {
         window.gsap.utils.toArray(".site-footer [data-enter]").forEach(function (el) {
           window.gsap.set(el, { autoAlpha: 1, y: 0, clearProps: "filter" });
@@ -578,12 +604,10 @@
     }
 
     function syncIndexFromScroll() {
-      holds = buildHolds();
-      var idx = nearestIndex(lenis.scroll);
-      /* Zawsze odśwież handoff stopki (zależny od rect, nie tylko indeksu). */
-      syncStepView(idx);
+      var idx = indexFromViewport();
       if (idx === activeIndex) return;
       activeIndex = idx;
+      syncStepView(idx);
       syncSectionFocus(idx);
       window.dispatchEvent(
         new CustomEvent("cosgral:section-step", {
@@ -765,7 +789,6 @@
     }
 
     if (FREE_SCROLL) {
-      document.documentElement.classList.add("is-free-scroll");
       lenis.on("scroll", syncIndexFromScroll);
     } else {
       lenis.on("scroll", function () {

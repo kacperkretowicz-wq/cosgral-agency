@@ -1,8 +1,8 @@
 /**
  * Portfolio hero — kostka + rozpad w linię piasku (jak homepage) przy wejściu na stronę.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
-import { createShardGeometry } from "./cube-shape.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
+import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 
 (function () {
   "use strict";

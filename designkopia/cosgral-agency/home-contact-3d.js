@@ -1,7 +1,7 @@
 /**
  * Mini globe for contact section background.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
 
 (function () {
   "use strict";

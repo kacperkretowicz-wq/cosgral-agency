@@ -204,7 +204,11 @@
         { threshold: MOBILE ? 0.28 : 0.42, rootMargin: "8% 0px" }
       );
       io.observe(card);
-      if (card.getBoundingClientRect().height > 0) video.play().catch(function () {});
+      /* Start od razu tylko dla karty faktycznie w kadrze — poza nim decyduje IO
+         (wcześniej wszystkie wideo Realizacji ruszały przy ładowaniu strony). */
+      var rect = card.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+      if (rect.height > 0 && rect.bottom > 0 && rect.top < vh) video.play().catch(function () {});
     });
   }
 

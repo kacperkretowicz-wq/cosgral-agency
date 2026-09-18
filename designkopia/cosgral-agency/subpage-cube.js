@@ -1,9 +1,9 @@
 /**
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
-import { createIntactCubeParts } from "./cube-shape.js";
-import { createFxaaPass } from "./three-fxaa-pass.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
+import { createIntactCubeParts } from "./cube-shape.js?v=20260918d";
+import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
 (function () {
   "use strict";
@@ -341,6 +341,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     return menuFrom.galleryMenu && menuBlend > 0.001 && menuFrom.sideEntry && !menuFrom.keepDriftVisible;
   }
 
+  /* Maks. krycie portalu = to, co daje CSS (.subpage-cube-portal / about-page /
+     motyw jasny) — inline opacity z fade nadpisywała arkusz, więc w motywie jasnym
+     sześcian miał 0.58 zamiast 0.12, a na O nas świecił przez tekst zespołu. */
+  function portalMaxOpacity() {
+    if (document.documentElement.getAttribute("data-theme") === "light") return 0.12;
+    return isAboutPage ? 0.42 : 0.68;
+  }
+
   function setCubeVisualFade(dim) {
     if (galleryHidesMenuCubeMesh()) dim = 0;
     var fade = Math.max(0, Math.min(1, dim * getMenuCubeDimMul()));
@@ -349,7 +357,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     setWireOpacity(wire, 0.1 * fade);
     edges.material.opacity = 0.44 * fade;
     if (portal && menuBlend <= 0.001 && !grafikiMenuActive) {
-      portal.style.opacity = fade < 0.98 ? String(0.68 * fade) : "";
+      portal.style.opacity = fade < 0.98 ? String(portalMaxOpacity() * fade) : "";
     }
   }
 
@@ -563,10 +571,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   function applyPortfolioStroniesEnter(ft, time) {
     syncCamera();
     root.rotation.set(0, 0, 0);
-    var drift = getDriftPose(portfolioFlight.driftP, time);
+    var ease = easeOutSmooth(ft);
+    /* Cel lotu dogania ŻYWY scroll: driftP to progress z góry sekcji w chwili startu,
+       a faza drift liczy pozę z bieżącego scrollProgress — przy dalszym przewijaniu
+       w trakcie 3,9 s lotu sześcian „doskakiwał" na koniec (O nas: skok w dół). */
+    var pTarget = portfolioFlight.driftP + (scrollProgress - portfolioFlight.driftP) * ease;
+    var drift = getDriftPose(pTarget, time);
     var z = MOBILE ? 0.3 : 0.36;
     var tl = getScreenCornerWorld("tl", z);
-    var ease = easeOutSmooth(ft);
     var ctrlX = tl.x * 0.34 + drift.rootX * 0.66;
     var ctrlY = tl.y * 0.18 + drift.rootY * 0.82;
     var arc = quadArc(ease, tl.x, tl.y, ctrlX, ctrlY, drift.rootX, drift.rootY);

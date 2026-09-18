@@ -307,6 +307,11 @@ html.is-service-dive-enter {
 }
 
 /* Scroll-driven cube portal */
+/* O nas: sześcian dryfuje za tekstem zespołu — ciszej, żeby nie konkurował z treścią
+   (subpage-cube.js: portalMaxOpacity() trzyma tę samą wartość dla inline fade). */
+body.about-page .subpage-cube-portal {
+  opacity: 0.42;
+}
 .subpage-cube-portal {
   position: fixed;
   inset: 0;
@@ -1069,15 +1074,6 @@ html.reduce-motion .nav-overlay__char {
   object-fit: cover;
   object-position: center 18%;
   display: block;
-}
-.about-team__photo--kacper {
-  border: none;
-  box-shadow: none;
-  background: transparent;
-}
-.about-team__img--kacper {
-  object-position: center center;
-  transform: scale(1.34);
 }
 .about-team__name {
   margin: 0;

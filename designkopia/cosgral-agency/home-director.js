@@ -138,14 +138,32 @@
       ["name", "email", "company", "message", "bot-field"].forEach(function (key) {
         params.append(key, (data.get(key) || "").toString());
       });
+      params.append("lang", (i18n && i18n.getLang && i18n.getLang()) || document.documentElement.lang || "pl");
 
-      fetch("/", {
+      /* Produkcja (SEOHOST, cosgral.pl): contact.php → mail() na kontakt@cosgral.pl.
+         Podgląd Netlify (*.netlify.app) nie ma PHP — tam POST na "/" łapią Netlify Forms.
+         Wcześniej POST "/" szedł wszędzie: na SEOHOST zwracał 200 (HTML strony),
+         więc formularz pokazywał sukces, a mail nigdy nie wychodził. */
+      var host = location.hostname || "";
+      var netlify = /\.netlify\.app$/.test(host);
+      var endpoint = netlify ? "/" : form.getAttribute("action") || "contact.php";
+
+      fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
         body: params.toString(),
       })
         .then(function (res) {
           if (!res.ok) throw new Error("send failed");
+          if (netlify) return;
+          var ct = res.headers.get("content-type") || "";
+          /* Bez PHP (GitHub Pages, python http.server) serwer oddaje plik .php jako tekst z 200 */
+          if (ct.indexOf("application/json") < 0) throw new Error("no backend");
+          return res.json().then(function (json) {
+            if (!json || json.ok !== true) throw new Error("send failed");
+          });
+        })
+        .then(function () {
           showContactSuccess();
         })
         .catch(function () {
