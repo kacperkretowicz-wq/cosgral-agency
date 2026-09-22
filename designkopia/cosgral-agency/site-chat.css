@@ -168,6 +168,34 @@ html[data-theme="light"] .cg-chat-label {
   flex-shrink: 0;
 }
 
+.cg-chat-launcher__icon--open {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: auto;
+  color: var(--cg-chat-ink);
+  opacity: 1;
+  transition: opacity 0.35s var(--cg-chat-ease), transform 0.35s var(--cg-chat-ease);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cg-chat-launcher__icon--open svg {
+  width: 1.7rem;
+  height: 1.7rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cg-chat-launcher[aria-expanded="true"] .cg-chat-launcher__icon--open {
+  opacity: 0;
+  transform: scale(0.85);
+}
+
 .cg-chat-launcher__icon--close {
   position: absolute;
   inset: 0;

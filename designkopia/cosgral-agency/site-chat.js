@@ -5,7 +5,7 @@
   var HUB_FALLBACK = "https://cosgralhub.netlify.app/api/site-chat";
   var STORAGE_KEY = "cg_chat_visitor_key";
   var AI_STORAGE_PREFIX = "cg_chat_ai_msgs_";
-  var POLL_MS = 1800;
+  var POLL_MS = 4000;
   var AI_SOURCE = "cosgral-ai";
 
   var ICON_CLOSE =
@@ -139,13 +139,13 @@
     "aria-label": "Otwórz czat",
   });
   var stage = el("span", "cg-chat-launcher__stage");
-  var cubeCanvas = el("canvas", "cg-chat-cube-canvas");
-  cubeCanvas.setAttribute("data-cg-chat-cube", "1");
-  cubeCanvas.setAttribute("aria-hidden", "true");
+  var iconOpen = el("span", "cg-chat-launcher__icon cg-chat-launcher__icon--open", {
+    html: ICON_CHAT,
+  });
   var iconClose = el("span", "cg-chat-launcher__icon cg-chat-launcher__icon--close", {
     html: ICON_CLOSE,
   });
-  stage.appendChild(cubeCanvas);
+  stage.appendChild(iconOpen);
   stage.appendChild(iconClose);
   var label = el("span", "cg-chat-label", { text: "LIVE CZAT" });
   launcher.appendChild(stage);
@@ -189,9 +189,10 @@
         input.focus();
         scrollBottom();
       });
-      poll();
+      setPolling(true);
     } else {
       panel.classList.remove("is-open");
+      setPolling(false);
     }
   }
 
@@ -480,8 +481,18 @@
   loadLocalAi().forEach(function (m) {
     renderMessage(m);
   });
-  poll();
-  window.setInterval(poll, POLL_MS);
+
+  var pollTimer = null;
+  function setPolling(on) {
+    if (on) {
+      if (pollTimer) return;
+      poll();
+      pollTimer = window.setInterval(poll, POLL_MS);
+    } else if (pollTimer) {
+      window.clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  }
 
   window.CosgralChat = {
     open: function () {
