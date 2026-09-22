@@ -78,8 +78,8 @@ function http_json(string $method, string $url, ?array $body = null, array $head
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_HTTPHEADER => $hdrs,
-        CURLOPT_TIMEOUT => 45,
-        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT => 18,
+        CURLOPT_CONNECTTIMEOUT => 8,
     ];
     if ($body !== null) {
         $json = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -252,7 +252,12 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
     if (!$res['ok']) {
         throw new RuntimeException('gemini_failed');
     }
-    $parts = $res['data']['candidates'][0]['content']['parts'] ?? [];
+    $candidate = $res['data']['candidates'][0] ?? null;
+    $finish = is_array($candidate) ? (string)($candidate['finishReason'] ?? '') : '';
+    if ($finish === 'SAFETY' || $finish === 'BLOCKLIST' || $finish === 'PROHIBITED_CONTENT') {
+        return 'Jasne — wróćmy do rzeczy. W czym mogę pomóc w sprawie strony, CRM, SEO albo automatyzacji?';
+    }
+    $parts = is_array($candidate) ? ($candidate['content']['parts'] ?? []) : [];
     $text = '';
     foreach ($parts as $p) {
         if (is_array($p) && isset($p['text'])) {

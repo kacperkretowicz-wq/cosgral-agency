@@ -331,21 +331,56 @@
   }
 
   function postChat(body) {
+    var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timedOut = false;
+    var timer = window.setTimeout(function () {
+      timedOut = true;
+      if (ctrl) ctrl.abort();
+    }, 22000);
+
     return fetch(API, {
       method: "POST",
       credentials: "omit",
       headers: { "Content-Type": "application/json" },
+      signal: ctrl ? ctrl.signal : undefined,
       body: JSON.stringify({
         visitor_key: visitorKey,
         body: body,
         page_url: location.href.slice(0, 500),
         history: conversation.slice(-12),
       }),
-    }).then(function (r) {
-      return r.json().then(function (data) {
-        return { ok: r.ok, data: data, status: r.status };
+    })
+      .then(function (r) {
+        return r
+          .json()
+          .catch(function () {
+            return {};
+          })
+          .then(function (data) {
+            return { ok: r.ok, data: data || {}, status: r.status };
+          });
+      })
+      .catch(function (err) {
+        if (timedOut) {
+          return { ok: false, data: {}, status: 408, timedOut: true };
+        }
+        throw err;
+      })
+      .finally(function () {
+        window.clearTimeout(timer);
       });
-    });
+  }
+
+  function localFallbackAi() {
+    return {
+      id: "ai-local-" + uuid(),
+      role: "agent",
+      body:
+        "Chwilę trwało — zespół Cosgral dostał Twoją wiadomość i wróci, jak będzie wolny. " +
+        "Możesz też napisać na kontakt@cosgral.pl albo zadzwonić: Jakub +48 533 790 518.",
+      source: AI_SOURCE,
+      created_at: new Date().toISOString(),
+    };
   }
 
   form.addEventListener("submit", function (e) {
@@ -369,8 +404,7 @@
 
     postChat(body)
       .then(function (res) {
-        if (!res.ok) throw new Error("send failed");
-        showTyping(false);
+        if (!res.ok) throw new Error(res.timedOut ? "timeout" : "send failed");
 
         if (res.data && res.data.human_takeover) {
           humanTakeover = true;
@@ -384,12 +418,19 @@
         if (res.data && res.data.ai_message && res.data.ai_message.body) {
           saveLocalAi(res.data.ai_message);
           renderMessage(res.data.ai_message);
-        } else if (!humanTakeover && res.data && !res.data.ai_message) {
-          poll();
+        } else if (!humanTakeover) {
+          var fb = localFallbackAi();
+          saveLocalAi(fb);
+          renderMessage(fb);
         }
       })
-      .catch(function () {
-        showTyping(false);
+      .catch(function (err) {
+        if (err && err.message === "timeout" && !humanTakeover) {
+          var fb = localFallbackAi();
+          saveLocalAi(fb);
+          renderMessage(fb);
+          return;
+        }
         input.value = body;
         delete knownIds[optimisticId];
         if (optimisticBubble && optimisticBubble.parentNode === msgs) {
@@ -400,6 +441,7 @@
         }
       })
       .finally(function () {
+        showTyping(false);
         sending = false;
         submit.disabled = false;
         input.focus();
