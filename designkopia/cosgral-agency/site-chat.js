@@ -139,13 +139,13 @@
     "aria-label": "Otwórz czat",
   });
   var stage = el("span", "cg-chat-launcher__stage");
-  var iconOpen = el("span", "cg-chat-launcher__icon cg-chat-launcher__icon--open", {
-    html: ICON_CHAT,
-  });
+  var cubeCanvas = el("canvas", "cg-chat-cube-canvas");
+  cubeCanvas.setAttribute("data-cg-chat-cube", "1");
+  cubeCanvas.setAttribute("aria-hidden", "true");
   var iconClose = el("span", "cg-chat-launcher__icon cg-chat-launcher__icon--close", {
     html: ICON_CLOSE,
   });
-  stage.appendChild(iconOpen);
+  stage.appendChild(cubeCanvas);
   stage.appendChild(iconClose);
   var label = el("span", "cg-chat-label", { text: "LIVE CZAT" });
   launcher.appendChild(stage);
