@@ -1,13 +1,7 @@
 (function () {
   "use strict";
 
-  var API = (
-    window.COSGRAL_CHAT_API ||
-    (location.protocol === "http:" || location.protocol === "https:"
-      ? "/api/site-chat"
-      : "https://cosgralhub.netlify.app/api/site-chat")
-  ).replace(/\/$/, "");
-
+  var API = (window.COSGRAL_CHAT_API || "/api/site-chat").replace(/\/$/, "");
   var HUB_FALLBACK = "https://cosgralhub.netlify.app/api/site-chat";
   var STORAGE_KEY = "cg_chat_visitor_key";
   var AI_STORAGE_PREFIX = "cg_chat_ai_msgs_";

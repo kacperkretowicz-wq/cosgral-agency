@@ -1,22 +1,21 @@
 # Live chat AI (Gemini Flash)
 
+## Produkcja (cosgral.pl / SEOHOST)
+
+Endpoint: `/api/site-chat` → rewrite → `api/site-chat.php`
+
+1. Skopiuj `api/site-chat.secrets.php.example` → `api/site-chat.secrets.php`
+2. Wstaw `GEMINI_API_KEY` z Google AI Studio
+3. Wgraj na SEOHOST (`./scripts/deploy-seohost.sh` + osobno secrets jeśli nie w mirror)
+
+## Preview (Netlify)
+
 Endpoint: `/api/site-chat` → `netlify/functions/site-chat.mjs`
 
-## Netlify env
-
-| Variable | Required | Notes |
-|---|---|---|
-| `GEMINI_API_KEY` | **yes** | Google AI Studio / Gemini API key |
-| `GEMINI_MODEL` | no | default `gemini-2.0-flash` |
-| `CHAT_HUB_AGENT_PIN` | no | PIN z Cosgral Hub — wtedy odpowiedzi AI trafiają też do CRM jako agent |
-| `COSGRAL_HUB_CHAT_API` | no | default `https://cosgralhub.netlify.app/api/site-chat` |
-
-Bez `GEMINI_API_KEY` czat nadal zapisuje wiadomość w Hubie i odsyła bezpieczny fallback (prośba o kontakt).
+Env na Netlify: `GEMINI_API_KEY` (wymagane), opcjonalnie `GEMINI_MODEL`, `CHAT_HUB_AGENT_PIN`.
 
 ## Flow
 
-1. Klient pisze → wiadomość leci do Cosgral Hub (zespół widzi lead).
-2. Jeśli w wątku nie ma jeszcze odpowiedzi człowieka → Gemini Flash odpowiada na bazie oferty ze strony.
-3. Gdy konsultant odpisze w Hubie (`role: agent`) → AI milknie (`human_takeover`).
-
-Deploy: `./scripts/deploy-agency-preview.sh`
+1. Klient pisze → wiadomość leci do Cosgral Hub
+2. Gemini Flash odpowiada na bazie oferty ze strony
+3. Gdy konsultant odpisze w Hubie → AI milknie
