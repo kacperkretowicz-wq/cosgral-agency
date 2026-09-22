@@ -1,13 +1,18 @@
 (function () {
   "use strict";
 
-  var API =
-    (window.COSGRAL_CHAT_API || "https://cosgralhub.netlify.app/api/site-chat").replace(
-      /\/$/,
-      "",
-    );
+  var API = (
+    window.COSGRAL_CHAT_API ||
+    (location.protocol === "http:" || location.protocol === "https:"
+      ? "/api/site-chat"
+      : "https://cosgralhub.netlify.app/api/site-chat")
+  ).replace(/\/$/, "");
+
+  var HUB_FALLBACK = "https://cosgralhub.netlify.app/api/site-chat";
   var STORAGE_KEY = "cg_chat_visitor_key";
+  var AI_STORAGE_PREFIX = "cg_chat_ai_msgs_";
   var POLL_MS = 1800;
+  var AI_SOURCE = "cosgral-ai";
 
   var ICON_CLOSE =
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>';
@@ -50,6 +55,40 @@
   var unread = 0;
   var sending = false;
   var closeTimer = null;
+  var humanTakeover = false;
+  var conversation = [];
+  var typingEl = null;
+
+  function aiStorageKey() {
+    return AI_STORAGE_PREFIX + visitorKey;
+  }
+
+  function loadLocalAi() {
+    try {
+      var raw = localStorage.getItem(aiStorageKey());
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveLocalAi(msg) {
+    if (!msg || !msg.id) return;
+    try {
+      var list = loadLocalAi();
+      if (list.some(function (m) { return m.id === msg.id; })) return;
+      list.push({
+        id: msg.id,
+        role: "agent",
+        body: msg.body,
+        source: AI_SOURCE,
+        created_at: msg.created_at || new Date().toISOString(),
+      });
+      if (list.length > 40) list = list.slice(-40);
+      localStorage.setItem(aiStorageKey(), JSON.stringify(list));
+    } catch (_) {}
+  }
 
   var root = el("div", "cg-chat-root");
   root.setAttribute("data-cg-chat", "1");
@@ -61,10 +100,12 @@
 
   var head = el("div", "cg-chat-head");
   var brand = el("div", "cg-chat-head__brand");
-  brand.appendChild(el("div", "cg-chat-head__eyebrow", { text: "Live" }));
+  var eyebrow = el("div", "cg-chat-head__eyebrow", { text: "Live" });
+  brand.appendChild(eyebrow);
   brand.appendChild(el("strong", null, { text: "Cosgral" }));
   head.appendChild(brand);
-  head.appendChild(el("div", "cg-chat-status", { title: "Online" }));
+  var statusDot = el("div", "cg-chat-status", { title: "Online" });
+  head.appendChild(statusDot);
 
   var msgs = el("div", "cg-chat-msgs");
   var empty = el("div", "cg-chat-empty");
@@ -76,7 +117,7 @@
   empty.appendChild(el("div", "cg-chat-empty__label", { text: "Napisz do nas" }));
   empty.appendChild(
     el("div", "cg-chat-empty__text", {
-      text: "Powiedz, czego potrzebujesz — odpiszemy jak najszybciej.",
+      text: "Odpiszemy od razu — asystent Cosgral jest online, a zespół dołączy, gdy będzie wolny.",
     }),
   );
   msgs.appendChild(empty);
@@ -122,6 +163,16 @@
   root.appendChild(panel);
   root.appendChild(launcher);
 
+  function setEyebrow() {
+    if (humanTakeover) {
+      eyebrow.textContent = "Zespół";
+      statusDot.title = "Konsultant online";
+    } else {
+      eyebrow.textContent = "Live";
+      statusDot.title = "Asystent online";
+    }
+  }
+
   function setOpen(next) {
     next = !!next;
     if (next === open) return;
@@ -163,8 +214,17 @@
     msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function renderMessage(m) {
-    if (knownIds[m.id]) return;
+  function remember(m) {
+    if (!m || !m.body) return;
+    conversation.push({
+      role: m.role === "agent" ? "agent" : "visitor",
+      body: m.body,
+    });
+    if (conversation.length > 24) conversation = conversation.slice(-24);
+  }
+
+  function renderMessage(m, opts) {
+    if (!m || !m.id || knownIds[m.id]) return;
     knownIds[m.id] = 1;
     if (empty.parentNode) empty.remove();
     var bubble = el(
@@ -172,12 +232,69 @@
       "cg-chat-bubble cg-chat-bubble--" + (m.role === "agent" ? "agent" : "visitor"),
       { text: m.body },
     );
+    if (m.source === AI_SOURCE) bubble.setAttribute("data-cg-ai", "1");
     msgs.appendChild(bubble);
+    if (!(opts && opts.silentRemember)) remember(m);
     if (m.role === "agent" && !open) {
       unread += 1;
       updateBadge();
     }
     scrollBottom();
+  }
+
+  function showTyping(on) {
+    if (on) {
+      if (typingEl) return;
+      if (empty.parentNode) empty.remove();
+      typingEl = el("div", "cg-chat-typing", { "aria-label": "Pisze…" });
+      typingEl.appendChild(el("span"));
+      typingEl.appendChild(el("span"));
+      typingEl.appendChild(el("span"));
+      msgs.appendChild(typingEl);
+      scrollBottom();
+    } else if (typingEl) {
+      typingEl.remove();
+      typingEl = null;
+    }
+  }
+
+  function mergeAndRender(serverMessages) {
+    var list = Array.isArray(serverMessages) ? serverMessages.slice() : [];
+    var localAi = loadLocalAi();
+    var hubIds = Object.create(null);
+    list.forEach(function (m) {
+      if (m && m.id) hubIds[m.id] = 1;
+    });
+
+    if (!humanTakeover) {
+      localAi.forEach(function (m) {
+        if (m && m.id && !hubIds[m.id]) list.push(m);
+      });
+    }
+
+    list.sort(function (a, b) {
+      var ta = a && a.created_at ? Date.parse(a.created_at) : 0;
+      var tb = b && b.created_at ? Date.parse(b.created_at) : 0;
+      return ta - tb;
+    });
+
+    var sawHuman = false;
+    list.forEach(function (m) {
+      if (!m) return;
+      if (
+        m.role === "agent" &&
+        m.source !== AI_SOURCE &&
+        String(m.id || "").indexOf("ai-") !== 0
+      ) {
+        sawHuman = true;
+      }
+      renderMessage(m);
+    });
+
+    if (sawHuman && !humanTakeover) {
+      humanTakeover = true;
+      setEyebrow();
+    }
   }
 
   function poll() {
@@ -186,13 +303,54 @@
       { cache: "no-store", credentials: "omit" },
     )
       .then(function (r) {
+        if (!r.ok) throw new Error("poll failed");
         return r.json();
       })
       .then(function (data) {
-        if (!data || !Array.isArray(data.messages)) return;
-        data.messages.forEach(renderMessage);
+        if (!data) return;
+        if (data.human_takeover) {
+          humanTakeover = true;
+          setEyebrow();
+        }
+        mergeAndRender(data.messages);
       })
-      .catch(function () {});
+      .catch(function () {
+        if (API !== HUB_FALLBACK) {
+          fetch(
+            HUB_FALLBACK +
+              "?visitor_key=" +
+              encodeURIComponent(visitorKey) +
+              "&_=" +
+              Date.now(),
+            { cache: "no-store", credentials: "omit" },
+          )
+            .then(function (r) {
+              return r.json();
+            })
+            .then(function (data) {
+              if (data && Array.isArray(data.messages)) mergeAndRender(data.messages);
+            })
+            .catch(function () {});
+        }
+      });
+  }
+
+  function postChat(body) {
+    return fetch(API, {
+      method: "POST",
+      credentials: "omit",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        visitor_key: visitorKey,
+        body: body,
+        page_url: location.href.slice(0, 500),
+        history: conversation.slice(-12),
+      }),
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        return { ok: r.ok, data: data, status: r.status };
+      });
+    });
   }
 
   form.addEventListener("submit", function (e) {
@@ -201,29 +359,50 @@
     if (!body || sending) return;
     sending = true;
     submit.disabled = true;
-    fetch(API, {
-      method: "POST",
-      credentials: "omit",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        visitor_key: visitorKey,
-        body: body,
-        page_url: location.href.slice(0, 500),
-      }),
-    })
-      .then(function (r) {
-        return r.json().then(function (data) {
-          return { ok: r.ok, data: data };
-        });
-      })
+    input.value = "";
+
+    var optimisticId = "local-" + uuid();
+    renderMessage({
+      id: optimisticId,
+      role: "visitor",
+      body: body,
+      created_at: new Date().toISOString(),
+    });
+    var optimisticBubble = msgs.lastElementChild;
+
+    if (!humanTakeover) showTyping(true);
+
+    postChat(body)
       .then(function (res) {
         if (!res.ok) throw new Error("send failed");
-        input.value = "";
-        if (res.data && res.data.message) renderMessage(res.data.message);
-        else poll();
+        showTyping(false);
+
+        if (res.data && res.data.human_takeover) {
+          humanTakeover = true;
+          setEyebrow();
+        }
+
+        if (res.data && res.data.message && res.data.message.id) {
+          knownIds[res.data.message.id] = 1;
+        }
+
+        if (res.data && res.data.ai_message && res.data.ai_message.body) {
+          saveLocalAi(res.data.ai_message);
+          renderMessage(res.data.ai_message);
+        } else if (!humanTakeover && res.data && !res.data.ai_message) {
+          poll();
+        }
       })
       .catch(function () {
+        showTyping(false);
         input.value = body;
+        delete knownIds[optimisticId];
+        if (optimisticBubble && optimisticBubble.parentNode === msgs) {
+          optimisticBubble.remove();
+        }
+        if (conversation.length && conversation[conversation.length - 1].body === body) {
+          conversation.pop();
+        }
       })
       .finally(function () {
         sending = false;
@@ -241,6 +420,7 @@
   });
 
   document.documentElement.appendChild(root);
+  setEyebrow();
 
   /* Visible only between hero end and contact/footer — slide+fade from bottom */
   function heroEl() {
@@ -303,6 +483,9 @@
     applyChatVisibility(true);
   }, 120);
 
+  loadLocalAi().forEach(function (m) {
+    renderMessage(m);
+  });
   poll();
   window.setInterval(poll, POLL_MS);
 
