@@ -192,7 +192,7 @@
 .service-panel__title {
   font-family: var(--font-display, system-ui, sans-serif);
   font-size: clamp(2.2rem, 6.2vw, 4.6rem);
-  font-weight: 600;
+  font-weight: 300;
   line-height: 0.98;
   letter-spacing: -0.03em;
   max-width: 12ch;
@@ -216,7 +216,7 @@
 .service-panel__col h3 {
   font-family: var(--font-display, system-ui, sans-serif);
   font-size: clamp(1.05rem, 1.8vw, 1.5rem);
-  font-weight: 600;
+  font-weight: 300;
   margin-bottom: clamp(0.75rem, 1.8vh, 1.15rem);
   letter-spacing: -0.02em;
 }

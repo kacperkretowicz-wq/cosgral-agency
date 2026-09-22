@@ -14,18 +14,19 @@ if [[ -z "$PASS" ]]; then
 fi
 
 if ! command -v lftp >/dev/null 2>&1; then
-  echo "Brak lftp — zainstaluj: sudo apt-get install lftp" >&2
+  echo "Brak lftp — zainstaluj: brew install lftp" >&2
   exit 1
 fi
 
-echo "Deploy $SRC -> $USER@$HOST:$REMOTE"
+echo "Deploy $SRC/ -> $USER@$HOST:$REMOTE"
 
-lftp -u "$USER","$PASS" "$HOST" <<EOF
+# Trailing slash on SRC = contents into REMOTE (no nested cosgral-agency/)
+lftp -u "$USER","$PASS" "$HOST" <<LFTP
 set ftp:ssl-allow no
 set net:timeout 30
 set net:max-retries 3
-mirror -R --verbose --parallel=4 --delete "$SRC" "$REMOTE"
+mirror -R --verbose --parallel=4 --exclude-glob .DS_Store --exclude-glob .git* "$SRC/" "$REMOTE"
 bye
-EOF
+LFTP
 
 echo "Deploy zakończony."

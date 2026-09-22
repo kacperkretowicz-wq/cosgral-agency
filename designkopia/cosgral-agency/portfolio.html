@@ -11,7 +11,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="cosgral-build" content="20260918f" />
+<meta name="cosgral-build" content="20260917af" />
 <script src="site-cache-bust.js?v=20260831e"></script>
 <title>Portfolio — cosgral.agency</title>
 <meta name="description" content="Realizacje — montaż wideo, kreacja graficzna, strony internetowe, systemy i automatyzacje." />
@@ -34,11 +34,11 @@
   "about": "Wybrane realizacje agencji COSGRAL — strony, wideo, grafiki i automatyzacje."
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260918f" />
-<link rel="stylesheet" href="theme-mode.css?v=20260918f" />
-<link rel="stylesheet" href="page-transitions.css?v=20260810h" />
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260922ui52" />
+<link rel="stylesheet" href="web-case-panel.css?v=20260920ui39" />
+<link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
+<link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
 <script>
   (function () {
     if (sessionStorage.getItem("cosgral-page-transition")) {
@@ -46,9 +46,10 @@
     }
   })();
 </script>
-<script src="page-transitions.js?v=20260918d"></script>
+<script src="page-transitions.js?v=20260920ui10"></script>
 <script src="cosgral-motion-pref.js?v=20260831e"></script>
-<script src="theme-mode.js?v=20260831f"></script>
+<script src="theme-mode.js?v=20260920ui34"></script>
+  <link rel="stylesheet" href="site-chat.css?v=20260922ui51" />
 </head>
 <body class="subpage portfolio-page">
 <a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
@@ -70,7 +71,7 @@
 
 <nav class="site-nav" id="site-nav">
   <a href="index.html#top" class="site-nav__logo" data-i18n-aria-label="common.logo_aria" aria-label="COSGRAL — strona główna">
-    <img src="images/cosgral-agency/brand/cosgral-logo-cube-192.png" alt="" class="site-nav__logo-img" width="48" height="48" />
+    <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <div class="site-nav__actions">
     <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
@@ -106,51 +107,54 @@
     <p class="portfolio-hero__lead" data-i18n="portfolio.hero_lead">Wybrane projekty stron, wideo, grafiki oraz systemów i automatyzacji.</p>
   </header>
 
-  <section id="strony" class="portfolio-section" data-portfolio-section>
-    <div class="portfolio-section__curtain" aria-hidden="true"></div>
+  <section id="strony" class="portfolio-section portfolio-section--web" data-portfolio-section>
     <div class="container">
       <div class="portfolio-section__head" data-portfolio-head>
         <h2 class="portfolio-section__title" data-i18n="portfolio.web_title">Strony internetowe</h2>
         <p class="section-lead" data-i18n="portfolio.web_lead">Od landing page po serwisy firmowe i sklepy — projekt i wdrożenie pod cele biznesowe.</p>
         <a class="portfolio-section__link" href="index.html?service=blue" data-i18n="portfolio.web_service">Usługa: strony internetowe →</a>
       </div>
-      <div class="portfolio-web-grid" data-portfolio-body>
-        <a class="portfolio-web-card" href="https://mjsocialmedia.netlify.app/" target="_blank" rel="noopener noreferrer">
-          <div class="portfolio-web-card__preview portfolio-web-card__preview--mj" aria-hidden="true">
-            <video class="portfolio-web-card__video" data-portfolio-video data-video-src="portfolio-media/showcase/web/mj-social-media.mp4" muted loop playsinline preload="none"></video>
-            <div class="portfolio-web-card__chrome">
-              <span></span><span></span><span></span>
-            </div>
-            <p class="portfolio-web-card__domain">mjsocialmedia.netlify.app</p>
+      <div class="web-deck" data-web-deck data-portfolio-body data-cursor="drag-x">
+        <div class="web-deck__viewport">
+          <div class="web-deck__track" data-web-deck-track>
+            <button type="button" class="web-deck__card" data-web-case="juicy" aria-label="Juicy Events">
+              <div class="web-deck__preview web-deck__preview--juicy" aria-hidden="true">
+                <div class="web-deck__chrome"><span></span><span></span><span></span></div>
+                <video class="web-deck__video" data-portfolio-video data-video-mode="focus-only" data-video-src="portfolio-media/showcase/web/juicy-events.mp4" poster="portfolio-media/showcase/web/juicy-events-poster.jpg" muted loop playsinline preload="metadata"></video>
+              </div>
+              <div class="web-deck__body">
+                <h3 class="web-deck__title" data-i18n="portfolio.juicy_title">Juicy Events</h3>
+                <p class="web-deck__desc" data-i18n="portfolio.juicy_desc">Agencja eventowa</p>
+              </div>
+            </button>
+            <button type="button" class="web-deck__card" data-web-case="trove" aria-label="Trove Archive">
+              <div class="web-deck__preview web-deck__preview--trove" aria-hidden="true">
+                <div class="web-deck__chrome"><span></span><span></span><span></span></div>
+                <video class="web-deck__video" data-portfolio-video data-video-mode="focus-only" data-video-src="portfolio-media/showcase/web/trove-archive.mp4" poster="portfolio-media/showcase/web/trove-archive-poster.jpg" muted loop playsinline preload="metadata"></video>
+              </div>
+              <div class="web-deck__body">
+                <h3 class="web-deck__title" data-i18n="portfolio.trove_title">Trove Archive</h3>
+                <p class="web-deck__desc" data-i18n="portfolio.trove_desc">Ecommerce fashion</p>
+              </div>
+            </button>
+            <button type="button" class="web-deck__card" data-web-case="mj" aria-label="MJ Social Media">
+              <div class="web-deck__preview web-deck__preview--mj" aria-hidden="true">
+                <div class="web-deck__chrome"><span></span><span></span><span></span></div>
+                <video class="web-deck__video" data-portfolio-video data-video-mode="focus-only" data-video-src="portfolio-media/showcase/web/mj-social-media.mp4" poster="portfolio-media/showcase/web/mj-social-media-poster.jpg" muted loop playsinline preload="metadata"></video>
+              </div>
+              <div class="web-deck__body">
+                <h3 class="web-deck__title" data-i18n="portfolio.mj_title">MJ Social Media</h3>
+                <p class="web-deck__desc" data-i18n="portfolio.mj_desc">Content creator</p>
+              </div>
+            </button>
           </div>
-          <div class="portfolio-web-card__body">
-            <p class="portfolio-web-card__tag">MJ Social Media</p>
-            <h3 class="portfolio-web-card__title" data-i18n="portfolio.mj_title">Landing page content creatora</h3>
-            <p class="portfolio-web-card__desc" data-i18n="portfolio.mj_desc">Strona marki osobistej content creatora: oferta usług, portfolio i kontakt. Zaprojektowana tak, aby prowadzić odbiorców z social mediów do zapytania ofertowego.</p>
-            <span class="portfolio-web-card__cta" data-i18n="portfolio.view_site">Zobacz stronę →</span>
-          </div>
-        </a>
-        <a class="portfolio-web-card" href="https://trovearchive.com/" target="_blank" rel="noopener noreferrer">
-          <div class="portfolio-web-card__preview portfolio-web-card__preview--trove" aria-hidden="true">
-            <video class="portfolio-web-card__video" data-portfolio-video data-video-src="portfolio-media/showcase/web/trove-archive.mp4" muted loop playsinline preload="none"></video>
-            <div class="portfolio-web-card__chrome">
-              <span></span><span></span><span></span>
-            </div>
-            <p class="portfolio-web-card__domain">trovearchive.com</p>
-          </div>
-          <div class="portfolio-web-card__body">
-            <p class="portfolio-web-card__tag">Trove Archive</p>
-            <h3 class="portfolio-web-card__title" data-i18n="portfolio.trove_title">E-commerce vintage fashion</h3>
-            <p class="portfolio-web-card__desc" data-i18n="portfolio.trove_desc">Sklep online z odzieżą vintage luxury: katalog, koszyk i checkout. Przejrzysty proces zakupowy wspierający konwersję i wizerunek marki premium.</p>
-            <span class="portfolio-web-card__cta" data-i18n="portfolio.view_site">Zobacz stronę →</span>
-          </div>
-        </a>
+        </div>
+        <p class="web-deck__hint" data-i18n="portfolio.web_deck_hint">Przesuń trackpadem między projektami</p>
       </div>
     </div>
   </section>
 
   <section id="montaz" class="portfolio-section" data-portfolio-section>
-    <div class="portfolio-section__curtain" aria-hidden="true"></div>
     <div class="container">
       <div class="portfolio-section__head" data-portfolio-head>
         <h2 class="portfolio-section__title" data-i18n="portfolio.montaz_title">Montaż wideo</h2>
@@ -160,14 +164,13 @@
       <div data-portfolio-body>
         <div id="reels-tiles" class="reels-tiles"></div>
         <p class="reels-tiles__footer">
-          <a class="reels-tiles__cta glass-btn" href="portfolio-montaz.html" data-i18n="portfolio.view_all">Zobacz wszystko →</a>
+          <a class="reels-tiles__cta glass-btn" href="portfolio-montaz.html" data-i18n="portfolio.view_more">Zobacz więcej →</a>
         </p>
       </div>
     </div>
   </section>
 
   <section id="grafiki" class="portfolio-section portfolio-section--grafiki" data-portfolio-section>
-    <div class="portfolio-section__curtain" aria-hidden="true"></div>
     <div class="graphics-stage">
       <div class="graphics-stage__cinema" data-portfolio-body>
         <div id="graphics-collage" class="graphics-collage"></div>
@@ -181,12 +184,15 @@
     </div>
   </section>
 
+  <section id="automatyzacje-intro" class="portfolio-chapter" data-portfolio-chapter aria-label="Systemy i automatyzacje">
+    <h2 class="portfolio-chapter__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
+  </section>
+
   <section id="automatyzacje" class="portfolio-section portfolio-section--automatyzacje portfolio-scene" data-portfolio-section>
-    <div class="portfolio-section__curtain" aria-hidden="true"></div>
     <div class="portfolio-scene__panel">
       <div class="container">
         <div class="portfolio-section__head" data-portfolio-head>
-          <h2 class="portfolio-section__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
+          <h2 class="portfolio-section__title visually-hidden" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
           <p class="section-lead" data-i18n="portfolio.automation_lead">Aplikacje, CRM i procesy automatyczne, które porządkują sprzedaż, operacje i komunikację z klientem.</p>
           <a class="portfolio-section__link" href="index.html?service=orange" data-i18n="portfolio.automation_service">Usługa: automatyzacje →</a>
         </div>
@@ -330,27 +336,30 @@
   </div>
 </footer>
 
-<script src="i18n.js?v=20260825x"></script>
+<script src="i18n.js?v=20260920ui10"></script>
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="smooth-scroll.js?v=20260917ae"></script>
-<script src="home-cursor-field.js?v=20260916a"></script>
-<script src="home-cursor.js?v=20260916a"></script>
-<script src="home-tile-interact.js?v=20260918d"></script>
+<script src="home-cursor-field.js?v=20260920ui7"></script>
+<script src="home-cursor.js?v=20260920ui10"></script>
+<script src="home-tile-interact.js?v=20260920ui41"></script>
 <script src="subpage-ambient-bg.js?v=20260916a"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
-<script type="module" src="subpage-cube.js?v=20260918e"></script>
-<script type="module" src="portfolio-hero-sand.js?v=20260918d"></script>
-<script defer src="home-nav-menu.js?v=20260816at"></script>
+<script type="module" src="subpage-cube.js?v=20260920ui43"></script>
+<script type="module" src="portfolio-hero-sand.js?v=20260920ui26"></script>
+<script defer src="home-nav-menu.js?v=20260920ui31"></script>
 <script src="sections.js?v=20260814e"></script>
 <script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
-<script src="portfolio-video.js?v=20260807ag"></script>
-<script src="portfolio-montaz.js?v=20260831e"></script>
-<script src="portfolio-graphics.js?v=20260917ae"></script>
-<script src="portfolio-page-motion.js?v=20260917ae"></script>
-<script src="portfolio-section-stepper.js?v=20260917ae"></script>
-<script src="portfolio-scroll-rail.js?v=20260812s"></script>
+<script src="portfolio-video.js?v=20260920ui19"></script>
+<script src="portfolio-web-deck.js?v=20260920ui33"></script>
+<script src="portfolio-montaz.js?v=20260920ui36"></script>
+<script src="portfolio-graphics.js?v=20260920ui40"></script>
+<script src="portfolio-page-motion.js?v=20260920ui41"></script>
+<script src="portfolio-section-stepper.js?v=20260919al"></script>
+<script src="portfolio-scroll-rail.js?v=20260922ui52"></script>
+<script defer src="site-chat.js?v=20260922ui51"></script>
+<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
 </body>
 </html>

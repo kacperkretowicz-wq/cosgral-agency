@@ -9,6 +9,10 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
+  var noGyroPages =
+    document.body.classList.contains("graphics-gallery-page") ||
+    document.body.classList.contains("reels-gallery-page");
+
   var COARSE = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
@@ -57,10 +61,16 @@
       state.tnx = (clientX / window.innerWidth) * 2 - 1;
       state.tny = -((clientY / window.innerHeight) * 2 - 1);
     }
+    if (MOBILE && !orient.active) {
+      /* Touch fallback when gyro is unavailable / not yet granted */
+      state.tnx = (clientX / window.innerWidth) * 2 - 1;
+      state.tny = -((clientY / window.innerHeight) * 2 - 1);
+      state.fromOrientation = false;
+    }
     if (COARSE) {
       state.x = state.tx;
       state.y = state.ty;
-      if (!MOBILE && !orient.active) {
+      if (!orient.active) {
         state.nx = state.tnx;
         state.ny = state.tny;
       }
@@ -173,7 +183,16 @@
   document.addEventListener(
     "touchmove",
     function (e) {
-      if (MOBILE || !e.touches[0]) return;
+      if (!e.touches[0]) return;
+      setTarget(e.touches[0].clientX, e.touches[0].clientY);
+    },
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "touchstart",
+    function (e) {
+      if (!e.touches[0]) return;
       setTarget(e.touches[0].clientX, e.touches[0].clientY);
     },
     { passive: true }
@@ -210,19 +229,26 @@
   }
 
   function tick() {
-    if (orient.active || orient.listening) {
-      state.tnx += (orient.tnx - state.tnx) * 0.16;
-      state.tny += (orient.tny - state.tny) * 0.16;
-      state.nx += (state.tnx - state.nx) * 0.16;
-      state.ny += (state.tny - state.ny) * 0.16;
+    if (orient.active) {
+      state.tnx += (orient.tnx - state.tnx) * 0.22;
+      state.tny += (orient.tny - state.tny) * 0.22;
+      state.nx += (state.tnx - state.nx) * 0.22;
+      state.ny += (state.tny - state.ny) * 0.22;
       state.x = (state.nx * 0.5 + 0.5) * window.innerWidth;
       state.y = (-state.ny * 0.5 + 0.5) * window.innerHeight;
-      state.fromOrientation = orient.active;
-    } else if (!MOBILE) {
+      state.fromOrientation = true;
+    } else if (MOBILE) {
+      state.x += (state.tx - state.x) * 0.12;
+      state.y += (state.ty - state.y) * 0.12;
+      state.nx += (state.tnx - state.nx) * 0.12;
+      state.ny += (state.tny - state.ny) * 0.12;
+      state.fromOrientation = false;
+    } else {
       state.x += (state.tx - state.x) * 0.08;
       state.y += (state.ty - state.y) * 0.08;
       state.nx += (state.tnx - state.nx) * 0.08;
       state.ny += (state.tny - state.ny) * 0.08;
+      state.fromOrientation = false;
     }
     applyPointer();
     requestAnimationFrame(tick);
@@ -270,7 +296,7 @@
     }
   }
 
-  armMobileGyro();
+  if (!noGyroPages) armMobileGyro();
   applyPointer();
   requestAnimationFrame(tick);
 })();

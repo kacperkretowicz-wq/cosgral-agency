@@ -18,12 +18,6 @@
   try {
     if (localStorage.getItem("cosgral-force-motion") === "1") return;
   } catch (e) {}
-  if (typeof window.matchMedia !== "function") return;
-
-  var isDesktopPointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (isDesktopPointer) return;
-
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    document.documentElement.classList.add("reduce-motion");
-  }
+  /* Tło ambient i sześcian zostają włączone także na mobile.
+     Reduce-motion tylko z ?reduceMotion= — iOS „Reduce Motion” gasiłby cały shader. */
 })();

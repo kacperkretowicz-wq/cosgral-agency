@@ -1,5 +1,6 @@
 /**
  * Portfolio — sterowanie odtwarzaniem MP4 (lazy load, limit dekoderów, pause poza viewportem).
+ * Pause zachowuje currentTime — powrót na kafelek wznawia od miejsca pauzy.
  */
 (function () {
   "use strict";
@@ -14,9 +15,33 @@
 
   function ensureSrc(video) {
     var src = video.getAttribute("data-video-src");
-    if (!src || video.getAttribute("src")) return;
+    if (!src || video.getAttribute("src")) return false;
     video.src = src;
     video.load();
+    return true;
+  }
+
+  function showPausedFrame(video) {
+    if (!video || shouldSkip(video)) return;
+    if (!video.paused && !video.ended) return;
+    ensureSrc(video);
+    var settle = function () {
+      try {
+        if (!Number.isFinite(video.currentTime) || video.currentTime < 0.04) {
+          video.currentTime = 0.08;
+        }
+      } catch (e) {}
+      if (!video.paused) video.pause();
+    };
+    if (video.readyState >= 2) {
+      settle();
+      return;
+    }
+    var onReady = function () {
+      video.removeEventListener("loadeddata", onReady);
+      settle();
+    };
+    video.addEventListener("loadeddata", onReady);
   }
 
   function removeFromPlaying(video) {
@@ -26,11 +51,8 @@
   }
 
   function pauseVideo(video) {
-    if (!video || video.paused) {
-      removeFromPlaying(video);
-      return;
-    }
-    video.pause();
+    if (!video) return;
+    if (!video.paused) video.pause();
     removeFromPlaying(video);
   }
 
@@ -64,7 +86,9 @@
     if (!video || video.dataset.portfolioVideoBound) return;
     video.dataset.portfolioVideoBound = "1";
     video.removeAttribute("autoplay");
-    if (!video.getAttribute("preload")) video.setAttribute("preload", "none");
+    if (!video.getAttribute("preload") || video.getAttribute("preload") === "none") {
+      video.setAttribute("preload", "metadata");
+    }
     if (!video.hasAttribute("data-portfolio-video")) {
       video.setAttribute("data-portfolio-video", "");
     }
@@ -103,7 +127,10 @@
   function syncReelsFocus(stage) {
     if (!stage) return;
     stage.querySelectorAll(".reels-tiles__track--clone video").forEach(pauseVideo);
-    stage.querySelectorAll(".reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card").forEach(function (card) {
+    var cards = stage.querySelectorAll(
+      ".reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card, .reels-grid__card"
+    );
+    cards.forEach(function (card) {
       var video = card.querySelector("video");
       if (!video) return;
       if (card.classList.contains("is-in-focus")) {
@@ -119,13 +146,22 @@
     root.querySelectorAll("video").forEach(pauseVideo);
   }
 
+  function warmFramesIn(root) {
+    if (!root) return;
+    root.querySelectorAll("video[data-video-src], video[data-portfolio-video]").forEach(showPausedFrame);
+  }
+
   function bindSectionPause(sectionId) {
     var section = document.getElementById(sectionId);
     if (!section) return;
     var sectionIo = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          if (!entry.isIntersecting) pauseAllIn(section);
+          if (!entry.isIntersecting) {
+            pauseAllIn(section);
+            return;
+          }
+          if (sectionId === "strony") warmFramesIn(section);
         });
       },
       { threshold: 0.02 }
@@ -138,6 +174,8 @@
     bindSectionPause("montaz");
     bindSectionPause("strony");
     bindSectionPause("grafiki");
+    var strony = document.getElementById("strony");
+    if (strony) warmFramesIn(strony);
   }
 
   window.CosgralPortfolioVideo = {
@@ -147,6 +185,8 @@
     play: playVideo,
     pause: pauseVideo,
     pauseAllIn: pauseAllIn,
+    warmFrame: showPausedFrame,
+    warmFramesIn: warmFramesIn,
   };
 
   if (document.readyState === "loading") {

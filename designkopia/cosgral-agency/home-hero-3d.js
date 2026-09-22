@@ -2,9 +2,9 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260918d";
-import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
+import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260919mob";
+import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (function () {
   "use strict";
@@ -20,6 +20,12 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
   var HALF = 1.35;
   var CUBE_SCALE = 0.5;
+  /* Mobile hero cube — 1.6× previous size */
+  var MOBILE_HERO_CUBE = 1.6;
+  var HERO_SCALE_MUL = MOBILE ? 0.39 * MOBILE_HERO_CUBE : 0.78;
+  var PEAK_SCALE_MUL = MOBILE ? 0.58 * MOBILE_HERO_CUBE : 1.16;
+  var EDGE_OP = MOBILE ? 0.18 : 0.24;
+  var SHELL_OP = MOBILE ? 0.5 : 0.45;
   var SHARDS = LOW_PERF ? 280 : 1600;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
@@ -390,6 +396,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
   }
 
   var SURFACE = MOBILE ? 1200 : 2800;
+  /* Na mobile cubeGroup.scale jest ~2× mniejszy, a gl_PointSize nie skaluje się
+     z obiektem — te same sprite'y dają jaśniejszy glow. Dopasowujemy do desktopu. */
+  var SURFACE_SIZE_MUL = MOBILE ? 0.48 : 1;
+  var SURFACE_ALPHA_MUL = MOBILE ? 0.42 : 1;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
@@ -397,7 +407,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     sPos[si * 3] = sp[0];
     sPos[si * 3 + 1] = sp[1];
     sPos[si * 3 + 2] = sp[2];
-    sSize[si] = 0.45 + Math.random() * 1.6;
+    sSize[si] = (0.45 + Math.random() * 1.6) * SURFACE_SIZE_MUL;
   }
   var sGeo = new THREE.BufferGeometry();
   sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
@@ -411,12 +421,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
       uFade: { value: 1 },
+      uAlphaMul: { value: SURFACE_ALPHA_MUL },
     },
     vertexShader: `
       attribute float size;
       uniform float uTime;
       uniform vec2 uMouse;
       uniform float uFade;
+      uniform float uAlphaMul;
       varying float vAlpha;
       void main() {
         vec3 pos = position;
@@ -428,7 +440,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
         gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);
         gl_Position = projectionMatrix * mv;
-        vAlpha = (0.42 + smoothstep(2.8, 0.0, dist) * 0.7) * uFade;
+        vAlpha = (0.16 + smoothstep(2.8, 0.0, dist) * 0.25) * uFade * uAlphaMul;
       }
     `,
     fragmentShader: `
@@ -437,7 +449,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
         float d = length(gl_PointCoord - 0.5);
         if (d > 0.5) discard;
         float glow = 1.0 - smoothstep(0.0, 0.5, d);
-        gl_FragColor = vec4(0.9, 0.9, 0.9, vAlpha * glow);
+        gl_FragColor = vec4(0.7, 0.7, 0.72, vAlpha * glow * 0.5);
       }
     `,
   });
@@ -682,10 +694,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
       void main() {
         if (vAlpha < 0.02) discard;
         // Match hero particle language: soft luminous grey
-        vec3 lit = mix(vec3(0.45), vec3(0.95), vShade);
-        vec3 sand = vec3(0.75 + vShade * 0.1);
+        vec3 lit = mix(vec3(0.38), vec3(0.7), vShade);
+        vec3 sand = vec3(0.55 + vShade * 0.08);
         vec3 col = mix(sand, lit, 0.4 + 0.6 * vForm);
-        gl_FragColor = vec4(col, vAlpha);
+        gl_FragColor = vec4(col, vAlpha * 0.7);
       }
     `,
   });
@@ -843,15 +855,15 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
       end: "bottom top",
       scrub: 1.1,
       onUpdate: function (self) {
-        var cur = window.cosgralSand || (window.cosgralSand = {});
+        var cur = window.cosgralSand || {};
         if ((cur.cinema || 0) >= 0.96) {
-          // Mutacja, nie nowy obiekt — inni piszą tu własne pola (servicesVisible,
-          // motionTail, portalCovered) i podmiana kasowała je co tick scruba.
-          cur.break = Math.max(cur.break || 0, 0.98);
-          cur.stream = Math.max(cur.stream || 0, 0.85 + self.progress * 0.15);
-          cur.cinema = Math.max(cur.cinema || 0, 1);
-          cur.locked = true;
-          cur.motion = 1;
+          window.cosgralSand = {
+            break: Math.max(cur.break || 0, 0.98),
+            stream: Math.max(cur.stream || 0, 0.85 + self.progress * 0.15),
+            cinema: Math.max(cur.cinema || 0, 1),
+            locked: true,
+            motion: 1,
+          };
           document.documentElement.classList.add("is-sand-stream");
         }
       },
@@ -968,8 +980,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     var heroX = MOBILE ? 0.3 : 0.4;
     var heroY = MOBILE ? 0.54 : 0.7;
     var heroZ = 0.36;
-    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
-    var peakScale = CUBE_SCALE * (MOBILE ? 1.06 : 1.16);
+    var heroScale = CUBE_SCALE * HERO_SCALE_MUL;
+    var peakScale = CUBE_SCALE * PEAK_SCALE_MUL;
     var cornerX = MOBILE ? 4.35 : 5.55;
     var cornerY = MOBILE ? 3.05 : 3.85;
     var centerX = mouse.x * 0.028;
@@ -1156,7 +1168,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
     if (menuBlend > 0.001) {
       mobileDriftSpinReady = false;
-      var menuScale = heroScale * 1.14;
+      /* Mobile: bigger menu cube so labels fit on the face */
+      var menuScale = CUBE_SCALE * (MOBILE ? 0.82 : 0.78 * 1.14);
       var menuX = heroX;
       var menuY = heroY;
       var menuZ = heroZ;
@@ -1216,15 +1229,15 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
       cubeVisible = true;
       sMat.uniforms.uFade.value = cubeDim;
-      setWireOpacity(wire, 0.35 * cubeDim);
-      shell.material.opacity = 0.35 * cubeDim;
-      edges.material.opacity = 0.95 * cubeDim;
+      setWireOpacity(wire, 0.12 * cubeDim);
+      shell.material.opacity = SHELL_OP * cubeDim;
+      edges.material.opacity = EDGE_OP * cubeDim;
     } else {
       var fade = cubeVisible ? 1 : 0;
       sMat.uniforms.uFade.value = fade;
-      shell.material.opacity = 0.35 * fade;
-      setWireOpacity(wire, 0.35 * fade);
-      edges.material.opacity = 0.95 * fade;
+      shell.material.opacity = SHELL_OP * fade;
+      setWireOpacity(wire, 0.12 * fade);
+      edges.material.opacity = EDGE_OP * fade;
       if (introActive || introLanding || (!introStarted && motion < 0.01 && menuBlend < 0.001)) {
         cubeVisible = true;
       }
@@ -1239,7 +1252,15 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     var shardStream = displayStream;
     var menuAbsorb = 0;
 
-    if (menuBlend > 0.001 && sandLineActive()) {
+    var heroMenuOpen =
+      menuBlend > 0.001 && (window.cosgralSectionSnap?.getIndex?.() ?? 0) === 0 && !menuFrom.sideEntry;
+
+    if (heroMenuOpen) {
+      /* Hero megamenu — bez cząsteczek (jak zamknięty stream) */
+      menuAbsorb = 0;
+      shardBreak = 0;
+      shardStream = 0;
+    } else if (menuBlend > 0.001 && sandLineActive()) {
       menuAbsorb = menuSandAbsorb();
       var hold = menuSandHold || { break: displayBreak, stream: displayStream };
       var keep = 1 - menuAbsorb;
@@ -1273,18 +1294,21 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
       if (cardSampleTick++ % 3 === 0) sampleCards();
     }
 
-    // Portal stays visible for sand ribbon after cube exits
+    // Portal stays visible for sand ribbon after cube exits.
+    // Nie ściemniaj canvasu póki sześcian jest jeszcze na ekranie — wcześniej
+    // tilesOp ściemniał cały portal w trakcie scrolla i wyglądało to jak „gasnący” model.
     var sandOn =
       menuBlend > 0.02 ||
       sandLocked ||
       displayStream > 0.32 ||
       displayBreak > 0.4 ||
       tm > 0.08;
-    var portalOp = sandOn || inHero || motion < 0.08
-      ? 1
-      : tilesOp > 0.45
-        ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
-        : 1;
+    var portalOp =
+      sandOn || inHero || motion < 0.08 || cubeVisible
+        ? 1
+        : tilesOp > 0.45
+          ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
+          : 1;
     var needsScene = portalOp > 0.05 || sandOn || menuBlend > 0.001;
 
     if (canvas.parentElement) {
@@ -1302,9 +1326,6 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     }
 
     if (!needsScene) return;
-    // Stopka zakrywa portal w całości (section-flow: is-footer-covered) — kadr i tak
-    // niewidoczny, więc nie palimy GPU; menu nad stopką nadal renderuje.
-    if (sandExt && sandExt.portalCovered && menuBlend <= 0.001) return;
 
     // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
     // Poza nią częstotliwość ustala sterownik jakości (na tier 0 też co klatkę).
@@ -1333,7 +1354,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
   function captureMenuFrom() {
     var heroZ = 0.36;
-    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
+    var heroScale = CUBE_SCALE * HERO_SCALE_MUL;
     var sectionIdx = window.cosgralSectionSnap?.getIndex?.() ?? 0;
 
     menuFrom.offscreen = false;
@@ -1391,17 +1412,16 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     }
     cubeGroup.visible = true;
     sMat.uniforms.uFade.value = 1;
-    shell.material.opacity = 0.35;
-    setWireOpacity(wire, 0.35);
-    edges.material.opacity = 0.95;
+    shell.material.opacity = SHELL_OP;
+    setWireOpacity(wire, 0.12);
+    edges.material.opacity = EDGE_OP;
   }
 
   function syncMenuAnchorPose() {
     var heroX = MOBILE ? 0.3 : 0.4;
     var heroY = MOBILE ? 0.54 : 0.7;
     var heroZ = 0.36;
-    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
-    var menuScale = heroScale * 1.14;
+    var menuScale = CUBE_SCALE * (MOBILE ? 0.82 : 0.78 * 1.14);
 
     menuAnchorGroup.position.set(heroX, heroY, heroZ);
     menuAnchorGroup.scale.set(menuScale, menuScale, menuScale);
@@ -1470,13 +1490,16 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
   }
 
   function prepareHeroMenuOpenFromClosed() {
-    if (sandLineActive()) {
-      menuSandHold = { break: displayBreak, stream: displayStream };
+    if (!shardsBuilt) buildShards();
+    captureMenuFrom();
+    /* Hero: czyste menu bez piasku. Inne sekcje: stream → absorb → zniknięcie. */
+    if (menuFrom.sideEntry || (window.cosgralSectionSnap?.getIndex?.() ?? 0) > 0) {
+      displayBreak = Math.max(displayBreak, 0.98);
+      displayStream = Math.max(displayStream, 0.98);
+      menuSandHold = { break: 0.98, stream: 0.98 };
     } else {
       menuSandHold = null;
     }
-    if (!shardsBuilt && menuSandHold) buildShards();
-    captureMenuFrom();
     snapMenuFromPose();
   }
 

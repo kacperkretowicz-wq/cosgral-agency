@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 /* COSGRAL HOME — dark minimal + globe 3D */
 /* Fonty: <link rel="stylesheet"> w <head> index.html (równolegle z tym plikiem,
    @import tutaj ładował je dopiero po pobraniu i sparsowaniu całego CSS). */
+=======
+/* COSGRAL HOME — dark minimal + globe 3D
+   Typografia jak Parhouse (Geomanist): Satoshi — wolny geometryczny odpowiednik */
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap");
+>>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
 
 :root {
   --bg: #030303;
@@ -10,9 +16,9 @@
   --border: rgba(255,255,255,0.1);
   --accent: #fff;
   --glow: rgba(255, 255, 255, 0.22);
-  --font-display: "Stack Sans Notch", system-ui, sans-serif;
-  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: "Satoshi", system-ui, sans-serif;
+  --font-body: "Satoshi", system-ui, sans-serif;
+  --font-mono: "Satoshi", system-ui, sans-serif;
   --container: 1320px;
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -48,7 +54,7 @@ html:has(body.home-page)::-webkit-scrollbar {
 }
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 300;
   line-height: 1.05;
   letter-spacing: -0.02em;
 }
@@ -230,11 +236,20 @@ html.is-free-scroll .site-footer {
     }
   }
 }
+html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone,
+html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone * {
+  pointer-events: none !important;
+}
 html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone {
   visibility: hidden !important;
   opacity: 0 !important;
-  pointer-events: none !important;
   z-index: 0 !important;
+}
+/* Keep tiles / CTAs clickable while the scene is still partly visible */
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone),
+html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-recessed:not(.is-depth-gone),
+html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-active:not(.is-depth-gone) {
+  pointer-events: auto !important;
 }
 html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone .home-scene__panel,
 html.is-free-scroll #uslugi.is-depth-gone,
@@ -270,6 +285,10 @@ html.is-free-scroll #uslugi.is-visible.home-scene {
 html.is-free-scroll #kontakt.home-depth {
   z-index: 60 !important;
   background: var(--bg, #030303);
+<<<<<<< HEAD
+=======
+  min-height: auto;
+>>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
 }
 html.is-free-scroll #proces.home-depth {
   z-index: 50 !important;
@@ -455,14 +474,14 @@ html.reduce-motion .home-scene [data-enter] {
   background: var(--bg, #030303);
   overflow: hidden;
   box-sizing: border-box;
-  min-height: 100svh;
-  min-height: 100dvh;
+  min-height: auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   padding: clamp(1.5rem, 4vh, 2.75rem) var(--gutter) clamp(1.75rem, 5vh, 3rem);
 }
 
+<<<<<<< HEAD
 /* Stopka — cover Kontaktu prowadzi depth ticker (section-flow), bez zmiany layoutu.
    is-footer-step (cover > 0.45) odpala wejścia stopki; is-footer-covered (cover ≥ 0.985)
    chowa portal sześcianu/piasku dopiero, gdy stopka zakrywa go w całości — wcześniej
@@ -473,6 +492,40 @@ html.is-footer-covered .home-sand {
   /* !important — home-hero-3d pisze visibility inline; menu (niżej w pliku) i tak nadpisuje */
   visibility: hidden !important;
   pointer-events: none;
+=======
+/* Kontakt → stopka: bez runway — jedna ciągła taśma na --bg */
+html.is-free-scroll .footer-runway {
+  display: none;
+  height: 0;
+  min-height: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Stopka — miękki handoff (opacity steruje JS, bez twardego cuta) */
+html.is-free-scroll #kontakt.home-depth,
+html.is-free-scroll #kontakt.is-footer-handoff {
+  transition: opacity 0.05s linear;
+  will-change: opacity;
+}
+html.is-free-scroll #kontakt.home-depth {
+  margin-bottom: 0;
+  padding-bottom: clamp(2rem, 5dvh, 3.25rem);
+}
+.site-footer {
+  margin-top: 0;
+  border-top: none;
+}
+html.is-footer-step .site-footer {
+  position: relative;
+  z-index: 2;
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: clamp(1.25rem, 3.5vh, 2.5rem);
+  padding-bottom: clamp(1.25rem, 3.5vh, 2.5rem);
+>>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
 }
 
 .home-cursor { position: fixed; top: 0; left: 0; z-index: 10001; pointer-events: none; mix-blend-mode: difference; }
@@ -574,7 +627,7 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   gap: 0.5rem;
   font-family: var(--font-body);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -600,7 +653,7 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
 .nav-overlay {
   position: fixed;
   inset: 0;
-  z-index: 498;
+  z-index: 520;
   pointer-events: none;
   visibility: hidden;
 }
@@ -611,8 +664,9 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
 .nav-overlay__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(3, 3, 3, 0.88);
-  backdrop-filter: blur(22px);
+  z-index: 0;
+  background: rgba(3, 3, 3, 0.38);
+  backdrop-filter: blur(12px);
   opacity: 0;
   transition: opacity 0.55s var(--ease);
   cursor: pointer;
@@ -624,7 +678,7 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   position: fixed;
   left: 50%;
   top: 50%;
-  z-index: 2;
+  z-index: 3;
   width: 270px;
   height: 270px;
   transform: translate(-50%, -50%);
@@ -646,34 +700,39 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   list-style: none;
   margin: 0;
   padding: 0;
-  width: 78%;
-  height: 78%;
+  width: min(92%, 22rem);
+  height: auto;
+  min-height: 78%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0;
+  gap: 0.12em;
 }
 .nav-overlay__list li {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-shrink: 0;
 }
 .nav-overlay__list a {
   position: relative;
   display: block;
   width: 100%;
   font-family: var(--font-mono);
-  font-size: calc(var(--menu-face-size) * 0.104);
-  font-weight: 600;
-  line-height: 1.12;
+  font-size: calc(var(--menu-face-size) * 0.092);
+  font-weight: 300;
+  line-height: 1.18;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  padding: calc(var(--menu-face-size) * 0.02) 0;
-  color: rgba(255, 255, 255, 0.88);
-  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.72);
+  white-space: nowrap;
+  padding: calc(var(--menu-face-size) * 0.018) 0;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow:
+    0 1px 16px rgba(0, 0, 0, 0.85),
+    0 0 24px rgba(0, 0, 0, 0.55);
   opacity: 0;
   transform: scale(1);
   clip-path: inset(0 100% 0 0);
@@ -707,21 +766,52 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   opacity: 1;
 }
 .nav-overlay__label {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  align-items: baseline;
 }
 .nav-overlay__char {
   display: inline-block;
+  white-space: nowrap;
 }
 .nav-overlay.is-open .nav-overlay__list a {
   pointer-events: auto;
 }
 body.is-nav-menu-open .home-cube-portal {
-  z-index: 500;
+  z-index: 518 !important;
   opacity: 1 !important;
   visibility: visible !important;
+  filter: brightness(2.76) saturate(1.06);
 }
 body.is-nav-menu-open .home-cube-portal .home-hero__canvas {
-  filter: brightness(0.58) saturate(0.82);
+  filter: none;
+}
+/* Dim page under the cube; keep menu links above */
+body.is-nav-menu-open::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 512;
+  background: rgba(0, 0, 0, 0.64);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.34s var(--ease);
+}
+body.is-nav-menu-open .nav-overlay {
+  z-index: 520;
+  background: transparent;
+}
+body.is-nav-menu-open .nav-overlay__backdrop {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+body.is-nav-menu-open .site-nav {
+  z-index: 530;
 }
 body.is-nav-menu-open .home-scroll-rail {
   opacity: 0;
@@ -800,7 +890,7 @@ html.reduce-motion .nav-overlay__char {
   box-sizing: border-box;
   font-family: var(--font-display);
   font-size: clamp(2.75rem, calc((100vw - 2 * var(--gutter)) / 8), calc((100vw - 2 * var(--gutter)) / 8));
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: 0.28em;
   line-height: 0.82;
   text-transform: uppercase;
@@ -1037,7 +1127,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .services-fan__float-tag {
   font-family: var(--font-display);
   font-size: clamp(1.1rem, 2.2vw, 1.65rem);
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   color: var(--ink);
@@ -1056,7 +1146,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .services-fan__title {
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 4.4vw, 3rem);
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.03em;
   text-transform: uppercase;
 }
@@ -1281,7 +1371,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .services-fan__name {
   font-family: var(--font-display);
   font-size: clamp(1.35rem, 2.5vw, 1.85rem);
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.02em;
   line-height: 1.1;
   transform-style: preserve-3d;
@@ -1306,7 +1396,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .home-services__title {
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 4.4vw, 3rem);
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.03em;
   text-transform: uppercase;
 }
@@ -1341,7 +1431,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .home-work__title {
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 3.4vw, 2.65rem);
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.03em;
   text-transform: uppercase;
   max-width: 15ch;
@@ -1363,6 +1453,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 }
 .home-work__card {
   position: relative;
+  z-index: 2;
   grid-column: span 1;
   min-height: 0;
   height: 100%;
@@ -1374,7 +1465,13 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   justify-content: flex-end;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.35s var(--ease);
+  cursor: pointer;
+  transition: border-color 0.35s var(--ease), transform 0.18s ease-out;
+  transform:
+    perspective(900px)
+    rotateX(var(--card-tilt-x, 0deg))
+    rotateY(var(--card-tilt-y, 0deg));
+  transform-style: preserve-3d;
 }
 .home-work__card--wide {
   grid-column: 1 / -1;
@@ -1394,6 +1491,12 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  pointer-events: none;
+}
+.home-work__card-media video,
+.home-work__card-media img,
+.home-work__card-body {
+  pointer-events: none;
 }
 .home-work__card-media::after {
   content: "";
@@ -1622,7 +1725,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .home-faq__title {
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 4.4vw, 3rem);
-  font-weight: 600;
+  font-weight: 300;
   text-transform: uppercase;
   margin-bottom: 2.5rem;
 }
@@ -1639,17 +1742,74 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   font-size: clamp(1.05rem, 2.2vw, 1.4rem);
   font-weight: 400;
 }
-.faq-item__icon { font-size: 1.25rem; color: var(--muted); transition: transform 0.3s; }
+.faq-item__icon { font-size: 1.25rem; color: var(--muted); transition: transform 0.35s var(--ease); }
 .faq-item[data-open="true"] .faq-item__icon { transform: rotate(45deg); }
-.faq-item__a { max-height: 0; overflow: hidden; transition: max-height 0.45s var(--ease); }
-.faq-item__a-inner { padding-bottom: 1.25rem; color: var(--muted); font-size: 0.95rem; line-height: 1.65; }
+.faq-item__a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.faq-item[data-open="true"] .faq-item__a {
+  grid-template-rows: 1fr;
+}
+.faq-item__a-inner {
+  overflow: hidden;
+  min-height: 0;
+  padding-bottom: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.28s ease,
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    padding-bottom 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.faq-item[data-open="true"] .faq-item__a-inner {
+  padding-bottom: 1.25rem;
+  opacity: 1;
+  transform: none;
+}
 
-/* CONTACT */
+/* CONTACT — no gyro tilt; form must stay fully interactive */
 .home-contact {
   position: relative;
+  z-index: 2;
   padding: var(--section-pad) var(--gutter);
   overflow: hidden;
   text-align: center;
+  transform: none !important;
+}
+#kontakt .home-tilt-layer,
+#kontakt .home-tilt-face,
+.home-contact .home-tilt-layer,
+.home-contact .home-tilt-face {
+  transform: none !important;
+  perspective: none !important;
+  will-change: auto !important;
+}
+#kontakt,
+#kontakt .home-scene__panel,
+#kontakt .home-contact__inner,
+#kontakt .audit-form,
+#kontakt input,
+#kontakt textarea,
+#kontakt button,
+.home-contact input,
+.home-contact textarea,
+.home-contact button {
+  pointer-events: auto !important;
+}
+#kontakt input,
+#kontakt textarea,
+.home-contact input,
+.home-contact textarea {
+  position: relative;
+  z-index: 5;
+  -webkit-user-select: text;
+  user-select: text;
+  touch-action: manipulation;
 }
 .home-contact.home-scene {
   display: flex;
@@ -1801,7 +1961,7 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .home-contact__content[hidden] { display: none !important; }
 .audit-form__success-title {
   font-size: clamp(1.5rem, 3.5vw, 2rem);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.02em;
   margin: 0 0 0.75rem;
 }
@@ -1830,32 +1990,7 @@ html.is-footer-step .site-footer__ambient {
   opacity: 1;
 }
 .site-footer__rule {
-  position: absolute;
-  top: 0;
-  left: var(--gutter);
-  right: var(--gutter);
-  height: 1px;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-}
-.site-footer__rule span {
-  display: block;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.08) 12%,
-    rgba(255, 255, 255, 0.42) 50%,
-    rgba(255, 255, 255, 0.08) 88%,
-    transparent 100%
-  );
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 1.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-html.is-footer-step .site-footer__rule span {
-  transform: scaleX(1);
+  display: none !important;
 }
 .footer-grid {
   position: relative;
@@ -2002,7 +2137,7 @@ html.is-footer-step .site-footer__rule span {
 .cosgral-footer-wordmark {
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 6.8vw, 4.6rem);
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: 0.05em;
   text-transform: lowercase;
   line-height: 1;
@@ -2037,15 +2172,20 @@ html.is-footer-step .cosgral-footer-wordmark {
 }
 .footer-bottom a:hover { color: rgba(255, 255, 255, 0.85); }
 
-html.is-footer-step .site-footer [data-enter] {
-  animation: footer-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+html.is-footer-step .site-footer [data-enter],
+.site-footer [data-enter] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  filter: none !important;
+  animation: none !important;
 }
-html.is-footer-step .footer-cta { animation-delay: 0.04s; }
-html.is-footer-step .footer-col:nth-child(2) { animation-delay: 0.1s; }
-html.is-footer-step .footer-col:nth-child(3) { animation-delay: 0.16s; }
-html.is-footer-step .footer-col:nth-child(4) { animation-delay: 0.22s; }
-html.is-footer-step .footer-col:nth-child(5) { animation-delay: 0.28s; }
-html.is-footer-step .footer-bottom { animation-delay: 0.34s; }
+html.is-footer-step .footer-cta,
+html.is-footer-step .footer-col,
+html.is-footer-step .footer-bottom {
+  animation: none !important;
+  animation-delay: 0s !important;
+}
 
 .site-footer .footer-social,
 .site-footer .footer-social__link {
@@ -2144,7 +2284,7 @@ html.reduce-motion .reveal-word > span {
   translate: 50% 0;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.85));
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-  transition: height 0.35s var(--ease);
+  transition: height 0.12s linear;
 }
 .home-scroll-rail__dots {
   position: absolute;
@@ -2152,17 +2292,14 @@ html.reduce-motion .reveal-word > span {
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
+  display: block;
   height: 100%;
 }
 .home-scroll-rail__item {
-  position: relative;
-  right: auto;
-  top: auto;
-  translate: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translateY(-50%);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -2174,7 +2311,7 @@ html.reduce-motion .reveal-word > span {
   white-space: nowrap;
   font-family: var(--font-mono, monospace);
   font-size: 0.62rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.52);
@@ -2302,6 +2439,37 @@ html.reduce-motion .home-scroll-rail { display: none; }
   #proces.home-process.home-scene {
     justify-content: flex-start;
     padding-block: clamp(5.85rem, 13dvh, 7.35rem) clamp(3.25rem, 8dvh, 4.75rem);
+  }
+
+  /* Proces: 4 kroki > 1 ekran — nie przycinaj i nie pinuj sticky na mobile */
+  #proces.home-process.home-scene {
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+  }
+  #proces.home-process.home-scene .home-scene__panel {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    overflow: visible;
+  }
+  html.is-free-scroll #proces.home-depth {
+    position: relative !important;
+    top: auto;
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+  }
+
+  #kontakt.home-contact.home-scene,
+  html.is-free-scroll #kontakt.home-depth {
+    min-height: auto;
+    overflow: visible;
+    justify-content: flex-start;
+    padding-block: clamp(3.5rem, 8dvh, 4.5rem) clamp(1.5rem, 4dvh, 2.25rem);
+  }
+  #kontakt.home-contact.home-scene .home-scene__panel {
+    flex: 0 0 auto;
+    justify-content: flex-start;
   }
 
   .home-process.home-scene .home-process__steps {
@@ -2493,10 +2661,9 @@ html.reduce-motion .home-scroll-rail { display: none; }
   .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 0.6rem; margin-bottom: 0.55rem; }
   .site-footer {
     overflow: visible;
-    min-height: 100svh;
-    min-height: 100dvh;
-    justify-content: center;
-    padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+    min-height: auto;
+    justify-content: flex-start;
+    padding-top: clamp(1.1rem, 3.5dvh, 1.75rem);
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
   }
   .site-footer .footer-cta,
@@ -2571,6 +2738,15 @@ html.reduce-motion .home-scroll-rail { display: none; }
     letter-spacing: 0.03em;
     white-space: nowrap;
   }
+<<<<<<< HEAD
+=======
+  html.is-footer-step .site-footer {
+    min-height: auto;
+    justify-content: flex-start;
+    padding-top: clamp(1.1rem, 3.5dvh, 1.75rem);
+    padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
+  }
+>>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
   .site-footer [data-enter] {
     opacity: 1 !important;
     visibility: visible !important;
@@ -2588,6 +2764,15 @@ html.reduce-motion .home-scroll-rail { display: none; }
 .home-tilt-layer {
   width: 100%;
   transform-style: preserve-3d;
+  perspective: 1200px;
+}
+.home-tilt-face {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+  transform-origin: 50vw 50vh;
+  will-change: transform;
 }
 .home-scene__panel > .home-tilt-layer {
   flex: 1;
@@ -2598,22 +2783,20 @@ html.reduce-motion .home-scroll-rail { display: none; }
   min-height: 0;
   height: 100%;
 }
+.home-scene__panel > .home-tilt-layer > .home-tilt-face {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: inherit;
+  align-items: inherit;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
 html.has-global-tilt:not(.reduce-motion) .site-nav,
-html.has-global-tilt:not(.reduce-motion) .home-scroll-rail {
-  transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
+html.has-global-tilt:not(.reduce-motion) .home-scroll-rail,
+html.has-global-tilt:not(.reduce-motion) .site-footer {
   transform-origin: 50vw 50vh;
-}
-@media (min-width: 901px) {
-  html.has-global-tilt:not(.reduce-motion) .site-footer {
-    transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
-    transform-origin: 50vw 50vh;
-  }
-}
-
-html.has-global-tilt:not(.reduce-motion) body.home-page .home-scene.is-in-view:not(.home-hero) > .home-scene__panel > .home-tilt-layer {
-  transform: rotateX(var(--global-tilt-x)) rotateY(var(--global-tilt-y));
-  transform-origin: 50vw 50vh;
-  will-change: transform;
 }
 
 body.is-nav-menu-open.is-cube-menu-front .nav-overlay__list a {
@@ -2629,6 +2812,68 @@ body.is-nav-menu-open.is-cube-menu-front .nav-overlay__stage {
 
 html.is-nav-menu-open .nav-overlay__stage {
   transform: translate(-50%, -50%) !important;
+  height: auto !important;
+  min-height: var(--menu-face-size, 270px);
+}
+
+@media (max-width: 900px) {
+  .nav-overlay__list {
+    width: min(90%, 16.5rem);
+    min-height: 70%;
+    gap: 0.02em;
+  }
+  .nav-overlay__list a {
+    font-size: calc(var(--menu-face-size) * 0.066);
+    letter-spacing: 0.035em;
+    line-height: 1.1;
+    padding: calc(var(--menu-face-size) * 0.008) 0;
+  }
+  .nav-overlay__list a.is-hovered,
+  .nav-overlay__list a:hover,
+  .nav-overlay__list a:focus-visible {
+    transform: scale(1.03);
+  }
+  /* Services: same size as main menu links, left-aligned */
+  .nav-overlay__sublist a {
+    font-size: calc(var(--menu-face-size) * 0.066);
+    letter-spacing: 0.035em;
+    line-height: 1.1;
+    padding: calc(var(--menu-face-size) * 0.008) 0;
+    white-space: nowrap;
+    text-align: left;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .nav-overlay.is-services-expanded .nav-overlay__stage,
+  html.is-nav-menu-open .nav-overlay.is-services-expanded .nav-overlay__stage {
+    left: max(1rem, 6vw) !important;
+    top: 50% !important;
+    width: min(88vw, 20rem) !important;
+    transform: translateY(-50%) !important;
+    --menu-face-size: 240px !important;
+  }
+  .nav-overlay.is-services-expanded .nav-overlay__list,
+  .nav-overlay.is-services-expanded .nav-overlay__sublist,
+  .nav-overlay.is-services-expanded .nav-overlay__item--services,
+  .nav-overlay.is-services-expanded .nav-overlay__sublist li {
+    width: 100%;
+    max-width: 100%;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .nav-overlay.is-services-expanded .nav-overlay__list a[data-nav-services-toggle],
+  .nav-overlay.is-services-expanded .nav-overlay__sublist a {
+    text-align: left;
+    width: auto;
+    max-width: 100%;
+  }
+  .nav-overlay.is-services-expanded .nav-overlay__sublist a.is-hovered,
+  .nav-overlay.is-services-expanded .nav-overlay__sublist a:hover,
+  .nav-overlay.is-services-expanded .nav-overlay__sublist a:focus-visible {
+    transform: scale(1.03);
+    transform-origin: left center;
+  }
 }
 
 .nav-overlay__item--services {
@@ -2668,7 +2913,7 @@ html.is-nav-menu-open .nav-overlay__stage {
   max-width: 100%;
   font-family: var(--font-mono);
   font-size: calc(var(--menu-face-size) * 0.104);
-  font-weight: 600;
+  font-weight: 300;
   line-height: 1.12;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -2753,11 +2998,16 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
 /* Mobile gyro permission gate (iOS requires a tap) — home + subpages */
 .gyro-enable {
   position: fixed;
-  left: 50%;
-  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
-  z-index: 12000;
-  transform: translateX(-50%);
-  padding: 0.72rem 1.2rem;
+  left: auto;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(3.35rem + env(safe-area-inset-bottom, 0px));
+  z-index: 12050;
+  transform: none;
+  height: 3.45rem;
+  padding: 0 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 14px;
   background: rgba(8, 8, 8, 0.82);
@@ -2774,7 +3024,7 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
 }
 .gyro-enable.is-done {
   opacity: 0;
-  transform: translateX(-50%) translateY(8px);
+  transform: translateY(8px);
   pointer-events: none;
 }
 @media (min-width: 901px) and (hover: hover) {

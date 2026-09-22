@@ -14,7 +14,7 @@
     { id: "strony", selector: "#strony" },
     { id: "montaz", selector: "#montaz" },
     { stId: "grafiki-pin", hold: 0, id: "grafiki" },
-    { id: "automatyzacje", selector: "#automatyzacje" },
+    { id: "automatyzacje", selector: "#automatyzacje-intro" },
     { id: "footer", footer: true },
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) {
@@ -769,6 +769,25 @@
     if (!document.body.classList.contains("portfolio-page")) return;
     if (window.cosgralPortfolioStepper) return;
     if (!window.ScrollTrigger || !window.gsap) return;
+    /* Film mode: no section pins / snap — rail talks to portfolio-film directly */
+    if (document.body.classList.contains("portfolio-page--film")) {
+      window.cosgralPortfolioStepper = {
+        holds: [],
+        refreshHolds: function () {
+          return [];
+        },
+        freeScroll: true,
+        goTo: function () {},
+        stepUp: function () {},
+        stepDown: function () {},
+        jumpTo: function () {},
+        getIndex: function () {
+          return 0;
+        },
+        SECTION_IDS: SECTION_IDS,
+      };
+      return;
+    }
     if (!ScrollTrigger.getById("grafiki-pin")) return;
     init();
   }

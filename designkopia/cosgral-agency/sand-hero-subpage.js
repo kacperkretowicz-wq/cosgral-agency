@@ -5,13 +5,8 @@
   "use strict";
 
   var config = null;
-  if (document.body.classList.contains("about-page")) {
-    config = {
-      hero: ".about-hero",
-      content: ".about-team",
-      ids: ["about-hero", "about-team"],
-    };
-  } else if (document.body.classList.contains("graphics-gallery-page")) {
+  /* about-page: handled by about-page.js (depth stack, no sand) */
+  if (document.body.classList.contains("graphics-gallery-page")) {
     config = {
       hero: ".gallery-hero",
       content: "#graphics-gallery",

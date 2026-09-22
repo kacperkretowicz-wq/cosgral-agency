@@ -1,9 +1,9 @@
 /**
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260918d";
-import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
+import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (function () {
   "use strict";
@@ -15,7 +15,18 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
   var portal = document.querySelector(".subpage-cube-portal");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
   var HALF = 1.35;
-  var CUBE_SCALE = MOBILE ? 0.36 : 0.46;
+  var CUBE_SCALE = MOBILE ? 0.23 : 0.46;
+  var EDGE_OP = MOBILE ? 0.12 : 0.16;
+  var SHELL_OP = MOBILE ? 0.58 : 0.55;
+  var WIRE_OP = 0.08;
+  var isPortfolioPage = document.body.classList.contains("portfolio-page");
+  var isCasePage = document.body.classList.contains("case-page");
+  /* Realizacje (portfolio list) — cube 2× jaśniejszy vs poprzedni hero */
+  if (isPortfolioPage && !isCasePage) {
+    EDGE_OP = Math.min(1, 0.44 * 2);
+    SHELL_OP = Math.min(1, 0.62 * 2);
+    WIRE_OP = Math.min(1, 0.1 * 2);
+  }
   var MENU_OPEN_DUR = 2.4;
   var MENU_CLOSE_DUR = 2.0;
   var MENU_OPEN_SIDE_DUR = 4.1;
@@ -46,17 +57,20 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
   var menuTween = { blend: 0, closing: false };
   var grafikiMenuActive = false;
   var grafikiFade = 0.68;
-  var isPortfolioPage = document.body.classList.contains("portfolio-page");
+  var isFilmPage = document.body.classList.contains("portfolio-page--film");
+  var isShowcasePage = document.body.classList.contains("portfolio-page--showcase");
   var isAboutPage = document.body.classList.contains("about-page");
   var isGraphicsGalleryPage = document.body.classList.contains("graphics-gallery-page");
   var isReelsGalleryPage = document.body.classList.contains("reels-gallery-page");
   var isGallerySubpage = isGraphicsGalleryPage || isReelsGalleryPage;
   var isSandHeroSubpage = isAboutPage || isGallerySubpage;
-  var isPortfolioMainPage = isPortfolioPage && !isSandHeroSubpage;
+  var isPortfolioMainPage = isPortfolioPage && !isSandHeroSubpage && !isCasePage;
   var isSandHeroPage = isPortfolioMainPage || isSandHeroSubpage;
+  var filmDrive = { p: 0, act: "open" };
+  var showcaseDrive = { p: 0, pose: "intro" };
   var portfolioFlight = {
-    phase: isSandHeroPage ? "hidden" : "drift",
-    t: 0,
+    phase: isShowcasePage ? "showcase" : isFilmPage ? "film" : isSandHeroPage ? "hidden" : "drift",
+    t: isShowcasePage || isFilmPage ? 1 : 0,
     driftP: 0,
     hideAfter: false,
   };
@@ -341,23 +355,24 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     return menuFrom.galleryMenu && menuBlend > 0.001 && menuFrom.sideEntry && !menuFrom.keepDriftVisible;
   }
 
-  /* Maks. krycie portalu = to, co daje CSS (.subpage-cube-portal / about-page /
-     motyw jasny) — inline opacity z fade nadpisywała arkusz, więc w motywie jasnym
-     sześcian miał 0.58 zamiast 0.12, a na O nas świecił przez tekst zespołu. */
-  function portalMaxOpacity() {
-    if (document.documentElement.getAttribute("data-theme") === "light") return 0.12;
-    return isAboutPage ? 0.42 : 0.68;
-  }
-
   function setCubeVisualFade(dim) {
     if (galleryHidesMenuCubeMesh()) dim = 0;
     var fade = Math.max(0, Math.min(1, dim * getMenuCubeDimMul()));
     sMat.uniforms.uFade.value = fade;
-    shell.material.opacity = 0.62 * fade;
-    setWireOpacity(wire, 0.1 * fade);
-    edges.material.opacity = 0.44 * fade;
+    shell.material.opacity = SHELL_OP * fade;
+    setWireOpacity(wire, WIRE_OP * fade);
+    edges.material.opacity = EDGE_OP * fade;
     if (portal && menuBlend <= 0.001 && !grafikiMenuActive) {
-      portal.style.opacity = fade < 0.98 ? String(portalMaxOpacity() * fade) : "";
+      if ((isFilmPage && portfolioFlight.phase === "film") || (isShowcasePage && portfolioFlight.phase === "showcase")) {
+        if (fade < 0.06) portal.style.opacity = "0";
+        else portal.style.removeProperty("opacity");
+      } else if (isPortfolioPage && !isCasePage) {
+        /* Full portal brightness on Realizacje hero */
+        if (fade < 0.06) portal.style.opacity = "0";
+        else portal.style.removeProperty("opacity");
+      } else {
+        portal.style.opacity = fade < 0.98 ? String(0.68 * fade) : "";
+      }
     }
   }
 
@@ -394,29 +409,12 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     if (!isSandHeroPage) return;
     killPortfolioFlightTweens();
     portfolioSectionIndex = index;
-
-    if (index === 0) {
-      portfolioFlight.phase = "hidden";
-      portfolioFlight.t = 1;
-      portfolioFlight.hideAfter = false;
-      cubeGroup.visible = false;
-      setCubeVisualFade(0);
-      return;
-    }
-
-    if (isSandHeroSubpage && index === 1) {
-      var contentSel = getSandHeroContentSelector();
-      portfolioFlight.driftP = contentSel ? getSectionScrollProgress(contentSel) : getScrollProgress();
-      setPortfolioDriftIdle();
-      paintPortfolioDriftNow();
-      return;
-    }
-
-    if (!isPortfolioMainPage) return;
-
-    portfolioFlight.driftP = index === 1 ? getSectionScrollProgress("#strony") : getScrollProgress();
-    setPortfolioDriftIdle();
-    paintPortfolioDriftNow();
+    /* Cube stays in hero only — never drift into later sections */
+    portfolioFlight.phase = "hidden";
+    portfolioFlight.t = 1;
+    portfolioFlight.hideAfter = false;
+    cubeGroup.visible = false;
+    setCubeVisualFade(0);
   }
 
   function startPortfolioHeroPass(opts) {
@@ -571,14 +569,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
   function applyPortfolioStroniesEnter(ft, time) {
     syncCamera();
     root.rotation.set(0, 0, 0);
-    var ease = easeOutSmooth(ft);
-    /* Cel lotu dogania ŻYWY scroll: driftP to progress z góry sekcji w chwili startu,
-       a faza drift liczy pozę z bieżącego scrollProgress — przy dalszym przewijaniu
-       w trakcie 3,9 s lotu sześcian „doskakiwał" na koniec (O nas: skok w dół). */
-    var pTarget = portfolioFlight.driftP + (scrollProgress - portfolioFlight.driftP) * ease;
-    var drift = getDriftPose(pTarget, time);
+    var drift = getDriftPose(portfolioFlight.driftP, time);
     var z = MOBILE ? 0.3 : 0.36;
     var tl = getScreenCornerWorld("tl", z);
+    var ease = easeOutSmooth(ft);
     var ctrlX = tl.x * 0.34 + drift.rootX * 0.66;
     var ctrlY = tl.y * 0.18 + drift.rootY * 0.82;
     var arc = quadArc(ease, tl.x, tl.y, ctrlX, ctrlY, drift.rootX, drift.rootY);
@@ -674,6 +668,254 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     setCubeVisualFade(driftFade * (grafikiMenuActive ? grafikiFade / 0.68 : 1));
   }
 
+  function filmPoseFor(p, act, time) {
+    var breathX = Math.sin(time * 0.22) * 0.05;
+    var breathY = Math.cos(time * 0.18) * 0.04;
+    var spin = time * 0.28;
+    if (act === "open" || p < 0.14) {
+      return {
+        x: breathX * 0.4,
+        y: 0.08 + breathY,
+        z: MOBILE ? 0.15 : 0.28,
+        sc: CUBE_SCALE * (MOBILE ? 1.35 : 1.55),
+        fade: 0.95,
+        rx: 0.25 + Math.sin(spin) * 0.08,
+        ry: -0.2 + spin * 0.35,
+        rz: Math.sin(spin * 0.7) * 0.06,
+      };
+    }
+    if (act === "web" || p < 0.38) {
+      return {
+        x: (MOBILE ? 0.55 : 0.95) + breathX,
+        y: (MOBILE ? 0.2 : 0.35) + breathY,
+        z: -0.15,
+        sc: CUBE_SCALE * 0.72,
+        fade: 0.62,
+        rx: 0.4 + Math.sin(spin) * 0.05,
+        ry: 0.8 + spin * 0.2,
+        rz: 0.1,
+      };
+    }
+    if (act === "reels" || p < 0.58) {
+      return {
+        x: MOBILE ? -0.7 : -1.15,
+        y: MOBILE ? -0.15 : -0.25,
+        z: -0.45,
+        sc: CUBE_SCALE * 0.42,
+        fade: 0.28,
+        rx: 0.7,
+        ry: 1.4 + spin * 0.15,
+        rz: -0.15,
+      };
+    }
+    if (act === "gfx" || p < 0.8) {
+      return {
+        x: MOBILE ? 0.45 : 0.7,
+        y: MOBILE ? -0.35 : -0.5,
+        z: 0.05,
+        sc: CUBE_SCALE * 0.58,
+        fade: 0.48,
+        rx: 0.35 + Math.sin(spin) * 0.1,
+        ry: -0.9 + spin * 0.25,
+        rz: 0.2,
+      };
+    }
+    return {
+      x: MOBILE ? 0.35 : 0.55,
+      y: MOBILE ? 0.45 : 0.65,
+      z: 0.12,
+      sc: CUBE_SCALE * 0.8,
+      fade: 0.7,
+      rx: 0.2 + Math.sin(spin) * 0.06,
+      ry: -0.35 + spin * 0.18,
+      rz: 0.05,
+    };
+  }
+
+  function applyPortfolioFilm(p, time) {
+    menuPhase.time = time;
+    cubeGroup.visible = true;
+    var pose = filmPoseFor(p, filmDrive.act, time);
+    cubeGroup.position.set(0, 0, 0);
+    cubeGroup.scale.set(pose.sc, pose.sc, pose.sc);
+    root.position.x += (pose.x - root.position.x) * 0.08;
+    root.position.y += (pose.y - root.position.y) * 0.08;
+    root.position.z += (pose.z - root.position.z) * 0.08;
+    cubeGroup.rotation.x += (pose.rx - cubeGroup.rotation.x) * 0.06;
+    cubeGroup.rotation.y += (pose.ry - cubeGroup.rotation.y) * 0.06;
+    cubeGroup.rotation.z += (pose.rz - cubeGroup.rotation.z) * 0.06;
+
+    var inf = getCubePointerInfluence();
+    if (inf.nx || inf.ny) {
+      mouse.x += (inf.nx - mouse.x) * 0.05;
+      mouse.y += (inf.ny - mouse.y) * 0.05;
+      root.rotation.y += inf.nx * 0.04;
+      root.rotation.x += inf.ny * 0.03;
+    } else {
+      mouse.x *= 0.95;
+      mouse.y *= 0.95;
+      root.rotation.y *= 0.96;
+      root.rotation.x *= 0.96;
+    }
+
+    setCubeVisualFade(pose.fade * (grafikiMenuActive ? grafikiFade / 0.68 : 1));
+    if (portal && menuBlend <= 0.001) {
+      portal.style.opacity = "";
+      portal.style.visibility = "visible";
+    }
+  }
+
+  function enableFilmMode() {
+    if (!isFilmPage) return;
+    killPortfolioFlightTweens();
+    portfolioFlight.phase = "film";
+    portfolioFlight.t = 1;
+    portfolioFlight.hideAfter = false;
+    cubeGroup.visible = true;
+    if (portal) {
+      portal.style.opacity = "";
+      portal.style.visibility = "visible";
+    }
+  }
+
+  function setFilmProgress(p, act) {
+    if (!isFilmPage) return;
+    filmDrive.p = Math.max(0, Math.min(1, p == null ? 0 : p));
+    if (act) filmDrive.act = act;
+    if (portfolioFlight.phase !== "film") enableFilmMode();
+    portfolioFlight.driftP = filmDrive.p;
+  }
+
+  function showcasePoseFor(p, pose, time) {
+    var breathX = Math.sin(time * 0.2) * 0.035;
+    var breathY = Math.cos(time * 0.16) * 0.025;
+    var spin = time * 0.26;
+    var t = Math.max(0, Math.min(1, p == null ? 0 : p));
+
+    /* Intro hold — slightly right of center */
+    if (pose === "intro") {
+      return {
+        x: 0.35 + breathX,
+        y: 0.05 + breathY,
+        z: 0.15,
+        sc: CUBE_SCALE * (MOBILE ? 1.15 : 1.35),
+        fade: 0.95,
+        rx: 0.28 + Math.sin(spin) * 0.06,
+        ry: -0.25 + spin * 0.35,
+        rz: 0.04,
+      };
+    }
+
+    /* Scroll out of intro — glide to top-left and fade */
+    if (pose === "intro-exit") {
+      return {
+        x: 0.35 - t * (MOBILE ? 1.55 : 1.85) + breathX * (1 - t),
+        y: 0.05 + t * (MOBILE ? 0.95 : 1.15) + breathY * (1 - t),
+        z: 0.15 - t * 0.4,
+        sc: CUBE_SCALE * (MOBILE ? 1.15 : 1.35) * (1 - t * 0.45),
+        fade: Math.max(0, 0.95 - t * 1.15),
+        rx: 0.28 + t * 0.4,
+        ry: -0.25 + t * 1.2 + spin * 0.2,
+        rz: 0.04 - t * 0.2,
+      };
+    }
+
+    /* Enter with collage tiles — from left into scene */
+    if (pose === "collage-enter") {
+      return {
+        x: -1.4 + t * (MOBILE ? 1.9 : 2.25) + breathX,
+        y: 0.35 - t * 0.15 + breathY,
+        z: -0.2 + t * 0.15,
+        sc: CUBE_SCALE * (0.55 + t * 0.35),
+        fade: Math.min(0.88, t * 1.1),
+        rx: 0.4 + Math.sin(spin) * 0.05,
+        ry: 0.35 + spin * 0.2,
+        rz: 0.06,
+      };
+    }
+
+    if (pose === "right" || (pose !== "edge" && t < 0.55)) {
+      return {
+        x: (MOBILE ? 0.55 : 0.9) + breathX,
+        y: (MOBILE ? 0.12 : 0.2) + breathY,
+        z: -0.05,
+        sc: CUBE_SCALE * 0.82,
+        fade: 0.8,
+        rx: 0.35 + Math.sin(spin) * 0.05,
+        ry: 0.55 + spin * 0.2,
+        rz: 0.08,
+      };
+    }
+
+    /* Edge / morph settle */
+    return {
+      x: MOBILE ? 0.85 : 1.15,
+      y: MOBILE ? -0.05 : -0.15,
+      z: -0.3,
+      sc: CUBE_SCALE * 0.5,
+      fade: 0.42,
+      rx: 0.5,
+      ry: 1.0 + spin * 0.12,
+      rz: -0.08,
+    };
+  }
+
+  function applyPortfolioShowcase(p, time) {
+    menuPhase.time = time;
+    cubeGroup.visible = true;
+    var pose = showcasePoseFor(p, showcaseDrive.pose, time);
+    cubeGroup.position.set(0, 0, 0);
+    cubeGroup.scale.set(pose.sc, pose.sc, pose.sc);
+    /* Snappier follow so cube tracks scroll scrub */
+    var follow = 0.22;
+    root.position.x += (pose.x - root.position.x) * follow;
+    root.position.y += (pose.y - root.position.y) * follow;
+    root.position.z += (pose.z - root.position.z) * follow;
+    cubeGroup.rotation.x += (pose.rx - cubeGroup.rotation.x) * 0.14;
+    cubeGroup.rotation.y += (pose.ry - cubeGroup.rotation.y) * 0.14;
+    cubeGroup.rotation.z += (pose.rz - cubeGroup.rotation.z) * 0.14;
+
+    var inf = getCubePointerInfluence();
+    if (inf.nx || inf.ny) {
+      mouse.x += (inf.nx - mouse.x) * 0.05;
+      mouse.y += (inf.ny - mouse.y) * 0.05;
+      root.rotation.y += inf.nx * 0.035;
+      root.rotation.x += inf.ny * 0.025;
+    } else {
+      mouse.x *= 0.95;
+      mouse.y *= 0.95;
+      root.rotation.y *= 0.96;
+      root.rotation.x *= 0.96;
+    }
+
+    setCubeVisualFade(pose.fade * (grafikiMenuActive ? grafikiFade / 0.68 : 1));
+    if (portal && menuBlend <= 0.001) {
+      portal.style.removeProperty("opacity");
+      portal.style.visibility = pose.fade > 0.02 ? "visible" : "hidden";
+    }
+  }
+
+  function enableShowcaseMode() {
+    if (!isShowcasePage) return;
+    killPortfolioFlightTweens();
+    portfolioFlight.phase = "showcase";
+    portfolioFlight.t = 1;
+    portfolioFlight.hideAfter = false;
+    cubeGroup.visible = true;
+    if (portal) {
+      portal.style.removeProperty("opacity");
+      portal.style.visibility = "visible";
+    }
+  }
+
+  function setShowcaseProgress(p, pose) {
+    if (!isShowcasePage) return;
+    showcaseDrive.p = Math.max(0, Math.min(1, p == null ? 0 : p));
+    if (pose) showcaseDrive.pose = pose;
+    if (portfolioFlight.phase !== "showcase") enableShowcaseMode();
+    portfolioFlight.driftP = showcaseDrive.p;
+  }
+
   function getBestFaceIndex() {
     cubeGroup.getWorldPosition(_cubePos);
     _toCam.copy(camera.position).sub(_cubePos).normalize();
@@ -759,12 +1001,11 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
   function menuTargets() {
     if (menuFrom.target) return menuFrom.target;
     if (menuFrom.sideEntry) {
-      var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
       return {
         x: MOBILE ? 0.3 : 0.4,
         y: MOBILE ? 0.54 : 0.7,
         z: 0.36,
-        sc: heroScale * 1.14,
+        sc: CUBE_SCALE * (MOBILE ? 0.82 : 0.78 * 1.14),
       };
     }
     return {
@@ -794,6 +1035,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
   function isSubpageCubeVisible() {
     if (!cubeGroup.visible) return false;
+    if (isShowcasePage && portfolioFlight.phase === "showcase") return sMat.uniforms.uFade.value > 0.12;
+    if (isFilmPage && portfolioFlight.phase === "film") return sMat.uniforms.uFade.value > 0.12;
     if (isSandHeroPage && (portfolioFlight.phase === "hidden" || portfolioFlight.phase === "hero-pass")) {
       return false;
     }
@@ -891,12 +1134,12 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     cubeGroup.updateMatrixWorld(true);
     menuFrom.driftMatrix = cubeGroup.matrixWorld.clone();
 
-    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
+    var menuOpenScale = CUBE_SCALE * (MOBILE ? 1.62 : 0.78 * 1.14);
     menuFrom.target = {
       x: MOBILE ? 0.3 : 0.4,
       y: MOBILE ? 0.54 : 0.7,
       z: MOBILE ? 0.32 : 0.42,
-      sc: heroScale * 1.14,
+      sc: menuOpenScale,
     };
     menuFrom.px = 0;
     menuFrom.py = 0;
@@ -1131,17 +1374,16 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     cubeGroup.visible = true;
     var fade = (menuFrom.driftFade != null ? menuFrom.driftFade : 0.85) * driftFade * getMenuCubeDimMul();
     sMat.uniforms.uFade.value = fade;
-    shell.material.opacity = 0.62 * fade;
-    setWireOpacity(wire, 0.1 * fade);
-    edges.material.opacity = 0.44 * fade;
+    shell.material.opacity = SHELL_OP * fade;
+    setWireOpacity(wire, WIRE_OP * fade);
+    edges.material.opacity = EDGE_OP * fade;
   }
 
   function applySideEntryPose(arrive, targetGroup) {
     var heroX = MOBILE ? 0.3 : 0.4;
     var heroY = MOBILE ? 0.54 : 0.7;
     var heroZ = 0.36;
-    var heroScale = CUBE_SCALE * (MOBILE ? 0.67 : 0.78);
-    var menuScale = heroScale * 1.14;
+    var menuScale = CUBE_SCALE * (MOBILE ? 1.62 : 0.78 * 1.14);
     var useSoftFly = menuFrom.bgExit || menuFrom.galleryMenu;
     var startX = menuFrom.px;
     var startY = menuFrom.py;
@@ -1327,14 +1569,25 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     return MENU_CLOSE_EASE;
   }
 
+  function isHeroMenuContext() {
+    /* Megamenu always matches hero (no sand absorb) — cube is hero-only now */
+    return true;
+  }
+
   function notifyMenuOpen() {
+    var heroMenu = isHeroMenuContext();
+    var useSand = !heroMenu || menuFrom.particlePass;
+    menuFrom.sandBoosted = useSand;
+    if (heroMenu) document.body.classList.add("is-menu-sand-suppressed");
+    else document.body.classList.remove("is-menu-sand-suppressed");
     window.dispatchEvent(
       new CustomEvent("cosgral:cube-menu", {
         detail: {
           open: true,
-          showSand: menuFrom.galleryMenu && isSandHeroPage,
-          boostSand: menuFrom.galleryMenu && !menuFrom.bgExit && isSandHeroPage,
+          showSand: useSand,
+          boostSand: useSand,
           particlePass: menuFrom.particlePass,
+          heroMenu: heroMenu,
         },
       })
     );
@@ -1391,7 +1644,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
       "is-cube-menu-front",
       "is-cube-menu-passing",
       "is-cube-menu-bg-exit",
-      "is-cube-menu-drift-bg"
+      "is-cube-menu-drift-bg",
+      "is-menu-sand-suppressed"
     );
     if (isSandHeroPage && !grafikiMenuActive) restoreSandHeroMenuCloseState();
     else if (grafikiMenuActive && portal) portal.style.opacity = "0";
@@ -1591,6 +1845,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
   root.add(menuAnchorGroup);
 
   var SURFACE = MOBILE ? 1200 : 2800;
+  var SURFACE_SIZE_MUL = MOBILE ? 0.5 : 1;
+  var SURFACE_ALPHA_MUL = MOBILE ? 0.42 : 1;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
@@ -1598,7 +1854,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     sPos[si * 3] = sp[0];
     sPos[si * 3 + 1] = sp[1];
     sPos[si * 3 + 2] = sp[2];
-    sSize[si] = 0.45 + Math.random() * 1.6;
+    sSize[si] = (0.45 + Math.random() * 1.6) * SURFACE_SIZE_MUL;
   }
 
   var sGeo = new THREE.BufferGeometry();
@@ -1613,12 +1869,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
       uFade: { value: 1 },
+      uAlphaMul: { value: SURFACE_ALPHA_MUL },
     },
     vertexShader: `
       attribute float size;
       uniform float uTime;
       uniform vec2 uMouse;
       uniform float uFade;
+      uniform float uAlphaMul;
       varying float vAlpha;
       void main() {
         vec3 pos = position;
@@ -1630,7 +1888,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
         gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);
         gl_Position = projectionMatrix * mv;
-        vAlpha = (0.14 + smoothstep(2.8, 0.0, dist) * 0.38) * uFade;
+        vAlpha = (0.05 + smoothstep(2.8, 0.0, dist) * 0.14) * uFade * uAlphaMul;
       }
     `,
     fragmentShader: `
@@ -1639,7 +1897,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
         float d = length(gl_PointCoord - 0.5);
         if (d > 0.5) discard;
         float glow = 1.0 - smoothstep(0.0, 0.5, d);
-        gl_FragColor = vec4(0.9, 0.9, 0.9, vAlpha * glow);
+        gl_FragColor = vec4(0.7, 0.7, 0.72, vAlpha * glow * 0.4);
       }
     `,
   });
@@ -1781,6 +2039,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
         }
       } else if (isSandHeroPage && portfolioFlight.phase === "hero-pass") {
         applyPortfolioHeroPass(portfolioFlight.t, t);
+      } else if (isShowcasePage && portfolioFlight.phase === "showcase") {
+        applyPortfolioShowcase(showcaseDrive.p, t);
+      } else if (isFilmPage && portfolioFlight.phase === "film") {
+        applyPortfolioFilm(filmDrive.p, t);
       } else if (isSandHeroPage && portfolioFlight.phase === "hidden") {
         syncCamera();
         root.position.set(0, 0, 0);
@@ -1874,7 +2136,15 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
 
   requestAnimationFrame(animate);
 
-  if (isSandHeroPage) {
+  if (isShowcasePage) {
+    enableShowcaseMode();
+    setShowcaseProgress(0, "intro");
+  } else if (isFilmPage) {
+    enableFilmMode();
+    setFilmProgress(0, "open");
+  }
+
+  if (isSandHeroPage && !isFilmPage && !isShowcasePage) {
     window.addEventListener("cosgral:section-step", function (e) {
       var next = e.detail && typeof e.detail.index === "number" ? e.detail.index : 0;
       if (e.detail && e.detail.initial) {
@@ -1882,35 +2152,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
         return;
       }
 
-      var prev = portfolioSectionIndex;
       portfolioSectionIndex = next;
-
-      if (next === 0) {
-        if (prev > 0) {
-          startPortfolioStroniesExit({ hideAfter: true });
-        } else {
-          killPortfolioFlightTweens();
-          portfolioFlight.phase = "hidden";
-          portfolioFlight.t = 1;
-          portfolioFlight.hideAfter = false;
-          cubeGroup.visible = false;
-          setCubeVisualFade(0);
-        }
-        return;
-      }
-
-      if (next === 1 && prev !== 1) {
-        if (prev < next) {
-          startPortfolioStroniesEnter();
-        } else {
-          setPortfolioDriftIdle();
-        }
-        return;
-      }
-
-      if (isPortfolioMainPage && prev === 1 && next > 1) {
-        setPortfolioDriftIdle();
-      }
+      /* Keep cube out of non-hero sections; hero pass is unchanged */
+      killPortfolioFlightTweens();
+      portfolioFlight.phase = "hidden";
+      portfolioFlight.t = 1;
+      portfolioFlight.hideAfter = false;
+      cubeGroup.visible = false;
+      setCubeVisualFade(0);
     });
   }
 
@@ -2027,6 +2276,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js?v=20260918d";
     setPortfolioIntroBlend: function () {
       /* legacy no-op — lot sześcianu sterowany przez portfolioFlight */
     },
+    enableFilmMode: enableFilmMode,
+    setFilmProgress: setFilmProgress,
+    enableShowcaseMode: enableShowcaseMode,
+    setShowcaseProgress: setShowcaseProgress,
     startPortfolioHeroPass: startPortfolioHeroPass,
     cancelPortfolioHeroPass: cancelPortfolioHeroPass,
     applyPortfolioBootSection: applyPortfolioBootSection,

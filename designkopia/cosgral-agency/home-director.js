@@ -7,21 +7,24 @@
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
 
   document.querySelectorAll("[data-faq-toggle]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
+    if (btn.dataset.faqBound === "1") return;
+    btn.dataset.faqBound = "1";
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
       var item = btn.closest(".faq-item");
-      var answer = item.querySelector(".faq-item__a");
+      if (!item) return;
       var isOpen = item.getAttribute("data-open") === "true";
-      document.querySelectorAll(".faq-item[data-open='true']").forEach(function (other) {
-        if (other !== item) {
-          other.setAttribute("data-open", "false");
-          other.querySelector("[data-faq-toggle]").setAttribute("aria-expanded", "false");
-          other.querySelector(".faq-item__a").style.maxHeight = "";
-        }
-      });
       var next = !isOpen;
+
+      document.querySelectorAll(".faq-item[data-open='true']").forEach(function (other) {
+        if (other === item) return;
+        other.setAttribute("data-open", "false");
+        var otherBtn = other.querySelector("[data-faq-toggle]");
+        if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
+      });
+
       item.setAttribute("data-open", String(next));
       btn.setAttribute("aria-expanded", String(next));
-      answer.style.maxHeight = next ? answer.scrollHeight + "px" : "";
     });
   });
 

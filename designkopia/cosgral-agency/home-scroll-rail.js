@@ -69,22 +69,15 @@
     return Math.min(max, Math.max(0, footer.offsetTop));
   }
 
-  function verticalMargins(el) {
-    var cs = window.getComputedStyle(el);
-    return (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
-  }
-
-  /* Jak w home-section-stepper: sticky psuje offsetTop, a offsetHeight nie liczy
-     marginesów (dwell scen depth) — sumujemy rodzeństwo z marginesami. */
   function sectionLayoutTop(el) {
     if (!el) return 0;
     var parent = el.parentElement;
     if (!parent) return Math.max(0, el.offsetTop || 0);
     var y = 0;
     for (var child = parent.firstElementChild; child && child !== el; child = child.nextElementSibling) {
-      y += (child.offsetHeight || 0) + verticalMargins(child);
+      y += child.offsetHeight || 0;
     }
-    return y + (parseFloat(window.getComputedStyle(el).marginTop) || 0);
+    return y;
   }
 
   function holdScroll(st, hold) {
@@ -160,6 +153,7 @@
     var maxScroll = 0;
     var snapPoints = [];
     var holdPositions = [];
+    var railPositions = [];
     var visited = Object.create(null);
     var lastIndex = -1;
 
@@ -238,11 +232,13 @@
       maxScroll = ScrollTrigger.maxScroll(window) || 1;
       snapPoints = [];
       holdPositions = [];
+      railPositions = [];
 
       SCENES.forEach(function (scene, i) {
         if (scene.footer) {
           var footerY = footerHoldY();
           holdPositions.push(footerY);
+          railPositions.push(footerY);
           snapPoints.push(footerY / maxScroll);
           return;
         }
@@ -251,6 +247,7 @@
           if (el) {
             var y = Math.max(0, sectionLayoutTop(el));
             holdPositions.push(y);
+            railPositions.push(y);
             snapPoints.push(y / maxScroll);
             return;
           }
@@ -258,11 +255,41 @@
         var st = ScrollTrigger.getById(scene.stId);
         if (!st) {
           holdPositions.push(0);
+          railPositions.push(0);
           return;
         }
-        var pos = holdScroll(st, scene.hold);
-        holdPositions.push(pos);
-        snapPoints.push(pos / maxScroll);
+        holdPositions.push(holdScroll(st, scene.hold));
+        railPositions.push(st.start);
+        snapPoints.push(holdPositions[i] / maxScroll);
+      });
+
+      /* Keep rail positions strictly increasing for stable layout. */
+      for (var r = 1; r < railPositions.length; r++) {
+        if (railPositions[r] < railPositions[r - 1] + 1) {
+          railPositions[r] = railPositions[r - 1] + 1;
+        }
+      }
+      layoutDots();
+    }
+
+    function railSpan() {
+      var first = railPositions[0] ?? 0;
+      var last = railPositions[railPositions.length - 1] ?? first + 1;
+      var span = last - first;
+      return { first: first, last: last, span: span <= 0 ? 1 : span };
+    }
+
+    function yToRailPct(y) {
+      var s = railSpan();
+      return Math.min(100, Math.max(0, ((y - s.first) / s.span) * 100));
+    }
+
+    function layoutDots() {
+      if (railPositions.length < 1) return;
+      ui.dots.forEach(function (dot, i) {
+        var li = dot.closest(".home-scroll-rail__item");
+        if (!li) return;
+        li.style.top = yToRailPct(railPositions[i] ?? 0).toFixed(2) + "%";
       });
     }
 
@@ -298,7 +325,6 @@
       SCENES.forEach(function (scene, i) {
         if (scene.footer) {
           var footerY = footerHoldY();
-          var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
           var dist = Math.abs(scroll - footerY);
           if (dist < bestDist) {
             bestDist = dist;
@@ -308,7 +334,6 @@
         }
         var st = ScrollTrigger.getById(scene.stId);
         if (!st) return;
-        var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
         var center = holdScroll(st, scene.hold);
         var dist = Math.abs(scroll - center);
         if (dist < bestDist) {
@@ -320,41 +345,19 @@
       return best;
     }
 
-    function dotPercent(index) {
-      var n = SCENES.length;
-      if (n <= 1) return 0;
-      return (index / (n - 1)) * 100;
-    }
-
     function fillHeightForScroll(scroll) {
-      if (holdPositions.length < 2) return 0;
-      var last = holdPositions.length - 1;
-      if (scroll <= holdPositions[0]) return 0;
-      if (scroll >= holdPositions[last]) return 100;
-      for (var i = 0; i < last; i++) {
-        var start = holdPositions[i];
-        var end = holdPositions[i + 1];
-        if (scroll > end) continue;
-        var span = end - start;
-        var t = span <= 0 ? 1 : (scroll - start) / span;
-        t = Math.min(1, Math.max(0, t));
-        return dotPercent(i) + t * (dotPercent(i + 1) - dotPercent(i));
-      }
-      return 100;
+      return yToRailPct(scroll);
     }
 
-    function update(opts) {
-      if (!opts || opts.metrics !== false) refreshMetrics();
+    function update() {
+      refreshMetrics();
       var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
+      var current = activeScene();
       var fillPct = fillHeightForScroll(scroll);
       ui.fill.style.height = fillPct.toFixed(2) + "%";
 
       var snapIdx = window.cosgralSectionSnap?.getIndex?.();
-      var currentIndex = snapIdx != null && snapIdx >= 0 ? snapIdx : -1;
-      if (currentIndex < 0) {
-        var current = activeScene();
-        currentIndex = current ? current.index : -1;
-      }
+      var currentIndex = snapIdx != null && snapIdx >= 0 ? snapIdx : current ? current.index : -1;
 
       if (currentIndex >= 0 && currentIndex !== lastIndex) {
         revealTitle(currentIndex);
@@ -400,21 +403,11 @@
       });
     });
 
-    ScrollTrigger.addEventListener("refresh", function () {
-      update();
-    });
+    ScrollTrigger.addEventListener("refresh", update);
     if (window.cosgralSmoothScroll?.lenis) {
-      window.cosgralSmoothScroll.lenis.on("scroll", function () {
-        update({ metrics: false });
-      });
+      window.cosgralSmoothScroll.lenis.on("scroll", update);
     } else {
-      window.addEventListener(
-        "scroll",
-        function () {
-          update({ metrics: false });
-        },
-        { passive: true }
-      );
+      window.addEventListener("scroll", update, { passive: true });
     }
 
     window.addEventListener("cosgral:section-step", function (e) {

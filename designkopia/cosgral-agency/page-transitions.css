@@ -3,14 +3,20 @@
   position: fixed;
   inset: 0;
   z-index: 12000;
-  pointer-events: none;
+  pointer-events: none !important;
   visibility: hidden;
   opacity: 0;
 }
 .page-transition.is-active {
-  pointer-events: auto;
+  pointer-events: auto !important;
   visibility: visible;
   opacity: 1;
+}
+/* Stuck enter class must never leave a click-blocking veil */
+html.is-page-enter:not(.is-page-transitioning) .page-transition:not(.is-active) {
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 .page-transition__veil {
   position: absolute;

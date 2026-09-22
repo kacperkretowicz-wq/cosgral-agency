@@ -215,15 +215,42 @@
   function syncStageToCube() {
     if (!isOpen || !stage) return;
 
+    var mobile = window.matchMedia("(max-width: 900px)").matches;
+    /* Services on mobile: left column, same type size as main menu */
+    if (mobile && servicesExpanded) {
+      var panelW = Math.min(window.innerWidth * 0.88, 320);
+      var inset = Math.max(16, window.innerWidth * 0.06);
+      stage.style.left = inset + "px";
+      stage.style.top = "50%";
+      stage.style.width = panelW + "px";
+      stage.style.height = "auto";
+      stage.style.minHeight = "0";
+      stage.style.setProperty("--menu-face-size", "240px");
+      stage.style.transform = "translateY(-50%)";
+      syncRaf = window.requestAnimationFrame(syncStageToCube);
+      return;
+    }
+
     var rect =
       window.cosgralCube?.getMenuFaceAnchorRect?.() ||
       window.cosgralCube?.getMenuFaceRect?.();
     if (rect && rect.size > 40) {
+      var face = Math.max(rect.size, mobile ? Math.min(window.innerWidth * 0.72, 280) : 240);
       stage.style.left = rect.x + "px";
       stage.style.top = rect.y + "px";
-      stage.style.width = rect.size + "px";
-      stage.style.height = servicesExpanded ? "auto" : rect.size + "px";
-      stage.style.setProperty("--menu-face-size", rect.size + "px");
+      stage.style.width = face + "px";
+      stage.style.height = "auto";
+      stage.style.minHeight = face + "px";
+      stage.style.setProperty("--menu-face-size", face + "px");
+      stage.style.transform = "translate(-50%, -50%)";
+    } else {
+      var fallback = Math.min(window.innerWidth * (mobile ? 0.86 : 0.72), mobile ? 340 : 360);
+      stage.style.left = "50%";
+      stage.style.top = "50%";
+      stage.style.width = fallback + "px";
+      stage.style.height = "auto";
+      stage.style.minHeight = fallback + "px";
+      stage.style.setProperty("--menu-face-size", fallback + "px");
       stage.style.transform = "translate(-50%, -50%)";
     }
 

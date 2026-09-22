@@ -244,110 +244,6 @@
       ]
     },
     {
-      "id": "safe-grant",
-      "name": "Safe Grant",
-      "items": [
-        {
-          "src": "portfolio-media/graphics/safe-grant/001.jpg",
-          "full": "portfolio-media/graphics/safe-grant/001.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/002.jpg",
-          "full": "portfolio-media/graphics/safe-grant/002.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/003.jpg",
-          "full": "portfolio-media/graphics/safe-grant/003.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/004.jpg",
-          "full": "portfolio-media/graphics/safe-grant/004.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/005.jpg",
-          "full": "portfolio-media/graphics/safe-grant/005.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/006.jpg",
-          "full": "portfolio-media/graphics/safe-grant/006.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/007.jpg",
-          "full": "portfolio-media/graphics/safe-grant/007.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/008.jpg",
-          "full": "portfolio-media/graphics/safe-grant/008.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/009.jpg",
-          "full": "portfolio-media/graphics/safe-grant/009.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/010.jpg",
-          "full": "portfolio-media/graphics/safe-grant/010.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/011.jpg",
-          "full": "portfolio-media/graphics/safe-grant/011.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/012.jpg",
-          "full": "portfolio-media/graphics/safe-grant/012.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/013.jpg",
-          "full": "portfolio-media/graphics/safe-grant/013.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        },
-        {
-          "src": "portfolio-media/graphics/safe-grant/014.jpg",
-          "full": "portfolio-media/graphics/safe-grant/014.jpg",
-          "w": 900,
-          "h": 1600,
-          "type": "image"
-        }
-      ]
-    },
-    {
       "id": "bts",
       "name": "BTS",
       "items": [
@@ -418,13 +314,6 @@
       "full": "portfolio-media/graphics/far-east/002-full.mp4",
       "client": "Far East",
       "id": "far-east"
-    },
-    {
-      "type": "image",
-      "src": "portfolio-media/graphics/safe-grant/001.jpg",
-      "full": "portfolio-media/graphics/safe-grant/001.jpg",
-      "client": "Safe Grant",
-      "id": "safe-grant"
     },
     {
       "type": "video",

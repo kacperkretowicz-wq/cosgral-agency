@@ -568,8 +568,8 @@
         "en": "Video editing — COSGRAL portfolio"
       },
       "description": {
-        "pl": "Rolki i montaż wideo COSGRAL — Orlińscy, Far East, Anna Jarosik, BTS i więcej.",
-        "en": "COSGRAL video reels and editing — Orlińscy, Far East, Anna Jarosik, BTS and more."
+        "pl": "Rolki i montaż wideo COSGRAL — Far East, Anna Jarosik, BTS i więcej.",
+        "en": "COSGRAL video reels and editing — Far East, Anna Jarosik, BTS and more."
       }
     },
     "grafiki_meta": {
@@ -578,8 +578,8 @@
         "en": "Graphics — COSGRAL portfolio"
       },
       "description": {
-        "pl": "Galeria grafik COSGRAL — Juicy Events, Far East, Safe Grant, BTS i więcej.",
-        "en": "COSGRAL graphics gallery — Juicy Events, Far East, Safe Grant, BTS and more."
+        "pl": "Galeria grafik COSGRAL — Juicy Events, Far East, BTS i więcej.",
+        "en": "COSGRAL graphics gallery — Juicy Events, Far East, BTS and more."
       }
     },
     "hero_title": {
@@ -589,6 +589,110 @@
     "hero_lead": {
       "pl": "Wybrane projekty stron, wideo, grafiki oraz systemów i automatyzacji.",
       "en": "Selected website, video, graphics, systems and automation projects."
+    },
+    "selected_title": {
+      "pl": "Wybrane realizacje",
+      "en": "Selected work"
+    },
+    "nav_automation": {
+      "pl": "Automatyzacje",
+      "en": "Automation"
+    },
+    "nav_ai": {
+      "pl": "AI dla biznesu",
+      "en": "AI for business"
+    },
+    "nav_web": {
+      "pl": "Strony internetowe",
+      "en": "Websites"
+    },
+    "nav_graphics": {
+      "pl": "Grafiki",
+      "en": "Graphics"
+    },
+    "nav_video": {
+      "pl": "Montaż",
+      "en": "Video"
+    },
+    "ai_eyebrow": {
+      "pl": "AI dla biznesu",
+      "en": "AI for business"
+    },
+    "ai_claim": {
+      "pl": "Od informacji o firmie do przygotowanej szansy sprzedażowej.",
+      "en": "From company information to a prepared sales opportunity."
+    },
+    "ai_lead": {
+      "pl": "Projektujemy agentów AI i automatyzacje, które wspierają sprzedaż B2B: research, kwalifikacja, CRM i przygotowanie handlowca — z jasnymi regułami użycia danych.",
+      "en": "We design AI agents and automation that support B2B sales: research, qualification, CRM and salesperson prep — with clear rules for data use."
+    },
+    "ai_b1_title": {
+      "pl": "Firmy dopasowane do profilu klienta",
+      "en": "Companies that match your customer profile"
+    },
+    "ai_b1_desc": {
+      "pl": "Definiujemy branże, skalę, lokalizację i sygnały popytu. Agent przygotowuje kandydatów z uzgodnionych źródeł i uzasadnia dopasowanie.",
+      "en": "We define industries, scale, location and demand signals. The agent prepares candidates from agreed sources and explains the match."
+    },
+    "ai_b2_title": {
+      "pl": "Porządek w kontaktach i CRM",
+      "en": "Organised contacts and CRM"
+    },
+    "ai_b2_desc": {
+      "pl": "Łączy rekordy tej samej firmy, wykrywa duplikaty, uzupełnia dozwolone pola ze źródłem i datą — bez chaosu w bazie.",
+      "en": "It merges records for the same company, detects duplicates and fills permitted fields with source and date — without database chaos."
+    },
+    "ai_b3_title": {
+      "pl": "Priorytety i brief dla handlowca",
+      "en": "Priorities and a brief for sales"
+    },
+    "ai_b3_desc": {
+      "pl": "Porównuje firmy z Waszymi kryteriami, układa kolejkę follow-up i tworzy brief: fakty, historia, otwarte wątki, pytania.",
+      "en": "It compares companies with your criteria, builds a follow-up queue and creates a brief: facts, history, open topics, questions."
+    },
+    "ai_b4_title": {
+      "pl": "Szkice wiadomości i kolejne kroki",
+      "en": "Draft messages and next steps"
+    },
+    "ai_b4_desc": {
+      "pl": "Na bazie oferty i historii kontaktu przygotowuje draft wiadomości, podsumowanie spotkania lub zadanie. Wysyłka zostaje osobnym, zatwierdzonym etapem.",
+      "en": "Using your offer and contact history it prepares a message draft, meeting summary or task. Sending stays a separate, approved stage."
+    },
+    "ai_day_title": {
+      "pl": "Dzień pracy zespołu sprzedaży",
+      "en": "A working day in the sales team"
+    },
+    "ai_day_desc": {
+      "pl": "Ustalamy rynki i kryteria. Agent przygotowuje listę, sprawdza CRM i oznacza firmy już w rozmowie. Handlowiec dostaje profil, powody dopasowania i proponowany kolejny krok — akceptuje, dodaje kontekst i decyduje o kontakcie.",
+      "en": "We define markets and criteria. The agent prepares a list, checks the CRM and flags companies already in conversation. The salesperson gets a profile, match reasons and a suggested next step — they approve, add context and decide how to contact."
+    },
+    "ai_faq1_q": {
+      "pl": "Czy agent musi od razu wysyłać wiadomości?",
+      "en": "Does the agent have to send messages immediately?"
+    },
+    "ai_faq1_a": {
+      "pl": "Nie. Możemy zacząć od researchu, kwalifikacji i draftów. Kontakt zostaje po stronie handlowca. Automatyczna wysyłka to osobny, uzgodniony etap.",
+      "en": "No. We can start with research, qualification and drafts. Contact stays with the salesperson. Automatic sending is a separate, agreed stage."
+    },
+    "ai_faq2_q": {
+      "pl": "Czy zadziała z naszą istniejącą bazą?",
+      "en": "Can it work with our existing database?"
+    },
+    "ai_faq2_a": {
+      "pl": "Tak. Często zaczynamy od czyszczenia rekordów, braków i szans bez kolejnego kroku. Testujemy próbkę i reguły dopasowania przed większymi zmianami.",
+      "en": "Yes. We often start by cleaning records, filling gaps and highlighting opportunities without a next step. We test a sample and matching rules before larger changes."
+    },
+    "ai_faq3_q": {
+      "pl": "Jak mierzymy, czy działa?",
+      "en": "How do we measure whether it works?"
+    },
+    "ai_faq3_a": {
+      "pl": "Ustalamy baseline: czas przygotowania, akceptacja kandydatów, kompletność rekordów. Wyniki sprzedaży zależą też od oferty i rynku — nie przypisujemy ich automatycznie agentowi.",
+      "en": "We set a baseline: prep time, acceptance rate and record completeness. Sales results also depend on the offer and market — we do not automatically attribute them to the agent."
+    },
+    "ai_cta": {
+      "pl": "Porozmawiajmy o agencie AI",
+      "en": "Talk to us about an AI agent"
     },
     "cta_lead": {
       "pl": "Masz podobny projekt? Napisz — przygotujemy zakres, plan i wycenę.",
@@ -607,20 +711,118 @@
       "en": "Service: websites →"
     },
     "mj_title": {
-      "pl": "Landing page content creatora",
-      "en": "Content creator landing page"
+      "pl": "MJ Social Media",
+      "en": "MJ Social Media"
     },
     "mj_desc": {
-      "pl": "Strona marki osobistej content creatora: oferta usług, portfolio i kontakt. Zaprojektowana tak, aby prowadzić odbiorców z social mediów do zapytania ofertowego.",
-      "en": "A personal-brand website for a content creator: services, portfolio and contact. Designed to guide social audiences toward a project inquiry."
+      "pl": "Content creator",
+      "en": "Content creator"
     },
     "trove_title": {
-      "pl": "E-commerce vintage fashion",
-      "en": "Vintage fashion e-commerce"
+      "pl": "Trove Archive",
+      "en": "Trove Archive"
     },
     "trove_desc": {
-      "pl": "Sklep online z odzieżą vintage luxury: katalog, koszyk i checkout. Przejrzysty proces zakupowy wspierający konwersję i wizerunek marki premium.",
-      "en": "An online store for vintage luxury clothing: catalog, cart and checkout. A clear purchase flow that supports conversion and a premium brand image."
+      "pl": "Ecommerce fashion",
+      "en": "Ecommerce fashion"
+    },
+    "juicy_title": {
+      "pl": "Juicy Events",
+      "en": "Juicy Events"
+    },
+    "juicy_desc": {
+      "pl": "Agencja eventowa",
+      "en": "Event agency"
+    },
+    "juicy_meta": {
+      "title": {
+        "pl": "Juicy Events — strona internetowa | COSGRAL",
+        "en": "Juicy Events — website | COSGRAL"
+      },
+      "description": {
+        "pl": "Wdrożenie strony Juicy Events — agencji eventowej działającej w całej Polsce. Nagranie, opis realizacji i link do serwisu.",
+        "en": "Juicy Events website delivery — a Poland-wide event agency. Recording, case notes and a link to the live site."
+      }
+    },
+    "mj_meta": {
+      "title": {
+        "pl": "MJ Social Media — strona internetowa | COSGRAL",
+        "en": "MJ Social Media — website | COSGRAL"
+      },
+      "description": {
+        "pl": "Landing page content creatora MJ Social Media — nagranie strony, opis wdrożenia i link do realizacji.",
+        "en": "MJ Social Media creator landing page — site recording, delivery notes and a live link."
+      }
+    },
+    "trove_meta": {
+      "title": {
+        "pl": "Trove Archive — strona internetowa | COSGRAL",
+        "en": "Trove Archive — website | COSGRAL"
+      },
+      "description": {
+        "pl": "Sklep Trove Archive — vintage luxury e-commerce. Nagranie, opis wdrożenia i link do sklepu.",
+        "en": "Trove Archive store — vintage luxury e-commerce. Recording, delivery notes and a live link."
+      }
+    },
+    "case_eyebrow": {
+      "pl": "Strona internetowa",
+      "en": "Website"
+    },
+    "visit_site": {
+      "pl": "Odwiedź stronę",
+      "en": "Visit website"
+    },
+    "web_deck_hint": {
+      "pl": "Przesuń trackpadem między projektami",
+      "en": "Swipe the trackpad between projects"
+    },
+    "juicy_p1": {
+      "pl": "Juicy Events to agencja eventowa działająca w całej Polsce — od kameralnych wydarzeń prywatnych po duże produkcje biznesowe i artystyczne. Klient potrzebował strony, która nie wygląda jak katalog usług, tylko jak zaproszenie na event: odważnej, soczystej i wiarygodnej jednocześnie.",
+      "en": "Juicy Events is an event agency working across Poland — from intimate private gatherings to large business and artistic productions. The client needed a site that would not read like a service catalog, but like an invitation to an event: bold, juicy and trustworthy at the same time."
+    },
+    "juicy_p2": {
+      "pl": "Zależało nam na tym, żeby pierwsza sekunda mówiła, kim są. Silny rytm typografii, duża przestrzeń na obraz i jasna hierarchia miały oddać festiwalowy charakter marki, nie gubiąc przy tym powagi organizatora, któremu powierza się budżet i gości. Strona miała działać tak samo dobrze na telefonie — stamtąd przychodzi większość zapytań z Instagrama i Facebooka.",
+      "en": "We wanted the first second to say who they are. A strong typographic rhythm, generous space for image and a clear hierarchy had to carry the brand’s festival energy without losing the seriousness of an organizer trusted with budget and guests. The site also had to work just as well on a phone — that is where most Instagram and Facebook inquiries arrive."
+    },
+    "juicy_p3": {
+      "pl": "Strategia była prosta: jeden mocny przekaz o zasięgu ogólnopolskim, krótki opis tego, co Juicy robi, i natychmiastowa ścieżka do kontaktu. Zamiast rozbudowanego bloga czy wielopoziomowego menu zbudowaliśmy serwis, który w kilku ekranach pokazuje charakter, skalę i sposób współpracy. Każdy blok prowadzi do rozmowy — nie do kolejnej podstrony, na której gubi się energia.",
+      "en": "The strategy was simple: one strong nationwide message, a short account of what Juicy does, and an immediate path to contact. Instead of a long blog or a nested menu we built a site that shows character, scale and the way of working in a few screens. Every block leads to a conversation — not to another page where the energy leaks away."
+    },
+    "juicy_p4": {
+      "pl": "Klient oczekiwał wdrożenia, które da się pokazać w pitchu i w stories, a jednocześnie będzie narzędziem sprzedażowym: szybkim, czytelnym i gotowym na zapytania z całej Polski. Taką stronę oddaliśmy — z nagraniem powyżej widać rytm scrolla, układ treści i to, jak marka wchodzi na ekran.",
+      "en": "The client expected a delivery they could show in a pitch and in stories, and that would still work as a sales tool: fast, readable and ready for inquiries from all over Poland. That is the site we shipped — the recording above shows the scroll rhythm, the content layout and how the brand enters the screen."
+    },
+    "mj_p1": {
+      "pl": "MJ Social Media to marka osobista content creatora. Celem było zebranie ruchu z Instagrama i TikToka na jednej stronie, która w kilkanaście sekund tłumaczy ofertę i prowadzi do zapytania — bez rozpraszaczy i bez poczucia, że weszło się na szablon freelance’era.",
+      "en": "MJ Social Media is a content creator’s personal brand. The goal was to gather Instagram and TikTok traffic on one page that explains the offer in a few seconds and leads to an inquiry — without distractions and without the feeling of a generic freelancer template."
+    },
+    "mj_p2": {
+      "pl": "Zależało nam na krótkim, prawie instagramowym scrollu: twarz marki na starcie, jasny zakres usług, wybrane realizacje i jeden główny przycisk. Typografia i tempo miały być blisko treści, które MJ publikuje na co dzień, żeby przejście z rolki na stronę nie psuło wizerunku.",
+      "en": "We wanted a short, almost Instagram-like scroll: the face of the brand at the start, a clear service range, selected work and one primary button. Typography and pacing had to sit close to the content MJ publishes every day, so the jump from a reel to the site would not break the image."
+    },
+    "mj_p3": {
+      "pl": "Strategia konwersji była jednokierunkowa. Każda sekcja powtarza tę samą obietnicę — współpraca, nie tylko „zobacz portfolio” — i spycha do kontaktu. Zrezygnowaliśmy z rozbudowanego bloga i zbędnych podstron, żeby osoba z social mediów nie zgubiła się po drodze.",
+      "en": "The conversion strategy was one-way. Every section repeats the same promise — collaboration, not just “see the portfolio” — and pushes toward contact. We dropped a long blog and extra subpages so someone arriving from social would not get lost on the way."
+    },
+    "mj_p4": {
+      "pl": "Klient oczekiwał strony, która wygląda jak rozszerzenie jego kanałów i od razu zbiera leady. Wdrożenie oddaje ten brief: lądowanie z social, szybki odczyt oferty i prosta ścieżka do rozmowy.",
+      "en": "The client expected a site that feels like an extension of their channels and collects leads immediately. The delivery matches that brief: a landing from social, a fast read of the offer and a simple path to a conversation."
+    },
+    "trove_p1": {
+      "pl": "Trove Archive to sklep z odzieżą vintage luxury. Klient chciał e-commerce, który wygląda jak archiwum i lookbook, a nie jak typowy marketplace — i jednocześnie pozwala kupić rzecz w kilku krokach, bez tarcia.",
+      "en": "Trove Archive is a vintage luxury clothing store. The client wanted e-commerce that looks like an archive and a lookbook, not a typical marketplace — and still lets someone buy a piece in a few steps, without friction."
+    },
+    "trove_p2": {
+      "pl": "Zależało nam na fotografii jako głównym języku strony. Duże kadry, spokojna typografia i dużo powietrza miały budować poczucie rzadkości i selekcji. Katalog, koszyk i checkout musiały zostać czytelne, żeby wizerunek premium nie utrudniał zakupu.",
+      "en": "We wanted photography to be the main language of the site. Large frames, calm typography and plenty of air had to build a sense of rarity and selection. Catalog, cart and checkout still had to stay readable, so the premium image would not get in the way of buying."
+    },
+    "trove_p3": {
+      "pl": "Strategia była dwutorowa: najpierw emocja i zaufanie do selekcji, potem maksymalnie krótka ścieżka zakupowa. Segregacja kolekcji, karty produktów i podsumowanie koszyka prowadzą liniowo do płatności — bez zbędnych pop-upów i bez rozbijania rytmu oglądania ubrań.",
+      "en": "The strategy ran on two tracks: first emotion and trust in the selection, then the shortest possible purchase path. Collection grouping, product cards and the cart summary lead linearly to payment — without extra pop-ups and without breaking the rhythm of looking at clothes."
+    },
+    "trove_p4": {
+      "pl": "Klient oczekiwał sklepu, który uniesie wizerunek vintage luxury i nie zgubi konwersji. Takie wdrożenie oddaliśmy: editorial na wierzchu, e-commerce pod spodem. Nagranie pokazuje, jak katalog i proces zakupowy układają się w jeden rytm.",
+      "en": "The client expected a store that could carry a vintage luxury image without losing conversion. That is the delivery: editorial on the surface, e-commerce underneath. The recording shows how the catalog and the purchase flow sit in one rhythm."
     },
     "montaz_title": {
       "pl": "Montaż wideo",
@@ -651,8 +853,8 @@
       "en": "Creative for social and campaigns: posts, stories and key visuals."
     },
     "grafiki_page_lead": {
-      "pl": "Wybrane realizacje graficzne dla marek i wydarzeń — m.in. Juicy Events, Far East, Safe Grant i BTS.",
-      "en": "Selected graphic work for brands and events — including Juicy Events, Far East, Safe Grant and BTS."
+      "pl": "Wybrane realizacje graficzne dla marek i wydarzeń — m.in. Juicy Events, Far East i BTS.",
+      "en": "Selected graphic work for brands and events — including Juicy Events, Far East and BTS."
     },
     "grafiki_service": {
       "pl": "Usługa: grafika i wideo →",
@@ -737,6 +939,10 @@
     "view_all": {
       "pl": "Zobacz wszystko →",
       "en": "View all →"
+    },
+    "view_more": {
+      "pl": "Zobacz więcej →",
+      "en": "See more →"
     },
     "view_site": {
       "pl": "Zobacz stronę →",

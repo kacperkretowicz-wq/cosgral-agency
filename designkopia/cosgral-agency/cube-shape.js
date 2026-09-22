@@ -130,7 +130,7 @@ export function createIntactCubeParts(half) {
   var shellMat = new THREE.MeshBasicMaterial({
     color: 0x080808,
     transparent: true,
-    opacity: 0.35,
+    opacity: 0.45,
     depthWrite: true,
     polygonOffset: true,
     polygonOffsetFactor: 1,
@@ -144,13 +144,13 @@ export function createIntactCubeParts(half) {
     new THREE.LineBasicMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.95,
+      opacity: 0.24,
       depthWrite: false,
     })
   );
   edges.renderOrder = 1;
 
-  return { boxGeo, shell, wire: null, edges, setWireOpacity };
+  return { boxGeo: boxGeo, shell: shell, wire: null, edges: edges, setWireOpacity: setWireOpacity };
 }
 
 /**

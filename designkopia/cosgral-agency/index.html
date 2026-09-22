@@ -11,8 +11,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="cosgral-build" content="20260918f" />
-<script src="site-cache-bust.js?v=20260917ad"></script>
+<meta name="cosgral-build" content="20260919a" />
+<script src="site-cache-bust.js?v=20260919a"></script>
 <title>COSGRAL — agencja cyfrowa | strony, aplikacje, CRM, automatyzacje</title>
 <meta name="description" content="COSGRAL — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo. Budujemy produkty cyfrowe i systemy dla firm." />
 <link rel="canonical" href="https://cosgral.pl/" />
@@ -47,19 +47,10 @@
   "description": "Agencja cyfrowa — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo."
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preconnect" href="https://cdn.prod.website-files.com" />
-<link rel="preconnect" href="https://unpkg.com" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;family=Stack+Sans+Notch:wght@400;500;600;700&amp;display=swap" />
-<link rel="stylesheet" href="cosgral-home.css?v=20260918f" />
-<!-- Sześcian 3D: start pobierania modułów od razu, nie po sparsowaniu home-hero-3d.js -->
-<link rel="modulepreload" href="vendor/three-0.170.0.module.min.js" />
-<link rel="modulepreload" href="home-hero-3d.js?v=20260918d" />
-<link rel="modulepreload" href="cube-shape.js?v=20260918d" />
-<link rel="modulepreload" href="three-fxaa-pass.js?v=20260918d" />
-<link rel="stylesheet" href="theme-mode.css?v=20260918f" />
-<link rel="stylesheet" href="page-transitions.css?v=20260810h" />
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="cosgral-home.css?v=20260922ui52" />
+<link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
+<link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
 <script>
   (function () {
@@ -93,9 +84,10 @@
 <script src="service-themes.js?v=20260810l"></script>
 <script src="services-content.js?v=20260825w"></script>
 <script src="service-panel.js?v=20260816at"></script>
-<script src="page-transitions.js?v=20260918d"></script>
-<script src="cosgral-motion-pref.js?v=20260831e"></script>
-<script src="theme-mode.js?v=20260831f"></script>
+<script src="page-transitions.js?v=20260920ui10"></script>
+<script src="cosgral-motion-pref.js?v=20260919a"></script>
+<script src="theme-mode.js?v=20260920ui34"></script>
+  <link rel="stylesheet" href="site-chat.css?v=20260922ui51" />
 </head>
 <body class="home-page">
 
@@ -118,7 +110,7 @@
 <div id="preloader" aria-hidden="true">
   <div class="preloader__inner">
     <div class="preloader__cube-slot" aria-hidden="true">
-      <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-192.png" alt="" width="64" height="97" decoding="async" />
+      <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" decoding="async" />
     </div>
     <div class="preloader__bar" aria-hidden="true">
       <div class="preloader__bar-fill" id="preloader-bar"></div>
@@ -130,7 +122,7 @@
 
 <nav class="site-nav" id="site-nav">
   <a href="index.html#top" class="site-nav__logo" data-i18n-aria-label="common.logo_aria" aria-label="COSGRAL — strona główna">
-    <img src="images/cosgral-agency/brand/cosgral-logo-cube-192.png" alt="" class="site-nav__logo-img" width="48" height="48" />
+    <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
   <div class="site-nav__actions">
     <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
@@ -435,7 +427,7 @@
         <a class="home-contact__phone" href="tel:+48533790518" data-i18n="contact.phone_kuba">Jakub · +48 533 790 518</a>
         <a class="home-contact__phone" href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a>
       </div>
-      <form id="audit-form" class="audit-form" name="audit-contact" method="POST" action="contact.php" data-netlify="true" data-netlify-honeypot="bot-field" data-audit-form data-lenis-prevent>
+      <form id="audit-form" class="audit-form" name="audit-contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" data-audit-form data-lenis-prevent>
         <input type="hidden" name="form-name" value="audit-contact" />
         <p class="visually-hidden" hidden>
           <label>Nie wypełniaj: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
@@ -465,6 +457,8 @@
 </section>
 
 </main>
+
+<div class="footer-runway" id="footer-runway" aria-hidden="true"></div>
 
 <footer class="site-footer">
   <div class="site-footer__ambient" aria-hidden="true"></div>
@@ -529,22 +523,24 @@
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="i18n.js?v=20260825x"></script>
+<script src="i18n.js?v=20260919gyro"></script>
 <script src="preloader.js?v=20260831c"></script>
-<script src="smooth-scroll.js?v=20260918a"></script>
+<script src="smooth-scroll.js?v=20260917ad"></script>
 <script src="cosgral-perf.js?v=20260901a"></script>
-<script src="home-cursor-field.js?v=20260917ad"></script>
+<script src="home-cursor-field.js?v=20260920ui7"></script>
 <script src="home-ambient-bg.js?v=20260917ad"></script>
-<script type="module" src="home-hero-3d.js?v=20260918d"></script>
+<script type="module" src="home-hero-3d.js?v=20260920ui34"></script>
 <script src="home-cursor.js?v=20260917ad"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
-<script src="home-services-fan.js?v=20260918d"></script>
-<script src="home-section-flow.js?v=20260918d"></script>
-<script src="home-scroll-rail.js?v=20260918d"></script>
-<script src="home-section-stepper.js?v=20260918d"></script>
-<script src="home-director.js?v=20260918e"></script>
-<script src="home-tile-interact.js?v=20260918d"></script>
-<script defer src="home-nav-menu.js?v=20260816at"></script>
+<script src="home-services-fan.js?v=20260831b"></script>
+<script src="home-section-flow.js?v=20260920ui27"></script>
+<script src="home-scroll-rail.js?v=20260922ui52"></script>
+<script src="home-section-stepper.js?v=20260917ad"></script>
+<script src="home-director.js?v=20260920ui37"></script>
+<script src="home-tile-interact.js?v=20260920ui9"></script>
+<script defer src="home-nav-menu.js?v=20260920ui31"></script>
+<script defer src="site-chat.js?v=20260922ui51"></script>
+<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
 </body>
 </html>

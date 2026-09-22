@@ -1,20 +1,51 @@
 /**
  * Portfolio — prawy suwak sekcji (jak na homepage).
+ * Showcase / film: dots without chapter titles.
  */
 (function () {
   "use strict";
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
+  var FILM = document.body.classList.contains("portfolio-page--film");
+  var SHOWCASE = document.body.classList.contains("portfolio-page--showcase");
 
-  var SCENES = [
-    { id: "portfolio-top", selector: ".portfolio-hero", label: "Portfolio", i18n: "portfolio.rail_portfolio" },
-    { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony", showTitle: true },
-    { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz", showTitle: true },
-    { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki", showTitle: true },
-    { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: true },
-    { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
-  ];
+  var SCENES = SHOWCASE
+    ? [
+        { id: "intro", selector: "#portfolio-intro", label: "Start", i18n: "portfolio.rail_portfolio" },
+        { id: "collage", selector: "#portfolio-collage", label: "Overview", i18n: "portfolio.selected_title" },
+        { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony" },
+        { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz" },
+        { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki" },
+        { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
+        { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
+      ]
+    : FILM
+    ? [
+        { id: "open", act: "open", label: "Start", i18n: "portfolio.rail_portfolio" },
+        { id: "strony", act: "web", label: "Strony", i18n: "portfolio.rail_strony" },
+        { id: "montaz", act: "reels", label: "Montaż", i18n: "portfolio.rail_montaz" },
+        { id: "grafiki", act: "gfx", label: "Grafiki", i18n: "portfolio.rail_grafiki" },
+        { id: "automatyzacje", act: "auto", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
+        { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
+      ]
+    : [
+        { id: "portfolio-top", selector: ".portfolio-hero", label: "Portfolio", i18n: "portfolio.rail_portfolio" },
+        { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony", showTitle: true },
+        { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz", showTitle: true },
+        { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki", showTitle: true },
+        { id: "automatyzacje", selector: "#automatyzacje-intro", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: true },
+        { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
+      ];
+
+  /* Film act midpoints within pin progress (0–1) */
+  var FILM_ACT_PROGRESS = {
+    open: 0.04,
+    web: 0.18,
+    reels: 0.38,
+    gfx: 0.6,
+    auto: 0.86,
+  };
 
   function sceneLabel(scene) {
     if (window.cosgralI18n?.t && scene.i18n) {
@@ -36,10 +67,32 @@
     return el.getBoundingClientRect().top + window.scrollY;
   }
 
-  function dotPercent(index) {
-    var n = SCENES.length;
-    if (n <= 1) return 0;
-    return (index / (n - 1)) * 100;
+  function railSpanFrom(positions) {
+    var first = positions[0] ?? 0;
+    var last = positions[positions.length - 1] ?? first + 1;
+    var span = last - first;
+    return { first: first, last: last, span: span <= 0 ? 1 : span };
+  }
+
+  function yToRailPct(y, positions) {
+    var s = railSpanFrom(positions);
+    return Math.min(100, Math.max(0, ((y - s.first) / s.span) * 100));
+  }
+
+  function ensureIncreasing(positions) {
+    for (var i = 1; i < positions.length; i++) {
+      if (positions[i] < positions[i - 1] + 1) positions[i] = positions[i - 1] + 1;
+    }
+    return positions;
+  }
+
+  function layoutDots(ui, positions) {
+    if (!positions || positions.length < 1) return;
+    ui.dots.forEach(function (dot, i) {
+      var li = dot.closest(".home-scroll-rail__item");
+      if (!li) return;
+      li.style.top = yToRailPct(positions[i] ?? 0, positions).toFixed(2) + "%";
+    });
   }
 
   function buildRail() {
@@ -47,7 +100,8 @@
     rail.className = "home-scroll-rail";
     rail.setAttribute("data-scroll-rail", "");
     rail.setAttribute("data-i18n-aria-label", "rail.portfolio_aria");
-    rail.setAttribute("aria-label", "Postęp sekcji portfolio");
+    rail.setAttribute("aria-label", FILM || SHOWCASE ? "Postęp Realizacji" : "Postęp sekcji portfolio");
+    if (FILM || SHOWCASE) rail.classList.add("home-scroll-rail--film");
 
     var track = document.createElement("div");
     track.className = "home-scroll-rail__track";
@@ -62,7 +116,7 @@
     SCENES.forEach(function (scene, i) {
       var li = document.createElement("li");
       li.className = "home-scroll-rail__item";
-      if (scene.showTitle) {
+      if (scene.showTitle && !FILM && !SHOWCASE) {
         var title = document.createElement("button");
         title.type = "button";
         title.className = "home-scroll-rail__title";
@@ -94,9 +148,125 @@
     return { rail: rail, fill: fill, dots: list.querySelectorAll("[data-scroll-rail-dot]") };
   }
 
-  function init() {
-    if (REDUCED) return;
-    var ui = buildRail();
+  function initFilmRail(ui) {
+    var lastIndex = -1;
+    var filmProgress = 0;
+    var railPositions = [];
+
+    applyI18n();
+    window.addEventListener("cosgral:langchange", applyI18n);
+    window.addEventListener("cosgral:i18n-ready", applyI18n);
+
+    function actIndexFromProgress(p) {
+      if (p < 0.14) return 0;
+      if (p < 0.38) return 1;
+      if (p < 0.58) return 2;
+      if (p < 0.8) return 3;
+      return 4;
+    }
+
+    function footerReached() {
+      var footer = document.querySelector(".site-footer");
+      if (!footer) return false;
+      var rect = footer.getBoundingClientRect();
+      return rect.top < window.innerHeight * 0.72;
+    }
+
+    function refreshRailPositions() {
+      var pin = window.ScrollTrigger && ScrollTrigger.getById("portfolio-film-pin");
+      var footer = document.querySelector(".site-footer");
+      var footerY = footer
+        ? footer.getBoundingClientRect().top + window.scrollY
+        : (pin ? pin.end : window.scrollY) + window.innerHeight;
+      railPositions = SCENES.map(function (scene) {
+        if (scene.footer) return footerY;
+        if (!pin) return 0;
+        var t = FILM_ACT_PROGRESS[scene.act] != null ? FILM_ACT_PROGRESS[scene.act] : 0;
+        return pin.start + (pin.end - pin.start) * t;
+      });
+      ensureIncreasing(railPositions);
+      layoutDots(ui, railPositions);
+    }
+
+    function sync(p) {
+      filmProgress = Math.max(0, Math.min(1, p == null ? filmProgress : p));
+      refreshRailPositions();
+      var pin = window.ScrollTrigger && ScrollTrigger.getById("portfolio-film-pin");
+      var scrollY = window.scrollY;
+      if (pin && !footerReached()) {
+        scrollY = pin.start + (pin.end - pin.start) * filmProgress;
+      }
+      var idx = footerReached() ? SCENES.length - 1 : actIndexFromProgress(filmProgress);
+      var fillPct = footerReached() ? 100 : yToRailPct(scrollY, railPositions);
+      ui.fill.style.height = fillPct.toFixed(2) + "%";
+
+      if (idx !== lastIndex) lastIndex = idx;
+
+      ui.dots.forEach(function (dot, i) {
+        var isCurrent = i === idx;
+        dot.classList.toggle("is-active", isCurrent);
+        dot.classList.toggle("is-hold", isCurrent);
+        if (isCurrent) dot.setAttribute("aria-current", "step");
+        else dot.removeAttribute("aria-current");
+        var li = dot.closest(".home-scroll-rail__item");
+        if (li) li.classList.toggle("is-current", isCurrent);
+      });
+    }
+
+    function goToScene(index) {
+      var scene = SCENES[index];
+      if (!scene) return;
+      if (scene.footer) {
+        var footer = document.querySelector(".site-footer");
+        if (!footer) return;
+        var y = footer.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96);
+        var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+        if (lenis && lenis.scrollTo) lenis.scrollTo(y, { duration: 1 });
+        else window.scrollTo({ top: y, behavior: "smooth" });
+        return;
+      }
+      if (window.cosgralPortfolioFilm && window.cosgralPortfolioFilm.scrollToAct) {
+        window.cosgralPortfolioFilm.scrollToAct(scene.act);
+        return;
+      }
+      var pin = window.ScrollTrigger && ScrollTrigger.getById("portfolio-film-pin");
+      if (!pin) return;
+      var t = FILM_ACT_PROGRESS[scene.act] != null ? FILM_ACT_PROGRESS[scene.act] : 0;
+      var y = pin.start + (pin.end - pin.start) * t;
+      var lenis2 = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+      if (lenis2 && lenis2.scrollTo) lenis2.scrollTo(y, { duration: 1.1 });
+      else window.scrollTo({ top: y, behavior: "smooth" });
+    }
+
+    ui.dots.forEach(function (dot) {
+      dot.addEventListener("click", function () {
+        goToScene(Number(dot.getAttribute("data-scene-index")));
+      });
+    });
+
+    window.cosgralFilmRail = {
+      sync: sync,
+      refresh: function () {
+        var film = window.cosgralPortfolioFilm;
+        sync(film && film.getProgress ? film.getProgress() : filmProgress);
+      },
+    };
+    window.cosgralPortfolioRail = { refresh: window.cosgralFilmRail.refresh, scenes: SCENES };
+
+    window.addEventListener("scroll", function () {
+      if (footerReached()) sync(filmProgress);
+    }, { passive: true });
+    window.addEventListener("resize", function () {
+      window.cosgralFilmRail.refresh();
+    });
+    window.addEventListener("load", function () {
+      window.cosgralFilmRail.refresh();
+    });
+
+    sync(0);
+  }
+
+  function initClassicRail(ui) {
     var visited = Object.create(null);
     var holdPositions = [];
     var lastIndex = -1;
@@ -124,11 +294,13 @@
     function refreshMetrics() {
       if (window.cosgralPortfolioStepper?.holds) {
         holdPositions = window.cosgralPortfolioStepper.holds.slice();
-        return;
+      } else {
+        holdPositions = SCENES.map(function (scene) {
+          return sceneY(scene.selector);
+        });
       }
-      holdPositions = SCENES.map(function (scene) {
-        return sceneY(scene.selector);
-      });
+      ensureIncreasing(holdPositions);
+      layoutDots(ui, holdPositions);
     }
 
     function activeIndex() {
@@ -149,26 +321,7 @@
     }
 
     function fillHeightForScroll(scroll) {
-      var snapIdx = window.cosgralPortfolioStepper?.getIndex?.();
-      var idx = snapIdx != null && snapIdx >= 0 ? snapIdx : activeIndex();
-
-      if (holdPositions.length < 2) return dotPercent(idx);
-
-      var start = holdPositions[idx] ?? 0;
-      var end = holdPositions[idx + 1];
-
-      if (end == null) return dotPercent(idx);
-
-      if (scroll <= start + 4) return dotPercent(idx);
-
-      if (scroll >= end - 4) return dotPercent(Math.min(idx + 1, SCENES.length - 1));
-
-      var span = end - start;
-      if (span <= 0) return dotPercent(idx);
-
-      var t = (scroll - start) / span;
-      t = Math.min(1, Math.max(0, t));
-      return dotPercent(idx) + t * (dotPercent(idx + 1) - dotPercent(idx));
+      return yToRailPct(scroll, holdPositions);
     }
 
     function update() {
@@ -239,6 +392,13 @@
 
     update();
     window.cosgralPortfolioRail = { refresh: update, scenes: SCENES };
+  }
+
+  function init() {
+    if (REDUCED) return;
+    var ui = buildRail();
+    if (FILM) initFilmRail(ui);
+    else initClassicRail(ui);
   }
 
   if (document.readyState === "loading") {

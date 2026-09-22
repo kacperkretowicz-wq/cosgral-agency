@@ -7,7 +7,16 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 (function () {
   "use strict";
 
-  if (!document.body.classList.contains("portfolio-page") && !document.body.classList.contains("about-page")) return;
+  if (
+    !document.body.classList.contains("portfolio-page") &&
+    !document.body.classList.contains("graphics-gallery-page") &&
+    !document.body.classList.contains("reels-gallery-page") &&
+    !document.body.classList.contains("privacy-page") &&
+    !document.body.classList.contains("case-page")
+  ) {
+    return;
+  }
+  /* O nas: bez sand/cząsteczek — tylko sticky depth między intro a zespołem */
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
   var backCanvas = document.getElementById("portfolio-sand-back");
@@ -32,6 +41,7 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
   var menuParticlePass = false;
   var menuParticlePassClosing = false;
   var menuBoostHero = null;
+  var menuSandSuppressed = false;
 
   function smooth01(edge0, edge1, x) {
     var t = Math.max(0, Math.min(1, (x - edge0) / Math.max(1e-4, edge1 - edge0)));
@@ -46,6 +56,8 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 
   function armMenuSandVisible() {
     menuSandVisible = true;
+    menuSandSuppressed = false;
+    document.body.classList.remove("is-menu-sand-suppressed");
     if (menuBoostHero == null) menuBoostHero = state.hero;
     state.hero = 1;
     lockMenuSandLine();
@@ -57,6 +69,8 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     menuSandBoost = true;
     menuSandBoostClosing = false;
     menuParticlePass = false;
+    menuSandSuppressed = false;
+    document.body.classList.remove("is-menu-sand-suppressed");
     lockMenuSandLine();
     if (menuBoostHero == null) menuBoostHero = state.hero;
     state.hero = 1;
@@ -97,6 +111,35 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       displayBreak = state.break * state.hero;
       displayStream = state.stream * state.hero;
     }
+  }
+
+  function suppressMenuSand() {
+    menuSandSuppressed = true;
+    menuSandVisible = false;
+    menuSandBoost = false;
+    menuSandBoostClosing = false;
+    menuParticlePass = false;
+    menuParticlePassClosing = false;
+    menuSandHold = null;
+    if (menuBoostHero != null) {
+      state.hero = menuBoostHero;
+      menuBoostHero = null;
+    }
+    displayBreak = 0;
+    displayStream = 0;
+    document.body.classList.remove(
+      "is-grafiki-menu-sand",
+      "is-gallery-menu-particles"
+    );
+    document.body.classList.add("is-menu-sand-suppressed");
+  }
+
+  function releaseMenuSandSuppress() {
+    if (!menuSandSuppressed) return;
+    menuSandSuppressed = false;
+    document.body.classList.remove("is-menu-sand-suppressed");
+    displayBreak = state.break * state.hero;
+    displayStream = state.stream * state.hero;
   }
 
   function releaseMenuSandBoost() {
@@ -427,7 +470,10 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     var baseBreak = state.break * sandPowerMul(menuBlend);
     var baseStream = state.stream * sandPowerMul(menuBlend);
 
-    if (!(menuBlend > 0.001 && (menuSandHold || menuSandVisible || menuSandBoost))) {
+    if (menuSandSuppressed) {
+      displayBreak = 0;
+      displayStream = 0;
+    } else if (!(menuBlend > 0.001 && (menuSandHold || menuSandVisible || menuSandBoost))) {
       if (state.stream < 0.97 || state.break < 0.97) {
         displayBreak = baseBreak;
         displayStream = baseStream;
@@ -435,6 +481,10 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
         displayBreak += (baseBreak - displayBreak) * 0.18;
         displayStream += (baseStream - displayStream) * 0.18;
       }
+    }
+
+    if (menuBlend <= 0.001 && menuSandSuppressed) {
+      releaseMenuSandSuppress();
     }
 
     if (menuBlend <= 0.001 && (menuSandBoostClosing || menuParticlePassClosing)) {
@@ -466,8 +516,10 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
         menuAbsorb = menuSandAbsorb();
       }
       var hold = menuSandHold;
-      shardBreak = hold.break;
-      shardStream = hold.stream;
+      /* Jak homepage Usługi: absorb wciąga pył w kostkę i finalnie go gasi */
+      var keep = 1 - menuAbsorb;
+      shardBreak = hold.break * keep;
+      shardStream = hold.stream * keep;
     }
 
     var menuLabelReveal =
@@ -483,7 +535,12 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       var layerAlpha = layer.baseAlpha || 0.72;
       var matSrc = cubeMat;
 
-      if (menuParticlePass && menuBlend > 0.001) {
+      if (menuSandSuppressed) {
+        layerBreak = 0;
+        layerStream = 0;
+        layerAbsorb = 0;
+        layerAlpha = 0;
+      } else if (menuParticlePass && menuBlend > 0.001) {
         if (isFront) {
           if (particleAssemble > 0.02) {
             layerBreak = PP_BREAK;
@@ -512,19 +569,29 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
         layerStream = shardStream;
         layerAbsorb = menuAbsorb;
         matSrc = menuMat || cubeMat;
+        /* Homepage: mesh znika gdy break≈0 po pełnym absorbie */
+        if (layerBreak < 0.002) layerAlpha = 0;
       } else if (menuBlend > 0.001) {
         layerAbsorb = menuAbsorb;
         layerBreak = menuAbsorb > 0.001 ? shardBreak : displayBreak;
         layerStream = menuAbsorb > 0.001 ? shardStream : displayStream;
         matSrc = menuMat || absorbMat || cubeMat;
+        if (layerBreak < 0.002 && menuAbsorb > 0.4) layerAlpha = 0;
       }
 
       if (menuSandVisible || menuSandBoost) {
-        layerAlpha = layer.baseAlpha || layerAlpha;
+        if (!menuSandSuppressed && !(layerBreak < 0.002 && menuAbsorb > 0.4)) {
+          layerAlpha = layer.baseAlpha || layerAlpha;
+        }
       }
 
       if (menuLabelReveal > 0.001 && layerAbsorb > 0.12) {
         layerAlpha *= 1 - menuLabelReveal * 0.5;
+      }
+
+      /* Po pełnym absorbie pył znika (jak homepage Usługi) */
+      if (menuAbsorb > 0.001) {
+        layerAlpha *= Math.max(0, 1 - menuAbsorb);
       }
 
       layer.mat.uniforms.uTime.value = t;
@@ -542,6 +609,11 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 
   window.addEventListener("cosgral:cube-menu", function (e) {
     if (e.detail && e.detail.open) {
+      if (e.detail.heroMenu) {
+        suppressMenuSand();
+        return;
+      }
+      releaseMenuSandSuppress();
       if (e.detail.particlePass) {
         armParticlePassMenu();
         return;
@@ -558,6 +630,10 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       } else {
         menuSandHold = null;
       }
+      return;
+    }
+    if (menuSandSuppressed) {
+      releaseMenuSandSuppress();
       return;
     }
     if (menuSandBoost) {
@@ -588,24 +664,64 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     state.cube = 1;
     state.break = 0.98;
     state.stream = 0.98;
-    displayBreak = 0.98;
-    displayStream = 0.98;
     window.cosgralCube?.cancelPortfolioHeroPass?.();
     document.body.classList.remove("is-portfolio-intro-pending");
     if (sectionIndex > 0) {
+      state.hero = 0;
+      displayBreak = 0;
+      displayStream = 0;
       window.cosgralCube?.applyPortfolioBootSection?.(sectionIndex);
+    } else {
+      displayBreak = 0.98;
+      displayStream = 0.98;
     }
+  }
+
+  function setSandHeroVisibility(index, opts) {
+    opts = opts || {};
+    var onHero = index === 0;
+    var target = onHero ? 1 : 0;
+    /* During megamenu sand takeover, only remember the post-menu target */
+    if (menuSandBoost || menuSandVisible || menuParticlePass || menuSandSuppressed) {
+      if (menuBoostHero == null) menuBoostHero = state.hero;
+      menuBoostHero = target;
+      return;
+    }
+    if (window.gsap && !opts.immediate) {
+      gsap.killTweensOf(state, "hero");
+      gsap.to(state, {
+        hero: target,
+        duration: opts.duration != null ? opts.duration : MOBILE ? 0.55 : 0.72,
+        ease: "power2.out",
+        onUpdate: function () {
+          displayBreak = state.break * state.hero;
+          displayStream = state.stream * state.hero;
+        },
+        onComplete: function () {
+          displayBreak = state.break * state.hero;
+          displayStream = state.stream * state.hero;
+        },
+      });
+      return;
+    }
+    state.hero = target;
+    displayBreak = state.break * state.hero;
+    displayStream = state.stream * state.hero;
   }
 
   function runIntro() {
     var breakDelay = MOBILE ? 0.55 : 0.72;
     var breakDur = MOBILE ? 2.6 : 3.35;
+    var isShowcase = document.body.classList.contains("portfolio-page--showcase");
 
-    window.cosgralCube?.startPortfolioHeroPass?.({
-      delay: breakDelay,
-      duration: breakDur,
-      ease: "power2.inOut",
-    });
+    /* Showcase drives the cube via scroll — skip the one-shot hero pass */
+    if (!isShowcase) {
+      window.cosgralCube?.startPortfolioHeroPass?.({
+        delay: breakDelay,
+        duration: breakDur,
+        ease: "power2.inOut",
+      });
+    }
 
     if (!window.gsap) {
       state.cube = 1;
@@ -695,6 +811,9 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 
   window.addEventListener("cosgral:section-step", function (e) {
     if (e.detail && e.detail.initial) bootIntroIfNeeded(e.detail.index);
+    if (e.detail && typeof e.detail.index === "number") {
+      setSandHeroVisibility(e.detail.index, { immediate: !!(e.detail && e.detail.initial) });
+    }
   });
 
   if (window.cosgralCube) {

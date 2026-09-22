@@ -95,26 +95,17 @@
       (opts.size ? " reels-tiles__card--" + opts.size : "") +
       (opts.depth ? " reels-tiles__card--" + opts.depth : "");
     var lane = opts.lane != null ? opts.lane : 0;
+    /* Preview na portfolio — tylko dekoracja (bez klików / lightbox) */
     return (
-      '<button type="button" class="' +
+      '<div class="' +
       cls +
       '" style="--i:' +
       i +
       ";--lane:" +
       lane +
-      '" data-reel-src="' +
-      mediaUrl(item.src) +
-      '" data-reel-full="' +
-      mediaUrl(item.full || item.src) +
-      '" data-reel-poster="' +
-      mediaUrl(item.poster || "") +
-      '" data-reel-alt="' +
-      (item.client || "Rolka") +
-      '" data-reel-audio="' +
-      (item.audio === false ? "false" : "true") +
-      '">' +
+      '" aria-hidden="true">' +
       tileMedia(item, !!opts.isClone) +
-      "</button>"
+      "</div>"
     );
   }
 
@@ -146,17 +137,18 @@
 
   function renderTiles(data) {
     if (!tilesRoot) return;
+    var allowed = { trove: true, wiktoria: true };
     var pool = collectItems(data).filter(function (item) {
-      return item.id !== "orlincy";
+      return !!allowed[item.id];
     });
     if (!pool.length && data.collage) {
       pool = data.collage.filter(function (item) {
-        return item.id !== "orlincy";
+        return !!allowed[item.id];
       });
     }
     if (!pool.length) return;
 
-    var tiles = pickTiles(pool, 20);
+    var tiles = pool;
     var sizes = ["sm", "xl", "xs", "lg", "md", "sm", "xl", "xs", "md", "lg", "xs", "md", "xl", "sm", "lg", "md", "xs", "xl", "sm", "lg"];
     var depths = ["far", "near", "mid", "far", "near", "mid", "far", "near", "mid", "near", "far", "mid", "near", "far", "mid", "near", "far", "mid", "near", "far"];
     var lanes = [2, 0, 1, -1, 2, 0, -2, 1, 0, 2, -1, 1, 0, 2, -1, 0, 1, -2, 2, 0];
@@ -185,11 +177,38 @@
       "</div>" +
       "</div>";
 
-    bindLightboxTriggers(tilesRoot);
     if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.scan(tilesRoot);
     initTilesEntrance();
     initTilesCenterFocus();
+    syncDriftSpeed();
     document.dispatchEvent(new CustomEvent("portfolio:media-ready", { detail: { type: "reels" } }));
+  }
+
+  /* Stała prędkość w px/s — na mobile krótsza belka przy 52s wyglądała wolniej */
+  var DRIFT_PX_PER_SEC = 96;
+  var driftResizeBound = false;
+
+  function syncDriftSpeed() {
+    if (!tilesRoot) return;
+    var belt = tilesRoot.querySelector(".reels-tiles__belt");
+    var track = tilesRoot.querySelector(".reels-tiles__track:not(.reels-tiles__track--clone)");
+    if (!belt || !track) return;
+    var w = track.getBoundingClientRect().width;
+    if (w < 40) return;
+    var sec = Math.max(16, Math.min(90, w / DRIFT_PX_PER_SEC));
+    belt.style.animationDuration = sec.toFixed(2) + "s";
+    if (!driftResizeBound) {
+      driftResizeBound = true;
+      var t = 0;
+      window.addEventListener(
+        "resize",
+        function () {
+          window.clearTimeout(t);
+          t = window.setTimeout(syncDriftSpeed, 120);
+        },
+        { passive: true }
+      );
+    }
   }
 
   function initTilesCenterFocus() {

@@ -189,14 +189,31 @@
     });
   }
 
-  function playEnter() {
-    if (window.cosgralServiceDive && window.cosgralServiceDive.playEnter()) return;
-
-    if (!sessionStorage.getItem(SESSION_KEY)) return;
-    sessionStorage.removeItem(SESSION_KEY);
+  function clearEnterLock() {
     document.documentElement.classList.remove("is-page-enter");
+    var overlay = document.getElementById("page-transition");
+    if (overlay && !overlay.classList.contains("is-active")) {
+      overlay.classList.remove("is-covering", "is-revealing");
+    }
+  }
+
+  function playEnter() {
+    if (window.cosgralServiceDive && window.cosgralServiceDive.playEnter()) {
+      clearEnterLock();
+      return;
+    }
+
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+      clearEnterLock();
+      return;
+    }
+    sessionStorage.removeItem(SESSION_KEY);
+    clearEnterLock();
     revealTransition(scrollToStoredHash);
   }
+
+  /* Safety: never leave a click-blocking enter veil */
+  window.setTimeout(clearEnterLock, REVEAL_MS + 400);
 
   function scrollToStoredHash() {
     if (sessionStorage.getItem(SERVICE_KEY)) return;

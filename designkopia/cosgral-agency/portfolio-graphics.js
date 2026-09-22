@@ -51,7 +51,6 @@
   var COLLAGE_COUNTS = {
     "juicy-events": 20,
     "far-east": 7,
-    "safe-grant": 6,
     bts: 2,
   };
 
@@ -290,6 +289,11 @@
     var baseW = mobile ? 172 : 272;
     var cx = WORLD_W * 0.5;
     var cy = WORLD_H * 0.5;
+    var cluster = clusterCenter(FOCUS_HERO_END);
+    var fx = cluster.x * m * spread;
+    var fy = cluster.y * m * spread - (mobile ? 40 : 80);
+    var clearW = mobile ? 320 : 640;
+    var clearH = mobile ? 260 : 400;
 
     tiles.forEach(function (tile) {
       var idx = Number(tile.getAttribute("data-idx"));
@@ -300,15 +304,34 @@
       if (inner) inner.style.width = baseW * pos.w * m + "px";
       if (media) media.style.aspectRatio = String(pos.ar);
 
-      var visibleEarly = false;
+      var tx = pos.x * m * spread;
+      var ty = pos.y * m * spread;
+      var tileW = baseW * pos.w * m * pos.s;
+      var tileH = tileW / (pos.ar || 0.8);
+      var hw = tileW * 0.5;
+      var hh = tileH * 0.5;
+      var ox = clearW * 0.5 + hw - Math.abs(tx - fx);
+      var oy = clearH * 0.5 + hh - Math.abs(ty - fy);
+      if (ox > 0 && oy > 0) {
+        var dx = tx - fx;
+        var dy = ty - fy;
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) dx = idx % 2 === 0 ? -1 : 1;
+        var nx = dx / (clearW * 0.5 + hw);
+        var ny = dy / (clearH * 0.5 + hh);
+        var d = Math.sqrt(nx * nx + ny * ny) || 0.01;
+        var push = 1.18 / d;
+        tx = fx + dx * push;
+        ty = fy + dy * push;
+      }
+
       gsap.set(tile, {
-        left: cx + pos.x * m * spread,
-        top: cy + pos.y * m * spread,
+        left: cx + tx,
+        top: cy + ty,
         xPercent: -50,
         yPercent: -50,
         scale: pos.s,
         rotation: pos.r,
-        opacity: visibleEarly ? 1 : 0,
+        opacity: 0,
         x: 0,
         zIndex: Math.round(pos.s * 100) + idx,
       });
@@ -1164,17 +1187,20 @@
 
     var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
     var pinLen = freeScroll ? (mobile ? "+=180%" : "+=240%") : mobile ? "+=72%" : "+=80%";
+    var filmMode = document.body.classList.contains("portfolio-page--film");
 
     var overlay = section.querySelector(".graphics-stage__overlay");
     var framesCta = section.querySelector("[data-graphics-frames-cta]");
 
     function setOverlay(p) {
-      /* Napis mocniej i wcześniej widoczny */
-      var show = p > 0.48;
-      var amt = Math.max(0, Math.min(1, (p - 0.48) / 0.22));
+      /* Napis pod koniec cinema — pełny dopiero ~0.78+ */
+      var show = p > 0.62;
+      var amt = Math.max(0, Math.min(1, (p - 0.62) / 0.2));
       if (overlay) {
         overlay.setAttribute("aria-hidden", show ? "false" : "true");
         gsap.set(overlay, { autoAlpha: show ? amt : 0 });
+        if (show && amt > 0.05) overlay.classList.add("is-on");
+        else overlay.classList.remove("is-on");
       }
       if (framesCta) {
         gsap.set(framesCta, {
@@ -1183,12 +1209,53 @@
           scale: 0.94 + amt * 0.06,
         });
       }
-      section.classList.toggle("is-cinema-done", p > 0.85);
-      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.48);
+      section.classList.toggle("is-cinema-done", p > 0.88);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.62);
     }
 
     if (overlay) gsap.set(overlay, { autoAlpha: 0 });
     if (framesCta) gsap.set(framesCta, { autoAlpha: 0, y: 20, scale: 0.94 });
+
+    window.cosgralGraphicsCinema = {
+      setProgress: function (p) {
+        cinemaTl.progress(Math.max(0, Math.min(1, p)));
+        setOverlay(p);
+      },
+      timeline: cinemaTl,
+    };
+
+    /* Film mode: no local pin — portfolio-film.js drives progress */
+    if (filmMode) {
+      cinemaTl.progress(0);
+      setOverlay(0);
+      window.cosgralGrafikiStepper = {
+        refresh: function () {},
+        snapToHold: function () {},
+        revealHold: function () {},
+        transitionToBeat: function () {},
+        resetForReentry: function () {
+          cinemaTl.progress(0);
+          setOverlay(0);
+        },
+        getBeat: function () {
+          return 0;
+        },
+        isAnimating: function () {
+          return false;
+        },
+        getPassDown: function () {
+          return true;
+        },
+        getPassUp: function () {
+          return true;
+        },
+        suspendHold: function () {},
+        getHoldY: function () {
+          return 0;
+        },
+      };
+      return;
+    }
 
     var pinHandlers = {};
 
@@ -1363,15 +1430,49 @@
     return document.querySelector(".portfolio-page [data-scroll-rail]");
   }
 
-  function appendRailStage(timeline, vars, position, duration) {
-    var rail = getScrollRail();
-    if (!rail || !vars) return;
-    timeline.to(rail, Object.assign({ ease: "none", duration: duration }, vars), position);
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function parseRgba(str) {
+    var m = String(str).match(/rgba?\(([^)]+)\)/);
+    if (!m) return [255, 255, 255, 1];
+    var p = m[1].split(",").map(function (v) {
+      return parseFloat(v.trim());
+    });
+    if (p.length < 4) p.push(1);
+    return p;
+  }
+
+  function mixRgba(from, to, t) {
+    var a = parseRgba(from);
+    var b = parseRgba(to);
+    return (
+      "rgba(" +
+      Math.round(lerp(a[0], b[0], t)) +
+      ", " +
+      Math.round(lerp(a[1], b[1], t)) +
+      ", " +
+      Math.round(lerp(a[2], b[2], t)) +
+      ", " +
+      lerp(a[3], b[3], t).toFixed(3) +
+      ")"
+    );
+  }
+
+  function mixRail(from, to, t) {
+    var out = {};
+    Object.keys(to).forEach(function (key) {
+      out[key] = from[key] && String(from[key]).indexOf("rgba") !== -1 ? mixRgba(from[key], to[key], t) : to[key];
+    });
+    return out;
   }
 
   function initGrafikiBloom() {
     var section = document.getElementById("grafiki");
     if (!section || !window.gsap || !window.ScrollTrigger) return;
+    /* Film mode: ambient stays under master timeline — no competing bloom pin */
+    if (document.body.classList.contains("portfolio-page--film")) return;
 
     var ambient = document.querySelector(".subpage-ambient");
     var blur = document.querySelector(".subpage-ambient__blur");
@@ -1379,6 +1480,7 @@
     var cube = document.querySelector(".subpage-cube-portal");
     var bloom = document.getElementById("grafiki-bloom");
     var rail = getScrollRail();
+    var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
 
     grafikiMenuState.cube = cube;
     gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
@@ -1387,91 +1489,66 @@
     gsap.set(bloom, { opacity: 0 });
     if (rail) gsap.set(rail, RAIL_LIGHT);
 
-    var cinema = document.querySelector(".graphics-cinema");
-    var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
-    var nextSection = document.getElementById("automatyzacje");
-    var scrubSpeed = 3.4;
+    function applyAmbientLift(t) {
+      t = Math.max(0, Math.min(1, t));
+      gsap.set(bloom, { opacity: lerp(0, 0.66, t) });
+      gsap.set(shade, { backgroundColor: mixRgba("rgba(3, 3, 3, 0.28)", "rgba(255, 255, 255, 0.84)", t) });
+      gsap.set(ambient, {
+        filter:
+          "grayscale(" +
+          lerp(1, 0, t).toFixed(3) +
+          ") contrast(" +
+          lerp(1.04, 1.01, t).toFixed(3) +
+          ") brightness(" +
+          lerp(0.78, 2.52, t).toFixed(3) +
+          ")",
+      });
+      gsap.set(blur, { opacity: lerp(0.55, 0.82, t) });
+      if (rail) gsap.set(rail, mixRail(RAIL_LIGHT, RAIL_DARK, t));
+      /* Jasny tryb przez całą widoczność Grafiki — ściemnianie dopiero gdy sekcja zniknie ze scrolla */
+      document.body.classList.toggle("is-grafiki-light", t > 0.06);
+      syncGrafikiCubeFade();
+    }
 
-    var bloomTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top bottom",
-        endTrigger: cinema || section,
-        end: "top 35%",
-        scrub: scrubSpeed,
-        onUpdate: syncGrafikiCubeFade,
+    function liftFromScroll(self) {
+      var pin = ScrollTrigger.getById("grafiki-pin");
+      var y = self.scroll();
+      var liftStart = self.start;
+      var pinStart = pin ? pin.start : self.start + (self.end - self.start) * 0.22;
+      var pinEnd = pin ? pin.end : self.end;
+      /* Ściemnianie dopiero po końcu pina (= Grafiki już nie widać) */
+      var darkenStart = pinEnd;
+      var darkenEnd = self.end;
+      var t;
+      if (y <= pinStart) {
+        var raw = (y - liftStart) / Math.max(1, pinStart - liftStart);
+        t = Math.min(1, Math.pow(Math.max(0, raw), 0.4));
+      } else if (y <= darkenStart) {
+        t = 1;
+      } else {
+        t = 1 - (y - darkenStart) / Math.max(1, darkenEnd - darkenStart);
+      }
+      applyAmbientLift(t);
+    }
+
+    var bloomST = ScrollTrigger.create({
+      id: "grafiki-bloom",
+      trigger: section,
+      start: function () {
+        var pin = ScrollTrigger.getById("grafiki-pin");
+        return pin ? pin.start - window.innerHeight * 0.72 : "top 92%";
       },
+      end: function () {
+        var pin = ScrollTrigger.getById("grafiki-pin");
+        /* Do ściemnienia po zniknięciu Grafiki — przejście w Automatyzacje / chapter */
+        return pin ? pin.end + window.innerHeight * 0.85 : "bottom top";
+      },
+      invalidateOnRefresh: true,
+      onUpdate: liftFromScroll,
+      onRefresh: liftFromScroll,
     });
 
-    bloomTl
-      .to(bloom, { opacity: 0.03, ease: "none", duration: 0.28 }, 0)
-      .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.06)", ease: "none", duration: 0.28 }, 0)
-      .to(ambient, { filter: "grayscale(0.88) contrast(1.04) brightness(0.86)", ease: "none", duration: 0.28 }, 0)
-      .to(blur, { opacity: 0.56, ease: "none", duration: 0.28 }, 0)
-
-      .to(bloom, { opacity: 0.1, ease: "none", duration: 0.24 }, 0.28)
-      .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.16)", ease: "none", duration: 0.24 }, 0.28)
-      .to(ambient, { filter: "grayscale(0.62) contrast(1.03) brightness(1.08)", ease: "none", duration: 0.24 }, 0.28)
-      .to(blur, { opacity: 0.6, ease: "none", duration: 0.24 }, 0.28)
-
-      .to(bloom, { opacity: 0.28, ease: "none", duration: 0.24 }, 0.52)
-      .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.38)", ease: "none", duration: 0.24 }, 0.52)
-      .to(ambient, { filter: "grayscale(0.32) contrast(1.02) brightness(1.42)", ease: "none", duration: 0.24 }, 0.52)
-      .to(blur, { opacity: 0.66, ease: "none", duration: 0.24 }, 0.52)
-
-      .to(bloom, { opacity: 0.56, ease: "none", duration: 0.24 }, 0.76)
-      .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.66)", ease: "none", duration: 0.24 }, 0.76)
-      .to(ambient, { filter: "grayscale(0.12) contrast(1.02) brightness(1.82)", ease: "none", duration: 0.24 }, 0.76)
-      .to(blur, { opacity: 0.72, ease: "none", duration: 0.24 }, 0.76);
-
-    appendRailStage(bloomTl, RAIL_S1, 0, 0.28);
-    appendRailStage(bloomTl, RAIL_S2, 0.28, 0.24);
-    appendRailStage(bloomTl, RAIL_S3, 0.52, 0.24);
-    appendRailStage(bloomTl, RAIL_DARK, 0.76, 0.24);
-
-    var darkenTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: grafikiCta || section,
-        start: "bottom top",
-        endTrigger: nextSection || section,
-        end: "top 35%",
-        scrub: scrubSpeed,
-        onUpdate: syncGrafikiCubeFade,
-      },
-    });
-
-    darkenTl
-      .to(bloom, { opacity: 0.28, ease: "none", duration: 0.24 }, 0)
-      .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.38)", ease: "none", duration: 0.24 }, 0)
-      .to(ambient, { filter: "grayscale(0.32) contrast(1.02) brightness(1.42)", ease: "none", duration: 0.24 }, 0)
-      .to(blur, { opacity: 0.66, ease: "none", duration: 0.24 }, 0)
-
-      .to(bloom, { opacity: 0.1, ease: "none", duration: 0.24 }, 0.24)
-      .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.16)", ease: "none", duration: 0.24 }, 0.24)
-      .to(ambient, { filter: "grayscale(0.62) contrast(1.03) brightness(1.08)", ease: "none", duration: 0.24 }, 0.24)
-      .to(blur, { opacity: 0.6, ease: "none", duration: 0.24 }, 0.24)
-
-      .to(bloom, { opacity: 0.03, ease: "none", duration: 0.24 }, 0.48)
-      .to(shade, { backgroundColor: "rgba(255, 255, 255, 0.06)", ease: "none", duration: 0.24 }, 0.48)
-      .to(ambient, { filter: "grayscale(0.88) contrast(1.04) brightness(0.86)", ease: "none", duration: 0.24 }, 0.48)
-      .to(blur, { opacity: 0.56, ease: "none", duration: 0.24 }, 0.48)
-
-      .to(bloom, { opacity: 0, ease: "none", duration: 0.28 }, 0.72)
-      .to(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)", ease: "none", duration: 0.28 }, 0.72)
-      .to(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)", ease: "none", duration: 0.28 }, 0.72)
-      .to(blur, { opacity: 0.55, ease: "none", duration: 0.28 }, 0.72);
-
-    appendRailStage(darkenTl, RAIL_S3, 0, 0.24);
-    appendRailStage(darkenTl, RAIL_S2, 0.24, 0.24);
-    appendRailStage(darkenTl, RAIL_S1, 0.48, 0.24);
-    appendRailStage(darkenTl, RAIL_LIGHT, 0.72, 0.28);
-
-    grafikiMenuState.cube = cube;
-    grafikiMenuState.bloomTl = bloomTl;
-    grafikiMenuState.darkenTl = darkenTl;
-    grafikiMenuState.triggers = [bloomTl.scrollTrigger, darkenTl.scrollTrigger].filter(Boolean);
-
-    ScrollTrigger.create({
+    var zoneST = ScrollTrigger.create({
       trigger: section,
       start: "top bottom",
       endTrigger: grafikiCta || section,
@@ -1482,7 +1559,7 @@
         syncGrafikiCubeFade();
       },
       onLeave: function () {
-        document.body.classList.remove("is-grafiki-zone");
+        document.body.classList.remove("is-grafiki-zone", "is-grafiki-light");
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },
@@ -1492,30 +1569,15 @@
         syncGrafikiCubeFade();
       },
       onLeaveBack: function () {
-        document.body.classList.remove("is-grafiki-zone");
+        document.body.classList.remove("is-grafiki-zone", "is-grafiki-light");
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },
     });
 
-    ScrollTrigger.create({
-      trigger: section,
-      start: "top 32%",
-      endTrigger: grafikiCta || section,
-      end: "bottom top",
-      onEnter: function () {
-        document.body.classList.add("is-grafiki-light");
-      },
-      onLeave: function () {
-        document.body.classList.remove("is-grafiki-light");
-      },
-      onEnterBack: function () {
-        document.body.classList.add("is-grafiki-light");
-      },
-      onLeaveBack: function () {
-        document.body.classList.remove("is-grafiki-light");
-      },
-    });
+    grafikiMenuState.bloomTl = bloomST;
+    grafikiMenuState.darkenTl = null;
+    grafikiMenuState.triggers = [bloomST, zoneST];
 
     syncGrafikiCubeFade();
   }
@@ -1599,7 +1661,7 @@
 
   bindLightboxUi();
 
-  fetch("portfolio-media/graphics/manifest.json?v=20260807ai")
+  fetch("portfolio-media/graphics/manifest.json?v=20260919h")
     .then(function (r) {
       return r.json();
     })

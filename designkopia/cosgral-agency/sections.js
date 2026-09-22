@@ -102,24 +102,24 @@
 
   // ─── FAQ akordeon ────────────────────────────────────────────────────
   document.querySelectorAll("[data-faq-toggle]").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    if (btn.dataset.faqBound === "1") return;
+    btn.dataset.faqBound = "1";
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
       const item = btn.closest(".faq-item");
-      const answer = item.querySelector(".faq-item__a");
+      if (!item) return;
       const isOpen = item.getAttribute("data-open") === "true";
+      const next = !isOpen;
 
-      // zamknij pozostałe (jeden otwarty naraz)
       document.querySelectorAll(".faq-item[data-open='true']").forEach((other) => {
-        if (other !== item) {
-          other.setAttribute("data-open", "false");
-          other.querySelector("[data-faq-toggle]").setAttribute("aria-expanded", "false");
-          other.querySelector(".faq-item__a").style.maxHeight = "";
-        }
+        if (other === item) return;
+        other.setAttribute("data-open", "false");
+        const otherBtn = other.querySelector("[data-faq-toggle]");
+        if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
       });
 
-      const next = !isOpen;
       item.setAttribute("data-open", String(next));
       btn.setAttribute("aria-expanded", String(next));
-      answer.style.maxHeight = next ? answer.scrollHeight + "px" : "";
     });
   });
 
