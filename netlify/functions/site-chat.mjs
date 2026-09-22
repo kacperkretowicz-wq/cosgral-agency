@@ -4,7 +4,7 @@ const HUB_API = (
   process.env.COSGRAL_HUB_CHAT_API || "https://cosgralhub.netlify.app/api/site-chat"
 ).replace(/\/$/, "");
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const AI_SOURCE = "cosgral-ai";
 /** Invisible marker so Hub-mirrored AI replies are not treated as human takeover. */
 const AI_BODY_PREFIX = "\u200Bcgai\u200B";
@@ -164,7 +164,7 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
       contents: toGeminiContents(history, latestUser),
       generationConfig: {
         temperature: 0.55,
-        maxOutputTokens: 512,
+        maxOutputTokens: 2048,
       },
     }),
   });

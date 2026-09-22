@@ -15,7 +15,7 @@ const HUB_API = 'https://cosgralhub.netlify.app/api/site-chat';
 const AI_SOURCE = 'cosgral-ai';
 /** UTF-8 zero-width space wrapper — marks AI replies mirrored into Hub. */
 const AI_BODY_PREFIX = "\xE2\x80\x8Bcgai\xE2\x80\x8B";
-const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-3.6-flash';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -244,7 +244,7 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
         'contents' => $contents,
         'generationConfig' => [
             'temperature' => 0.55,
-            'maxOutputTokens' => 512,
+            'maxOutputTokens' => 2048,
         ],
     ];
 
