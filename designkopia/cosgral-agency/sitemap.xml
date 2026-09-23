@@ -36,6 +36,21 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://cosgral.pl/portfolio-telforceone-crm.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosgral.pl/portfolio-telforceone-code39.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosgral.pl/portfolio-telforceone-forecast.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://cosgral.pl/o-nas.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Poglądowa wizualizacja aplikacji stanów magazynowych i prognozowania">
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#252219"/><stop offset="1" stop-color="#0e1010"/></linearGradient><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e7c877" stop-opacity=".38"/><stop offset="1" stop-color="#e7c877" stop-opacity="0"/></linearGradient></defs>
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <rect x="34" y="31" width="572" height="298" rx="13" fill="#151815" stroke="#77705b" stroke-opacity=".65"/>
+  <path d="M34 76h572" stroke="#77705b" stroke-opacity=".5"/>
+  <text x="54" y="57" fill="#f2efdf" font-family="Arial,sans-serif" font-size="14" font-weight="700" letter-spacing="2">TF1 / FORECAST</text>
+  <rect x="53" y="96" width="159" height="61" rx="6" fill="#202820"/><text x="68" y="116" fill="#a6ad9a" font-family="Arial,sans-serif" font-size="9" letter-spacing="1">STAN MAGAZYNOWY</text><text x="68" y="143" fill="#f2efdf" font-family="Arial,sans-serif" font-size="24">12 480 <tspan font-size="11" fill="#b0b5a4">szt.</tspan></text>
+  <rect x="224" y="96" width="159" height="61" rx="6" fill="#202820"/><text x="239" y="116" fill="#a6ad9a" font-family="Arial,sans-serif" font-size="9" letter-spacing="1">POKRYCIE ZAPASU</text><text x="239" y="143" fill="#e7c877" font-family="Arial,sans-serif" font-size="24">28 <tspan font-size="11" fill="#b0b5a4">dni</tspan></text>
+  <rect x="395" y="96" width="192" height="61" rx="6" fill="#27251c"/><text x="410" y="116" fill="#b8ad83" font-family="Arial,sans-serif" font-size="9" letter-spacing="1">REKOMENDACJA</text><text x="410" y="143" fill="#f0d889" font-family="Arial,sans-serif" font-size="13">Zamów +1 200 szt.</text>
+  <rect x="53" y="173" width="534" height="134" rx="6" fill="#1d211d"/>
+  <text x="68" y="194" fill="#aaa995" font-family="Arial,sans-serif" font-size="9" letter-spacing="1">POMIAR / PROGNOZA POPYTU</text>
+  <g stroke="#717764" stroke-opacity=".25"><path d="M68 217h502M68 251h502M68 285h502"/></g>
+  <path d="M69 268 123 258 172 263 220 236 271 247 322 225 370 235 421 207 474 217 526 199 570 185V287H69Z" fill="url(#fill)"/>
+  <path d="m69 268 54-10 49 5 48-27 51 11 51-22 48 10 51-28" fill="none" stroke="#f5f0db" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m421 207 53 10 52-18 44-14" fill="none" stroke="#e7c877" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
+  <circle cx="421" cy="207" r="5" fill="#e7c877"/><text x="405" y="300" fill="#a6ad9a" font-family="Arial,sans-serif" font-size="8">DZIŚ</text><text x="535" y="300" fill="#e7c877" font-family="Arial,sans-serif" font-size="8">+30 DNI</text>
+</svg>

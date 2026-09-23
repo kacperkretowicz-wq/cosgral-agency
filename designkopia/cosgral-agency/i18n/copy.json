@@ -999,6 +999,132 @@
     "rail_automation": {
       "pl": "Automatyzacje",
       "en": "Automation"
+    },
+    "tf_more": {
+      "pl": "Zobacz realizację →",
+      "en": "View case study →"
+    },
+    "tf_art_note": {
+      "pl": "Wizualizacja poglądowa",
+      "en": "Illustrative visual"
+    },
+    "tf_back": {
+      "pl": "← Wróć do realizacji",
+      "en": "← Back to projects"
+    },
+    "tf_crm_title": {
+      "pl": "CRM z mapą dla handlowców",
+      "en": "CRM with a map for sales representatives"
+    },
+    "tf_crm_tag": {
+      "pl": "CRM / sprzedaż terenowa",
+      "en": "CRM / field sales"
+    },
+    "tf_crm_lede": {
+      "pl": "Baza danych klientów i zintegrowana mapa dla przedstawicieli handlowych.",
+      "en": "A customer database and integrated map for field sales representatives."
+    },
+    "tf_crm_description": {
+      "pl": "Aplikacja CRM dla TelForceOne S.A. z bazą danych i mapą wspierającą pracę przedstawicieli handlowych.",
+      "en": "A CRM app for TelForceOne S.A. with a database and a map supporting field sales representatives."
+    },
+    "tf_crm_meta": {
+      "title": {
+        "pl": "CRM z mapą dla handlowców — TelForceOne S.A. | COSGRAL",
+        "en": "CRM with a map for sales representatives — TelForceOne S.A. | COSGRAL"
+      },
+      "description": {
+        "pl": "Aplikacja CRM dla TelForceOne S.A. z bazą danych i mapą wspierającą pracę przedstawicieli handlowych.",
+        "en": "A CRM app for TelForceOne S.A. with a database and a map supporting field sales representatives."
+      }
+    },
+    "tf_crm_p1": {
+      "pl": "Dla TelForceOne S.A. powstała aplikacja CRM dla zespołu przedstawicieli handlowych. Łączy bazę danych klientów z widokiem mapy, dzięki czemu informacje potrzebne do pracy w terenie są dostępne w jednym miejscu.",
+      "en": "We built a CRM app for TelForceOne S.A.’s sales representatives. It combines a customer database with a map view, keeping the information needed in the field in one place."
+    },
+    "tf_crm_p2": {
+      "pl": "Mapa nadaje danym kontekst przestrzenny: pomaga zorientować się, gdzie znajdują się klienci i planować kolejne wizyty. Widok klienta oraz praca na trasie tworzą spójny proces dla handlowca.",
+      "en": "The map gives customer data a spatial context: it helps the team see where customers are and plan upcoming visits. Customer records and route work form a coherent workflow."
+    },
+    "tf_crm_p3": {
+      "pl": "Projekt pokazuje, jak narzędzie sprzedażowe można zbudować wokół codziennego sposobu pracy zespołu, zamiast wymagać przełączania się między oddzielną bazą kontaktów i mapą.",
+      "en": "The project shows how a sales tool can follow the team’s daily work instead of making them switch between a separate contact database and map."
+    },
+    "tf_code39_title": {
+      "pl": "Generator kodów kreskowych Code 39",
+      "en": "Code 39 barcode generator"
+    },
+    "tf_code39_tag": {
+      "pl": "Narzędzie / identyfikacja",
+      "en": "Tool / identification"
+    },
+    "tf_code39_lede": {
+      "pl": "Aplikacja do generowania kodów kreskowych Code 39.",
+      "en": "An app for generating Code 39 barcodes."
+    },
+    "tf_code39_description": {
+      "pl": "Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.",
+      "en": "An app for TelForceOne S.A. generating barcodes in the Code 39 standard."
+    },
+    "tf_code39_meta": {
+      "title": {
+        "pl": "Generator kodów kreskowych Code 39 — TelForceOne S.A. | COSGRAL",
+        "en": "Code 39 barcode generator — TelForceOne S.A. | COSGRAL"
+      },
+      "description": {
+        "pl": "Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.",
+        "en": "An app for TelForceOne S.A. generating barcodes in the Code 39 standard."
+      }
+    },
+    "tf_code39_p1": {
+      "pl": "Drugim narzędziem dla TelForceOne S.A. jest aplikacja do generowania kodów kreskowych w standardzie Code 39. Ułatwia przygotowanie oznaczeń potrzebnych do identyfikacji produktów i materiałów.",
+      "en": "The second tool for TelForceOne S.A. generates barcodes in the Code 39 standard. It helps prepare labels used to identify products and materials."
+    },
+    "tf_code39_p2": {
+      "pl": "Interfejs skupia się na krótkim zadaniu: wprowadzeniu wartości, obejrzeniu wyniku i przygotowaniu kodu do wykorzystania. Poglądowa wizualizacja powyżej pokazuje tę prostą ścieżkę.",
+      "en": "The interface focuses on a short task: entering a value, reviewing the result and preparing the code for use. The illustrative visual above shows this simple flow."
+    },
+    "tf_code39_p3": {
+      "pl": "Projekt należy do tej samej rodziny narzędzi operacyjnych: pomaga przełożyć powtarzalny proces na czytelną aplikację dostępną dla zespołu.",
+      "en": "It belongs to the same family of operational tools: turning a repetitive process into a clear app for the team."
+    },
+    "tf_forecast_title": {
+      "pl": "Kontrola stanów i prognozowanie",
+      "en": "Inventory control and forecasting"
+    },
+    "tf_forecast_tag": {
+      "pl": "Analityka / zapasy",
+      "en": "Analytics / inventory"
+    },
+    "tf_forecast_lede": {
+      "pl": "Aplikacja do kontroli stanów i prognozowania zapotrzebowania.",
+      "en": "An app for monitoring stock and forecasting demand."
+    },
+    "tf_forecast_description": {
+      "pl": "Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania.",
+      "en": "An app for TelForceOne S.A. supporting inventory control and demand forecasting."
+    },
+    "tf_forecast_meta": {
+      "title": {
+        "pl": "Kontrola stanów i prognozowanie — TelForceOne S.A. | COSGRAL",
+        "en": "Inventory control and forecasting — TelForceOne S.A. | COSGRAL"
+      },
+      "description": {
+        "pl": "Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania.",
+        "en": "An app for TelForceOne S.A. supporting inventory control and demand forecasting."
+      }
+    },
+    "tf_forecast_p1": {
+      "pl": "Trzecia aplikacja dla TelForceOne S.A. skupia się na kontroli stanów i prognozowaniu. Łączy bieżący widok zapasów z perspektywą przyszłego zapotrzebowania.",
+      "en": "The third app for TelForceOne S.A. focuses on inventory control and forecasting. It combines a current view of stock with a view of future demand."
+    },
+    "tf_forecast_p2": {
+      "pl": "Takie zestawienie pomaga zespołowi wychwycić ryzyko braków oraz planować kolejne decyzje zakupowe na podstawie danych. Wizualizacja powyżej pokazuje ideę połączenia stanów, trendu i prognozy.",
+      "en": "This combination helps the team spot shortage risk and plan purchasing decisions using data. The visual above illustrates stock, trend and forecast together."
+    },
+    "tf_forecast_p3": {
+      "pl": "W projekcie ważna jest czytelność: najpierw stan, potem zmiana w czasie i sygnał wymagający uwagi. Dzięki temu panel wspiera szybkie decyzje operacyjne.",
+      "en": "Clarity matters here: first the current state, then change over time, then the signal requiring attention. The panel supports quick operational decisions."
     }
   }
 }
