@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 /* COSGRAL HOME — dark minimal + globe 3D */
 /* Fonty: <link rel="stylesheet"> w <head> index.html (równolegle z tym plikiem,
    @import tutaj ładował je dopiero po pobraniu i sparsowaniu całego CSS). */
-=======
-/* COSGRAL HOME — dark minimal + globe 3D
-   Typografia jak Parhouse (Geomanist): Satoshi — wolny geometryczny odpowiednik */
-@import url("https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap");
->>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
 
 :root {
   --bg: #030303;
@@ -285,10 +279,6 @@ html.is-free-scroll #uslugi.is-visible.home-scene {
 html.is-free-scroll #kontakt.home-depth {
   z-index: 60 !important;
   background: var(--bg, #030303);
-<<<<<<< HEAD
-=======
-  min-height: auto;
->>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
 }
 html.is-free-scroll #proces.home-depth {
   z-index: 50 !important;
@@ -481,18 +471,11 @@ html.reduce-motion .home-scene [data-enter] {
   padding: clamp(1.5rem, 4vh, 2.75rem) var(--gutter) clamp(1.75rem, 5vh, 3rem);
 }
 
-<<<<<<< HEAD
 /* Stopka — cover Kontaktu prowadzi depth ticker (section-flow), bez zmiany layoutu.
    is-footer-step (cover > 0.45) odpala wejścia stopki; is-footer-covered (cover ≥ 0.985)
    chowa portal sześcianu/piasku dopiero, gdy stopka zakrywa go w całości — wcześniej
    piasek nad górną, jeszcze widoczną częścią Kontaktu znikałby skokiem. */
-html.is-footer-covered .home-cube-portal,
-html.is-footer-covered .home-sand {
-  opacity: 0 !important;
-  /* !important — home-hero-3d pisze visibility inline; menu (niżej w pliku) i tak nadpisuje */
-  visibility: hidden !important;
-  pointer-events: none;
-=======
+
 /* Kontakt → stopka: bez runway — jedna ciągła taśma na --bg */
 html.is-free-scroll .footer-runway {
   display: none;
@@ -502,30 +485,12 @@ html.is-free-scroll .footer-runway {
   visibility: hidden;
 }
 
-/* Stopka — miękki handoff (opacity steruje JS, bez twardego cuta) */
-html.is-free-scroll #kontakt.home-depth,
-html.is-free-scroll #kontakt.is-footer-handoff {
-  transition: opacity 0.05s linear;
-  will-change: opacity;
-}
-html.is-free-scroll #kontakt.home-depth {
-  margin-bottom: 0;
-  padding-bottom: clamp(2rem, 5dvh, 3.25rem);
-}
-.site-footer {
-  margin-top: 0;
-  border-top: none;
-}
-html.is-footer-step .site-footer {
-  position: relative;
-  z-index: 2;
-  min-height: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding-top: clamp(1.25rem, 3.5vh, 2.5rem);
-  padding-bottom: clamp(1.25rem, 3.5vh, 2.5rem);
->>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
+html.is-footer-covered .home-cube-portal,
+html.is-footer-covered .home-sand {
+  opacity: 0 !important;
+  /* !important — home-hero-3d pisze visibility inline; menu (niżej w pliku) i tak nadpisuje */
+  visibility: hidden !important;
+  pointer-events: none;
 }
 
 .home-cursor { position: fixed; top: 0; left: 0; z-index: 10001; pointer-events: none; mix-blend-mode: difference; }
@@ -2738,15 +2703,13 @@ html.reduce-motion .home-scroll-rail { display: none; }
     letter-spacing: 0.03em;
     white-space: nowrap;
   }
-<<<<<<< HEAD
-=======
+
   html.is-footer-step .site-footer {
     min-height: auto;
     justify-content: flex-start;
     padding-top: clamp(1.1rem, 3.5dvh, 1.75rem);
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
   }
->>>>>>> c56279a (Sync agency site with Seohost: live chat cube, portfolio cases, scroll rail.)
   .site-footer [data-enter] {
     opacity: 1 !important;
     visibility: visible !important;
