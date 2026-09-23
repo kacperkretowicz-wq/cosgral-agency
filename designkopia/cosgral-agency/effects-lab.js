@@ -2,6 +2,11 @@
   "use strict";
 
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try {
+    var savedMotion = sessionStorage.getItem("cosgral-lab-motion");
+    if (savedMotion === "on") reduced = false;
+    if (savedMotion === "off") reduced = true;
+  } catch (e) {}
   var motionToggle = document.querySelector("[data-toggle-motion]");
   var motionStatus = document.querySelector("[data-motion-status]");
   var parallax = document.querySelector("[data-lab-parallax]");
@@ -42,6 +47,7 @@
   }
   function setMotion(enabled) {
     reduced = !enabled;
+    try { sessionStorage.setItem("cosgral-lab-motion", enabled ? "on" : "off"); } catch (e) {}
     motionToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
     motionToggle.textContent = enabled ? "Wyłącz ruch" : "Włącz ruch";
     motionStatus.hidden = enabled;
