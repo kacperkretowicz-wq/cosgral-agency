@@ -139,6 +139,138 @@ function detect_human_takeover(array $messages): bool
     return false;
 }
 
+function agent_alias_map(): array
+{
+    static $map = null;
+    if ($map !== null) {
+        return $map;
+    }
+    $map = [
+        'jakub' => 'Jakub',
+        'jakubgral' => 'Jakub',
+        'jakubczupajlo' => 'Jakub',
+        'kacper' => 'Kacper',
+        'kacperkretowicz' => 'Kacper',
+        'kuba' => 'Jakub',
+    ];
+    $file = __DIR__ . '/site-chat.secrets.php';
+    if (is_readable($file)) {
+        $local = require $file;
+        if (is_array($local) && !empty($local['AGENT_ALIASES']) && is_array($local['AGENT_ALIASES'])) {
+            foreach ($local['AGENT_ALIASES'] as $k => $v) {
+                if (is_string($k) && is_string($v) && $k !== '' && $v !== '') {
+                    $map[mb_strtolower($k, 'UTF-8')] = $v;
+                }
+            }
+        }
+    }
+    return $map;
+}
+
+function first_non_empty_string(array $values): string
+{
+    foreach ($values as $v) {
+        if (is_string($v)) {
+            $t = trim($v);
+            if ($t !== '') {
+                return $t;
+            }
+        }
+    }
+    return '';
+}
+
+function nested_string(array $m, string $path): string
+{
+    $cur = $m;
+    foreach (explode('.', $path) as $part) {
+        if (!is_array($cur) || !array_key_exists($part, $cur)) {
+            return '';
+        }
+        $cur = $cur[$part];
+    }
+    return is_string($cur) ? trim($cur) : '';
+}
+
+function resolve_agent_name(array $m): string
+{
+    if (is_ai_agent_message($m)) {
+        return 'Cosgral AI';
+    }
+
+    $raw = first_non_empty_string([
+        $m['agent_name'] ?? null,
+        $m['sender_name'] ?? null,
+        $m['author_name'] ?? null,
+        $m['display_name'] ?? null,
+        $m['user_name'] ?? null,
+        $m['username'] ?? null,
+        $m['login'] ?? null,
+        $m['handle'] ?? null,
+        $m['name'] ?? null,
+        nested_string($m, 'agent.name'),
+        nested_string($m, 'agent.display_name'),
+        nested_string($m, 'agent.username'),
+        nested_string($m, 'user.name'),
+        nested_string($m, 'user.display_name'),
+        nested_string($m, 'user.username'),
+        nested_string($m, 'sender.name'),
+        nested_string($m, 'author.name'),
+        nested_string($m, 'meta.agent_name'),
+        nested_string($m, 'meta.name'),
+        nested_string($m, 'meta.username'),
+    ]);
+
+    $email = first_non_empty_string([
+        $m['agent_email'] ?? null,
+        $m['user_email'] ?? null,
+        $m['email'] ?? null,
+        nested_string($m, 'agent.email'),
+        nested_string($m, 'user.email'),
+        nested_string($m, 'sender.email'),
+        nested_string($m, 'meta.email'),
+    ]);
+
+    $hay = mb_strtolower(trim($raw . ' ' . $email), 'UTF-8');
+    foreach (agent_alias_map() as $needle => $label) {
+        if ($needle !== '' && $hay !== '' && strpos($hay, $needle) !== false) {
+            return $label;
+        }
+    }
+
+    if ($raw !== '') {
+        // First token as given name if Hub sends full name
+        $parts = preg_split('/\s+/u', $raw) ?: [];
+        $first = $parts[0] ?? $raw;
+        foreach (agent_alias_map() as $needle => $label) {
+            if (mb_strtolower($first, 'UTF-8') === $needle) {
+                return $label;
+            }
+        }
+        if (preg_match('/^(jakub|kacper)$/iu', $first)) {
+            return mb_convert_case($first, MB_CASE_TITLE, 'UTF-8');
+        }
+        return $first;
+    }
+
+    return 'Konsultant';
+}
+
+function enrich_agent_message(array $m): array
+{
+    $ai = is_ai_agent_message($m);
+    if ($ai) {
+        $m['body'] = strip_ai_prefix((string)($m['body'] ?? ''));
+        $m['source'] = AI_SOURCE;
+        $m['agent_kind'] = 'ai';
+        $m['agent_name'] = 'Cosgral AI';
+    } else {
+        $m['agent_kind'] = 'human';
+        $m['agent_name'] = resolve_agent_name($m);
+    }
+    return $m;
+}
+
 function normalize_messages(array $messages): array
 {
     $out = [];
@@ -146,9 +278,8 @@ function normalize_messages(array $messages): array
         if (!is_array($m)) {
             continue;
         }
-        if (is_ai_agent_message($m)) {
-            $m['body'] = strip_ai_prefix((string)($m['body'] ?? ''));
-            $m['source'] = AI_SOURCE;
+        if (($m['role'] ?? '') === 'agent') {
+            $m = enrich_agent_message($m);
         }
         $out[] = $m;
     }
@@ -198,6 +329,8 @@ function hub_post_agent(string $api, string $visitorKey, string $body, string $p
     }
     $msg['body'] = strip_ai_prefix((string)($msg['body'] ?? ''));
     $msg['source'] = AI_SOURCE;
+    $msg['agent_kind'] = 'ai';
+    $msg['agent_name'] = 'Cosgral AI';
     return $msg;
 }
 
@@ -243,7 +376,8 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
         ],
         'contents' => $contents,
         'generationConfig' => [
-            'temperature' => 0.55,
+            'temperature' => 0.82,
+            'topP' => 0.95,
             'maxOutputTokens' => 2048,
         ],
     ];
@@ -285,10 +419,25 @@ if ($method === 'GET') {
         respond(502, ['error' => 'hub_unavailable']);
     }
     $messages = is_array($hub['data']['messages'] ?? null) ? $hub['data']['messages'] : [];
+    $normalized = normalize_messages($messages);
+    $takeover = detect_human_takeover($messages);
+    $active = null;
+    if ($takeover) {
+        for ($i = count($normalized) - 1; $i >= 0; $i--) {
+            $m = $normalized[$i];
+            if (($m['role'] ?? '') === 'agent' && ($m['agent_kind'] ?? '') === 'human') {
+                $active = ['kind' => 'human', 'name' => (string)($m['agent_name'] ?? 'Konsultant')];
+                break;
+            }
+        }
+    } else {
+        $active = ['kind' => 'ai', 'name' => 'Cosgral AI'];
+    }
     respond(200, [
         'thread_id' => $hub['data']['thread_id'] ?? null,
-        'messages' => normalize_messages($messages),
-        'human_takeover' => detect_human_takeover($messages),
+        'messages' => $normalized,
+        'human_takeover' => $takeover,
+        'active_agent' => $active,
     ]);
 }
 
@@ -334,11 +483,24 @@ $existing = ($hubSnap['ok'] && is_array($hubSnap['data']['messages'] ?? null))
 $humanTakeover = detect_human_takeover($existing);
 
 if ($humanTakeover) {
+    $activeName = 'Konsultant';
+    $normalizedExisting = normalize_messages($existing);
+    for ($i = count($normalizedExisting) - 1; $i >= 0; $i--) {
+        $m = $normalizedExisting[$i];
+        if (($m['role'] ?? '') === 'agent' && ($m['agent_kind'] ?? '') === 'human') {
+            $activeName = (string)($m['agent_name'] ?? 'Konsultant');
+            break;
+        }
+    }
     respond(201, [
         'thread_id' => $hubPost['data']['thread_id'] ?? ($hubSnap['data']['thread_id'] ?? null),
         'message' => $visitorMessage,
         'ai_message' => null,
         'human_takeover' => true,
+        'active_agent' => [
+            'kind' => 'human',
+            'name' => $activeName,
+        ],
     ]);
 }
 
@@ -365,8 +527,12 @@ if ($aiMessage === null) {
         'role' => 'agent',
         'body' => $replyText,
         'source' => AI_SOURCE,
+        'agent_kind' => 'ai',
+        'agent_name' => 'Cosgral AI',
         'created_at' => gmdate('c'),
     ];
+} else {
+    $aiMessage = enrich_agent_message($aiMessage);
 }
 
 respond(201, [
@@ -374,4 +540,8 @@ respond(201, [
     'message' => $visitorMessage,
     'ai_message' => $aiMessage,
     'human_takeover' => false,
+    'active_agent' => [
+        'kind' => 'ai',
+        'name' => 'Cosgral AI',
+    ],
 ]);

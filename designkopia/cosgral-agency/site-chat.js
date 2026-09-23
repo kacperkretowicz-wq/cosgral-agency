@@ -52,6 +52,69 @@
   var humanTakeover = false;
   var conversation = [];
   var typingEl = null;
+  var activeHumanName = "";
+  var takeoverNoticeShown = false;
+
+  function isAiMessage(m) {
+    if (!m) return false;
+    if (m.source === AI_SOURCE || m.agent_kind === "ai") return true;
+    if (String(m.id || "").indexOf("ai-") === 0) return true;
+    return false;
+  }
+
+  function resolveClientAgentName(m) {
+    if (isAiMessage(m)) return "Cosgral AI";
+    var raw = String(
+      m.agent_name ||
+        m.sender_name ||
+        m.author_name ||
+        m.display_name ||
+        m.user_name ||
+        m.username ||
+        m.login ||
+        m.handle ||
+        (m.agent && (m.agent.name || m.agent.display_name || m.agent.username)) ||
+        (m.user && (m.user.name || m.user.display_name || m.user.username)) ||
+        (m.meta && (m.meta.agent_name || m.meta.name || m.meta.username)) ||
+        "",
+    ).trim();
+    var email = String(
+      m.agent_email ||
+        m.user_email ||
+        m.email ||
+        (m.user && m.user.email) ||
+        (m.agent && m.agent.email) ||
+        (m.meta && m.meta.email) ||
+        "",
+    ).toLowerCase();
+    var hay = (raw + " " + email).toLowerCase();
+    if (hay.indexOf("kacper") !== -1) return "Kacper";
+    if (hay.indexOf("jakub") !== -1 || hay.indexOf("kuba") !== -1) return "Jakub";
+    if (raw) return raw.split(/\s+/)[0];
+    return activeHumanName || "Konsultant";
+  }
+
+  function setEyebrow() {
+    if (humanTakeover) {
+      var who = activeHumanName || "Zespół";
+      eyebrow.textContent = who + " · człowiek";
+      statusDot.title = who + " online";
+    } else {
+      eyebrow.textContent = "Cosgral AI";
+      statusDot.title = "Asystent online";
+    }
+  }
+
+  function showTakeoverNotice(name) {
+    if (takeoverNoticeShown) return;
+    takeoverNoticeShown = true;
+    if (empty.parentNode) empty.remove();
+    var notice = el("div", "cg-chat-notice", {
+      text: name + " dołączył do rozmowy — od teraz pisze człowiek.",
+    });
+    msgs.appendChild(notice);
+    scrollBottom();
+  }
 
   function aiStorageKey() {
     return AI_STORAGE_PREFIX + visitorKey;
@@ -77,6 +140,8 @@
         role: "agent",
         body: msg.body,
         source: AI_SOURCE,
+        agent_kind: "ai",
+        agent_name: "Cosgral AI",
         created_at: msg.created_at || new Date().toISOString(),
       });
       if (list.length > 40) list = list.slice(-40);
@@ -111,7 +176,7 @@
   empty.appendChild(el("div", "cg-chat-empty__label", { text: "Napisz do nas" }));
   empty.appendChild(
     el("div", "cg-chat-empty__text", {
-      text: "Odpiszemy od razu — asystent Cosgral jest online, a zespół dołączy, gdy będzie wolny.",
+      text: "Opisz, czego szukasz — Cosgral AI doradzi i poprowadzi rozmowę, aż dołączy Jakub albo Kacper.",
     }),
   );
   msgs.appendChild(empty);
@@ -156,16 +221,6 @@
 
   root.appendChild(panel);
   root.appendChild(launcher);
-
-  function setEyebrow() {
-    if (humanTakeover) {
-      eyebrow.textContent = "Zespół";
-      statusDot.title = "Konsultant online";
-    } else {
-      eyebrow.textContent = "Live";
-      statusDot.title = "Asystent online";
-    }
-  }
 
   function setOpen(next) {
     next = !!next;
@@ -222,13 +277,42 @@
     if (!m || !m.id || knownIds[m.id]) return;
     knownIds[m.id] = 1;
     if (empty.parentNode) empty.remove();
-    var bubble = el(
-      "div",
-      "cg-chat-bubble cg-chat-bubble--" + (m.role === "agent" ? "agent" : "visitor"),
-      { text: m.body },
-    );
-    if (m.source === AI_SOURCE) bubble.setAttribute("data-cg-ai", "1");
-    msgs.appendChild(bubble);
+
+    if (m.role === "agent") {
+      var ai = isAiMessage(m);
+      var name = resolveClientAgentName(m);
+      var row = el(
+        "div",
+        "cg-chat-row cg-chat-row--agent " + (ai ? "cg-chat-row--ai" : "cg-chat-row--human"),
+      );
+      var meta = el("div", "cg-chat-row__meta");
+      meta.appendChild(el("span", "cg-chat-row__name", { text: name }));
+      meta.appendChild(
+        el("span", "cg-chat-row__tag", { text: ai ? "AI" : "człowiek" }),
+      );
+      var bubble = el("div", "cg-chat-bubble cg-chat-bubble--agent", { text: m.body });
+      if (ai) bubble.setAttribute("data-cg-ai", "1");
+      row.appendChild(meta);
+      row.appendChild(bubble);
+      msgs.appendChild(row);
+
+      if (!ai) {
+        activeHumanName = name;
+        if (!humanTakeover) {
+          humanTakeover = true;
+          showTakeoverNotice(name);
+          setEyebrow();
+        } else if (!takeoverNoticeShown) {
+          showTakeoverNotice(name);
+        }
+        setEyebrow();
+      }
+    } else {
+      msgs.appendChild(
+        el("div", "cg-chat-bubble cg-chat-bubble--visitor", { text: m.body }),
+      );
+    }
+
     if (!(opts && opts.silentRemember)) remember(m);
     if (m.role === "agent" && !open) {
       unread += 1;
@@ -241,15 +325,32 @@
     if (on) {
       if (typingEl) return;
       if (empty.parentNode) empty.remove();
-      typingEl = el("div", "cg-chat-typing", { "aria-label": "Pisze…" });
-      typingEl.appendChild(el("span"));
-      typingEl.appendChild(el("span"));
-      typingEl.appendChild(el("span"));
+      typingEl = el("div", "cg-chat-typing-wrap");
+      typingEl.appendChild(
+        el("div", "cg-chat-row__meta", {
+          html: '<span class="cg-chat-row__name">Cosgral AI</span><span class="cg-chat-row__tag">AI</span>',
+        }),
+      );
+      var dots = el("div", "cg-chat-typing", { "aria-label": "Cosgral AI pisze…" });
+      dots.appendChild(el("span"));
+      dots.appendChild(el("span"));
+      dots.appendChild(el("span"));
+      typingEl.appendChild(dots);
       msgs.appendChild(typingEl);
       scrollBottom();
     } else if (typingEl) {
       typingEl.remove();
       typingEl = null;
+    }
+  }
+
+  function applyActiveAgent(agent) {
+    if (!agent || typeof agent !== "object") return;
+    if (agent.kind === "human") {
+      humanTakeover = true;
+      activeHumanName = String(agent.name || "Konsultant");
+      showTakeoverNotice(activeHumanName);
+      setEyebrow();
     }
   }
 
@@ -273,23 +374,10 @@
       return ta - tb;
     });
 
-    var sawHuman = false;
     list.forEach(function (m) {
       if (!m) return;
-      if (
-        m.role === "agent" &&
-        m.source !== AI_SOURCE &&
-        String(m.id || "").indexOf("ai-") !== 0
-      ) {
-        sawHuman = true;
-      }
       renderMessage(m);
     });
-
-    if (sawHuman && !humanTakeover) {
-      humanTakeover = true;
-      setEyebrow();
-    }
   }
 
   function poll() {
@@ -305,8 +393,9 @@
         if (!data) return;
         if (data.human_takeover) {
           humanTakeover = true;
-          setEyebrow();
         }
+        applyActiveAgent(data.active_agent);
+        setEyebrow();
         mergeAndRender(data.messages);
       })
       .catch(function () {
@@ -379,6 +468,8 @@
         "Chwilę trwało — zespół Cosgral dostał Twoją wiadomość i wróci, jak będzie wolny. " +
         "Możesz też napisać na kontakt@cosgral.pl albo zadzwonić: Jakub +48 533 790 518.",
       source: AI_SOURCE,
+      agent_kind: "ai",
+      agent_name: "Cosgral AI",
       created_at: new Date().toISOString(),
     };
   }
@@ -408,8 +499,9 @@
 
         if (res.data && res.data.human_takeover) {
           humanTakeover = true;
-          setEyebrow();
         }
+        applyActiveAgent(res.data && res.data.active_agent);
+        setEyebrow();
 
         if (res.data && res.data.message && res.data.message.id) {
           knownIds[res.data.message.id] = 1;

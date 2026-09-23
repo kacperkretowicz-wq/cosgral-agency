@@ -109,15 +109,114 @@ function detectHumanTakeover(messages) {
   });
 }
 
-function normalizeMessages(messages) {
-  return (Array.isArray(messages) ? messages : []).map(function (m) {
-    if (!m) return m;
-    if (!isAiAgentMessage(m)) return m;
+function nestedString(m, path) {
+  let cur = m;
+  for (const part of String(path).split(".")) {
+    if (!cur || typeof cur !== "object" || !(part in cur)) return "";
+    cur = cur[part];
+  }
+  return typeof cur === "string" ? cur.trim() : "";
+}
+
+function firstNonEmpty(values) {
+  for (const v of values) {
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return "";
+}
+
+const AGENT_ALIASES = {
+  jakub: "Jakub",
+  jakubgral: "Jakub",
+  jakubczupajlo: "Jakub",
+  kuba: "Jakub",
+  kacper: "Kacper",
+  kacperkretowicz: "Kacper",
+};
+
+function resolveAgentName(m) {
+  if (isAiAgentMessage(m)) return "Cosgral AI";
+  const raw = firstNonEmpty([
+    m.agent_name,
+    m.sender_name,
+    m.author_name,
+    m.display_name,
+    m.user_name,
+    m.username,
+    m.login,
+    m.handle,
+    m.name,
+    nestedString(m, "agent.name"),
+    nestedString(m, "agent.display_name"),
+    nestedString(m, "agent.username"),
+    nestedString(m, "user.name"),
+    nestedString(m, "user.display_name"),
+    nestedString(m, "user.username"),
+    nestedString(m, "sender.name"),
+    nestedString(m, "author.name"),
+    nestedString(m, "meta.agent_name"),
+    nestedString(m, "meta.name"),
+    nestedString(m, "meta.username"),
+  ]);
+  const email = firstNonEmpty([
+    m.agent_email,
+    m.user_email,
+    m.email,
+    nestedString(m, "agent.email"),
+    nestedString(m, "user.email"),
+    nestedString(m, "sender.email"),
+    nestedString(m, "meta.email"),
+  ]);
+  const hay = (raw + " " + email).toLowerCase();
+  for (const [needle, label] of Object.entries(AGENT_ALIASES)) {
+    if (needle && hay.indexOf(needle) !== -1) return label;
+  }
+  if (raw) {
+    const first = raw.split(/\s+/)[0] || raw;
+    const key = first.toLowerCase();
+    if (AGENT_ALIASES[key]) return AGENT_ALIASES[key];
+    if (/^(jakub|kacper)$/i.test(first)) {
+      return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+    }
+    return first;
+  }
+  return "Konsultant";
+}
+
+function enrichAgentMessage(m) {
+  if (!m || m.role !== "agent") return m;
+  if (isAiAgentMessage(m)) {
     return Object.assign({}, m, {
       body: stripAiPrefix(m.body),
       source: AI_SOURCE,
+      agent_kind: "ai",
+      agent_name: "Cosgral AI",
     });
+  }
+  return Object.assign({}, m, {
+    agent_kind: "human",
+    agent_name: resolveAgentName(m),
   });
+}
+
+function normalizeMessages(messages) {
+  return (Array.isArray(messages) ? messages : []).map(function (m) {
+    if (!m) return m;
+    if (m.role === "agent") return enrichAgentMessage(m);
+    return m;
+  });
+}
+
+function resolveActiveAgent(messages, takeover) {
+  if (!takeover) return { kind: "ai", name: "Cosgral AI" };
+  const list = Array.isArray(messages) ? messages : [];
+  for (let i = list.length - 1; i >= 0; i--) {
+    const m = list[i];
+    if (m && m.role === "agent" && m.agent_kind === "human") {
+      return { kind: "human", name: String(m.agent_name || "Konsultant") };
+    }
+  }
+  return { kind: "human", name: "Konsultant" };
 }
 
 function toGeminiContents(history, latestUser) {
@@ -163,7 +262,8 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
       },
       contents: toGeminiContents(history, latestUser),
       generationConfig: {
-        temperature: 0.55,
+        temperature: 0.82,
+        topP: 0.95,
         maxOutputTokens: 2048,
       },
     }),
@@ -224,11 +324,14 @@ export async function handler(event) {
     if (visitorKey.length < 8) return ok(400, { error: "visitor_key_required" });
     try {
       const data = await hubGet(visitorKey);
-      const messages = normalizeMessages(data.messages);
+      const rawMessages = Array.isArray(data.messages) ? data.messages : [];
+      const messages = normalizeMessages(rawMessages);
+      const takeover = detectHumanTakeover(rawMessages);
       return ok(200, {
         thread_id: data.thread_id || null,
         messages,
-        human_takeover: detectHumanTakeover(Array.isArray(data.messages) ? data.messages : []),
+        human_takeover: takeover,
+        active_agent: resolveActiveAgent(messages, takeover),
       });
     } catch (_) {
       return ok(502, { error: "hub_unavailable" });
@@ -276,11 +379,14 @@ export async function handler(event) {
   const humanTakeover = detectHumanTakeover(existing);
 
   if (humanTakeover) {
+    const normalizedExisting = normalizeMessages(existing);
+    const active = resolveActiveAgent(normalizedExisting, true);
     return ok(201, {
       thread_id: hubResult.thread_id || hubSnapshot.thread_id || null,
       message: visitorMessage,
       ai_message: null,
       human_takeover: true,
+      active_agent: active,
     });
   }
 
@@ -305,8 +411,12 @@ export async function handler(event) {
       role: "agent",
       body: replyText,
       source: AI_SOURCE,
+      agent_kind: "ai",
+      agent_name: "Cosgral AI",
       created_at: new Date().toISOString(),
     };
+  } else {
+    aiMessage = enrichAgentMessage(aiMessage);
   }
 
   return ok(201, {
@@ -314,5 +424,6 @@ export async function handler(event) {
     message: visitorMessage,
     ai_message: aiMessage,
     human_takeover: false,
+    active_agent: { kind: "ai", name: "Cosgral AI" },
   });
 }
