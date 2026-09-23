@@ -137,6 +137,18 @@
     }
   }
 
+  function resetFreshSubpageScroll() {
+    if (isHomePath(window.location.pathname) || window.location.hash) return;
+    var entry = performance.getEntriesByType?.("navigation")?.[0];
+    if (entry && (entry.type === "reload" || entry.type === "back_forward")) return;
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+    requestAnimationFrame(function () {
+      window.scrollTo(0, 0);
+      window.cosgralSmoothScroll?.lenis?.scrollTo?.(0, { immediate: true });
+    });
+  }
+
   function ensureOverlay() {
     var el = document.getElementById("page-transition");
     if (el) return el;
@@ -198,6 +210,7 @@
   }
 
   function playEnter() {
+    resetFreshSubpageScroll();
     if (window.cosgralServiceDive && window.cosgralServiceDive.playEnter()) {
       clearEnterLock();
       return;

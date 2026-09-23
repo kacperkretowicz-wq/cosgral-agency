@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Laboratorium efektów — COSGRAL (wersja testowa)</title>
+  <meta name="description" content="Interaktywny podgląd efektów oraz aplikacji TelForceOne w testowej wersji COSGRAL." />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link rel="stylesheet" href="cosgral-subpages.css?v=20260923test2" />
+  <link rel="stylesheet" href="effects-lab.css?v=20260923test1" />
+</head>
+<body class="subpage effects-lab-page">
+  <a class="lab-skip" href="#main">Przejdź do treści</a>
+  <nav class="site-nav" id="site-nav">
+    <a href="index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
+      <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
+    </a>
+    <div class="site-nav__actions">
+      <a class="lab-nav-link" href="portfolio.html">Realizacje</a>
+      <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
+        <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>Menu</span>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+    <div class="nav-overlay__backdrop" data-nav-close></div>
+    <div class="nav-overlay__stage">
+      <nav class="nav-overlay__links" aria-label="Menu główne">
+        <ul class="nav-overlay__list">
+          <li><a href="index.html#top" data-nav-close>Start</a></li>
+          <li><a href="portfolio.html" data-nav-close>Realizacje</a></li>
+          <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle>Usługi</a></li>
+          <li><a href="efekty-lab.html" data-nav-close>Efekty</a></li>
+          <li><a href="o-nas.html" data-nav-close>O nas</a></li>
+          <li><a href="index.html#kontakt" data-nav-close>Kontakt</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <main id="main" class="lab-main">
+    <section class="lab-hero" aria-labelledby="lab-title">
+      <div class="lab-hero__halo" aria-hidden="true"></div>
+      <p class="lab-kicker">COSGRAL / WERSJA TESTOWA / 01—04</p>
+      <h1 id="lab-title">Ruch, który<br /><em>pokazuje pracę.</em></h1>
+      <p class="lab-hero__lead">Cztery działające próby interakcji na przykładzie realizacji COSGRAL. Przewiń stronę, porusz kursorem po kartach i oceń, co pasuje do marki.</p>
+      <div class="lab-hero__actions">
+        <a href="#apps">Zobacz aplikacje <span aria-hidden="true">↘</span></a>
+        <a href="#parallax">Testuj efekty <span aria-hidden="true">↘</span></a>
+        <button type="button" class="lab-motion-toggle" data-toggle-motion aria-pressed="true">Wyłącz ruch</button>
+      </div>
+      <p class="lab-motion-status" data-motion-status aria-live="polite" hidden></p>
+      <span class="lab-hero__index" aria-hidden="true">SCROLL TO EXPLORE&nbsp; ↓</span>
+    </section>
+
+    <section id="apps" class="lab-section lab-apps" aria-labelledby="apps-title">
+      <div class="lab-section__head">
+        <p class="lab-kicker">01 / REALIZACJE</p>
+        <h2 id="apps-title">Trzy aplikacje.<br /><span>Jeden kontekst biznesowy.</span></h2>
+        <p>TelForceOne S.A. — wizualizacje poglądowe projektów. Każda karta prowadzi do opisu realizacji w portfolio.</p>
+      </div>
+      <div class="lab-app-grid">
+        <a class="lab-app" href="portfolio-telforceone-crm.html">
+          <span class="lab-app__media"><img src="assets/cases/telforceone-crm.svg" alt="Wizualizacja CRM z mapą handlowców" loading="lazy" /></span>
+          <span class="lab-app__meta">01 / CRM + MAPA</span>
+          <strong>CRM dla przedstawicieli</strong>
+          <span>Baza klientów, historia wizyt i mapa pracy w terenie.</span>
+          <span class="lab-app__arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="lab-app" href="portfolio-telforceone-code39.html">
+          <span class="lab-app__media"><img src="assets/cases/telforceone-code39.svg" alt="Wizualizacja generatora kodów Code 39" loading="lazy" /></span>
+          <span class="lab-app__meta">02 / CODE 39</span>
+          <strong>Generator kodów kreskowych</strong>
+          <span>Tworzenie i druk etykiet do identyfikacji produktów.</span>
+          <span class="lab-app__arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="lab-app" href="portfolio-telforceone-forecast.html">
+          <span class="lab-app__media"><img src="assets/cases/telforceone-forecast.svg" alt="Wizualizacja kontroli stanów i prognozowania" loading="lazy" /></span>
+          <span class="lab-app__meta">03 / FORECAST</span>
+          <strong>Stany i prognozowanie</strong>
+          <span>Kontrola zapasów i prognoza przyszłego zapotrzebowania.</span>
+          <span class="lab-app__arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="parallax" class="lab-effect lab-effect--parallax" aria-labelledby="parallax-title" data-lab-parallax>
+      <div class="lab-effect__sticky">
+        <div class="lab-effect__copy">
+          <p class="lab-kicker">02 / PARALAKSA OBRAZU</p>
+          <h2 id="parallax-title">Obraz ma<br />własne tempo.</h2>
+          <p>Przewijaj: wizualizacja CRM przesuwa się wolniej niż tekst, tworząc głębię bez przejmowania kontroli nad scrollem.</p>
+          <span class="lab-effect__usage">Najlepsze miejsce: wstęp do studium przypadku</span>
+        </div>
+        <div class="lab-parallax-window">
+          <div class="lab-parallax-image"><img src="assets/cases/telforceone-crm.svg" alt="Mapa i panel CRM w demonstracji paralaksy" loading="lazy" /></div>
+          <span class="lab-parallax-window__mark">TELFORCEONE / FIELD CRM</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="layout" class="lab-effect lab-effect--layout" aria-labelledby="layout-title" data-lab-layout>
+      <div class="lab-effect__sticky lab-effect__sticky--layout">
+        <div class="lab-effect__copy">
+          <p class="lab-kicker">03 / UKŁAD ZALEŻNY OD SCROLLA</p>
+          <h2 id="layout-title">Od jednego problemu<br />do trzech rozwiązań.</h2>
+          <p>Przewijaj: karty rozchodzą się z jednego stosu do czytelnej siatki. Układ opowiada o zakresie projektu.</p>
+        </div>
+        <div class="lab-layout-stage" aria-label="Trzy karty aplikacji TelForceOne tworzą siatkę podczas przewijania">
+          <div class="lab-layout-card"><img src="assets/cases/telforceone-crm.svg" alt="" /><span>CRM + MAPA</span></div>
+          <div class="lab-layout-card"><img src="assets/cases/telforceone-code39.svg" alt="" /><span>CODE 39</span></div>
+          <div class="lab-layout-card"><img src="assets/cases/telforceone-forecast.svg" alt="" /><span>STANY + FORECAST</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="interaction" class="lab-section lab-interaction" aria-labelledby="interaction-title">
+      <div class="lab-section__head">
+        <p class="lab-kicker">04 / REAKCJA NA RUCH</p>
+        <h2 id="interaction-title">Dotknij i porusz.</h2>
+        <p>Te efekty reagują na użytkownika. Przyciski „Odtwórz” uruchamiają je również bez kursora.</p>
+      </div>
+      <div class="lab-interaction__grid">
+        <div class="lab-interaction__item">
+          <div class="lab-interaction__heading"><div><span>01</span><h3>Magnetyczna karta</h3></div><button type="button" data-play-magnet>Odtwórz</button></div>
+          <div class="lab-magnet" tabindex="0" aria-label="Porusz kursorem, by przechylić kartę CRM">
+            <div class="lab-magnet__face"><img src="assets/cases/telforceone-crm.svg" alt="Poglądowa wizualizacja CRM" /><span>FIELD CRM / TELFORCEONE</span></div>
+          </div>
+          <p>Delikatny przechył i odbicie światła; pasuje do kart portfolio na komputerze.</p>
+        </div>
+        <div class="lab-interaction__item">
+          <div class="lab-interaction__heading"><div><span>02</span><h3>Płynne ugięcie obrazu</h3></div><button type="button" data-play-wave>Odtwórz</button></div>
+          <div class="lab-wave" tabindex="0" aria-label="Porusz kursorem, by zniekształcić obraz aplikacji">
+            <canvas width="640" height="360" aria-hidden="true"></canvas>
+            <img src="assets/cases/telforceone-forecast.svg" alt="Poglądowa wizualizacja aplikacji stanów i prognozowania" />
+            <span>INVENTORY / FORECAST</span>
+          </div>
+          <p>Miękkie zniekształcenie pod kursorem; do krótkiego podglądu, nie do długiego tekstu.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lab-outro">
+      <p class="lab-kicker">TESTUJEMY, ZANIM WDROŻYMY</p>
+      <h2>Co warto przenieść na stronę?</h2>
+      <div class="lab-outro__grid">
+        <p><strong>01 / Menu</strong> Natychmiastowa reakcja i linki widoczne bez czekania na 3D.</p>
+        <p><strong>02 / Portfolio</strong> Paralaksa tylko na dużych obrazach realizacji, w umiarkowanym zakresie.</p>
+        <p><strong>03 / Aplikacje</strong> Wyraźny blok TelForceOne i krótkie opisy problemu oraz rozwiązania.</p>
+        <p><strong>04 / Dostępność</strong> Ruch ograniczony na telefonie i wyłączony przy preferencji redukcji animacji.</p>
+      </div>
+      <div class="lab-outro__actions"><a href="portfolio.html#automatyzacje">Zobacz realizacje ↗</a><a href="index.html#top">Wróć na start ↗</a></div>
+      <p class="lab-outro__sources">Inspiracje: <a href="https://tympanus.net/codrops/webzibition/" target="_blank" rel="noopener noreferrer">Webzibition / Codrops</a> · <a href="https://tympanus.net/codrops/2025/06/11/building-an-infinite-parallax-grid-with-gsap-and-seamless-tiling/" target="_blank" rel="noopener noreferrer">paralaksa siatki</a> · <a href="https://tympanus.net/codrops/2025/07/29/built-to-move-a-closer-look-at-the-animations-behind-eduard-bodaks-portfolio/" target="_blank" rel="noopener noreferrer">karty i scroll</a></p>
+    </section>
+  </main>
+  <script defer src="home-nav-menu.js?v=20260923test2"></script>
+  <script defer src="effects-lab.js?v=20260923test1"></script>
+</body>
+</html>

@@ -758,6 +758,29 @@
       SECTION_IDS: SECTION_IDS,
     };
 
+    function landOnDeepLink() {
+      var id = (window.location.hash || "").replace(/^#/, "");
+      var index = SECTION_IDS.indexOf(id);
+      if (index < 0) return;
+      var section = document.getElementById(id);
+      if (!section) return;
+      var target = Math.max(0, section.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
+      if (!Number.isFinite(target) || target < 1) return;
+      if (window.cosgralSmoothScroll?.lenis) {
+        window.cosgralSmoothScroll.lenis.scrollTo(target, { immediate: true });
+      } else {
+        window.scrollTo(0, target);
+      }
+      activeIndex = index;
+      syncStepView(index);
+      if (index === AUTO_IDX) ensureAutoVisible();
+    }
+
+    window.addEventListener("cosgral:page-hash-scroll", landOnDeepLink);
+    window.addEventListener("load", function () {
+      window.setTimeout(landOnDeepLink, 450);
+    }, { once: true });
+
     ScrollTrigger.addEventListener("refresh", function () {
       holds = buildHolds();
       window.cosgralPortfolioStepper.holds = holds;

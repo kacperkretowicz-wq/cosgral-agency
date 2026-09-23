@@ -258,8 +258,17 @@
   }
 
   function startStageSync() {
-    if (syncRaf) window.cancelAnimationFrame(syncRaf);
-    syncStageToCube();
+    // The 3D cube may be offscreen or still loading. Keep navigation in a
+    // predictable place and let the cube animate behind it.
+    stopStageSync();
+    if (!stage) return;
+    stage.style.left = "50%";
+    stage.style.top = "50%";
+    stage.style.width = "min(84vw, 360px)";
+    stage.style.height = "auto";
+    stage.style.minHeight = "min(84vw, 360px)";
+    stage.style.setProperty("--menu-face-size", "min(84vw, 360px)");
+    stage.style.transform = "translate(-50%, -50%)";
   }
 
   function stopStageSync() {
@@ -310,48 +319,14 @@
   function animateLinksForOpen() {
     if (REDUCED || !window.gsap) return;
     var chars = menuChars();
-    var delay = linksDelayForBlend();
-
     gsap.killTweensOf(links);
     gsap.killTweensOf(chars);
-    gsap.set(links, { opacity: 0, clipPath: "inset(0 100% 0 0)" });
-    if (chars.length) {
-      gsap.set(chars, { opacity: 0, y: 12, filter: "blur(4px)" });
-    }
-
-    gsap.fromTo(
-      links,
-      { clipPath: "inset(0 100% 0 0)", opacity: 0 },
-      {
-        clipPath: "inset(0 0% 0 0)",
-        opacity: 1,
-        duration: 0.38,
-        stagger: 0.045,
-        ease: "power3.out",
-        delay: delay,
-        overwrite: true,
-      }
-    );
-
-    gsap.fromTo(
-      chars,
-      {
-        opacity: 0,
-        y: 12,
-        filter: "blur(4px)",
-      },
-      {
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-        duration: 0.32,
-        stagger: { each: 0.01, from: "start" },
-        ease: "power3.out",
-        delay: delay + 0.04,
-        overwrite: true,
-        clearProps: "filter,transform",
-      }
-    );
+    gsap.set(chars, { opacity: 1, y: 0, clearProps: "filter,transform" });
+    gsap.set(links, { clipPath: "inset(0 0% 0 0)" });
+    gsap.fromTo(links, { opacity: 0, y: 8 }, {
+      opacity: 1, y: 0, duration: 0.2, stagger: 0.018,
+      ease: "power2.out", overwrite: true, clearProps: "transform",
+    });
   }
 
   function bindLinkHover() {
@@ -520,7 +495,7 @@
       gsap.to(backdrop, { opacity: 0, duration: 0.26, ease: "power2.in", overwrite: true });
     }
 
-    var cubeTween = invokeCubeClose();
+    invokeCubeClose();
     var overlayDone = false;
 
     var finishOverlay = function () {
@@ -537,14 +512,8 @@
       if (onComplete) onComplete();
     };
 
-    var closeDur = window.cosgralCube?.getMenuCloseDuration?.() || 2.85;
-    var closeBlend = window.cosgralCube?.getMenuBlend?.() ?? (isOpen ? 1 : 0);
-    var closeMs = Math.max(80, closeDur * closeBlend * 1000 + 80);
-    if (cubeTween && cubeTween.eventCallback) {
-      cubeTween.eventCallback("onComplete", finishAll);
-    } else {
-      window.setTimeout(finishAll, REDUCED ? 0 : closeMs);
-    }
+    // Never hold links or navigation hostage to the cube's multi-second tween.
+    window.setTimeout(finishAll, REDUCED ? 0 : 220);
   }
 
   function openNav() {
@@ -637,6 +606,7 @@
 
   document.querySelectorAll("a.site-nav__logo").forEach(function (logo) {
     logo.addEventListener("click", function (e) {
+      if (!document.body.classList.contains("home-page")) return;
       e.preventDefault();
       if (isOpen) closeNav();
       if (window.cosgralSectionSnap?.jumpTo) {

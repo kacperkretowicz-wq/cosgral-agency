@@ -1516,6 +1516,8 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   flex-shrink: 0;
   display: flex;
   justify-content: flex-start;
+  gap: .65rem;
+  flex-wrap: wrap;
 }
 .home-work__link {
   display: inline-flex;
@@ -2994,4 +2996,9 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
   .gyro-enable {
     display: none !important;
   }
+}
+/* Navigation stays readable when GSAP or the 3D scene loads slowly. */
+.nav-overlay.is-open .nav-overlay__list > li > a {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
 }
