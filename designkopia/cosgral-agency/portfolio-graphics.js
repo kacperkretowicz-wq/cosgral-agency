@@ -43,15 +43,21 @@
     requestAnimationFrame(refreshGrafikiBloomState);
   });
 
-  var collageRoot = document.getElementById("graphics-collage");
+  var collageRoot = document.getElementById("graphics-brands-cards") || document.getElementById("graphics-collage");
+  var brandsRoot = document.getElementById("graphics-brands");
   var galleryRoot = document.getElementById("graphics-gallery");
   var lightbox = document.getElementById("graphics-lightbox");
   var lightboxNav = null;
 
   var COLLAGE_COUNTS = {
-    "juicy-events": 20,
-    "far-east": 7,
-    bts: 2,
+    "juicy-events": 3,
+    "far-east": 2,
+    bts: 1,
+  };
+
+  var BRANDS_WORD = {
+    pl: ["GRA", "FI", "KI"],
+    en: ["VI", "SU", "ALS"],
   };
 
   var WORLD_W = 2600;
@@ -339,55 +345,273 @@
     });
   }
 
+  function getBrandsLang() {
+    if (window.cosgralI18n && typeof window.cosgralI18n.getLang === "function") {
+      return window.cosgralI18n.getLang() === "en" ? "en" : "pl";
+    }
+    return (document.documentElement.lang || "pl").toLowerCase().indexOf("en") === 0 ? "en" : "pl";
+  }
+
+  function syncBrandsWord() {
+    var word = document.querySelector("[data-graphics-brands-word]");
+    if (!word) return;
+    var parts = BRANDS_WORD[getBrandsLang()] || BRANDS_WORD.pl;
+    var chunks = word.querySelectorAll(".graphics-brands__chunk");
+    if (chunks[0]) chunks[0].textContent = parts[0];
+    if (chunks[1]) chunks[1].textContent = parts[1];
+    if (chunks[2]) chunks[2].textContent = parts[2];
+    word.setAttribute("aria-label", parts.join(""));
+  }
+
   function renderCollage(data) {
-    if (!collageRoot) return;
-    var items = buildCollageItems(data);
+    if (!brandsRoot || !collageRoot) return;
+    var items = buildCollageItems(data).slice(0, 6);
     if (!items.length) return;
 
-    var tilesHtml = "";
+    /* Stable layout slots matching Locomotive Brands pin (6 floating cards). */
+    var slots = [
+      { x: 8, y: 14, w: 15, ar: "1 / 1" },
+      { x: 38, y: 6, w: 13, ar: "3 / 4" },
+      { x: 72, y: 10, w: 12, ar: "9 / 16" },
+      { x: 10, y: 62, w: 16, ar: "1 / 1" },
+      { x: 42, y: 68, w: 14, ar: "5 / 4" },
+      { x: 74, y: 58, w: 16, ar: "1 / 1" },
+    ];
+
+    var html = "";
     items.forEach(function (item, i) {
-      tilesHtml +=
-        '<button type="button" class="graphics-cinema__tile" data-idx="' +
+      var slot = slots[i] || slots[slots.length - 1];
+      html +=
+        '<button type="button" class="graphics-brands__card" data-brands-card="' +
         i +
-        '"' +
+        '" style="--bx:' +
+        slot.x +
+        "%;--by:" +
+        slot.y +
+        "%;--bw:" +
+        slot.w +
+        "%;--bar:" +
+        slot.ar +
+        ';"' +
         itemAttrs(item, item.client, item.groupIndex) +
         ">" +
-        '<span class="graphics-cinema__tile-inner">' +
-        mediaMarkup(item, { imgClass: "graphics-cinema__media", videoClass: "graphics-cinema__media" }) +
-        "</span></button>";
+        mediaMarkup(item, { imgClass: "graphics-brands__media", videoClass: "graphics-brands__media" }) +
+        "</button>";
     });
 
-    collageRoot.innerHTML =
-      '<div class="graphics-cinema">' +
-      '<div class="graphics-cinema__viewport">' +
-      '<div class="graphics-cinema__camera">' +
-      '<div class="graphics-cinema__world" style="--world-w:' +
-      WORLD_W +
-      "px;--world-h:" +
-      WORLD_H +
-      'px">' +
-      '<p class="graphics-cinema__watermark" aria-hidden="true">Kreacja</p>' +
-      tilesHtml +
-      "</div></div></div></div>";
-
+    collageRoot.innerHTML = html;
+    syncBrandsWord();
     bindLightboxTriggers(collageRoot);
     if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.scan(collageRoot);
-    var graphicsSection = document.getElementById("grafiki");
-    if (graphicsSection && window.IntersectionObserver) {
-      var warmObserver = new IntersectionObserver(function (entries) {
-        if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
-        EARLY_VISIBLE.forEach(function (idx) {
-          var tile = collageRoot.querySelector('.graphics-cinema__tile[data-idx="' + idx + '"]');
-          var img = tile && tile.querySelector("img.graphics-cinema__media");
-          if (img) img.loading = "eager";
-        });
-        warmObserver.disconnect();
-      }, { rootMargin: "100% 0px" });
-      warmObserver.observe(graphicsSection);
-    }
-    initCinemaScroll();
+    initBrandsMotion();
     initGrafikiBloom();
     document.dispatchEvent(new CustomEvent("portfolio:media-ready", { detail: { type: "graphics" } }));
+  }
+
+  /**
+   * Locomotive MTL “Brands” kinetic type — frame-accurate loop for GRAFIKI / VISUALS.
+   * Center chunk stays put; outer chunks orbit: home → horizontal → 4 diagonals → horizontal → home.
+   */
+  function initBrandsMotion() {
+    var section = document.getElementById("grafiki");
+    var stage = brandsRoot && brandsRoot.querySelector(".graphics-brands__stage");
+    var chunkA = brandsRoot && brandsRoot.querySelector(".graphics-brands__chunk--a");
+    var chunkB = brandsRoot && brandsRoot.querySelector(".graphics-brands__chunk--b");
+    var chunkC = brandsRoot && brandsRoot.querySelector(".graphics-brands__chunk--c");
+    var cards = collageRoot ? collageRoot.querySelectorAll(".graphics-brands__card") : [];
+    if (!section || !stage || !chunkA || !chunkB || !chunkC) return;
+
+    section.classList.add("is-grafiki-frames", "is-grafiki-brands");
+    brandsRoot.classList.add("is-ready");
+
+    var reduced = document.documentElement.classList.contains("reduce-motion");
+    var mobile = window.matchMedia("(max-width: 900px)").matches;
+
+    function stubStepper(pinST) {
+      window.cosgralGrafikiStepper = {
+        refresh: function () {
+          if (pinST) pinST.refresh();
+        },
+        snapToHold: function () {},
+        revealHold: function () {},
+        transitionToBeat: function () {},
+        resetForReentry: function () {
+          if (window._grafikiBrandsTl) window._grafikiBrandsTl.progress(0);
+        },
+        getBeat: function () {
+          return 1;
+        },
+        isAnimating: function () {
+          return false;
+        },
+        getPassDown: function () {
+          return true;
+        },
+        getPassUp: function () {
+          return true;
+        },
+        suspendHold: function () {},
+        getHoldY: function () {
+          return pinST ? pinST.start : 0;
+        },
+        syncCubeFade: syncGrafikiCubeFade,
+      };
+    }
+
+    if (reduced || !window.gsap) {
+      stubStepper(null);
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    var vx = mobile ? 28 : 36;
+    var vy = mobile ? 22 : 28;
+    var hx = mobile ? 30 : 38;
+
+    function measureHome() {
+      var wa = chunkA.getBoundingClientRect().width;
+      var wb = chunkB.getBoundingClientRect().width;
+      var wc = chunkC.getBoundingClientRect().width;
+      return {
+        a: { x: -(wb * 0.5 + wa * 0.5), y: 0 },
+        c: { x: wb * 0.5 + wc * 0.5, y: 0 },
+      };
+    }
+
+    var home = measureHome();
+    var pos = {
+      midL: { x: (-hx / 100) * window.innerWidth, y: 0 },
+      midR: { x: (hx / 100) * window.innerWidth, y: 0 },
+      TL: { x: (-vx / 100) * window.innerWidth, y: (-vy / 100) * window.innerHeight },
+      TR: { x: (vx / 100) * window.innerWidth, y: (-vy / 100) * window.innerHeight },
+      BL: { x: (-vx / 100) * window.innerWidth, y: (vy / 100) * window.innerHeight },
+      BR: { x: (vx / 100) * window.innerWidth, y: (vy / 100) * window.innerHeight },
+    };
+
+    gsap.set([chunkA, chunkB, chunkC], { xPercent: -50, yPercent: -50 });
+    gsap.set(chunkB, { x: 0, y: 0 });
+    gsap.set(chunkA, { x: home.a.x, y: home.a.y });
+    gsap.set(chunkC, { x: home.c.x, y: home.c.y });
+
+    cards.forEach(function (card, i) {
+      gsap.set(card, { x: 0, y: 0, rotate: (i % 2 === 0 ? -1 : 1) * (i + 1) * 0.35 });
+    });
+
+    var move = { duration: 0.7, ease: "power3.inOut" };
+    var hold = 0.3;
+
+    var tl = gsap.timeline({
+      repeat: -1,
+      defaults: move,
+    });
+
+    /* 0.00–0.25 intact hold */
+    tl.to({}, { duration: 0.25 });
+
+    /* horizontal split */
+    tl.to(chunkA, { x: pos.midL.x, y: pos.midL.y }, ">");
+    tl.to(chunkC, { x: pos.midR.x, y: pos.midR.y }, "<");
+    tl.to({}, { duration: hold });
+
+    /* diagonal 1: A=TL C=BR */
+    tl.to(chunkA, { x: pos.TL.x, y: pos.TL.y });
+    tl.to(chunkC, { x: pos.BR.x, y: pos.BR.y }, "<");
+    tl.to({}, { duration: hold });
+
+    /* diagonal 2: A=TR C=BL */
+    tl.to(chunkA, { x: pos.TR.x, y: pos.TR.y });
+    tl.to(chunkC, { x: pos.BL.x, y: pos.BL.y }, "<");
+    tl.to({}, { duration: hold });
+
+    /* diagonal 3: A=BR C=TL */
+    tl.to(chunkA, { x: pos.BR.x, y: pos.BR.y });
+    tl.to(chunkC, { x: pos.TL.x, y: pos.TL.y }, "<");
+    tl.to({}, { duration: hold });
+
+    /* diagonal 4: A=BL C=TR */
+    tl.to(chunkA, { x: pos.BL.x, y: pos.BL.y });
+    tl.to(chunkC, { x: pos.TR.x, y: pos.TR.y }, "<");
+    tl.to({}, { duration: hold });
+
+    /* horizontal return */
+    tl.to(chunkA, { x: pos.midL.x, y: pos.midL.y });
+    tl.to(chunkC, { x: pos.midR.x, y: pos.midR.y }, "<");
+    tl.to({}, { duration: hold });
+
+    /* recenter / merge */
+    tl.to(chunkA, {
+      x: function () {
+        return measureHome().a.x;
+      },
+      y: 0,
+      duration: 0.55,
+      ease: "power3.inOut",
+    });
+    tl.to(
+      chunkC,
+      {
+        x: function () {
+          return measureHome().c.x;
+        },
+        y: 0,
+        duration: 0.55,
+        ease: "power3.inOut",
+      },
+      "<",
+    );
+    tl.to({}, { duration: 0.2 });
+
+    /* Independent slow float for cards (full loop, reverse path). */
+    cards.forEach(function (card, i) {
+      var ampX = mobile ? 10 + (i % 3) * 4 : 16 + (i % 3) * 6;
+      var ampY = mobile ? 12 + (i % 2) * 5 : 18 + (i % 2) * 8;
+      var dir = i % 2 === 0 ? 1 : -1;
+      gsap.to(card, {
+        x: dir * ampX,
+        y: -dir * ampY,
+        duration: 3.2 + i * 0.18,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+    });
+
+    window._grafikiBrandsTl = tl;
+
+    var pinST = ScrollTrigger.create({
+      id: "grafiki-pin",
+      trigger: section,
+      start: "top top",
+      end: mobile ? "+=110%" : "+=120%",
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 0.35,
+      invalidateOnRefresh: true,
+      refreshPriority: -1,
+      onEnter: function () {
+        document.body.classList.add("is-grafiki-zone");
+        if (tl.paused()) tl.play();
+      },
+      onEnterBack: function () {
+        document.body.classList.add("is-grafiki-zone");
+        if (tl.paused()) tl.play();
+      },
+    });
+
+    stubStepper(pinST);
+
+    document.addEventListener("cosgral:lang", syncBrandsWord);
+    document.addEventListener("click", function (e) {
+      var btn = e.target && e.target.closest && e.target.closest("[data-i18n-lang-btn]");
+      if (btn) setTimeout(syncBrandsWord, 30);
+    });
+
+    window.addEventListener("load", function () {
+      ScrollTrigger.refresh();
+      if (window.cosgralGrafikiStepper?.refresh) window.cosgralGrafikiStepper.refresh();
+      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
+    });
   }
 
   /**
@@ -1175,179 +1399,6 @@
     };
   }
 
-  function initCinemaScroll() {
-    var reduced = document.documentElement.classList.contains("reduce-motion");
-    var cinema = collageRoot && collageRoot.querySelector(".graphics-cinema");
-    var section = document.getElementById("grafiki");
-    if (!cinema || !section) return;
-
-    var camera = cinema.querySelector(".graphics-cinema__camera");
-    var world = cinema.querySelector(".graphics-cinema__world");
-    var watermark = cinema.querySelector(".graphics-cinema__watermark");
-    var tiles = cinema.querySelectorAll(".graphics-cinema__tile");
-    var mobile = window.matchMedia("(max-width: 900px)").matches;
-    var freeScroll = true;
-
-    if (reduced || !window.gsap || !window.ScrollTrigger) {
-      cinema.classList.add("is-static");
-      collageRoot.classList.add("is-ready");
-      return;
-    }
-
-    gsap.registerPlugin(ScrollTrigger);
-    placeTilesOnWorld(world, tiles, mobile);
-    section.classList.add("is-grafiki-frames");
-
-    var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
-    /* Original choreography; roughly 22% less motion per scroll distance. */
-    var pinLen = freeScroll ? (mobile ? "+=155%" : "+=185%") : mobile ? "+=72%" : "+=80%";
-    var filmMode = document.body.classList.contains("portfolio-page--film");
-
-    var overlay = section.querySelector(".graphics-stage__overlay");
-    var framesCta = section.querySelector("[data-graphics-frames-cta]");
-
-    function setOverlay(p) {
-      /* Napis pod koniec cinema — pełny dopiero ~0.78+ */
-      var show = p > 0.62;
-      var amt = Math.max(0, Math.min(1, (p - 0.62) / 0.2));
-      if (overlay) {
-        overlay.setAttribute("aria-hidden", show ? "false" : "true");
-        gsap.set(overlay, { autoAlpha: show ? amt : 0 });
-        if (show && amt > 0.05) overlay.classList.add("is-on");
-        else overlay.classList.remove("is-on");
-      }
-      if (framesCta) {
-        gsap.set(framesCta, {
-          autoAlpha: show ? amt : 0,
-          y: (1 - amt) * 20,
-          scale: 0.94 + amt * 0.06,
-        });
-      }
-      section.classList.toggle("is-cinema-done", p > 0.88);
-      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.62);
-    }
-
-    if (overlay) gsap.set(overlay, { autoAlpha: 0 });
-    if (framesCta) gsap.set(framesCta, { autoAlpha: 0, y: 20, scale: 0.94 });
-
-    window.cosgralGraphicsCinema = {
-      setProgress: function (p) {
-        cinemaTl.progress(Math.max(0, Math.min(1, p)));
-        setOverlay(p);
-      },
-      timeline: cinemaTl,
-    };
-
-    /* Film mode: no local pin — portfolio-film.js drives progress */
-    if (filmMode) {
-      cinemaTl.progress(0);
-      setOverlay(0);
-      window.cosgralGrafikiStepper = {
-        refresh: function () {},
-        snapToHold: function () {},
-        revealHold: function () {},
-        transitionToBeat: function () {},
-        resetForReentry: function () {
-          cinemaTl.progress(0);
-          setOverlay(0);
-        },
-        getBeat: function () {
-          return 0;
-        },
-        isAnimating: function () {
-          return false;
-        },
-        getPassDown: function () {
-          return true;
-        },
-        getPassUp: function () {
-          return true;
-        },
-        suspendHold: function () {},
-        getHoldY: function () {
-          return 0;
-        },
-      };
-      return;
-    }
-
-    var pinHandlers = {};
-
-    var pinST = ScrollTrigger.create({
-      id: "grafiki-pin",
-      trigger: section,
-      start: "top top",
-      end: pinLen,
-      pin: true,
-      pinSpacing: true,
-      scrub: freeScroll ? true : false,
-      anticipatePin: 0.35,
-      invalidateOnRefresh: true,
-      refreshPriority: -1,
-      onEnter: function () {
-        if (pinHandlers.onEnter) pinHandlers.onEnter();
-      },
-      onEnterBack: function () {
-        if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
-      },
-      onUpdate: function (self) {
-        if (freeScroll) {
-          cinemaTl.progress(self.progress);
-          setOverlay(self.progress);
-        }
-        if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
-      },
-      onRefresh: function (self) {
-        if (freeScroll) {
-          cinemaTl.progress(self.progress || 0);
-          setOverlay(self.progress || 0);
-        }
-      },
-    });
-
-    if (freeScroll) {
-      window.cosgralGrafikiStepper = {
-        refresh: function () {
-          if (pinST) pinST.refresh();
-        },
-        snapToHold: function () {},
-        revealHold: function () {},
-        transitionToBeat: function () {},
-        resetForReentry: function () {
-          cinemaTl.progress(0);
-          setOverlay(0);
-        },
-        getBeat: function () {
-          return pinST && pinST.progress > 0.55 ? 1 : 0;
-        },
-        isAnimating: function () {
-          return false;
-        },
-        getPassDown: function () {
-          return true;
-        },
-        getPassUp: function () {
-          return true;
-        },
-        suspendHold: function () {},
-        getHoldY: function () {
-          return pinST ? pinST.start : 0;
-        },
-      };
-    } else {
-      initGrafikiStepper(section, cinemaTl, pinST, pinHandlers);
-    }
-
-    collageRoot.classList.add("is-ready");
-    section.classList.add("is-cinema-ready");
-
-    window.addEventListener("load", function () {
-      ScrollTrigger.refresh();
-      if (window.cosgralGrafikiStepper?.refresh) window.cosgralGrafikiStepper.refresh();
-      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
-    });
-  }
-
   var RAIL_LIGHT = {
     "--rail-track-edge": "rgba(255, 255, 255, 0.04)",
     "--rail-track-mid": "rgba(255, 255, 255, 0.14)",
@@ -1494,7 +1545,7 @@
     var cube = document.querySelector(".subpage-cube-portal");
     var bloom = document.getElementById("grafiki-bloom");
     var rail = getScrollRail();
-    var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
+    var grafikiCta = document.querySelector("#grafiki [data-graphics-frames-cta]") || document.querySelector("#grafiki .graphics-brands");
 
     grafikiMenuState.cube = cube;
     gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });

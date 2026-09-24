@@ -35,7 +35,7 @@
 }
 </script>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260924polish1" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260924brands1" />
 <link rel="stylesheet" href="telforce-cases.css?v=20260924tfo1" />
 <script src="telforce-previews.js?v=20260924tfo1" defer></script>
 <link rel="stylesheet" href="web-case-panel.css?v=20260924polish1" />
@@ -173,14 +173,22 @@
   </section>
 
   <section id="grafiki" class="portfolio-section portfolio-section--grafiki" data-portfolio-section>
-    <div class="graphics-stage">
-      <div class="graphics-stage__cinema" data-portfolio-body>
-        <div id="graphics-collage" class="graphics-collage"></div>
+    <div class="graphics-stage graphics-stage--brands">
+      <div class="graphics-brands" id="graphics-brands" data-portfolio-body>
+        <div class="graphics-brands__stage">
+          <div class="graphics-brands__cards" id="graphics-brands-cards" aria-hidden="false"></div>
+          <div class="graphics-brands__word" data-graphics-brands-word aria-label="Grafiki">
+            <span class="graphics-brands__chunk graphics-brands__chunk--a" data-chunk="a">GRA</span>
+            <span class="graphics-brands__chunk graphics-brands__chunk--b" data-chunk="b">FI</span>
+            <span class="graphics-brands__chunk graphics-brands__chunk--c" data-chunk="c">KI</span>
+          </div>
+          <p class="graphics-brands__label graphics-brands__label--side" data-i18n="portfolio.brands_label_side">Wybrane realizacje</p>
+          <p class="graphics-brands__label graphics-brands__label--foot" data-i18n="portfolio.brands_label_foot">Posty · stories · key visual</p>
+        </div>
       </div>
-      <div class="graphics-stage__overlay" aria-hidden="true">
+      <div class="graphics-stage__overlay graphics-stage__overlay--brands" aria-hidden="false">
         <a class="graphics-frames-cta" href="portfolio-grafiki.html" data-graphics-frames-cta>
-          <span class="graphics-frames-cta__title">Grafiki</span>
-          <span class="graphics-frames-cta__more glass-btn">Zobacz więcej →</span>
+          <span class="graphics-frames-cta__more glass-btn" data-i18n="portfolio.see_more_graphics">Zobacz więcej →</span>
         </a>
       </div>
     </div>
@@ -402,7 +410,7 @@
 <script src="portfolio-video.js?v=20260920ui19"></script>
 <script src="portfolio-web-deck.js?v=20260920ui33"></script>
 <script src="portfolio-montaz.js?v=20260920ui36"></script>
-<script src="portfolio-graphics.js?v=20260924scrollfix3"></script>
+<script src="portfolio-graphics.js?v=20260924brands1"></script>
 <script src="portfolio-page-motion.js?v=20260924polish1"></script>
 <script src="portfolio-section-stepper.js?v=20260924polish1"></script>
 <script src="portfolio-scroll-rail.js?v=20260922ui52"></script>

@@ -845,8 +845,24 @@
       "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
     },
     "grafiki_title": {
-      "pl": "Grafiki",
-      "en": "Graphics"
+      "pl": "GRAFIKI",
+      "en": "VISUALS"
+    },
+    "brands_word": {
+      "pl": "GRAFIKI",
+      "en": "VISUALS"
+    },
+    "brands_label_side": {
+      "pl": "Wybrane realizacje",
+      "en": "Selected work"
+    },
+    "brands_label_foot": {
+      "pl": "Posty · stories · key visual",
+      "en": "Posts · stories · key visuals"
+    },
+    "see_more_graphics": {
+      "pl": "Zobacz więcej →",
+      "en": "See more →"
     },
     "grafiki_lead": {
       "pl": "Kreacje do social mediów i kampanii: posty, stories i key visuale.",
