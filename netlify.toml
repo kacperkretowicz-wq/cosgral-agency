@@ -8,6 +8,20 @@
 [build.environment]
   NODE_VERSION = "20"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Live chat API (Gemini Flash + proxy do Cosgral Hub)
+# Env wymagane na Netlify: GEMINI_API_KEY
+# Env opcjonalne: GEMINI_MODEL, CHAT_HUB_AGENT_PIN, COSGRAL_HUB_CHAT_API
+
+[[redirects]]
+  from = "/api/site-chat"
+  to = "/.netlify/functions/site-chat"
+  status = 200
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]

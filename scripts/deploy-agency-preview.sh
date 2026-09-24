@@ -7,4 +7,10 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 cd "$ROOT"
 npx --yes netlify-cli link --id "$SITE_ID" >/dev/null 2>&1 || true
-npx --yes netlify-cli deploy --prod --dir=designkopia/cosgral-agency --site="$SITE_ID" --no-build
+# Static site + serverless chat (Gemini). Requires GEMINI_API_KEY on the Netlify site.
+npx --yes netlify-cli deploy \
+  --prod \
+  --dir=designkopia/cosgral-agency \
+  --functions=netlify/functions \
+  --site="$SITE_ID" \
+  --no-build

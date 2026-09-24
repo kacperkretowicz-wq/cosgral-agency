@@ -6,6 +6,9 @@ DirectoryIndex index.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Live chat AI API (PHP) — same path as Netlify Functions on preview
+  RewriteRule ^api/site-chat/?$ /api/site-chat.php [L,QSA]
+
   # /portfolio and /portfolio/ → page (keep /portfolio-media/reels|graphics|… assets)
   RewriteRule ^portfolio/?$ /portfolio.html [R=301,L]
 
