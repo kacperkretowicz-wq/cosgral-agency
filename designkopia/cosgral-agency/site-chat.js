@@ -97,7 +97,7 @@
   function setEyebrow() {
     if (humanTakeover) {
       var who = activeHumanName || "Zespół";
-      eyebrow.textContent = who + " · człowiek";
+      eyebrow.textContent = who;
       statusDot.title = who + " online";
     } else {
       eyebrow.textContent = "Cosgral AI";
@@ -110,7 +110,7 @@
     takeoverNoticeShown = true;
     if (empty.parentNode) empty.remove();
     var notice = el("div", "cg-chat-notice", {
-      text: name + " dołączył do rozmowy — od teraz pisze człowiek.",
+      text: name + " dołączył do rozmowy",
     });
     msgs.appendChild(notice);
     scrollBottom();
@@ -287,9 +287,9 @@
       );
       var meta = el("div", "cg-chat-row__meta");
       meta.appendChild(el("span", "cg-chat-row__name", { text: name }));
-      meta.appendChild(
-        el("span", "cg-chat-row__tag", { text: ai ? "AI" : "człowiek" }),
-      );
+      if (ai) {
+        meta.appendChild(el("span", "cg-chat-row__tag", { text: "AI" }));
+      }
       var bubble = el("div", "cg-chat-bubble cg-chat-bubble--agent", { text: m.body });
       if (ai) bubble.setAttribute("data-cg-ai", "1");
       row.appendChild(meta);
