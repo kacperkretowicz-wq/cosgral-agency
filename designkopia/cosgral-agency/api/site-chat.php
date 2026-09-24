@@ -70,7 +70,7 @@ function uuid_v4(): string
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-function http_json(string $method, string $url, ?array $body = null, array $headers = []): array
+function http_json(string $method, string $url, ?array $body = null, array $headers = [], int $timeout = 18): array
 {
     $ch = curl_init($url);
     $hdrs = array_merge(['Accept: application/json'], $headers);
@@ -78,8 +78,8 @@ function http_json(string $method, string $url, ?array $body = null, array $head
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_HTTPHEADER => $hdrs,
-        CURLOPT_TIMEOUT => 18,
-        CURLOPT_CONNECTTIMEOUT => 8,
+        CURLOPT_TIMEOUT => max(5, $timeout),
+        CURLOPT_CONNECTTIMEOUT => min(8, max(3, $timeout)),
     ];
     if ($body !== null) {
         $json = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -336,9 +336,35 @@ function hub_post_agent(string $api, string $visitorKey, string $body, string $p
 
 function fallback_ai_text(): string
 {
-    return 'Dzięki za wiadomość — zespół Cosgral właśnie ją widzi i odpisze tak szybko, jak to możliwe. '
-        . 'Tymczasem możesz napisać, czego potrzebujesz (strona, aplikacja, CRM, SEO albo wideo), '
-        . 'albo zadzwonić: Jakub +48 533 790 518 · Kacper +48 571 798 397.';
+    return 'Jasne — ogarniam temat. Napisz proszę 1–2 zdania więcej: co dokładnie chcesz wdrożyć '
+        . '(np. sklep, strona firmowa, CRM, SEO) i na kiedy. '
+        . 'Na tej podstawie Jakub lub Kacper dopną wycenę: +48 533 790 518 / +48 571 798 397.';
+}
+
+function gemini_extract_text(array $data): string
+{
+    $candidate = $data['candidates'][0] ?? null;
+    if (!is_array($candidate)) {
+        return '';
+    }
+    $finish = (string)($candidate['finishReason'] ?? '');
+    if ($finish === 'SAFETY' || $finish === 'BLOCKLIST' || $finish === 'PROHIBITED_CONTENT') {
+        return 'Jasne — wróćmy do rzeczy. W czym mogę pomóc: strona, sklep, CRM, SEO czy automatyzacja?';
+    }
+    $parts = $candidate['content']['parts'] ?? [];
+    $text = '';
+    if (is_array($parts)) {
+        foreach ($parts as $p) {
+            if (is_array($p) && isset($p['text']) && is_string($p['text'])) {
+                // Skip thought parts if API returns them separately
+                if (!empty($p['thought'])) {
+                    continue;
+                }
+                $text .= $p['text'];
+            }
+        }
+    }
+    return trim($text);
 }
 
 function gemini_reply(string $apiKey, string $model, array $history, string $latestUser, string $pageUrl): string
@@ -376,33 +402,38 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
         ],
         'contents' => $contents,
         'generationConfig' => [
-            'temperature' => 0.82,
+            'temperature' => 0.9,
             'topP' => 0.95,
-            'maxOutputTokens' => 2048,
+            'maxOutputTokens' => 4096,
+            // gemini-3.x flash: thinking spala budżet/czas → fallbacki na czacie
+            'thinkingConfig' => [
+                'thinkingBudget' => 0,
+            ],
         ],
     ];
 
-    $res = http_json('POST', $url, $payload);
-    if (!$res['ok']) {
-        throw new RuntimeException('gemini_failed');
-    }
-    $candidate = $res['data']['candidates'][0] ?? null;
-    $finish = is_array($candidate) ? (string)($candidate['finishReason'] ?? '') : '';
-    if ($finish === 'SAFETY' || $finish === 'BLOCKLIST' || $finish === 'PROHIBITED_CONTENT') {
-        return 'Jasne — wróćmy do rzeczy. W czym mogę pomóc w sprawie strony, CRM, SEO albo automatyzacji?';
-    }
-    $parts = is_array($candidate) ? ($candidate['content']['parts'] ?? []) : [];
-    $text = '';
-    foreach ($parts as $p) {
-        if (is_array($p) && isset($p['text'])) {
-            $text .= (string)$p['text'];
+    $lastError = 'gemini_failed';
+    for ($attempt = 0; $attempt < 3; $attempt++) {
+        if ($attempt > 0) {
+            usleep(350000 * $attempt);
         }
+        $res = http_json('POST', $url, $payload, [], 36);
+        if (!$res['ok']) {
+            $status = (int)($res['status'] ?? 0);
+            $lastError = 'gemini_http_' . $status;
+            // Retry transient overload / rate limits
+            if ($status === 429 || $status === 503 || $status === 500 || $status === 0) {
+                continue;
+            }
+            throw new RuntimeException($lastError);
+        }
+        $text = gemini_extract_text($res['data']);
+        if ($text !== '') {
+            return mb_substr($text, 0, 2200, 'UTF-8');
+        }
+        $lastError = 'gemini_empty';
     }
-    $text = trim($text);
-    if ($text === '') {
-        throw new RuntimeException('gemini_empty');
-    }
-    return mb_substr($text, 0, 2000, 'UTF-8');
+    throw new RuntimeException($lastError);
 }
 
 $secrets = load_secrets();

@@ -425,7 +425,7 @@
     var timer = window.setTimeout(function () {
       timedOut = true;
       if (ctrl) ctrl.abort();
-    }, 22000);
+    }, 45000);
 
     return fetch(API, {
       method: "POST",
@@ -465,8 +465,8 @@
       id: "ai-local-" + uuid(),
       role: "agent",
       body:
-        "Chwilę trwało — zespół Cosgral dostał Twoją wiadomość i wróci, jak będzie wolny. " +
-        "Możesz też napisać na kontakt@cosgral.pl albo zadzwonić: Jakub +48 533 790 518.",
+        "Jasne — ogarniam temat. Doprecyzuj proszę w 1–2 zdaniach, co chcesz (np. sklep, strona, CRM) i na kiedy. " +
+        "Jakub +48 533 790 518 · Kacper +48 571 798 397.",
       source: AI_SOURCE,
       agent_kind: "ai",
       agent_name: "Cosgral AI",

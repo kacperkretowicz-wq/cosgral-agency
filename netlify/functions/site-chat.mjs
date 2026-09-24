@@ -252,54 +252,72 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
     `?key=${encodeURIComponent(apiKey)}`;
 
   const pageNote = pageUrl ? `\nKlient jest na stronie: ${String(pageUrl).slice(0, 400)}` : "";
+  const payload = {
+    systemInstruction: {
+      parts: [{ text: SYSTEM_INSTRUCTION + pageNote }],
+    },
+    contents: toGeminiContents(history, latestUser),
+    generationConfig: {
+      temperature: 0.9,
+      topP: 0.95,
+      maxOutputTokens: 4096,
+      thinkingConfig: { thinkingBudget: 0 },
+    },
+  };
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: SYSTEM_INSTRUCTION + pageNote }],
-      },
-      contents: toGeminiContents(history, latestUser),
-      generationConfig: {
-        temperature: 0.82,
-        topP: 0.95,
-        maxOutputTokens: 2048,
-      },
-    }),
-  });
-
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = new Error("gemini_failed");
-    err.status = res.status;
-    err.data = data;
-    throw err;
+  let lastErr = new Error("gemini_failed");
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt > 0) {
+      await new Promise(function (r) {
+        setTimeout(r, 350 * attempt);
+      });
+    }
+    let res;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error("gemini_network");
+      continue;
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const err = new Error("gemini_failed");
+      err.status = res.status;
+      err.data = data;
+      lastErr = err;
+      if (res.status === 429 || res.status === 503 || res.status === 500) continue;
+      throw err;
+    }
+    const parts =
+      data &&
+      data.candidates &&
+      data.candidates[0] &&
+      data.candidates[0].content &&
+      data.candidates[0].content.parts
+        ? data.candidates[0].content.parts
+        : [];
+    const text = parts
+      .map(function (p) {
+        if (!p || p.thought) return "";
+        return p.text ? p.text : "";
+      })
+      .join("")
+      .trim();
+    if (text) return text.slice(0, 2200);
+    lastErr = new Error("gemini_empty");
   }
-
-  const text =
-    data &&
-    data.candidates &&
-    data.candidates[0] &&
-    data.candidates[0].content &&
-    data.candidates[0].content.parts
-      ? data.candidates[0].content.parts
-          .map(function (p) {
-            return p && p.text ? p.text : "";
-          })
-          .join("")
-          .trim()
-      : "";
-
-  if (!text) throw new Error("gemini_empty");
-  return text.slice(0, 2000);
+  throw lastErr;
 }
 
 function fallbackAiText() {
   return (
-    "Dzięki za wiadomość — zespół Cosgral właśnie ją widzi i odpisze tak szybko, jak to możliwe. " +
-    "Tymczasem możesz napisać, czego potrzebujesz (strona, aplikacja, CRM, SEO albo wideo), " +
-    "albo zadzwonić: Jakub +48 533 790 518 · Kacper +48 571 798 397."
+    "Jasne — ogarniam temat. Napisz proszę 1–2 zdania więcej: co dokładnie chcesz wdrożyć " +
+    "(np. sklep, strona firmowa, CRM, SEO) i na kiedy. " +
+    "Na tej podstawie Jakub lub Kacper dopną wycenę: +48 533 790 518 / +48 571 798 397."
   );
 }
 
