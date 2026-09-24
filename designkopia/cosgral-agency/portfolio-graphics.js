@@ -465,14 +465,17 @@
 
     gsap.registerPlugin(ScrollTrigger);
 
-    var vx = mobile ? 28 : 36;
-    var vy = mobile ? 22 : 28;
-    var hx = mobile ? 30 : 38;
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var vx = mobile ? 0.3 : 0.36;
+    var vy = mobile ? 0.24 : 0.3;
+    var hx = mobile ? 0.32 : 0.4;
 
     function measureHome() {
-      var wa = chunkA.getBoundingClientRect().width;
-      var wb = chunkB.getBoundingClientRect().width;
-      var wc = chunkC.getBoundingClientRect().width;
+      gsap.set([chunkA, chunkB, chunkC], { x: 0, y: 0, xPercent: -50, yPercent: -50 });
+      var wa = chunkA.offsetWidth || chunkA.getBoundingClientRect().width;
+      var wb = chunkB.offsetWidth || chunkB.getBoundingClientRect().width;
+      var wc = chunkC.offsetWidth || chunkC.getBoundingClientRect().width;
       return {
         a: { x: -(wb * 0.5 + wa * 0.5), y: 0 },
         c: { x: wb * 0.5 + wc * 0.5, y: 0 },
@@ -480,137 +483,197 @@
     }
 
     var home = measureHome();
-    var pos = {
-      midL: { x: (-hx / 100) * window.innerWidth, y: 0 },
-      midR: { x: (hx / 100) * window.innerWidth, y: 0 },
-      TL: { x: (-vx / 100) * window.innerWidth, y: (-vy / 100) * window.innerHeight },
-      TR: { x: (vx / 100) * window.innerWidth, y: (-vy / 100) * window.innerHeight },
-      BL: { x: (-vx / 100) * window.innerWidth, y: (vy / 100) * window.innerHeight },
-      BR: { x: (vx / 100) * window.innerWidth, y: (vy / 100) * window.innerHeight },
+    var textPos = {
+      midL: { x: -hx * w, y: 0 },
+      midR: { x: hx * w, y: 0 },
+      TL: { x: -vx * w, y: -vy * h },
+      TR: { x: vx * w, y: -vy * h },
+      BL: { x: -vx * w, y: vy * h },
+      BR: { x: vx * w, y: vy * h },
     };
+
+    var cardLayouts = [
+      [
+        { l: 8, t: 12, s: 1, z: 2 },
+        { l: 38, t: 5, s: 1.05, z: 3 },
+        { l: 74, t: 10, s: 0.95, z: 2 },
+        { l: 9, t: 62, s: 1, z: 2 },
+        { l: 42, t: 68, s: 0.95, z: 2 },
+        { l: 74, t: 58, s: 1.05, z: 3 },
+      ],
+      [
+        { l: 6, t: 8, s: 0.85, z: 2 },
+        { l: 34, t: 4, s: 1.35, z: 5 },
+        { l: 78, t: 8, s: 0.9, z: 2 },
+        { l: 8, t: 66, s: 0.95, z: 2 },
+        { l: 44, t: 72, s: 0.85, z: 2 },
+        { l: 76, t: 62, s: 0.95, z: 2 },
+      ],
+      [
+        { l: 22, t: 18, s: 0.9, z: 2 },
+        { l: 40, t: 8, s: 0.8, z: 2 },
+        { l: 78, t: 6, s: 1.05, z: 3 },
+        { l: 8, t: 58, s: 0.9, z: 2 },
+        { l: 38, t: 62, s: 1.3, z: 5 },
+        { l: 72, t: 52, s: 1.1, z: 3 },
+      ],
+      [
+        { l: 8, t: 6, s: 0.85, z: 2 },
+        { l: 28, t: 8, s: 0.75, z: 2 },
+        { l: 70, t: 4, s: 1.05, z: 3 },
+        { l: 10, t: 64, s: 0.9, z: 2 },
+        { l: 36, t: 70, s: 0.85, z: 2 },
+        { l: 58, t: 28, s: 1.55, z: 6 },
+      ],
+      [
+        { l: 6, t: 8, s: 0.9, z: 2 },
+        { l: 24, t: 10, s: 0.8, z: 2 },
+        { l: 62, t: 4, s: 1.4, z: 6 },
+        { l: 10, t: 60, s: 1.05, z: 3 },
+        { l: 40, t: 66, s: 0.95, z: 2 },
+        { l: 76, t: 58, s: 0.95, z: 2 },
+      ],
+      [
+        { l: 10, t: 10, s: 0.95, z: 2 },
+        { l: 36, t: 6, s: 1.1, z: 3 },
+        { l: 74, t: 8, s: 1, z: 2 },
+        { l: 10, t: 64, s: 1, z: 2 },
+        { l: 42, t: 70, s: 0.95, z: 2 },
+        { l: 74, t: 60, s: 1, z: 2 },
+      ],
+      [
+        { l: 8, t: 12, s: 1, z: 2 },
+        { l: 38, t: 5, s: 1.05, z: 3 },
+        { l: 74, t: 10, s: 0.95, z: 2 },
+        { l: 9, t: 62, s: 1, z: 2 },
+        { l: 42, t: 68, s: 0.95, z: 2 },
+        { l: 74, t: 58, s: 1.05, z: 3 },
+      ],
+    ];
+
+    var tl;
+
+    function applyCardLayout(layout, extras) {
+      extras = extras || {};
+      cards.forEach(function (card, i) {
+        var slot = layout[i] || layout[0];
+        var props = {
+          left: slot.l + "%",
+          top: slot.t + "%",
+          scale: slot.s,
+          zIndex: slot.z,
+          x: 0,
+          y: 0,
+          rotate: (i % 2 === 0 ? -1.2 : 1.1) * (0.4 + i * 0.15),
+          duration: extras.duration != null ? extras.duration : 1,
+          ease: extras.ease || "power2.inOut",
+        };
+        if (extras.immediate) gsap.set(card, props);
+        else tl.to(card, props, extras.at);
+      });
+    }
 
     gsap.set([chunkA, chunkB, chunkC], { xPercent: -50, yPercent: -50 });
     gsap.set(chunkB, { x: 0, y: 0 });
     gsap.set(chunkA, { x: home.a.x, y: home.a.y });
     gsap.set(chunkC, { x: home.c.x, y: home.c.y });
+    applyCardLayout(cardLayouts[0], { immediate: true });
 
-    cards.forEach(function (card, i) {
-      gsap.set(card, { x: 0, y: 0, rotate: (i % 2 === 0 ? -1 : 1) * (i + 1) * 0.35 });
-    });
+    var overlay = section.querySelector(".graphics-stage__overlay--brands");
+    var framesCta = section.querySelector("[data-graphics-frames-cta]");
+    if (overlay) gsap.set(overlay, { autoAlpha: 0 });
+    if (framesCta) gsap.set(framesCta, { autoAlpha: 0, y: 18 });
 
-    var move = { duration: 0.7, ease: "power3.inOut" };
-    var hold = 0.3;
-
-    var tl = gsap.timeline({
-      repeat: -1,
-      defaults: move,
-    });
-
-    /* 0.00–0.25 intact hold */
-    tl.to({}, { duration: 0.25 });
-
-    /* horizontal split */
-    tl.to(chunkA, { x: pos.midL.x, y: pos.midL.y }, ">");
-    tl.to(chunkC, { x: pos.midR.x, y: pos.midR.y }, "<");
-    tl.to({}, { duration: hold });
-
-    /* diagonal 1: A=TL C=BR */
-    tl.to(chunkA, { x: pos.TL.x, y: pos.TL.y });
-    tl.to(chunkC, { x: pos.BR.x, y: pos.BR.y }, "<");
-    tl.to({}, { duration: hold });
-
-    /* diagonal 2: A=TR C=BL */
-    tl.to(chunkA, { x: pos.TR.x, y: pos.TR.y });
-    tl.to(chunkC, { x: pos.BL.x, y: pos.BL.y }, "<");
-    tl.to({}, { duration: hold });
-
-    /* diagonal 3: A=BR C=TL */
-    tl.to(chunkA, { x: pos.BR.x, y: pos.BR.y });
-    tl.to(chunkC, { x: pos.TL.x, y: pos.TL.y }, "<");
-    tl.to({}, { duration: hold });
-
-    /* diagonal 4: A=BL C=TR */
-    tl.to(chunkA, { x: pos.BL.x, y: pos.BL.y });
-    tl.to(chunkC, { x: pos.TR.x, y: pos.TR.y }, "<");
-    tl.to({}, { duration: hold });
-
-    /* horizontal return */
-    tl.to(chunkA, { x: pos.midL.x, y: pos.midL.y });
-    tl.to(chunkC, { x: pos.midR.x, y: pos.midR.y }, "<");
-    tl.to({}, { duration: hold });
-
-    /* recenter / merge */
-    tl.to(chunkA, {
-      x: function () {
-        return measureHome().a.x;
-      },
-      y: 0,
-      duration: 0.55,
-      ease: "power3.inOut",
-    });
-    tl.to(
-      chunkC,
-      {
-        x: function () {
-          return measureHome().c.x;
+    tl = gsap.timeline({
+      defaults: { ease: "power2.inOut" },
+      scrollTrigger: {
+        id: "grafiki-pin",
+        trigger: section,
+        start: "top top",
+        end: mobile ? "+=240%" : "+=280%",
+        pin: true,
+        pinSpacing: true,
+        scrub: 0.75,
+        anticipatePin: 0.4,
+        invalidateOnRefresh: true,
+        refreshPriority: -1,
+        onEnter: function () {
+          document.body.classList.add("is-grafiki-zone");
         },
-        y: 0,
-        duration: 0.55,
-        ease: "power3.inOut",
+        onEnterBack: function () {
+          document.body.classList.add("is-grafiki-zone");
+        },
       },
-      "<",
-    );
-    tl.to({}, { duration: 0.2 });
-
-    /* Independent slow float for cards (full loop, reverse path). */
-    cards.forEach(function (card, i) {
-      var ampX = mobile ? 10 + (i % 3) * 4 : 16 + (i % 3) * 6;
-      var ampY = mobile ? 12 + (i % 2) * 5 : 18 + (i % 2) * 8;
-      var dir = i % 2 === 0 ? 1 : -1;
-      gsap.to(card, {
-        x: dir * ampX,
-        y: -dir * ampY,
-        duration: 3.2 + i * 0.18,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-      });
     });
 
     window._grafikiBrandsTl = tl;
+    var pinST = tl.scrollTrigger;
 
-    var pinST = ScrollTrigger.create({
-      id: "grafiki-pin",
-      trigger: section,
-      start: "top top",
-      end: mobile ? "+=110%" : "+=120%",
-      pin: true,
-      pinSpacing: true,
-      anticipatePin: 0.35,
-      invalidateOnRefresh: true,
-      refreshPriority: -1,
-      onEnter: function () {
-        document.body.classList.add("is-grafiki-zone");
-        if (tl.paused()) tl.play();
-      },
-      onEnterBack: function () {
-        document.body.classList.add("is-grafiki-zone");
-        if (tl.paused()) tl.play();
-      },
+    tl.to({}, { duration: 0.35 });
+    tl.to(chunkA, { x: textPos.midL.x, y: textPos.midL.y, duration: 1 }, ">");
+    tl.to(chunkC, { x: textPos.midR.x, y: textPos.midR.y, duration: 1 }, "<");
+    applyCardLayout(cardLayouts[1], { at: "<", duration: 1 });
+    tl.to({}, { duration: 0.35 });
+
+    tl.to(chunkA, { x: textPos.TL.x, y: textPos.TL.y, duration: 1 });
+    tl.to(chunkC, { x: textPos.BR.x, y: textPos.BR.y, duration: 1 }, "<");
+    applyCardLayout(cardLayouts[2], { at: "<", duration: 1 });
+    tl.to({}, { duration: 0.4 });
+
+    tl.to(chunkA, { x: textPos.BR.x, y: textPos.BR.y, duration: 1 });
+    tl.to(chunkC, { x: textPos.TL.x, y: textPos.TL.y, duration: 1 }, "<");
+    applyCardLayout(cardLayouts[3], { at: "<", duration: 1 });
+    tl.to({}, { duration: 0.4 });
+
+    tl.to(chunkA, { x: textPos.BL.x, y: textPos.BL.y, duration: 1 });
+    tl.to(chunkC, { x: textPos.TR.x, y: textPos.TR.y, duration: 1 }, "<");
+    applyCardLayout(cardLayouts[4], { at: "<", duration: 1 });
+    tl.to({}, { duration: 0.35 });
+
+    tl.to(chunkA, { x: textPos.midL.x, y: textPos.midL.y, duration: 1 });
+    tl.to(chunkC, { x: textPos.midR.x, y: textPos.midR.y, duration: 1 }, "<");
+    applyCardLayout(cardLayouts[5], { at: "<", duration: 1 });
+    tl.to({}, { duration: 0.3 });
+
+    tl.to(chunkA, {
+      x: function () { return measureHome().a.x; },
+      y: 0,
+      duration: 0.9,
     });
+    tl.to(chunkC, {
+      x: function () { return measureHome().c.x; },
+      y: 0,
+      duration: 0.9,
+    }, "<");
+    applyCardLayout(cardLayouts[6], { at: "<", duration: 0.9 });
+    if (overlay) tl.to(overlay, { autoAlpha: 1, duration: 0.5 }, "-=0.35");
+    if (framesCta) tl.to(framesCta, { autoAlpha: 1, y: 0, duration: 0.5 }, "<");
+    tl.to({}, { duration: 0.55 });
 
     stubStepper(pinST);
 
-    document.addEventListener("cosgral:lang", syncBrandsWord);
+    document.addEventListener("cosgral:lang", function () {
+      syncBrandsWord();
+      var h2 = measureHome();
+      var p = tl.progress();
+      if (p < 0.08 || p > 0.92) {
+        gsap.set(chunkA, { x: h2.a.x, y: 0 });
+        gsap.set(chunkC, { x: h2.c.x, y: 0 });
+      }
+    });
     document.addEventListener("click", function (e) {
       var btn = e.target && e.target.closest && e.target.closest("[data-i18n-lang-btn]");
-      if (btn) setTimeout(syncBrandsWord, 30);
+      if (btn) setTimeout(syncBrandsWord, 40);
     });
 
     window.addEventListener("load", function () {
       ScrollTrigger.refresh();
-      if (window.cosgralGrafikiStepper?.refresh) window.cosgralGrafikiStepper.refresh();
-      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
+      if (window.cosgralGrafikiStepper && window.cosgralGrafikiStepper.refresh) {
+        window.cosgralGrafikiStepper.refresh();
+      }
+      if (window.cosgralPortfolioRail && window.cosgralPortfolioRail.refresh) {
+        window.cosgralPortfolioRail.refresh();
+      }
     });
   }
 
