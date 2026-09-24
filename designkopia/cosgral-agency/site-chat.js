@@ -159,7 +159,7 @@
 
   var head = el("div", "cg-chat-head");
   var brand = el("div", "cg-chat-head__brand");
-  var eyebrow = el("div", "cg-chat-head__eyebrow", { text: "Live" });
+  var eyebrow = el("div", "cg-chat-head__eyebrow", { text: "Cosgral AI" });
   brand.appendChild(eyebrow);
   brand.appendChild(el("strong", null, { text: "Cosgral" }));
   head.appendChild(brand);
