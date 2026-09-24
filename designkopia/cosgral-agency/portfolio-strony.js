@@ -245,7 +245,7 @@
     tiltRaf = 0;
     tiltTargets.forEach(function (t) {
       if (!t || !t.card) return;
-      var max = 7.5;
+      var max = 4.2;
       gsap.to(t.card, {
         rotationY: t.nx * max * 2,
         rotationX: -t.ny * max * 2,

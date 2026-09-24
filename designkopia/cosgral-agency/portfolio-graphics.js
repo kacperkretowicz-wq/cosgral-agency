@@ -372,6 +372,19 @@
 
     bindLightboxTriggers(collageRoot);
     if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.scan(collageRoot);
+    var graphicsSection = document.getElementById("grafiki");
+    if (graphicsSection && window.IntersectionObserver) {
+      var warmObserver = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+        EARLY_VISIBLE.forEach(function (idx) {
+          var tile = collageRoot.querySelector('.graphics-cinema__tile[data-idx="' + idx + '"]');
+          var img = tile && tile.querySelector("img.graphics-cinema__media");
+          if (img) img.loading = "eager";
+        });
+        warmObserver.disconnect();
+      }, { rootMargin: "100% 0px" });
+      warmObserver.observe(graphicsSection);
+    }
     initCinemaScroll();
     initGrafikiBloom();
     document.dispatchEvent(new CustomEvent("portfolio:media-ready", { detail: { type: "graphics" } }));
@@ -1186,7 +1199,8 @@
     section.classList.add("is-grafiki-frames");
 
     var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
-    var pinLen = freeScroll ? (mobile ? "+=180%" : "+=240%") : mobile ? "+=72%" : "+=80%";
+    /* Original choreography; roughly 22% less motion per scroll distance. */
+    var pinLen = freeScroll ? (mobile ? "+=155%" : "+=185%") : mobile ? "+=72%" : "+=80%";
     var filmMode = document.body.classList.contains("portfolio-page--film");
 
     var overlay = section.querySelector(".graphics-stage__overlay");
@@ -1559,7 +1573,7 @@
         syncGrafikiCubeFade();
       },
       onLeave: function () {
-        document.body.classList.remove("is-grafiki-zone", "is-grafiki-light");
+        document.body.classList.remove("is-grafiki-zone");
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },
@@ -1569,7 +1583,7 @@
         syncGrafikiCubeFade();
       },
       onLeaveBack: function () {
-        document.body.classList.remove("is-grafiki-zone", "is-grafiki-light");
+        document.body.classList.remove("is-grafiki-zone");
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },

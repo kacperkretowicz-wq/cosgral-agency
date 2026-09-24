@@ -427,6 +427,10 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
   }
 
   var clock = new THREE.Clock();
+  var lastScrollAt = 0;
+  window.addEventListener("scroll", function () {
+    lastScrollAt = performance.now();
+  }, { passive: true });
 
   function sandPowerMul(menuBlend) {
     if (menuBlend > 0.001 || menuSandBoost || menuSandVisible || menuSandHold) return 1;
@@ -457,6 +461,14 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
+    var menuIsActive = (window.cosgralCube?.getMenuBlend?.() || 0) > 0.001;
+    var sectionIndex = window.cosgralPortfolioStepper?.getIndex?.();
+    // Keep the existing sand frame while scrolling past the hero. Its tiny
+    // particles are decorative; the gallery gets the rendering budget.
+    if (typeof sectionIndex === "number" && sectionIndex > 0 &&
+        !menuIsActive && !menuSandVisible && !menuSandBoost &&
+        !menuParticlePass && !menuSandHold &&
+        performance.now() - lastScrollAt < 180) return;
     var t = clock.getElapsedTime();
     syncPointer();
     mouse.x += (mouse.tx - mouse.x) * 0.06;
@@ -601,7 +613,9 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       layer.mat.uniforms.uLayerAlpha.value = layerAlpha;
       layer.mat.uniforms.uMouse.value.set(mouse.x, mouse.y);
       if (matSrc) layer.mat.uniforms.uCubeMat.value.copy(matSrc);
-      layer.renderer.render(layer.scene, layer.camera);
+      if (layerAlpha > 0.001 || menuSandVisible || menuSandBoost || menuParticlePass) {
+        layer.renderer.render(layer.scene, layer.camera);
+      }
     });
   }
 

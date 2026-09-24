@@ -351,7 +351,7 @@
       if (fromPanel && toPanel && fromPanel !== toPanel) {
         var fromIsAuto = fromPanel.id === "automatyzacje" || !!fromPanel.closest?.("#automatyzacje");
         if (!fromIsAuto) {
-          tl.to(fromPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(10px)", duration: 0.42, ease: "power2.in" }, 0);
+          tl.to(fromPanel, { autoAlpha: 0, duration: 0.32, ease: "power2.in" }, 0);
         }
       }
       if (curtain) {
@@ -368,8 +368,8 @@
             tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);
           }
         } else {
-          gsap.set(toPanel, { autoAlpha: 0, filter: MOBILE ? "none" : "blur(12px)" });
-          tl.to(toPanel, { autoAlpha: 1, filter: MOBILE ? "none" : "blur(0px)", duration: 0.52, ease: "power2.out" }, 0.4);
+          gsap.set(toPanel, { autoAlpha: 0, filter: "none" });
+          tl.to(toPanel, { autoAlpha: 1, duration: 0.42, ease: "power2.out" }, 0.4);
           if (curtain) {
             tl.to(curtain, { autoAlpha: 0, duration: 0.45, ease: "power2.out" }, 0.44);
           }
@@ -757,6 +757,31 @@
       },
       SECTION_IDS: SECTION_IDS,
     };
+
+    function landOnDeepLink() {
+      var id = (window.location.hash || "").replace(/^#/, "");
+      var index = SECTION_IDS.indexOf(id);
+      if (index < 0) return;
+      var section = document.getElementById(id);
+      if (!section) return;
+      var target = Math.max(0, section.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
+      if (id === "grafiki") {
+        var graphicsPin = ScrollTrigger.getById("grafiki-pin");
+        if (graphicsPin) target = graphicsPin.start + (graphicsPin.end - graphicsPin.start) * 0.82;
+      }
+      if (!Number.isFinite(target) || target < 1) return;
+      if (window.cosgralSmoothScroll?.lenis) {
+        window.cosgralSmoothScroll.lenis.scrollTo(target, { immediate: true });
+      } else {
+        window.scrollTo(0, target);
+      }
+      activeIndex = index;
+      syncStepView(index);
+      if (index === AUTO_IDX) ensureAutoVisible();
+    }
+
+    window.addEventListener("cosgral:page-hash-scroll", landOnDeepLink);
+    window.requestAnimationFrame(landOnDeepLink);
 
     ScrollTrigger.addEventListener("refresh", function () {
       holds = buildHolds();
