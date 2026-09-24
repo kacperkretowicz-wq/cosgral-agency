@@ -247,68 +247,77 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
     throw err;
   }
 
-  const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent` +
-    `?key=${encodeURIComponent(apiKey)}`;
-
   const pageNote = pageUrl ? `\nKlient jest na stronie: ${String(pageUrl).slice(0, 400)}` : "";
-  const payload = {
-    systemInstruction: {
-      parts: [{ text: SYSTEM_INSTRUCTION + pageNote }],
-    },
-    contents: toGeminiContents(history, latestUser),
-    generationConfig: {
+  const contents = toGeminiContents(history, latestUser);
+  const configs = [
+    {
       temperature: 0.9,
       topP: 0.95,
       maxOutputTokens: 4096,
       thinkingConfig: { thinkingBudget: 0 },
     },
-  };
+    {
+      temperature: 0.9,
+      topP: 0.95,
+      maxOutputTokens: 4096,
+    },
+  ];
+  const models = Array.from(
+    new Set([GEMINI_MODEL || "gemini-3.6-flash", "gemini-flash-latest", "gemini-2.5-flash"]),
+  );
 
   let lastErr = new Error("gemini_failed");
-  for (let attempt = 0; attempt < 3; attempt++) {
-    if (attempt > 0) {
-      await new Promise(function (r) {
-        setTimeout(r, 350 * attempt);
-      });
+  for (const tryModel of models) {
+    const url =
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(tryModel)}:generateContent` +
+      `?key=${encodeURIComponent(apiKey)}`;
+    for (const generationConfig of configs) {
+      let res;
+      try {
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: SYSTEM_INSTRUCTION + pageNote }],
+            },
+            contents,
+            generationConfig,
+          }),
+        });
+      } catch (e) {
+        lastErr = e instanceof Error ? e : new Error("gemini_network");
+        continue;
+      }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const err = new Error("gemini_failed");
+        err.status = res.status;
+        err.data = data;
+        lastErr = err;
+        if (res.status === 400 || res.status === 429 || res.status === 503 || res.status === 500) {
+          continue;
+        }
+        break;
+      }
+      const parts =
+        data &&
+        data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].content &&
+        data.candidates[0].content.parts
+          ? data.candidates[0].content.parts
+          : [];
+      const text = parts
+        .map(function (p) {
+          if (!p || p.thought) return "";
+          return p.text ? p.text : "";
+        })
+        .join("")
+        .trim();
+      if (text) return text.slice(0, 2200);
+      lastErr = new Error("gemini_empty");
     }
-    let res;
-    try {
-      res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } catch (e) {
-      lastErr = e instanceof Error ? e : new Error("gemini_network");
-      continue;
-    }
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const err = new Error("gemini_failed");
-      err.status = res.status;
-      err.data = data;
-      lastErr = err;
-      if (res.status === 429 || res.status === 503 || res.status === 500) continue;
-      throw err;
-    }
-    const parts =
-      data &&
-      data.candidates &&
-      data.candidates[0] &&
-      data.candidates[0].content &&
-      data.candidates[0].content.parts
-        ? data.candidates[0].content.parts
-        : [];
-    const text = parts
-      .map(function (p) {
-        if (!p || p.thought) return "";
-        return p.text ? p.text : "";
-      })
-      .join("")
-      .trim();
-    if (text) return text.slice(0, 2200);
-    lastErr = new Error("gemini_empty");
   }
   throw lastErr;
 }

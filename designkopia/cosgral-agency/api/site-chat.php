@@ -391,47 +391,62 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
     }
     $contents[] = ['role' => 'user', 'parts' => [['text' => $latest]]];
 
-    $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-        . rawurlencode($model)
-        . ':generateContent?key='
-        . rawurlencode($apiKey);
-
-    $payload = [
-        'systemInstruction' => [
-            'parts' => [['text' => cosgral_chat_system_instruction($pageUrl)]],
-        ],
-        'contents' => $contents,
-        'generationConfig' => [
-            'temperature' => 0.9,
-            'topP' => 0.95,
-            'maxOutputTokens' => 4096,
-            // gemini-3.x flash: thinking spala budżet/czas → fallbacki na czacie
-            'thinkingConfig' => [
-                'thinkingBudget' => 0,
-            ],
+    $baseConfig = [
+        'temperature' => 0.9,
+        'topP' => 0.95,
+        'maxOutputTokens' => 4096,
+        'thinkingConfig' => [
+            'thinkingBudget' => 0,
         ],
     ];
+    $configNoThink = [
+        'temperature' => 0.9,
+        'topP' => 0.95,
+        'maxOutputTokens' => 4096,
+    ];
+
+    $models = array_values(array_unique(array_filter([
+        $model !== '' ? $model : 'gemini-3.6-flash',
+        'gemini-flash-latest',
+        'gemini-2.5-flash',
+    ])));
 
     $lastError = 'gemini_failed';
-    for ($attempt = 0; $attempt < 3; $attempt++) {
-        if ($attempt > 0) {
-            usleep(350000 * $attempt);
-        }
-        $res = http_json('POST', $url, $payload, [], 36);
-        if (!$res['ok']) {
-            $status = (int)($res['status'] ?? 0);
-            $lastError = 'gemini_http_' . $status;
-            // Retry transient overload / rate limits
-            if ($status === 429 || $status === 503 || $status === 500 || $status === 0) {
-                continue;
+    foreach ($models as $i => $tryModel) {
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+            . rawurlencode($tryModel)
+            . ':generateContent?key='
+            . rawurlencode($apiKey);
+
+        foreach ([$baseConfig, $configNoThink] as $genConfig) {
+            $payload = [
+                'systemInstruction' => [
+                    'parts' => [['text' => cosgral_chat_system_instruction($pageUrl)]],
+                ],
+                'contents' => $contents,
+                'generationConfig' => $genConfig,
+            ];
+            $timeout = $i === 0 ? 28 : 18;
+            $res = http_json('POST', $url, $payload, [], $timeout);
+            if (!$res['ok']) {
+                $status = (int)($res['status'] ?? 0);
+                $lastError = 'gemini_http_' . $status . '_' . $tryModel;
+                if ($status === 400) {
+                    // next config variant / model
+                    continue;
+                }
+                if ($status === 429 || $status === 503 || $status === 500 || $status === 0) {
+                    usleep(300000);
+                    continue;
+                }
+                break;
             }
-            throw new RuntimeException($lastError);
+            $text = gemini_extract_text($res['data']);
+            if ($text !== '') {
+                return mb_substr($text, 0, 2200, 'UTF-8');
+            }
+            $lastError = 'gemini_empty_' . $tryModel;
         }
-        $text = gemini_extract_text($res['data']);
-        if ($text !== '') {
-            return mb_substr($text, 0, 2200, 'UTF-8');
-        }
-        $lastError = 'gemini_empty';
     }
     throw new RuntimeException($lastError);
 }
