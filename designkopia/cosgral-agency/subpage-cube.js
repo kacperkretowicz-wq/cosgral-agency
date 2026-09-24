@@ -1,7 +1,7 @@
 /**
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
@@ -2132,8 +2132,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
         sMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
       }
       cubeGroup.updateMatrixWorld(true);
-      if (fxaa) fxaa.render(scene, camera);
-      else renderer.render(scene, camera);
+      if (cubeGroup.visible || menuBlend > 0.001) {
+        if (fxaa) fxaa.render(scene, camera);
+        else renderer.render(scene, camera);
+      }
     } catch (err) {
       console.error("[subpage-cube]", err);
     }

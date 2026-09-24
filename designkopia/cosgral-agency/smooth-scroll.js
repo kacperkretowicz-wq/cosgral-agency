@@ -42,13 +42,13 @@
 
   var lenis = new Lenis({
     /* Wolniejszy, gładszy krok kółka — dłuższy dwell w sekcji, bez ciężkiego lagu */
-    lerp: MOBILE ? 0.24 : 0.18,
-    duration: MOBILE ? 0.7 : 0.8,
+    lerp: MOBILE ? 0.25 : 0.22,
+    duration: MOBILE ? 0.65 : 0.72,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: true,
     smoothTouch: false,
     touchMultiplier: 1.05,
-    wheelMultiplier: MOBILE ? 1 : 0.95,
+    wheelMultiplier: 1.0,
   });
 
   window.cosgralSmoothScroll.lenis = lenis;

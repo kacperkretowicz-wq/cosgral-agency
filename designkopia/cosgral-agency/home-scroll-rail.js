@@ -63,10 +63,8 @@
   ];
 
   function footerHoldY() {
-    var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : 1;
-    if (!footer) return max;
-    return Math.min(max, Math.max(0, footer.offsetTop));
+    return Math.max(0, max);
   }
 
   function sectionLayoutTop(el) {
@@ -296,52 +294,16 @@
     function activeScene() {
       var best = null;
       var bestDist = Infinity;
-
-      SCENES.forEach(function (scene, i) {
-        if (scene.footer) {
-          var footerY = footerHoldY();
-          var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
-          var dist = Math.abs(scroll - footerY);
-          if (dist < bestDist) {
-            bestDist = dist;
-            best = { scene: scene, st: null, index: i };
-          }
-          return;
-        }
-        var st = ScrollTrigger.getById(scene.stId);
-        if (!st) return;
-        var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
-        var center = holdScroll(st, scene.hold);
-        var dist = Math.abs(scroll - center);
-        if (st.isActive && dist < bestDist) {
-          bestDist = dist;
-          best = { scene: scene, st: st, index: i };
-        }
-      });
-
-      if (best) return best;
-
       var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
-      SCENES.forEach(function (scene, i) {
-        if (scene.footer) {
-          var footerY = footerHoldY();
-          var dist = Math.abs(scroll - footerY);
-          if (dist < bestDist) {
-            bestDist = dist;
-            best = { scene: scene, st: null, index: i };
-          }
-          return;
-        }
-        var st = ScrollTrigger.getById(scene.stId);
-        if (!st) return;
-        var center = holdScroll(st, scene.hold);
+
+      for (var i = 0; i < SCENES.length; i++) {
+        var center = holdPositions[i] != null ? holdPositions[i] : 0;
         var dist = Math.abs(scroll - center);
         if (dist < bestDist) {
           bestDist = dist;
-          best = { scene: scene, st: st, index: i };
+          best = { scene: SCENES[i], index: i };
         }
-      });
-
+      }
       return best;
     }
 
@@ -350,7 +312,7 @@
     }
 
     function update() {
-      refreshMetrics();
+      if (!holdPositions.length) refreshMetrics();
       var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
       var current = activeScene();
       var fillPct = fillHeightForScroll(scroll);
@@ -403,7 +365,7 @@
       });
     });
 
-    ScrollTrigger.addEventListener("refresh", update);
+    ScrollTrigger.addEventListener("refresh", function () { refreshMetrics(); update(); });
     if (window.cosgralSmoothScroll?.lenis) {
       window.cosgralSmoothScroll.lenis.on("scroll", update);
     } else {

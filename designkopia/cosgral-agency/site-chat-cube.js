@@ -3,7 +3,7 @@
  * Materials + surface shimmer match home-hero-3d.js (same look on mobile & desktop).
  * Framed with padding so rotated cube never clips the canvas.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
 
 (function () {

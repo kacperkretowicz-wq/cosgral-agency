@@ -19,11 +19,11 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var FINE = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  /* Match the visible Usługi feel site-wide */
-  var TILT_PITCH = MOBILE ? 5.2 : 7.2;
-  var TILT_YAW = MOBILE ? 6.4 : 9.0;
-  var CARD_PITCH = MOBILE ? 5.5 : 9.5;
-  var CARD_YAW = MOBILE ? 7.0 : 12.5;
+  /* Match the visible Usługi feel site-wide (subtle, refined tilt) */
+  var TILT_PITCH = MOBILE ? 3.8 : 5.0;
+  var TILT_YAW = MOBILE ? 4.6 : 6.2;
+  var CARD_PITCH = MOBILE ? 3.5 : 5.5;
+  var CARD_YAW = MOBILE ? 4.5 : 7.2;
 
   var tiltFrame = 0;
   var lastTx = "";

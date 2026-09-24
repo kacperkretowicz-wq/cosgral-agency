@@ -267,11 +267,17 @@ html.is-free-scroll #uslugi.home-depth,
 html.is-free-scroll #uslugi.is-visible.home-scene {
   z-index: 20 !important;
 }
-/* Kontakt: sticky jak reszta stacku, nieprzezroczyste tło (formularz nie nachodzi na Proces).
-   Stopka (sibling main, wyższy stacking) przykrywa Kontakt tym samym coverem co inne sceny. */
+/* Kontakt i stopka jako osobne, sekwencyjne struktury.
+   Kontakt przykrywa Proces (wyższy z-index 60, nieprzezroczyste tło),
+   ale NIE jest sticky – po wejściu przewija się naturalnie do góry,
+   a stopka płynie bezpośrednio pod nim, bez nakładania się i ucinania formularza. */
+html.is-free-scroll main.home-film > #kontakt.home-depth,
 html.is-free-scroll #kontakt.home-depth {
+  position: relative !important;
+  top: auto !important;
   z-index: 60 !important;
-  background: var(--bg, #030303);
+  background: var(--bg, #030303) !important;
+  margin-bottom: 0 !important;
 }
 html.is-free-scroll #proces.home-depth {
   z-index: 50 !important;
@@ -2422,6 +2428,8 @@ html.reduce-motion .home-scroll-rail { display: none; }
 
   #kontakt.home-contact.home-scene,
   html.is-free-scroll #kontakt.home-depth {
+    position: relative !important;
+    top: auto !important;
     min-height: auto;
     overflow: visible;
     justify-content: flex-start;

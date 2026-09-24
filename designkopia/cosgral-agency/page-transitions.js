@@ -85,19 +85,6 @@
     return p === "/" || p.endsWith("/index.html");
   }
 
-  function forceHomeStart() {
-    if (!isHomePath(window.location.pathname)) return;
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    if (window.cosgralSmoothScroll?.lenis) {
-      window.cosgralSmoothScroll.lenis.scrollTo(0, { immediate: true });
-    }
-    if (window.cosgralSectionSnap?.goTo) {
-      window.cosgralSectionSnap.goTo(0, 0, true);
-    }
-  }
-
   function resetFreshSubpageScroll() {
     if (isHomePath(window.location.pathname) || window.location.hash) return;
     var entry = performance.getEntriesByType?.("navigation")?.[0];
@@ -197,7 +184,10 @@
     if (!hash) return;
 
     if (isHomePath(window.location.pathname)) {
-      forceHomeStart();
+      // The home stepper reads location.hash; native anchors cover reduced motion.
+      if (!window.location.hash) {
+        history.replaceState(null, "", window.location.pathname + window.location.search + hash);
+      }
       return;
     }
 

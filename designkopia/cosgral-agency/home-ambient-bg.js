@@ -1,5 +1,8 @@
 /**
  * Full-page liquid waves — uniform B&W, cursor-reactive (fixed behind all sections).
+ * Optimized: fast algebraic polynomial approximation (no heavy pow/log2),
+ * unrolled octave loop, hardware-bilinear 540p buffer, smooth 60fps pacing,
+ * and auto-pause when covered by footer/kontakt.
  */
 (function () {
   "use strict";
@@ -14,7 +17,73 @@
 
   var VERT = "\n    attribute vec2 aPos;\n    void main() { gl_Position = vec4(aPos, 0.0, 1.0); }\n  ";
 
-  var FRAG = "\n    precision mediump float;\n    uniform vec2 uRes;\n    uniform float uTime;\n    uniform vec2 uMouse;\n\n    float wave(vec2 p, float t) {\n      float w = 0.0;\n      float amp = 1.0;\n      for (int i = 0; i < 4; i++) {\n        float fi = float(i);\n        p.x += sin(p.y * (1.4 + fi * 0.35) + t * 0.7) * 0.18;\n        w += sin(p.x * (1.8 + fi * 0.7) + p.y * 1.1 + t * (0.5 + fi * 0.08)) * amp;\n        amp *= 0.58;\n      }\n      return w * 0.5 + 0.5;\n    }\n\n    void main() {\n      vec2 uv = gl_FragCoord.xy / uRes.xy;\n      vec2 m = uMouse * 0.5 + 0.5;\n      vec2 toM = uv - m;\n      float mDist = length(toM);\n      float mForce = smoothstep(0.62, 0.0, mDist);\n\n      vec2 p = uv * vec2(2.8, 2.0);\n      p += normalize(toM + 0.0001) * mForce * 0.17 * sin(uTime * 1.7 + mDist * 13.0);\n      p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;\n\n      float t = uTime * 0.14;\n      float w = wave(p, t);\n      float ridge = pow(1.0 - abs(sin(w * 4.2 + t * 0.25)), 6.0);\n\n      vec3 base = vec3(0.055, 0.055, 0.055);\n      vec3 dim = vec3(0.24, 0.24, 0.24);\n      vec3 mid = vec3(0.58, 0.58, 0.58);\n      vec3 hi = vec3(1.0, 1.0, 1.0);\n\n      vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);\n      ribbon = mix(ribbon, hi, ridge * 0.52);\n\n      vec3 col = base;\n      col = mix(col, ribbon, smoothstep(0.08, 0.88, ridge) * 0.58);\n      col += hi * pow(ridge, 14.0) * 0.32;\n      col += mid * mForce * 0.16;\n      col += hi * mForce * ridge * 0.12;\n\n      float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));\n      col *= 0.58 + vignette * 0.42;\n\n      // Dawny CSS `filter: grayscale(1) contrast(1.04) brightness(0.78)` na canvasie\n      // policzony tutaj. Kolor i tak jest szary (grayscale = tozsamosc), a kompozytor\n      // oszczedza pelnoekranowy pass filtra w kazdej klatce.\n      col = ((col - 0.5) * 1.04 + 0.5) * 0.78;\n\n      gl_FragColor = vec4(col, 1.0);\n    }\n  ";
+  var FRAG = `
+    precision mediump float;
+    uniform vec2 uRes;
+    uniform float uTime;
+    uniform vec2 uMouse;
+
+    float wave(vec2 p, float t) {
+      float w = 0.0;
+      // Octave 0
+      p.x += sin(p.y * 1.4 + t * 0.7) * 0.18;
+      w += sin(p.x * 1.8 + p.y * 1.1 + t * 0.5);
+      // Octave 1
+      p.x += sin(p.y * 1.75 + t * 0.7) * 0.18;
+      w += sin(p.x * 2.5 + p.y * 1.1 + t * 0.58) * 0.58;
+      // Octave 2
+      p.x += sin(p.y * 2.1 + t * 0.7) * 0.18;
+      w += sin(p.x * 3.2 + p.y * 1.1 + t * 0.66) * 0.3364;
+      // Octave 3
+      p.x += sin(p.y * 2.45 + t * 0.7) * 0.18;
+      w += sin(p.x * 3.9 + p.y * 1.1 + t * 0.74) * 0.1951;
+
+      return w * 0.5 + 0.5;
+    }
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / uRes.xy;
+      vec2 m = uMouse * 0.5 + 0.5;
+      vec2 toM = uv - m;
+      float mDist = length(toM);
+      float mForce = smoothstep(0.62, 0.0, mDist);
+
+      vec2 p = uv * vec2(2.8, 2.0);
+      p += normalize(toM + 0.0001) * mForce * 0.17 * sin(uTime * 1.7 + mDist * 13.0);
+      p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;
+
+      float t = uTime * 0.14;
+      float w = wave(p, t);
+      float s = 1.0 - abs(sin(w * 4.2 + t * 0.25));
+      float s2 = s * s;
+      float ridge = s2 * s2 * s2;
+
+      vec3 base = vec3(0.055, 0.055, 0.055);
+      vec3 dim = vec3(0.24, 0.24, 0.24);
+      vec3 mid = vec3(0.58, 0.58, 0.58);
+      vec3 hi = vec3(1.0, 1.0, 1.0);
+
+      vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);
+      ribbon = mix(ribbon, hi, ridge * 0.52);
+
+      vec3 col = base;
+      col = mix(col, ribbon, smoothstep(0.08, 0.88, ridge) * 0.58);
+
+      float r2 = ridge * ridge;
+      float r4 = r2 * r2;
+      float r14 = r4 * r4 * r4 * r2;
+      col += hi * r14 * 0.32;
+      col += mid * mForce * 0.16;
+      col += hi * mForce * ridge * 0.12;
+
+      float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));
+      col *= 0.58 + vignette * 0.42;
+
+      col = ((col - 0.5) * 1.04 + 0.5) * 0.78;
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
 
   var gl =
     canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" }) ||
@@ -67,23 +136,17 @@
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
   var start = performance.now();
-  var frameSkip = 0;
+  var lastFrameTime = 0;
 
-  // Fale są miękkie (gradienty + rozmyte grzbiety), więc pełna rozdzielczość
-  // nic nie daje — renderujemy w ułamku pikseli CSS, a kompozytor skaluje
-  // canvas bilinearnie do 100% viewportu. 0.66 = ~44% fragmentów względem 1.0
-  // (wcześniej desktop szedł nawet w DPR 1.5, czyli 2.25× więcej niż 1.0).
-  // Cięcia poniżej tego dopiero, gdy sterownik zgłosi gubione klatki.
-  var SCALE_BY_TIER = MOBILE ? [0.75, 0.6, 0.5] : [0.66, 0.5, 0.4];
-  // Tło zmienia się powoli; 20–30 klatek na sekundę wystarcza do płynnego ruchu.
-  var SKIP_BY_TIER = MOBILE ? [3, 4, 5] : [2, 3, 4];
+  var SCALE_BY_TIER = MOBILE ? [0.55, 0.45, 0.38] : [0.52, 0.44, 0.36];
   var dprCap = SCALE_BY_TIER[0];
-  var tierSkip = SKIP_BY_TIER[0];
 
   function resize() {
     var dpr = dprCap;
-    var w = Math.round(window.innerWidth * dpr);
-    var h = Math.round(window.innerHeight * dpr);
+    var maxW = MOBILE ? 720 : 1280;
+    var maxH = MOBILE ? 540 : 720;
+    var w = Math.min(maxW, Math.round(window.innerWidth * dpr));
+    var h = Math.min(maxH, Math.round(window.innerHeight * dpr));
     if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
       canvas.width = w;
       canvas.height = h;
@@ -93,7 +156,6 @@
 
   if (window.cosgralPerf) {
     window.cosgralPerf.subscribe(function (t) {
-      tierSkip = SKIP_BY_TIER[t] || SKIP_BY_TIER[0];
       var cap = SCALE_BY_TIER[t] || SCALE_BY_TIER[0];
       if (cap === dprCap) return;
       dprCap = cap;
@@ -104,13 +166,19 @@
   function frame(now) {
     if (!running) return;
 
-    var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
-    var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 5 : 4) : MOBILE ? 3 : 2);
-    frameSkip += 1;
-    if (skipN > 1 && frameSkip % skipN !== 0) {
+    // Kiedy użytkownik jest w sekcji Kontakt lub Stopka, nieprzezroczyste tło (#030303)
+    // całkowicie zasłania ten canvas — wstrzymujemy rysowanie (0% GPU/CPU na dole strony).
+    if (document.documentElement.classList.contains("is-footer-covered")) {
       requestAnimationFrame(frame);
       return;
     }
+
+    // Limit 60 FPS dla monitorów 144Hz/240Hz, aby nie przepalać GPU
+    if (now - lastFrameTime < 14) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    lastFrameTime = now;
 
     var ptr = window.cosgralPointer;
     if (ptr) {

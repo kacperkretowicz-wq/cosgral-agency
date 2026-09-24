@@ -211,7 +211,8 @@ html.reduce-motion .service-page-video__tint {
   height: 100%;
   pointer-events: none;
   opacity: 1;
-  filter: grayscale(1) contrast(1.04) brightness(0.78);
+  transform: translateZ(0);
+  will-change: transform;
   background:
     radial-gradient(ellipse 140% 90% at 50% 38%, #161616 0%, #0a0a0a 42%, #030303 100%);
 }

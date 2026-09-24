@@ -25,9 +25,9 @@
   var badStreak = 0;
   var goodStreak = 0;
 
-  // Progi w ms na klatkę. 22 ms ≈ 45 fps, 14 ms ≈ 71 fps.
+  // 18 ms pozwala odzyskać pełną jakość na ekranach 60 Hz (klatka ≈ 16,7 ms).
   var DOWN_MS = 22;
-  var UP_MS = 14;
+  var UP_MS = 18;
   // Ile kolejnych klatek musi potwierdzić stan, zanim zmienimy poziom.
   var DOWN_STREAK = 45;
   var UP_STREAK = 240;

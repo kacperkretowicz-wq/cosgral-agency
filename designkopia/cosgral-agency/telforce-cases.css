@@ -24,7 +24,7 @@
 .portfolio-case-card--telforce .portfolio-case-card__link:focus-visible .portfolio-case-card__visual {
   transform: scale(1.025);
 }
-.portfolio-case-card--telforce .portfolio-case-card__link:focus-visible { outline: 2px solid #d6c99f; outline-offset: -2px; }
+.portfolio-case-card--telforce .portfolio-case-card__link:focus-visible { outline: 2px solid rgba(255, 255, 255, 0.7); outline-offset: -2px; }
 .portfolio-case-card__art-note {
   position: absolute;
   right: .7rem;
@@ -59,13 +59,13 @@
   stroke-dashoffset: 700;
   animation: tf-draw 7s ease-in-out infinite;
 }
-.tf-motion__route { stroke: #92AECF; }
-.tf-motion__forecast { stroke: #9BB69F; stroke-width: 6; }
+.tf-motion__route { stroke: rgba(255, 255, 255, 0.88); }
+.tf-motion__forecast { stroke: #FFFFFF; stroke-width: 4.5; }
 .tf-motion__pin,
 .tf-motion__forecast-point {
   fill: none;
-  stroke: #7798BE;
-  stroke-width: 3;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 2.5;
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
@@ -75,7 +75,7 @@
 .tf-motion__pin--2 { animation-delay: .8s; }
 .tf-motion__pin--3 { animation-delay: 1.3s; }
 .tf-motion__pin--4 { animation-delay: 1.8s; }
-.tf-motion__forecast-point { stroke: #698670; animation-delay: 2s; }
+.tf-motion__forecast-point { stroke: #FFFFFF; animation-delay: 2s; }
 .tf-motion__scanner { transform: translateX(-75px); opacity: 0; animation: tf-scan-code 5s ease-in-out infinite; }
 @keyframes tf-draw { 0%, 5% { stroke-dashoffset: 700; opacity: 0; } 12% { opacity: 1; } 45%, 75% { stroke-dashoffset: 0; opacity: 1; } 95%, 100% { stroke-dashoffset: 0; opacity: 0; } }
 @keyframes tf-pulse { 0%, 6% { opacity: 0; transform: scale(.5); } 12% { opacity: .9; transform: scale(1); } 20%, 100% { opacity: 0; transform: scale(1.6); } }

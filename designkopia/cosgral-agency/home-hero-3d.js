@@ -2,7 +2,7 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260919mob";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
@@ -267,12 +267,12 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     group.rotation.setFromQuaternion(group.quaternion, "XYZ");
   }
 
+  var _quadArcResult = { x: 0, y: 0 };
   function quadArc(t, sx, sy, cx, cy, ex, ey) {
     var u = 1 - t;
-    return {
-      x: u * u * sx + 2 * u * t * cx + t * t * ex,
-      y: u * u * sy + 2 * u * t * cy + t * t * ey,
-    };
+    _quadArcResult.x = u * u * sx + 2 * u * t * cx + t * t * ex;
+    _quadArcResult.y = u * u * sy + 2 * u * t * cy + t * t * ey;
+    return _quadArcResult;
   }
 
   function startIntro() {
@@ -817,9 +817,16 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   }
 
   var cardNodes = null;
+  var cardSampleDirty = true;
+  function markCardsDirty() {
+    cardSampleDirty = true;
+  }
   window.addEventListener("resize", function () {
     cardNodes = null;
-  });
+    cardSampleDirty = true;
+  }, { passive: true });
+  window.addEventListener("scroll", markCardsDirty, { passive: true });
+  window.addEventListener("cosgral:services-fan-step", markCardsDirty, { passive: true });
 
   function sampleCards() {
     if (!shardMat) return;
@@ -1294,9 +1301,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     }
 
     if (cardsZoneVisible && (displayStream > 0.15 || sandLocked)) {
-      // Każde sampleCards() to wymuszony reflow (getBoundingClientRect na kartach),
-      // więc próbkujemy co 3. klatkę niezależnie od klasy urządzenia.
-      if (cardSampleTick++ % 3 === 0) sampleCards();
+      if (cardSampleDirty) {
+        cardSampleDirty = false;
+        sampleCards();
+      }
     }
 
     // Portal stays visible for sand ribbon after cube exits.
@@ -1314,11 +1322,12 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
         : tilesOp > 0.45
           ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
           : 1;
-    var needsScene = portalOp > 0.05 || sandOn || menuBlend > 0.001;
+    var inFooter = document.documentElement.classList.contains("is-footer-covered");
+    var needsScene = !inFooter && (portalOp > 0.05 || sandOn || menuBlend > 0.001);
 
     if (canvas.parentElement) {
-      var op = String(portalOp);
-      var vis = portalOp > 0.05 ? "visible" : "hidden";
+      var op = inFooter ? "0" : String(portalOp);
+      var vis = (!inFooter && portalOp > 0.05) ? "visible" : "hidden";
       // Zapisy stylu unieważniają styl całego poddrzewa — piszemy tylko przy zmianie.
       if (op !== lastPortalOp) {
         canvas.parentElement.style.opacity = op;
@@ -1331,11 +1340,6 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     }
 
     if (!needsScene) return;
-
-    // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
-    // Poza nią częstotliwość ogranicza sterownik jakości.
-    var fullRate = zoneVisible || menuBlend > 0.001;
-    if (!fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);

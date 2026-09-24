@@ -238,16 +238,16 @@
       state.y = (-state.ny * 0.5 + 0.5) * window.innerHeight;
       state.fromOrientation = true;
     } else if (MOBILE) {
-      state.x += (state.tx - state.x) * 0.12;
-      state.y += (state.ty - state.y) * 0.12;
-      state.nx += (state.tnx - state.nx) * 0.12;
-      state.ny += (state.tny - state.ny) * 0.12;
+      state.x += (state.tx - state.x) * 0.18;
+      state.y += (state.ty - state.y) * 0.18;
+      state.nx += (state.tnx - state.nx) * 0.18;
+      state.ny += (state.tny - state.ny) * 0.18;
       state.fromOrientation = false;
     } else {
-      state.x += (state.tx - state.x) * 0.08;
-      state.y += (state.ty - state.y) * 0.08;
-      state.nx += (state.tnx - state.nx) * 0.08;
-      state.ny += (state.tny - state.ny) * 0.08;
+      state.x += (state.tx - state.x) * 0.20;
+      state.y += (state.ty - state.y) * 0.20;
+      state.nx += (state.tnx - state.nx) * 0.20;
+      state.ny += (state.tny - state.ny) * 0.20;
       state.fromOrientation = false;
     }
     applyPointer();

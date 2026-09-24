@@ -26,11 +26,8 @@
   if (FREE_SCROLL && !REDUCED) document.documentElement.classList.add("is-free-scroll");
 
   function footerHoldY() {
-    var footer = document.querySelector(".site-footer");
-    var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
-    if (!footer) return max;
-    /* Full-viewport footer section — pin its top to the viewport top */
-    return Math.min(max, Math.max(0, footer.offsetTop));
+    var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : (document.documentElement.scrollHeight - window.innerHeight);
+    return Math.max(0, max);
   }
 
   function verticalMargins(el) {
@@ -193,13 +190,16 @@
     function indexFromViewport() {
       var vh = window.innerHeight || 1;
       var y = lenis.scroll;
+      var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : (document.documentElement.scrollHeight - window.innerHeight);
+      if (y >= max - 25) return holds.length - 1;
+
       var down = y >= lastScrollY - 0.5;
       lastScrollY = y;
       var enter = down ? 0.28 : 0.52;
 
       if (footerEl) {
         var ft = footerEl.getBoundingClientRect().top;
-        if (ft <= vh * enter) return holds.length - 1;
+        if (ft <= vh * (down ? 0.65 : 0.8)) return holds.length - 1;
       }
 
       for (var i = SECTION_IDS.length - 1; i >= 0; i--) {
@@ -835,12 +835,22 @@
       return 0;
     }
 
+    var currentY = lenis ? lenis.scroll : window.scrollY;
     var bootIndex = bootSectionIndex();
+    if (currentY > 50) {
+      bootIndex = indexFromViewport();
+    }
     activeIndex = bootIndex;
     syncStepView(bootIndex);
     syncSectionFocus(bootIndex);
-    syncSandForJump(bootIndex);
-    goTo(bootIndex, 0, true);
+    if (bootIndex === 0) {
+      syncSandForJump(0);
+    }
+    if (!FREE_SCROLL) {
+      goTo(bootIndex, 0, true);
+    } else if (bootIndex > 0 && currentY <= 50) {
+      goTo(bootIndex, 0, true);
+    }
     beginCooldown();
 
     window.cosgralSectionSnap = {
@@ -908,13 +918,23 @@
     if (window.ScrollTrigger) ScrollTrigger.refresh();
     if (!isHomeReload()) {
       await new Promise(function (resolve) {
-        if (window.cosgralCube?.introDone?.()) {
+        var currentScroll = window.scrollY || (window.cosgralSmoothScroll?.lenis?.scroll || 0);
+        if (window.cosgralCube?.introDone?.() || currentScroll > 50) {
           resolve();
           return;
         }
         var done = function () {
+          window.removeEventListener("scroll", onScrollEarly);
+          window.removeEventListener("cosgral:cube-intro-done", done);
           resolve();
         };
+        var onScrollEarly = function () {
+          var y = window.scrollY || (window.cosgralSmoothScroll?.lenis?.scroll || 0);
+          if (y > 50) {
+            done();
+          }
+        };
+        window.addEventListener("scroll", onScrollEarly, { passive: true });
         window.addEventListener("cosgral:cube-intro-done", done, { once: true });
         window.setTimeout(done, MOBILE ? 3800 : 5200);
       });

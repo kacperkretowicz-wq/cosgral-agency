@@ -50,6 +50,7 @@
   var unread = 0;
   var sending = false;
   var closeTimer = null;
+  var pollInFlight = false;
 
   var root = el("div", "cg-chat-root");
   root.setAttribute("data-cg-chat", "1");
@@ -181,6 +182,8 @@
   }
 
   function poll() {
+    if (document.hidden || pollInFlight) return;
+    pollInFlight = true;
     fetch(
       API + "?visitor_key=" + encodeURIComponent(visitorKey) + "&_=" + Date.now(),
       { cache: "no-store", credentials: "omit" },
@@ -192,7 +195,10 @@
         if (!data || !Array.isArray(data.messages)) return;
         data.messages.forEach(renderMessage);
       })
-      .catch(function () {});
+      .catch(function () {})
+      .finally(function () {
+        pollInFlight = false;
+      });
   }
 
   form.addEventListener("submit", function (e) {
@@ -305,6 +311,9 @@
 
   poll();
   window.setInterval(poll, POLL_MS);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) poll();
+  });
 
   window.CosgralChat = {
     open: function () {

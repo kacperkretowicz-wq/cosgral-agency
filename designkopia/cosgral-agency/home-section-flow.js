@@ -741,18 +741,20 @@
       ScrollTrigger.create({
         id: "footer-handoff",
         trigger: ".site-footer",
-        start: "top 88%",
-        end: "top 40%",
-        scrub: MOBILE ? 0.85 : 1.1,
+        start: "top 92%",
+        end: "bottom bottom",
+        scrub: MOBILE ? 0.6 : 0.8,
         onUpdate: function (self) {
           var fade = self.progress;
           var eased = fade * fade * (3 - 2 * fade);
-          document.documentElement.classList.toggle("is-footer-step", eased > 0.35);
-          contact.classList.toggle("is-footer-handoff", eased > 0.08);
+          document.documentElement.classList.toggle("is-footer-step", eased > 0.25);
+          document.documentElement.classList.toggle("is-footer-covered", eased > 0.05);
+          contact.classList.toggle("is-footer-handoff", eased > 0.05);
         },
         onLeaveBack: function () {
           contact.classList.remove("is-footer-handoff");
           document.documentElement.classList.remove("is-footer-step");
+          document.documentElement.classList.remove("is-footer-covered");
         },
       });
     }
