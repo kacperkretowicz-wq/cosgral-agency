@@ -621,7 +621,7 @@
         return;
       }
       if (window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(0, { duration: 2.2 });
+        window.cosgralSmoothScroll.scrollTo(0, { duration: 0.8 });
         return;
       }
       var top = document.getElementById("top");

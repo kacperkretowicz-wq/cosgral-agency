@@ -8,6 +8,10 @@
   overflow: hidden;
 }
 
+body.portfolio-page #main > .portfolio-section--web.is-depth-recessed {
+  overflow: clip;
+}
+
 .portfolio-section--web > .home-tilt-layer,
 .portfolio-section--web > .home-tilt-layer > .home-tilt-face,
 .portfolio-section--web .container {
@@ -449,6 +453,7 @@ html.is-web-case-open body {
 
   .web-deck__viewport {
     min-height: clamp(220px, 52vh, 420px);
+    overflow: clip;
   }
 
   .web-case-panel {

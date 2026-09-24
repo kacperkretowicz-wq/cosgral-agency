@@ -17,8 +17,8 @@
     crimson: "systemy-crm.html",
     green: "grafika-i-montaz-wideo.html",
   };
-  var EXIT_MS = 680;
-  var REVEAL_MS = 780;
+  var EXIT_MS = 360;
+  var REVEAL_MS = 500;
   var navigating = false;
 
   function siteRoot() {
@@ -217,6 +217,10 @@
 
       var headerOffset = window.matchMedia("(max-width: 900px)").matches ? 72 : 96;
       var y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+      if (id === "grafiki" && window.ScrollTrigger) {
+        var graphicsPin = ScrollTrigger.getById("grafiki-pin");
+        if (graphicsPin) y = graphicsPin.start + (graphicsPin.end - graphicsPin.start) * 0.82;
+      }
       window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
 
       if (window.cosgralSmoothScroll?.scrollTo) {
@@ -225,7 +229,7 @@
 
       if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
       window.dispatchEvent(new CustomEvent("cosgral:page-hash-scroll", { detail: { hash: hash } }));
-    }, 360);
+    }, 0);
   }
 
   function shouldHandleLink(anchor) {

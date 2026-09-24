@@ -44,9 +44,10 @@
   function applyRecess(el, p) {
     if (!el || !window.gsap) return;
     var target = poseTarget(el);
+    if (target.style.filter !== "none") target.style.filter = "none";
     var hold = 0.04;
     if (p <= hold) {
-      gsap.set(target, { autoAlpha: 1, yPercent: 0, scale: 1, filter: "blur(0px)", force3D: true });
+      gsap.set(target, { autoAlpha: 1, yPercent: 0, scale: 1, force3D: true });
       gsap.set(el, { autoAlpha: 1 });
       el.classList.remove("is-depth-recessed", "is-depth-gone");
       el.style.pointerEvents = "";
@@ -58,7 +59,6 @@
       autoAlpha: 1 - fade,
       yPercent: (MOBILE ? -4 : -8) * u,
       scale: 1 - (MOBILE ? 0.2 : 0.3) * u,
-      filter: MOBILE ? "none" : "blur(" + (18 * u).toFixed(2) + "px)",
       transformOrigin: "50% 42%",
       force3D: true,
     });
@@ -242,12 +242,10 @@
           {
             opacity: 0,
             y: i % 2 === 0 ? 72 : -56,
-            filter: MOBILE ? "none" : "blur(12px)",
           },
           {
             opacity: 1,
             y: 0,
-            filter: MOBILE ? "none" : "blur(0px)",
             stagger: 0.08,
             ease: "power3.out",
             scrollTrigger: {
@@ -300,14 +298,13 @@
       bound = true;
       gsap.fromTo(
         nodes,
-        Object.assign({ opacity: 0, filter: MOBILE ? "none" : "blur(8px)" }, opts.from),
+         Object.assign({ opacity: 0 }, opts.from),
         {
           opacity: 1,
           y: 0,
           x: 0,
           rotateZ: 0,
           scale: 1,
-          filter: MOBILE ? "none" : "blur(0px)",
           stagger: opts.stagger || 0.08,
           ease: "power3.out",
           scrollTrigger: {

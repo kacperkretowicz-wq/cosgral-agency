@@ -4,18 +4,45 @@ from html import escape
 
 OUT = Path(__file__).resolve().parents[1] / "assets" / "cases"
 
+FILLS = {
+    "#F5F5F1": "#0F151B", "#FCFCF9": "#171F27", "#F0F1ED": "#111A22",
+    "#FFFFFF": "#1A242D", "#FCFCFA": "#18222B", "#F5F6F2": "#1B2730",
+    "#E8EDE9": "#162630", "#E9EAE5": "#151E26", "#E9EEF4": "#1A2A39",
+    "#E8EEE8": "#1B3028", "#E4ECE6": "#1D3A31",
+}
+INK = {
+    "#20242A": "#E9EEF2", "#22272B": "#E9EEF2", "#242B2F": "#EEF2F4",
+    "#252C2E": "#EDF2F3", "#25292A": "#E8EDF0", "#2D3437": "#DDE6EC",
+    "#30383A": "#DDE6EC", "#343C3D": "#DDE6EC", "#394243": "#DDE6EC",
+    "#3D4547": "#CDD8DF", "#515A5A": "#BECAD2", "#808882": "#98A9B4",
+    "#838986": "#8C9DA9", "#838A84": "#8C9DA9", "#89908B": "#8295A2",
+    "#8B918C": "#8295A2", "#929A93": "#8295A2", "#949A95": "#8295A2",
+    "#969B96": "#8295A2", "#9AA09A": "#8295A2", "#7D827E": "#8295A2",
+    "#858884": "#8295A2", "#8C918D": "#8295A2", "#B5B3AD": "#A7B4BD",
+    "#E8E5DF": "#E9EEF2", "#69756E": "#A5B6BF", "#47614E": "#A3CEAF",
+}
+LINES = {
+    "#D9DBD7": "#2D3944", "#DADDD8": "#2D3944", "#D7DAD4": "#2D3944",
+    "#E1E4DF": "#303C46", "#E2E4DF": "#303C46", "#E7E9E4": "#2B3640",
+    "#EBEDE9": "#2B3640", "#C9CECA": "#40505C", "#313438": "#27323D",
+}
+
 
 def text(x, y, value, size=18, color="#20242A", weight=400, spacing=None, family="Arial, Helvetica, sans-serif"):
     extra = f' letter-spacing="{spacing}"' if spacing is not None else ""
+    color = INK.get(color, color)
     return f'<text x="{x}" y="{y}" fill="{color}" font-family="{family}" font-size="{size}" font-weight="{weight}"{extra}>{escape(value)}</text>'
 
 
 def rect(x, y, w, h, fill, r=0, stroke=None, sw=1):
+    fill = FILLS.get(fill, fill)
+    stroke = LINES.get(stroke, stroke)
     border = f' stroke="{stroke}" stroke-width="{sw}"' if stroke else ""
     return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}" fill="{fill}"{border}/>'
 
 
 def line(x1, y1, x2, y2, color, sw=1, dash=None):
+    color = LINES.get(color, color)
     d = f' stroke-dasharray="{dash}"' if dash else ""
     return f'<path d="M{x1} {y1}L{x2} {y2}" fill="none" stroke="{color}" stroke-width="{sw}"{d}/>'
 
@@ -36,7 +63,7 @@ def chrome(index, category, accent):
 {text(1042,52,index+'  /  03',16,'#B5B3AD',400,2)}
 {text(70,697,category.upper(),14,'#858884',700,2)}
 {text(1010,697,'TELFORCEONE S.A.',14,'#858884',700,1)}
-<g filter="url(#shadow)"><rect x="70" y="108" width="1140" height="542" rx="10" fill="#F5F5F1"/></g>
+<g filter="url(#shadow)"><rect x="70" y="108" width="1140" height="542" rx="10" fill="#0F151B"/></g>
 <g clip-path="url(#screen)">
 {rect(70,108,1140,52,'#FCFCF9')}{line(70,160,1210,160,'#D9DBD7')}
 <circle cx="92" cy="134" r="5" fill="#D9DBD7"/><circle cx="108" cy="134" r="5" fill="#D9DBD7"/><circle cx="124" cy="134" r="5" fill="#D9DBD7"/>
@@ -147,5 +174,13 @@ def forecast():
 if __name__ == "__main__":
     OUT.mkdir(parents=True,exist_ok=True)
     for name,build in [("crm",crm),("code39",code39),("forecast",forecast)]:
-        (OUT/f"telforceone-{name}.svg").write_text(build(),encoding="utf-8")
+        artwork = build()
+        artwork = artwork.replace('stroke="#FFFFFF"', 'stroke="#40505C"')
+        artwork = artwork.replace('fill="#1E2428"', 'fill="#E8EDF0"')
+        artwork = artwork.replace('fill="#E4ECE6"', 'fill="#1D3A31"')
+        artwork = artwork.replace('stroke="#D2DAD4"', 'stroke="#516574"')
+        artwork = artwork.replace('#4B6D97', '#7EA8D2')
+        artwork = artwork.replace('#AD684B', '#C8876A')
+        artwork = artwork.replace('#617A68', '#80B294')
+        (OUT/f"telforceone-{name}.svg").write_text(artwork,encoding="utf-8")
         print(name,(OUT/f"telforceone-{name}.svg").stat().st_size)

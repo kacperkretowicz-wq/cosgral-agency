@@ -27,16 +27,16 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     SHELL_OP = Math.min(1, 0.62 * 2);
     WIRE_OP = Math.min(1, 0.1 * 2);
   }
-  var MENU_OPEN_DUR = 2.4;
-  var MENU_CLOSE_DUR = 2.0;
-  var MENU_OPEN_SIDE_DUR = 4.1;
-  var MENU_OPEN_SIDE_BG_DUR = 4.4;
-  var MENU_OPEN_HOME_SIDE_DUR = 6.1;
-  var MENU_CLOSE_SIDE_DUR = 3.9;
-  var MENU_CLOSE_SIDE_BG_DUR = 2.6;
-  var MENU_CLOSE_HOME_SIDE_DUR = 1.95;
-  var MENU_OPEN_PASS_DUR = 3.4;
-  var MENU_CLOSE_PASS_DUR = 2.8;
+  var MENU_OPEN_DUR = 1.05;
+  var MENU_CLOSE_DUR = 0.78;
+  var MENU_OPEN_SIDE_DUR = 1.45;
+  var MENU_OPEN_SIDE_BG_DUR = 1.55;
+  var MENU_OPEN_HOME_SIDE_DUR = 1.8;
+  var MENU_CLOSE_SIDE_DUR = 1.1;
+  var MENU_CLOSE_SIDE_BG_DUR = 0.9;
+  var MENU_CLOSE_HOME_SIDE_DUR = 0.8;
+  var MENU_OPEN_PASS_DUR = 1.4;
+  var MENU_CLOSE_PASS_DUR = 1.0;
   var MENU_Z_FRONT = 0.4;
   var PP_DISSOLVE_END = 0.36;
   var PP_ASSEMBLE_START = 0.64;
@@ -47,7 +47,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var MENU_SIDE_BG_EASE = "power1.inOut";
   var MENU_SIDE_BG_EXIT_END = 0.3;
   var MENU_LINKS_LEAD = 0.07;
-  var MENU_LABELS_BEFORE_CUBE = 1.0;
+  var MENU_LABELS_BEFORE_CUBE = 0.55;
   var MENU_CUBE_LABEL_DIM = 0.5;
   var MENU_SEG_MIN_DUR = 0.14;
   var MENU_CAM = { x: 0, y: 0, z: 5.4 };
@@ -1929,6 +1929,12 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   resize();
 
   function animate() {
+    requestAnimationFrame(animate);
+    if (document.hidden) return;
+    // W strefie Grafiki portal jest niewidoczny. Nie renderuj kosztownej
+    // sceny WebGL do czasu otwarcia menu lub powrotu do innej sekcji.
+    if (isPortfolioMainPage && grafikiMenuActive && menuTween.blend <= 0.001 &&
+        !document.body.classList.contains("is-nav-menu-open")) return;
     try {
       var nowMs = performance.now();
       var t = nowMs * 0.001;
@@ -2131,7 +2137,6 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     } catch (err) {
       console.error("[subpage-cube]", err);
     }
-    requestAnimationFrame(animate);
   }
 
   requestAnimationFrame(animate);

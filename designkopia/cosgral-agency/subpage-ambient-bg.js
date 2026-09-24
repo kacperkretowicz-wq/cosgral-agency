@@ -325,6 +325,7 @@
     var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
     var running = false;
     var start = performance.now();
+    var lastDraw = 0;
     var MOBILE =
       window.matchMedia("(max-width: 900px)").matches ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
@@ -345,6 +346,13 @@
 
     function frame(now) {
       if (!running) return;
+      // Fale poruszają się wolno; ograniczenie liczby klatek odciąża GPU,
+      // gdy jednocześnie pracują sceny 3D portfolio i animacja menu.
+      if (now - lastDraw < (MOBILE ? 50 : 33)) {
+        requestAnimationFrame(frame);
+        return;
+      }
+      lastDraw = now;
       resize();
 
       var ptr = window.cosgralPointer;

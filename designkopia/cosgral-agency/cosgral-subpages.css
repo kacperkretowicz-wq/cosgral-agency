@@ -123,11 +123,11 @@ h1, h2, h3 {
   margin: -32px 0 0 -32px;
 }
 @media (hover: hover) and (pointer: fine) and (min-width: 901px) {
-  html:not(.reduce-motion) body.subpage {
+  html:not(.reduce-motion) body.subpage:not(.service-page) {
     cursor: none;
   }
-  html:not(.reduce-motion) body.subpage a,
-  html:not(.reduce-motion) body.subpage button {
+  html:not(.reduce-motion) body.subpage:not(.service-page) a,
+  html:not(.reduce-motion) body.subpage:not(.service-page) button {
     cursor: none;
   }
 }

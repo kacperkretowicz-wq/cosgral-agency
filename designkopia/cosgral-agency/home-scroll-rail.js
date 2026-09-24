@@ -173,7 +173,7 @@
       if (scene.footer) {
         var footerY = footerHoldY();
         if (window.cosgralSmoothScroll?.scrollTo) {
-          window.cosgralSmoothScroll.scrollTo(footerY, { duration: MOBILE ? 4.4 : 5.28 });
+          window.cosgralSmoothScroll.scrollTo(footerY, { duration: MOBILE ? 0.75 : 0.9 });
         }
         return;
       }
@@ -183,7 +183,7 @@
       if (window.cosgralSectionSnap?.goToY) {
         window.cosgralSectionSnap.goToY(target);
       } else if (window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(target, { duration: MOBILE ? 2.2 : 2.7 });
+        window.cosgralSmoothScroll.scrollTo(target, { duration: MOBILE ? 0.75 : 0.9 });
       } else {
         window.scrollTo({ top: target, behavior: "smooth" });
       }

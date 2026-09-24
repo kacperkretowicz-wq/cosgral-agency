@@ -1186,7 +1186,7 @@
     section.classList.add("is-grafiki-frames");
 
     var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
-    var pinLen = freeScroll ? (mobile ? "+=180%" : "+=240%") : mobile ? "+=72%" : "+=80%";
+    var pinLen = freeScroll ? (mobile ? "+=120%" : "+=145%") : mobile ? "+=72%" : "+=80%";
     var filmMode = document.body.classList.contains("portfolio-page--film");
 
     var overlay = section.querySelector(".graphics-stage__overlay");
