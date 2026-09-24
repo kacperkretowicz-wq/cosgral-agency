@@ -9,7 +9,14 @@
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var SESSION_KEY = "cosgral-page-transition";
   var HASH_KEY = "cosgral-scroll-target";
-  var SERVICE_KEY = "cosgral-service-open";
+  var SERVICE_PAGES = {
+    blue: "tworzenie-stron-internetowych.html",
+    purple: "projektowanie-aplikacji.html",
+    gold: "pozycjonowanie-seo-geo.html",
+    orange: "wdrazanie-automatyzacji.html",
+    crimson: "systemy-crm.html",
+    green: "grafika-i-montaz-wideo.html",
+  };
   var EXIT_MS = 680;
   var REVEAL_MS = 780;
   var navigating = false;
@@ -30,9 +37,6 @@
     var match = href.match(/uslugi\/([^/?#]+)/);
     if (!match) return null;
     var slug = match[1].replace(/\.html$/, "");
-    if (window.cosgralServicePanel?.themeFromSlug) {
-      return window.cosgralServicePanel.themeFromSlug(slug);
-    }
     var map = {
       "tworzenie-stron-internetowych": "blue",
       "projektowanie-aplikacji": "purple",
@@ -56,55 +60,12 @@
   }
 
   function serviceHomeUrl(themeId) {
-    return siteRoot() + "index.html?service=" + themeId;
-  }
-
-  function navigateToServiceInPlace(themeId) {
-    if (navigating) return;
-
-    if (REDUCED) {
-      if (window.cosgralServicePanel?.prepareAndOpen) {
-        window.cosgralServicePanel.prepareAndOpen(themeId);
-      }
-      return;
-    }
-
-    navigating = true;
-    playExit();
-    if (window.cosgralServicePanel?.forceClose) window.cosgralServicePanel.forceClose();
-
-    window.setTimeout(function () {
-      if (window.cosgralServicePanel?.prepareAndOpen) {
-        window.cosgralServicePanel.prepareAndOpen(themeId);
-      }
-      revealTransition(function () {
-        navigating = false;
-      });
-    }, EXIT_MS);
+    return siteRoot() + "uslugi/" + (SERVICE_PAGES[themeId] || SERVICE_PAGES.blue);
   }
 
   function navigateToService(themeId) {
-    if (navigating) return;
-
-    if (isHomePage()) {
-      navigateToServiceInPlace(themeId);
-      return;
-    }
-
-    if (REDUCED) {
-      window.location.href = serviceHomeUrl(themeId);
-      return;
-    }
-
-    navigating = true;
-    sessionStorage.setItem(SESSION_KEY, "1");
-    sessionStorage.setItem(SERVICE_KEY, themeId);
-    sessionStorage.removeItem(HASH_KEY);
-
-    playExit();
-    window.setTimeout(function () {
-      window.location.href = serviceHomeUrl(themeId);
-    }, EXIT_MS);
+    if (!SERVICE_PAGES[themeId]) return;
+    navigateTo(serviceHomeUrl(themeId));
   }
 
   function logoSrc() {
@@ -229,7 +190,6 @@
   window.setTimeout(clearEnterLock, REVEAL_MS + 400);
 
   function scrollToStoredHash() {
-    if (sessionStorage.getItem(SERVICE_KEY)) return;
     if (new URLSearchParams(window.location.search).get("service")) return;
 
     var hash = sessionStorage.getItem(HASH_KEY);
@@ -315,12 +275,8 @@
 
     try {
       var parsed = new URL(url, window.location.href);
-      var service = parsed.searchParams.get("service");
       var homeDest = isHomePath(parsed.pathname);
-      if (service) {
-        sessionStorage.setItem(SERVICE_KEY, service);
-        sessionStorage.removeItem(HASH_KEY);
-      } else if (parsed.hash && !homeDest) {
+      if (parsed.hash && !homeDest) {
         sessionStorage.setItem(HASH_KEY, parsed.hash);
       } else {
         sessionStorage.removeItem(HASH_KEY);
@@ -343,6 +299,7 @@
 
         var anchor = e.target.closest("a[href]");
         if (!anchor) return;
+        if (anchor.classList.contains("services-fan__card") && !anchor.classList.contains("is-active")) return;
         if (anchor.hasAttribute("data-nav-services-sub")) return;
         if (anchor.hasAttribute("data-nav-services-toggle")) return;
 

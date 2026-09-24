@@ -26,7 +26,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var PEAK_SCALE_MUL = MOBILE ? 0.58 * MOBILE_HERO_CUBE : 1.16;
   var EDGE_OP = MOBILE ? 0.18 : 0.24;
   var SHELL_OP = MOBILE ? 0.5 : 0.45;
-  var SHARDS = LOW_PERF ? 280 : 1600;
+  var SHARDS = LOW_PERF ? 280 : 1000;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
   var streamAmt = 0;
@@ -357,7 +357,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.25));
   renderer.setClearColor(0x000000, 0);
 
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
@@ -743,16 +743,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   // nie schodzi z ekranu — obserwujemy sekcje, w których sześcian jest naprawdę
   // potrzebny, żeby nie renderować sceny przez całą długość strony.
   var zoneVisible = true;
+  var cardsZoneVisible = typeof IntersectionObserver !== "function";
   var lastPortalOp = null;
   var lastPortalVis = null;
   var offZoneTick = 0;
-  // Poza strefą sześcianu na ekranie zostaje wolno dryfujące pole piasku.
-  // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
-  // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
-  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
-  // Miękkie, addytywne cząstki nie zyskują na DPR 2 — cap 1.5 tnie fill-rate
-  // o ~44% na ekranach hi-DPI bez widocznej różnicy.
-  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [1.5, 1.25, 1];
+  // Poza hero i przejściem scena pozostaje animowana, ale nie wymaga 60 FPS.
+  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [3, 4, 5] : [2, 3, 4];
+  // Miękkie cząstki zachowują czytelność przy mniejszej rozdzielczości.
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1.0, 1.0, 1] : [1.25, 1.1, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;
@@ -788,6 +786,13 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     zones.forEach(function (z) {
       io.observe(z);
     });
+  })();
+  (function watchCardsZone() {
+    var services = document.getElementById("uslugi");
+    if (!services || typeof IntersectionObserver !== "function") return;
+    new IntersectionObserver(function (entries) {
+      cardsZoneVisible = entries[0].isIntersecting;
+    }, { rootMargin: "20% 0px" }).observe(services);
   })();
 
   function restoreRendererDpr() {
@@ -1288,7 +1293,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       shardMat.uniforms.uCubeMat.value.copy(cubeGroup.matrixWorld);
     }
 
-    if (displayStream > 0.15 || sandLocked) {
+    if (cardsZoneVisible && (displayStream > 0.15 || sandLocked)) {
       // Każde sampleCards() to wymuszony reflow (getBoundingClientRect na kartach),
       // więc próbkujemy co 3. klatkę niezależnie od klasy urządzenia.
       if (cardSampleTick++ % 3 === 0) sampleCards();
@@ -1328,7 +1333,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     if (!needsScene) return;
 
     // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
-    // Poza nią częstotliwość ustala sterownik jakości (na tier 0 też co klatkę).
+    // Poza nią częstotliwość ogranicza sterownik jakości.
     var fullRate = zoneVisible || menuBlend > 0.001;
     if (!fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
 

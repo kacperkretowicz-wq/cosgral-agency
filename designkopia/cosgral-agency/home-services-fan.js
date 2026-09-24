@@ -351,8 +351,15 @@
   }
 
   section.addEventListener("click", function (e) {
-    // Środkowy aktywny kafelek nadal otwiera panel usługi.
-    if (e.target.closest(".services-fan__card.is-active")) return;
+    var card = e.target.closest(".services-fan__card");
+    if (card) {
+      if (card.classList.contains("is-active")) return;
+      e.preventDefault();
+      hideHint();
+      hideTapHint();
+      goTo(cards.indexOf(card));
+      return;
+    }
     if (e.target.closest("a")) return;
     hideHint();
     hideTapHint();

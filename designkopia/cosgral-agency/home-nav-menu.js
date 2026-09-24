@@ -38,8 +38,15 @@
   }
 
   function serviceHref(theme) {
-    if (document.body.classList.contains("home-page")) return "?service=" + theme;
-    return siteRoot() + "index.html?service=" + theme;
+    var pages = {
+      blue: "tworzenie-stron-internetowych.html",
+      purple: "projektowanie-aplikacji.html",
+      gold: "pozycjonowanie-seo-geo.html",
+      orange: "wdrazanie-automatyzacji.html",
+      crimson: "systemy-crm.html",
+      green: "grafika-i-montaz-wideo.html",
+    };
+    return siteRoot() + "uslugi/" + pages[theme];
   }
 
   function findServicesLink() {

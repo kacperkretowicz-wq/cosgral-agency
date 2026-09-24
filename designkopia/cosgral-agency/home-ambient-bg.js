@@ -75,7 +75,8 @@
   // (wcześniej desktop szedł nawet w DPR 1.5, czyli 2.25× więcej niż 1.0).
   // Cięcia poniżej tego dopiero, gdy sterownik zgłosi gubione klatki.
   var SCALE_BY_TIER = MOBILE ? [0.75, 0.6, 0.5] : [0.66, 0.5, 0.4];
-  var SKIP_BY_TIER = MOBILE ? [2, 3, 4] : [1, 2, 3];
+  // Tło zmienia się powoli; 20–30 klatek na sekundę wystarcza do płynnego ruchu.
+  var SKIP_BY_TIER = MOBILE ? [3, 4, 5] : [2, 3, 4];
   var dprCap = SCALE_BY_TIER[0];
   var tierSkip = SKIP_BY_TIER[0];
 
@@ -104,7 +105,7 @@
     if (!running) return;
 
     var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
-    var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
+    var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 5 : 4) : MOBILE ? 3 : 2);
     frameSkip += 1;
     if (skipN > 1 && frameSkip % skipN !== 0) {
       requestAnimationFrame(frame);

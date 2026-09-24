@@ -48,10 +48,16 @@
 }
 </script>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-home.css?v=20260923test2" />
+<link rel="stylesheet" href="cosgral-home.css?v=20260923fix3" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
-<link rel="stylesheet" href="service-panel.css?v=20260816at" />
+<script>
+  (function () {
+    var pages = { blue: 'tworzenie-stron-internetowych', purple: 'projektowanie-aplikacji', gold: 'pozycjonowanie-seo-geo', orange: 'wdrazanie-automatyzacji', crimson: 'systemy-crm', green: 'grafika-i-montaz-wideo' };
+    var id = new URLSearchParams(location.search).get('service');
+    if (pages[id]) location.replace('uslugi/' + pages[id] + '.html');
+  })();
+</script>
 <script>
   (function () {
     var path = (location.pathname || "/").replace(/\/$/, "") || "/";
@@ -82,9 +88,7 @@
   })();
 </script>
 <script src="service-themes.js?v=20260810l"></script>
-<script src="services-content.js?v=20260825w"></script>
-<script src="service-panel.js?v=20260816at"></script>
-<script src="page-transitions.js?v=20260923test2"></script>
+<script src="page-transitions.js?v=20260923fix3"></script>
 <script src="cosgral-motion-pref.js?v=20260919a"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
   <link rel="stylesheet" href="site-chat.css?v=20260922ui51" />
@@ -217,7 +221,7 @@
       <span class="services-fan__hint-text" data-i18n="services.fan_hint">Przesuń w lewo lub prawo — touchpad, palec lub strzałki</span>
     </div>
     <div class="services-fan__carousel" data-services-fan>
-      <button type="button" class="services-fan__card" data-service-theme="blue" data-tile-interact>
+      <a href="uslugi/tworzenie-stron-internetowych.html" class="services-fan__card" data-service-theme="blue" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
           <video muted loop playsinline preload="none" data-fan-video-src="assets/stock/hero-abstract.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
@@ -225,8 +229,8 @@
         </div>
         <span class="services-fan__num">01</span>
         <span class="services-fan__name" data-i18n="services.card1">Strony internetowe</span>
-      </button>
-      <button type="button" class="services-fan__card" data-service-theme="purple" data-tile-interact>
+      </a>
+      <a href="uslugi/projektowanie-aplikacji.html" class="services-fan__card" data-service-theme="purple" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
           <video muted loop playsinline preload="none" data-fan-video-src="assets/services/aplikacje.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
@@ -234,8 +238,8 @@
         </div>
         <span class="services-fan__num">02</span>
         <span class="services-fan__name" data-i18n="services.card2">Aplikacje</span>
-      </button>
-      <button type="button" class="services-fan__card" data-service-theme="gold" data-tile-interact>
+      </a>
+      <a href="uslugi/pozycjonowanie-seo-geo.html" class="services-fan__card" data-service-theme="gold" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
           <video muted loop playsinline preload="none" data-fan-video-src="assets/services/pozycjonowanie-seo.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
@@ -243,8 +247,8 @@
         </div>
         <span class="services-fan__num">03</span>
         <span class="services-fan__name" data-i18n="services.card3">Pozycjonowanie SEO &amp; GEO</span>
-      </button>
-      <button type="button" class="services-fan__card" data-service-theme="orange" data-tile-interact>
+      </a>
+      <a href="uslugi/wdrazanie-automatyzacji.html" class="services-fan__card" data-service-theme="orange" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
           <video muted loop playsinline preload="none" data-fan-video-src="assets/services/automatyzacje.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
@@ -252,8 +256,8 @@
         </div>
         <span class="services-fan__num">04</span>
         <span class="services-fan__name" data-i18n="services.card4">Automatyzacje</span>
-      </button>
-      <button type="button" class="services-fan__card" data-service-theme="crimson" data-tile-interact>
+      </a>
+      <a href="uslugi/systemy-crm.html" class="services-fan__card" data-service-theme="crimson" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
           <video muted loop playsinline preload="none" data-fan-video-src="assets/services/crm.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
@@ -261,8 +265,8 @@
         </div>
         <span class="services-fan__num">05</span>
         <span class="services-fan__name" data-i18n="services.card5">Systemy CRM</span>
-      </button>
-      <button type="button" class="services-fan__card" data-service-theme="green" data-tile-interact>
+      </a>
+      <a href="uslugi/grafika-i-montaz-wideo.html" class="services-fan__card" data-service-theme="green" data-tile-interact>
         <div class="services-fan__card-media" aria-hidden="true">
           <video muted loop playsinline preload="none" data-fan-video-src="assets/services/grafika-montaz.mp4"></video>
           <div class="services-fan__card-tint" aria-hidden="true"></div>
@@ -270,7 +274,7 @@
         </div>
         <span class="services-fan__num">06</span>
         <span class="services-fan__name" data-i18n="services.card6">Grafika i montaż wideo</span>
-      </button>
+      </a>
     </div>
   </div>
   </div>
@@ -483,12 +487,12 @@
     <div class="footer-col" data-enter="top">
       <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
       <ul>
-        <li><a href="?service=blue" data-i18n="footer.link_websites">Strony</a></li>
-        <li><a href="?service=purple" data-i18n="services.card2">Aplikacje</a></li>
-        <li><a href="?service=gold" data-i18n="services.card3">SEO / GEO</a></li>
-        <li><a href="?service=orange" data-i18n="services.card4">Automatyzacje</a></li>
-        <li><a href="?service=crimson" data-i18n="footer.link_crm">CRM</a></li>
-        <li><a href="?service=green" data-i18n="footer.link_video">Wideo</a></li>
+        <li><a href="uslugi/tworzenie-stron-internetowych.html" data-i18n="footer.link_websites">Strony</a></li>
+        <li><a href="uslugi/projektowanie-aplikacji.html" data-i18n="services.card2">Aplikacje</a></li>
+        <li><a href="uslugi/pozycjonowanie-seo-geo.html" data-i18n="services.card3">SEO / GEO</a></li>
+        <li><a href="uslugi/wdrazanie-automatyzacji.html" data-i18n="services.card4">Automatyzacje</a></li>
+        <li><a href="uslugi/systemy-crm.html" data-i18n="footer.link_crm">CRM</a></li>
+        <li><a href="uslugi/grafika-i-montaz-wideo.html" data-i18n="footer.link_video">Wideo</a></li>
       </ul>
     </div>
     <div class="footer-col" data-enter="bottom">
@@ -529,18 +533,18 @@
 <script src="smooth-scroll.js?v=20260917ad"></script>
 <script src="cosgral-perf.js?v=20260901a"></script>
 <script src="home-cursor-field.js?v=20260920ui7"></script>
-<script src="home-ambient-bg.js?v=20260917ad"></script>
-<script type="module" src="home-hero-3d.js?v=20260920ui34"></script>
+<script src="home-ambient-bg.js?v=20260923fix3"></script>
+<script type="module" src="home-hero-3d.js?v=20260923fix3"></script>
 <script src="home-cursor.js?v=20260917ad"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
-<script src="home-services-fan.js?v=20260831b"></script>
+<script src="home-services-fan.js?v=20260923fix3"></script>
 <script src="home-section-flow.js?v=20260920ui27"></script>
 <script src="home-scroll-rail.js?v=20260922ui52"></script>
 <script src="home-section-stepper.js?v=20260917ad"></script>
 <script src="home-director.js?v=20260920ui37"></script>
 <script src="home-tile-interact.js?v=20260920ui9"></script>
-<script defer src="home-nav-menu.js?v=20260923test2"></script>
+<script defer src="home-nav-menu.js?v=20260923fix3"></script>
 <script defer src="site-chat.js?v=20260922ui51"></script>
 <script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
 </body>

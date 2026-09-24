@@ -202,23 +202,16 @@ html.is-free-scroll main.home-film {
     --depth-dwell: 26dvh;
   }
 }
-/* Tor pod stopkę WEWNĄTRZ main: ostatnie sticky dziecko (Kontakt) trzyma się
-   top:0 tylko dopóki kontener trwa — spacer daje mu dwell + pełny cover, a stopka
-   (sibling main, z-index 8 > main 1) wjeżdża z ujemnym marginesem nad Kontakt
-   dokładnie tak, jak każda kolejna scena nad poprzednią. Bez luki, bez prześwitu. */
+/* Kontakt kończy główną treść; stopka płynie zaraz po nim. Dodatkowy tor i
+   ujemny margines zostawiały pod stopką widoczną kopię kontaktu. */
 html.is-free-scroll main.home-film::after {
-  content: "";
-  display: block;
-  height: calc(100vh + var(--depth-dwell));
-  height: calc(100dvh + var(--depth-dwell));
-  pointer-events: none;
+  content: none;
 }
 html.is-free-scroll main.home-film > #kontakt.home-depth {
   margin-bottom: 0;
 }
 html.is-free-scroll .site-footer {
-  margin-top: -100vh;
-  margin-top: -100dvh;
+  margin-top: 0;
 }
 @media (max-width: 900px) {
   html.is-free-scroll main.home-film {

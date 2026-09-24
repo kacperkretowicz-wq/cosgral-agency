@@ -2019,7 +2019,7 @@ body.portfolio-page #grafiki.is-depth-gone {
 /* Service pages */
 .service-page { position: relative; }
 .service-hero {
-  padding: clamp(7rem, 16vw, 11rem) 0 clamp(3rem, 8vw, 5rem);
+  padding: clamp(7rem, 16vw, 11rem) var(--gutter) clamp(3rem, 8vw, 5rem);
 }
 .service-hero__num {
   font-family: var(--font-mono);
@@ -2034,7 +2034,7 @@ body.portfolio-page #grafiki.is-depth-gone {
   max-width: 44rem;
 }
 .service-block {
-  padding: clamp(2rem, 5vw, 3.5rem) 0;
+  padding: clamp(2rem, 5vw, 3.5rem) var(--gutter);
   border-top: 1px solid var(--border);
 }
 .service-block__title {
