@@ -391,7 +391,8 @@
   }
 
   /**
-   * Frames scrub: kafelki wlatują i układają się, kamera odjeżdża.
+   * Frames scrub: kafelki wlatują powoli i układają się, kamera odjeżdża.
+   * Długa oś czasu + duży stagger → ruch przy scrollu jest spokojny, nie chaotyczny.
    */
   function buildCinemaTimeline(camera, watermark, tiles) {
     var mobile = window.matchMedia("(max-width: 900px)").matches;
@@ -400,13 +401,13 @@
     var spread = mobile ? 1.02 : 1.14;
     heroEnd = { x: heroEnd.x * m * spread, y: heroEnd.y * m * spread - (mobile ? 40 : 80) };
     var endScale = mobile ? 0.78 : 0.92;
-    var startScale = mobile ? 1.55 : 1.85;
+    var startScale = mobile ? 1.4 : 1.65;
     var start = cameraFocus(clusterCenter(FOCUS_JUICY), startScale);
-    var mid = cameraFocus(clusterCenter(FOCUS_FAR), mobile ? 1.15 : 1.28);
+    var mid = cameraFocus(clusterCenter(FOCUS_FAR), mobile ? 1.12 : 1.22);
     var full = cameraFocus(heroEnd, endScale);
 
     gsap.set(camera, start);
-    if (watermark) gsap.set(watermark, { opacity: 0, scale: 0.92 });
+    if (watermark) gsap.set(watermark, { opacity: 0, scale: 0.96 });
 
     var tileArr = Array.prototype.slice.call(tiles);
     tileArr.forEach(function (tile, i) {
@@ -415,15 +416,21 @@
       var fromLeft = i % 2 === 0;
       gsap.set(tile, {
         opacity: 0,
-        x: fromLeft ? -(mobile ? 120 : 220) : mobile ? 120 : 220,
-        y: (i % 5) * (mobile ? 18 : 28) - 40,
-        scale: pos.s * 0.42,
-        rotation: pos.r + (fromLeft ? -18 : 18),
+        x: fromLeft ? -(mobile ? 56 : 96) : mobile ? 56 : 96,
+        y: (i % 5) * (mobile ? 10 : 14) - 18,
+        scale: pos.s * 0.78,
+        rotation: pos.r + (fromLeft ? -5 : 5),
         transformOrigin: "50% 50%",
       });
     });
 
-    var tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
+    var tl = gsap.timeline({ paused: true, defaults: { ease: "sine.inOut" } });
+    /* Chwila spokoju na starcie pinu */
+    tl.to({}, { duration: 0.55 });
+
+    var tileStart = 0.55;
+    var tileStep = mobile ? 0.085 : 0.1;
+    var tileDur = mobile ? 1.35 : 1.55;
 
     tileArr.forEach(function (tile, i) {
       var idx = Number(tile.getAttribute("data-idx"));
@@ -436,36 +443,28 @@
           y: 0,
           scale: pos.s,
           rotation: pos.r,
-          duration: 0.55,
-          ease: "power3.out",
+          duration: tileDur,
+          ease: "power1.out",
         },
-        i * 0.018
+        tileStart + i * tileStep
       );
     });
 
-    tl.to(camera, Object.assign({ duration: 0.7, ease: "power2.inOut" }, mid), 0.35);
-    tl.to(camera, Object.assign({ duration: 0.85, ease: "power1.inOut" }, full), 0.85);
+    var camMidAt = tileStart + 0.8;
+    var camFullAt = tileStart + tileArr.length * tileStep * 0.45 + 1.1;
+    tl.to(camera, Object.assign({ duration: 2.2, ease: "sine.inOut" }, mid), camMidAt);
+    tl.to(camera, Object.assign({ duration: 2.6, ease: "sine.inOut" }, full), camFullAt);
 
     if (watermark) {
-      tl.to(watermark, { opacity: 0.08, scale: 1, duration: 0.6, ease: "power2.out" }, 0.9);
+      tl.to(
+        watermark,
+        { opacity: 0.08, scale: 1, duration: 1.4, ease: "sine.out" },
+        camFullAt + 0.6
+      );
     }
 
-    tileArr.forEach(function (tile, i) {
-      var idx = Number(tile.getAttribute("data-idx"));
-      var pos = WORLD[idx];
-      if (!pos) return;
-      tl.to(
-        tile,
-        {
-          scale: pos.s * 1.02,
-          duration: 0.35,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: 1,
-        },
-        1.35 + (i % 7) * 0.02
-      );
-    });
+    /* Krótki hold na końcu, żeby CTA nie wskakiwał w środku ruchu */
+    tl.to({}, { duration: 0.9 });
 
     return tl;
   }
@@ -1199,17 +1198,17 @@
     section.classList.add("is-grafiki-frames");
 
     var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
-    /* Original choreography; roughly 22% less motion per scroll distance. */
-    var pinLen = freeScroll ? (mobile ? "+=155%" : "+=185%") : mobile ? "+=72%" : "+=80%";
+    /* Długi pin = ta sama choreografia rozłożona na dużo więcej scrolla. */
+    var pinLen = freeScroll ? (mobile ? "+=340%" : "+=420%") : mobile ? "+=72%" : "+=80%";
     var filmMode = document.body.classList.contains("portfolio-page--film");
 
     var overlay = section.querySelector(".graphics-stage__overlay");
     var framesCta = section.querySelector("[data-graphics-frames-cta]");
 
     function setOverlay(p) {
-      /* Napis pod koniec cinema — pełny dopiero ~0.78+ */
-      var show = p > 0.62;
-      var amt = Math.max(0, Math.min(1, (p - 0.62) / 0.2));
+      /* Napis pod koniec cinema — pełny dopiero ~0.82+ */
+      var show = p > 0.78;
+      var amt = Math.max(0, Math.min(1, (p - 0.78) / 0.14));
       if (overlay) {
         overlay.setAttribute("aria-hidden", show ? "false" : "true");
         gsap.set(overlay, { autoAlpha: show ? amt : 0 });
@@ -1223,8 +1222,8 @@
           scale: 0.94 + amt * 0.06,
         });
       }
-      section.classList.toggle("is-cinema-done", p > 0.88);
-      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.62);
+      section.classList.toggle("is-cinema-done", p > 0.92);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.78);
     }
 
     if (overlay) gsap.set(overlay, { autoAlpha: 0 });
@@ -1280,7 +1279,8 @@
       end: pinLen,
       pin: true,
       pinSpacing: true,
-      scrub: freeScroll ? true : false,
+      /* Lekki lag scruba = płynniejsze, mniej „strzelające” przejścia */
+      scrub: freeScroll ? (mobile ? 1.35 : 1.75) : false,
       anticipatePin: 0.35,
       invalidateOnRefresh: true,
       refreshPriority: -1,
