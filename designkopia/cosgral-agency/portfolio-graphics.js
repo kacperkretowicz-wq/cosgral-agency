@@ -425,12 +425,12 @@
     });
 
     var tl = gsap.timeline({ paused: true, defaults: { ease: "sine.inOut" } });
-    /* Chwila spokoju na starcie pinu */
-    tl.to({}, { duration: 0.55 });
+    /* Dłuższy spokój na starcie — ruch zaczyna się później w pinie */
+    tl.to({}, { duration: 1.1 });
 
-    var tileStart = 0.55;
-    var tileStep = mobile ? 0.085 : 0.1;
-    var tileDur = mobile ? 1.35 : 1.55;
+    var tileStart = 1.1;
+    var tileStep = mobile ? 0.12 : 0.145;
+    var tileDur = mobile ? 1.85 : 2.15;
 
     tileArr.forEach(function (tile, i) {
       var idx = Number(tile.getAttribute("data-idx"));
@@ -450,21 +450,21 @@
       );
     });
 
-    var camMidAt = tileStart + 0.8;
-    var camFullAt = tileStart + tileArr.length * tileStep * 0.45 + 1.1;
-    tl.to(camera, Object.assign({ duration: 2.2, ease: "sine.inOut" }, mid), camMidAt);
-    tl.to(camera, Object.assign({ duration: 2.6, ease: "sine.inOut" }, full), camFullAt);
+    var camMidAt = tileStart + 1.2;
+    var camFullAt = tileStart + tileArr.length * tileStep * 0.5 + 1.8;
+    tl.to(camera, Object.assign({ duration: 3.2, ease: "sine.inOut" }, mid), camMidAt);
+    tl.to(camera, Object.assign({ duration: 3.8, ease: "sine.inOut" }, full), camFullAt);
 
     if (watermark) {
       tl.to(
         watermark,
-        { opacity: 0.08, scale: 1, duration: 1.4, ease: "sine.out" },
-        camFullAt + 0.6
+        { opacity: 0.08, scale: 1, duration: 1.8, ease: "sine.out" },
+        camFullAt + 0.9
       );
     }
 
-    /* Krótki hold na końcu, żeby CTA nie wskakiwał w środku ruchu */
-    tl.to({}, { duration: 0.9 });
+    /* Hold na końcu — CTA później */
+    tl.to({}, { duration: 1.4 });
 
     return tl;
   }
@@ -1198,17 +1198,17 @@
     section.classList.add("is-grafiki-frames");
 
     var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
-    /* Długi pin = ta sama choreografia rozłożona na dużo więcej scrolla. */
-    var pinLen = freeScroll ? (mobile ? "+=340%" : "+=420%") : mobile ? "+=72%" : "+=80%";
+    /* Jeszcze dłuższy pin = wolniejsza choreografia na cały ruch scrolla. */
+    var pinLen = freeScroll ? (mobile ? "+=520%" : "+=680%") : mobile ? "+=72%" : "+=80%";
     var filmMode = document.body.classList.contains("portfolio-page--film");
 
     var overlay = section.querySelector(".graphics-stage__overlay");
     var framesCta = section.querySelector("[data-graphics-frames-cta]");
 
     function setOverlay(p) {
-      /* Napis pod koniec cinema — pełny dopiero ~0.82+ */
-      var show = p > 0.78;
-      var amt = Math.max(0, Math.min(1, (p - 0.78) / 0.14));
+      /* CTA dopiero pod sam koniec */
+      var show = p > 0.86;
+      var amt = Math.max(0, Math.min(1, (p - 0.86) / 0.1));
       if (overlay) {
         overlay.setAttribute("aria-hidden", show ? "false" : "true");
         gsap.set(overlay, { autoAlpha: show ? amt : 0 });
@@ -1222,8 +1222,8 @@
           scale: 0.94 + amt * 0.06,
         });
       }
-      section.classList.toggle("is-cinema-done", p > 0.92);
-      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.78);
+      section.classList.toggle("is-cinema-done", p > 0.94);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.86);
     }
 
     if (overlay) gsap.set(overlay, { autoAlpha: 0 });
@@ -1279,8 +1279,8 @@
       end: pinLen,
       pin: true,
       pinSpacing: true,
-      /* Lekki lag scruba = płynniejsze, mniej „strzelające” przejścia */
-      scrub: freeScroll ? (mobile ? 1.35 : 1.75) : false,
+      /* Większy lag = płynniejszy, wolniejszy odczucie ruchu */
+      scrub: freeScroll ? (mobile ? 1.85 : 2.4) : false,
       anticipatePin: 0.35,
       invalidateOnRefresh: true,
       refreshPriority: -1,
@@ -1318,7 +1318,7 @@
           setOverlay(0);
         },
         getBeat: function () {
-          return pinST && pinST.progress > 0.55 ? 1 : 0;
+          return pinST && pinST.progress > 0.86 ? 1 : 0;
         },
         isAnimating: function () {
           return false;
