@@ -43,21 +43,15 @@
     requestAnimationFrame(refreshGrafikiBloomState);
   });
 
-  var collageRoot = document.getElementById("graphics-brands-cards") || document.getElementById("graphics-collage");
-  var brandsRoot = document.getElementById("graphics-brands");
+  var collageRoot = document.getElementById("graphics-collage");
   var galleryRoot = document.getElementById("graphics-gallery");
   var lightbox = document.getElementById("graphics-lightbox");
   var lightboxNav = null;
 
   var COLLAGE_COUNTS = {
-    "juicy-events": 3,
-    "far-east": 2,
-    bts: 1,
-  };
-
-  var BRANDS_WORD = {
-    pl: ["GRA", "FI", "KI"],
-    en: ["VI", "SU", "ALS"],
+    "juicy-events": 20,
+    "far-east": 7,
+    bts: 2,
   };
 
   var WORLD_W = 2600;
@@ -345,336 +339,55 @@
     });
   }
 
-  function getBrandsLang() {
-    if (window.cosgralI18n && typeof window.cosgralI18n.getLang === "function") {
-      return window.cosgralI18n.getLang() === "en" ? "en" : "pl";
-    }
-    return (document.documentElement.lang || "pl").toLowerCase().indexOf("en") === 0 ? "en" : "pl";
-  }
-
-  function syncBrandsWord() {
-    var word = document.querySelector("[data-graphics-brands-word]");
-    if (!word) return;
-    var parts = BRANDS_WORD[getBrandsLang()] || BRANDS_WORD.pl;
-    var chunks = word.querySelectorAll(".graphics-brands__chunk");
-    if (chunks[0]) chunks[0].textContent = parts[0];
-    if (chunks[1]) chunks[1].textContent = parts[1];
-    if (chunks[2]) chunks[2].textContent = parts[2];
-    word.setAttribute("aria-label", parts.join(""));
-  }
-
   function renderCollage(data) {
-    if (!brandsRoot || !collageRoot) return;
-    var items = buildCollageItems(data).slice(0, 6);
+    if (!collageRoot) return;
+    var items = buildCollageItems(data);
     if (!items.length) return;
 
-    /* Stable layout slots matching Locomotive Brands pin (6 floating cards). */
-    var slots = [
-      { x: 8, y: 14, w: 15, ar: "1 / 1" },
-      { x: 38, y: 6, w: 13, ar: "3 / 4" },
-      { x: 72, y: 10, w: 12, ar: "9 / 16" },
-      { x: 10, y: 62, w: 16, ar: "1 / 1" },
-      { x: 42, y: 68, w: 14, ar: "5 / 4" },
-      { x: 74, y: 58, w: 16, ar: "1 / 1" },
-    ];
-
-    var html = "";
+    var tilesHtml = "";
     items.forEach(function (item, i) {
-      var slot = slots[i] || slots[slots.length - 1];
-      html +=
-        '<button type="button" class="graphics-brands__card" data-brands-card="' +
+      tilesHtml +=
+        '<button type="button" class="graphics-cinema__tile" data-idx="' +
         i +
-        '" style="--bx:' +
-        slot.x +
-        "%;--by:" +
-        slot.y +
-        "%;--bw:" +
-        slot.w +
-        "%;--bar:" +
-        slot.ar +
-        ';"' +
+        '"' +
         itemAttrs(item, item.client, item.groupIndex) +
         ">" +
-        mediaMarkup(item, { imgClass: "graphics-brands__media", videoClass: "graphics-brands__media" }) +
-        "</button>";
+        '<span class="graphics-cinema__tile-inner">' +
+        mediaMarkup(item, { imgClass: "graphics-cinema__media", videoClass: "graphics-cinema__media" }) +
+        "</span></button>";
     });
 
-    collageRoot.innerHTML = html;
-    syncBrandsWord();
+    collageRoot.innerHTML =
+      '<div class="graphics-cinema">' +
+      '<div class="graphics-cinema__viewport">' +
+      '<div class="graphics-cinema__camera">' +
+      '<div class="graphics-cinema__world" style="--world-w:' +
+      WORLD_W +
+      "px;--world-h:" +
+      WORLD_H +
+      'px">' +
+      '<p class="graphics-cinema__watermark" aria-hidden="true">Kreacja</p>' +
+      tilesHtml +
+      "</div></div></div></div>";
+
     bindLightboxTriggers(collageRoot);
     if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.scan(collageRoot);
-    initBrandsMotion();
+    var graphicsSection = document.getElementById("grafiki");
+    if (graphicsSection && window.IntersectionObserver) {
+      var warmObserver = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+        EARLY_VISIBLE.forEach(function (idx) {
+          var tile = collageRoot.querySelector('.graphics-cinema__tile[data-idx="' + idx + '"]');
+          var img = tile && tile.querySelector("img.graphics-cinema__media");
+          if (img) img.loading = "eager";
+        });
+        warmObserver.disconnect();
+      }, { rootMargin: "100% 0px" });
+      warmObserver.observe(graphicsSection);
+    }
+    initCinemaScroll();
     initGrafikiBloom();
     document.dispatchEvent(new CustomEvent("portfolio:media-ready", { detail: { type: "graphics" } }));
-  }
-
-  /**
-   * Locomotive MTL “Brands” kinetic type — frame-accurate loop for GRAFIKI / VISUALS.
-   * Center chunk stays put; outer chunks orbit: home → horizontal → 4 diagonals → horizontal → home.
-   */
-  function initBrandsMotion() {
-    var section = document.getElementById("grafiki");
-    var stage = brandsRoot && brandsRoot.querySelector(".graphics-brands__stage");
-    var chunkA = brandsRoot && brandsRoot.querySelector(".graphics-brands__chunk--a");
-    var chunkB = brandsRoot && brandsRoot.querySelector(".graphics-brands__chunk--b");
-    var chunkC = brandsRoot && brandsRoot.querySelector(".graphics-brands__chunk--c");
-    var cards = collageRoot ? collageRoot.querySelectorAll(".graphics-brands__card") : [];
-    if (!section || !stage || !chunkA || !chunkB || !chunkC) return;
-
-    section.classList.add("is-grafiki-frames", "is-grafiki-brands");
-    brandsRoot.classList.add("is-ready");
-
-    var reduced = document.documentElement.classList.contains("reduce-motion");
-    var mobile = window.matchMedia("(max-width: 900px)").matches;
-
-    function stubStepper(pinST) {
-      window.cosgralGrafikiStepper = {
-        refresh: function () {
-          if (pinST) pinST.refresh();
-        },
-        snapToHold: function () {},
-        revealHold: function () {},
-        transitionToBeat: function () {},
-        resetForReentry: function () {
-          if (window._grafikiBrandsTl) window._grafikiBrandsTl.progress(0);
-        },
-        getBeat: function () {
-          return 1;
-        },
-        isAnimating: function () {
-          return false;
-        },
-        getPassDown: function () {
-          return true;
-        },
-        getPassUp: function () {
-          return true;
-        },
-        suspendHold: function () {},
-        getHoldY: function () {
-          return pinST ? pinST.start : 0;
-        },
-        syncCubeFade: syncGrafikiCubeFade,
-      };
-    }
-
-    if (reduced || !window.gsap) {
-      stubStepper(null);
-      return;
-    }
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-    var vx = mobile ? 0.3 : 0.36;
-    var vy = mobile ? 0.24 : 0.3;
-    var hx = mobile ? 0.32 : 0.4;
-
-    function measureHome() {
-      gsap.set([chunkA, chunkB, chunkC], { x: 0, y: 0, xPercent: -50, yPercent: -50 });
-      var wa = chunkA.offsetWidth || chunkA.getBoundingClientRect().width;
-      var wb = chunkB.offsetWidth || chunkB.getBoundingClientRect().width;
-      var wc = chunkC.offsetWidth || chunkC.getBoundingClientRect().width;
-      return {
-        a: { x: -(wb * 0.5 + wa * 0.5), y: 0 },
-        c: { x: wb * 0.5 + wc * 0.5, y: 0 },
-      };
-    }
-
-    var home = measureHome();
-    var textPos = {
-      midL: { x: -hx * w, y: 0 },
-      midR: { x: hx * w, y: 0 },
-      TL: { x: -vx * w, y: -vy * h },
-      TR: { x: vx * w, y: -vy * h },
-      BL: { x: -vx * w, y: vy * h },
-      BR: { x: vx * w, y: vy * h },
-    };
-
-    var cardLayouts = [
-      [
-        { l: 8, t: 12, s: 1, z: 2 },
-        { l: 38, t: 5, s: 1.05, z: 3 },
-        { l: 74, t: 10, s: 0.95, z: 2 },
-        { l: 9, t: 62, s: 1, z: 2 },
-        { l: 42, t: 68, s: 0.95, z: 2 },
-        { l: 74, t: 58, s: 1.05, z: 3 },
-      ],
-      [
-        { l: 6, t: 8, s: 0.85, z: 2 },
-        { l: 34, t: 4, s: 1.35, z: 5 },
-        { l: 78, t: 8, s: 0.9, z: 2 },
-        { l: 8, t: 66, s: 0.95, z: 2 },
-        { l: 44, t: 72, s: 0.85, z: 2 },
-        { l: 76, t: 62, s: 0.95, z: 2 },
-      ],
-      [
-        { l: 22, t: 18, s: 0.9, z: 2 },
-        { l: 40, t: 8, s: 0.8, z: 2 },
-        { l: 78, t: 6, s: 1.05, z: 3 },
-        { l: 8, t: 58, s: 0.9, z: 2 },
-        { l: 38, t: 62, s: 1.3, z: 5 },
-        { l: 72, t: 52, s: 1.1, z: 3 },
-      ],
-      [
-        { l: 8, t: 6, s: 0.85, z: 2 },
-        { l: 28, t: 8, s: 0.75, z: 2 },
-        { l: 70, t: 4, s: 1.05, z: 3 },
-        { l: 10, t: 64, s: 0.9, z: 2 },
-        { l: 36, t: 70, s: 0.85, z: 2 },
-        { l: 58, t: 28, s: 1.55, z: 6 },
-      ],
-      [
-        { l: 6, t: 8, s: 0.9, z: 2 },
-        { l: 24, t: 10, s: 0.8, z: 2 },
-        { l: 62, t: 4, s: 1.4, z: 6 },
-        { l: 10, t: 60, s: 1.05, z: 3 },
-        { l: 40, t: 66, s: 0.95, z: 2 },
-        { l: 76, t: 58, s: 0.95, z: 2 },
-      ],
-      [
-        { l: 10, t: 10, s: 0.95, z: 2 },
-        { l: 36, t: 6, s: 1.1, z: 3 },
-        { l: 74, t: 8, s: 1, z: 2 },
-        { l: 10, t: 64, s: 1, z: 2 },
-        { l: 42, t: 70, s: 0.95, z: 2 },
-        { l: 74, t: 60, s: 1, z: 2 },
-      ],
-      [
-        { l: 8, t: 12, s: 1, z: 2 },
-        { l: 38, t: 5, s: 1.05, z: 3 },
-        { l: 74, t: 10, s: 0.95, z: 2 },
-        { l: 9, t: 62, s: 1, z: 2 },
-        { l: 42, t: 68, s: 0.95, z: 2 },
-        { l: 74, t: 58, s: 1.05, z: 3 },
-      ],
-    ];
-
-    var tl;
-
-    function applyCardLayout(layout, extras) {
-      extras = extras || {};
-      cards.forEach(function (card, i) {
-        var slot = layout[i] || layout[0];
-        var props = {
-          left: slot.l + "%",
-          top: slot.t + "%",
-          scale: slot.s,
-          zIndex: slot.z,
-          x: 0,
-          y: 0,
-          rotate: (i % 2 === 0 ? -1.2 : 1.1) * (0.4 + i * 0.15),
-          duration: extras.duration != null ? extras.duration : 1,
-          ease: extras.ease || "power2.inOut",
-        };
-        if (extras.immediate) gsap.set(card, props);
-        else tl.to(card, props, extras.at);
-      });
-    }
-
-    gsap.set([chunkA, chunkB, chunkC], { xPercent: -50, yPercent: -50 });
-    gsap.set(chunkB, { x: 0, y: 0 });
-    gsap.set(chunkA, { x: home.a.x, y: home.a.y });
-    gsap.set(chunkC, { x: home.c.x, y: home.c.y });
-    applyCardLayout(cardLayouts[0], { immediate: true });
-
-    var overlay = section.querySelector(".graphics-stage__overlay--brands");
-    var framesCta = section.querySelector("[data-graphics-frames-cta]");
-    if (overlay) gsap.set(overlay, { autoAlpha: 0 });
-    if (framesCta) gsap.set(framesCta, { autoAlpha: 0, y: 18 });
-
-    tl = gsap.timeline({
-      defaults: { ease: "power2.inOut" },
-      scrollTrigger: {
-        id: "grafiki-pin",
-        trigger: section,
-        start: "top top",
-        end: mobile ? "+=240%" : "+=280%",
-        pin: true,
-        pinSpacing: true,
-        scrub: 0.75,
-        anticipatePin: 0.4,
-        invalidateOnRefresh: true,
-        refreshPriority: -1,
-        onEnter: function () {
-          document.body.classList.add("is-grafiki-zone");
-        },
-        onEnterBack: function () {
-          document.body.classList.add("is-grafiki-zone");
-        },
-      },
-    });
-
-    window._grafikiBrandsTl = tl;
-    var pinST = tl.scrollTrigger;
-
-    tl.to({}, { duration: 0.35 });
-    tl.to(chunkA, { x: textPos.midL.x, y: textPos.midL.y, duration: 1 }, ">");
-    tl.to(chunkC, { x: textPos.midR.x, y: textPos.midR.y, duration: 1 }, "<");
-    applyCardLayout(cardLayouts[1], { at: "<", duration: 1 });
-    tl.to({}, { duration: 0.35 });
-
-    tl.to(chunkA, { x: textPos.TL.x, y: textPos.TL.y, duration: 1 });
-    tl.to(chunkC, { x: textPos.BR.x, y: textPos.BR.y, duration: 1 }, "<");
-    applyCardLayout(cardLayouts[2], { at: "<", duration: 1 });
-    tl.to({}, { duration: 0.4 });
-
-    tl.to(chunkA, { x: textPos.BR.x, y: textPos.BR.y, duration: 1 });
-    tl.to(chunkC, { x: textPos.TL.x, y: textPos.TL.y, duration: 1 }, "<");
-    applyCardLayout(cardLayouts[3], { at: "<", duration: 1 });
-    tl.to({}, { duration: 0.4 });
-
-    tl.to(chunkA, { x: textPos.BL.x, y: textPos.BL.y, duration: 1 });
-    tl.to(chunkC, { x: textPos.TR.x, y: textPos.TR.y, duration: 1 }, "<");
-    applyCardLayout(cardLayouts[4], { at: "<", duration: 1 });
-    tl.to({}, { duration: 0.35 });
-
-    tl.to(chunkA, { x: textPos.midL.x, y: textPos.midL.y, duration: 1 });
-    tl.to(chunkC, { x: textPos.midR.x, y: textPos.midR.y, duration: 1 }, "<");
-    applyCardLayout(cardLayouts[5], { at: "<", duration: 1 });
-    tl.to({}, { duration: 0.3 });
-
-    tl.to(chunkA, {
-      x: function () { return measureHome().a.x; },
-      y: 0,
-      duration: 0.9,
-    });
-    tl.to(chunkC, {
-      x: function () { return measureHome().c.x; },
-      y: 0,
-      duration: 0.9,
-    }, "<");
-    applyCardLayout(cardLayouts[6], { at: "<", duration: 0.9 });
-    if (overlay) tl.to(overlay, { autoAlpha: 1, duration: 0.5 }, "-=0.35");
-    if (framesCta) tl.to(framesCta, { autoAlpha: 1, y: 0, duration: 0.5 }, "<");
-    tl.to({}, { duration: 0.55 });
-
-    stubStepper(pinST);
-
-    document.addEventListener("cosgral:lang", function () {
-      syncBrandsWord();
-      var h2 = measureHome();
-      var p = tl.progress();
-      if (p < 0.08 || p > 0.92) {
-        gsap.set(chunkA, { x: h2.a.x, y: 0 });
-        gsap.set(chunkC, { x: h2.c.x, y: 0 });
-      }
-    });
-    document.addEventListener("click", function (e) {
-      var btn = e.target && e.target.closest && e.target.closest("[data-i18n-lang-btn]");
-      if (btn) setTimeout(syncBrandsWord, 40);
-    });
-
-    window.addEventListener("load", function () {
-      ScrollTrigger.refresh();
-      if (window.cosgralGrafikiStepper && window.cosgralGrafikiStepper.refresh) {
-        window.cosgralGrafikiStepper.refresh();
-      }
-      if (window.cosgralPortfolioRail && window.cosgralPortfolioRail.refresh) {
-        window.cosgralPortfolioRail.refresh();
-      }
-    });
   }
 
   /**
@@ -1462,6 +1175,179 @@
     };
   }
 
+  function initCinemaScroll() {
+    var reduced = document.documentElement.classList.contains("reduce-motion");
+    var cinema = collageRoot && collageRoot.querySelector(".graphics-cinema");
+    var section = document.getElementById("grafiki");
+    if (!cinema || !section) return;
+
+    var camera = cinema.querySelector(".graphics-cinema__camera");
+    var world = cinema.querySelector(".graphics-cinema__world");
+    var watermark = cinema.querySelector(".graphics-cinema__watermark");
+    var tiles = cinema.querySelectorAll(".graphics-cinema__tile");
+    var mobile = window.matchMedia("(max-width: 900px)").matches;
+    var freeScroll = true;
+
+    if (reduced || !window.gsap || !window.ScrollTrigger) {
+      cinema.classList.add("is-static");
+      collageRoot.classList.add("is-ready");
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+    placeTilesOnWorld(world, tiles, mobile);
+    section.classList.add("is-grafiki-frames");
+
+    var cinemaTl = buildCinemaTimeline(camera, watermark, tiles);
+    /* Original choreography; roughly 22% less motion per scroll distance. */
+    var pinLen = freeScroll ? (mobile ? "+=155%" : "+=185%") : mobile ? "+=72%" : "+=80%";
+    var filmMode = document.body.classList.contains("portfolio-page--film");
+
+    var overlay = section.querySelector(".graphics-stage__overlay");
+    var framesCta = section.querySelector("[data-graphics-frames-cta]");
+
+    function setOverlay(p) {
+      /* Napis pod koniec cinema — pełny dopiero ~0.78+ */
+      var show = p > 0.62;
+      var amt = Math.max(0, Math.min(1, (p - 0.62) / 0.2));
+      if (overlay) {
+        overlay.setAttribute("aria-hidden", show ? "false" : "true");
+        gsap.set(overlay, { autoAlpha: show ? amt : 0 });
+        if (show && amt > 0.05) overlay.classList.add("is-on");
+        else overlay.classList.remove("is-on");
+      }
+      if (framesCta) {
+        gsap.set(framesCta, {
+          autoAlpha: show ? amt : 0,
+          y: (1 - amt) * 20,
+          scale: 0.94 + amt * 0.06,
+        });
+      }
+      section.classList.toggle("is-cinema-done", p > 0.88);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.62);
+    }
+
+    if (overlay) gsap.set(overlay, { autoAlpha: 0 });
+    if (framesCta) gsap.set(framesCta, { autoAlpha: 0, y: 20, scale: 0.94 });
+
+    window.cosgralGraphicsCinema = {
+      setProgress: function (p) {
+        cinemaTl.progress(Math.max(0, Math.min(1, p)));
+        setOverlay(p);
+      },
+      timeline: cinemaTl,
+    };
+
+    /* Film mode: no local pin — portfolio-film.js drives progress */
+    if (filmMode) {
+      cinemaTl.progress(0);
+      setOverlay(0);
+      window.cosgralGrafikiStepper = {
+        refresh: function () {},
+        snapToHold: function () {},
+        revealHold: function () {},
+        transitionToBeat: function () {},
+        resetForReentry: function () {
+          cinemaTl.progress(0);
+          setOverlay(0);
+        },
+        getBeat: function () {
+          return 0;
+        },
+        isAnimating: function () {
+          return false;
+        },
+        getPassDown: function () {
+          return true;
+        },
+        getPassUp: function () {
+          return true;
+        },
+        suspendHold: function () {},
+        getHoldY: function () {
+          return 0;
+        },
+      };
+      return;
+    }
+
+    var pinHandlers = {};
+
+    var pinST = ScrollTrigger.create({
+      id: "grafiki-pin",
+      trigger: section,
+      start: "top top",
+      end: pinLen,
+      pin: true,
+      pinSpacing: true,
+      scrub: freeScroll ? true : false,
+      anticipatePin: 0.35,
+      invalidateOnRefresh: true,
+      refreshPriority: -1,
+      onEnter: function () {
+        if (pinHandlers.onEnter) pinHandlers.onEnter();
+      },
+      onEnterBack: function () {
+        if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
+      },
+      onUpdate: function (self) {
+        if (freeScroll) {
+          cinemaTl.progress(self.progress);
+          setOverlay(self.progress);
+        }
+        if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
+      },
+      onRefresh: function (self) {
+        if (freeScroll) {
+          cinemaTl.progress(self.progress || 0);
+          setOverlay(self.progress || 0);
+        }
+      },
+    });
+
+    if (freeScroll) {
+      window.cosgralGrafikiStepper = {
+        refresh: function () {
+          if (pinST) pinST.refresh();
+        },
+        snapToHold: function () {},
+        revealHold: function () {},
+        transitionToBeat: function () {},
+        resetForReentry: function () {
+          cinemaTl.progress(0);
+          setOverlay(0);
+        },
+        getBeat: function () {
+          return pinST && pinST.progress > 0.55 ? 1 : 0;
+        },
+        isAnimating: function () {
+          return false;
+        },
+        getPassDown: function () {
+          return true;
+        },
+        getPassUp: function () {
+          return true;
+        },
+        suspendHold: function () {},
+        getHoldY: function () {
+          return pinST ? pinST.start : 0;
+        },
+      };
+    } else {
+      initGrafikiStepper(section, cinemaTl, pinST, pinHandlers);
+    }
+
+    collageRoot.classList.add("is-ready");
+    section.classList.add("is-cinema-ready");
+
+    window.addEventListener("load", function () {
+      ScrollTrigger.refresh();
+      if (window.cosgralGrafikiStepper?.refresh) window.cosgralGrafikiStepper.refresh();
+      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
+    });
+  }
+
   var RAIL_LIGHT = {
     "--rail-track-edge": "rgba(255, 255, 255, 0.04)",
     "--rail-track-mid": "rgba(255, 255, 255, 0.14)",
@@ -1608,7 +1494,7 @@
     var cube = document.querySelector(".subpage-cube-portal");
     var bloom = document.getElementById("grafiki-bloom");
     var rail = getScrollRail();
-    var grafikiCta = document.querySelector("#grafiki [data-graphics-frames-cta]") || document.querySelector("#grafiki .graphics-brands");
+    var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
 
     grafikiMenuState.cube = cube;
     gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
