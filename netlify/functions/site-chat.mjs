@@ -358,7 +358,7 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
         })
         .join("")
         .trim();
-      if (text) return text.slice(0, 2200);
+      if (text && !isCannedAiFallback(text)) return text.slice(0, 2200);
       lastErr = new Error("gemini_empty");
     }
   }
