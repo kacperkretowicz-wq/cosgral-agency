@@ -107,8 +107,8 @@
         applyRecess(leave, 0);
         return;
       }
-      // Montaż → Grafiki: recess from scroll position (pinned grafiki.top stays
-      // near 0 and would otherwise freeze coverAmount mid-transition).
+      // Montaż → Grafiki: keep Montaż fully visible until Grafiki is almost
+      // pinned, then ease-in fade (was disappearing too early at 0.4vh).
       if (leave.id === "montaz" && enter.id === "grafiki") {
         var pin = window.ScrollTrigger && ScrollTrigger.getById("grafiki-pin");
         var scroll = window.scrollY || 0;
@@ -117,7 +117,7 @@
         }
         var vh = window.innerHeight || 1;
         if (pin) {
-          var fadeStart = pin.start - vh * 0.4;
+          var fadeStart = pin.start - vh * 0.12;
           if (scroll <= fadeStart) {
             applyRecess(leave, 0);
             return;
@@ -126,7 +126,10 @@
             applyRecess(leave, 1);
             return;
           }
-          applyRecess(leave, (scroll - fadeStart) / Math.max(1, pin.start - fadeStart));
+          var raw = (scroll - fadeStart) / Math.max(1, pin.start - fadeStart);
+          // Cubic ease-in: hold opacity, then soft fade in the last beats
+          var eased = raw * raw * raw;
+          applyRecess(leave, eased);
           return;
         }
       }
