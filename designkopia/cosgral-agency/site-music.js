@@ -65,9 +65,9 @@
     }
   } catch (e) {}
 
-  var wantPlay = false;
+  var wantPlay = true;
   try {
-    wantPlay = localStorage.getItem(STORAGE_ON) === "1";
+    wantPlay = localStorage.getItem(STORAGE_ON) !== "0";
   } catch (e2) {}
 
   var savedTime = 0;
@@ -80,13 +80,7 @@
   try {
     var navAt = parseInt(sessionStorage.getItem(STORAGE_NAV) || "0", 10) || 0;
     fromNav = !!(navAt && Date.now() - navAt < 60000);
-    forceAutoplay =
-      wantPlay &&
-      (fromNav ||
-        sessionStorage.getItem(STORAGE_AUTOPLAY) === "1" ||
-        sessionStorage.getItem("cosgral-music-engaged") === "1" ||
-        !!window.__cosgralMusicShouldAutoplay ||
-        !!window.__cosgralEarlyPlaying);
+    forceAutoplay = wantPlay;
     if (fromNav) sessionStorage.removeItem(STORAGE_NAV);
     if (forceAutoplay) {
       wantPlay = true;
@@ -117,7 +111,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925fix14");
+    link.href = assetPath("site-music.css?v=20260925fix20");
     document.head.appendChild(link);
   }
 
@@ -913,24 +907,25 @@
       playCurrent();
     };
     kickPlay();
-    window.setTimeout(kickPlay, 30);
+    window.setTimeout(kickPlay, 40);
     window.setTimeout(kickPlay, 120);
-    window.setTimeout(kickPlay, 320);
-    window.setTimeout(kickPlay, 700);
-    window.setTimeout(kickPlay, 1400);
+    window.setTimeout(kickPlay, 280);
+    window.setTimeout(kickPlay, 500);
+    window.setTimeout(kickPlay, 800);
+    window.setTimeout(kickPlay, 1000);
     armGestureResume();
-    // Keep trying after subpage entry until playback actually starts
+    // Keep trying after subpage entry until playback actually starts (~1s burst)
     if (resumeRetryTimer) clearInterval(resumeRetryTimer);
     var autoTries = 0;
     resumeRetryTimer = window.setInterval(function () {
       autoTries += 1;
-      if (unlocked || !wantPlay || autoTries > 40) {
+      if (unlocked || !wantPlay || autoTries > 12) {
         clearInterval(resumeRetryTimer);
         resumeRetryTimer = 0;
         return;
       }
       playCurrent();
-    }, 100);
+    }, 80);
     window.addEventListener("pageshow", function (ev) {
       if (!wantPlay) return;
       if (ev && ev.persisted) unlocked = false;

@@ -336,10 +336,28 @@ function hub_post_agent(string $api, string $visitorKey, string $body, string $p
 
 function fallback_ai_text(): string
 {
-    return 'Jasne — ogarniam temat. Napisz proszę 1–2 zdania więcej: co dokładnie chcesz wdrożyć '
-        . '(np. sklep, strona firmowa, CRM, SEO) i na kiedy. '
-        . 'Na tej podstawie Jakub lub Kacper z Cosgral dopną wycenę i plan współpracy: '
+    return 'Jasne — ogarniam temat po stronie Cosgral. Napisz 1–2 zdania: co chcesz wdrożyć '
+        . '(strona, sklep, CRM, SEO, automatyzacja) i na kiedy. '
+        . 'Jakub lub Kacper dopną wycenę i plan współpracy: '
         . '+48 533 790 518 / +48 571 798 397 albo kontakt@cosgral.pl.';
+}
+
+function ensure_agency_steer(string $text): string
+{
+    $hay = mb_strtolower($text, 'UTF-8');
+    $needles = [
+        'jakub', 'kacper', '533 790', '571 798', 'kontakt@cosgral', 'cosgral',
+        'wycen', 'audyt', 'rozmow', 'współprac', 'wspolprac', 'wdroż', 'wdroz',
+        'nasz zespół', 'nasz zespol', 'u nas',
+    ];
+    foreach ($needles as $n) {
+        if (mb_strpos($hay, $n) !== false) {
+            return $text;
+        }
+    }
+    $cta = 'Jeśli chcesz, wdrożymy to w Cosgral — napisz branżę i cel, albo dzwoń '
+        . 'do Jakuba (+48 533 790 518) lub Kacpra (+48 571 798 397).';
+    return rtrim($text) . "\n\n" . $cta;
 }
 
 function gemini_extract_text(array $data): string
@@ -350,7 +368,7 @@ function gemini_extract_text(array $data): string
     }
     $finish = (string)($candidate['finishReason'] ?? '');
     if ($finish === 'SAFETY' || $finish === 'BLOCKLIST' || $finish === 'PROHIBITED_CONTENT') {
-        return 'Jasne — wróćmy do rzeczy. W czym mogę pomóc: strona, sklep, CRM, SEO czy automatyzacja?';
+        return 'Jasne — wróćmy do rzeczy, które realnie ruszamy w Cosgral: strona, sklep, CRM, SEO albo automatyzacja. Co jest teraz najważniejsze?';
     }
     $parts = $candidate['content']['parts'] ?? [];
     $text = '';
@@ -390,19 +408,28 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
     ) {
         array_pop($contents);
     }
-    $contents[] = ['role' => 'user', 'parts' => [['text' => $latest]]];
+    $contents[] = [
+        'role' => 'user',
+        'parts' => [[
+            'text' => "[Zasada Cosgral — obowiązkowa przy tej odpowiedzi]\n"
+                . "Odpowiedz na pytanie klienta, ale jednocześnie zawsze prowadź do współpracy z naszą agencją. "
+                . "Reprezentuj dobro Cosgral. Nie polecaj konkurencji ani DIY jako lepszej opcji. "
+                . "Zakończ mostem do nas (audyt / rozmowa / telefon Jakub lub Kacper).\n\n"
+                . "Wiadomość klienta:\n" . $latest,
+        ]],
+    ];
 
     $baseConfig = [
-        'temperature' => 0.9,
-        'topP' => 0.95,
+        'temperature' => 0.45,
+        'topP' => 0.85,
         'maxOutputTokens' => 4096,
         'thinkingConfig' => [
             'thinkingBudget' => 0,
         ],
     ];
     $configNoThink = [
-        'temperature' => 0.9,
-        'topP' => 0.95,
+        'temperature' => 0.45,
+        'topP' => 0.85,
         'maxOutputTokens' => 4096,
     ];
 
@@ -444,7 +471,7 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
             }
             $text = gemini_extract_text($res['data']);
             if ($text !== '') {
-                return mb_substr($text, 0, 2200, 'UTF-8');
+                return mb_substr(ensure_agency_steer($text), 0, 2200, 'UTF-8');
             }
             $lastError = 'gemini_empty_' . $tryModel;
         }
@@ -565,6 +592,7 @@ try {
 } catch (Throwable $e) {
     $replyText = fallback_ai_text();
 }
+$replyText = ensure_agency_steer($replyText);
 
 $aiMessage = hub_post_agent($hubApi, $visitorKey, $replyText, $secrets['CHAT_HUB_AGENT_PIN']);
 if ($aiMessage === null) {
