@@ -338,7 +338,8 @@ function fallback_ai_text(): string
 {
     return 'Jasne — ogarniam temat. Napisz proszę 1–2 zdania więcej: co dokładnie chcesz wdrożyć '
         . '(np. sklep, strona firmowa, CRM, SEO) i na kiedy. '
-        . 'Na tej podstawie Jakub lub Kacper dopną wycenę: +48 533 790 518 / +48 571 798 397.';
+        . 'Na tej podstawie Jakub lub Kacper z Cosgral dopną wycenę i plan współpracy: '
+        . '+48 533 790 518 / +48 571 798 397 albo kontakt@cosgral.pl.';
 }
 
 function gemini_extract_text(array $data): string
