@@ -1935,7 +1935,9 @@ body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [role="
   visibility: visible !important;
 }
 body.portfolio-page #main > [data-portfolio-section].is-depth-recessed {
-  overflow: visible;
+  overflow: hidden;
+  /* Keep half-cut tiles from leaking into the next scene */
+  contain: paint;
 }
 body.portfolio-page #grafiki.is-depth-recessed,
 body.portfolio-page #grafiki.is-depth-gone {
@@ -2173,6 +2175,24 @@ body.portfolio-page #grafiki.is-depth-gone {
   height: 100%;
   overflow: hidden;
   pointer-events: none;
+}
+/* Hide cinema until the pin engages — prevents Montaż/Grafiki overlap jump */
+#grafiki:not(.is-grafiki-pinned) .graphics-stage__cinema {
+  opacity: 0;
+  visibility: hidden;
+}
+#grafiki.is-grafiki-pinned .graphics-stage__cinema {
+  opacity: 1;
+  visibility: visible;
+}
+/* Finale CTA only while pinned — stops duplicate GRAFIKI end after unpin */
+#grafiki.is-cinema-done:not(.is-grafiki-pinned) .graphics-frames-cta,
+#grafiki.is-cinema-done:not(.is-grafiki-pinned) .graphics-stage__overlay,
+body.is-grafiki-overlay-reveal:not(.is-grafiki-pinned) #grafiki .graphics-frames-cta,
+body.is-grafiki-overlay-reveal:not(.is-grafiki-pinned) #grafiki .graphics-stage__overlay {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 .graphics-stage__overlay {
   position: relative;

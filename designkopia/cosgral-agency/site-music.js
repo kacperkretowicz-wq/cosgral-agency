@@ -98,7 +98,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925fix6");
+    link.href = assetPath("site-music.css?v=20260925fix8");
     document.head.appendChild(link);
   }
 
@@ -299,7 +299,16 @@
     persistTime();
     try {
       sessionStorage.setItem(STORAGE_NAV, String(Date.now()));
-      localStorage.setItem(STORAGE_ON, wantPlay ? "1" : "0");
+      // Don't clobber ON=1 if memory state lagged behind storage / engagement
+      var stayOn =
+        wantPlay ||
+        localStorage.getItem(STORAGE_ON) === "1" ||
+        wasMediaEngaged() ||
+        unlocked ||
+        !!(window.__cosgralEarlyPlaying);
+      if (stayOn) wantPlay = true;
+      localStorage.setItem(STORAGE_ON, stayOn ? "1" : "0");
+      if (track()) localStorage.setItem(STORAGE_TRACK, track().id);
     } catch (e7) {}
   }
 
@@ -383,22 +392,41 @@
 
   function destroyPlayers() {
     stopTimeHeartbeat();
-    if (ytPlayer && typeof ytPlayer.destroy === "function") {
+    // Park early-boot audio outside the host so clearing host doesn't kill it
+    var early = document.getElementById("cosgral-music-early");
+    if (early) {
       try {
-        ytPlayer.destroy();
-      } catch (e9) {}
+        if (early.parentNode) early.parentNode.removeChild(early);
+        document.documentElement.appendChild(early);
+      } catch (ePark) {}
+      window.__cosgralEarlyAudio = early;
     }
-    ytPlayer = null;
-    ytReady = false;
-    if (audioEl) {
-      audioEl.pause();
-      audioEl.removeAttribute("src");
-      audioEl.load();
-      audioEl.remove();
+    if (audioEl && audioEl.id === "cosgral-music-early") {
+      audioEl = null;
+    } else if (audioEl) {
+      try {
+        audioEl.pause();
+        audioEl.removeAttribute("src");
+        audioEl.load();
+        if (audioEl.parentNode) audioEl.parentNode.removeChild(audioEl);
+      } catch (eD1) {}
       audioEl = null;
     }
+    if (ytPlayer) {
+      try {
+        if (typeof ytPlayer.destroy === "function") ytPlayer.destroy();
+      } catch (eD2) {}
+      ytPlayer = null;
+      ytReady = false;
+    }
     var mount = document.getElementById("site-music-yt");
-    if (mount) mount.remove();
+    if (mount) {
+      try {
+        mount.remove();
+      } catch (eM) {}
+    }
+    var host = document.getElementById("site-music-host");
+    if (host) host.innerHTML = "";
   }
 
   function loadYoutubeApi(cb) {
@@ -431,22 +459,64 @@
     }
   }
 
+  function adoptEarlyAudio(t) {
+    var early = window.__cosgralEarlyAudio || document.getElementById("cosgral-music-early");
+    if (!early || !t || !t.audio) return null;
+    if (early.dataset.trackId && early.dataset.trackId !== t.id) return null;
+    return early;
+  }
+
   function mountTrack(thenPlay, opts) {
     opts = opts || {};
     var fromStart = !!opts.fromStart;
     if (fromStart) clearSavedTime();
 
     var t = track();
-    destroyPlayers();
-    var host = ensureHost();
     var shouldAuto = !!(thenPlay || wantPlay);
+    var host = ensureHost();
 
     if (t.audio) {
+      var early = !fromStart ? adoptEarlyAudio(t) : null;
+      if (fromStart) {
+        // Manual skip — discard early element so we truly restart at 0:00
+        var stale = window.__cosgralEarlyAudio || document.getElementById("cosgral-music-early");
+        if (stale) {
+          try {
+            stale.pause();
+            if (stale.parentNode) stale.parentNode.removeChild(stale);
+          } catch (eStale) {}
+          window.__cosgralEarlyAudio = null;
+          window.__cosgralEarlyPlaying = false;
+        }
+      }
+      if (early) {
+        // Reuse already-playing element — seamless across subpages
+        audioEl = early;
+        if (audioEl.parentNode !== host) host.appendChild(audioEl);
+        window.__cosgralEarlyAudio = audioEl;
+        setPlayerVolume(targetVolume());
+        if (!audioEl.paused && !audioEl.ended) {
+          unlocked = true;
+          gestureArmed = false;
+          markMediaEngaged();
+          startTimeHeartbeat();
+          refreshUi();
+          applyVolume();
+          return;
+        }
+        if (shouldAuto) playCurrent({ fromStart: fromStart });
+        return;
+      }
+
+      destroyPlayers();
+      host = ensureHost();
       audioEl = document.createElement("audio");
       audioEl.loop = true;
       audioEl.preload = "auto";
+      audioEl.autoplay = !!shouldAuto;
       audioEl.setAttribute("playsinline", "");
       audioEl.setAttribute("webkit-playsinline", "");
+      audioEl.dataset.trackId = t.id;
       audioEl.src = assetPath(t.audio);
       host.appendChild(audioEl);
       setPlayerVolume(targetVolume());
@@ -471,6 +541,18 @@
       }
       if (shouldAuto) playCurrent({ fromStart: fromStart });
       return;
+    }
+
+    // YouTube path — tear down early HTML5 if switching away
+    destroyPlayers();
+    if (window.__cosgralEarlyAudio) {
+      try {
+        window.__cosgralEarlyAudio.pause();
+        if (window.__cosgralEarlyAudio.parentNode) {
+          window.__cosgralEarlyAudio.parentNode.removeChild(window.__cosgralEarlyAudio);
+        }
+      } catch (eEarly) {}
+      window.__cosgralEarlyAudio = null;
     }
 
     if (!t.youtube) return;

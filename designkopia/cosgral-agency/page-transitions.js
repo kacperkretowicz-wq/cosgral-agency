@@ -307,8 +307,19 @@
     navigating = true;
     sessionStorage.setItem(SESSION_KEY, "1");
 
+    var musicOn = !!(
+      window.CosgralMusic &&
+      window.CosgralMusic.isActive &&
+      window.CosgralMusic.isActive()
+    );
+
     if (window.CosgralMusic && window.CosgralMusic.persistNow) {
       window.CosgralMusic.persistNow();
+    }
+    if (musicOn && window.CosgralMusic.play) {
+      try {
+        window.CosgralMusic.play();
+      } catch (ePlay) {}
     }
 
     try {
@@ -328,9 +339,12 @@
     }
 
     playExit();
+    /* Music on: navigate almost immediately so the next page's early-boot
+       play() still rides media-engagement / sticky activation. */
+    var delay = musicOn ? 70 : EXIT_MS;
     window.setTimeout(function () {
       window.location.href = url;
-    }, EXIT_MS);
+    }, delay);
   }
 
   function bindLinks() {

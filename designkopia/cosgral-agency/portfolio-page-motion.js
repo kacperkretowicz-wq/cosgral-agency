@@ -107,6 +107,29 @@
         applyRecess(leave, 0);
         return;
       }
+      // Montaż → Grafiki: recess from scroll position (pinned grafiki.top stays
+      // near 0 and would otherwise freeze coverAmount mid-transition).
+      if (leave.id === "montaz" && enter.id === "grafiki") {
+        var pin = window.ScrollTrigger && ScrollTrigger.getById("grafiki-pin");
+        var scroll = window.scrollY || 0;
+        if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+          scroll = window.cosgralSmoothScroll.scroll;
+        }
+        var vh = window.innerHeight || 1;
+        if (pin) {
+          var fadeStart = pin.start - vh * 0.4;
+          if (scroll <= fadeStart) {
+            applyRecess(leave, 0);
+            return;
+          }
+          if (scroll >= pin.start) {
+            applyRecess(leave, 1);
+            return;
+          }
+          applyRecess(leave, (scroll - fadeStart) / Math.max(1, pin.start - fadeStart));
+          return;
+        }
+      }
       applyRecess(leave, coverAmount(enter));
     }
     ScrollTrigger.create({

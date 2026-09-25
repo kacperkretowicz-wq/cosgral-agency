@@ -401,7 +401,8 @@
     var spread = mobile ? 1.02 : 1.14;
     heroEnd = { x: heroEnd.x * m * spread, y: heroEnd.y * m * spread - (mobile ? 40 : 80) };
     var endScale = mobile ? 0.78 : 0.92;
-    var startScale = mobile ? 1.28 : 1.42;
+    /* Lower zoom so intro tiles aren't clipped by the viewport edges */
+    var startScale = mobile ? 1.08 : 1.18;
     var start = cameraFocus(clusterCenter(FOCUS_JUICY), startScale);
     var mid = cameraFocus(clusterCenter(FOCUS_FAR), mobile ? 1.12 : 1.22);
     var full = cameraFocus(heroEnd, endScale);
@@ -414,13 +415,12 @@
       var idx = Number(tile.getAttribute("data-idx"));
       var pos = WORLD[idx] || { s: 1, r: 0 };
       var fromLeft = i % 2 === 0;
-      var isIntro = INTRO_TILES.indexOf(idx) !== -1;
       gsap.set(tile, {
-        /* Intro cluster already faintly on-screen when pin engages */
-        opacity: isIntro ? 0.55 : 0,
+        /* Hidden until pin — avoids bleeding into Montaż */
+        opacity: 0,
         x: fromLeft ? -(mobile ? 56 : 96) : mobile ? 56 : 96,
         y: (i % 5) * (mobile ? 10 : 14) - 18,
-        scale: pos.s * (isIntro ? 0.9 : 0.78),
+        scale: pos.s * 0.78,
         rotation: pos.r + (fromLeft ? -5 : 5),
         transformOrigin: "50% 50%",
       });
@@ -428,7 +428,7 @@
 
     var tl = gsap.timeline({ paused: true, defaults: { ease: "sine.inOut" } });
 
-    /* Start immediately when pin engages — rail GRAFIKI = first cinema frames */
+    /* Fly-in starts at progress 0 once pinned (no empty lead). */
     var tileStart = 0;
     var tileStep = mobile ? 0.1 : 0.12;
     var tileDur = mobile ? 1.7 : 2.0;
@@ -445,7 +445,7 @@
           y: 0,
           scale: pos.s,
           rotation: pos.r,
-          duration: isIntro ? tileDur * 0.85 : tileDur,
+          duration: isIntro ? tileDur * 0.75 : tileDur,
           ease: "power1.out",
         },
         isIntro ? 0 : tileStart + i * tileStep
@@ -465,8 +465,8 @@
       );
     }
 
-    /* Hold na końcu — CTA później */
-    tl.to({}, { duration: 1.4 });
+    /* Short end hold — long hold made the finale feel duplicated after unpin */
+    tl.to({}, { duration: 0.55 });
 
     return tl;
   }
@@ -1210,10 +1210,10 @@
     var framesCta = section.querySelector("[data-graphics-frames-cta]");
 
     function setOverlay(p) {
-      /* CTA dopiero pod sam koniec — opacity (nie autoAlpha), żeby klik działał */
-      var show = p > 0.82;
-      var amt = Math.max(0, Math.min(1, (p - 0.82) / 0.12));
-      var clickable = show && amt > 0.2;
+      /* CTA near the end of the pin only — clear fully when p is low / unpinned */
+      var show = p > 0.88;
+      var amt = Math.max(0, Math.min(1, (p - 0.88) / 0.08));
+      var clickable = show && amt > 0.25;
       if (overlay) {
         overlay.setAttribute("aria-hidden", show ? "false" : "true");
         gsap.set(overlay, {
@@ -1236,8 +1236,24 @@
           framesCta.style.visibility = "visible";
         }
       }
-      section.classList.toggle("is-cinema-done", p > 0.9);
-      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.82);
+      section.classList.toggle("is-cinema-done", p > 0.94);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", show);
+    }
+
+    function clearGrafikiFinale() {
+      section.classList.remove("is-cinema-done", "is-grafiki-pinned");
+      document.body.classList.remove(
+        "is-grafiki-overlay-reveal",
+        "is-grafiki-cinema-end",
+        "is-grafiki-pinned"
+      );
+      setOverlay(0);
+    }
+
+    function setGrafikiPinned(on) {
+      section.classList.toggle("is-grafiki-pinned", !!on);
+      document.body.classList.toggle("is-grafiki-pinned", !!on);
+      if (!on) clearGrafikiFinale();
     }
 
     if (overlay) gsap.set(overlay, { opacity: 0, visibility: "hidden" });
@@ -1293,16 +1309,29 @@
       end: pinLen,
       pin: true,
       pinSpacing: true,
-      /* Większy lag = płynniejszy, wolniejszy odczucie ruchu */
       scrub: freeScroll ? (mobile ? 1.85 : 2.4) : false,
-      anticipatePin: 0.35,
+      anticipatePin: 0.15,
       invalidateOnRefresh: true,
       refreshPriority: -1,
+      onToggle: function (self) {
+        setGrafikiPinned(self.isActive);
+      },
       onEnter: function () {
+        setGrafikiPinned(true);
         if (pinHandlers.onEnter) pinHandlers.onEnter();
       },
       onEnterBack: function () {
+        setGrafikiPinned(true);
         if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
+      },
+      onLeave: function () {
+        clearGrafikiFinale();
+        if (pinHandlers.onLeave) pinHandlers.onLeave();
+      },
+      onLeaveBack: function () {
+        clearGrafikiFinale();
+        cinemaTl.progress(0);
+        if (pinHandlers.onLeaveBack) pinHandlers.onLeaveBack();
       },
       onUpdate: function (self) {
         if (freeScroll) {
@@ -1312,9 +1341,15 @@
         if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
       },
       onRefresh: function (self) {
+        setGrafikiPinned(!!self.isActive);
         if (freeScroll) {
-          cinemaTl.progress(self.progress || 0);
-          setOverlay(self.progress || 0);
+          if (self.isActive) {
+            cinemaTl.progress(self.progress || 0);
+            setOverlay(self.progress || 0);
+          } else {
+            cinemaTl.progress(0);
+            setOverlay(0);
+          }
         }
       },
     });
@@ -1569,16 +1604,22 @@
       trigger: section,
       start: function () {
         var pin = ScrollTrigger.getById("grafiki-pin");
-        /* Bez wczesnego rozjaśniania przed pinem */
         return pin ? pin.start : "top top";
       },
       end: function () {
         var pin = ScrollTrigger.getById("grafiki-pin");
-        return pin ? pin.end + window.innerHeight * 0.85 : "bottom top";
+        /* End with the pin — extending past it re-played a second dark finale */
+        return pin ? pin.end : "bottom top";
       },
       invalidateOnRefresh: true,
       onUpdate: liftFromScroll,
       onRefresh: liftFromScroll,
+      onLeave: function () {
+        applyAmbientLift(0);
+      },
+      onLeaveBack: function () {
+        applyAmbientLift(0);
+      },
     });
 
     var zoneST = ScrollTrigger.create({
