@@ -412,6 +412,17 @@
         if (openPanel) return;
         var card = e.target.closest(".services-fan__card.is-active");
         if (!card) return;
+        /* Boczne strefy = nawigacja karuzeli — nie otwieraj panelu z kafelka */
+        if (window.cosgralServicesFan && typeof window.cosgralServicesFan.isSideNavZone === "function") {
+          if (window.cosgralServicesFan.isSideNavZone(e.clientX)) return;
+        } else {
+          var uslugi = document.getElementById("uslugi");
+          if (uslugi) {
+            var rect = uslugi.getBoundingClientRect();
+            var ratio = (e.clientX - rect.left) / Math.max(1, rect.width);
+            if (ratio < 0.28 || ratio > 0.72) return;
+          }
+        }
         e.preventDefault();
         e.stopPropagation();
         openFromCard(card);

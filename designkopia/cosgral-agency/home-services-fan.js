@@ -343,22 +343,69 @@
     }
   }
 
-  // ——— Nawigacja: cała sekcja Usługi — lewa połowa = prev, prawa = next ———
+  // ——— Nawigacja: boczne strefy (nawet nad kafelkiem) = prev/next;
+  // środek aktywnego kafelka nadal otwiera panel usługi ———
+  var SIDE_ZONE = MOBILE ? 0.3 : 0.28;
+
+  function sideZoneFromX(clientX) {
+    var rect = section.getBoundingClientRect();
+    var ratio = (clientX - rect.left) / Math.max(1, rect.width);
+    if (ratio < SIDE_ZONE) return -1;
+    if (ratio > 1 - SIDE_ZONE) return 1;
+    return 0;
+  }
+
   function sideFromEvent(e) {
+    var zone = sideZoneFromX(e.clientX);
+    if (zone !== 0) return zone;
     var rect = section.getBoundingClientRect();
     var x = e.clientX - rect.left;
     return x < rect.width * 0.5 ? -1 : 1;
   }
 
-  section.addEventListener("click", function (e) {
-    // Środkowy aktywny kafelek nadal otwiera panel usługi.
-    if (e.target.closest(".services-fan__card.is-active")) return;
-    if (e.target.closest("a")) return;
-    hideHint();
-    hideTapHint();
-    if (sideFromEvent(e) < 0) prev();
-    else next();
-  });
+  section.addEventListener(
+    "click",
+    function (e) {
+      if (e.target.closest("a")) return;
+      var zone = sideZoneFromX(e.clientX);
+      /* Lewa/prawa strona ekranu — zawsze karuzela, kafelek nie przechwytuje */
+      if (zone !== 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        hideHint();
+        hideTapHint();
+        if (zone < 0) prev();
+        else next();
+        return;
+      }
+      /* Środek: aktywny kafelek → service-panel (document capture); poza kartą → nawigacja */
+      if (e.target.closest(".services-fan__card.is-active")) return;
+      hideHint();
+      hideTapHint();
+      if (sideFromEvent(e) < 0) prev();
+      else next();
+    },
+    true
+  );
+
+  if (btnPrev) {
+    btnPrev.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      hideHint();
+      hideTapHint();
+      prev();
+    });
+  }
+  if (btnNext) {
+    btnNext.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      hideHint();
+      hideTapHint();
+      next();
+    });
+  }
 
   section.addEventListener(
     "touchstart",
@@ -407,13 +454,21 @@
       touchTracking = false;
       touchAxis = null;
 
-      // Krótki tap (bez swipe) — lewa/prawa połowa sekcji.
+      // Krótki tap (bez swipe) — boczne strefy zawsze zmieniają kafelek.
       if (!axis || (Math.abs(dx) < SWIPE_MIN_DX && Math.abs(dy) < SWIPE_MIN_DX)) {
+        var zone = sideZoneFromX(endX);
+        if (zone !== 0) {
+          hideHint();
+          hideTapHint();
+          if (zone < 0) prev();
+          else next();
+          return;
+        }
         var active = section.querySelector(".services-fan__card.is-active");
         if (active) {
           var r = active.getBoundingClientRect();
           if (endX >= r.left && endX <= r.right && endY >= r.top && endY <= r.bottom) {
-            return; // tap w kafelek → zostaw klikowi otwarcie panelu
+            return; // tap w środek kafelka → zostaw klikowi otwarcie panelu
           }
         }
         hideHint();
@@ -549,6 +604,9 @@
   window.cosgralServicesFan = {
     goToIndex: function (nextIndex) {
       goTo(nextIndex);
+    },
+    isSideNavZone: function (clientX) {
+      return sideZoneFromX(clientX) !== 0;
     },
     stepFromWheel: function (deltaY) {
       if (!isUslugiActive() || !canNavigate()) return false;
