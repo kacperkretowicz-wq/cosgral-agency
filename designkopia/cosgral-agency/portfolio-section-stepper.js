@@ -122,14 +122,11 @@
     }
 
     function nearestIndex(scroll) {
+      // Last hold reached — Grafiki only after its pin start, not midway from Montaż
       var best = 0;
-      var dist = Infinity;
+      var slop = Math.max(48, Math.round(window.innerHeight * 0.06));
       for (var i = 0; i < holds.length; i++) {
-        var d = Math.abs(scroll - holds[i]);
-        if (d < dist) {
-          dist = d;
-          best = i;
-        }
+        if (scroll + slop >= holds[i]) best = i;
       }
       return best;
     }

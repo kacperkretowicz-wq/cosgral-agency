@@ -370,19 +370,16 @@
     }
 
     function activeIndex() {
-      if (window.cosgralPortfolioStepper?.getIndex) {
-        return window.cosgralPortfolioStepper.getIndex();
-      }
+      // Prefer live last-hold over stepper cache (can lag one frame behind Lenis)
       var scroll = window.scrollY;
+      if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+        scroll = window.cosgralSmoothScroll.scroll;
+      }
       var best = 0;
-      var bestDist = Infinity;
-      holdPositions.forEach(function (y, i) {
-        var dist = Math.abs(scroll - y);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
-      });
+      var slop = Math.max(24, Math.round(window.innerHeight * 0.04));
+      for (var i = 0; i < holdPositions.length; i++) {
+        if (scroll + slop >= (holdPositions[i] ?? 0)) best = i;
+      }
       return best;
     }
 

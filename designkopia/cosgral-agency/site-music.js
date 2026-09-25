@@ -74,7 +74,7 @@
   var fromNav = false;
   try {
     var navAt = parseInt(sessionStorage.getItem(STORAGE_NAV) || "0", 10) || 0;
-    fromNav = wantPlay && navAt && Date.now() - navAt < 8000;
+    fromNav = wantPlay && navAt && Date.now() - navAt < 20000;
     if (fromNav) sessionStorage.removeItem(STORAGE_NAV);
   } catch (eNav) {}
 
@@ -98,7 +98,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925fix4");
+    link.href = assetPath("site-music.css?v=20260925fix6");
     document.head.appendChild(link);
   }
 
@@ -236,11 +236,15 @@
     });
   }
 
-  function persist() {
+  function persistTrackOnly() {
     try {
       localStorage.setItem(STORAGE_TRACK, track().id);
       localStorage.setItem(STORAGE_ON, wantPlay ? "1" : "0");
-    } catch (e3) {}
+    } catch (e3b) {}
+  }
+
+  function persist() {
+    persistTrackOnly();
     persistTime();
   }
 
@@ -252,6 +256,23 @@
       } catch (e4) {}
       savedTime = t;
     }
+  }
+
+  function clearSavedTime() {
+    savedTime = 0;
+    try {
+      sessionStorage.removeItem(STORAGE_TIME);
+    } catch (eClr) {}
+  }
+
+  function seekToStart() {
+    clearSavedTime();
+    try {
+      if (audioEl) audioEl.currentTime = 0;
+      if (ytPlayer && typeof ytPlayer.seekTo === "function") {
+        ytPlayer.seekTo(0, true);
+      }
+    } catch (eSeek0) {}
   }
 
   function getCurrentTime() {
@@ -410,7 +431,11 @@
     }
   }
 
-  function mountTrack(thenPlay) {
+  function mountTrack(thenPlay, opts) {
+    opts = opts || {};
+    var fromStart = !!opts.fromStart;
+    if (fromStart) clearSavedTime();
+
     var t = track();
     destroyPlayers();
     var host = ensureHost();
@@ -420,10 +445,12 @@
       audioEl = document.createElement("audio");
       audioEl.loop = true;
       audioEl.preload = "auto";
+      audioEl.setAttribute("playsinline", "");
+      audioEl.setAttribute("webkit-playsinline", "");
       audioEl.src = assetPath(t.audio);
       host.appendChild(audioEl);
       setPlayerVolume(targetVolume());
-      if (savedTime > 1) {
+      if (!fromStart && savedTime > 1) {
         audioEl.addEventListener(
           "loadedmetadata",
           function () {
@@ -431,8 +458,18 @@
           },
           { once: true }
         );
+      } else {
+        audioEl.addEventListener(
+          "loadedmetadata",
+          function () {
+            try {
+              audioEl.currentTime = 0;
+            } catch (e0) {}
+          },
+          { once: true }
+        );
       }
-      if (shouldAuto) playCurrent();
+      if (shouldAuto) playCurrent({ fromStart: fromStart });
       return;
     }
 
@@ -457,18 +494,21 @@
           rel: 0,
           loop: 1,
           playlist: t.youtube,
-          start: savedTime > 1 ? Math.floor(savedTime) : 0,
+          start: !fromStart && savedTime > 1 ? Math.floor(savedTime) : 0,
         },
         events: {
           onReady: function () {
             ytReady = true;
             setPlayerVolume(targetVolume());
-            seekToSaved();
-            if (shouldAuto) playCurrent();
+            if (fromStart) seekToStart();
+            else seekToSaved();
+            if (shouldAuto) playCurrent({ fromStart: fromStart });
           },
           onStateChange: function (ev) {
             if (ev.data === 1) {
               unlocked = true;
+              gestureArmed = false;
+              markMediaEngaged();
               startTimeHeartbeat();
               refreshUi();
               applyVolume();
@@ -492,17 +532,22 @@
     });
   }
 
-  function playCurrent() {
+  function playCurrent(opts) {
+    opts = opts || {};
     wantPlay = true;
-    persist();
+    persistTrackOnly();
+    if (!opts.fromStart) persistTime();
     refreshUi();
 
     if (audioEl) {
-      seekToSaved();
+      if (opts.fromStart) seekToStart();
+      else seekToSaved();
       var p = audioEl.play();
       if (p && p.then) {
         p.then(function () {
           unlocked = true;
+          gestureArmed = false;
+          markMediaEngaged();
           startTimeHeartbeat();
           refreshUi();
           applyVolume();
@@ -513,6 +558,8 @@
         });
       } else {
         unlocked = true;
+        gestureArmed = false;
+        markMediaEngaged();
         startTimeHeartbeat();
         refreshUi();
       }
@@ -523,13 +570,15 @@
       try {
         ytPlayer.unMute();
         ytPlayer.setVolume(Math.round(currentVol));
-        seekToSaved();
+        if (opts.fromStart) seekToStart();
+        else seekToSaved();
         ytPlayer.playVideo();
-        // Don't assume unlocked until state 1 — but try
         window.setTimeout(function () {
           try {
             if (ytPlayer.getPlayerState && ytPlayer.getPlayerState() === 1) {
               unlocked = true;
+              gestureArmed = false;
+              markMediaEngaged();
               startTimeHeartbeat();
               refreshUi();
             } else if (wantPlay && !unlocked) {
@@ -548,7 +597,7 @@
       return;
     }
 
-    mountTrack(true);
+    mountTrack(true, opts);
   }
 
   function pauseCurrent() {
@@ -578,13 +627,11 @@
   function selectTrack(index, autoPlay) {
     if (index < 0 || index >= TRACKS.length) return;
     trackIndex = index;
-    savedTime = 0;
-    try {
-      sessionStorage.removeItem(STORAGE_TIME);
-    } catch (e14) {}
-    persist();
+    // Manual skip / pick must start from 0 — clear BEFORE persist (old player still has time)
+    clearSavedTime();
+    persistTrackOnly();
     refreshUi();
-    mountTrack(!!(autoPlay || wantPlay));
+    mountTrack(!!(autoPlay || wantPlay), { fromStart: true });
   }
 
   function nextTrack(autoPlay) {
@@ -646,19 +693,78 @@
     bodyObs.observe(document.body, { childList: true, subtree: true });
   }
 
+  function markMediaEngaged() {
+    try {
+      sessionStorage.setItem("cosgral-music-engaged", "1");
+    } catch (eEng) {}
+  }
+
+  function wasMediaEngaged() {
+    try {
+      return sessionStorage.getItem("cosgral-music-engaged") === "1";
+    } catch (eEng2) {
+      return false;
+    }
+  }
+
   var gestureArmed = false;
+  var resumeRetryTimer = 0;
+
+  function tryResumePlayback() {
+    if (!wantPlay || unlocked) return false;
+    playCurrent();
+    return true;
+  }
+
   function armGestureResume() {
     if (gestureArmed || !wantPlay) return;
     gestureArmed = true;
+
     var resume = function () {
       if (!wantPlay || unlocked) return;
-      playCurrent();
+      tryResumePlayback();
     };
-    // Any interaction continues music after subpage load (no need to hit play again)
-    ["pointerdown", "touchstart", "keydown", "wheel", "scroll"].forEach(function (ev) {
-      document.addEventListener(ev, resume, { capture: true, passive: true, once: false });
+
+    // Lenis hijacks wheel/scroll — native scroll often never fires. Use pointer + Lenis.
+    ["pointerdown", "pointerup", "touchstart", "keydown", "mousemove", "wheel"].forEach(function (ev) {
+      document.addEventListener(ev, resume, { capture: true, passive: true });
     });
-    // After successful unlock, listeners become no-ops via unlocked check
+    window.addEventListener("scroll", resume, { capture: true, passive: true });
+    window.addEventListener("focus", resume);
+    window.addEventListener("pageshow", resume);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") resume();
+    });
+
+    if (window.cosgralSmoothScroll?.lenis?.on) {
+      try {
+        window.cosgralSmoothScroll.lenis.on("scroll", resume);
+      } catch (eLenis) {}
+    } else {
+      // Lenis may boot after music — hook when ready
+      window.addEventListener(
+        "cosgral:smooth-ready",
+        function () {
+          try {
+            window.cosgralSmoothScroll?.lenis?.on?.("scroll", resume);
+          } catch (eLenis2) {}
+        },
+        { once: true }
+      );
+    }
+
+    // Retry burst after SPA-like full navigations (MEI window)
+    if (resumeRetryTimer) clearInterval(resumeRetryTimer);
+    var tries = 0;
+    resumeRetryTimer = window.setInterval(function () {
+      tries += 1;
+      if (unlocked || !wantPlay || tries > 24) {
+        clearInterval(resumeRetryTimer);
+        resumeRetryTimer = 0;
+        return;
+      }
+      tryResumePlayback();
+    }, fromNav || wasMediaEngaged() ? 120 : 280);
   }
 
   ensureCss();
@@ -669,15 +775,28 @@
   // Save position before leaving
   window.addEventListener("pagehide", markNavigatingAway);
   window.addEventListener("beforeunload", markNavigatingAway);
+  document.addEventListener(
+    "click",
+    function (e) {
+      var a = e.target && e.target.closest && e.target.closest("a[href]");
+      if (!a || !wantPlay) return;
+      markNavigatingAway();
+      // Warm MEI inside the user gesture before page transition
+      tryResumePlayback();
+    },
+    true
+  );
 
   // Auto-resume across subpages when music was on
   mountTrack(wantPlay);
   if (wantPlay) {
     refreshUi();
-    // Immediate try (works when browser MEI / recent navigation allows)
     window.setTimeout(function () {
       if (wantPlay && !unlocked) playCurrent();
-    }, fromNav ? 80 : 200);
+    }, fromNav || wasMediaEngaged() ? 40 : 180);
+    window.setTimeout(function () {
+      if (wantPlay && !unlocked) playCurrent();
+    }, fromNav ? 350 : 700);
     armGestureResume();
   }
 

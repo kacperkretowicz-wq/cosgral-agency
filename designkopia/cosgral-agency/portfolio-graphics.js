@@ -401,7 +401,7 @@
     var spread = mobile ? 1.02 : 1.14;
     heroEnd = { x: heroEnd.x * m * spread, y: heroEnd.y * m * spread - (mobile ? 40 : 80) };
     var endScale = mobile ? 0.78 : 0.92;
-    var startScale = mobile ? 1.4 : 1.65;
+    var startScale = mobile ? 1.28 : 1.42;
     var start = cameraFocus(clusterCenter(FOCUS_JUICY), startScale);
     var mid = cameraFocus(clusterCenter(FOCUS_FAR), mobile ? 1.12 : 1.22);
     var full = cameraFocus(heroEnd, endScale);
@@ -414,27 +414,29 @@
       var idx = Number(tile.getAttribute("data-idx"));
       var pos = WORLD[idx] || { s: 1, r: 0 };
       var fromLeft = i % 2 === 0;
+      var isIntro = INTRO_TILES.indexOf(idx) !== -1;
       gsap.set(tile, {
-        opacity: 0,
+        /* Intro cluster already faintly on-screen when pin engages */
+        opacity: isIntro ? 0.55 : 0,
         x: fromLeft ? -(mobile ? 56 : 96) : mobile ? 56 : 96,
         y: (i % 5) * (mobile ? 10 : 14) - 18,
-        scale: pos.s * 0.78,
+        scale: pos.s * (isIntro ? 0.9 : 0.78),
         rotation: pos.r + (fromLeft ? -5 : 5),
         transformOrigin: "50% 50%",
       });
     });
 
     var tl = gsap.timeline({ paused: true, defaults: { ease: "sine.inOut" } });
-    /* Dłuższy spokój na starcie — ruch zaczyna się później w pinie */
-    tl.to({}, { duration: 1.1 });
 
-    var tileStart = 1.1;
-    var tileStep = mobile ? 0.12 : 0.145;
-    var tileDur = mobile ? 1.85 : 2.15;
+    /* Start immediately when pin engages — rail GRAFIKI = first cinema frames */
+    var tileStart = 0;
+    var tileStep = mobile ? 0.1 : 0.12;
+    var tileDur = mobile ? 1.7 : 2.0;
 
     tileArr.forEach(function (tile, i) {
       var idx = Number(tile.getAttribute("data-idx"));
       var pos = WORLD[idx] || { s: 1, r: 0 };
+      var isIntro = INTRO_TILES.indexOf(idx) !== -1;
       tl.to(
         tile,
         {
@@ -443,17 +445,17 @@
           y: 0,
           scale: pos.s,
           rotation: pos.r,
-          duration: tileDur,
+          duration: isIntro ? tileDur * 0.85 : tileDur,
           ease: "power1.out",
         },
-        tileStart + i * tileStep
+        isIntro ? 0 : tileStart + i * tileStep
       );
     });
 
-    var camMidAt = tileStart + 1.2;
-    var camFullAt = tileStart + tileArr.length * tileStep * 0.5 + 1.8;
-    tl.to(camera, Object.assign({ duration: 3.2, ease: "sine.inOut" }, mid), camMidAt);
-    tl.to(camera, Object.assign({ duration: 3.8, ease: "sine.inOut" }, full), camFullAt);
+    var camMidAt = 0.55;
+    var camFullAt = tileArr.length * tileStep * 0.45 + 1.35;
+    tl.to(camera, Object.assign({ duration: 3.0, ease: "sine.inOut" }, mid), camMidAt);
+    tl.to(camera, Object.assign({ duration: 3.6, ease: "sine.inOut" }, full), camFullAt);
 
     if (watermark) {
       tl.to(
