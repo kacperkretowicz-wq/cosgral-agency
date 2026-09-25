@@ -1890,10 +1890,22 @@ body.portfolio-page #main > [data-portfolio-section].is-depth-gone {
 body.portfolio-page #main > [data-portfolio-section].is-depth-active {
   z-index: var(--depth-z, 20);
 }
-/* Interact while partially on-screen — even mid recess / transition */
-body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone),
-body.portfolio-page #main > [data-portfolio-section].is-depth-recessed:not(.is-depth-gone) {
+/* Shell nie przechwytuje — klikalne kafelki / Zobacz więcej także w trakcie blur / transition */
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) {
+  pointer-events: none !important;
+}
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) a,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) button,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .glass-btn,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .portfolio-case-card,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .portfolio-case-card__link,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .reels-tiles__cta,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .graphics-frames-cta,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [data-tile-interact],
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [href],
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [role="button"] {
   pointer-events: auto !important;
+  visibility: visible !important;
 }
 body.portfolio-page #main > [data-portfolio-section].is-depth-recessed {
   overflow: visible;

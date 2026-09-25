@@ -66,7 +66,12 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : 1;
     if (!footer) return max;
-    return Math.min(max, Math.max(0, footer.offsetTop));
+    var scrollY = window.scrollY || window.pageYOffset || 0;
+    if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+      scrollY = window.cosgralSmoothScroll.scroll;
+    }
+    var y = footer.getBoundingClientRect().top + scrollY;
+    return Math.min(max, Math.max(0, y));
   }
 
   function sectionLayoutTop(el) {

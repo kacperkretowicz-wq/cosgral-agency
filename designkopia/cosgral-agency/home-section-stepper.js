@@ -29,8 +29,12 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    /* Full-viewport footer section — pin its top to the viewport top */
-    return Math.min(max, Math.max(0, footer.offsetTop));
+    var scrollY = window.scrollY || window.pageYOffset || 0;
+    if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+      scrollY = window.cosgralSmoothScroll.scroll;
+    }
+    var y = footer.getBoundingClientRect().top + scrollY;
+    return Math.min(max, Math.max(0, y));
   }
 
   function verticalMargins(el) {

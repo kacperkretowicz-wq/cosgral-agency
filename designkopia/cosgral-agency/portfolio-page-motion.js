@@ -48,16 +48,18 @@
     if (target.style.filter !== "none") target.style.filter = "none";
     var hold = 0.04;
     if (p <= hold) {
-      gsap.set(target, { autoAlpha: 1, yPercent: 0, scale: 1, force3D: true });
-      gsap.set(el, { autoAlpha: 1 });
+      gsap.set(target, { opacity: 1, visibility: "visible", yPercent: 0, scale: 1, force3D: true });
+      gsap.set(el, { opacity: 1, visibility: "visible" });
       el.classList.remove("is-depth-recessed", "is-depth-gone");
       el.style.pointerEvents = "";
       return;
     }
     var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
     var fade = u * u;
+    /* opacity (nie autoAlpha) — klikalne w trakcie blur / przejścia */
     gsap.set(target, {
-      autoAlpha: 1 - fade,
+      opacity: 1 - fade,
+      visibility: "visible",
       yPercent: (MOBILE ? -4 : -8) * u,
       scale: 1 - (MOBILE ? 0.2 : 0.3) * u,
       transformOrigin: "50% 42%",
@@ -67,10 +69,10 @@
     if (u >= 0.98) {
       el.classList.add("is-depth-gone");
       el.style.pointerEvents = "none";
-      gsap.set(el, { autoAlpha: 0 });
+      gsap.set(el, { opacity: 0, visibility: "hidden" });
     } else {
       el.classList.remove("is-depth-gone");
-      gsap.set(el, { autoAlpha: 1 });
+      gsap.set(el, { opacity: 1, visibility: "visible" });
       el.style.pointerEvents = "";
     }
   }

@@ -202,26 +202,25 @@ html.is-free-scroll main.home-film {
     --depth-dwell: 26dvh;
   }
 }
-/* Tor pod stopkę WEWNĄTRZ main: ostatnie sticky dziecko (Kontakt) trzyma się
-   top:0 tylko dopóki kontener trwa — spacer daje mu dwell + pełny cover, a stopka
-   (sibling main, z-index 8 > main 1) wjeżdża z ujemnym marginesem nad Kontakt
-   dokładnie tak, jak każda kolejna scena nad poprzednią. Bez luki, bez prześwitu. */
+/* Kontakt + stopka = jedna ciągła taśma (bez sticky cover / -100dvh overlay).
+   Spacer i ujemny margin powodowały zacinanie przy handoffie — usunięte. */
 html.is-free-scroll main.home-film::after {
-  content: "";
-  display: block;
-  height: calc(100vh + var(--depth-dwell));
-  height: calc(100dvh + var(--depth-dwell));
+  content: none !important;
+  display: none !important;
+  height: 0 !important;
   pointer-events: none;
 }
 html.is-free-scroll main.home-film > #kontakt.home-depth {
-  margin-bottom: 0;
+  position: relative !important;
+  top: auto !important;
+  margin-bottom: 0 !important;
+  background: var(--bg, #030303);
+  overflow: visible;
+  justify-content: flex-start;
 }
 html.is-free-scroll .site-footer {
-  margin-top: -100vh;
-  margin-top: -100dvh;
-  /* Pełny viewport — inaczej sticky Kontakt prześwieca pod krótką stopką */
-  min-height: 100vh;
-  min-height: 100dvh;
+  margin-top: 0 !important;
+  min-height: auto !important;
   box-sizing: border-box;
   background: var(--bg, #030303);
   justify-content: flex-start;
@@ -245,10 +244,27 @@ html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone {
   opacity: 0 !important;
   z-index: 0 !important;
 }
-/* Keep tiles / CTAs clickable while the scene is still partly visible */
-html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone),
-html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-recessed:not(.is-depth-gone),
-html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-active:not(.is-depth-gone) {
+/* Shell nie przechwytuje klików — tylko interaktywne cele.
+   Dzięki temu kafelki / CTA spod zblurowanej warstwy działają w trakcie przejścia. */
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) {
+  pointer-events: none !important;
+}
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) a,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) button,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) input,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) textarea,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) select,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) label,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) summary,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .home-work__card,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .glass-btn,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .faq-item,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .faq-item__q,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .services-fan__card,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-tile-interact],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-faq-toggle],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [href],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [role="button"] {
   pointer-events: auto !important;
 }
 html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone .home-scene__panel,
@@ -280,8 +296,7 @@ html.is-free-scroll #uslugi.home-depth,
 html.is-free-scroll #uslugi.is-visible.home-scene {
   z-index: 20 !important;
 }
-/* Kontakt: sticky jak reszta stacku, nieprzezroczyste tło (formularz nie nachodzi na Proces).
-   Stopka (sibling main, wyższy stacking) przykrywa Kontakt tym samym coverem co inne sceny. */
+/* Kontakt: dokumentowy ciąg z stopką (nie sticky overlay). Tło kryje Proces przy wjeździe. */
 html.is-free-scroll #kontakt.home-depth {
   z-index: 60 !important;
   background: var(--bg, #030303);
@@ -465,14 +480,17 @@ html.reduce-motion .home-scene [data-enter] {
   filter: none !important;
   visibility: visible !important;
 }
-/* Free-scroll: po wejściu w scenę data-enter nie może zostawić visibility:hidden
-   (GSAP autoAlpha + tilt wrap potrafiło zablokować kliknięcia w kafelki Realizacji). */
-html.is-free-scroll .home-scene.is-depth-active.is-visible [data-enter],
-html.is-free-scroll .home-scene.is-entered.is-visible [data-enter] {
+/* Free-scroll: data-enter używa opacity (nie autoAlpha), więc visibility zostaje visible.
+   Kafelki / CTA klikalne też w trakcie blur / przejścia do kolejnej sekcji. */
+html.is-free-scroll .home-scene:not(.is-depth-gone) [data-enter],
+html.is-free-scroll .home-scene:not(.is-depth-gone) .reveal-word > span {
   visibility: visible !important;
 }
-html.is-free-scroll .home-scene.is-depth-active.is-visible .home-work__card,
-html.is-free-scroll .home-scene.is-entered.is-visible .home-work__card {
+html.is-free-scroll .home-scene:not(.is-depth-gone) .home-work__card,
+html.is-free-scroll .home-scene:not(.is-depth-gone) .home-work__link,
+html.is-free-scroll .home-scene:not(.is-depth-gone) .glass-btn,
+html.is-free-scroll .home-scene.is-depth-recessed:not(.is-depth-gone) a,
+html.is-free-scroll .home-scene.is-depth-recessed:not(.is-depth-gone) button {
   visibility: visible !important;
   pointer-events: auto !important;
 }
@@ -489,12 +507,7 @@ html.is-free-scroll .home-scene.is-entered.is-visible .home-work__card {
   padding: clamp(1.5rem, 4vh, 2.75rem) var(--gutter) clamp(1.75rem, 5vh, 3rem);
 }
 
-/* Stopka — cover Kontaktu prowadzi depth ticker (section-flow), bez zmiany layoutu.
-   is-footer-step (cover > 0.45) odpala wejścia stopki; is-footer-covered (cover ≥ 0.985)
-   chowa portal sześcianu/piasku dopiero, gdy stopka zakrywa go w całości — wcześniej
-   piasek nad górną, jeszcze widoczną częścią Kontaktu znikałby skokiem. */
-
-/* Kontakt → stopka: bez runway — jedna ciągła taśma na --bg */
+/* Kontakt → stopka: jedna ciągła taśma na --bg (bez runway / cover hide Kontaktu) */
 html.is-free-scroll .footer-runway {
   display: none;
   height: 0;
@@ -509,14 +522,6 @@ html.is-footer-covered .home-sand {
   /* !important — home-hero-3d pisze visibility inline; menu (niżej w pliku) i tak nadpisuje */
   visibility: hidden !important;
   pointer-events: none;
-}
-html.is-footer-covered #kontakt.home-depth,
-html.is-footer-covered #kontakt.home-depth * {
-  pointer-events: none !important;
-}
-html.is-footer-covered #kontakt.home-depth {
-  visibility: hidden !important;
-  opacity: 0 !important;
 }
 
 .home-cursor { position: fixed; top: 0; left: 0; z-index: 10001; pointer-events: none; mix-blend-mode: difference; }
@@ -1830,6 +1835,31 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   padding-block: clamp(1rem, 3.5vh, 2.25rem);
   overflow: hidden;
   box-sizing: border-box;
+}
+html.is-free-scroll .home-contact.home-scene {
+  overflow: visible;
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding-block: 0;
+}
+html.is-free-scroll #kontakt.home-depth > .home-scene__panel {
+  align-self: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: clamp(1rem, 3.5vh, 2.25rem);
+  box-sizing: border-box;
+}
+html.is-free-scroll #kontakt .site-footer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin-top: 0;
+  flex-shrink: 0;
+  /* Nadpisz globalny z-index:8 — stopka jest w środku #kontakt */
+  z-index: 1;
 }
 .home-contact.home-scene .home-scene__panel {
   position: relative;
