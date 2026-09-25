@@ -1184,6 +1184,10 @@
     var section = document.getElementById("grafiki");
     if (!cinema || !section) return;
 
+    /* Prevent double init (fetch/media-ready / HMR) which breaks pin + duplicates UI */
+    if (section.dataset.cinemaScrollInit === "1") return;
+    section.dataset.cinemaScrollInit = "1";
+
     var camera = cinema.querySelector(".graphics-cinema__camera");
     var world = cinema.querySelector(".graphics-cinema__world");
     var watermark = cinema.querySelector(".graphics-cinema__watermark");
@@ -1208,6 +1212,7 @@
 
     var overlay = section.querySelector(".graphics-stage__overlay");
     var framesCta = section.querySelector("[data-graphics-frames-cta]");
+    var stage = section.querySelector(".graphics-stage");
 
     function setOverlay(p) {
       /* CTA near the end of the pin only — clear fully when p is low / unpinned */
@@ -1242,9 +1247,6 @@
         document.body.classList.add("is-grafiki-light");
         if (window.cosgralGrafikiBloom?.apply) {
           window.cosgralGrafikiBloom.apply(1);
-        } else {
-          var bloomST = window.ScrollTrigger && ScrollTrigger.getById("grafiki-bloom");
-          if (bloomST) bloomST.update();
         }
       }
     }
@@ -1261,6 +1263,19 @@
     function setGrafikiPinned(on) {
       section.classList.toggle("is-grafiki-pinned", !!on);
       document.body.classList.toggle("is-grafiki-pinned", !!on);
+    }
+
+    function clearGrafikiRecess() {
+      section.classList.remove("is-depth-recessed", "is-depth-gone");
+      section.style.pointerEvents = "";
+      if (window.gsap) {
+        gsap.set(section, { clearProps: "opacity,visibility" });
+        if (stage) {
+          gsap.set(stage, {
+            clearProps: "opacity,visibility,transform,filter,yPercent,scale",
+          });
+        }
+      }
     }
 
     if (overlay) gsap.set(overlay, { opacity: 0, visibility: "hidden" });
@@ -1308,10 +1323,8 @@
     }
 
     var pinHandlers = {};
-    /* First portion of cinema plays while Montaż recesses / Grafiki covers it */
-    var APPROACH_END = mobile ? 0.12 : 0.16;
-    /* Tiles ease in across most of the Montaż cover — continuous scroll-tell */
-    var APPROACH_TILE_START = mobile ? 0.28 : 0.32;
+    var APPROACH_END = mobile ? 0.12 : 0.15;
+    var APPROACH_TILE_START = mobile ? 0.3 : 0.35;
 
     function cinemaFromPinProgress(p) {
       return APPROACH_END + Math.max(0, Math.min(1, p)) * (1 - APPROACH_END);
@@ -1323,6 +1336,12 @@
       return ((t - APPROACH_TILE_START) / (1 - APPROACH_TILE_START)) * APPROACH_END;
     }
 
+    /* Kill stale triggers from a prior boot */
+    ["grafiki-pin", "grafiki-approach", "grafiki-cinema-sync"].forEach(function (id) {
+      var old = ScrollTrigger.getById(id);
+      if (old) old.kill();
+    });
+
     var pinST = ScrollTrigger.create({
       id: "grafiki-pin",
       trigger: section,
@@ -1330,88 +1349,95 @@
       end: pinLen,
       pin: true,
       pinSpacing: true,
-      scrub: freeScroll ? (mobile ? 1.85 : 2.4) : false,
-      anticipatePin: 0.15,
+      /* Tight scrub = same feel up & down; high scrub lagged and “broke” on reverse */
+      scrub: freeScroll ? (mobile ? 0.75 : 0.95) : false,
+      anticipatePin: 0.05,
       invalidateOnRefresh: true,
       refreshPriority: -1,
       onToggle: function (self) {
         setGrafikiPinned(self.isActive);
+        if (self.isActive) clearGrafikiRecess();
       },
       onEnter: function () {
         setGrafikiPinned(true);
+        clearGrafikiRecess();
         if (pinHandlers.onEnter) pinHandlers.onEnter();
       },
       onEnterBack: function () {
         setGrafikiPinned(true);
+        clearGrafikiRecess();
         if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
       },
       onLeave: function () {
-        // Keep light end-frame (GRAFIKI + button); free-scroll into footer
         setGrafikiPinned(false);
-        cinemaTl.progress(1);
-        setOverlay(1);
+        if (freeScroll) {
+          cinemaTl.progress(1);
+          setOverlay(1);
+        }
         if (pinHandlers.onLeave) pinHandlers.onLeave();
       },
       onLeaveBack: function () {
         setGrafikiPinned(false);
         clearGrafikiFinale();
-        cinemaTl.progress(0);
+        /* Don’t hard-snap to 0 — cinema-sync will set approach progress */
         if (pinHandlers.onLeaveBack) pinHandlers.onLeaveBack();
       },
       onUpdate: function (self) {
-        if (freeScroll) {
-          var cp = cinemaFromPinProgress(self.progress);
-          cinemaTl.progress(cp);
-          setOverlay(cp);
-        }
-        if (window.cosgralGrafikiBloom?.syncFromPin) {
-          window.cosgralGrafikiBloom.syncFromPin(self);
-        }
         if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
       },
       onRefresh: function (self) {
         setGrafikiPinned(!!self.isActive);
-        if (!freeScroll) return;
-        if (self.isActive) {
-          var cp = cinemaFromPinProgress(self.progress || 0);
-          cinemaTl.progress(cp);
-          setOverlay(cp);
-        } else if (typeof self.scroll === "function" && self.scroll() > self.end) {
-          cinemaTl.progress(1);
-          setOverlay(1);
-        }
-        if (window.cosgralGrafikiBloom?.syncFromPin) {
-          window.cosgralGrafikiBloom.syncFromPin(self);
-        }
+        if (self.isActive) clearGrafikiRecess();
       },
     });
 
-    /* Approach: tiles fly in only after Montaż is recessed / almost gone */
+    /**
+     * Single bidirectional cinema scrub: approach → pin → post-pin end frame.
+     * Avoids approach/pin fighting (which duplicated Grafiki on scroll-up).
+     */
+    function syncCinemaFromScroll() {
+      if (!freeScroll || !pinST) return;
+      var y = typeof pinST.scroll === "function" ? pinST.scroll() : window.scrollY || 0;
+      var start = pinST.start;
+      var end = pinST.end;
+      var vh = window.innerHeight || 1;
+      var approachStart = start - vh;
+      var cp = 0;
+
+      if (y <= approachStart) {
+        cp = 0;
+      } else if (y < start) {
+        var ap = (y - approachStart) / Math.max(1, start - approachStart);
+        cp = approachCinemaProgress(ap);
+      } else if (y <= end) {
+        var pp = (y - start) / Math.max(1, end - start);
+        cp = cinemaFromPinProgress(pp);
+      } else {
+        cp = 1;
+      }
+
+      cinemaTl.progress(cp);
+      setOverlay(cp);
+      if (window.cosgralGrafikiBloom?.syncFromPin) {
+        window.cosgralGrafikiBloom.syncFromPin(pinST);
+      }
+    }
+
     ScrollTrigger.create({
-      id: "grafiki-approach",
-      trigger: section,
-      start: "top bottom",
-      end: "top top",
-      scrub: freeScroll ? (mobile ? 1.2 : 1.6) : false,
+      id: "grafiki-cinema-sync",
+      start: 0,
+      end: "max",
       invalidateOnRefresh: true,
       refreshPriority: -2,
-      onUpdate: function (self) {
-        if (!freeScroll || pinST.isActive) return;
-        cinemaTl.progress(approachCinemaProgress(self.progress));
-        setOverlay(0);
-      },
-      onRefresh: function (self) {
-        if (!freeScroll || pinST.isActive) return;
-        if (self.progress > 0 && self.progress < 1) {
-          cinemaTl.progress(approachCinemaProgress(self.progress));
-        }
-      },
+      onUpdate: syncCinemaFromScroll,
+      onRefresh: syncCinemaFromScroll,
     });
 
     if (freeScroll) {
       window.cosgralGrafikiStepper = {
         refresh: function () {
           if (pinST) pinST.refresh();
+          syncCinemaFromScroll();
         },
         snapToHold: function () {},
         revealHold: function () {},
@@ -1419,6 +1445,7 @@
         resetForReentry: function () {
           cinemaTl.progress(0);
           setOverlay(0);
+          clearGrafikiRecess();
         },
         getBeat: function () {
           return pinST && cinemaFromPinProgress(pinST.progress) > 0.88 ? 1 : 0;
@@ -1443,9 +1470,11 @@
 
     collageRoot.classList.add("is-ready");
     section.classList.add("is-cinema-ready");
+    syncCinemaFromScroll();
 
     window.addEventListener("load", function () {
       ScrollTrigger.refresh();
+      syncCinemaFromScroll();
       if (window.cosgralGrafikiStepper?.refresh) window.cosgralGrafikiStepper.refresh();
       if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
     });

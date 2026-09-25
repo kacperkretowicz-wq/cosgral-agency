@@ -1975,16 +1975,29 @@ body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [role="
   pointer-events: auto !important;
   visibility: visible !important;
 }
-/* Soft depth cover — scale/blur instead of hard paint-clip against the next section */
+/* Soft depth cover — allow slight blur bleed, but clip Montaż tiles to avoid ghost duplicates */
 body.portfolio-page #main > [data-portfolio-section].is-depth-recessed {
-  overflow: visible;
-  contain: none;
+  overflow: hidden;
+  contain: paint;
 }
-body.portfolio-page #montaz.is-depth-recessed,
-body.portfolio-page #grafiki.is-depth-recessed,
-body.portfolio-page #grafiki.is-depth-gone {
+body.portfolio-page #montaz.is-depth-recessed {
+  overflow: hidden !important;
+  max-height: 100svh;
+  contain: paint;
+}
+/* Grafiki: when recessed under footer, keep overflow visible for soft scale-out */
+body.portfolio-page #grafiki.is-depth-recessed {
   overflow: visible !important;
   contain: none;
+}
+body.portfolio-page #grafiki.is-grafiki-pinned {
+  overflow: hidden !important;
+}
+body.portfolio-page #grafiki.is-grafiki-pinned .graphics-stage {
+  /* Pin active: never keep leftover recess transforms */
+  transform: none;
+  filter: none;
+  opacity: 1;
 }
 .portfolio-section .container {
   position: relative;
@@ -2986,11 +2999,6 @@ body.is-lightbox-open {
   box-sizing: border-box;
   overflow: hidden;
   padding-bottom: clamp(1rem, 3vh, 1.75rem);
-}
-/* During depth cover, let Montaż scale/blur away instead of hard-clipping tiles */
-.portfolio-page #montaz.is-depth-recessed {
-  overflow: visible;
-  max-height: none;
 }
 .portfolio-page #montaz > .home-tilt-layer,
 .portfolio-page #montaz > .home-tilt-layer > .home-tilt-face {

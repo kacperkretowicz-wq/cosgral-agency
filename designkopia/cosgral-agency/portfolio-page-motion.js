@@ -50,21 +50,16 @@
     if (!el || !window.gsap) return;
     var target = poseTarget(el);
     var hold = 0.02;
-    var exitScale = MOBILE ? 0.8 : 0.7;
-    var exitBlur = MOBILE ? 8 : 14;
-    var exitY = MOBILE ? -3 : -6;
+    var exitScale = MOBILE ? 0.82 : 0.72;
+    var exitBlur = MOBILE ? 6 : 12;
+    var exitY = MOBILE ? -2 : -5;
     if (p <= hold) {
-      gsap.set(target, {
-        opacity: 1,
-        visibility: "visible",
-        yPercent: 0,
-        scale: 1,
-        filter: "blur(0px)",
-        force3D: true,
-      });
-      gsap.set(el, { opacity: 1, visibility: "visible" });
       el.classList.remove("is-depth-recessed", "is-depth-gone");
       el.style.pointerEvents = "";
+      gsap.set(el, { clearProps: "opacity,visibility" });
+      gsap.set(target, {
+        clearProps: "opacity,visibility,transform,filter,yPercent,scale",
+      });
       return;
     }
     var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
