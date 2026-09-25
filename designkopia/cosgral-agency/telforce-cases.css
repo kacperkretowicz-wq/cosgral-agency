@@ -295,19 +295,28 @@
   }
   .case-study--systems .case-study__title {
     max-width: none;
-    font-size: clamp(2.05rem, 9.2vw, 3.1rem);
+    font-size: clamp(1.9rem, 8.4vw, 2.85rem);
+    line-height: 1.02;
   }
   .case-study--systems .case-study__lede {
     max-width: none;
     margin-bottom: 1.15rem;
+    font-size: 1.02rem;
+    line-height: 1.5;
   }
   .case-study--systems .case-study__signals {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 0.45rem;
   }
   .case-study--systems .case-study__signals li {
-    flex: 1 1 auto;
-    padding: 0.5rem 0.7rem;
-    font-size: 0.58rem;
+    flex: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    white-space: normal;
   }
   .case-study--systems .case-study__stage {
     padding: 0;
@@ -317,23 +326,67 @@
     border-right: none;
     box-shadow: none;
   }
+  /* Jedna kolumna — inaczej copy + aside ściskają się do wąskich pasów */
   .case-study--systems .case-study__body {
-    gap: 1.35rem;
-    padding-top: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding-top: 1.5rem;
+    width: 100%;
+    max-width: none;
+  }
+  .case-study--systems .case-study__copy {
+    order: 1;
+    max-width: none;
+    width: 100%;
+    gap: 1.1rem;
+  }
+  .case-study--systems .case-study__copy p,
+  .case-study--systems .case-study__copy p:first-child {
+    max-width: none;
+    width: 100%;
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+  .case-study--systems .case-study__copy p:first-child {
+    font-size: 1.12rem;
+    line-height: 1.55;
   }
   .case-study--systems .case-study__aside {
+    order: 2;
     position: static;
-    order: 0;
+    width: 100%;
+    box-sizing: border-box;
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
+    margin-top: 0.25rem;
   }
-  .case-study--systems .case-study__copy p:first-child {
-    max-width: none;
+  .case-study--systems .case-study__aside-label {
+    line-height: 1.4;
+    white-space: normal;
+  }
+  .case-study--systems .case-study__visit,
+  .case-study--systems .case-study__cta {
+    width: 100%;
+    min-height: 2.85rem;
+    box-sizing: border-box;
   }
   .case-study--systems .case-study__client::before {
     width: 0.9rem;
     margin-right: 0.55rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .case-study--systems .case-study__signals li {
+    font-size: 0.64rem;
+    padding: 0.6rem 0.75rem;
+  }
+  .case-study--systems .case-study__copy p,
+  .case-study--systems .case-study__copy p:first-child {
+    font-size: 1.02rem;
   }
 }
 
