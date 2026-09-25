@@ -748,11 +748,25 @@
           var fade = self.progress;
           var eased = fade * fade * (3 - 2 * fade);
           document.documentElement.classList.toggle("is-footer-step", eased > 0.35);
+          document.documentElement.classList.toggle("is-footer-covered", eased > 0.92);
           contact.classList.toggle("is-footer-handoff", eased > 0.08);
+          if (eased > 0.92) {
+            contact.classList.add("is-depth-gone");
+            contact.style.pointerEvents = "none";
+          } else if (eased < 0.75) {
+            contact.classList.remove("is-depth-gone");
+            contact.style.pointerEvents = "";
+          }
         },
         onLeaveBack: function () {
-          contact.classList.remove("is-footer-handoff");
-          document.documentElement.classList.remove("is-footer-step");
+          contact.classList.remove("is-footer-handoff", "is-depth-gone");
+          contact.style.pointerEvents = "";
+          document.documentElement.classList.remove("is-footer-step", "is-footer-covered");
+        },
+        onLeave: function () {
+          document.documentElement.classList.add("is-footer-step", "is-footer-covered");
+          contact.classList.add("is-depth-gone", "is-footer-handoff");
+          contact.style.pointerEvents = "none";
         },
       });
     }

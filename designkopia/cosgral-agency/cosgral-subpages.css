@@ -331,7 +331,7 @@ body.is-portfolio-scene-bridge .portfolio-scene-curtain {
   text-transform: uppercase;
   color: var(--ink);
 }
-/* Automatyzacje — zawsze czytelna po chapter intro */
+/* Automatyzacje — zawsze czytelna po chapter intro; bez żyroskopu */
 body.portfolio-page #automatyzacje.is-entered,
 body.portfolio-page #automatyzacje.is-visible {
   opacity: 1 !important;
@@ -339,6 +339,19 @@ body.portfolio-page #automatyzacje.is-visible {
   pointer-events: auto !important;
 }
 body.portfolio-page #automatyzacje.is-entered .portfolio-scene__panel,
+body.portfolio-page #automatyzacje.is-visible .portfolio-scene__panel {
+  opacity: 1 !important;
+}
+body.portfolio-page #automatyzacje .home-tilt-layer,
+body.portfolio-page #automatyzacje .home-tilt-face {
+  transform: none !important;
+  perspective: none !important;
+  -webkit-perspective: none !important;
+}
+body.portfolio-page #automatyzacje {
+  --global-tilt-x: 0deg;
+  --global-tilt-y: 0deg;
+}
 body.portfolio-page #automatyzacje.is-visible .home-tilt-layer {
   opacity: 1;
 }

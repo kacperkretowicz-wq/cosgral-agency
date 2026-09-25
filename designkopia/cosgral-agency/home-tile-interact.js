@@ -218,6 +218,8 @@
     });
 
     document.querySelectorAll("[data-portfolio-section]").forEach(function (section) {
+      /* Systemy i automatyzacje: bez żyroskopu / global tilt */
+      if (section.id === "automatyzacje") return;
       wrapChildren(section, ".portfolio-section__curtain");
     });
 

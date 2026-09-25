@@ -893,64 +893,64 @@
       "en": "Application"
     },
     "auto1_client": {
-      "pl": "ShelfSync",
-      "en": "ShelfSync"
+      "pl": "Trove",
+      "en": "Trove"
     },
     "auto1_title": {
       "pl": "Panel sklepu i monitoring cen",
       "en": "Store panel & price monitoring"
     },
     "auto1_desc": {
-      "pl": "Aplikacja dla wielokanałowego sprzedawcy fashion: stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.",
-      "en": "An app for a multi-channel fashion seller: stock levels, marketplace price checks and markdown alerts. Less manual control — faster response to price changes."
+      "pl": "Stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.",
+      "en": "Stock levels, marketplace price checks and markdown alerts. Less manual control — faster response to price changes."
     },
     "auto2_tag": {
       "pl": "CRM",
       "en": "CRM"
     },
     "auto2_client": {
-      "pl": "Northline Studio",
-      "en": "Northline Studio"
+      "pl": "",
+      "en": ""
     },
     "auto2_title": {
       "pl": "CRM leadów, dealów i operacji sprzedażowych",
       "en": "CRM for leads, deals and sales operations"
     },
     "auto2_desc": {
-      "pl": "CRM dla zespołu B2B: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów między handlowcami.",
-      "en": "A B2B team CRM: leads → deals → pipeline, notes, statuses and reminders in one place. Full contact history without leads getting lost between salespeople."
+      "pl": "Narzędzie do prowadzenia sprzedaży: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów.",
+      "en": "A sales tool: leads → deals → pipeline, notes, statuses and reminders in one place. Full contact history without lost leads."
     },
     "auto3_tag": {
       "pl": "Automatyzacja",
       "en": "Automation"
     },
     "auto3_client": {
-      "pl": "Atelier Bloom",
-      "en": "Atelier Bloom"
+      "pl": "",
+      "en": ""
     },
     "auto3_title": {
       "pl": "Chatbot AI do wiadomości klientów",
       "en": "AI chatbot for customer messages"
     },
     "auto3_desc": {
-      "pl": "Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź dostępna 24/7.",
-      "en": "An AI assistant answering Instagram, Facebook and website messages — FAQ, opening hours, preliminary quotes and handoff to a consultant. First reply available 24/7."
+      "pl": "Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź 24/7.",
+      "en": "An AI assistant answering Instagram, Facebook and website messages — FAQ, opening hours, preliminary quotes and handoff to a consultant. First reply 24/7."
     },
     "auto4_tag": {
       "pl": "Automatyzacja",
       "en": "Automation"
     },
     "auto4_client": {
-      "pl": "Parcel & Co.",
-      "en": "Parcel & Co."
+      "pl": "Trove",
+      "en": "Trove"
     },
     "auto4_title": {
       "pl": "Zamówienie → faktura → status paczki",
       "en": "Order → invoice → parcel status"
     },
     "auto4_desc": {
-      "pl": "Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta (e-mail/Slack). Mniej ręcznej pracy przy obsłudze zamówień.",
-      "en": "An e-commerce workflow: a new order triggers invoice-ready export, parcel status updates and a customer notification (email/Slack). Less manual work in order operations."
+      "pl": "Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta. Mniej ręcznej pracy przy obsłudze zamówień.",
+      "en": "An e-commerce workflow: a new order triggers invoice-ready export, parcel status updates and a customer notification. Less manual work in order operations."
     },
     "view_all": {
       "pl": "Zobacz wszystko →",
@@ -1141,6 +1141,234 @@
     "tf_forecast_p3": {
       "pl": "W projekcie ważna jest czytelność: najpierw stan, potem zmiana w czasie i sygnał wymagający uwagi. Dzięki temu panel wspiera szybkie decyzje operacyjne.",
       "en": "Clarity matters here: first the current state, then change over time, then the signal requiring attention. The panel supports quick operational decisions."
+    },
+    "case_trove_panel_tag": {
+      "pl": "Aplikacja",
+      "en": "Application"
+    },
+    "case_trove_panel_title": {
+      "pl": "Panel sklepu i monitoring cen",
+      "en": "Store panel & price monitoring"
+    },
+    "case_trove_panel_lede": {
+      "pl": "Jeden panel na stany, ceny marketplace i alerty przecen dla Trove.",
+      "en": "One panel for stock, marketplace prices and markdown alerts for Trove."
+    },
+    "case_trove_panel_meta": {
+      "title": {
+        "pl": "Panel sklepu i monitoring cen — Trove | COSGRAL",
+        "en": "Store panel & price monitoring — Trove | COSGRAL"
+      },
+      "description": {
+        "pl": "Panel sklepu i monitoring cen dla Trove — stany, marketplace i alerty.",
+        "en": "Store panel and price monitoring for Trove — stock, marketplaces and alerts."
+      }
+    },
+    "case_trove_panel_p1": {
+      "pl": "Dla Trove zbudowaliśmy panel, który zbiera stany magazynowe i ceny z kanałów sprzedaży w jednym widoku. Zamiast ręcznego sprawdzania marketplace’ów zespół widzi różnice i ryzyka od razu.",
+      "en": "For Trove we built a panel that gathers stock levels and channel prices in one view. Instead of checking marketplaces by hand, the team sees gaps and risks immediately."
+    },
+    "case_trove_panel_p2": {
+      "pl": "Monitoring cen porównuje oferty i sygnalizuje przeceny oraz odchylenia. Alerty skracają czas reakcji, gdy konkurencja zmienia warunki albo gdy własna oferta wypada z rynku.",
+      "en": "Price monitoring compares offers and flags markdowns and outliers. Alerts cut reaction time when competitors move or when your listing falls behind."
+    },
+    "case_trove_panel_p3": {
+      "pl": "Cel był prosty: mniej ręcznej kontroli, więcej kontroli nad marżą i dostępnością — bez kolejnego arkusza Excel.",
+      "en": "The goal was simple: less manual checking, more control over margin and availability — without another spreadsheet."
+    },
+    "case_trove_panel_client": {
+      "pl": "Trove",
+      "en": "Trove"
+    },
+    "case_crm_leady_tag": {
+      "pl": "CRM",
+      "en": "CRM"
+    },
+    "case_crm_leady_title": {
+      "pl": "CRM leadów, dealów i operacji sprzedażowych",
+      "en": "CRM for leads, deals and sales operations"
+    },
+    "case_crm_leady_lede": {
+      "pl": "Narzędzie do prowadzenia sprzedaży: leady, deale, pipeline i historia kontaktu w jednym miejscu.",
+      "en": "A sales tool: leads, deals, pipeline and contact history in one place."
+    },
+    "case_crm_leady_meta": {
+      "title": {
+        "pl": "CRM leadów, dealów i operacji sprzedażowych | COSGRAL",
+        "en": "CRM for leads, deals and sales operations | COSGRAL"
+      },
+      "description": {
+        "pl": "CRM do leadów, dealów i pipeline — notatki, statusy i przypomnienia w jednym narzędziu.",
+        "en": "CRM for leads, deals and pipeline — notes, statuses and reminders in one tool."
+      }
+    },
+    "case_crm_leady_p1": {
+      "pl": "To narzędzie CRM do prowadzenia sprzedaży od pierwszego kontaktu do domknięcia deala. Leady, deale i pipeline żyją w jednym procesie, zamiast ginąć między skrzynkami i notatkami.",
+      "en": "This CRM tool runs sales from first contact to a closed deal. Leads, deals and pipeline live in one process instead of getting lost between inboxes and notes."
+    },
+    "case_crm_leady_p2": {
+      "pl": "Notatki, statusy i przypomnienia trzymają historię kontaktu przy karcie klienta. Zespół widzi, kto prowadzi rozmowę i co zostało ustalone — bez dopytywania się nawzajem.",
+      "en": "Notes, statuses and reminders keep contact history on the account. The team sees who owns the conversation and what was agreed — without chasing each other."
+    },
+    "case_crm_leady_p3": {
+      "pl": "Efekt: mniej utraconych leadów, czytelniejszy pipeline i sprzedaż, którą da się kontynuować nawet gdy zmienia się osoba odpowiedzialna.",
+      "en": "Result: fewer lost leads, a clearer pipeline, and sales that can continue even when ownership changes."
+    },
+    "case_chatbot_ai_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "case_chatbot_ai_title": {
+      "pl": "Chatbot AI do wiadomości klientów",
+      "en": "AI chatbot for customer messages"
+    },
+    "case_chatbot_ai_lede": {
+      "pl": "Asystent AI odpowiadający na wiadomości z social i WWW — z przekazaniem rozmowy do człowieka.",
+      "en": "An AI assistant answering social and website messages — with handoff to a human."
+    },
+    "case_chatbot_ai_meta": {
+      "title": {
+        "pl": "Chatbot AI do wiadomości klientów | COSGRAL",
+        "en": "AI chatbot for customer messages | COSGRAL"
+      },
+      "description": {
+        "pl": "Chatbot AI do wiadomości z Instagram, Facebook i WWW — FAQ, wyceny i handoff do konsultanta.",
+        "en": "AI chatbot for Instagram, Facebook and website messages — FAQ, quotes and consultant handoff."
+      }
+    },
+    "case_chatbot_ai_p1": {
+      "pl": "Chatbot AI odbiera wiadomości z Instagrama, Facebooka i formularza WWW. Odpowiada na FAQ, godziny otwarcia i typowe pytania o ofertę, zanim do rozmowy wejdzie konsultant.",
+      "en": "The AI chatbot takes messages from Instagram, Facebook and the website form. It answers FAQ, opening hours and common offer questions before a consultant joins."
+    },
+    "case_chatbot_ai_p2": {
+      "pl": "Gdy temat wykracza poza automat, rozmowa jest przekazywana człowiekowi wraz z kontekstem. Klient nie zaczyna od zera, a zespół dostaje już wstępnie zebrane informacje.",
+      "en": "When the topic goes beyond automation, the chat is handed to a human with context. The customer does not start from zero, and the team gets pre-collected details."
+    },
+    "case_chatbot_ai_p3": {
+      "pl": "Narzędzie daje pierwszą odpowiedź 24/7 i odciąża skrzynkę, bez utraty ścieżki do realnej rozmowy sprzedażowej lub obsługowej.",
+      "en": "The tool gives a first reply 24/7 and lightens the inbox, without losing the path to a real sales or support conversation."
+    },
+    "case_trove_workflow_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "case_trove_workflow_title": {
+      "pl": "Zamówienie → faktura → status paczki",
+      "en": "Order → invoice → parcel status"
+    },
+    "case_trove_workflow_lede": {
+      "pl": "Automatyczny workflow e-commerce dla Trove: od zamówienia przez fakturę po status dostawy.",
+      "en": "An automated e-commerce workflow for Trove: from order through invoice to delivery status."
+    },
+    "case_trove_workflow_meta": {
+      "title": {
+        "pl": "Zamówienie → faktura → status paczki — Trove | COSGRAL",
+        "en": "Order → invoice → parcel status — Trove | COSGRAL"
+      },
+      "description": {
+        "pl": "Workflow Trove: zamówienie uruchamia fakturę, status paczki i powiadomienie klienta.",
+        "en": "Trove workflow: an order triggers invoice, parcel status and customer notification."
+      }
+    },
+    "case_trove_workflow_p1": {
+      "pl": "Dla Trove zaprojektowaliśmy łańcuch automatyzacji wokół nowego zamówienia. Zamiast ręcznego przepisywania danych system przygotowuje eksport pod fakturę i aktualizuje status realizacji.",
+      "en": "For Trove we designed an automation chain around a new order. Instead of retyping data by hand, the system prepares invoice export and updates fulfilment status."
+    },
+    "case_trove_workflow_p2": {
+      "pl": "Status paczki i powiadomienie klienta domykają pętlę: kupujący wie, gdzie jest przesyłka, a zespół nie musi ręcznie klikać kolejnych kroków w kilku narzędziach.",
+      "en": "Parcel status and customer notification close the loop: the buyer knows where the shipment is, and the team does not click the same steps across several tools."
+    },
+    "case_trove_workflow_p3": {
+      "pl": "Efekt to mniej operacyjnej tarcia przy każdym zamówieniu i spójniejsza obsługa od checkoutu do dostawy.",
+      "en": "The result is less operational friction on every order and a more coherent path from checkout to delivery."
+    },
+    "case_trove_workflow_client": {
+      "pl": "Trove",
+      "en": "Trove"
+    },
+    "tf_crm_s1": {
+      "pl": "Mapa klientów",
+      "en": "Client map"
+    },
+    "tf_crm_s2": {
+      "pl": "Baza handlowców",
+      "en": "Sales database"
+    },
+    "tf_crm_s3": {
+      "pl": "Praca w terenie",
+      "en": "Field work"
+    },
+    "tf_code_s1": {
+      "pl": "Code 39",
+      "en": "Code 39"
+    },
+    "tf_code_s2": {
+      "pl": "Generator etykiet",
+      "en": "Label generator"
+    },
+    "tf_code_s3": {
+      "pl": "Szybki wydruk",
+      "en": "Fast print"
+    },
+    "tf_forecast_s1": {
+      "pl": "Stany magazynowe",
+      "en": "Stock levels"
+    },
+    "tf_forecast_s2": {
+      "pl": "Prognoza popytu",
+      "en": "Demand forecast"
+    },
+    "tf_forecast_s3": {
+      "pl": "Alerty braków",
+      "en": "Shortage alerts"
+    },
+    "case_trove_panel_s1": {
+      "pl": "Stany magazynowe",
+      "en": "Stock levels"
+    },
+    "case_trove_panel_s2": {
+      "pl": "Ceny marketplace",
+      "en": "Marketplace prices"
+    },
+    "case_trove_panel_s3": {
+      "pl": "Alerty przecen",
+      "en": "Markdown alerts"
+    },
+    "case_crm_leady_s1": {
+      "pl": "Leady → deale",
+      "en": "Leads → deals"
+    },
+    "case_crm_leady_s2": {
+      "pl": "Pipeline sprzedaży",
+      "en": "Sales pipeline"
+    },
+    "case_crm_leady_s3": {
+      "pl": "Historia kontaktu",
+      "en": "Contact history"
+    },
+    "case_chatbot_ai_s1": {
+      "pl": "Social + WWW",
+      "en": "Social + web"
+    },
+    "case_chatbot_ai_s2": {
+      "pl": "FAQ i wyceny",
+      "en": "FAQ & quotes"
+    },
+    "case_chatbot_ai_s3": {
+      "pl": "Handoff do człowieka",
+      "en": "Human handoff"
+    },
+    "case_trove_workflow_s1": {
+      "pl": "Nowe zamówienie",
+      "en": "New order"
+    },
+    "case_trove_workflow_s2": {
+      "pl": "Eksport faktury",
+      "en": "Invoice export"
+    },
+    "case_trove_workflow_s3": {
+      "pl": "Status paczki",
+      "en": "Parcel status"
     }
   }
 }

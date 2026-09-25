@@ -1520,23 +1520,28 @@
       gsap.set(blur, { opacity: lerp(0.55, 0.82, t) });
       if (rail) gsap.set(rail, mixRail(RAIL_LIGHT, RAIL_DARK, t));
       /* Jasny tryb przez całą widoczność Grafiki — ściemnianie dopiero gdy sekcja zniknie ze scrolla */
-      document.body.classList.toggle("is-grafiki-light", t > 0.06);
+      document.body.classList.toggle("is-grafiki-light", t > 0.18);
       syncGrafikiCubeFade();
     }
 
     function liftFromScroll(self) {
       var pin = ScrollTrigger.getById("grafiki-pin");
       var y = self.scroll();
-      var liftStart = self.start;
-      var pinStart = pin ? pin.start : self.start + (self.end - self.start) * 0.22;
+      var pinStart = pin ? pin.start : self.start;
       var pinEnd = pin ? pin.end : self.end;
-      /* Ściemnianie dopiero po końcu pina (= Grafiki już nie widać) */
+      var pinSpan = Math.max(1, pinEnd - pinStart);
+      /* Rozjaśnianie później i wolniej — dopiero po ~22% pinu, pełne ~58% */
+      var liftStart = pinStart + pinSpan * 0.22;
+      var liftFull = pinStart + pinSpan * 0.58;
       var darkenStart = pinEnd;
       var darkenEnd = self.end;
       var t;
-      if (y <= pinStart) {
-        var raw = (y - liftStart) / Math.max(1, pinStart - liftStart);
-        t = Math.min(1, Math.pow(Math.max(0, raw), 0.4));
+      if (y <= liftStart) {
+        t = 0;
+      } else if (y < liftFull) {
+        var raw = (y - liftStart) / Math.max(1, liftFull - liftStart);
+        /* Ease-in: dłużej ciemno, potem spokojny wzrost */
+        t = Math.pow(Math.max(0, Math.min(1, raw)), 1.65);
       } else if (y <= darkenStart) {
         t = 1;
       } else {
@@ -1550,11 +1555,11 @@
       trigger: section,
       start: function () {
         var pin = ScrollTrigger.getById("grafiki-pin");
-        return pin ? pin.start - window.innerHeight * 0.72 : "top 92%";
+        /* Bez wczesnego rozjaśniania przed pinem */
+        return pin ? pin.start : "top top";
       },
       end: function () {
         var pin = ScrollTrigger.getById("grafiki-pin");
-        /* Do ściemnienia po zniknięciu Grafiki — przejście w Automatyzacje / chapter */
         return pin ? pin.end + window.innerHeight * 0.85 : "bottom top";
       },
       invalidateOnRefresh: true,

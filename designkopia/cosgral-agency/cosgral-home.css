@@ -219,6 +219,12 @@ html.is-free-scroll main.home-film > #kontakt.home-depth {
 html.is-free-scroll .site-footer {
   margin-top: -100vh;
   margin-top: -100dvh;
+  /* Pełny viewport — inaczej sticky Kontakt prześwieca pod krótką stopką */
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  background: var(--bg, #030303);
+  justify-content: flex-start;
 }
 @media (max-width: 900px) {
   html.is-free-scroll main.home-film {
@@ -491,6 +497,14 @@ html.is-footer-covered .home-sand {
   /* !important — home-hero-3d pisze visibility inline; menu (niżej w pliku) i tak nadpisuje */
   visibility: hidden !important;
   pointer-events: none;
+}
+html.is-footer-covered #kontakt.home-depth,
+html.is-footer-covered #kontakt.home-depth * {
+  pointer-events: none !important;
+}
+html.is-footer-covered #kontakt.home-depth {
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 .home-cursor { position: fixed; top: 0; left: 0; z-index: 10001; pointer-events: none; mix-blend-mode: difference; }
@@ -2626,7 +2640,8 @@ html.reduce-motion .home-scroll-rail { display: none; }
   .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 0.6rem; margin-bottom: 0.55rem; }
   .site-footer {
     overflow: visible;
-    min-height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
     justify-content: flex-start;
     padding-top: clamp(1.1rem, 3.5dvh, 1.75rem);
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
@@ -2705,7 +2720,8 @@ html.reduce-motion .home-scroll-rail { display: none; }
   }
 
   html.is-footer-step .site-footer {
-    min-height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
     justify-content: flex-start;
     padding-top: clamp(1.1rem, 3.5dvh, 1.75rem);
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
