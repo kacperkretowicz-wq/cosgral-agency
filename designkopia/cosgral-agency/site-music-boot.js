@@ -1,6 +1,6 @@
 /**
- * Early sync music boot — starts HTML5 tracks before deferred scripts.
- * Survives subpage navigations via MEI + immediate play(); site-music.js adopts the element.
+ * Early music boot — resumes playback as soon as the next subpage starts.
+ * HTML5 tracks play immediately; YouTube is marked for deferred site-music.js.
  */
 (function () {
   "use strict";
@@ -12,18 +12,42 @@
       "session-01": "assets/music/session-01.mp3",
       "session-02": "assets/music/session-02.mp3",
     };
-    var src = AUDIO[id];
-    // Keep nav flag warm for YouTube / deferred player
+    var YOUTUBE = {
+      "ghost-cities": "asn93p_UtXE",
+    };
+
     try {
       sessionStorage.setItem("cosgral-music-nav", String(Date.now()));
+      sessionStorage.setItem("cosgral-music-engaged", "1");
+      sessionStorage.setItem("cosgral-music-autoplay", "1");
     } catch (eNav) {}
 
-    if (!src) return;
+    var src = AUDIO[id];
+    var pathPrefix = (location.pathname || "").indexOf("/uslugi/") !== -1 ? "../" : "";
 
-    var path = (location.pathname || "").indexOf("/uslugi/") !== -1 ? "../" + src : src;
+    if (!src) {
+      // YouTube / unknown — site-music.js autoplays from the nav flag
+      window.__cosgralMusicShouldAutoplay = true;
+      if (YOUTUBE[id]) window.__cosgralMusicYoutube = YOUTUBE[id];
+      return;
+    }
+
     var existing = document.getElementById("cosgral-music-early");
     if (existing) {
       window.__cosgralEarlyAudio = existing;
+      window.__cosgralMusicShouldAutoplay = true;
+      try {
+        var pExist = existing.play();
+        if (pExist && pExist.then) {
+          pExist
+            .then(function () {
+              window.__cosgralEarlyPlaying = true;
+            })
+            .catch(function () {
+              window.__cosgralEarlyPlaying = false;
+            });
+        }
+      } catch (ePlayExist) {}
       return;
     }
 
@@ -35,7 +59,7 @@
     a.setAttribute("playsinline", "");
     a.setAttribute("webkit-playsinline", "");
     a.autoplay = true;
-    a.src = path;
+    a.src = pathPrefix + src;
     a.volume = 0.58;
 
     var saved = parseFloat(sessionStorage.getItem("cosgral-music-time") || "0") || 0;
@@ -53,17 +77,38 @@
 
     (document.documentElement || document.head).appendChild(a);
     window.__cosgralEarlyAudio = a;
+    window.__cosgralMusicShouldAutoplay = true;
 
-    var p = a.play();
-    if (p && p.then) {
-      p.then(function () {
-        window.__cosgralEarlyPlaying = true;
-        try {
-          sessionStorage.setItem("cosgral-music-engaged", "1");
-        } catch (eE) {}
-      }).catch(function () {
-        window.__cosgralEarlyPlaying = false;
-      });
-    }
+    var kick = function () {
+      var p = a.play();
+      if (p && p.then) {
+        p.then(function () {
+          window.__cosgralEarlyPlaying = true;
+          try {
+            sessionStorage.setItem("cosgral-music-engaged", "1");
+          } catch (eE) {}
+        }).catch(function () {
+          window.__cosgralEarlyPlaying = false;
+          // Retry a few times — sticky activation after in-site navigation
+          var n = 0;
+          var timer = window.setInterval(function () {
+            n += 1;
+            var again = a.play();
+            if (again && again.then) {
+              again
+                .then(function () {
+                  window.__cosgralEarlyPlaying = true;
+                  clearInterval(timer);
+                })
+                .catch(function () {});
+            }
+            if (n > 20) clearInterval(timer);
+          }, 100);
+        });
+      }
+    };
+    kick();
+    document.addEventListener("DOMContentLoaded", kick, { once: true });
+    window.addEventListener("pageshow", kick);
   } catch (e) {}
 })();

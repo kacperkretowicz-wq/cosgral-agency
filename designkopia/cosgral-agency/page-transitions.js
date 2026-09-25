@@ -307,16 +307,27 @@
     navigating = true;
     sessionStorage.setItem(SESSION_KEY, "1");
 
-    var musicOn = !!(
-      window.CosgralMusic &&
-      window.CosgralMusic.isActive &&
-      window.CosgralMusic.isActive()
-    );
+    var musicOn = false;
+    try {
+      musicOn = !!(
+        (window.CosgralMusic &&
+          window.CosgralMusic.isActive &&
+          window.CosgralMusic.isActive()) ||
+        localStorage.getItem("cosgral-music-on") === "1" ||
+        sessionStorage.getItem("cosgral-music-engaged") === "1"
+      );
+      if (musicOn) {
+        localStorage.setItem("cosgral-music-on", "1");
+        sessionStorage.setItem("cosgral-music-nav", String(Date.now()));
+        sessionStorage.setItem("cosgral-music-autoplay", "1");
+        sessionStorage.setItem("cosgral-music-engaged", "1");
+      }
+    } catch (eMusicFlag) {}
 
     if (window.CosgralMusic && window.CosgralMusic.persistNow) {
       window.CosgralMusic.persistNow();
     }
-    if (musicOn && window.CosgralMusic.play) {
+    if (musicOn && window.CosgralMusic && window.CosgralMusic.play) {
       try {
         window.CosgralMusic.play();
       } catch (ePlay) {}
@@ -339,9 +350,8 @@
     }
 
     playExit();
-    /* Music on: navigate almost immediately so the next page's early-boot
-       play() still rides media-engagement / sticky activation. */
-    var delay = musicOn ? 70 : EXIT_MS;
+    /* Music on: navigate immediately so the next page autoplays in the same session */
+    var delay = musicOn ? 40 : EXIT_MS;
     window.setTimeout(function () {
       window.location.href = url;
     }, delay);

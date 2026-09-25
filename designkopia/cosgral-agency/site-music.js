@@ -8,10 +8,14 @@
 (function () {
   "use strict";
 
+  if (window.__cosgralMusicInit) return;
+  window.__cosgralMusicInit = true;
+
   var STORAGE_TRACK = "cosgral-music-track";
   var STORAGE_ON = "cosgral-music-on";
   var STORAGE_TIME = "cosgral-music-time";
   var STORAGE_NAV = "cosgral-music-nav";
+  var STORAGE_AUTOPLAY = "cosgral-music-autoplay";
   var VOL_NORMAL = 58;
   var VOL_DUCK = 10;
   var VOL_FADE_MS = 1400;
@@ -72,10 +76,25 @@
   } catch (eTime) {}
 
   var fromNav = false;
+  var forceAutoplay = false;
   try {
     var navAt = parseInt(sessionStorage.getItem(STORAGE_NAV) || "0", 10) || 0;
-    fromNav = wantPlay && navAt && Date.now() - navAt < 20000;
+    fromNav = !!(navAt && Date.now() - navAt < 60000);
+    forceAutoplay =
+      wantPlay &&
+      (fromNav ||
+        sessionStorage.getItem(STORAGE_AUTOPLAY) === "1" ||
+        sessionStorage.getItem("cosgral-music-engaged") === "1" ||
+        !!window.__cosgralMusicShouldAutoplay ||
+        !!window.__cosgralEarlyPlaying);
     if (fromNav) sessionStorage.removeItem(STORAGE_NAV);
+    if (forceAutoplay) {
+      wantPlay = true;
+      try {
+        localStorage.setItem(STORAGE_ON, "1");
+        sessionStorage.setItem(STORAGE_AUTOPLAY, "1");
+      } catch (eForce) {}
+    }
   } catch (eNav) {}
 
   var ytReady = false;
@@ -98,7 +117,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925fix8");
+    link.href = assetPath("site-music.css?v=20260925fix14");
     document.head.appendChild(link);
   }
 
@@ -299,6 +318,8 @@
     persistTime();
     try {
       sessionStorage.setItem(STORAGE_NAV, String(Date.now()));
+      sessionStorage.setItem(STORAGE_AUTOPLAY, "1");
+      sessionStorage.setItem("cosgral-music-engaged", "1");
       // Don't clobber ON=1 if memory state lagged behind storage / engagement
       var stayOn =
         wantPlay ||
@@ -650,13 +671,26 @@
 
     if (ytPlayer && typeof ytPlayer.playVideo === "function") {
       try {
-        ytPlayer.unMute();
+        if (forceAutoplay || fromNav) {
+          // Sticky activation after in-site nav: start muted then unmute
+          try {
+            ytPlayer.mute();
+          } catch (eMute) {}
+        }
         ytPlayer.setVolume(Math.round(currentVol));
         if (opts.fromStart) seekToStart();
         else seekToSaved();
         ytPlayer.playVideo();
         window.setTimeout(function () {
           try {
+            if (forceAutoplay || fromNav) {
+              try {
+                ytPlayer.unMute();
+                ytPlayer.setVolume(Math.round(targetVolume()));
+              } catch (eUnmute) {}
+            } else {
+              ytPlayer.unMute();
+            }
             if (ytPlayer.getPlayerState && ytPlayer.getPlayerState() === 1) {
               unlocked = true;
               gestureArmed = false;
@@ -670,7 +704,7 @@
           } catch (e11) {
             armGestureResume();
           }
-        }, 600);
+        }, forceAutoplay || fromNav ? 180 : 600);
       } catch (e12) {
         unlocked = false;
         refreshUi();
@@ -869,17 +903,40 @@
     true
   );
 
-  // Auto-resume across subpages when music was on
-  mountTrack(wantPlay);
-  if (wantPlay) {
+  // Auto-resume across subpages when music was on — play immediately, no click needed
+  mountTrack(wantPlay || forceAutoplay);
+  if (wantPlay || forceAutoplay) {
+    wantPlay = true;
     refreshUi();
-    window.setTimeout(function () {
-      if (wantPlay && !unlocked) playCurrent();
-    }, fromNav || wasMediaEngaged() ? 40 : 180);
-    window.setTimeout(function () {
-      if (wantPlay && !unlocked) playCurrent();
-    }, fromNav ? 350 : 700);
+    var kickPlay = function () {
+      if (!wantPlay) return;
+      if (unlocked) return;
+      playCurrent();
+    };
+    kickPlay();
+    window.setTimeout(kickPlay, 30);
+    window.setTimeout(kickPlay, 120);
+    window.setTimeout(kickPlay, 320);
+    window.setTimeout(kickPlay, 700);
+    window.setTimeout(kickPlay, 1400);
+    // Keep trying briefly after subpage entry until audio/video actually starts
+    if (resumeRetryTimer) clearInterval(resumeRetryTimer);
+    var autoTries = 0;
+    resumeRetryTimer = window.setInterval(function () {
+      autoTries += 1;
+      if (unlocked || !wantPlay || autoTries > 40) {
+        clearInterval(resumeRetryTimer);
+        resumeRetryTimer = 0;
+        return;
+      }
+      playCurrent();
+    }, 100);
     armGestureResume();
+    window.addEventListener("pageshow", function (ev) {
+      if (!wantPlay) return;
+      if (ev && ev.persisted) unlocked = false;
+      playCurrent();
+    });
   }
 
   window.CosgralMusic = {
