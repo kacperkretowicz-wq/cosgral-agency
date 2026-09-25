@@ -1392,46 +1392,86 @@
     });
 
     /**
-     * Single bidirectional cinema scrub: approach → pin → post-pin end frame.
-     * Avoids approach/pin fighting (which duplicated Grafiki on scroll-up).
+     * Jeden dwukierunkowy scrub: dojazd → pin → klatka końcowa za pinem.
+     * Liczony wyłącznie z pozycji scrolla, więc w górę wygląda tak samo jak w dół
+     * (wcześniej dojazd i pin liczyły się osobno i grafiki się dublowały).
      */
-    function syncCinemaFromScroll() {
-      if (!freeScroll || !pinST) return;
-      var y = typeof pinST.scroll === "function" ? pinST.scroll() : window.scrollY || 0;
-      var start = pinST.start;
-      var end = pinST.end;
-      var vh = window.innerHeight || 1;
+    var lastCinemaProgress = -1;
+
+    function cinemaProgressAt(y, start, end, vh) {
       var approachStart = start - vh;
-      var cp = 0;
-
-      if (y <= approachStart) {
-        cp = 0;
-      } else if (y < start) {
-        var ap = (y - approachStart) / Math.max(1, start - approachStart);
-        cp = approachCinemaProgress(ap);
-      } else if (y <= end) {
-        var pp = (y - start) / Math.max(1, end - start);
-        cp = cinemaFromPinProgress(pp);
-      } else {
-        cp = 1;
+      if (y <= approachStart) return 0;
+      if (y < start) {
+        return approachCinemaProgress((y - approachStart) / Math.max(1, start - approachStart));
       }
+      if (y <= end) {
+        return cinemaFromPinProgress((y - start) / Math.max(1, end - start));
+      }
+      return 1;
+    }
 
-      cinemaTl.progress(cp);
-      setOverlay(cp);
-      if (window.cosgralGrafikiBloom?.syncFromPin) {
-        window.cosgralGrafikiBloom.syncFromPin(pinST);
+    function paintCinema(cp, info) {
+      if (Math.abs(cp - lastCinemaProgress) >= 0.0008) {
+        lastCinemaProgress = cp;
+        cinemaTl.progress(cp);
+        setOverlay(cp);
+      }
+      if (window.cosgralGrafikiBloom?.syncFromScroll) {
+        window.cosgralGrafikiBloom.syncFromScroll(info);
       }
     }
 
-    ScrollTrigger.create({
-      id: "grafiki-cinema-sync",
-      start: 0,
-      end: "max",
-      invalidateOnRefresh: true,
-      refreshPriority: -2,
-      onUpdate: syncCinemaFromScroll,
-      onRefresh: syncCinemaFromScroll,
-    });
+    function syncCinemaFromScroll() {
+      if (!freeScroll || !pinST) return;
+      var y = typeof pinST.scroll === "function" ? pinST.scroll() : window.scrollY || 0;
+      var vh = window.innerHeight || 1;
+      var endBand = document.querySelector(".portfolio-end");
+      paintCinema(cinemaProgressAt(y, pinST.start, pinST.end, vh), {
+        y: y,
+        start: pinST.start,
+        end: pinST.end,
+        vh: vh,
+        endBandTop: endBand ? endBand.getBoundingClientRect().top + y : null,
+      });
+    }
+
+    if (window.cosgralScrollDirector) {
+      window.cosgralScrollDirector.register(
+        "grafiki-cinema",
+        function measure() {
+          if (!pinST) return null;
+          var endBand = document.querySelector(".portfolio-end");
+          var scrolled =
+            window.cosgralSmoothScroll?.lenis?.scroll ?? (window.scrollY || 0);
+          return {
+            start: pinST.start,
+            end: pinST.end,
+            endBandTop: endBand ? endBand.getBoundingClientRect().top + scrolled : null,
+          };
+        },
+        function apply(y, geo, st) {
+          if (!geo || !freeScroll) return;
+          paintCinema(cinemaProgressAt(y, geo.start, geo.end, st.vh), {
+            y: y,
+            start: geo.start,
+            end: geo.end,
+            vh: st.vh,
+            endBandTop: geo.endBandTop,
+          });
+        },
+        10
+      );
+    } else {
+      ScrollTrigger.create({
+        id: "grafiki-cinema-sync",
+        start: 0,
+        end: "max",
+        invalidateOnRefresh: true,
+        refreshPriority: -2,
+        onUpdate: syncCinemaFromScroll,
+        onRefresh: syncCinemaFromScroll,
+      });
+    }
 
     if (freeScroll) {
       window.cosgralGrafikiStepper = {
@@ -1473,7 +1513,9 @@
     syncCinemaFromScroll();
 
     window.addEventListener("load", function () {
-      ScrollTrigger.refresh();
+      /* Każdy refresh przelicza piny i potrafi szarpnąć stroną — zbieramy je w jeden. */
+      if (window.cosgralScrollDirector) window.cosgralScrollDirector.requestRefresh(180);
+      else ScrollTrigger.refresh();
       syncCinemaFromScroll();
       if (window.cosgralGrafikiStepper?.refresh) window.cosgralGrafikiStepper.refresh();
       if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
@@ -1637,11 +1679,9 @@
 
     function applyAmbientLift(t) {
       t = Math.max(0, Math.min(1, t));
-      if (Math.abs(t - lastLift) < 0.001 && lastLift >= 0) {
-        document.body.classList.toggle("is-grafiki-light", t > 0.04);
-        document.documentElement.style.setProperty("--grafiki-lift", t.toFixed(3));
-        return;
-      }
+      /* Pełnoekranowy grayscale/brightness to najdroższy zapis na tej stronie —
+         przepuszczamy tylko realne zmiany, inaczej GPU przelicza go co klatkę. */
+      if (lastLift >= 0 && Math.abs(t - lastLift) < 0.004) return;
       lastLift = t;
       document.documentElement.style.setProperty("--grafiki-lift", t.toFixed(3));
       /* CSS var drives visible wash; JS keeps ambient/rail in sync */
@@ -1680,16 +1720,52 @@
       return Math.pow(raw, 1.2);
     }
 
-    function endBandCover() {
-      var endBand = document.querySelector(".portfolio-end");
-      if (!endBand) return 0;
-      var top = endBand.getBoundingClientRect().top;
-      var vh = window.innerHeight || 1;
+    function coverFromTop(top, vh) {
       if (top <= 0) return 1;
       if (top >= vh) return 0;
       /* Ease cover so light→dark is gradual across ~full viewport */
       var raw = 1 - top / vh;
       return raw * raw * (3 - 2 * raw);
+    }
+
+    function endBandCover() {
+      var endBand = document.querySelector(".portfolio-end");
+      if (!endBand) return 0;
+      return coverFromTop(endBand.getBoundingClientRect().top, window.innerHeight || 1);
+    }
+
+    /**
+     * Wersja bez odczytu layoutu — dyrygent podaje zmierzone wcześniej pozycje,
+     * więc w trakcie scrolla tylko liczymy i zapisujemy.
+     */
+    function syncLiftFromScroll(info) {
+      if (!info) return;
+      var vh = info.vh || window.innerHeight || 1;
+      var start = info.start;
+      var end = info.end;
+      var y = info.y;
+      var pinProgress =
+        y <= start ? 0 : y >= end ? 1 : (y - start) / Math.max(1, end - start);
+      var cover =
+        info.endBandTop != null ? coverFromTop(info.endBandTop - y, vh) : endBandCover();
+      var t = 0;
+
+      if (y >= start && y <= end) {
+        t = liftAmountFromPinProgress(pinProgress);
+      } else if (y > end) {
+        /* Za pinem: pełne światło, które gaśnie dopiero gdy stopka zaczyna zakrywać */
+        t = Math.max(0, 1 - cover);
+      } else if (pinProgress > 0.18) {
+        t = liftAmountFromPinProgress(pinProgress);
+      }
+
+      if (
+        document.body.classList.contains("is-grafiki-overlay-reveal") ||
+        section.classList.contains("is-cinema-done")
+      ) {
+        t = Math.max(t, 1 - cover);
+      }
+      applyAmbientLift(t);
     }
 
     function syncLiftFromPin(pin) {
@@ -1734,8 +1810,10 @@
           : "bottom top";
       },
       invalidateOnRefresh: true,
-      onUpdate: liftFromScroll,
-      onRefresh: liftFromScroll,
+      /* Przy dyrygencie kanał cinema już przelicza lift w tym samym przebiegu —
+         drugi listener liczyłby dokładnie to samo po raz drugi na każdą klatkę. */
+      onUpdate: window.cosgralScrollDirector ? null : liftFromScroll,
+      onRefresh: window.cosgralScrollDirector ? null : liftFromScroll,
       onLeave: function () {
         /* Only darken once Grafiki has left the viewport */
         var vh = window.innerHeight || 1;
@@ -1786,6 +1864,7 @@
     window.cosgralGrafikiBloom = {
       apply: applyAmbientLift,
       syncFromPin: syncLiftFromPin,
+      syncFromScroll: syncLiftFromScroll,
       refresh: liftFromScroll,
     };
 
