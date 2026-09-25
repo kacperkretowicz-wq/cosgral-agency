@@ -1,17 +1,44 @@
 /**
  * Site-wide ambient music (YouTube / optional audio files).
- * Track switcher under Menu; ducks on mega-menu, popups, section changes.
+ * Track switcher under Menu. Smooth duck on mega-menu + popups only.
+ * Continues across subpages via persisted state + auto-resume.
  *
- * Add tracks in COSGRAL_MUSIC_TRACKS (youtube id and/or audio URL).
+ * Add tracks: youtube id and/or audio URL in COSGRAL_MUSIC_TRACKS.
  */
 (function () {
   "use strict";
 
+  // If this page runs inside the music keep-alive shell, let the parent drive music + nav.
+  if (window.parent && window.parent !== window) {
+    try {
+      if (window.parent.CosgralMusic) {
+        document.documentElement.classList.add("is-music-shell-child");
+        // Rewrite navigate to parent so the player never unloads
+        var patchNav = function () {
+          if (!window.cosgralPageTransition) return;
+          var orig = window.cosgralPageTransition.navigate;
+          window.cosgralPageTransition.navigate = function (url) {
+            if (window.parent.CosgralMusic.navigateKeepAlive) {
+              window.parent.CosgralMusic.navigateKeepAlive(url);
+              return;
+            }
+            if (orig) orig(url);
+          };
+        };
+        if (window.cosgralPageTransition) patchNav();
+        else window.addEventListener("DOMContentLoaded", patchNav);
+        return;
+      }
+    } catch (eShell) {}
+  }
+
   var STORAGE_TRACK = "cosgral-music-track";
   var STORAGE_ON = "cosgral-music-on";
+  var STORAGE_TIME = "cosgral-music-time";
+  var STORAGE_NAV = "cosgral-music-nav";
   var VOL_NORMAL = 58;
-  var VOL_DUCK = 11;
-  var SECTION_DUCK_MS = 900;
+  var VOL_DUCK = 10;
+  var VOL_FADE_MS = 1400;
 
   /** @type {{id:string,title:string,artist?:string,youtube?:string,audio?:string}[]} */
   var TRACKS = window.COSGRAL_MUSIC_TRACKS || [
@@ -51,13 +78,28 @@
     wantPlay = localStorage.getItem(STORAGE_ON) === "1";
   } catch (e2) {}
 
+  var savedTime = 0;
+  try {
+    savedTime = parseFloat(sessionStorage.getItem(STORAGE_TIME) || "0") || 0;
+  } catch (eTime) {}
+
+  var fromNav = false;
+  try {
+    var navAt = parseInt(sessionStorage.getItem(STORAGE_NAV) || "0", 10) || 0;
+    fromNav = wantPlay && navAt && Date.now() - navAt < 8000;
+    if (fromNav) sessionStorage.removeItem(STORAGE_NAV);
+  } catch (eNav) {}
+
   var ytReady = false;
   var ytPlayer = null;
   var audioEl = null;
   var duckReasons = Object.create(null);
-  var sectionDuckTimer = null;
   var unlocked = false;
   var ui = null;
+  var currentVol = VOL_NORMAL;
+  var volRaf = 0;
+  var volTarget = VOL_NORMAL;
+  var timeTimer = 0;
 
   function track() {
     return TRACKS[trackIndex] || TRACKS[0];
@@ -68,7 +110,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925music2");
+    link.href = assetPath("site-music.css?v=20260925music4");
     document.head.appendChild(link);
   }
 
@@ -78,14 +120,21 @@
   }
 
   function buildUi() {
-    var col = document.createElement("div");
-    col.className = "site-nav__menu-col";
-    if (actions) {
-      toggle.parentNode.insertBefore(col, toggle);
-    } else {
-      nav.appendChild(col);
+    if (document.getElementById("site-music")) {
+      ui = document.getElementById("site-music");
+      return;
     }
-    col.appendChild(toggle);
+
+    var col = document.querySelector(".site-nav__menu-col");
+    if (!col) {
+      col = document.createElement("div");
+      col.className = "site-nav__menu-col";
+      if (actions) toggle.parentNode.insertBefore(col, toggle);
+      else nav.appendChild(col);
+      col.appendChild(toggle);
+    } else if (toggle.parentNode !== col) {
+      col.appendChild(toggle);
+    }
 
     ui = document.createElement("div");
     ui.className = "site-music";
@@ -185,14 +234,14 @@
     var t = track();
     var title = ui.querySelector(".site-music__title");
     if (title) title.textContent = t.title;
-    ui.classList.toggle("is-playing", !!wantPlay && unlocked);
+    // Optimistic: if user wants music on, show pause (playing) state
+    ui.classList.toggle("is-playing", !!wantPlay);
     ui.classList.toggle("is-needs-gesture", !!wantPlay && !unlocked);
     var playIcon = ui.querySelector(".site-music__icon-play");
     var pauseIcon = ui.querySelector(".site-music__icon-pause");
     if (playIcon && pauseIcon) {
-      var showPause = wantPlay && unlocked;
-      playIcon.hidden = showPause;
-      pauseIcon.hidden = !showPause;
+      playIcon.hidden = !!wantPlay;
+      pauseIcon.hidden = !wantPlay;
     }
     ui.querySelectorAll(".site-music__list button").forEach(function (btn, i) {
       btn.setAttribute("aria-current", i === trackIndex ? "true" : "false");
@@ -204,6 +253,45 @@
       localStorage.setItem(STORAGE_TRACK, track().id);
       localStorage.setItem(STORAGE_ON, wantPlay ? "1" : "0");
     } catch (e3) {}
+    persistTime();
+  }
+
+  function persistTime() {
+    var t = getCurrentTime();
+    if (t > 0.5) {
+      try {
+        sessionStorage.setItem(STORAGE_TIME, String(t));
+      } catch (e4) {}
+      savedTime = t;
+    }
+  }
+
+  function getCurrentTime() {
+    try {
+      if (audioEl && !isNaN(audioEl.currentTime)) return audioEl.currentTime;
+      if (ytPlayer && typeof ytPlayer.getCurrentTime === "function") {
+        return ytPlayer.getCurrentTime() || 0;
+      }
+    } catch (e5) {}
+    return savedTime || 0;
+  }
+
+  function seekToSaved() {
+    if (!(savedTime > 1)) return;
+    try {
+      if (audioEl) audioEl.currentTime = savedTime;
+      if (ytPlayer && typeof ytPlayer.seekTo === "function") {
+        ytPlayer.seekTo(savedTime, true);
+      }
+    } catch (e6) {}
+  }
+
+  function markNavigatingAway() {
+    persistTime();
+    try {
+      sessionStorage.setItem(STORAGE_NAV, String(Date.now()));
+      localStorage.setItem(STORAGE_ON, wantPlay ? "1" : "0");
+    } catch (e7) {}
   }
 
   function targetVolume() {
@@ -213,22 +301,64 @@
     return VOL_NORMAL;
   }
 
-  function applyVolume() {
-    var v = targetVolume();
+  function setPlayerVolume(v) {
+    currentVol = v;
     if (ytPlayer && typeof ytPlayer.setVolume === "function") {
       try {
-        ytPlayer.setVolume(v);
-      } catch (e4) {}
+        ytPlayer.setVolume(Math.round(v));
+      } catch (e8) {}
     }
     if (audioEl) {
       audioEl.volume = Math.max(0, Math.min(1, v / 100));
     }
   }
 
+  function animateVolumeTo(target) {
+    volTarget = target;
+    if (reduce) {
+      if (volRaf) cancelAnimationFrame(volRaf);
+      volRaf = 0;
+      setPlayerVolume(target);
+      return;
+    }
+    if (volRaf) return;
+    var start = currentVol;
+    var from = start;
+    var to = target;
+    var t0 = performance.now();
+    var dur = VOL_FADE_MS;
+
+    function step(now) {
+      // If target changed mid-fade, retarget smoothly from current
+      if (volTarget !== to) {
+        from = currentVol;
+        to = volTarget;
+        t0 = now;
+      }
+      var p = Math.min(1, (now - t0) / dur);
+      // ease in-out
+      var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      setPlayerVolume(from + (to - from) * e);
+      if (p < 1 || volTarget !== to) {
+        volRaf = requestAnimationFrame(step);
+      } else {
+        volRaf = 0;
+        setPlayerVolume(volTarget);
+      }
+    }
+    volRaf = requestAnimationFrame(step);
+  }
+
+  function applyVolume() {
+    animateVolumeTo(targetVolume());
+  }
+
   function setDuck(reason, on) {
+    var before = targetVolume();
     if (on) duckReasons[reason] = true;
     else delete duckReasons[reason];
-    applyVolume();
+    var after = targetVolume();
+    if (before !== after) applyVolume();
   }
 
   function ensureHost() {
@@ -243,12 +373,14 @@
   }
 
   function destroyPlayers() {
+    stopTimeHeartbeat();
     if (ytPlayer && typeof ytPlayer.destroy === "function") {
       try {
         ytPlayer.destroy();
-      } catch (e5) {}
+      } catch (e9) {}
     }
     ytPlayer = null;
+    ytReady = false;
     if (audioEl) {
       audioEl.pause();
       audioEl.removeAttribute("src");
@@ -278,10 +410,23 @@
     }
   }
 
+  function startTimeHeartbeat() {
+    stopTimeHeartbeat();
+    timeTimer = window.setInterval(persistTime, 2500);
+  }
+
+  function stopTimeHeartbeat() {
+    if (timeTimer) {
+      clearInterval(timeTimer);
+      timeTimer = 0;
+    }
+  }
+
   function mountTrack(thenPlay) {
     var t = track();
     destroyPlayers();
     var host = ensureHost();
+    var shouldAuto = !!(thenPlay || wantPlay);
 
     if (t.audio) {
       audioEl = document.createElement("audio");
@@ -289,8 +434,17 @@
       audioEl.preload = "auto";
       audioEl.src = assetPath(t.audio);
       host.appendChild(audioEl);
-      applyVolume();
-      if (thenPlay) playCurrent();
+      setPlayerVolume(targetVolume());
+      if (savedTime > 1) {
+        audioEl.addEventListener(
+          "loadedmetadata",
+          function () {
+            seekToSaved();
+          },
+          { once: true }
+        );
+      }
+      if (shouldAuto) playCurrent();
       return;
     }
 
@@ -305,7 +459,7 @@
         width: "1",
         videoId: t.youtube,
         playerVars: {
-          autoplay: 0,
+          autoplay: shouldAuto ? 1 : 0,
           controls: 0,
           disablekb: 1,
           fs: 0,
@@ -315,35 +469,35 @@
           rel: 0,
           loop: 1,
           playlist: t.youtube,
+          start: savedTime > 1 ? Math.floor(savedTime) : 0,
         },
         events: {
           onReady: function () {
             ytReady = true;
-            applyVolume();
-            if (thenPlay || wantPlay) playCurrent();
+            setPlayerVolume(targetVolume());
+            seekToSaved();
+            if (shouldAuto) playCurrent();
           },
           onStateChange: function (ev) {
-            // 1 = playing
             if (ev.data === 1) {
               unlocked = true;
-              if (ui) ui.classList.remove("is-needs-gesture");
+              startTimeHeartbeat();
               refreshUi();
               applyVolume();
             }
-            // 0 = ended — restart for loop fallback
+            if (ev.data === 2) {
+              persistTime();
+            }
             if (ev.data === 0 && wantPlay) {
               try {
                 ytPlayer.seekTo(0, true);
                 ytPlayer.playVideo();
-              } catch (e6) {}
+              } catch (e10) {}
             }
           },
           onError: function () {
             unlocked = false;
-            if (ui) {
-              ui.classList.add("is-needs-gesture");
-              ui.classList.remove("is-playing");
-            }
+            refreshUi();
           },
         },
       });
@@ -353,54 +507,80 @@
   function playCurrent() {
     wantPlay = true;
     persist();
-    var p;
+    refreshUi();
+
     if (audioEl) {
-      p = audioEl.play();
+      seekToSaved();
+      var p = audioEl.play();
       if (p && p.then) {
         p.then(function () {
           unlocked = true;
+          startTimeHeartbeat();
           refreshUi();
           applyVolume();
         }).catch(function () {
           unlocked = false;
           refreshUi();
+          armGestureResume();
         });
       } else {
         unlocked = true;
+        startTimeHeartbeat();
         refreshUi();
       }
       return;
     }
+
     if (ytPlayer && typeof ytPlayer.playVideo === "function") {
       try {
         ytPlayer.unMute();
-        ytPlayer.setVolume(targetVolume());
+        ytPlayer.setVolume(Math.round(currentVol));
+        seekToSaved();
         ytPlayer.playVideo();
-        unlocked = true;
-        refreshUi();
-      } catch (e7) {
+        // Don't assume unlocked until state 1 — but try
+        window.setTimeout(function () {
+          try {
+            if (ytPlayer.getPlayerState && ytPlayer.getPlayerState() === 1) {
+              unlocked = true;
+              startTimeHeartbeat();
+              refreshUi();
+            } else if (wantPlay && !unlocked) {
+              armGestureResume();
+              refreshUi();
+            }
+          } catch (e11) {
+            armGestureResume();
+          }
+        }, 600);
+      } catch (e12) {
         unlocked = false;
         refreshUi();
+        armGestureResume();
       }
       return;
     }
+
     mountTrack(true);
   }
 
   function pauseCurrent() {
     wantPlay = false;
+    persistTime();
     persist();
+    stopTimeHeartbeat();
     if (audioEl) audioEl.pause();
     if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
       try {
         ytPlayer.pauseVideo();
-      } catch (e8) {}
+      } catch (e13) {}
     }
+    unlocked = false;
     refreshUi();
   }
 
   function togglePlay() {
     if (wantPlay && unlocked) pauseCurrent();
+    else if (wantPlay && !unlocked) playCurrent();
     else {
       if (!ytPlayer && !audioEl) mountTrack(true);
       else playCurrent();
@@ -410,6 +590,10 @@
   function selectTrack(index, autoPlay) {
     if (index < 0 || index >= TRACKS.length) return;
     trackIndex = index;
+    savedTime = 0;
+    try {
+      sessionStorage.removeItem(STORAGE_TIME);
+    } catch (e14) {}
     persist();
     refreshUi();
     mountTrack(!!(autoPlay || wantPlay));
@@ -420,6 +604,7 @@
   }
 
   function syncOverlayDucks() {
+    // Only mega menu + popups (service panel / chat) — NOT section changes
     var menuOpen =
       document.body.classList.contains("is-nav-menu-open") ||
       document.documentElement.classList.contains("is-nav-menu-open") ||
@@ -440,15 +625,6 @@
     setDuck("chat", chatOpen);
   }
 
-  function duckSectionBriefly() {
-    setDuck("section", true);
-    if (sectionDuckTimer) clearTimeout(sectionDuckTimer);
-    sectionDuckTimer = setTimeout(function () {
-      setDuck("section", false);
-      sectionDuckTimer = null;
-    }, reduce ? 200 : SECTION_DUCK_MS);
-  }
-
   function watchDom() {
     var obs = new MutationObserver(function () {
       syncOverlayDucks();
@@ -464,10 +640,8 @@
       subtree: false,
     });
     var overlay = document.getElementById("nav-overlay");
-    if (overlay) {
-      obs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
-    }
-    // Chat panel mounts later
+    if (overlay) obs.observe(overlay, { attributes: true, attributeFilter: ["class"] });
+
     var bodyObs = new MutationObserver(function () {
       syncOverlayDucks();
       var chat = document.querySelector(".cg-chat-panel");
@@ -484,27 +658,39 @@
     bodyObs.observe(document.body, { childList: true, subtree: true });
   }
 
+  var gestureArmed = false;
+  function armGestureResume() {
+    if (gestureArmed || !wantPlay) return;
+    gestureArmed = true;
+    var resume = function () {
+      if (!wantPlay || unlocked) return;
+      playCurrent();
+    };
+    // Any interaction continues music after subpage load (no need to hit play again)
+    ["pointerdown", "touchstart", "keydown", "wheel", "scroll"].forEach(function (ev) {
+      document.addEventListener(ev, resume, { capture: true, passive: true, once: false });
+    });
+    // After successful unlock, listeners become no-ops via unlocked check
+  }
+
   ensureCss();
   buildUi();
   watchDom();
   syncOverlayDucks();
 
-  window.addEventListener("cosgral:section-step", function () {
-    duckSectionBriefly();
-  });
+  // Save position before leaving
+  window.addEventListener("pagehide", markNavigatingAway);
+  window.addEventListener("beforeunload", markNavigatingAway);
 
-  // Prefetch player; auto-resume only after gesture if previously on
-  mountTrack(false);
+  // Auto-resume across subpages when music was on
+  mountTrack(wantPlay);
   if (wantPlay) {
     refreshUi();
-    // Try once — browsers often block; play button pulses until unlocked
-    var tryOnce = function () {
-      document.removeEventListener("pointerdown", tryOnce, true);
-      document.removeEventListener("keydown", tryOnce, true);
+    // Immediate try (works when browser MEI / recent navigation allows)
+    window.setTimeout(function () {
       if (wantPlay && !unlocked) playCurrent();
-    };
-    document.addEventListener("pointerdown", tryOnce, true);
-    document.addEventListener("keydown", tryOnce, true);
+    }, fromNav ? 80 : 200);
+    armGestureResume();
   }
 
   window.CosgralMusic = {
@@ -524,5 +710,110 @@
       }
     },
     duck: setDuck,
+    persistNow: markNavigatingAway,
+    isActive: function () {
+      return !!wantPlay;
+    },
+    volume: function () {
+      return currentVol;
+    },
+    isDucked: function () {
+      for (var k in duckReasons) if (duckReasons[k]) return true;
+      return false;
+    },
+    navigateKeepAlive: navigateKeepAlive,
   };
+
+  var shellFrame = null;
+
+  function navigateKeepAlive(url) {
+    if (!wantPlay) {
+      window.location.href = url;
+      return;
+    }
+    markNavigatingAway();
+
+    var absolute;
+    try {
+      absolute = new URL(url, window.location.href).href;
+    } catch (eUrl) {
+      absolute = url;
+    }
+
+    if (!shellFrame) {
+      enterMusicShell(absolute);
+      return;
+    }
+
+    try {
+      shellFrame.contentWindow.location.href = absolute;
+    } catch (eNav2) {
+      shellFrame.src = absolute;
+    }
+    try {
+      history.pushState({ cosgralMusicShell: 1 }, "", absolute);
+    } catch (eHist) {}
+  }
+
+  function enterMusicShell(url) {
+    document.documentElement.classList.add("is-music-shell");
+    document.body.classList.add("is-music-shell");
+
+    var host = ensureHost();
+    var musicRoot = ui && ui.closest(".site-nav__menu-col");
+
+    var floater = document.getElementById("cosgral-music-floater");
+    if (!floater) {
+      floater = document.createElement("div");
+      floater.id = "cosgral-music-floater";
+      floater.className = "cosgral-music-floater";
+      document.body.appendChild(floater);
+    }
+    if (ui && ui.parentNode !== floater) {
+      floater.appendChild(ui);
+    }
+
+    shellFrame = document.getElementById("cosgral-app-frame");
+    if (!shellFrame) {
+      shellFrame = document.createElement("iframe");
+      shellFrame.id = "cosgral-app-frame";
+      shellFrame.title = "COSGRAL";
+      shellFrame.setAttribute("allow", "autoplay; clipboard-write");
+      document.body.appendChild(shellFrame);
+    }
+
+    // Remove everything except shell chrome
+    Array.prototype.slice.call(document.body.children).forEach(function (child) {
+      if (child === shellFrame || child === floater || child === host) return;
+      if (child.id === "page-transition") return;
+      child.remove();
+    });
+    if (host.parentNode !== document.body) document.body.appendChild(host);
+    if (floater.parentNode !== document.body) document.body.appendChild(floater);
+
+    shellFrame.src = url;
+    try {
+      history.pushState({ cosgralMusicShell: 1 }, "", url);
+    } catch (eHist2) {}
+
+    shellFrame.addEventListener("load", function onShellLoad() {
+      try {
+        var doc = shellFrame.contentDocument;
+        if (!doc) return;
+        var style = doc.createElement("style");
+        style.textContent =
+          "#site-music,.site-music-host,#cosgral-music-floater{display:none!important}";
+        (doc.head || doc.documentElement).appendChild(style);
+      } catch (eStyle) {}
+    });
+  }
+
+  window.addEventListener("popstate", function (e) {
+    if (!shellFrame || !wantPlay) return;
+    try {
+      shellFrame.contentWindow.location.href = window.location.href;
+    } catch (ePop) {
+      shellFrame.src = window.location.href;
+    }
+  });
 })();

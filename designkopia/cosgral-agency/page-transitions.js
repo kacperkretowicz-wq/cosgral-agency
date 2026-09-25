@@ -101,9 +101,24 @@
     sessionStorage.setItem(SERVICE_KEY, themeId);
     sessionStorage.removeItem(HASH_KEY);
 
+    if (window.CosgralMusic && window.CosgralMusic.persistNow) {
+      window.CosgralMusic.persistNow();
+    }
+
     playExit();
     window.setTimeout(function () {
-      window.location.href = serviceHomeUrl(themeId);
+      var dest = serviceHomeUrl(themeId);
+      if (
+        window.CosgralMusic &&
+        window.CosgralMusic.isActive &&
+        window.CosgralMusic.isActive() &&
+        window.CosgralMusic.navigateKeepAlive
+      ) {
+        window.CosgralMusic.navigateKeepAlive(dest);
+        navigating = false;
+        return;
+      }
+      window.location.href = dest;
     }, EXIT_MS);
   }
 
@@ -292,13 +307,33 @@
   }
 
   function navigateTo(url) {
+    // Content iframe inside music keep-alive shell → parent owns navigation
+    try {
+      if (
+        window.parent &&
+        window.parent !== window &&
+        window.parent.CosgralMusic &&
+        window.parent.CosgralMusic.navigateKeepAlive
+      ) {
+        window.parent.CosgralMusic.navigateKeepAlive(url);
+        return;
+      }
+    } catch (eParentNav) {}
+
     if (navigating || REDUCED) {
+      if (window.CosgralMusic && window.CosgralMusic.persistNow) {
+        window.CosgralMusic.persistNow();
+      }
       window.location.href = url;
       return;
     }
 
     navigating = true;
     sessionStorage.setItem(SESSION_KEY, "1");
+
+    if (window.CosgralMusic && window.CosgralMusic.persistNow) {
+      window.CosgralMusic.persistNow();
+    }
 
     try {
       var parsed = new URL(url, window.location.href);
@@ -318,6 +353,17 @@
 
     playExit();
     window.setTimeout(function () {
+      // Keep YouTube player alive across subpages while music is on
+      if (
+        window.CosgralMusic &&
+        window.CosgralMusic.isActive &&
+        window.CosgralMusic.isActive() &&
+        window.CosgralMusic.navigateKeepAlive
+      ) {
+        window.CosgralMusic.navigateKeepAlive(url);
+        navigating = false;
+        return;
+      }
       window.location.href = url;
     }, EXIT_MS);
   }
@@ -345,6 +391,11 @@
 
         e.preventDefault();
         e.stopPropagation();
+        if (window.CosgralMusic && window.CosgralMusic.isActive && window.CosgralMusic.isActive()) {
+          if (window.CosgralMusic.persistNow) window.CosgralMusic.persistNow();
+          // Keep media engagement warm during the click gesture
+          if (window.CosgralMusic.play) window.CosgralMusic.play();
+        }
         navigateTo(anchor.href);
       },
       true
