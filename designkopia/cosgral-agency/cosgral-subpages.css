@@ -2583,20 +2583,45 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  background: rgba(10, 10, 10, 0.92);
+  border-radius: 12px;
+  background: #111;
   overflow: hidden;
   min-height: 100%;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: border-color 0.45s var(--ease), box-shadow 0.45s var(--ease);
+}
+.portfolio-case-card:hover,
+.portfolio-case-card:focus-within {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 .portfolio-case-card__preview {
   position: relative;
   aspect-ratio: 16 / 9;
   display: grid;
   place-items: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
-  background: #0a0a0a;
+  background: #111;
+}
+.portfolio-case-card--telforce .portfolio-case-card__preview {
+  background: #0c0a0b;
+}
+.portfolio-case-card--app .portfolio-case-card__preview {
+  background: #080807;
+}
+.portfolio-case-card--crm .portfolio-case-card__preview {
+  background: #0d0b0c;
+}
+.portfolio-case-card--bot .portfolio-case-card__preview {
+  background: #111;
+}
+.portfolio-case-card--flow .portfolio-case-card__preview {
+  background: #0c0a0b;
 }
 .portfolio-case-card__visual {
   display: block;
@@ -2616,6 +2641,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   flex-direction: column;
   gap: 0.4rem;
   padding: clamp(0.95rem, 2.2vw, 1.25rem);
+  background: linear-gradient(180deg, #111 0%, #0c0a0b 100%);
 }
 .portfolio-case-card__tag {
   font-family: var(--font-mono);
@@ -2626,7 +2652,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
 }
 .portfolio-case-card__client {
   font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(245, 245, 245, 0.78);
   letter-spacing: 0.02em;
 }
 .portfolio-case-card__title {
@@ -2641,7 +2667,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   margin-top: 0.15rem;
   font-size: 0.92rem;
   line-height: 1.58;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(136, 136, 136, 0.95);
 }
 @media (max-width: 900px) {
   .portfolio-section--automatyzacje {

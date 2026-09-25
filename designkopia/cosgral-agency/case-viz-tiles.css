@@ -1,12 +1,13 @@
 /* Editorial scroll-telling — automation case subpages (services-inspo layout) */
 
 .case-study--viz {
-  --viz-ink: rgba(245, 242, 236, 0.94);
-  --viz-mute: rgba(232, 229, 219, 0.58);
+  /* Match web-deck / portfolio neutrals (#111, #f5f5f5, #888) */
+  --viz-ink: rgba(245, 245, 245, 0.94);
+  --viz-mute: rgba(136, 136, 136, 0.92);
   --viz-faint: rgba(255, 255, 255, 0.42);
   --viz-line: rgba(255, 255, 255, 0.1);
-  --viz-stage: #0a0a0a;
-  --viz-glow: rgba(232, 229, 219, 0.08);
+  --viz-stage: #111;
+  --viz-glow: rgba(255, 255, 255, 0.05);
   max-width: none;
   padding: 0;
 }
@@ -168,10 +169,14 @@
   position: relative;
   isolation: isolate;
   min-height: clamp(16rem, 46vh, 28rem);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
   background:
     radial-gradient(ellipse 70% 60% at 55% 40%, var(--viz-glow), transparent 65%),
-    linear-gradient(165deg, #121212 0%, var(--viz-stage) 100%);
+    linear-gradient(165deg, #0d0b0c 0%, var(--viz-stage) 55%, #080807 100%);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
   overflow: hidden;
   cursor: crosshair;
   touch-action: manipulation;
@@ -182,8 +187,10 @@
 .case-viz-tile__stage:hover,
 .case-viz-tile__stage:focus-within,
 .case-viz-tile.is-active .case-viz-tile__stage {
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .case-viz-tile__stage::before {
@@ -206,19 +213,27 @@
 .case-viz-chrome {
   position: absolute;
   z-index: 4;
-  top: 0.85rem;
-  left: 0.95rem;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   gap: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(0, 0, 0, 0.42);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   pointer-events: none;
 }
 
 .case-viz-chrome span {
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.22);
 }
+
+.case-viz-chrome span:nth-child(1) { background: #ff5f57; }
+.case-viz-chrome span:nth-child(2) { background: #febc2e; }
+.case-viz-chrome span:nth-child(3) { background: #28c840; }
 
 .case-viz-canvas {
   position: absolute;
@@ -233,7 +248,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  padding: clamp(1.4rem, 3.5vw, 2.4rem);
+  padding: clamp(2.4rem, 4.5vw, 3.2rem) clamp(1.4rem, 3.5vw, 2.4rem) clamp(1.4rem, 3.5vw, 2.4rem);
   transform: translate3d(var(--mx, 0), var(--my, 0), 0);
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: transform;
@@ -248,7 +263,7 @@
   position: relative;
   z-index: 2;
   width: min(100%, 34rem);
-  color: rgba(245, 242, 236, 0.9);
+  color: rgba(245, 245, 245, 0.9);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.06em;
@@ -407,7 +422,7 @@
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  background: rgba(10, 10, 10, 0.85);
+  background: rgba(17, 17, 17, 0.9);
   font-size: 0.55rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -492,7 +507,7 @@
   height: 0.9rem;
   border: 2px solid #fff;
   border-radius: 50%;
-  background: #0a0a0a;
+  background: #111;
   transform: translate(-50%, -50%);
 }
 
@@ -658,7 +673,7 @@
   height: 0.85rem;
   border: 2px solid #fff;
   border-radius: 50%;
-  background: rgba(10, 10, 10, 0.9);
+  background: rgba(17, 17, 17, 0.92);
   transform: translate(-50%, -50%);
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -737,7 +752,7 @@
 }
 
 .viz-chart__probe {
-  fill: #0a0a0a;
+  fill: #111;
   stroke: #fff;
   stroke-width: 2;
   opacity: 0;
@@ -790,7 +805,7 @@
 }
 
 .case-viz-close__copy p:first-child {
-  color: rgba(248, 246, 241, 0.95);
+  color: rgba(245, 245, 245, 0.95);
   font-size: clamp(1.15rem, 2.1vw, 1.35rem);
   line-height: 1.5;
 }
@@ -799,7 +814,11 @@
   gap: 0.85rem;
   padding: clamp(1.1rem, 2.5vw, 1.45rem);
   border: 1px solid var(--viz-line);
-  background: linear-gradient(165deg, rgba(18, 18, 18, 0.88) 0%, rgba(8, 8, 8, 0.72) 100%);
+  border-radius: 12px;
+  background: linear-gradient(165deg, rgba(17, 17, 17, 0.92) 0%, rgba(12, 10, 11, 0.88) 55%, rgba(8, 8, 7, 0.82) 100%);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 @keyframes case-viz-sheen {
