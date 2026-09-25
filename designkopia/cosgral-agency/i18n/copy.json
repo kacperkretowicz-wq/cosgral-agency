@@ -55,6 +55,22 @@
     "about": {
       "pl": "O nas",
       "en": "About"
+    },
+    "music": {
+      "pl": "Muzyka",
+      "en": "Music"
+    },
+    "music_play": {
+      "pl": "Włącz muzykę",
+      "en": "Play music"
+    },
+    "music_pause": {
+      "pl": "Wycisz muzykę",
+      "en": "Pause music"
+    },
+    "music_next": {
+      "pl": "Następny utwór",
+      "en": "Next track"
     }
   },
   "preloader": {
