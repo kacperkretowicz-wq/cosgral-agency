@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Parcel and Co order workflow">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Trove order invoice parcel workflow">
   <defs>
     <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#131313"/>
@@ -38,5 +38,5 @@
     <circle cx="556" cy="170" r="22" fill="#1a1a1a" stroke="rgba(255,255,255,0.28)"/>
     <path d="M546 170h20M556 160v20" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
   </g>
-  <text x="560" y="292" fill="rgba(255,255,255,0.35)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="end">Parcel &amp; Co.</text>
+  <text x="560" y="292" fill="rgba(255,255,255,0.35)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="end">Trove</text>
 </svg>
