@@ -1238,7 +1238,15 @@
       }
       section.classList.toggle("is-cinema-done", p > 0.94);
       document.body.classList.toggle("is-grafiki-overlay-reveal", show);
-      if (show) document.body.classList.add("is-grafiki-light");
+      if (show) {
+        document.body.classList.add("is-grafiki-light");
+        if (window.cosgralGrafikiBloom?.apply) {
+          window.cosgralGrafikiBloom.apply(1);
+        } else {
+          var bloomST = window.ScrollTrigger && ScrollTrigger.getById("grafiki-bloom");
+          if (bloomST) bloomST.update();
+        }
+      }
     }
 
     function clearGrafikiFinale() {
@@ -1356,6 +1364,9 @@
           cinemaTl.progress(cp);
           setOverlay(cp);
         }
+        if (window.cosgralGrafikiBloom?.syncFromPin) {
+          window.cosgralGrafikiBloom.syncFromPin(self);
+        }
         if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
       },
       onRefresh: function (self) {
@@ -1368,6 +1379,9 @@
         } else if (typeof self.scroll === "function" && self.scroll() > self.end) {
           cinemaTl.progress(1);
           setOverlay(1);
+        }
+        if (window.cosgralGrafikiBloom?.syncFromPin) {
+          window.cosgralGrafikiBloom.syncFromPin(self);
         }
       },
     });
@@ -1584,70 +1598,86 @@
     var bloom = document.getElementById("grafiki-bloom");
     var rail = getScrollRail();
     var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
+    var lastLift = -1;
 
     grafikiMenuState.cube = cube;
-    gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
-    gsap.set(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)" });
-    gsap.set(blur, { opacity: 0.55 });
-    gsap.set(bloom, { opacity: 0 });
+    if (shade) gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
+    if (ambient) gsap.set(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)" });
+    if (blur) gsap.set(blur, { opacity: 0.55 });
+    if (bloom) gsap.set(bloom, { opacity: 0 });
     if (rail) gsap.set(rail, RAIL_LIGHT);
 
     function applyAmbientLift(t) {
       t = Math.max(0, Math.min(1, t));
-      gsap.set(bloom, { opacity: lerp(0, 0.66, t) });
-      gsap.set(shade, { backgroundColor: mixRgba("rgba(3, 3, 3, 0.28)", "rgba(255, 255, 255, 0.84)", t) });
-      gsap.set(ambient, {
-        filter:
-          "grayscale(" +
-          lerp(1, 0, t).toFixed(3) +
-          ") contrast(" +
-          lerp(1.04, 1.01, t).toFixed(3) +
-          ") brightness(" +
-          lerp(0.78, 2.52, t).toFixed(3) +
-          ")",
-      });
-      gsap.set(blur, { opacity: lerp(0.55, 0.82, t) });
+      if (Math.abs(t - lastLift) < 0.001 && lastLift >= 0) {
+        document.body.classList.toggle("is-grafiki-light", t > 0.12);
+        return;
+      }
+      lastLift = t;
+      if (bloom) gsap.set(bloom, { opacity: lerp(0, 0.78, t) });
+      if (shade) {
+        gsap.set(shade, {
+          backgroundColor: mixRgba("rgba(3, 3, 3, 0.28)", "rgba(255, 255, 255, 0.9)", t),
+        });
+      }
+      if (ambient) {
+        gsap.set(ambient, {
+          filter:
+            "grayscale(" +
+            lerp(1, 0, t).toFixed(3) +
+            ") contrast(" +
+            lerp(1.04, 1.01, t).toFixed(3) +
+            ") brightness(" +
+            lerp(0.78, 2.65, t).toFixed(3) +
+            ")",
+        });
+      }
+      if (blur) gsap.set(blur, { opacity: lerp(0.55, 0.88, t) });
       if (rail) gsap.set(rail, mixRail(RAIL_LIGHT, RAIL_DARK, t));
-      /* Jasny tryb przez całą widoczność Grafiki — ściemnianie dopiero gdy sekcja zniknie ze scrolla */
-      document.body.classList.toggle("is-grafiki-light", t > 0.18);
+      document.body.classList.toggle("is-grafiki-light", t > 0.12);
       syncGrafikiCubeFade();
     }
 
-    function liftFromScroll(self) {
-      var pin = ScrollTrigger.getById("grafiki-pin");
-      var endBand = document.querySelector(".portfolio-end");
-      var y = self.scroll();
-      var pinStart = pin ? pin.start : self.start;
-      var pinEnd = pin ? pin.end : self.end;
-      var pinSpan = Math.max(1, pinEnd - pinStart);
-      /* Rozjaśnianie później i wolniej — dopiero po ~22% pinu, pełne ~50% */
-      var liftStart = pinStart + pinSpan * 0.22;
-      var liftFull = pinStart + pinSpan * 0.5;
-      /* Stay fully light through GRAFIKI title+button; darken only into footer */
-      var darkenStart = pinEnd;
-      var darkenEnd = endBand
-        ? Math.max(pinEnd + 1, endBand.getBoundingClientRect().top + y + (window.innerHeight || 0) * 0.35)
-        : self.end;
-      var t;
-      if (y <= liftStart) {
-        t = 0;
-      } else if (y < liftFull) {
-        var raw = (y - liftStart) / Math.max(1, liftFull - liftStart);
-        t = Math.pow(Math.max(0, Math.min(1, raw)), 1.65);
-      } else if (y <= darkenStart) {
-        t = 1;
-      } else {
-        t = 1 - (y - darkenStart) / Math.max(1, darkenEnd - darkenStart);
-        t = Math.max(0, Math.min(1, t));
+    function liftAmountFromPinProgress(p) {
+      p = Math.max(0, Math.min(1, p));
+      /* Start brightening mid-cinema; full light before GRAFIKI title */
+      var liftStart = 0.28;
+      var liftFull = 0.62;
+      if (p <= liftStart) return 0;
+      if (p >= liftFull) return 1;
+      var raw = (p - liftStart) / (liftFull - liftStart);
+      return Math.pow(raw, 1.35);
+    }
+
+    function syncLiftFromPin(pin) {
+      if (!pin) return;
+      var t = 0;
+      if (pin.isActive) {
+        t = liftAmountFromPinProgress(pin.progress || 0);
+      } else if (typeof pin.scroll === "function" && pin.scroll() > pin.end) {
+        /* Free-scroll after pin: stay light until footer covers */
+        var endBand = document.querySelector(".portfolio-end");
+        if (!endBand) {
+          t = 1;
+        } else {
+          var top = endBand.getBoundingClientRect().top;
+          var vh = window.innerHeight || 1;
+          if (top >= vh * 0.92) t = 1;
+          else if (top <= vh * 0.15) t = 0;
+          else t = Math.max(0, Math.min(1, (top - vh * 0.15) / (vh * 0.77)));
+        }
       }
-      /* Hard guarantee: finale title+button always on a light screen */
       if (
         document.body.classList.contains("is-grafiki-overlay-reveal") ||
-        (section && section.classList.contains("is-cinema-done"))
+        section.classList.contains("is-cinema-done")
       ) {
         t = Math.max(t, 1);
       }
       applyAmbientLift(t);
+    }
+
+    function liftFromScroll() {
+      syncLiftFromPin(ScrollTrigger.getById("grafiki-pin"));
     }
 
     var bloomST = ScrollTrigger.create({
@@ -1658,10 +1688,12 @@
         return pin ? pin.start : "top top";
       },
       end: function () {
-        var endBand = document.querySelector(".portfolio-end");
-        if (endBand) return endBand.offsetTop + Math.round((window.innerHeight || 0) * 0.4);
         var pin = ScrollTrigger.getById("grafiki-pin");
-        return pin ? pin.end + Math.round((window.innerHeight || 0) * 0.6) : "bottom top";
+        var endBand = document.querySelector(".portfolio-end");
+        if (pin && endBand) {
+          return pin.end + Math.round((window.innerHeight || 0) * 1.1);
+        }
+        return pin ? pin.end + Math.round((window.innerHeight || 0) * 0.85) : "bottom top";
       },
       invalidateOnRefresh: true,
       onUpdate: liftFromScroll,
@@ -1709,7 +1741,14 @@
     grafikiMenuState.darkenTl = null;
     grafikiMenuState.triggers = [bloomST, zoneST];
 
+    window.cosgralGrafikiBloom = {
+      apply: applyAmbientLift,
+      syncFromPin: syncLiftFromPin,
+      refresh: liftFromScroll,
+    };
+
     syncGrafikiCubeFade();
+    liftFromScroll();
   }
 
   function renderGallery(data) {
