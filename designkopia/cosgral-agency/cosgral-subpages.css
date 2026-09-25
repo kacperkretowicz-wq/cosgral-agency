@@ -1122,9 +1122,23 @@ html.reduce-motion .nav-overlay__char {
   position: relative;
   z-index: 2;
   padding: clamp(3rem, 8vh, 5rem) var(--gutter);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
-  background: linear-gradient(180deg, rgba(3, 3, 3, 0.35) 0%, rgba(3, 3, 3, 0.72) 55%, rgba(3, 3, 3, 0.85) 100%);
+  background: #030303;
+}
+.portfolio-end {
+  position: relative;
+  z-index: 2;
+  background: #030303;
+}
+.portfolio-end .portfolio-contact-cta {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.portfolio-end .site-footer {
+  background: transparent;
+  border-top: none;
+  margin-top: 0;
 }
 .portfolio-contact-cta__inner {
   display: flex;

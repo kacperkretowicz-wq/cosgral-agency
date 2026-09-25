@@ -1591,6 +1591,8 @@
       },
       onLeave: function () {
         document.body.classList.remove("is-grafiki-zone");
+        document.body.classList.remove("is-grafiki-light");
+        applyAmbientLift(0);
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },
@@ -1601,6 +1603,8 @@
       },
       onLeaveBack: function () {
         document.body.classList.remove("is-grafiki-zone");
+        document.body.classList.remove("is-grafiki-light");
+        applyAmbientLift(0);
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },

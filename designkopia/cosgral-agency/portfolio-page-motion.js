@@ -101,6 +101,12 @@
   function wireCover(leave, enter) {
     if (!leave || !enter || REDUCED || !window.ScrollTrigger) return;
     function sync() {
+      // Never recess the Grafiki cinema pin — opacity/scale on .graphics-stage
+      // kills the scrub animation while the next block approaches.
+      if (leave.id === "grafiki" || leave.classList.contains("portfolio-section--grafiki")) {
+        applyRecess(leave, 0);
+        return;
+      }
       applyRecess(leave, coverAmount(enter));
     }
     ScrollTrigger.create({

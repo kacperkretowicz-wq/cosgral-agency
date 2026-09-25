@@ -12,9 +12,9 @@
   var HOLDS_CONFIG = [
     { id: "portfolio-top", selector: ".portfolio-hero" },
     { id: "strony", selector: "#strony" },
-    { id: "automatyzacje", selector: "#automatyzacje-intro" },
+    { id: "automatyzacje", stId: "auto-chapter-pin", hold: 0.18, selector: "#automatyzacje-intro" },
     { id: "montaz", selector: "#montaz" },
-    { stId: "grafiki-pin", hold: 0, id: "grafiki" },
+    { id: "grafiki", stId: "grafiki-pin", hold: 0, selector: "#grafiki" },
     { id: "footer", footer: true },
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) {
@@ -30,7 +30,13 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    return Math.min(max, Math.max(0, footer.offsetTop));
+    // offsetTop breaks when footer is nested in .portfolio-end — use viewport + scroll
+    var scrollY = window.scrollY || window.pageYOffset || 0;
+    if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+      scrollY = window.cosgralSmoothScroll.scroll;
+    }
+    var y = footer.getBoundingClientRect().top + scrollY - (MOBILE ? 72 : 96);
+    return Math.min(max, Math.max(0, y));
   }
 
   function sectionHoldY(selector) {
@@ -52,10 +58,16 @@
       }
       if (cfg.stId) {
         var st = ScrollTrigger.getById(cfg.stId);
-        if (st) holds.push(holdY(st, cfg.hold));
+        if (st) {
+          holds.push(holdY(st, cfg.hold != null ? cfg.hold : 0));
+          return;
+        }
+      }
+      if (cfg.selector) {
+        holds.push(sectionHoldY(cfg.selector));
         return;
       }
-      if (cfg.selector) holds.push(sectionHoldY(cfg.selector));
+      if (cfg.id) holds.push(sectionHoldY("#" + cfg.id));
     });
     return holds;
   }
@@ -168,7 +180,7 @@
       if (!auto) return null;
       var start = Math.max(0, auto.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
       var end = footer
-        ? Math.max(0, footer.offsetTop)
+        ? Math.max(0, footer.getBoundingClientRect().top + window.scrollY)
         : window.ScrollTrigger
           ? ScrollTrigger.maxScroll(window)
           : document.documentElement.scrollHeight;

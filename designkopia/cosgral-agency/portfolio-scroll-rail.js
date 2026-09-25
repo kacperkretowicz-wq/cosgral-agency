@@ -80,8 +80,12 @@
   }
 
   function ensureIncreasing(positions) {
+    // Keep a meaningful scroll gap so rail labels never stack on one %
+    var minGap = Math.max(120, Math.round(window.innerHeight * 0.22));
     for (var i = 1; i < positions.length; i++) {
-      if (positions[i] < positions[i - 1] + 1) positions[i] = positions[i - 1] + 1;
+      if (!(positions[i] > positions[i - 1] + minGap)) {
+        positions[i] = positions[i - 1] + minGap;
+      }
     }
     return positions;
   }
@@ -291,13 +295,30 @@
       }
     }
 
+    function sceneHoldY(scene) {
+      if (!scene) return 0;
+      if (scene.footer) {
+        var footer = document.querySelector(".site-footer");
+        if (!footer) return document.documentElement.scrollHeight;
+        return Math.max(0, footer.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
+      }
+      if (scene.id === "automatyzacje") {
+        var chapterPin = window.ScrollTrigger && ScrollTrigger.getById("auto-chapter-pin");
+        if (chapterPin) return chapterPin.start + (chapterPin.end - chapterPin.start) * 0.18;
+      }
+      if (scene.id === "grafiki") {
+        var grafikiPin = window.ScrollTrigger && ScrollTrigger.getById("grafiki-pin");
+        if (grafikiPin) return grafikiPin.start;
+      }
+      return sceneY(scene.selector);
+    }
+
     function refreshMetrics() {
-      if (window.cosgralPortfolioStepper?.holds) {
-        holdPositions = window.cosgralPortfolioStepper.holds.slice();
+      var fromStepper = window.cosgralPortfolioStepper?.holds;
+      if (fromStepper && fromStepper.length === SCENES.length) {
+        holdPositions = fromStepper.slice();
       } else {
-        holdPositions = SCENES.map(function (scene) {
-          return sceneY(scene.selector);
-        });
+        holdPositions = SCENES.map(sceneHoldY);
       }
       ensureIncreasing(holdPositions);
       layoutDots(ui, holdPositions);

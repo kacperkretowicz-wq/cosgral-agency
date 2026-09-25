@@ -24,6 +24,18 @@
       artist: "BXRDVJA",
       youtube: "asn93p_UtXE",
     },
+    {
+      id: "session-01",
+      title: "Session 01",
+      artist: "COSGRAL",
+      audio: "assets/music/session-01.mp3",
+    },
+    {
+      id: "session-02",
+      title: "Session 02",
+      artist: "COSGRAL",
+      audio: "assets/music/session-02.mp3",
+    },
     // Kolejne utwory — dopisz tutaj (youtube: "VIDEO_ID" lub audio: "assets/music/….mp3")
   ];
 
@@ -86,7 +98,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925music5");
+    link.href = assetPath("site-music.css?v=20260925fix4");
     document.head.appendChild(link);
   }
 
