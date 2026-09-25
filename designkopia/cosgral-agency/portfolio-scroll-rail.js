@@ -81,7 +81,7 @@
 
   function ensureIncreasing(positions) {
     // Keep a meaningful scroll gap so rail labels never stack on one %
-    var minGap = Math.max(120, Math.round(window.innerHeight * 0.22));
+    var minGap = Math.max(280, Math.round(window.innerHeight * 0.38));
     for (var i = 1; i < positions.length; i++) {
       if (!(positions[i] > positions[i - 1] + minGap)) {
         positions[i] = positions[i - 1] + minGap;
@@ -90,12 +90,52 @@
     return positions;
   }
 
+  /** Map scroll holds → rail % with a hard minimum visual gap between dots. */
+  function layoutPercents(positions) {
+    if (!positions || positions.length < 1) return [];
+    var pcts = positions.map(function (y) {
+      return yToRailPct(y ?? 0, positions);
+    });
+    var n = pcts.length;
+    if (n < 2) return pcts;
+    // ~label height on a ~560px track ≈ 3–4%; keep ≥ 9% so titles never collide
+    var minPct = Math.max(9, Math.min(16, 92 / (n - 1)));
+    pcts[0] = 0;
+    for (var i = 1; i < n; i++) {
+      if (!(pcts[i] > pcts[i - 1] + minPct)) {
+        pcts[i] = pcts[i - 1] + minPct;
+      }
+    }
+    // If we overshot 100%, compress proportionally while keeping order
+    if (pcts[n - 1] > 100) {
+      var span = pcts[n - 1] || 1;
+      for (var j = 0; j < n; j++) {
+        pcts[j] = (pcts[j] / span) * 100;
+      }
+      // Re-assert min gap after compress if still feasible
+      var fitGap = Math.min(minPct, 100 / (n - 1));
+      pcts[0] = 0;
+      for (var k = 1; k < n; k++) {
+        if (!(pcts[k] > pcts[k - 1] + fitGap)) {
+          pcts[k] = pcts[k - 1] + fitGap;
+        }
+      }
+      if (pcts[n - 1] > 100) {
+        for (var m = 0; m < n; m++) {
+          pcts[m] = (m / (n - 1)) * 100;
+        }
+      }
+    }
+    return pcts;
+  }
+
   function layoutDots(ui, positions) {
     if (!positions || positions.length < 1) return;
+    var pcts = layoutPercents(positions);
     ui.dots.forEach(function (dot, i) {
       var li = dot.closest(".home-scroll-rail__item");
       if (!li) return;
-      li.style.top = yToRailPct(positions[i] ?? 0, positions).toFixed(2) + "%";
+      li.style.top = (pcts[i] ?? 0).toFixed(2) + "%";
     });
   }
 
@@ -314,9 +354,14 @@
     }
 
     function refreshMetrics() {
-      var fromStepper = window.cosgralPortfolioStepper?.holds;
-      if (fromStepper && fromStepper.length === SCENES.length) {
-        holdPositions = fromStepper.slice();
+      // Always rebuild — stepper.holds can go stale after pinSpacing settles
+      var live = null;
+      if (typeof window.cosgralPortfolioStepper?.refreshHolds === "function") {
+        live = window.cosgralPortfolioStepper.refreshHolds();
+        if (live && live.length) window.cosgralPortfolioStepper.holds = live;
+      }
+      if (live && live.length === SCENES.length) {
+        holdPositions = live.slice();
       } else {
         holdPositions = SCENES.map(sceneHoldY);
       }
@@ -342,7 +387,20 @@
     }
 
     function fillHeightForScroll(scroll) {
-      return yToRailPct(scroll, holdPositions);
+      if (!holdPositions.length) return 0;
+      var pcts = layoutPercents(holdPositions);
+      if (scroll <= holdPositions[0]) return pcts[0] || 0;
+      var last = holdPositions.length - 1;
+      if (scroll >= holdPositions[last]) return pcts[last] || 100;
+      for (var i = 1; i <= last; i++) {
+        if (scroll <= holdPositions[i]) {
+          var a = holdPositions[i - 1];
+          var b = holdPositions[i];
+          var t = b === a ? 0 : (scroll - a) / (b - a);
+          return (pcts[i - 1] || 0) + ((pcts[i] || 0) - (pcts[i - 1] || 0)) * t;
+        }
+      }
+      return pcts[last] || 100;
     }
 
     function update() {

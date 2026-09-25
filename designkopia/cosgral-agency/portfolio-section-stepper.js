@@ -800,7 +800,16 @@
     ScrollTrigger.addEventListener("refresh", function () {
       holds = buildHolds();
       window.cosgralPortfolioStepper.holds = holds;
+      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
     });
+
+    // Pin starts shift after first layout/media; rebuild holds once more
+    window.setTimeout(function () {
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+      holds = buildHolds();
+      window.cosgralPortfolioStepper.holds = holds;
+      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
+    }, 420);
   }
 
   function tryInit() {
