@@ -68,7 +68,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925music1");
+    link.href = assetPath("site-music.css?v=20260925music2");
     document.head.appendChild(link);
   }
 
@@ -320,9 +320,16 @@
           onReady: function () {
             ytReady = true;
             applyVolume();
-            if (thenPlay) playCurrent();
+            if (thenPlay || wantPlay) playCurrent();
           },
           onStateChange: function (ev) {
+            // 1 = playing
+            if (ev.data === 1) {
+              unlocked = true;
+              if (ui) ui.classList.remove("is-needs-gesture");
+              refreshUi();
+              applyVolume();
+            }
             // 0 = ended — restart for loop fallback
             if (ev.data === 0 && wantPlay) {
               try {
@@ -332,7 +339,11 @@
             }
           },
           onError: function () {
-            ui && ui.classList.add("is-needs-gesture");
+            unlocked = false;
+            if (ui) {
+              ui.classList.add("is-needs-gesture");
+              ui.classList.remove("is-playing");
+            }
           },
         },
       });
