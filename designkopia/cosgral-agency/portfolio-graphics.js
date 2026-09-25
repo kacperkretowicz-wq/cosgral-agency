@@ -1208,28 +1208,38 @@
     var framesCta = section.querySelector("[data-graphics-frames-cta]");
 
     function setOverlay(p) {
-      /* CTA dopiero pod sam koniec */
-      var show = p > 0.86;
-      var amt = Math.max(0, Math.min(1, (p - 0.86) / 0.1));
+      /* CTA dopiero pod sam koniec — opacity (nie autoAlpha), żeby klik działał */
+      var show = p > 0.82;
+      var amt = Math.max(0, Math.min(1, (p - 0.82) / 0.12));
+      var clickable = show && amt > 0.2;
       if (overlay) {
         overlay.setAttribute("aria-hidden", show ? "false" : "true");
-        gsap.set(overlay, { autoAlpha: show ? amt : 0 });
+        gsap.set(overlay, {
+          opacity: show ? amt : 0,
+          visibility: show ? "visible" : "hidden",
+        });
         if (show && amt > 0.05) overlay.classList.add("is-on");
         else overlay.classList.remove("is-on");
       }
       if (framesCta) {
         gsap.set(framesCta, {
-          autoAlpha: show ? amt : 0,
+          opacity: show ? amt : 0,
+          visibility: show ? "visible" : "hidden",
           y: (1 - amt) * 20,
           scale: 0.94 + amt * 0.06,
+          pointerEvents: clickable ? "auto" : "none",
         });
+        if (clickable) {
+          framesCta.style.pointerEvents = "auto";
+          framesCta.style.visibility = "visible";
+        }
       }
-      section.classList.toggle("is-cinema-done", p > 0.94);
-      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.86);
+      section.classList.toggle("is-cinema-done", p > 0.9);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.82);
     }
 
-    if (overlay) gsap.set(overlay, { autoAlpha: 0 });
-    if (framesCta) gsap.set(framesCta, { autoAlpha: 0, y: 20, scale: 0.94 });
+    if (overlay) gsap.set(overlay, { opacity: 0, visibility: "hidden" });
+    if (framesCta) gsap.set(framesCta, { opacity: 0, visibility: "hidden", y: 20, scale: 0.94, pointerEvents: "none" });
 
     window.cosgralGraphicsCinema = {
       setProgress: function (p) {
@@ -1320,7 +1330,7 @@
           setOverlay(0);
         },
         getBeat: function () {
-          return pinST && pinST.progress > 0.86 ? 1 : 0;
+          return pinST && pinST.progress > 0.82 ? 1 : 0;
         },
         isAnimating: function () {
           return false;

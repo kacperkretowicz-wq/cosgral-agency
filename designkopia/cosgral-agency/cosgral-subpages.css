@@ -2183,7 +2183,7 @@ body.portfolio-page #grafiki.is-depth-gone {
 }
 .graphics-frames-cta {
   position: relative;
-  z-index: 1;
+  z-index: 5;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
@@ -2191,6 +2191,34 @@ body.portfolio-page #grafiki.is-depth-gone {
   gap: clamp(1.1rem, 2.4vw, 1.6rem);
   text-decoration: none;
   color: var(--ink);
+}
+/* Gdy CTA jest widoczne — nic pod spodem nie przechwytuje kliknięć */
+body.is-grafiki-overlay-reveal #grafiki,
+body.is-grafiki-overlay-reveal #grafiki .graphics-stage,
+body.is-grafiki-overlay-reveal #grafiki .graphics-stage__cinema,
+body.is-grafiki-overlay-reveal #grafiki .graphics-cinema,
+body.is-grafiki-overlay-reveal #grafiki .graphics-cinema__tile,
+#grafiki.is-cinema-done .graphics-stage,
+#grafiki.is-cinema-done .graphics-stage__cinema,
+#grafiki.is-cinema-done .graphics-cinema__tile {
+  pointer-events: none !important;
+}
+body.is-grafiki-overlay-reveal #grafiki .graphics-stage__overlay,
+#grafiki.is-cinema-done .graphics-stage__overlay {
+  pointer-events: none !important;
+  visibility: visible !important;
+}
+body.is-grafiki-overlay-reveal #grafiki .graphics-frames-cta,
+#grafiki.is-cinema-done .graphics-frames-cta,
+body.is-grafiki-cinema-end #grafiki .graphics-frames-cta {
+  pointer-events: auto !important;
+  visibility: visible !important;
+  z-index: 60;
+  cursor: pointer;
+}
+body.is-grafiki-overlay-reveal #grafiki .graphics-frames-cta *,
+#grafiki.is-cinema-done .graphics-frames-cta * {
+  pointer-events: none !important; /* klik łapie cały <a>, nie dzieci */
 }
 .graphics-frames-cta__title {
   font-family: var(--font-display);
