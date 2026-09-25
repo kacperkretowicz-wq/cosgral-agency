@@ -12,9 +12,9 @@
   var HOLDS_CONFIG = [
     { id: "portfolio-top", selector: ".portfolio-hero" },
     { id: "strony", selector: "#strony" },
+    { id: "automatyzacje", selector: "#automatyzacje-intro" },
     { id: "montaz", selector: "#montaz" },
     { stId: "grafiki-pin", hold: 0, id: "grafiki" },
-    { id: "automatyzacje", selector: "#automatyzacje-intro" },
     { id: "footer", footer: true },
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) {

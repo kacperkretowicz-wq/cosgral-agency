@@ -173,11 +173,11 @@
     var cta = document.querySelector(".portfolio-contact-cta");
 
     var pairs = [
-      { leave: strony, enter: montaz },
-      { leave: montaz, enter: grafiki },
-      { leave: grafiki, enter: chapter },
+      { leave: strony, enter: chapter },
       { leave: chapter, enter: auto },
-      { leave: auto, enter: cta },
+      { leave: auto, enter: montaz },
+      { leave: montaz, enter: grafiki },
+      { leave: grafiki, enter: cta },
     ].filter(function (pair) {
       return pair.leave && pair.enter;
     });

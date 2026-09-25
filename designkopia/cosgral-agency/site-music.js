@@ -8,30 +8,6 @@
 (function () {
   "use strict";
 
-  // If this page runs inside the music keep-alive shell, let the parent drive music + nav.
-  if (window.parent && window.parent !== window) {
-    try {
-      if (window.parent.CosgralMusic) {
-        document.documentElement.classList.add("is-music-shell-child");
-        // Rewrite navigate to parent so the player never unloads
-        var patchNav = function () {
-          if (!window.cosgralPageTransition) return;
-          var orig = window.cosgralPageTransition.navigate;
-          window.cosgralPageTransition.navigate = function (url) {
-            if (window.parent.CosgralMusic.navigateKeepAlive) {
-              window.parent.CosgralMusic.navigateKeepAlive(url);
-              return;
-            }
-            if (orig) orig(url);
-          };
-        };
-        if (window.cosgralPageTransition) patchNav();
-        else window.addEventListener("DOMContentLoaded", patchNav);
-        return;
-      }
-    } catch (eShell) {}
-  }
-
   var STORAGE_TRACK = "cosgral-music-track";
   var STORAGE_ON = "cosgral-music-on";
   var STORAGE_TIME = "cosgral-music-time";
@@ -110,7 +86,7 @@
     var link = document.createElement("link");
     link.id = "site-music-css";
     link.rel = "stylesheet";
-    link.href = assetPath("site-music.css?v=20260925music4");
+    link.href = assetPath("site-music.css?v=20260925music5");
     document.head.appendChild(link);
   }
 
@@ -720,100 +696,7 @@
     isDucked: function () {
       for (var k in duckReasons) if (duckReasons[k]) return true;
       return false;
-    },
-    navigateKeepAlive: navigateKeepAlive,
+    }
   };
 
-  var shellFrame = null;
-
-  function navigateKeepAlive(url) {
-    if (!wantPlay) {
-      window.location.href = url;
-      return;
-    }
-    markNavigatingAway();
-
-    var absolute;
-    try {
-      absolute = new URL(url, window.location.href).href;
-    } catch (eUrl) {
-      absolute = url;
-    }
-
-    if (!shellFrame) {
-      enterMusicShell(absolute);
-      return;
-    }
-
-    try {
-      shellFrame.contentWindow.location.href = absolute;
-    } catch (eNav2) {
-      shellFrame.src = absolute;
-    }
-    try {
-      history.pushState({ cosgralMusicShell: 1 }, "", absolute);
-    } catch (eHist) {}
-  }
-
-  function enterMusicShell(url) {
-    document.documentElement.classList.add("is-music-shell");
-    document.body.classList.add("is-music-shell");
-
-    var host = ensureHost();
-    var musicRoot = ui && ui.closest(".site-nav__menu-col");
-
-    var floater = document.getElementById("cosgral-music-floater");
-    if (!floater) {
-      floater = document.createElement("div");
-      floater.id = "cosgral-music-floater";
-      floater.className = "cosgral-music-floater";
-      document.body.appendChild(floater);
-    }
-    if (ui && ui.parentNode !== floater) {
-      floater.appendChild(ui);
-    }
-
-    shellFrame = document.getElementById("cosgral-app-frame");
-    if (!shellFrame) {
-      shellFrame = document.createElement("iframe");
-      shellFrame.id = "cosgral-app-frame";
-      shellFrame.title = "COSGRAL";
-      shellFrame.setAttribute("allow", "autoplay; clipboard-write");
-      document.body.appendChild(shellFrame);
-    }
-
-    // Remove everything except shell chrome
-    Array.prototype.slice.call(document.body.children).forEach(function (child) {
-      if (child === shellFrame || child === floater || child === host) return;
-      if (child.id === "page-transition") return;
-      child.remove();
-    });
-    if (host.parentNode !== document.body) document.body.appendChild(host);
-    if (floater.parentNode !== document.body) document.body.appendChild(floater);
-
-    shellFrame.src = url;
-    try {
-      history.pushState({ cosgralMusicShell: 1 }, "", url);
-    } catch (eHist2) {}
-
-    shellFrame.addEventListener("load", function onShellLoad() {
-      try {
-        var doc = shellFrame.contentDocument;
-        if (!doc) return;
-        var style = doc.createElement("style");
-        style.textContent =
-          "#site-music,.site-music-host,#cosgral-music-floater{display:none!important}";
-        (doc.head || doc.documentElement).appendChild(style);
-      } catch (eStyle) {}
-    });
-  }
-
-  window.addEventListener("popstate", function (e) {
-    if (!shellFrame || !wantPlay) return;
-    try {
-      shellFrame.contentWindow.location.href = window.location.href;
-    } catch (ePop) {
-      shellFrame.src = window.location.href;
-    }
-  });
 })();

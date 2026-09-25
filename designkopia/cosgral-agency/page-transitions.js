@@ -107,18 +107,7 @@
 
     playExit();
     window.setTimeout(function () {
-      var dest = serviceHomeUrl(themeId);
-      if (
-        window.CosgralMusic &&
-        window.CosgralMusic.isActive &&
-        window.CosgralMusic.isActive() &&
-        window.CosgralMusic.navigateKeepAlive
-      ) {
-        window.CosgralMusic.navigateKeepAlive(dest);
-        navigating = false;
-        return;
-      }
-      window.location.href = dest;
+      window.location.href = serviceHomeUrl(themeId);
     }, EXIT_MS);
   }
 
@@ -307,19 +296,6 @@
   }
 
   function navigateTo(url) {
-    // Content iframe inside music keep-alive shell → parent owns navigation
-    try {
-      if (
-        window.parent &&
-        window.parent !== window &&
-        window.parent.CosgralMusic &&
-        window.parent.CosgralMusic.navigateKeepAlive
-      ) {
-        window.parent.CosgralMusic.navigateKeepAlive(url);
-        return;
-      }
-    } catch (eParentNav) {}
-
     if (navigating || REDUCED) {
       if (window.CosgralMusic && window.CosgralMusic.persistNow) {
         window.CosgralMusic.persistNow();
@@ -353,17 +329,6 @@
 
     playExit();
     window.setTimeout(function () {
-      // Keep YouTube player alive across subpages while music is on
-      if (
-        window.CosgralMusic &&
-        window.CosgralMusic.isActive &&
-        window.CosgralMusic.isActive() &&
-        window.CosgralMusic.navigateKeepAlive
-      ) {
-        window.CosgralMusic.navigateKeepAlive(url);
-        navigating = false;
-        return;
-      }
       window.location.href = url;
     }, EXIT_MS);
   }

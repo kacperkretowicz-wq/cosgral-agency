@@ -15,36 +15,36 @@
         { id: "intro", selector: "#portfolio-intro", label: "Start", i18n: "portfolio.rail_portfolio" },
         { id: "collage", selector: "#portfolio-collage", label: "Overview", i18n: "portfolio.selected_title" },
         { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony" },
+        { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz" },
         { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki" },
-        { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
       ]
     : FILM
     ? [
         { id: "open", act: "open", label: "Start", i18n: "portfolio.rail_portfolio" },
         { id: "strony", act: "web", label: "Strony", i18n: "portfolio.rail_strony" },
+        { id: "automatyzacje", act: "auto", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "montaz", act: "reels", label: "Montaż", i18n: "portfolio.rail_montaz" },
         { id: "grafiki", act: "gfx", label: "Grafiki", i18n: "portfolio.rail_grafiki" },
-        { id: "automatyzacje", act: "auto", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
       ]
     : [
         { id: "portfolio-top", selector: ".portfolio-hero", label: "Portfolio", i18n: "portfolio.rail_portfolio" },
         { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony", showTitle: true },
+        { id: "automatyzacje", selector: "#automatyzacje-intro", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: true },
         { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz", showTitle: true },
         { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki", showTitle: true },
-        { id: "automatyzacje", selector: "#automatyzacje-intro", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: true },
         { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
       ];
 
   /* Film act midpoints within pin progress (0–1) */
   var FILM_ACT_PROGRESS = {
     open: 0.04,
-    web: 0.18,
-    reels: 0.38,
-    gfx: 0.6,
-    auto: 0.86,
+    web: 0.16,
+    auto: 0.38,
+    reels: 0.62,
+    gfx: 0.84,
   };
 
   function sceneLabel(scene) {
