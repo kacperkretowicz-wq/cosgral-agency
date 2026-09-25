@@ -54,6 +54,7 @@
   var typingEl = null;
   var activeHumanName = "";
   var takeoverNoticeShown = false;
+  var lastVisitorBody = "";
 
   function isAiMessage(m) {
     if (!m) return false;
@@ -83,6 +84,16 @@
       .replace(/^\u200Bcgai\u200B/, "")
       .trim();
     return /^dzięk\w*\s+za\s+wiadomość/i.test(body);
+  }
+
+  function isCannedAiFallback(body) {
+    var t = String(body || "")
+      .replace(/^\u200Bcgai\u200B/, "")
+      .trim();
+    if (!t) return false;
+    if (/ogarniam temat/i.test(t)) return true;
+    if (/^dzięk\w*\s+za\s+wiadomość/i.test(t)) return true;
+    return false;
   }
 
   function resolveClientAgentName(m) {
@@ -147,7 +158,14 @@
     try {
       var raw = localStorage.getItem(aiStorageKey());
       var list = raw ? JSON.parse(raw) : [];
-      return Array.isArray(list) ? list : [];
+      if (!Array.isArray(list)) return [];
+      var clean = list.filter(function (m) {
+        return m && m.id && m.body && !isCannedAiFallback(m.body);
+      });
+      if (clean.length !== list.length) {
+        localStorage.setItem(aiStorageKey(), JSON.stringify(clean));
+      }
+      return clean;
     } catch (_) {
       return [];
     }
@@ -155,6 +173,7 @@
 
   function saveLocalAi(msg) {
     if (!msg || !msg.id) return;
+    if (isCannedAiFallback(msg.body)) return;
     try {
       var list = loadLocalAi();
       if (list.some(function (m) { return m.id === msg.id; })) return;
@@ -303,6 +322,7 @@
 
   function remember(m) {
     if (!m || !m.body) return;
+    if (m.role === "agent" && isCannedAiFallback(m.body)) return;
     conversation.push({
       role: m.role === "agent" ? "agent" : "visitor",
       body: m.body,
@@ -312,9 +332,17 @@
 
   function renderMessage(m, opts) {
     if (!m || !m.id || knownIds[m.id]) return;
-    if (isHubAutoReply(m)) {
+    if (isHubAutoReply(m) || (m.role === "agent" && isCannedAiFallback(m.body))) {
       knownIds[m.id] = 1;
       return;
+    }
+    if (m.role === "visitor") {
+      var vb = String(m.body || "").replace(/\s+/g, " ").trim();
+      if (vb && vb === lastVisitorBody) {
+        knownIds[m.id] = 1;
+        return;
+      }
+      lastVisitorBody = vb;
     }
     knownIds[m.id] = 1;
     if (empty.parentNode) empty.remove();
@@ -477,7 +505,9 @@
         visitor_key: visitorKey,
         body: body,
         page_url: location.href.slice(0, 500),
-        history: conversation.slice(-12),
+        history: conversation.filter(function (m) {
+          return m && m.body && !isCannedAiFallback(m.body);
+        }).slice(-12),
       }),
     })
       .then(function (r) {
@@ -501,13 +531,21 @@
       });
   }
 
-  function localFallbackAi() {
+  function localFallbackAi(userBody) {
+    var hint = String(userBody || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 140);
+    var body =
+      hint && !/^ale o czym/i.test(hint)
+        ? "Rozumiem — chodzi o: " +
+          hint +
+          ". W Cosgral robimy strony, sklepy, CRM, SEO, automatyzacje i wideo. Jaka branża i na kiedy?"
+        : "Jasne — napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy. Dopasuję ofertę Cosgral.";
     return {
       id: "ai-local-" + uuid(),
       role: "agent",
-      body:
-        "Jasne — ogarniam temat. Doprecyzuj proszę w 1–2 zdaniach, co chcesz (np. sklep, strona, CRM) i na kiedy. " +
-        "Jakub +48 533 790 518 · Kacper +48 571 798 397.",
+      body: body,
       source: AI_SOURCE,
       agent_kind: "ai",
       agent_name: "Cosgral AI",
@@ -536,6 +574,12 @@
 
     postChat(body)
       .then(function (res) {
+        if (!res.ok && (res.timedOut || res.status >= 500 || res.status === 408)) {
+          return postChat(body);
+        }
+        return res;
+      })
+      .then(function (res) {
         if (!res.ok) throw new Error(res.timedOut ? "timeout" : "send failed");
 
         if (res.data && res.data.human_takeover) {
@@ -548,20 +592,17 @@
           knownIds[res.data.message.id] = 1;
         }
 
-        if (res.data && res.data.ai_message && res.data.ai_message.body) {
-          saveLocalAi(res.data.ai_message);
-          renderMessage(res.data.ai_message);
+        var ai = res.data && res.data.ai_message;
+        if (ai && ai.body && !isCannedAiFallback(ai.body)) {
+          saveLocalAi(ai);
+          renderMessage(ai);
         } else if (!humanTakeover) {
-          var fb = localFallbackAi();
-          saveLocalAi(fb);
-          renderMessage(fb);
+          renderMessage(localFallbackAi(body));
         }
       })
       .catch(function (err) {
         if (err && err.message === "timeout" && !humanTakeover) {
-          var fb = localFallbackAi();
-          saveLocalAi(fb);
-          renderMessage(fb);
+          renderMessage(localFallbackAi(body));
           return;
         }
         input.value = body;
