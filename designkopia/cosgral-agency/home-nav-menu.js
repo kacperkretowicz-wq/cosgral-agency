@@ -275,6 +275,7 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("is-nav-menu-open", open);
     document.documentElement.classList.toggle("is-nav-menu-open", open);
+    setScrollLock(open);
     if (open && backdrop && window.gsap) {
       gsap.set(backdrop, { opacity: 1 });
     }
@@ -289,6 +290,33 @@
         servicesLink.setAttribute("aria-expanded", "false");
       }
       if (servicesSublist) servicesSublist.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function setScrollLock(locked) {
+    document.documentElement.classList.toggle("is-scroll-locked", locked);
+    document.body.classList.toggle("is-scroll-locked", locked);
+    var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+    if (lenis) {
+      try {
+        if (locked) lenis.stop();
+        else lenis.start();
+      } catch (err) {}
+    }
+    if (locked) {
+      var y = window.scrollY || window.pageYOffset || 0;
+      document.documentElement.style.setProperty("--scroll-lock-y", "-" + y + "px");
+      document.body.dataset.scrollLockY = String(y);
+    } else if (document.body.dataset.scrollLockY) {
+      var restore = parseInt(document.body.dataset.scrollLockY, 10) || 0;
+      delete document.body.dataset.scrollLockY;
+      document.documentElement.style.removeProperty("--scroll-lock-y");
+      window.scrollTo(0, restore);
+      if (lenis && lenis.scrollTo) {
+        try {
+          lenis.scrollTo(restore, { immediate: true });
+        } catch (err2) {}
+      }
     }
   }
 

@@ -376,8 +376,13 @@ html[data-theme="light"] .cg-chat-label {
 }
 
 .cg-chat-msgs {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   padding: 1rem 1.05rem;
   display: flex;
   flex-direction: column;

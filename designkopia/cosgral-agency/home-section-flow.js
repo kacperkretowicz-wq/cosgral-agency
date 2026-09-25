@@ -70,6 +70,7 @@
     /* Free-scroll depth stack: nie nadpisuj scrubowanych scale/blur/y */
     if (document.documentElement.classList.contains("is-free-scroll")) {
       scene.classList.add("is-entered", "is-visible");
+      snapSceneEntersVisible(scene);
       return;
     }
     gsap.set(panel, {
@@ -78,12 +79,17 @@
       filter: MOBILE ? "none" : "blur(0px)",
     });
     scene.classList.add("is-entered", "is-visible");
+    snapSceneEntersVisible(scene);
   }
 
   function playSceneEnters(scene, opts) {
     if (!scene || REDUCED || !window.gsap) return;
     opts = opts || {};
-    if (!opts.force && enteredScenes.has(scene)) return;
+    if (!opts.force && enteredScenes.has(scene)) {
+      /* Ponowne wejście: upewnij się, że nic nie zostało na visibility:hidden */
+      snapSceneEntersVisible(scene);
+      return;
+    }
     enteredScenes.add(scene);
 
     var targets = sceneEnterTargets(scene);
@@ -113,9 +119,20 @@
           ease: "power3.out",
           delay: opts.stagger === false ? 0 : i * 0.055,
           overwrite: true,
+          onComplete: function () {
+            /* visibility:hidden zostawione przez przerwany tween blokuje kliknięcia w kafelki */
+            el.style.visibility = "visible";
+            el.style.opacity = "1";
+            el.style.pointerEvents = "";
+          },
         }
       );
     });
+    /* Safety: po animacji wymuś widoczność (klik Realizacji) */
+    window.setTimeout(function () {
+      if (!scene.classList.contains("is-visible") && !scene.classList.contains("is-depth-active")) return;
+      snapSceneEntersVisible(scene);
+    }, 1100);
   }
 
   function snapSceneEntersVisible(scene) {
@@ -129,6 +146,11 @@
       x: 0,
       y: 0,
       filter: "none",
+    });
+    targets.forEach(function (el) {
+      el.style.visibility = "visible";
+      el.style.opacity = "1";
+      el.style.pointerEvents = "";
     });
   }
 

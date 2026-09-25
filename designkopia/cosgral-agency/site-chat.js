@@ -167,6 +167,9 @@
   head.appendChild(statusDot);
 
   var msgs = el("div", "cg-chat-msgs");
+  msgs.setAttribute("data-lenis-prevent", "");
+  msgs.setAttribute("data-lenis-prevent-wheel", "");
+  msgs.setAttribute("data-lenis-prevent-touch", "");
   var empty = el("div", "cg-chat-empty");
   empty.appendChild(
     el("div", "cg-chat-empty__mark", {
@@ -235,6 +238,8 @@
     launcher.setAttribute("aria-expanded", open ? "true" : "false");
     launcher.setAttribute("aria-label", open ? "Zamknij czat" : "Otwórz czat");
     panel.setAttribute("aria-hidden", open ? "false" : "true");
+    document.documentElement.classList.toggle("is-chat-open", open);
+    document.body.classList.toggle("is-chat-open", open);
 
     if (open) {
       panel.classList.add("is-open");
@@ -251,6 +256,10 @@
     }
   }
 
+  function scrollBottom() {
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
   function updateBadge() {
     if (unread > 0 && !open) {
       badge.hidden = false;
@@ -260,9 +269,14 @@
     }
   }
 
-  function scrollBottom() {
-    msgs.scrollTop = msgs.scrollHeight;
+  /* Nie pozwól Lenisowi / globalnym wheel handlerom zabrać scrolla historii */
+  function keepChatScroll(e) {
+    e.stopPropagation();
   }
+  msgs.addEventListener("wheel", keepChatScroll, { passive: true, capture: true });
+  msgs.addEventListener("touchstart", keepChatScroll, { passive: true, capture: true });
+  msgs.addEventListener("touchmove", keepChatScroll, { passive: true, capture: true });
+  panel.setAttribute("data-lenis-prevent", "");
 
   function remember(m) {
     if (!m || !m.body) return;

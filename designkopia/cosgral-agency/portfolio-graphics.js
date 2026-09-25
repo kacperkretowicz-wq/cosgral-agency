@@ -587,7 +587,9 @@
     function shouldIgnore() {
       if (!collageRoot || !collageRoot.classList.contains("is-ready")) return true;
       if (document.querySelector(".nav-overlay.is-open")) return true;
+      if (document.body.classList.contains("is-nav-menu-open")) return true;
       if (document.querySelector(".graphics-lightbox:not([hidden])")) return true;
+      if (document.querySelector(".cg-chat-panel.is-open")) return true;
       return false;
     }
 

@@ -175,6 +175,7 @@
   function onWheel(e) {
     if (!deck || openPanel) return;
     if (document.body.classList.contains("is-nav-menu-open")) return;
+    if (document.querySelector(".cg-chat-panel.is-open")) return;
     if (!sectionVisible && !isSectionOnScreen()) return;
     var dx = e.deltaX;
     var dy = e.deltaY;

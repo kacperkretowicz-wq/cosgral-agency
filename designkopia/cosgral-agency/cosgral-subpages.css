@@ -587,6 +587,27 @@ body.is-nav-menu-open .nav-overlay__backdrop {
 body.is-nav-menu-open .site-nav {
   z-index: 530;
 }
+
+/* Mega menu — lock page scroll on subpages */
+html.is-nav-menu-open,
+html.is-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  height: 100%;
+  touch-action: none;
+}
+body.is-nav-menu-open,
+body.is-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+html.is-nav-menu-open .nav-overlay,
+body.is-nav-menu-open .nav-overlay {
+  touch-action: auto;
+  overscroll-behavior: contain;
+}
+
 body.is-nav-menu-open.is-cube-menu-front.portfolio-page .portfolio-sand-portal--front,
 body.is-nav-menu-open.is-cube-menu-front.about-page .portfolio-sand-portal--front,
 body.is-nav-menu-open.is-cube-menu-front.graphics-gallery-page .portfolio-sand-portal--front,

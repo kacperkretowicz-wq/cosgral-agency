@@ -463,6 +463,18 @@ html.reduce-motion .home-scene [data-enter] {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
+  visibility: visible !important;
+}
+/* Free-scroll: po wejściu w scenę data-enter nie może zostawić visibility:hidden
+   (GSAP autoAlpha + tilt wrap potrafiło zablokować kliknięcia w kafelki Realizacji). */
+html.is-free-scroll .home-scene.is-depth-active.is-visible [data-enter],
+html.is-free-scroll .home-scene.is-entered.is-visible [data-enter] {
+  visibility: visible !important;
+}
+html.is-free-scroll .home-scene.is-depth-active.is-visible .home-work__card,
+html.is-free-scroll .home-scene.is-entered.is-visible .home-work__card {
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 .site-footer {
   position: relative;
@@ -795,6 +807,26 @@ body.is-nav-menu-open .site-nav {
 body.is-nav-menu-open .home-scroll-rail {
   opacity: 0;
   pointer-events: none;
+}
+
+/* Mega menu — zablokuj scroll strony (Lenis + natywny) */
+html.is-nav-menu-open,
+html.is-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  height: 100%;
+  touch-action: none;
+}
+body.is-nav-menu-open,
+body.is-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+html.is-nav-menu-open .nav-overlay,
+body.is-nav-menu-open .nav-overlay {
+  touch-action: auto;
+  overscroll-behavior: contain;
 }
 html.reduce-motion .nav-overlay__list a {
   opacity: 1;
