@@ -1941,17 +1941,6 @@ body.portfolio-page #main > [data-portfolio-section].home-depth {
   z-index: var(--depth-z, 10);
   background: transparent;
 }
-/* Kolejność malowania: sekcja wchodząca zawsze nad wychodzącą, a finał nad
-   przypiętymi Grafikami (pin robi position: fixed, więc bez tego wychodzi na wierzch). */
-body.portfolio-page [data-portfolio-section] {
-  position: relative;
-  z-index: var(--depth-z, 10);
-}
-body.portfolio-page .portfolio-end,
-body.portfolio-page .site-footer {
-  position: relative;
-  z-index: 60;
-}
 body.portfolio-page #main > [data-portfolio-section].home-depth.is-depth-gone,
 body.portfolio-page #main > [data-portfolio-section].home-depth.is-depth-gone *,
 body.portfolio-page #main > [data-portfolio-section].is-depth-gone,

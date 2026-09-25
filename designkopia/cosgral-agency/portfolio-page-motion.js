@@ -1,10 +1,6 @@
 /**
  * Portfolio — scroll-telling: kafelki wlatują ze scrolla i lądują w finalnym układzie.
- * Grafiki (cinema) mają własny pin w portfolio-graphics.js.
- *
- * Depth cover (sekcja wychodząca chowa się pod wchodzącą) jedzie przez
- * portfolio-scroll-director.js: geometria mierzona jest raz przy refreshu,
- * a style zapisujemy tylko wtedy, gdy wartość faktycznie się zmieniła.
+ * Grafiki (cinema) ma własny pin+scrub w portfolio-graphics.js.
  */
 (function () {
   "use strict";
@@ -14,16 +10,12 @@
   var sceneBridgeReady = false;
   var tileBound = {};
 
-  function director() {
-    return window.cosgralScrollDirector || null;
-  }
-
-  function clamp01(n) {
-    return n < 0 ? 0 : n > 1 ? 1 : n;
+  function getCurtain() {
+    return document.querySelector("[data-portfolio-scene-curtain]");
   }
 
   function smoothstep(edge0, edge1, x) {
-    var t = clamp01((x - edge0) / (edge1 - edge0));
+    var t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
     return t * t * (3 - 2 * t);
   }
 
@@ -31,19 +23,17 @@
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
 
-  function docTop(el) {
-    if (!el) return 0;
-    var smooth = window.cosgralSmoothScroll;
-    var y =
-      smooth && smooth.lenis && typeof smooth.lenis.scroll === "number"
-        ? smooth.lenis.scroll
-        : window.scrollY || window.pageYOffset || 0;
-    return el.getBoundingClientRect().top + y;
+  function coverAmount(next) {
+    if (!next) return 0;
+    var top = next.getBoundingClientRect().top;
+    var vh = window.innerHeight || 1;
+    if (top <= 0) return 1;
+    return 1 - Math.max(0, Math.min(1, top / vh));
   }
 
-  /** Element, który faktycznie cofamy w głąb — reszta sekcji zostaje w layoucie. */
   function poseTarget(el) {
     if (!el) return null;
+    // Grafiki: recess .graphics-stage only when leaving (pin forces recess 0 while active)
     if (el.id === "grafiki" || el.classList.contains("portfolio-section--grafiki")) {
       return el.querySelector(".graphics-stage") || el;
     }
@@ -56,25 +46,14 @@
     );
   }
 
-  /**
-   * Cofnięcie sekcji w głąb. Zapis tylko przy realnej zmianie — blur jest
-   * kwantyzowany do 0.5px, bo przy każdej nowej wartości przeglądarka przelicza
-   * całą teksturę rozmycia (to był główny koszt tej animacji).
-   */
-  function applyRecess(entry, p) {
-    var el = entry.leave;
+  function applyRecess(el, p) {
     if (!el || !window.gsap) return;
-
+    var target = poseTarget(el);
     var hold = 0.02;
-    var target = entry.target || el;
     var exitScale = MOBILE ? 0.82 : 0.72;
     var exitBlur = MOBILE ? 6 : 12;
     var exitY = MOBILE ? -2 : -5;
-
     if (p <= hold) {
-      if (entry.state === "idle") return;
-      entry.state = "idle";
-      entry.blur = -1;
       el.classList.remove("is-depth-recessed", "is-depth-gone");
       el.style.pointerEvents = "";
       gsap.set(el, { clearProps: "opacity,visibility" });
@@ -83,36 +62,24 @@
       });
       return;
     }
-
-    var u = easeInOut((p - hold) / (1 - hold));
+    var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
     var fade = u * u;
-    var blur = Math.round(exitBlur * u * 2) / 2;
-    var gone = u >= 0.995;
-
-    /* Ciągłe fade/scale/blur — bez skokowej zmiany visibility w połowie przejścia. */
-    if (entry.blur !== blur || Math.abs((entry.u || 0) - u) > 0.003) {
-      entry.u = u;
-      entry.blur = blur;
-      gsap.set(target, {
-        opacity: gone ? 0 : Math.max(0, 1 - fade),
-        visibility: "visible",
-        yPercent: exitY * u,
-        scale: 1 - (1 - exitScale) * u,
-        filter: gone ? "blur(0px)" : "blur(" + blur + "px)",
-        transformOrigin: "50% 42%",
-        force3D: true,
-      });
-    }
-
-    var nextState = gone ? "gone" : "recessed";
-    if (entry.state === nextState) return;
-    entry.state = nextState;
-
+    /* Continuous fade/scale/blur — no sudden visibility snap mid-cover */
+    gsap.set(target, {
+      opacity: Math.max(0, 1 - fade),
+      visibility: "visible",
+      yPercent: exitY * u,
+      scale: 1 - (1 - exitScale) * u,
+      filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
+      transformOrigin: "50% 42%",
+      force3D: true,
+    });
     el.classList.add("is-depth-recessed");
-    if (gone) {
+    if (u >= 0.995) {
       el.classList.add("is-depth-gone");
       el.style.pointerEvents = "none";
       gsap.set(el, { opacity: 0 });
+      gsap.set(target, { opacity: 0, filter: "blur(0px)" });
     } else {
       el.classList.remove("is-depth-gone");
       gsap.set(el, { opacity: 1, visibility: "visible" });
@@ -120,137 +87,58 @@
     }
   }
 
-  var curtainState = { amount: -1, bridge: null };
-
-  function setCurtain(curtain, amount) {
+  function setCurtain(amount) {
+    var curtain = getCurtain();
     if (!curtain || !window.gsap) return;
     var a = Math.max(0, Math.min(0.88, amount));
-    if (Math.abs(a - curtainState.amount) < 0.004) return;
-    curtainState.amount = a;
     gsap.set(curtain, {
       autoAlpha: a,
       visibility: a > 0.01 ? "visible" : "hidden",
     });
-    var bridge = a > 0.08;
-    if (bridge !== curtainState.bridge) {
-      curtainState.bridge = bridge;
-      document.body.classList.toggle("is-portfolio-scene-bridge", bridge);
-    }
+    document.body.classList.toggle("is-portfolio-scene-bridge", a > 0.08);
   }
 
-  /** Depth cover + kurtyna jako jeden kanał dyrygenta. */
-  function initPortfolioCinema() {
-    if (sceneBridgeReady || REDUCED || !window.gsap || !window.ScrollTrigger) return;
-    var dir = director();
-    if (!dir) return;
-    sceneBridgeReady = true;
+  function syncCurtainFromCovers(pairs) {
+    var peak = 0;
+    pairs.forEach(function (pair) {
+      var p = coverAmount(pair.enter);
+      var pulse = Math.sin(p * Math.PI) * 0.72;
+      if (pulse > peak) peak = pulse;
+    });
+    setCurtain(peak);
+  }
 
-    initChapterPin();
-
-    dir.register(
-      "portfolio-depth-cover",
-      function measure() {
-        var strony = document.getElementById("strony");
-        var montaz = document.getElementById("montaz");
-        var grafiki = document.getElementById("grafiki");
-        var chapter = document.getElementById("automatyzacje-intro");
-        var auto = document.getElementById("automatyzacje");
-        var endBand = document.querySelector(".portfolio-end");
-        var pin = ScrollTrigger.getById("grafiki-pin");
-
-        var raw = [
-          { leave: strony, enter: chapter },
-          { leave: chapter, enter: auto },
-          { leave: auto, enter: montaz },
-          { leave: montaz, enter: grafiki, enterAt: pin ? pin.start : null },
-          { leave: grafiki, enter: endBand, duringPin: "skip" },
-        ];
-
-        var entries = [];
-        for (var i = 0; i < raw.length; i++) {
-          var pair = raw[i];
-          if (!pair.leave || !pair.enter) continue;
-          entries.push({
-            leave: pair.leave,
-            target: poseTarget(pair.leave),
-            enterAt: pair.enterAt != null ? pair.enterAt : docTop(pair.enter),
-            duringPin: pair.duringPin || null,
-            state: null,
-            blur: -1,
-            u: 0,
-          });
+  function wireCover(leave, enter, opts) {
+    opts = opts || {};
+    if (!leave || !enter || REDUCED || !window.ScrollTrigger) return;
+    function sync() {
+      if (opts.afterPin) {
+        var pin = window.ScrollTrigger && ScrollTrigger.getById(opts.afterPin);
+        if (pin && pin.isActive) {
+          applyRecess(leave, 0);
+          return;
         }
-
-        /* Późniejsze sekcje malują się nad wcześniejszymi — koniec z nachodzeniem.
-           Pin przenosi sekcję do .pin-spacer, więc warstwę dostaje też opakowanie. */
-        var sections = document.querySelectorAll("[data-portfolio-section]");
-        for (var s = 0; s < sections.length; s++) {
-          var z = String(10 + s);
-          sections[s].style.setProperty("--depth-z", z);
-          var parent = sections[s].parentElement;
-          if (parent && parent.classList.contains("pin-spacer")) {
-            parent.style.setProperty("--depth-z", z);
-            parent.style.zIndex = z;
-          }
-        }
-
-        return {
-          entries: entries,
-          curtain: document.querySelector("[data-portfolio-scene-curtain]"),
-          pinStart: pin ? pin.start : null,
-          pinEnd: pin ? pin.end : null,
-        };
-      },
-      function apply(y, geo, st) {
-        if (!geo) return;
-        var vh = st.vh;
-        var pinActive =
-          geo.pinStart != null && y >= geo.pinStart - 1 && y <= geo.pinEnd + 1;
-        var peak = 0;
-
-        for (var i = 0; i < geo.entries.length; i++) {
-          var entry = geo.entries[i];
-          var cover =
-            entry.duringPin === "skip" && pinActive
-              ? 0
-              : clamp01(1 - (entry.enterAt - y) / vh);
-          applyRecess(entry, cover);
-          var pulse = Math.sin(cover * Math.PI) * 0.72;
-          if (pulse > peak) peak = pulse;
-        }
-
-        setCurtain(geo.curtain, peak);
-      },
-      20
-    );
-
-    dir.requestRefresh(60);
+      }
+      applyRecess(leave, coverAmount(enter));
+    }
+    ScrollTrigger.create({
+      id: (leave.id || "leave") + "-cover-" + (enter.id || "enter"),
+      start: 0,
+      end: "max",
+      invalidateOnRefresh: true,
+      onUpdate: sync,
+      onRefresh: sync,
+    });
   }
 
   function initChapterPin() {
     var chapter = document.getElementById("automatyzacje-intro");
     if (!chapter || REDUCED || !window.gsap || !window.ScrollTrigger) return;
-    if (ScrollTrigger.getById("auto-chapter-pin")) return;
 
     var title = chapter.querySelector(".portfolio-chapter__title");
     if (title) gsap.set(title, { autoAlpha: 0, y: 28, scale: 0.94 });
 
     gsap.set(chapter, { width: "100%", maxWidth: "none", clearProps: "left" });
-
-    var lastAmt = -1;
-    function paint(p) {
-      if (!title) return;
-      var show = smoothstep(0, 0.22, p);
-      var hold = 1 - smoothstep(0.72, 1, p);
-      var amt = p <= 0 ? 0 : Math.min(show, hold);
-      if (Math.abs(amt - lastAmt) < 0.004) return;
-      lastAmt = amt;
-      gsap.set(title, {
-        autoAlpha: amt,
-        y: (1 - amt) * 24,
-        scale: 0.94 + amt * 0.06,
-      });
-    }
 
     ScrollTrigger.create({
       id: "auto-chapter-pin",
@@ -264,13 +152,76 @@
       invalidateOnRefresh: true,
       refreshPriority: -2,
       onUpdate: function (self) {
-        paint(self.progress);
+        if (!title) return;
+        var p = self.progress;
+        var show = smoothstep(0, 0.22, p);
+        var hold = 1 - smoothstep(0.72, 1, p);
+        var amt = Math.min(show, hold);
+        gsap.set(title, {
+          autoAlpha: amt,
+          y: (1 - amt) * 24,
+          scale: 0.94 + amt * 0.06,
+        });
       },
       onRefresh: function (self) {
         gsap.set(chapter, { width: "100%", maxWidth: "none" });
-        lastAmt = -1;
-        paint(self.progress || 0);
+        if (!title) return;
+        var p = self.progress || 0;
+        var show = smoothstep(0, 0.22, p);
+        var hold = 1 - smoothstep(0.72, 1, p);
+        var amt = p <= 0 ? 0 : Math.min(show, hold);
+        gsap.set(title, {
+          autoAlpha: amt,
+          y: (1 - amt) * 24,
+          scale: 0.94 + amt * 0.06,
+        });
       },
+    });
+  }
+
+  function initPortfolioCinema() {
+    if (sceneBridgeReady || REDUCED || !window.gsap || !window.ScrollTrigger) return;
+    sceneBridgeReady = true;
+
+    var strony = document.getElementById("strony");
+    var montaz = document.getElementById("montaz");
+    var grafiki = document.getElementById("grafiki");
+    var chapter = document.getElementById("automatyzacje-intro");
+    var auto = document.getElementById("automatyzacje");
+    var endBand = document.querySelector(".portfolio-end");
+
+    var pairs = [
+      { leave: strony, enter: chapter },
+      { leave: chapter, enter: auto },
+      { leave: auto, enter: montaz },
+      { leave: montaz, enter: grafiki },
+      { leave: grafiki, enter: endBand, afterPin: "grafiki-pin" },
+    ].filter(function (pair) {
+      return pair.leave && pair.enter;
+    });
+
+    pairs.forEach(function (pair) {
+      wireCover(pair.leave, pair.enter, {
+        afterPin: pair.afterPin || null,
+      });
+    });
+
+    ScrollTrigger.create({
+      id: "portfolio-curtain-sync",
+      start: 0,
+      end: "max",
+      onUpdate: function () {
+        syncCurtainFromCovers(pairs);
+      },
+      onRefresh: function () {
+        syncCurtainFromCovers(pairs);
+      },
+    });
+
+    initChapterPin();
+    ScrollTrigger.refresh();
+    requestAnimationFrame(function () {
+      ScrollTrigger.refresh();
     });
   }
 
@@ -278,8 +229,7 @@
     if (!auto) return;
     auto.classList.add("is-entered", "is-visible");
     if (window.gsap) {
-      var panel =
-        auto.querySelector(".home-tilt-layer, .portfolio-scene__panel, .container") || auto;
+      var panel = auto.querySelector(".home-tilt-layer, .portfolio-scene__panel, .container") || auto;
       gsap.set(auto, { clearProps: "opacity,visibility" });
       gsap.set(panel, { clearProps: "opacity,visibility,transform,filter" });
       auto.classList.remove("is-depth-gone", "is-depth-recessed");
@@ -465,6 +415,7 @@
     }
 
     initPortfolioCinema();
+    ScrollTrigger.refresh();
   }
 
   if (document.readyState === "loading") {
@@ -475,11 +426,10 @@
 
   document.addEventListener("portfolio:media-ready", function () {
     initPortfolioCinema();
-    if (director()) director().requestRefresh(140);
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
-
   window.addEventListener("load", function () {
-    initPortfolioCinema();
-    if (director()) director().requestRefresh(180);
+    window.setTimeout(initPortfolioCinema, 180);
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
 })();

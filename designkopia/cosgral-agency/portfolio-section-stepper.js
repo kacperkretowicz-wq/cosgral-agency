@@ -802,8 +802,7 @@
 
     // Pin starts shift after first layout/media; rebuild holds once more
     window.setTimeout(function () {
-      if (window.cosgralScrollDirector) window.cosgralScrollDirector.requestRefresh(0);
-      else if (window.ScrollTrigger) ScrollTrigger.refresh();
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
       holds = buildHolds();
       window.cosgralPortfolioStepper.holds = holds;
       if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
@@ -846,8 +845,7 @@
         "portfolio:media-ready",
         function () {
           window.setTimeout(function () {
-            if (window.cosgralScrollDirector) window.cosgralScrollDirector.requestRefresh(0);
-            else if (window.ScrollTrigger) ScrollTrigger.refresh();
+            if (window.ScrollTrigger) ScrollTrigger.refresh();
             tryInit();
           }, 140);
         },

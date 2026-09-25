@@ -78,9 +78,8 @@
   gsap.ticker.add(function (time) {
     lenis.raf(time * 1000);
   });
-  /* Bez lag smoothingu długa klatka (WebGL / dekodowanie wideo) trafia do Lenisa
-     jako wielki delta i scroll przeskakuje. Pozwalamy nadrobić, ale z limitem. */
-  gsap.ticker.lagSmoothing(MOBILE ? 500 : 400, MOBILE ? 33 : 25);
+  /* Allow mild catch-up on mobile under GPU load; keep tight on desktop */
+  gsap.ticker.lagSmoothing(MOBILE ? 500 : 0);
 
   var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "faq", "proces", "kontakt"];
 
