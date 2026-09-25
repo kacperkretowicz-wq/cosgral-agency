@@ -336,9 +336,9 @@ function hub_post_agent(string $api, string $visitorKey, string $body, string $p
 
 function fallback_ai_text(): string
 {
-    return 'Chętnie to rozwinę — napisz proszę, o co konkretnie Ci chodzi '
-        . '(strona, sklep, CRM, SEO, automatyzacja albo coś innego). '
-        . 'Jakub i Kacper z Cosgral ogarniają wdrożenia: +48 533 790 518 / +48 571 798 397, kontakt@cosgral.pl.';
+    return 'Jasne — ogarniam temat. Napisz proszę 1–2 zdania więcej: co dokładnie chcesz wdrożyć '
+        . '(np. sklep, strona firmowa, CRM, SEO) i na kiedy. '
+        . 'Na tej podstawie Jakub lub Kacper dopną wycenę: +48 533 790 518 / +48 571 798 397.';
 }
 
 function gemini_extract_text(array $data): string
@@ -349,7 +349,7 @@ function gemini_extract_text(array $data): string
     }
     $finish = (string)($candidate['finishReason'] ?? '');
     if ($finish === 'SAFETY' || $finish === 'BLOCKLIST' || $finish === 'PROHIBITED_CONTENT') {
-        return 'Ten wątek omijam — wróćmy do projektu. W czym mogę pomóc: strona, sklep, CRM, SEO czy automatyzacja?';
+        return 'Jasne — wróćmy do rzeczy. W czym mogę pomóc: strona, sklep, CRM, SEO czy automatyzacja?';
     }
     $parts = $candidate['content']['parts'] ?? [];
     $text = '';
@@ -370,8 +370,8 @@ function gemini_extract_text(array $data): string
 function gemini_reply(string $apiKey, string $model, array $history, string $latestUser, string $pageUrl): string
 {
     $contents = [];
-    $latest = mb_substr($latestUser, 0, 4000, 'UTF-8');
-    $hist = array_slice($history, -20);
+    $latest = mb_substr($latestUser, 0, 2000, 'UTF-8');
+    $hist = array_slice($history, -12);
     foreach ($hist as $m) {
         if (!is_array($m) || empty($m['body'])) {
             continue;
@@ -379,7 +379,7 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
         $role = (($m['role'] ?? '') === 'agent' || ($m['role'] ?? '') === 'model') ? 'model' : 'user';
         $contents[] = [
             'role' => $role,
-            'parts' => [['text' => mb_substr((string)$m['body'], 0, 4000, 'UTF-8')]],
+            'parts' => [['text' => mb_substr((string)$m['body'], 0, 2000, 'UTF-8')]],
         ];
     }
     while (
@@ -392,7 +392,7 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
     $contents[] = ['role' => 'user', 'parts' => [['text' => $latest]]];
 
     $baseConfig = [
-        'temperature' => 0.8,
+        'temperature' => 0.9,
         'topP' => 0.95,
         'maxOutputTokens' => 4096,
         'thinkingConfig' => [
@@ -400,7 +400,7 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
         ],
     ];
     $configNoThink = [
-        'temperature' => 0.8,
+        'temperature' => 0.9,
         'topP' => 0.95,
         'maxOutputTokens' => 4096,
     ];
@@ -443,7 +443,7 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
             }
             $text = gemini_extract_text($res['data']);
             if ($text !== '') {
-                return mb_substr($text, 0, 4000, 'UTF-8');
+                return mb_substr($text, 0, 2200, 'UTF-8');
             }
             $lastError = 'gemini_empty_' . $tryModel;
         }
