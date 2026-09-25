@@ -261,6 +261,8 @@ html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) 
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .faq-item,
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .faq-item__q,
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .services-fan__card,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .services-fan__side-hit,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-fan-side],
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-tile-interact],
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-faq-toggle],
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [href],
@@ -1036,11 +1038,33 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 }
 .services-fan.home-scene .services-fan__head { margin-bottom: 0.35rem; }
 
+/* Pełne boczne strefy kliknięcia — pe:auto mimo pe:none na sekcji depth */
+.services-fan__side-hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(34%, 16rem);
+  z-index: 30;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: w-resize;
+  pointer-events: auto !important;
+  -webkit-tap-highlight-color: transparent;
+}
+.services-fan__side-hit--prev { left: 0; cursor: w-resize; }
+.services-fan__side-hit--next { right: 0; cursor: e-resize; }
+.services-fan__side-hit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: -4px;
+}
+
 /* Pulsujące podpowiedzi kliknięcia — 3 s po wejściu w sekcję */
 .services-fan__tap-pulse {
   position: absolute;
   top: 50%;
-  z-index: 20;
+  z-index: 31;
   translate: 0 -50%;
   width: clamp(68px, 11vw, 104px);
   height: clamp(68px, 11vw, 104px);

@@ -412,17 +412,14 @@
         if (openPanel) return;
         var card = e.target.closest(".services-fan__card.is-active");
         if (!card) return;
-        /* Boczne strefy = nawigacja karuzeli — nie otwieraj panelu z kafelka */
+        /* Boczne strefy ekranu / kafelka = nawigacja — nie otwieraj panelu */
         if (window.cosgralServicesFan && typeof window.cosgralServicesFan.isSideNavZone === "function") {
           if (window.cosgralServicesFan.isSideNavZone(e.clientX)) return;
-        } else {
-          var uslugi = document.getElementById("uslugi");
-          if (uslugi) {
-            var rect = uslugi.getBoundingClientRect();
-            var ratio = (e.clientX - rect.left) / Math.max(1, rect.width);
-            if (ratio < 0.28 || ratio > 0.72) return;
-          }
         }
+        if (e.target.closest("[data-fan-side]")) return;
+        var cardRect = card.getBoundingClientRect();
+        var cardRatio = (e.clientX - cardRect.left) / Math.max(1, cardRect.width);
+        if (cardRatio < 0.22 || cardRatio > 0.78) return;
         e.preventDefault();
         e.stopPropagation();
         openFromCard(card);

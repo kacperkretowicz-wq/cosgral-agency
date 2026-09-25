@@ -15,6 +15,9 @@
   var hint = document.querySelector("[data-fan-hint]");
   var btnPrev = document.querySelector("[data-fan-prev]");
   var btnNext = document.querySelector("[data-fan-next]");
+  var sideHits = Array.prototype.slice.call(
+    section.querySelectorAll("[data-fan-side]")
+  );
   var total = cards.length;
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
@@ -406,6 +409,40 @@
       next();
     });
   }
+  sideHits.forEach(function (btn) {
+    btn.addEventListener(
+      "click",
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        hideHint();
+        hideTapHint();
+        if (btn.getAttribute("data-fan-side") === "prev") prev();
+        else next();
+      },
+      true
+    );
+  });
+
+  /* Aktywny kafelek: klik w bocznej 1/3 karty = prev/next, nie panel */
+  cards.forEach(function (card) {
+    card.addEventListener(
+      "click",
+      function (e) {
+        if (!card.classList.contains("is-active")) return;
+        var r = card.getBoundingClientRect();
+        var ratio = (e.clientX - r.left) / Math.max(1, r.width);
+        if (ratio >= 0.22 && ratio <= 0.78) return; /* środek → service-panel */
+        e.preventDefault();
+        e.stopPropagation();
+        hideHint();
+        hideTapHint();
+        if (ratio < 0.5) prev();
+        else next();
+      },
+      true
+    );
+  });
 
   section.addEventListener(
     "touchstart",
