@@ -1301,9 +1301,17 @@
     var pinHandlers = {};
     /* First portion of cinema plays while Montaż recesses / Grafiki covers it */
     var APPROACH_END = mobile ? 0.11 : 0.14;
+    /* Tiles start only once Montaż is already blurred / nearly gone at top */
+    var APPROACH_TILE_START = mobile ? 0.48 : 0.55;
 
     function cinemaFromPinProgress(p) {
       return APPROACH_END + Math.max(0, Math.min(1, p)) * (1 - APPROACH_END);
+    }
+
+    function approachCinemaProgress(p) {
+      var t = Math.max(0, Math.min(1, p));
+      if (t <= APPROACH_TILE_START) return 0;
+      return ((t - APPROACH_TILE_START) / (1 - APPROACH_TILE_START)) * APPROACH_END;
     }
 
     var pinST = ScrollTrigger.create({
@@ -1363,7 +1371,7 @@
       },
     });
 
-    /* Approach: as Montaż recesses and Grafiki rises, tiles slowly fly in */
+    /* Approach: tiles fly in only after Montaż is recessed / almost gone */
     ScrollTrigger.create({
       id: "grafiki-approach",
       trigger: section,
@@ -1374,13 +1382,13 @@
       refreshPriority: -2,
       onUpdate: function (self) {
         if (!freeScroll || pinST.isActive) return;
-        cinemaTl.progress(self.progress * APPROACH_END);
+        cinemaTl.progress(approachCinemaProgress(self.progress));
         setOverlay(0);
       },
       onRefresh: function (self) {
         if (!freeScroll || pinST.isActive) return;
         if (self.progress > 0 && self.progress < 1) {
-          cinemaTl.progress(self.progress * APPROACH_END);
+          cinemaTl.progress(approachCinemaProgress(self.progress));
         }
       },
     });

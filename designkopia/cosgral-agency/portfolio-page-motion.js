@@ -49,10 +49,19 @@
   function applyRecess(el, p) {
     if (!el || !window.gsap) return;
     var target = poseTarget(el);
-    if (target.style.filter !== "none") target.style.filter = "none";
     var hold = 0.04;
+    var exitScale = MOBILE ? 0.78 : 0.68;
+    var exitBlur = MOBILE ? 10 : 18;
+    var exitY = MOBILE ? -4 : -8;
     if (p <= hold) {
-      gsap.set(target, { opacity: 1, visibility: "visible", yPercent: 0, scale: 1, force3D: true });
+      gsap.set(target, {
+        opacity: 1,
+        visibility: "visible",
+        yPercent: 0,
+        scale: 1,
+        filter: "blur(0px)",
+        force3D: true,
+      });
       gsap.set(el, { opacity: 1, visibility: "visible" });
       el.classList.remove("is-depth-recessed", "is-depth-gone");
       el.style.pointerEvents = "";
@@ -64,8 +73,9 @@
     gsap.set(target, {
       opacity: 1 - fade,
       visibility: "visible",
-      yPercent: (MOBILE ? -4 : -8) * u,
-      scale: 1 - (MOBILE ? 0.2 : 0.3) * u,
+      yPercent: exitY * u,
+      scale: 1 - (1 - exitScale) * u,
+      filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
       transformOrigin: "50% 42%",
       force3D: true,
     });
@@ -74,6 +84,7 @@
       el.classList.add("is-depth-gone");
       el.style.pointerEvents = "none";
       gsap.set(el, { opacity: 0, visibility: "hidden" });
+      gsap.set(target, { opacity: 0, visibility: "hidden", filter: "blur(0px)" });
     } else {
       el.classList.remove("is-depth-gone");
       gsap.set(el, { opacity: 1, visibility: "visible" });
@@ -186,7 +197,7 @@
     var grafiki = document.getElementById("grafiki");
     var chapter = document.getElementById("automatyzacje-intro");
     var auto = document.getElementById("automatyzacje");
-    var cta = document.querySelector(".portfolio-contact-cta");
+    var cta = document.querySelector(".portfolio-end") || document.querySelector(".portfolio-contact-cta");
 
     var pairs = [
       { leave: strony, enter: chapter },

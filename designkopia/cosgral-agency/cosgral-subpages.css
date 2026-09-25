@@ -1131,6 +1131,18 @@ html.reduce-motion .nav-overlay__char {
   z-index: 2;
   background: #030303;
 }
+/* Soft leading edge so Grafiki depth-recess reads before the solid audit band */
+.portfolio-end::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -56px;
+  height: 56px;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(to bottom, rgba(3, 3, 3, 0), #030303);
+}
 .portfolio-end .portfolio-contact-cta {
   background: transparent;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -1939,10 +1951,11 @@ body.portfolio-page #main > [data-portfolio-section].is-depth-recessed {
   /* Keep half-cut tiles from leaking into the next scene */
   contain: paint;
 }
+/* Grafiki exit under audit CTA: no hard paint clip — depth scale/blur must read above the band */
 body.portfolio-page #grafiki.is-depth-recessed,
 body.portfolio-page #grafiki.is-depth-gone {
-  overflow: hidden !important;
-  contain: paint;
+  overflow: visible !important;
+  contain: none;
 }
 .portfolio-section .container {
   position: relative;
