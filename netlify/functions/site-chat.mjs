@@ -102,10 +102,31 @@ function isAiAgentMessage(m) {
   return false;
 }
 
+function isHubAutoReply(m) {
+  if (!m || m.role !== "agent") return false;
+  if (isAiAgentMessage(m)) return false;
+  const author = String(m.author || "").toLowerCase();
+  if (author === "ai" || author === "bot" || author === "system" || author === "auto") {
+    return true;
+  }
+  const source = String(m.source || "").toLowerCase();
+  if (
+    source === "ai" ||
+    source === "bot" ||
+    source === "system" ||
+    source === "auto" ||
+    source === "auto-reply"
+  ) {
+    return true;
+  }
+  const body = stripAiPrefix(String(m.body || "")).trim();
+  return /^dzięk\w*\s+za\s+wiadomość/i.test(body);
+}
+
 function detectHumanTakeover(messages) {
   const list = Array.isArray(messages) ? messages : [];
   return list.some(function (m) {
-    return m && m.role === "agent" && !isAiAgentMessage(m);
+    return m && m.role === "agent" && !isAiAgentMessage(m) && !isHubAutoReply(m);
   });
 }
 
@@ -200,7 +221,9 @@ function enrichAgentMessage(m) {
 }
 
 function normalizeMessages(messages) {
-  return (Array.isArray(messages) ? messages : []).map(function (m) {
+  return (Array.isArray(messages) ? messages : []).filter(function (m) {
+    return !(m && m.role === "agent" && isHubAutoReply(m));
+  }).map(function (m) {
     if (!m) return m;
     if (m.role === "agent") return enrichAgentMessage(m);
     return m;
@@ -225,6 +248,7 @@ function toGeminiContents(history, latestUser) {
   const latest = String(latestUser).slice(0, 2000);
   for (const m of hist) {
     if (!m || !m.body) continue;
+    if (isHubAutoReply(m)) continue;
     const role = m.role === "agent" || m.role === "model" ? "model" : "user";
     contents.push({ role, parts: [{ text: String(m.body).slice(0, 2000) }] });
   }

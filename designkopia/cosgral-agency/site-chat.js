@@ -62,6 +62,29 @@
     return false;
   }
 
+  function isHubAutoReply(m) {
+    if (!m || m.role !== "agent") return false;
+    if (isAiMessage(m)) return false;
+    var author = String(m.author || "").toLowerCase();
+    if (author === "ai" || author === "bot" || author === "system" || author === "auto") {
+      return true;
+    }
+    var source = String(m.source || "").toLowerCase();
+    if (
+      source === "ai" ||
+      source === "bot" ||
+      source === "system" ||
+      source === "auto" ||
+      source === "auto-reply"
+    ) {
+      return true;
+    }
+    var body = String(m.body || "")
+      .replace(/^\u200Bcgai\u200B/, "")
+      .trim();
+    return /^dzięk\w*\s+za\s+wiadomość/i.test(body);
+  }
+
   function resolveClientAgentName(m) {
     if (isAiMessage(m)) return "Cosgral AI";
     var raw = String(
@@ -289,6 +312,10 @@
 
   function renderMessage(m, opts) {
     if (!m || !m.id || knownIds[m.id]) return;
+    if (isHubAutoReply(m)) {
+      knownIds[m.id] = 1;
+      return;
+    }
     knownIds[m.id] = 1;
     if (empty.parentNode) empty.remove();
 

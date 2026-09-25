@@ -126,15 +126,39 @@ function is_ai_agent_message(array $m): bool
     return strpos($body, AI_BODY_PREFIX) === 0;
 }
 
+function is_hub_auto_reply(array $m): bool
+{
+    if (($m['role'] ?? '') !== 'agent') {
+        return false;
+    }
+    if (is_ai_agent_message($m)) {
+        return false;
+    }
+    $author = mb_strtolower((string)($m['author'] ?? ''), 'UTF-8');
+    if (in_array($author, ['ai', 'bot', 'system', 'auto'], true)) {
+        return true;
+    }
+    $source = mb_strtolower((string)($m['source'] ?? ''), 'UTF-8');
+    if (in_array($source, ['ai', 'bot', 'system', 'auto', 'auto-reply'], true)) {
+        return true;
+    }
+    $body = trim(strip_ai_prefix((string)($m['body'] ?? '')));
+    return $body !== '' && (bool)preg_match('/^dzięk\w*\s+za\s+wiadomość/iu', $body);
+}
+
 function detect_human_takeover(array $messages): bool
 {
     foreach ($messages as $m) {
         if (!is_array($m)) {
             continue;
         }
-        if (($m['role'] ?? '') === 'agent' && !is_ai_agent_message($m)) {
-            return true;
+        if (($m['role'] ?? '') !== 'agent') {
+            continue;
         }
+        if (is_ai_agent_message($m) || is_hub_auto_reply($m)) {
+            continue;
+        }
+        return true;
     }
     return false;
 }
@@ -278,6 +302,9 @@ function normalize_messages(array $messages): array
         if (!is_array($m)) {
             continue;
         }
+        if (($m['role'] ?? '') === 'agent' && is_hub_auto_reply($m)) {
+            continue;
+        }
         if (($m['role'] ?? '') === 'agent') {
             $m = enrich_agent_message($m);
         }
@@ -374,6 +401,9 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
     $hist = array_slice($history, -12);
     foreach ($hist as $m) {
         if (!is_array($m) || empty($m['body'])) {
+            continue;
+        }
+        if (is_hub_auto_reply($m)) {
             continue;
         }
         $role = (($m['role'] ?? '') === 'agent' || ($m['role'] ?? '') === 'model') ? 'model' : 'user';
