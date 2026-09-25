@@ -283,6 +283,16 @@ body.service-page .subpage-cube-portal {
   opacity: 0;
   will-change: opacity;
 }
+/* Lift wash above sand-back so Grafiki brightening is actually visible */
+body.is-grafiki-light .subpage-ambient,
+body.is-grafiki-light .subpage-ambient__blur,
+body.is-grafiki-light .subpage-ambient__shade,
+body.is-grafiki-light .grafiki-bloom {
+  z-index: 1;
+}
+body.is-grafiki-light .grafiki-bloom {
+  z-index: 1;
+}
 .portfolio-scene-curtain {
   position: fixed;
   inset: 0;
