@@ -1,5 +1,16 @@
 /* Linked automation cards + systems case pages */
 
+/* Podstrony automatyzacji — bez piasku i sześcianu w tle */
+body.case-page--no-fx .subpage-cube-portal,
+body.case-page--no-fx .portfolio-sand-portal,
+body.case-page--no-fx #subpage-cube,
+body.case-page--no-fx #portfolio-sand-back,
+body.case-page--no-fx #portfolio-sand-front {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 .portfolio-case-card--telforce .portfolio-case-card__link,
 .portfolio-case-card--linked .portfolio-case-card__link {
   display: flex;

@@ -13,8 +13,9 @@
 <link rel="canonical" href="https://cosgral.pl/portfolio-telforceone-code39.html" />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="cosgral-subpages.css?v=20260925mobile2" />
-<link rel="stylesheet" href="telforce-cases.css?v=20260925nofx1" />
-<script src="telforce-previews.js?v=20260924tfo1" defer></script>
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz1" />
+<link rel="stylesheet" href="case-viz-tiles.css?v=20260925viz1" />
+<script src="case-viz-tiles.js?v=20260925viz1" defer></script>
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
 <script>
@@ -69,33 +70,199 @@
 </div>
 
 <main id="main">
-    <article class="case-study case-study--systems">
-  <div class="case-study__top">
-    <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
-    <div class="case-study__meta">
-      <p class="case-study__eyebrow" data-i18n="portfolio.tf_code39_tag">Narzędzie / identyfikacja</p>
-      <p class="case-study__client">TelForceOne S.A.</p>
+        <article class="case-study case-study--systems case-study--viz">
+  <header class="case-viz-intro">
+    <div class="case-viz-intro__main">
+      <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
+      <h1 class="case-study__title" data-i18n="portfolio.tf_code39_title">Generator kodów kreskowych Code 39</h1>
+      <p class="case-study__lede" data-i18n="portfolio.tf_code39_lede">Aplikacja do generowania kodów kreskowych Code 39.</p>
     </div>
-    <h1 class="case-study__title" data-i18n="portfolio.tf_code39_title">Generator kodów kreskowych Code 39</h1>
-    <p class="case-study__lede" data-i18n="portfolio.tf_code39_lede">Aplikacja do generowania kodów kreskowych Code 39.</p>
-    <ul class="case-study__signals" aria-label="Zakres">
-      <li data-i18n="portfolio.tf_code_s1">Code 39</li>
-      <li data-i18n="portfolio.tf_code_s2">Generator etykiet</li>
-      <li data-i18n="portfolio.tf_code_s3">Szybki wydruk</li>
-    </ul>
+    <aside class="case-viz-intro__aside">
+      <div class="case-study__meta">
+        <p class="case-study__eyebrow" data-i18n="portfolio.tf_code39_tag">Narzędzie / identyfikacja</p>
+          <p class="case-study__client">TelForceOne S.A.</p>
+      </div>
+      <ol class="case-viz-intro__index" aria-label="Moduły systemu">
+        <li><a href="#viz-input"><span>01</span>Input</a></li>
+        <li><a href="#viz-encode"><span>02</span>Encode</a></li>
+        <li><a href="#viz-preview"><span>03</span>Preview</a></li>
+        <li><a href="#viz-batch"><span>04</span>Batch</a></li>
+        <li><a href="#viz-print"><span>05</span>Print</a></li>
+        <li><a href="#viz-scan"><span>06</span>Scan</a></li>
+        <li><a href="#viz-archive"><span>07</span>Archivum</a></li>
+      </ol>
+    </aside>
+  </header>
+
+  <div class="case-viz-rail" aria-label="Wizualizacje systemu">
+    <section class="case-viz-tile" id="viz-input">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">01</span>
+        <h2 class="case-viz-tile__title">Wartość wejściowa</h2>
+        <p class="case-viz-tile__text">Wpisz kod — paski budują się na żywo w standardzie Code 39.</p>
+        <span class="case-viz-tile__hint">Edytuj pole</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="barcode" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Code 39 · wpisz wartość</p>
+            <div class="viz-barcode">
+              <div class="viz-barcode__bars" aria-hidden="true"></div>
+              <input class="viz-barcode__input" type="text" value="TFO-8841" maxlength="14" aria-label="Wartość kodu" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-encode">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">02</span>
+        <h2 class="case-viz-tile__title">Kodowanie</h2>
+        <p class="case-viz-tile__text">Kroki od znaku alfanumerycznego do wzorca pasków.</p>
+        <span class="case-viz-tile__hint">Kliknij krok</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="steps" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Flow · kliknij krok</p>
+            <div class="viz-steps">
+            <button type="button" class="viz-steps__node">Znak</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Checksum</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Paski</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Quiet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-preview">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">03</span>
+        <h2 class="case-viz-tile__title">Podgląd etykiety</h2>
+        <p class="case-viz-tile__text">KPI etykiety: szerokość, wysokość, kontrast — szybki sanity-check przed drukiem.</p>
+        <span class="case-viz-tile__hint">Snapshot</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="kpi" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget" data-viz-root>
+            <p class="viz-widget__label">Live snapshot</p>
+            <div class="viz-kpi">
+        <div class="viz-kpi__card"><span>W mm</span><b data-to="48" data-suffix="" data-prefix="">48</b></div>
+        <div class="viz-kpi__card"><span>H mm</span><b data-to="22" data-suffix="" data-prefix="">22</b></div>
+        <div class="viz-kpi__card"><span>DPI</span><b data-to="300" data-suffix="" data-prefix="">300</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-batch">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">04</span>
+        <h2 class="case-viz-tile__title">Partia kodów</h2>
+        <p class="case-viz-tile__text">Obciążenie generatora przy batchu — klik słupka pokazuje falę zadań.</p>
+        <span class="case-viz-tile__hint">Hover / klik</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="bars" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Stany · hover / klik</p>
+            <div class="viz-bars">
+              <div class="viz-bars__col" data-h="30"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="44"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="58"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="72"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="64"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="50"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="80"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="55"><div class="viz-bars__fill"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-print">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">05</span>
+        <h2 class="case-viz-tile__title">Szybki wydruk</h2>
+        <p class="case-viz-tile__text">Oś: generuj → kolejka → drukarka → potwierdzenie.</p>
+        <span class="case-viz-tile__hint">Przeciągnij</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="timeline" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Oś czasu · przeciągnij</p>
+            <div class="viz-timeline">
+              <div class="viz-timeline__track">
+                <div class="viz-timeline__fill"></div>
+                <div class="viz-timeline__knob"></div>
+              </div>
+              <div class="viz-timeline__marks">
+              <span>Gen</span>
+              <span>Kolejka</span>
+              <span>Druk</span>
+              <span>OK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-scan">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">06</span>
+        <h2 class="case-viz-tile__title">Weryfikacja skanem</h2>
+        <p class="case-viz-tile__text">Alerty gdy skaner nie czyta etykiety albo checksum nie zgadza się.</p>
+        <span class="case-viz-tile__hint">Pulse</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="alerts" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Alert feed</p>
+            <div class="viz-alert-feed">
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Checksum OK · TFO-8841</span><span>teraz</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Słaby kontrast</span><span>2 min</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Ponów druk · LOTE 12</span><span>5 min</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Skan OK</span><span>8 min</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-archive">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">07</span>
+        <h2 class="case-viz-tile__title">Archiwum oznaczeń</h2>
+        <p class="case-viz-tile__text">Gauge pokrycia: ile SKU ma aktywny, zweryfikowany Code 39.</p>
+        <span class="case-viz-tile__hint">Przesuń</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="gauge" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Covered · przesuń</p>
+            <div class="viz-gauge">
+              <div class="viz-gauge__arc"><div class="viz-gauge__needle"></div></div>
+              <div class="viz-gauge__value">62%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  <div class="case-study__stage">
-    <div class="case-study__film case-study__film--visual">
-      <div class="case-study__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
-      <img src="assets/cases/telforceone-code39.svg?v=20260925cases2" width="640" height="360" alt="Poglądowa wizualizacja: generator kodów Code 39" fetchpriority="high" />
-      <span class="case-study__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-    </div>
-  </div>
-  <div class="case-study__body">
-    <div class="case-study__copy">
-      <p data-i18n="portfolio.tf_code39_p1">Drugim narzędziem dla TelForceOne S.A. jest aplikacja do generowania kodów kreskowych w standardzie Code 39. Ułatwia przygotowanie oznaczeń potrzebnych do identyfikacji produktów i materiałów.</p>
-      <p data-i18n="portfolio.tf_code39_p2">Interfejs skupia się na krótkim zadaniu: wprowadzeniu wartości, obejrzeniu wyniku i przygotowaniu kodu do wykorzystania. Poglądowa wizualizacja powyżej pokazuje tę prostą ścieżkę.</p>
-      <p data-i18n="portfolio.tf_code39_p3">Projekt należy do tej samej rodziny narzędzi operacyjnych: pomaga przełożyć powtarzalny proces na czytelną aplikację dostępną dla zespołu.</p>
+
+  <div class="case-viz-close">
+    <div class="case-viz-close__copy">
+        <p data-i18n="portfolio.tf_code39_p1">Aplikacja do generowania kodów kreskowych Code 39 ułatwia oznaczanie produktów i materiałów.</p>
+        <p data-i18n="portfolio.tf_code39_p2">Interfejs skupia się na krótkim zadaniu: wartość → podgląd → wydruk.</p>
     </div>
     <aside class="case-study__aside">
       <p class="case-study__aside-label">TelForceOne S.A. / <span data-i18n="portfolio.tf_code39_tag">Narzędzie / identyfikacja</span></p>

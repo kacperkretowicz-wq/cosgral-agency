@@ -13,8 +13,9 @@
 <link rel="canonical" href="https://cosgral.pl/portfolio-chatbot-ai.html" />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="cosgral-subpages.css?v=20260925mobile2" />
-<link rel="stylesheet" href="telforce-cases.css?v=20260925nofx1" />
-<script src="telforce-previews.js?v=20260924tfo1" defer></script>
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz1" />
+<link rel="stylesheet" href="case-viz-tiles.css?v=20260925viz1" />
+<script src="case-viz-tiles.js?v=20260925viz1" defer></script>
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
 <script>
@@ -69,32 +70,218 @@
 </div>
 
 <main id="main">
-    <article class="case-study case-study--systems">
-  <div class="case-study__top">
-    <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
-    <div class="case-study__meta">
-      <p class="case-study__eyebrow" data-i18n="portfolio.case_chatbot_ai_tag">Automatyzacja</p>
+        <article class="case-study case-study--systems case-study--viz">
+  <header class="case-viz-intro">
+    <div class="case-viz-intro__main">
+      <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
+      <h1 class="case-study__title" data-i18n="portfolio.case_chatbot_ai_title">Chatbot AI do wiadomości klientów</h1>
+      <p class="case-study__lede" data-i18n="portfolio.case_chatbot_ai_lede">Asystent AI odpowiadający na wiadomości z social i WWW — z przekazaniem rozmowy do człowieka.</p>
     </div>
-    <h1 class="case-study__title" data-i18n="portfolio.case_chatbot_ai_title">Chatbot AI do wiadomości klientów</h1>
-    <p class="case-study__lede" data-i18n="portfolio.case_chatbot_ai_lede">Asystent AI odpowiadający na wiadomości z social i WWW — z przekazaniem rozmowy do człowieka.</p>
-    <ul class="case-study__signals" aria-label="Zakres">
-      <li data-i18n="portfolio.case_chatbot_ai_s1">Social + WWW</li>
-      <li data-i18n="portfolio.case_chatbot_ai_s2">FAQ i wyceny</li>
-      <li data-i18n="portfolio.case_chatbot_ai_s3">Handoff do człowieka</li>
-    </ul>
+    <aside class="case-viz-intro__aside">
+      <div class="case-study__meta">
+        <p class="case-study__eyebrow" data-i18n="portfolio.case_chatbot_ai_tag">Automatyzacja</p>
+      </div>
+      <ol class="case-viz-intro__index" aria-label="Moduły systemu">
+        <li><a href="#viz-inbox"><span>01</span>Inbox</a></li>
+        <li><a href="#viz-intent"><span>02</span>Intent</a></li>
+        <li><a href="#viz-reply"><span>03</span>Reply</a></li>
+        <li><a href="#viz-quote"><span>04</span>Wycena</a></li>
+        <li><a href="#viz-handoff"><span>05</span>Handoff</a></li>
+        <li><a href="#viz-context"><span>06</span>Kontekst</a></li>
+        <li><a href="#viz-night"><span>07</span>24/7</a></li>
+      </ol>
+    </aside>
+  </header>
+
+  <div class="case-viz-rail" aria-label="Wizualizacje systemu">
+    <section class="case-viz-tile" id="viz-inbox">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">01</span>
+        <h2 class="case-viz-tile__title">Wspólna skrzynka</h2>
+        <p class="case-viz-tile__text">Social i WWW spływają do jednego inboxu. Orbit pokazuje kanały wejścia.</p>
+        <span class="case-viz-tile__hint">Orbit kanałów</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="orbit" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Kanały</p>
+            <div class="viz-orbit">
+              <div class="viz-orbit__ring" aria-hidden="true"></div>
+              <div class="viz-orbit__core">INBOX</div>
+              <div class="viz-orbit__node">IG</div>
+              <div class="viz-orbit__node">FB</div>
+              <div class="viz-orbit__node">WWW</div>
+              <div class="viz-orbit__node">Mail</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-intent">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">02</span>
+        <h2 class="case-viz-tile__title">Wykrywanie intencji</h2>
+        <p class="case-viz-tile__text">AI klasyfikuje FAQ, wyceny i reklamacje zanim odpowie.</p>
+        <span class="case-viz-tile__hint">Kroki intencji</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="steps" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Flow · kliknij krok</p>
+            <div class="viz-steps">
+            <button type="button" class="viz-steps__node">Msg</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Intent</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">FAQ</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Reply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-reply">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">03</span>
+        <h2 class="case-viz-tile__title">Odpowiedź FAQ</h2>
+        <p class="case-viz-tile__text">Kliknij, by odtworzyć krótką rozmowę: pytanie klienta → odpowiedź bota.</p>
+        <span class="case-viz-tile__hint">Interaktywny chat</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="chat" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Rozmowa · kliknij</p>
+            <div class="viz-chat">
+              <div class="viz-chat__bubble viz-chat__bubble--user">Macie wolny termin w sobotę?</div>
+              <div class="viz-chat__bubble viz-chat__bubble--ai">Tak — 11:00 lub 15:30. Który wolicie?</div>
+              <div class="viz-chat__bubble viz-chat__bubble--user">15:30</div>
+              <div class="viz-chat__bubble viz-chat__bubble--ai">Zarezerwowane. Potwierdzenie wysłałam na maila.</div>
+              <div class="viz-chat__actions">
+                <button type="button" data-chat-step="0">Pytanie</button>
+                <button type="button" data-chat-step="1">Slot</button>
+                <button type="button" data-chat-step="2">Potwierdź</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-quote">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">04</span>
+        <h2 class="case-viz-tile__title">Asystent wyceny</h2>
+        <p class="case-viz-tile__text">Bot zbiera zakres i budżet, zanim handlowiec wejdzie na rozmowę.</p>
+        <span class="case-viz-tile__hint">Klik rozmowę</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="chat" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Rozmowa · kliknij</p>
+            <div class="viz-chat">
+              <div class="viz-chat__bubble viz-chat__bubble--user">Ile kosztuje strona wizytówka?</div>
+              <div class="viz-chat__bubble viz-chat__bubble--ai">Zakres: 1–5 podstron?</div>
+              <div class="viz-chat__bubble viz-chat__bubble--user">3 podstrony + formularz</div>
+              <div class="viz-chat__bubble viz-chat__bubble--ai">Widełki 4–7k. Przekazać do konsultanta?</div>
+              <div class="viz-chat__actions">
+                <button type="button" data-chat-step="0">Zakres</button>
+                <button type="button" data-chat-step="1">Brief</button>
+                <button type="button" data-chat-step="2">Handoff</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-handoff">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">05</span>
+        <h2 class="case-viz-tile__title">Przekazanie człowiekowi</h2>
+        <p class="case-viz-tile__text">Gdy pewność AI spada, deal idzie do konsultanta z pełnym kontekstem.</p>
+        <span class="case-viz-tile__hint">Drag karty</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="pipe" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Pipeline · przeciągnij / klik</p>
+            <div class="viz-pipe">
+              <div class="viz-pipe__col"><h4>Bot</h4>
+                <div class="viz-pipe__card">FAQ #12</div>
+                <div class="viz-pipe__card">Cennik</div>
+              </div>
+              <div class="viz-pipe__col"><h4>Review</h4>
+                <div class="viz-pipe__card">Reklamacja</div>
+              </div>
+              <div class="viz-pipe__col"><h4>Human</h4>
+                <div class="viz-pipe__card">Wycena B2B</div>
+              </div>
+              <div class="viz-pipe__col"><h4>Done</h4>
+                <div class="viz-pipe__card">Rezerwacja</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-context">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">06</span>
+        <h2 class="case-viz-tile__title">Kontekst rozmowy</h2>
+        <p class="case-viz-tile__text">Oś: pierwsze pytanie → zebrane dane → handoff. Scrub pokazuje ciągłość.</p>
+        <span class="case-viz-tile__hint">Przeciągnij</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="timeline" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Oś czasu · przeciągnij</p>
+            <div class="viz-timeline">
+              <div class="viz-timeline__track">
+                <div class="viz-timeline__fill"></div>
+                <div class="viz-timeline__knob"></div>
+              </div>
+              <div class="viz-timeline__marks">
+              <span>Start</span>
+              <span>Dane</span>
+              <span>Bot</span>
+              <span>Human</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-night">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">07</span>
+        <h2 class="case-viz-tile__title">Po godzinach</h2>
+        <p class="case-viz-tile__text">Gauge pokrycia: ile zapytań bot zamyka samodzielnie w nocy.</p>
+        <span class="case-viz-tile__hint">Przesuń</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="gauge" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Auto-resolve · przesuń</p>
+            <div class="viz-gauge">
+              <div class="viz-gauge__arc"><div class="viz-gauge__needle"></div></div>
+              <div class="viz-gauge__value">62%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  <div class="case-study__stage">
-    <div class="case-study__film case-study__film--visual">
-      <div class="case-study__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
-      <img src="assets/cases/atelier-bloom.svg?v=20260925brand2" width="640" height="360" alt="Chatbot AI do wiadomości klientów" fetchpriority="high" />
-      <span class="case-study__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-    </div>
-  </div>
-  <div class="case-study__body">
-    <div class="case-study__copy">
-      <p data-i18n="portfolio.case_chatbot_ai_p1">Chatbot AI odbiera wiadomości z Instagrama, Facebooka i formularza WWW. Odpowiada na FAQ, godziny otwarcia i typowe pytania o ofertę, zanim do rozmowy wejdzie konsultant.</p>
-      <p data-i18n="portfolio.case_chatbot_ai_p2">Gdy temat wykracza poza automat, rozmowa jest przekazywana człowiekowi wraz z kontekstem. Klient nie zaczyna od zera, a zespół dostaje już wstępnie zebrane informacje.</p>
-      <p data-i18n="portfolio.case_chatbot_ai_p3">Narzędzie daje pierwszą odpowiedź 24/7 i odciąża skrzynkę, bez utraty ścieżki do realnej rozmowy sprzedażowej lub obsługowej.</p>
+
+  <div class="case-viz-close">
+    <div class="case-viz-close__copy">
+        <p data-i18n="portfolio.case_chatbot_ai_p1">Chatbot AI odbiera wiadomości z Instagrama, Facebooka i formularza WWW.</p>
+        <p data-i18n="portfolio.case_chatbot_ai_p2">Gdy temat wykracza poza automat, rozmowa jest przekazywana człowiekowi wraz z kontekstem.</p>
     </div>
     <aside class="case-study__aside">
       <p class="case-study__aside-label"><span data-i18n="portfolio.case_chatbot_ai_tag">Automatyzacja</span></p>

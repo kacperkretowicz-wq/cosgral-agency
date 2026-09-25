@@ -13,8 +13,9 @@
 <link rel="canonical" href="https://cosgral.pl/portfolio-trove-panel.html" />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="cosgral-subpages.css?v=20260925mobile2" />
-<link rel="stylesheet" href="telforce-cases.css?v=20260925nofx1" />
-<script src="telforce-previews.js?v=20260924tfo1" defer></script>
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz1" />
+<link rel="stylesheet" href="case-viz-tiles.css?v=20260925viz1" />
+<script src="case-viz-tiles.js?v=20260925viz1" defer></script>
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
 <script>
@@ -69,33 +70,202 @@
 </div>
 
 <main id="main">
-    <article class="case-study case-study--systems">
-  <div class="case-study__top">
-    <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
-    <div class="case-study__meta">
-      <p class="case-study__eyebrow" data-i18n="portfolio.case_trove_panel_tag">Aplikacja</p>
-      <p class="case-study__client" data-i18n="portfolio.case_trove_panel_client">Trove</p>
+        <article class="case-study case-study--systems case-study--viz">
+  <header class="case-viz-intro">
+    <div class="case-viz-intro__main">
+      <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
+      <h1 class="case-study__title" data-i18n="portfolio.case_trove_panel_title">Panel sklepu i monitoring cen</h1>
+      <p class="case-study__lede" data-i18n="portfolio.case_trove_panel_lede">Jeden panel na stany, ceny marketplace i alerty przecen dla Trove.</p>
     </div>
-    <h1 class="case-study__title" data-i18n="portfolio.case_trove_panel_title">Panel sklepu i monitoring cen</h1>
-    <p class="case-study__lede" data-i18n="portfolio.case_trove_panel_lede">Jeden panel na stany, ceny marketplace i alerty przecen dla Trove.</p>
-    <ul class="case-study__signals" aria-label="Zakres">
-      <li data-i18n="portfolio.case_trove_panel_s1">Stany magazynowe</li>
-      <li data-i18n="portfolio.case_trove_panel_s2">Ceny marketplace</li>
-      <li data-i18n="portfolio.case_trove_panel_s3">Alerty przecen</li>
-    </ul>
+    <aside class="case-viz-intro__aside">
+      <div class="case-study__meta">
+        <p class="case-study__eyebrow" data-i18n="portfolio.case_trove_panel_tag">Aplikacja</p>
+          <p class="case-study__client" data-i18n="portfolio.case_trove_panel_client">Trove</p>
+      </div>
+      <ol class="case-viz-intro__index" aria-label="Moduły systemu">
+        <li><a href="#viz-overview"><span>01</span>Przegląd</a></li>
+        <li><a href="#viz-stock"><span>02</span>Stany</a></li>
+        <li><a href="#viz-prices"><span>03</span>Ceny</a></li>
+        <li><a href="#viz-alerts"><span>04</span>Alerty</a></li>
+        <li><a href="#viz-sync"><span>05</span>Sync</a></li>
+        <li><a href="#viz-margin"><span>06</span>Marża</a></li>
+        <li><a href="#viz-react"><span>07</span>Reakcja</a></li>
+      </ol>
+    </aside>
+  </header>
+
+  <div class="case-viz-rail" aria-label="Wizualizacje systemu">
+    <section class="case-viz-tile" id="viz-overview">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">01</span>
+        <h2 class="case-viz-tile__title">Pulpit operacyjny</h2>
+        <p class="case-viz-tile__text">KPI dostępności, marży i alertów w jednym kadrze — od razu widać, gdzie sklep traci rytm.</p>
+        <span class="case-viz-tile__hint">Przewiń · liczby ożywają</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="kpi" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget" data-viz-root>
+            <p class="viz-widget__label">Live snapshot</p>
+            <div class="viz-kpi">
+        <div class="viz-kpi__card"><span>SKU live</span><b data-to="1284" data-suffix="" data-prefix="">1284</b></div>
+        <div class="viz-kpi__card"><span>Alerty</span><b data-to="17" data-suffix="" data-prefix="">17</b></div>
+        <div class="viz-kpi__card"><span>Marża</span><b data-to="24" data-suffix="%" data-prefix="">24%</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-stock">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">02</span>
+        <h2 class="case-viz-tile__title">Stany magazynowe</h2>
+        <p class="case-viz-tile__text">Słupki reagują na kursor: szybki odczyt braków i nadwyżek bez wchodzenia w arkusz.</p>
+        <span class="case-viz-tile__hint">Hover / klik w słupek</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="bars" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Stany · hover / klik</p>
+            <div class="viz-bars">
+              <div class="viz-bars__col" data-h="42"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="58"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="47"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="72"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="38"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="65"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="51"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="80"><div class="viz-bars__fill"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-prices">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">03</span>
+        <h2 class="case-viz-tile__title">Ceny marketplace</h2>
+        <p class="case-viz-tile__text">Porównanie Allegro, własnego sklepu i konkurencji. Kliknięcie komórki odpala tryb alertu przeceny.</p>
+        <span class="case-viz-tile__hint">Kliknij kafelek ceny</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="prices" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Marketplace · klik = alert</p>
+            <div class="viz-price-grid">
+              <button type="button" class="viz-price-grid__cell" data-price="189"><span>Sklep</span><strong>189,00 zł</strong></button>
+              <button type="button" class="viz-price-grid__cell" data-price="174"><span>Allegro</span><strong>174,00 zł</strong></button>
+              <button type="button" class="viz-price-grid__cell" data-price="169"><span>Konkurent</span><strong>169,00 zł</strong></button>
+              <button type="button" class="viz-price-grid__cell" data-price="182"><span>Amazon</span><strong>182,00 zł</strong></button>
+              <button type="button" class="viz-price-grid__cell" data-price="191"><span>Empik</span><strong>191,00 zł</strong></button>
+              <button type="button" class="viz-price-grid__cell" data-price="171"><span>Ceneo</span><strong>171,00 zł</strong></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-alerts">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">04</span>
+        <h2 class="case-viz-tile__title">Alerty przecen</h2>
+        <p class="case-viz-tile__text">Feed zdarzeń pokazuje, kiedy oferta wypada z rynku albo gdy konkurencja schodzi z ceną.</p>
+        <span class="case-viz-tile__hint">Klik / auto-pulse</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="alerts" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Alert feed</p>
+            <div class="viz-alert-feed">
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Spadek −8% · Allegro</span><span>teraz</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Brak SKU-441</span><span>2 min</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Marża < 12%</span><span>7 min</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Dopasowanie Ceneo</span><span>12 min</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-sync">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">05</span>
+        <h2 class="case-viz-tile__title">Synchronizacja kanałów</h2>
+        <p class="case-viz-tile__text">Orbit węzłów sprzedaży: stany i ceny krążą do wspólnego źródła prawdy.</p>
+        <span class="case-viz-tile__hint">Aktywny orbit</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="orbit" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Kanały</p>
+            <div class="viz-orbit">
+              <div class="viz-orbit__ring" aria-hidden="true"></div>
+              <div class="viz-orbit__core">PANEL</div>
+              <div class="viz-orbit__node">Shop</div>
+              <div class="viz-orbit__node">Allegro</div>
+              <div class="viz-orbit__node">Amazon</div>
+              <div class="viz-orbit__node">Empik</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-margin">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">06</span>
+        <h2 class="case-viz-tile__title">Strażnik marży</h2>
+        <p class="case-viz-tile__text">Gauge pokazuje bezpieczny zakres. Przesuń, by zobaczyć próg ryzyka przeceny.</p>
+        <span class="case-viz-tile__hint">Przesuń po skali</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="gauge" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Marża · przesuń</p>
+            <div class="viz-gauge">
+              <div class="viz-gauge__arc"><div class="viz-gauge__needle"></div></div>
+              <div class="viz-gauge__value">62%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-react">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">07</span>
+        <h2 class="case-viz-tile__title">Czas reakcji</h2>
+        <p class="case-viz-tile__text">Oś od wykrycia przeceny do korekty oferty — scrub pokazuje, jak skracamy pętlę.</p>
+        <span class="case-viz-tile__hint">Przeciągnij suwak</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="timeline" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Oś czasu · przeciągnij</p>
+            <div class="viz-timeline">
+              <div class="viz-timeline__track">
+                <div class="viz-timeline__fill"></div>
+                <div class="viz-timeline__knob"></div>
+              </div>
+              <div class="viz-timeline__marks">
+              <span>Wykrycie</span>
+              <span>Analiza</span>
+              <span>Korekta</span>
+              <span>Live</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  <div class="case-study__stage">
-    <div class="case-study__film case-study__film--visual">
-      <div class="case-study__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
-      <img src="assets/cases/shelfsync.svg?v=20260925brand2" width="640" height="360" alt="Panel sklepu i monitoring cen" fetchpriority="high" />
-      <span class="case-study__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-    </div>
-  </div>
-  <div class="case-study__body">
-    <div class="case-study__copy">
-      <p data-i18n="portfolio.case_trove_panel_p1">Dla Trove zbudowaliśmy panel, który zbiera stany magazynowe i ceny z kanałów sprzedaży w jednym widoku. Zamiast ręcznego sprawdzania marketplace’ów zespół widzi różnice i ryzyka od razu.</p>
-      <p data-i18n="portfolio.case_trove_panel_p2">Monitoring cen porównuje oferty i sygnalizuje przeceny oraz odchylenia. Alerty skracają czas reakcji, gdy konkurencja zmienia warunki albo gdy własna oferta wypada z rynku.</p>
-      <p data-i18n="portfolio.case_trove_panel_p3">Cel był prosty: mniej ręcznej kontroli, więcej kontroli nad marżą i dostępnością — bez kolejnego arkusza Excel.</p>
+
+  <div class="case-viz-close">
+    <div class="case-viz-close__copy">
+        <p data-i18n="portfolio.case_trove_panel_p1">Dla Trove zbudowaliśmy panel, który zbiera stany magazynowe i ceny z kanałów sprzedaży w jednym widoku.</p>
+        <p data-i18n="portfolio.case_trove_panel_p2">Monitoring cen porównuje oferty i sygnalizuje przeceny oraz odchylenia — bez kolejnego arkusza Excel.</p>
     </div>
     <aside class="case-study__aside">
       <p class="case-study__aside-label">Trove / <span data-i18n="portfolio.case_trove_panel_tag">Aplikacja</span></p>
