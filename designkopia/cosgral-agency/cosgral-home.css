@@ -494,6 +494,14 @@ html.is-free-scroll .home-scene.is-depth-recessed:not(.is-depth-gone) button {
   visibility: visible !important;
   pointer-events: auto !important;
 }
+/* Grid/data-enter nie może zostać na opacity:0 — dzieci dziedziczą niewidoczność */
+html.is-free-scroll .home-scene.is-entered:not(.is-depth-gone) .home-work__grid,
+html.is-free-scroll .home-scene.is-visible:not(.is-depth-gone) .home-work__grid,
+html.is-free-scroll .home-scene.is-depth-active:not(.is-depth-gone) .home-work__grid,
+html.is-free-scroll .home-scene.is-entered:not(.is-depth-gone) .home-work__footer {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
 .site-footer {
   position: relative;
   z-index: 8;

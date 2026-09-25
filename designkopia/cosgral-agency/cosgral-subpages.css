@@ -331,11 +331,24 @@ body.is-portfolio-scene-bridge .portfolio-scene-curtain {
   text-transform: uppercase;
   color: var(--ink);
 }
-/* Automatyzacje — zawsze czytelna po chapter intro; bez żyroskopu */
+/* Automatyzacje — zawsze czytelna po chapter intro; bez żyroskopu.
+   Shell: pointer-events none — tylko linki/kafelki łapią klik (pass-through przy cover). */
 body.portfolio-page #automatyzacje.is-entered,
 body.portfolio-page #automatyzacje.is-visible {
   opacity: 1 !important;
   visibility: visible !important;
+  pointer-events: none !important;
+}
+body.portfolio-page #automatyzacje.is-entered a,
+body.portfolio-page #automatyzacje.is-visible a,
+body.portfolio-page #automatyzacje.is-entered button,
+body.portfolio-page #automatyzacje.is-visible button,
+body.portfolio-page #automatyzacje.is-entered .portfolio-case-card,
+body.portfolio-page #automatyzacje.is-visible .portfolio-case-card,
+body.portfolio-page #automatyzacje.is-entered .portfolio-case-card__link,
+body.portfolio-page #automatyzacje.is-visible .portfolio-case-card__link,
+body.portfolio-page #automatyzacje.is-entered .glass-btn,
+body.portfolio-page #automatyzacje.is-visible .glass-btn {
   pointer-events: auto !important;
 }
 body.portfolio-page #automatyzacje.is-entered .portfolio-scene__panel,
