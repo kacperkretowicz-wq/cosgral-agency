@@ -909,8 +909,7 @@
     wantPlay = true;
     refreshUi();
     var kickPlay = function () {
-      if (!wantPlay) return;
-      if (unlocked) return;
+      if (!wantPlay || unlocked) return;
       playCurrent();
     };
     kickPlay();
@@ -919,7 +918,8 @@
     window.setTimeout(kickPlay, 320);
     window.setTimeout(kickPlay, 700);
     window.setTimeout(kickPlay, 1400);
-    // Keep trying briefly after subpage entry until audio/video actually starts
+    armGestureResume();
+    // Keep trying after subpage entry until playback actually starts
     if (resumeRetryTimer) clearInterval(resumeRetryTimer);
     var autoTries = 0;
     resumeRetryTimer = window.setInterval(function () {
@@ -931,7 +931,6 @@
       }
       playCurrent();
     }, 100);
-    armGestureResume();
     window.addEventListener("pageshow", function (ev) {
       if (!wantPlay) return;
       if (ev && ev.persisted) unlocked = false;

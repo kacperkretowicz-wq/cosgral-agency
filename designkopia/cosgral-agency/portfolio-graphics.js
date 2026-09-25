@@ -1597,7 +1597,6 @@
     var cube = document.querySelector(".subpage-cube-portal");
     var bloom = document.getElementById("grafiki-bloom");
     var rail = getScrollRail();
-    var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
     var lastLift = -1;
 
     grafikiMenuState.cube = cube;
