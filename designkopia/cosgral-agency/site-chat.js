@@ -532,16 +532,26 @@
   }
 
   function localFallbackAi(userBody) {
-    var hint = String(userBody || "")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 140);
-    var body =
-      hint && !/^ale o czym/i.test(hint)
-        ? "Rozumiem — chodzi o: " +
-          hint +
-          ". W Cosgral robimy strony, sklepy, CRM, SEO, automatyzacje i wideo. Jaka branża i na kiedy?"
-        : "Jasne — napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy. Dopasuję ofertę Cosgral.";
+    var blob = String(userBody || "");
+    conversation.forEach(function (m) {
+      if (m && m.role === "visitor" && m.body) blob += " " + m.body;
+    });
+    var low = blob.toLowerCase();
+    var confused = /o czym ty mów|nie rozumiem/i.test(String(userBody || ""));
+    var body;
+    if (/sklep|e-?comm|woo|shopify|koszyk/.test(low)) {
+      body = confused
+        ? "Przepraszam — wracam do sklepu. W Cosgral robimy e-commerce (WooCommerce / Shopify): katalog, zamówienia, płatności. Jaka branża, ile produktów i na kiedy start?"
+        : "Sklep internetowy zrobimy w Cosgral — WooCommerce albo Shopify, z zamówieniami i dodawaniem produktów. Jaka branża i na kiedy start?";
+    } else if (/crm|leady|hubspot|pipedrive/.test(low)) {
+      body = "CRM ogarniamy: HubSpot, Pipedrive albo panel pod Was. Ile osób w zespole i z czego korzystacie dziś?";
+    } else if (/stron|landing|www|witryn/.test(low)) {
+      body = "Stronę firmową albo landing zrobimy pod zapytania. Jest już witryna, czy start od zera?";
+    } else {
+      body = confused
+        ? "Masz rację, za ogólnie. Napisz w jednym zdaniu: strona, sklep, CRM, SEO, automatyzacja czy wideo?"
+        : "Napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy.";
+    }
     return {
       id: "ai-local-" + uuid(),
       role: "agent",

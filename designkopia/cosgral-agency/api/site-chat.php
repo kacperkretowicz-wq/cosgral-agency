@@ -367,17 +367,47 @@ function hub_post_agent(string $api, string $visitorKey, string $body, string $p
     return $msg;
 }
 
-function fallback_ai_text(string $latestUser = ''): string
+function fallback_ai_text(string $latestUser = '', array $history = []): string
 {
-    $hint = trim(preg_replace('/\s+/u', ' ', $latestUser) ?? '');
-    $hint = mb_substr($hint, 0, 140, 'UTF-8');
-    if ($hint !== '' && !preg_match('/^ale o czym/iu', $hint)) {
-        $safe = str_replace(['"', '„', '”', '<', '>'], '', $hint);
-        return 'Rozumiem — chodzi o: ' . $safe . '. W Cosgral robimy strony, sklepy, CRM, SEO, automatyzacje i wideo. '
-            . 'Daj branżę i na kiedy, to Jakub albo Kacper dopną kolejny krok: +48 533 790 518 / +48 571 798 397.';
+    $blob = $latestUser;
+    foreach ($history as $m) {
+        if (!is_array($m) || empty($m['body'])) {
+            continue;
+        }
+        if (($m['role'] ?? '') === 'visitor' || ($m['role'] ?? '') === 'user') {
+            $blob .= ' ' . (string)$m['body'];
+        }
     }
-    return 'Jasne — napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy. '
-        . 'Dopasuję ofertę Cosgral i podłączę Jakuba albo Kacpera: +48 533 790 518 / +48 571 798 397.';
+    $low = mb_strtolower($blob, 'UTF-8');
+    $confused = (bool)preg_match('/o czym ty mów|nie rozumiem|co ty bredz/iu', $latestUser);
+
+    $service = '';
+    $reply = '';
+    if (preg_match('/sklep|e-?comm|woo|shopify|shoper|koszyk|katalog produkt/iu', $low)) {
+        $service = 'sklep';
+        $reply = $confused
+            ? 'Przepraszam — wracam do sklepu. W Cosgral robimy e-commerce (WooCommerce / Shopify): katalog, zamówienia, płatności, panel. Jaka branża, ile produktów i na kiedy start?'
+            : 'Sklep internetowy zrobimy w Cosgral — WooCommerce albo Shopify, z zamówieniami, płatnościami i dodawaniem produktów. Jaka branża, ile SKU i na kiedy chcesz start?';
+    } elseif (preg_match('/crm|leady|pipeline|hubspot|pipedrive/iu', $low)) {
+        $reply = $confused
+            ? 'Przepraszam — temat to CRM. Wdrażamy HubSpot, Pipedrive albo panel dedykowany pod wasz lejek. Ile osób w zespole sprzedaży i z czego korzystacie dziś?'
+            : 'CRM ogarniamy: HubSpot, Pipedrive albo coś pod Was. Ile osób korzysta i jaki jest teraz proces leadów?';
+    } elseif (preg_match('/seo|pozycjon|geo|widoczno/iu', $low)) {
+        $reply = 'SEO/GEO robimy od audytu po treści i schema. Masz już stronę, czy startujemy od nowa?';
+    } elseif (preg_match('/automatyz|zapier|make\.com|n8n|chatbot/iu', $low)) {
+        $reply = 'Automatyzacje (Make / n8n / Zapier) i boty do pierwszego kontaktu robimy w Cosgral. Jaki proces chcesz zdjąć ludziom z głowy?';
+    } elseif (preg_match('/apka|aplikacj|panel|b2b|dashboard/iu', $low)) {
+        $reply = 'Aplikacje i panele B2B projektujemy pod konkretny proces. Co ma robić użytkownik w środku — zamówienia, raporty, klienci?';
+    } elseif (preg_match('/stron|landing|www|witryn|wizytówk/iu', $low)) {
+        $reply = $confused
+            ? 'Przepraszam — chodziło o stronę. Robimy strony firmowe i landingi pod leady. Macie obecną witrynę, czy budujemy od zera?'
+            : 'Stronę firmową albo landing zrobimy tak, żeby zbierała zapytania. Jest już jakaś witryna, czy start od zera?';
+    } else {
+        $reply = $confused
+            ? 'Masz rację, za ogólnie. Napisz w jednym zdaniu, o co chodzi: strona, sklep, CRM, SEO, automatyzacja czy wideo?'
+            : 'Jasne — napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy. Dopasuję ofertę Cosgral i podłączę Jakuba albo Kacpera: +48 533 790 518 / +48 571 798 397.';
+    }
+    return $reply;
 }
 
 function gemini_extract_text(array $data): string
@@ -626,7 +656,7 @@ try {
         $pageUrl
     );
 } catch (Throwable $e) {
-    $replyText = fallback_ai_text($body);
+    $replyText = fallback_ai_text($body, $history !== [] ? $history : $existing);
 }
 
 $aiMessage = hub_post_agent($hubApi, $visitorKey, $replyText, $secrets['CHAT_HUB_AGENT_PIN']);
