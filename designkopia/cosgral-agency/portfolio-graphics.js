@@ -1309,9 +1309,9 @@
 
     var pinHandlers = {};
     /* First portion of cinema plays while Montaż recesses / Grafiki covers it */
-    var APPROACH_END = mobile ? 0.11 : 0.14;
-    /* Tiles start only once Montaż is already blurred / nearly gone at top */
-    var APPROACH_TILE_START = mobile ? 0.48 : 0.55;
+    var APPROACH_END = mobile ? 0.12 : 0.16;
+    /* Tiles ease in across most of the Montaż cover — continuous scroll-tell */
+    var APPROACH_TILE_START = mobile ? 0.28 : 0.32;
 
     function cinemaFromPinProgress(p) {
       return APPROACH_END + Math.max(0, Math.min(1, p)) * (1 - APPROACH_END);
@@ -1609,11 +1609,13 @@
     function applyAmbientLift(t) {
       t = Math.max(0, Math.min(1, t));
       if (Math.abs(t - lastLift) < 0.001 && lastLift >= 0) {
-        document.body.classList.toggle("is-grafiki-light", t > 0.08);
+        document.body.classList.toggle("is-grafiki-light", t > 0.04);
+        document.documentElement.style.setProperty("--grafiki-lift", t.toFixed(3));
         return;
       }
       lastLift = t;
-      /* CSS !important owns the visible wash; JS keeps ambient/rail in sync */
+      document.documentElement.style.setProperty("--grafiki-lift", t.toFixed(3));
+      /* CSS var drives visible wash; JS keeps ambient/rail in sync */
       if (bloom) gsap.set(bloom, { opacity: lerp(0, 0.9, t) });
       if (shade) {
         gsap.set(shade, {
@@ -1635,13 +1637,12 @@
       }
       if (blur) gsap.set(blur, { opacity: lerp(0.55, 0.2, t) });
       if (rail) gsap.set(rail, mixRail(RAIL_LIGHT, RAIL_DARK, t));
-      document.body.classList.toggle("is-grafiki-light", t > 0.08);
+      document.body.classList.toggle("is-grafiki-light", t > 0.04);
       syncGrafikiCubeFade();
     }
 
     function liftAmountFromPinProgress(p) {
       p = Math.max(0, Math.min(1, p));
-      /* Brighten through the cinema; full light well before end title */
       var liftStart = 0.18;
       var liftFull = 0.48;
       if (p <= liftStart) return 0;
@@ -1650,35 +1651,37 @@
       return Math.pow(raw, 1.2);
     }
 
+    function endBandCover() {
+      var endBand = document.querySelector(".portfolio-end");
+      if (!endBand) return 0;
+      var top = endBand.getBoundingClientRect().top;
+      var vh = window.innerHeight || 1;
+      if (top <= 0) return 1;
+      if (top >= vh) return 0;
+      /* Ease cover so light→dark is gradual across ~full viewport */
+      var raw = 1 - top / vh;
+      return raw * raw * (3 - 2 * raw);
+    }
+
     function syncLiftFromPin(pin) {
       if (!pin) return;
       var t = 0;
-      var vh = window.innerHeight || 1;
-      var rect = section.getBoundingClientRect();
-      var stillOnScreen = rect.bottom > vh * 0.1 && rect.top < vh * 0.95;
 
       if (pin.isActive) {
         t = liftAmountFromPinProgress(pin.progress || 0);
       } else if (typeof pin.scroll === "function" && pin.scroll() > pin.end) {
-        /* Stay fully light while Grafiki tiles are still visible */
-        if (stillOnScreen) t = 1;
-        else t = 0;
-      } else if (stillOnScreen && pin.progress > 0.18) {
+        /* After pin: start full light, then smoothly darken as footer covers */
+        t = Math.max(0, 1 - endBandCover());
+      } else if ((pin.progress || 0) > 0.18) {
         t = liftAmountFromPinProgress(pin.progress || 0);
       }
 
       if (
         document.body.classList.contains("is-grafiki-overlay-reveal") ||
-        section.classList.contains("is-cinema-done") ||
-        section.classList.contains("is-grafiki-pinned")
+        section.classList.contains("is-cinema-done")
       ) {
-        if (pin.isActive && (pin.progress || 0) >= 0.18) t = Math.max(t, liftAmountFromPinProgress(pin.progress || 0));
-        if (
-          document.body.classList.contains("is-grafiki-overlay-reveal") ||
-          section.classList.contains("is-cinema-done")
-        ) {
-          t = Math.max(t, 1);
-        }
+        /* Finale stays light until footer begins covering */
+        t = Math.max(t, 1 - endBandCover());
       }
       applyAmbientLift(t);
     }

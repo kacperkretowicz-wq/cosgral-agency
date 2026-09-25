@@ -290,19 +290,19 @@ body.is-grafiki-light .subpage-ambient__blur {
 }
 body.is-grafiki-light .subpage-ambient__shade {
   z-index: 1 !important;
-  background: rgba(255, 255, 255, 0.88) !important;
+  background: rgba(255, 255, 255, calc(0.88 * var(--grafiki-lift, 1))) !important;
 }
 body.is-grafiki-light .grafiki-bloom {
   z-index: 1 !important;
-  opacity: 0.9 !important;
+  opacity: calc(0.9 * var(--grafiki-lift, 1)) !important;
   background: #f0f0f0;
   visibility: visible !important;
 }
 body.is-grafiki-light {
-  --bg: #f0f0f0;
+  --bg: color-mix(in srgb, #f0f0f0 calc(var(--grafiki-lift, 1) * 100%), #030303);
 }
 body.is-grafiki-light.portfolio-page {
-  background: #f0f0f0;
+  background: color-mix(in srgb, #f0f0f0 calc(var(--grafiki-lift, 1) * 100%), #030303);
 }
 .portfolio-scene-curtain {
   position: fixed;
@@ -1152,17 +1152,23 @@ html.reduce-motion .nav-overlay__char {
   z-index: 2;
   background: #030303;
 }
-/* Soft leading edge so Grafiki depth-recess reads before the solid audit band */
+/* Tall soft leading edge — light Grafiki blends into the audit/footer band */
 .portfolio-end::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: -56px;
-  height: 56px;
+  top: -28vh;
+  height: 28vh;
   pointer-events: none;
   z-index: 3;
-  background: linear-gradient(to bottom, rgba(3, 3, 3, 0), #030303);
+  background: linear-gradient(
+    to bottom,
+    rgba(3, 3, 3, 0) 0%,
+    rgba(3, 3, 3, 0.15) 35%,
+    rgba(3, 3, 3, 0.55) 70%,
+    #030303 100%
+  );
 }
 .portfolio-end .portfolio-contact-cta {
   background: transparent;
@@ -1943,9 +1949,11 @@ body.portfolio-page #main > [data-portfolio-section].is-depth-gone * {
 }
 body.portfolio-page #main > [data-portfolio-section].home-depth.is-depth-gone,
 body.portfolio-page #main > [data-portfolio-section].is-depth-gone {
-  visibility: hidden !important;
+  /* Keep in layout for continuous cover — only fade out, no visibility snap */
+  visibility: visible !important;
   opacity: 0 !important;
   z-index: 0 !important;
+  pointer-events: none !important;
 }
 body.portfolio-page #main > [data-portfolio-section].is-depth-active {
   z-index: var(--depth-z, 20);
@@ -1967,12 +1975,12 @@ body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [role="
   pointer-events: auto !important;
   visibility: visible !important;
 }
+/* Soft depth cover — scale/blur instead of hard paint-clip against the next section */
 body.portfolio-page #main > [data-portfolio-section].is-depth-recessed {
-  overflow: hidden;
-  /* Keep half-cut tiles from leaking into the next scene */
-  contain: paint;
+  overflow: visible;
+  contain: none;
 }
-/* Grafiki exit under audit CTA: no hard paint clip — depth scale/blur must read above the band */
+body.portfolio-page #montaz.is-depth-recessed,
 body.portfolio-page #grafiki.is-depth-recessed,
 body.portfolio-page #grafiki.is-depth-gone {
   overflow: visible !important;
@@ -2978,6 +2986,11 @@ body.is-lightbox-open {
   box-sizing: border-box;
   overflow: hidden;
   padding-bottom: clamp(1rem, 3vh, 1.75rem);
+}
+/* During depth cover, let Montaż scale/blur away instead of hard-clipping tiles */
+.portfolio-page #montaz.is-depth-recessed {
+  overflow: visible;
+  max-height: none;
 }
 .portfolio-page #montaz > .home-tilt-layer,
 .portfolio-page #montaz > .home-tilt-layer > .home-tilt-face {

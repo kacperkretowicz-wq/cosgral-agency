@@ -49,10 +49,10 @@
   function applyRecess(el, p) {
     if (!el || !window.gsap) return;
     var target = poseTarget(el);
-    var hold = 0.04;
-    var exitScale = MOBILE ? 0.78 : 0.68;
-    var exitBlur = MOBILE ? 10 : 18;
-    var exitY = MOBILE ? -4 : -8;
+    var hold = 0.02;
+    var exitScale = MOBILE ? 0.8 : 0.7;
+    var exitBlur = MOBILE ? 8 : 14;
+    var exitY = MOBILE ? -3 : -6;
     if (p <= hold) {
       gsap.set(target, {
         opacity: 1,
@@ -69,9 +69,9 @@
     }
     var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
     var fade = u * u;
-    /* opacity (nie autoAlpha) — klikalne w trakcie blur / przejścia */
+    /* Continuous fade/scale/blur — no sudden visibility snap mid-cover */
     gsap.set(target, {
-      opacity: 1 - fade,
+      opacity: Math.max(0, 1 - fade),
       visibility: "visible",
       yPercent: exitY * u,
       scale: 1 - (1 - exitScale) * u,
@@ -80,11 +80,11 @@
       force3D: true,
     });
     el.classList.add("is-depth-recessed");
-    if (u >= 0.98) {
+    if (u >= 0.995) {
       el.classList.add("is-depth-gone");
       el.style.pointerEvents = "none";
-      gsap.set(el, { opacity: 0, visibility: "hidden" });
-      gsap.set(target, { opacity: 0, visibility: "hidden", filter: "blur(0px)" });
+      gsap.set(el, { opacity: 0 });
+      gsap.set(target, { opacity: 0, filter: "blur(0px)" });
     } else {
       el.classList.remove("is-depth-gone");
       gsap.set(el, { opacity: 1, visibility: "visible" });
@@ -113,9 +113,17 @@
     setCurtain(peak);
   }
 
-  function wireCover(leave, enter) {
+  function wireCover(leave, enter, opts) {
+    opts = opts || {};
     if (!leave || !enter || REDUCED || !window.ScrollTrigger) return;
     function sync() {
+      if (opts.afterPin) {
+        var pin = window.ScrollTrigger && ScrollTrigger.getById(opts.afterPin);
+        if (pin && pin.isActive) {
+          applyRecess(leave, 0);
+          return;
+        }
+      }
       applyRecess(leave, coverAmount(enter));
     }
     ScrollTrigger.create({
@@ -185,18 +193,22 @@
     var grafiki = document.getElementById("grafiki");
     var chapter = document.getElementById("automatyzacje-intro");
     var auto = document.getElementById("automatyzacje");
+    var endBand = document.querySelector(".portfolio-end");
 
     var pairs = [
       { leave: strony, enter: chapter },
       { leave: chapter, enter: auto },
       { leave: auto, enter: montaz },
       { leave: montaz, enter: grafiki },
+      { leave: grafiki, enter: endBand, afterPin: "grafiki-pin" },
     ].filter(function (pair) {
       return pair.leave && pair.enter;
     });
 
     pairs.forEach(function (pair) {
-      wireCover(pair.leave, pair.enter);
+      wireCover(pair.leave, pair.enter, {
+        afterPin: pair.afterPin || null,
+      });
     });
 
     ScrollTrigger.create({
