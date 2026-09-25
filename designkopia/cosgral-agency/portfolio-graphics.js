@@ -1238,6 +1238,7 @@
       }
       section.classList.toggle("is-cinema-done", p > 0.94);
       document.body.classList.toggle("is-grafiki-overlay-reveal", show);
+      if (show) document.body.classList.add("is-grafiki-light");
     }
 
     function clearGrafikiFinale() {
@@ -1337,10 +1338,10 @@
         if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
       },
       onLeave: function () {
-        // Hold end-frame tiles while section depth-covers under the audit CTA
+        // Keep light end-frame (GRAFIKI + button); free-scroll into footer
         setGrafikiPinned(false);
-        clearGrafikiFinale();
         cinemaTl.progress(1);
+        setOverlay(1);
         if (pinHandlers.onLeave) pinHandlers.onLeave();
       },
       onLeaveBack: function () {
@@ -1366,7 +1367,7 @@
           setOverlay(cp);
         } else if (typeof self.scroll === "function" && self.scroll() > self.end) {
           cinemaTl.progress(1);
-          setOverlay(0);
+          setOverlay(1);
         }
       },
     });
@@ -1614,26 +1615,37 @@
 
     function liftFromScroll(self) {
       var pin = ScrollTrigger.getById("grafiki-pin");
+      var endBand = document.querySelector(".portfolio-end");
       var y = self.scroll();
       var pinStart = pin ? pin.start : self.start;
       var pinEnd = pin ? pin.end : self.end;
       var pinSpan = Math.max(1, pinEnd - pinStart);
-      /* Rozjaśnianie później i wolniej — dopiero po ~22% pinu, pełne ~58% */
+      /* Rozjaśnianie później i wolniej — dopiero po ~22% pinu, pełne ~50% */
       var liftStart = pinStart + pinSpan * 0.22;
-      var liftFull = pinStart + pinSpan * 0.58;
+      var liftFull = pinStart + pinSpan * 0.5;
+      /* Stay fully light through GRAFIKI title+button; darken only into footer */
       var darkenStart = pinEnd;
-      var darkenEnd = self.end;
+      var darkenEnd = endBand
+        ? Math.max(pinEnd + 1, endBand.getBoundingClientRect().top + y + (window.innerHeight || 0) * 0.35)
+        : self.end;
       var t;
       if (y <= liftStart) {
         t = 0;
       } else if (y < liftFull) {
         var raw = (y - liftStart) / Math.max(1, liftFull - liftStart);
-        /* Ease-in: dłużej ciemno, potem spokojny wzrost */
         t = Math.pow(Math.max(0, Math.min(1, raw)), 1.65);
       } else if (y <= darkenStart) {
         t = 1;
       } else {
         t = 1 - (y - darkenStart) / Math.max(1, darkenEnd - darkenStart);
+        t = Math.max(0, Math.min(1, t));
+      }
+      /* Hard guarantee: finale title+button always on a light screen */
+      if (
+        document.body.classList.contains("is-grafiki-overlay-reveal") ||
+        (section && section.classList.contains("is-cinema-done"))
+      ) {
+        t = Math.max(t, 1);
       }
       applyAmbientLift(t);
     }
@@ -1646,9 +1658,10 @@
         return pin ? pin.start : "top top";
       },
       end: function () {
+        var endBand = document.querySelector(".portfolio-end");
+        if (endBand) return endBand.offsetTop + Math.round((window.innerHeight || 0) * 0.4);
         var pin = ScrollTrigger.getById("grafiki-pin");
-        /* End with the pin — extending past it re-played a second dark finale */
-        return pin ? pin.end : "bottom top";
+        return pin ? pin.end + Math.round((window.innerHeight || 0) * 0.6) : "bottom top";
       },
       invalidateOnRefresh: true,
       onUpdate: liftFromScroll,

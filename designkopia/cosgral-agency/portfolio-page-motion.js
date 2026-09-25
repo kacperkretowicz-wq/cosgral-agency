@@ -116,18 +116,6 @@
   function wireCover(leave, enter) {
     if (!leave || !enter || REDUCED || !window.ScrollTrigger) return;
     function sync() {
-      // Grafiki → next: same depth cover as other sections, but only AFTER the
-      // cinema pin releases (recessing mid-pin would fight the scrub).
-      if (leave.id === "grafiki" || leave.classList.contains("portfolio-section--grafiki")) {
-        var pin = window.ScrollTrigger && ScrollTrigger.getById("grafiki-pin");
-        if (pin && pin.isActive) {
-          applyRecess(leave, 0);
-          return;
-        }
-        applyRecess(leave, coverAmount(enter));
-        return;
-      }
-      // Montaż → Grafiki and every other pair: standard cover recess
       applyRecess(leave, coverAmount(enter));
     }
     ScrollTrigger.create({
@@ -197,14 +185,12 @@
     var grafiki = document.getElementById("grafiki");
     var chapter = document.getElementById("automatyzacje-intro");
     var auto = document.getElementById("automatyzacje");
-    var cta = document.querySelector(".portfolio-end") || document.querySelector(".portfolio-contact-cta");
 
     var pairs = [
       { leave: strony, enter: chapter },
       { leave: chapter, enter: auto },
       { leave: auto, enter: montaz },
       { leave: montaz, enter: grafiki },
-      { leave: grafiki, enter: cta },
     ].filter(function (pair) {
       return pair.leave && pair.enter;
     });
