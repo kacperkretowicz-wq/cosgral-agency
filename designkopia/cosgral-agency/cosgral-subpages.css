@@ -279,19 +279,30 @@ body.service-page .subpage-cube-portal {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: #fff;
+  background: #f3f3f3;
   opacity: 0;
   will-change: opacity;
 }
-/* Lift wash above sand-back so Grafiki brightening is actually visible */
+/* Hard light wash — ambient WebGL stays near-black even with brightness(); bloom must paint */
 body.is-grafiki-light .subpage-ambient,
-body.is-grafiki-light .subpage-ambient__blur,
-body.is-grafiki-light .subpage-ambient__shade,
-body.is-grafiki-light .grafiki-bloom {
+body.is-grafiki-light .subpage-ambient__blur {
   z-index: 1;
 }
+body.is-grafiki-light .subpage-ambient__shade {
+  z-index: 1 !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+}
 body.is-grafiki-light .grafiki-bloom {
-  z-index: 1;
+  z-index: 1 !important;
+  opacity: 0.9 !important;
+  background: #f0f0f0;
+  visibility: visible !important;
+}
+body.is-grafiki-light {
+  --bg: #f0f0f0;
+}
+body.is-grafiki-light.portfolio-page {
+  background: #f0f0f0;
 }
 .portfolio-scene-curtain {
   position: fixed;
