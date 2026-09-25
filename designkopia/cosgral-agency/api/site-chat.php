@@ -475,11 +475,8 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
 {
     @set_time_limit(60);
     $contents = gemini_build_contents($history, $latestUser);
-    $tryModel = 'gemini-2.5-flash';
-    if ($model !== '' && $model !== 'gemini-3.6-flash') {
-        $tryModel = $model;
-    }
-
+    $models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+    $lastError = 'gemini_failed';
     $payload = [
         'systemInstruction' => [
             'parts' => [['text' => cosgral_chat_system_instruction($pageUrl)]],
@@ -491,28 +488,29 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
             'maxOutputTokens' => 2048,
         ],
     ];
-    $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-        . rawurlencode($tryModel)
-        . ':generateContent?key='
-        . rawurlencode($apiKey);
-
-    $lastError = 'gemini_failed';
-    for ($n = 0; $n < 4; $n++) {
+    foreach ($models as $mName) {
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+            . rawurlencode($mName)
+            . ':generateContent?key='
+            . rawurlencode($apiKey);
         $res = http_json('POST', $url, $payload, [], 20);
         if ($res['ok']) {
             $text = gemini_extract_text($res['data']);
             if ($text !== '' && !is_canned_ai_fallback_text($text)) {
                 return mb_substr($text, 0, 2200, 'UTF-8');
             }
-            $lastError = 'gemini_empty_' . $tryModel;
-        } else {
-            $status = (int)($res['status'] ?? 0);
-            $lastError = 'gemini_http_' . $status . '_' . $tryModel . '_' . gemini_error_label($res);
-            if ($status !== 429 && $status !== 503 && $status !== 500 && $status !== 0) {
-                break;
-            }
+            $lastError = 'gemini_empty_' . $mName;
+            continue;
         }
-        usleep(700000 * ($n + 1));
+        $status = (int)($res['status'] ?? 0);
+        $lastError = 'gemini_http_' . $status . '_' . $mName . '_' . gemini_error_label($res);
+        if ($status === 429 || $status === 503) {
+            continue;
+        }
+        if ($status === 400 || $status === 404) {
+            continue;
+        }
+        break;
     }
     throw new RuntimeException($lastError);
 }
