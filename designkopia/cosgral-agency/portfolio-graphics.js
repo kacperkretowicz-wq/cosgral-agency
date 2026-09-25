@@ -1241,11 +1241,10 @@
     }
 
     function clearGrafikiFinale() {
-      section.classList.remove("is-cinema-done", "is-grafiki-pinned");
+      section.classList.remove("is-cinema-done");
       document.body.classList.remove(
         "is-grafiki-overlay-reveal",
-        "is-grafiki-cinema-end",
-        "is-grafiki-pinned"
+        "is-grafiki-cinema-end"
       );
       setOverlay(0);
     }
@@ -1253,7 +1252,6 @@
     function setGrafikiPinned(on) {
       section.classList.toggle("is-grafiki-pinned", !!on);
       document.body.classList.toggle("is-grafiki-pinned", !!on);
-      if (!on) clearGrafikiFinale();
     }
 
     if (overlay) gsap.set(overlay, { opacity: 0, visibility: "hidden" });
@@ -1301,6 +1299,12 @@
     }
 
     var pinHandlers = {};
+    /* First portion of cinema plays while Montaż recesses / Grafiki covers it */
+    var APPROACH_END = mobile ? 0.11 : 0.14;
+
+    function cinemaFromPinProgress(p) {
+      return APPROACH_END + Math.max(0, Math.min(1, p)) * (1 - APPROACH_END);
+    }
 
     var pinST = ScrollTrigger.create({
       id: "grafiki-pin",
@@ -1325,31 +1329,58 @@
         if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
       },
       onLeave: function () {
+        // Hold end-frame tiles while section depth-covers under the audit CTA
+        setGrafikiPinned(false);
         clearGrafikiFinale();
+        cinemaTl.progress(1);
         if (pinHandlers.onLeave) pinHandlers.onLeave();
       },
       onLeaveBack: function () {
+        setGrafikiPinned(false);
         clearGrafikiFinale();
         cinemaTl.progress(0);
         if (pinHandlers.onLeaveBack) pinHandlers.onLeaveBack();
       },
       onUpdate: function (self) {
         if (freeScroll) {
-          cinemaTl.progress(self.progress);
-          setOverlay(self.progress);
+          var cp = cinemaFromPinProgress(self.progress);
+          cinemaTl.progress(cp);
+          setOverlay(cp);
         }
         if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
       },
       onRefresh: function (self) {
         setGrafikiPinned(!!self.isActive);
-        if (freeScroll) {
-          if (self.isActive) {
-            cinemaTl.progress(self.progress || 0);
-            setOverlay(self.progress || 0);
-          } else {
-            cinemaTl.progress(0);
-            setOverlay(0);
-          }
+        if (!freeScroll) return;
+        if (self.isActive) {
+          var cp = cinemaFromPinProgress(self.progress || 0);
+          cinemaTl.progress(cp);
+          setOverlay(cp);
+        } else if (typeof self.scroll === "function" && self.scroll() > self.end) {
+          cinemaTl.progress(1);
+          setOverlay(0);
+        }
+      },
+    });
+
+    /* Approach: as Montaż recesses and Grafiki rises, tiles slowly fly in */
+    ScrollTrigger.create({
+      id: "grafiki-approach",
+      trigger: section,
+      start: "top bottom",
+      end: "top top",
+      scrub: freeScroll ? (mobile ? 1.2 : 1.6) : false,
+      invalidateOnRefresh: true,
+      refreshPriority: -2,
+      onUpdate: function (self) {
+        if (!freeScroll || pinST.isActive) return;
+        cinemaTl.progress(self.progress * APPROACH_END);
+        setOverlay(0);
+      },
+      onRefresh: function (self) {
+        if (!freeScroll || pinST.isActive) return;
+        if (self.progress > 0 && self.progress < 1) {
+          cinemaTl.progress(self.progress * APPROACH_END);
         }
       },
     });
@@ -1367,7 +1398,7 @@
           setOverlay(0);
         },
         getBeat: function () {
-          return pinST && pinST.progress > 0.82 ? 1 : 0;
+          return pinST && cinemaFromPinProgress(pinST.progress) > 0.88 ? 1 : 0;
         },
         isAnimating: function () {
           return false;

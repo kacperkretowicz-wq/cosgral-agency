@@ -1941,7 +1941,8 @@ body.portfolio-page #main > [data-portfolio-section].is-depth-recessed {
 }
 body.portfolio-page #grafiki.is-depth-recessed,
 body.portfolio-page #grafiki.is-depth-gone {
-  overflow: visible !important;
+  overflow: hidden !important;
+  contain: paint;
 }
 .portfolio-section .container {
   position: relative;
@@ -2176,12 +2177,8 @@ body.portfolio-page #grafiki.is-depth-gone {
   overflow: hidden;
   pointer-events: none;
 }
-/* Hide cinema until the pin engages — prevents Montaż/Grafiki overlap jump */
-#grafiki:not(.is-grafiki-pinned) .graphics-stage__cinema {
-  opacity: 0;
-  visibility: hidden;
-}
-#grafiki.is-grafiki-pinned .graphics-stage__cinema {
+/* Cinema visible during Montaż cover approach + pin (tiles fly in as previous recesses) */
+#grafiki .graphics-stage__cinema {
   opacity: 1;
   visibility: visible;
 }

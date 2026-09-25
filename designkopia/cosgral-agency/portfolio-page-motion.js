@@ -33,6 +33,10 @@
 
   function poseTarget(el) {
     if (!el) return null;
+    // Grafiki: recess .graphics-stage only when leaving (pin forces recess 0 while active)
+    if (el.id === "grafiki" || el.classList.contains("portfolio-section--grafiki")) {
+      return el.querySelector(".graphics-stage") || el;
+    }
     return (
       el.querySelector(".home-tilt-layer") ||
       el.querySelector(
@@ -101,38 +105,18 @@
   function wireCover(leave, enter) {
     if (!leave || !enter || REDUCED || !window.ScrollTrigger) return;
     function sync() {
-      // Never recess the Grafiki cinema pin — opacity/scale on .graphics-stage
-      // kills the scrub animation while the next block approaches.
+      // Grafiki → next: same depth cover as other sections, but only AFTER the
+      // cinema pin releases (recessing mid-pin would fight the scrub).
       if (leave.id === "grafiki" || leave.classList.contains("portfolio-section--grafiki")) {
-        applyRecess(leave, 0);
-        return;
-      }
-      // Montaż → Grafiki: keep Montaż fully visible until Grafiki is almost
-      // pinned, then ease-in fade (was disappearing too early at 0.4vh).
-      if (leave.id === "montaz" && enter.id === "grafiki") {
         var pin = window.ScrollTrigger && ScrollTrigger.getById("grafiki-pin");
-        var scroll = window.scrollY || 0;
-        if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
-          scroll = window.cosgralSmoothScroll.scroll;
-        }
-        var vh = window.innerHeight || 1;
-        if (pin) {
-          var fadeStart = pin.start - vh * 0.12;
-          if (scroll <= fadeStart) {
-            applyRecess(leave, 0);
-            return;
-          }
-          if (scroll >= pin.start) {
-            applyRecess(leave, 1);
-            return;
-          }
-          var raw = (scroll - fadeStart) / Math.max(1, pin.start - fadeStart);
-          // Cubic ease-in: hold opacity, then soft fade in the last beats
-          var eased = raw * raw * raw;
-          applyRecess(leave, eased);
+        if (pin && pin.isActive) {
+          applyRecess(leave, 0);
           return;
         }
+        applyRecess(leave, coverAmount(enter));
+        return;
       }
+      // Montaż → Grafiki and every other pair: standard cover recess
       applyRecess(leave, coverAmount(enter));
     }
     ScrollTrigger.create({
