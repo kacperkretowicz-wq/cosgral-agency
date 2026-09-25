@@ -574,12 +574,6 @@
 
     postChat(body)
       .then(function (res) {
-        if (!res.ok && (res.timedOut || res.status >= 500 || res.status === 408)) {
-          return postChat(body);
-        }
-        return res;
-      })
-      .then(function (res) {
         if (!res.ok) throw new Error(res.timedOut ? "timeout" : "send failed");
 
         if (res.data && res.data.human_takeover) {
