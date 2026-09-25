@@ -15,7 +15,7 @@ const HUB_API = 'https://cosgralhub.netlify.app/api/site-chat';
 const AI_SOURCE = 'cosgral-ai';
 /** UTF-8 zero-width space wrapper — marks AI replies mirrored into Hub. */
 const AI_BODY_PREFIX = "\xE2\x80\x8Bcgai\xE2\x80\x8B";
-const DEFAULT_GEMINI_MODEL = 'gemini-3.6-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -79,8 +79,14 @@ function http_json(string $method, string $url, ?array $body = null, array $head
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_HTTPHEADER => $hdrs,
         CURLOPT_TIMEOUT => max(5, $timeout),
-        CURLOPT_CONNECTTIMEOUT => min(8, max(3, $timeout)),
+        CURLOPT_CONNECTTIMEOUT => min(10, max(4, $timeout)),
+        CURLOPT_NOSIGNAL => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     ];
+    if (defined('CURL_IPRESOLVE_V4')) {
+        $opts[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
+    }
     if ($body !== null) {
         $json = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $hdrs[] = 'Content-Type: application/json';
@@ -93,7 +99,7 @@ function http_json(string $method, string $url, ?array $body = null, array $head
     $err = curl_error($ch);
     curl_close($ch);
     if ($raw === false) {
-        return ['ok' => false, 'status' => 0, 'data' => ['error' => $err]];
+        return ['ok' => false, 'status' => 0, 'data' => ['error' => $err !== '' ? $err : 'curl_failed']];
     }
     $data = json_decode($raw, true);
     if (!is_array($data)) {
@@ -456,66 +462,57 @@ function gemini_build_contents(array $history, string $latestUser): array
     return $contents;
 }
 
+function gemini_error_label(array $res): string
+{
+    $e = $res['data']['error'] ?? '';
+    if (is_array($e)) {
+        return (string)($e['status'] ?? $e['message'] ?? 'error');
+    }
+    return is_string($e) ? $e : '';
+}
+
 function gemini_reply(string $apiKey, string $model, array $history, string $latestUser, string $pageUrl): string
 {
     @set_time_limit(60);
     $contents = gemini_build_contents($history, $latestUser);
+    $tryModel = 'gemini-2.5-flash';
+    if ($model !== '' && $model !== 'gemini-3.6-flash') {
+        $tryModel = $model;
+    }
 
-    $configNoThink = [
-        'temperature' => 0.85,
-        'topP' => 0.95,
-        'maxOutputTokens' => 2048,
-    ];
-    $configThinkOff = [
-        'temperature' => 0.85,
-        'topP' => 0.95,
-        'maxOutputTokens' => 2048,
-        'thinkingConfig' => [
-            'thinkingBudget' => 0,
+    $payload = [
+        'systemInstruction' => [
+            'parts' => [['text' => cosgral_chat_system_instruction($pageUrl)]],
+        ],
+        'contents' => $contents,
+        'generationConfig' => [
+            'temperature' => 0.85,
+            'topP' => 0.95,
+            'maxOutputTokens' => 2048,
         ],
     ];
-
-    $models = array_values(array_unique(array_filter([
-        $model !== '' ? $model : 'gemini-2.5-flash',
-        'gemini-2.5-flash',
-        'gemini-flash-latest',
-    ])));
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+        . rawurlencode($tryModel)
+        . ':generateContent?key='
+        . rawurlencode($apiKey);
 
     $lastError = 'gemini_failed';
-    foreach ($models as $i => $tryModel) {
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-            . rawurlencode($tryModel)
-            . ':generateContent?key='
-            . rawurlencode($apiKey);
-
-        foreach ([$configNoThink, $configThinkOff] as $genConfig) {
-            $payload = [
-                'systemInstruction' => [
-                    'parts' => [['text' => cosgral_chat_system_instruction($pageUrl)]],
-                ],
-                'contents' => $contents,
-                'generationConfig' => $genConfig,
-            ];
-            $timeout = $i === 0 ? 16 : 12;
-            $res = http_json('POST', $url, $payload, [], $timeout);
-            if (!$res['ok']) {
-                $status = (int)($res['status'] ?? 0);
-                $lastError = 'gemini_http_' . $status . '_' . $tryModel;
-                if ($status === 400 || $status === 404) {
-                    continue;
-                }
-                if ($status === 429 || $status === 503 || $status === 500 || $status === 0) {
-                    usleep(200000);
-                    continue;
-                }
-                break;
-            }
+    for ($n = 0; $n < 4; $n++) {
+        $res = http_json('POST', $url, $payload, [], 20);
+        if ($res['ok']) {
             $text = gemini_extract_text($res['data']);
             if ($text !== '' && !is_canned_ai_fallback_text($text)) {
                 return mb_substr($text, 0, 2200, 'UTF-8');
             }
             $lastError = 'gemini_empty_' . $tryModel;
+        } else {
+            $status = (int)($res['status'] ?? 0);
+            $lastError = 'gemini_http_' . $status . '_' . $tryModel . '_' . gemini_error_label($res);
+            if ($status !== 429 && $status !== 503 && $status !== 500 && $status !== 0) {
+                break;
+            }
         }
+        usleep(700000 * ($n + 1));
     }
     throw new RuntimeException($lastError);
 }
