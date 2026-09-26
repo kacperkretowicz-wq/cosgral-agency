@@ -1,5 +1,8 @@
 /**
- * Realizacje — equal tiles + theme stage backgrounds.
+ * Realizacje — equal glass tiles + theme stage backgrounds.
+ * Web / Montaż: one full-bleed film cut from random source windows.
+ * Grafiki: drifting JUICY collage.
+ * Systems: bright WebGL cube stage (portfolio-systems-stage.js).
  */
 (function () {
   "use strict";
@@ -16,10 +19,6 @@
   var activeIndex = -1;
   var slideTimers = [];
   var wheelLock = 0;
-  var webClipTimer = null;
-  var systemsRaf = 0;
-  var systemsRunning = false;
-  var reelsReady = false;
 
   var WEB_CLIPS = [
     "portfolio-media/showcase/web/juicy-events.mp4",
@@ -27,19 +26,42 @@
     "portfolio-media/showcase/web/mj-social-media.mp4",
   ];
 
-  /* Wiktoria (orlincy) + TROVE (reklamy) */
-  var REEL_POOL = [
-    { src: "portfolio-media/reels/orlincy/001.mp4", poster: "portfolio-media/reels/orlincy/001-poster.jpg" },
-    { src: "portfolio-media/reels/reklamy/001.mp4", poster: "portfolio-media/reels/reklamy/001-poster.jpg" },
-    { src: "portfolio-media/reels/orlincy/002.mp4", poster: "portfolio-media/reels/orlincy/002-poster.jpg" },
-    { src: "portfolio-media/reels/reklamy/002.mp4", poster: "portfolio-media/reels/reklamy/002-poster.jpg" },
-    { src: "portfolio-media/reels/orlincy/003.mp4", poster: "portfolio-media/reels/orlincy/003-poster.jpg" },
-    { src: "portfolio-media/reels/reklamy/003.mp4", poster: "portfolio-media/reels/reklamy/003-poster.jpg" },
-    { src: "portfolio-media/reels/orlincy/004.mp4", poster: "portfolio-media/reels/orlincy/004-poster.jpg" },
-    { src: "portfolio-media/reels/reklamy/004.mp4", poster: "portfolio-media/reels/reklamy/004-poster.jpg" },
-    { src: "portfolio-media/reels/orlincy/005.mp4", poster: "portfolio-media/reels/orlincy/005-poster.jpg" },
-    { src: "portfolio-media/reels/reklamy/005.mp4", poster: "portfolio-media/reels/reklamy/005-poster.jpg" },
-    { src: "portfolio-media/reels/orlincy/006.mp4", poster: "portfolio-media/reels/orlincy/006-poster.jpg" },
+  var REEL_CLIPS = [
+    "portfolio-media/reels/orlincy/001.mp4",
+    "portfolio-media/reels/reklamy/001.mp4",
+    "portfolio-media/reels/orlincy/002.mp4",
+    "portfolio-media/reels/reklamy/002.mp4",
+    "portfolio-media/reels/orlincy/003.mp4",
+    "portfolio-media/reels/reklamy/003.mp4",
+    "portfolio-media/reels/orlincy/004.mp4",
+    "portfolio-media/reels/reklamy/004.mp4",
+    "portfolio-media/reels/orlincy/005.mp4",
+    "portfolio-media/reels/reklamy/005.mp4",
+    "portfolio-media/reels/orlincy/006.mp4",
+  ];
+
+  var JUICY_IMGS = [];
+  for (var j = 1; j <= 18; j++) {
+    var id = j < 10 ? "00" + j : j < 100 ? "0" + j : String(j);
+    JUICY_IMGS.push("portfolio-media/graphics/juicy-events/" + id + ".jpg");
+  }
+
+  /* Brand-board collage slots (Auras-like asymmetric identity board) */
+  var JUICY_SLOTS = [
+    { x: 4, y: 6, w: 22, rot: -8, z: 3 },
+    { x: 28, y: 3, w: 18, rot: 4, z: 2 },
+    { x: 50, y: 8, w: 26, rot: -3, z: 4 },
+    { x: 78, y: 4, w: 18, rot: 7, z: 2 },
+    { x: 8, y: 38, w: 20, rot: 5, z: 2 },
+    { x: 32, y: 34, w: 24, rot: -6, z: 5 },
+    { x: 58, y: 40, w: 16, rot: 9, z: 1 },
+    { x: 76, y: 36, w: 20, rot: -4, z: 3 },
+    { x: 2, y: 68, w: 24, rot: 3, z: 2 },
+    { x: 30, y: 66, w: 18, rot: -9, z: 4 },
+    { x: 52, y: 70, w: 22, rot: 6, z: 3 },
+    { x: 76, y: 64, w: 20, rot: -2, z: 2 },
+    { x: 18, y: 18, w: 14, rot: 12, z: 6 },
+    { x: 66, y: 22, w: 15, rot: -11, z: 5 },
   ];
 
   function clamp(i) {
@@ -95,224 +117,178 @@
     );
   }
 
-  /* ——— Web mosaic: random clip windows ——— */
-  function jumpWebClip(video) {
-    if (!video || !video.duration || !isFinite(video.duration)) return;
-    var span = Math.max(2.2, Math.min(5.5, video.duration * 0.18));
-    var maxStart = Math.max(0.2, video.duration - span);
-    video.currentTime = Math.random() * maxStart;
-    var play = video.play();
-    if (play && play.catch) play.catch(function () {});
-  }
+  /* ——— Full-bleed film cutters (one video, hard cuts between windows) ——— */
+  function createFilmCutter(video, pool, opts) {
+    opts = opts || {};
+    var holdMin = opts.holdMin || 2.1;
+    var holdMax = opts.holdMax || 3.8;
+    var timer = null;
+    var busy = false;
+    var lastSrc = "";
 
-  function bootWebMosaic() {
-    var cells = document.querySelectorAll("[data-stage-web-mosaic] video");
-    cells.forEach(function (video, i) {
-      var src = video.getAttribute("data-web-clip") || WEB_CLIPS[i % WEB_CLIPS.length];
-      if (!video.getAttribute("src")) video.src = src;
-      video.muted = true;
-      video.playsInline = true;
-      video.loop = true;
-      video.addEventListener(
-        "loadedmetadata",
-        function () {
-          jumpWebClip(video);
-        },
-        { once: true }
-      );
-      try {
-        video.load();
-      } catch (e) {}
-    });
-  }
+    function pickSrc() {
+      if (!pool.length) return "";
+      var next = pool[Math.floor(Math.random() * pool.length)];
+      if (pool.length > 1 && next === lastSrc) {
+        next = pool[Math.floor(Math.random() * pool.length)];
+      }
+      lastSrc = next;
+      return next;
+    }
 
-  function startWebClips() {
-    stopWebClips();
-    var cells = document.querySelectorAll("[data-stage-web-mosaic] video");
-    cells.forEach(function (video) {
-      jumpWebClip(video);
-    });
-    if (REDUCED) return;
-    webClipTimer = window.setInterval(function () {
-      var list = Array.prototype.slice.call(cells);
-      if (!list.length) return;
-      var pick = list[Math.floor(Math.random() * list.length)];
-      /* sometimes swap source for more variety */
-      if (Math.random() > 0.55) {
-        var next = WEB_CLIPS[Math.floor(Math.random() * WEB_CLIPS.length)];
-        if (pick.getAttribute("src") !== next) {
-          pick.src = next;
-          pick.addEventListener(
+    function jumpWindow() {
+      if (!video.duration || !isFinite(video.duration)) return;
+      var span = Math.max(holdMin, Math.min(holdMax, video.duration * 0.22));
+      var maxStart = Math.max(0.15, video.duration - span);
+      video.currentTime = Math.random() * maxStart;
+      var play = video.play();
+      if (play && play.catch) play.catch(function () {});
+    }
+
+    function scheduleNext() {
+      if (timer) window.clearTimeout(timer);
+      if (REDUCED) return;
+      var wait = (holdMin + Math.random() * (holdMax - holdMin)) * 1000;
+      timer = window.setTimeout(cut, wait);
+    }
+
+    function cut() {
+      if (busy) return;
+      busy = true;
+      var src = pickSrc();
+      if (!src) {
+        busy = false;
+        return;
+      }
+      if (video.getAttribute("src") !== src) {
+        video.src = src;
+        video.addEventListener(
+          "loadedmetadata",
+          function () {
+            jumpWindow();
+            busy = false;
+            scheduleNext();
+          },
+          { once: true }
+        );
+        try {
+          video.load();
+        } catch (e) {
+          busy = false;
+        }
+        return;
+      }
+      jumpWindow();
+      busy = false;
+      scheduleNext();
+    }
+
+    return {
+      start: function () {
+        video.muted = true;
+        video.playsInline = true;
+        video.loop = true;
+        if (!video.getAttribute("src")) {
+          video.src = pickSrc();
+          video.addEventListener(
             "loadedmetadata",
             function () {
-              jumpWebClip(pick);
+              jumpWindow();
+              scheduleNext();
             },
             { once: true }
           );
-          return;
+          try {
+            video.load();
+          } catch (e) {}
+        } else {
+          jumpWindow();
+          scheduleNext();
         }
-      }
-      jumpWebClip(pick);
-    }, 2800);
-  }
-
-  function stopWebClips() {
-    if (webClipTimer) {
-      window.clearInterval(webClipTimer);
-      webClipTimer = null;
-    }
-    document.querySelectorAll("[data-stage-web-mosaic] video").forEach(function (video) {
-      try {
-        video.pause();
-      } catch (e) {}
-    });
-  }
-
-  /* ——— Systems: B/W thinking lines ——— */
-  function bootSystemsCanvas() {
-    var canvas = document.querySelector("[data-stage-systems-canvas]");
-    if (!canvas) return null;
-    var ctx = canvas.getContext("2d");
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    var lines = [];
-    var w = 0;
-    var h = 0;
-
-    function resize() {
-      w = window.innerWidth;
-      h = window.innerHeight;
-      canvas.width = Math.max(1, Math.floor(w * dpr));
-      canvas.height = Math.max(1, Math.floor(h * dpr));
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (!lines.length) {
-        for (var i = 0; i < 36; i++) {
-          lines.push({
-            y: Math.random() * h,
-            amp: 6 + Math.random() * 56,
-            freq: 0.0012 + Math.random() * 0.0055,
-            speed: 0.35 + Math.random() * 1.1,
-            phase: Math.random() * Math.PI * 2,
-            alpha: 0.1 + Math.random() * 0.35,
-            width: 0.5 + Math.random() * 1.8,
-          });
-        }
-      }
-    }
-
-    function frame(t) {
-      if (!systemsRunning) return;
-      systemsRaf = window.requestAnimationFrame(frame);
-      ctx.fillStyle = "#050505";
-      ctx.fillRect(0, 0, w, h);
-      var time = t * 0.001;
-      lines.forEach(function (line) {
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(245,245,245," + line.alpha.toFixed(3) + ")";
-        ctx.lineWidth = line.width;
-        for (var x = 0; x <= w; x += 6) {
-          var y =
-            line.y +
-            Math.sin(x * line.freq + time * line.speed + line.phase) * line.amp +
-            Math.sin(x * line.freq * 2.2 - time * line.speed * 0.7) * (line.amp * 0.35);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-        line.y += Math.sin(time * 0.2 + line.phase) * 0.08;
-        if (line.y < -40) line.y = h + 20;
-        if (line.y > h + 40) line.y = -20;
-      });
-    }
-
-    resize();
-    window.addEventListener("resize", resize, { passive: true });
-    return {
-      start: function () {
-        if (systemsRunning) return;
-        systemsRunning = true;
-        systemsRaf = window.requestAnimationFrame(frame);
       },
       stop: function () {
-        systemsRunning = false;
-        if (systemsRaf) window.cancelAnimationFrame(systemsRaf);
-        systemsRaf = 0;
+        if (timer) {
+          window.clearTimeout(timer);
+          timer = null;
+        }
+        try {
+          video.pause();
+        } catch (e) {}
       },
     };
   }
 
-  var systemsApi = bootSystemsCanvas();
+  var webVideo = document.querySelector("[data-stage-web-film]");
+  var reelVideo = document.querySelector("[data-stage-reel-film]");
+  var webFilm = webVideo ? createFilmCutter(webVideo, WEB_CLIPS, { holdMin: 2.2, holdMax: 3.6 }) : null;
+  var reelFilm = reelVideo
+    ? createFilmCutter(reelVideo, REEL_CLIPS, { holdMin: 1.8, holdMax: 3.2 })
+    : null;
 
-  /* ——— Montaż reels field ——— */
-  function buildReelsField() {
-    var host = document.querySelector("[data-stage-reels]");
-    if (!host || reelsReady) return;
-    reelsReady = true;
-    var depths = ["near", "mid", "far", "mid", "far", "near", "mid", "far"];
-    function rowHtml(mod) {
-      var cards = "";
-      for (var i = 0; i < 8; i++) {
-        var item = REEL_POOL[(i + mod * 3) % REEL_POOL.length];
-        var depth = depths[i % depths.length];
-        cards +=
-          '<div class="stage-reel-card stage-reel-card--' +
-          depth +
-          '">' +
-          '<video muted loop playsinline preload="metadata" poster="' +
-          item.poster +
-          '" data-reel-src="' +
-          item.src +
-          '"></video>' +
-          "</div>";
-      }
-      return cards + cards + cards;
-    }
-    host.innerHTML =
-      '<div class="stage-reels-row stage-reels-row--a">' +
-      rowHtml(0) +
-      "</div>" +
-      '<div class="stage-reels-row stage-reels-row--b">' +
-      rowHtml(1) +
-      "</div>" +
-      '<div class="stage-reels-row stage-reels-row--c">' +
-      rowHtml(2) +
-      "</div>";
+  /* ——— JUICY drifting collage ——— */
+  function buildJuicyField() {
+    var host = document.querySelector("[data-stage-juicy]");
+    if (!host || host.getAttribute("data-ready") === "1") return;
+    host.setAttribute("data-ready", "1");
+    var html = "";
+    JUICY_SLOTS.forEach(function (slot, i) {
+      var src = JUICY_IMGS[i % JUICY_IMGS.length];
+      var drift = 14 + (i % 5) * 3;
+      var delay = -((i * 1.7) % drift);
+      html +=
+        '<div class="stage-juicy-card" style="' +
+        "left:" +
+        slot.x +
+        "%;top:" +
+        slot.y +
+        "%;width:" +
+        slot.w +
+        "vw;--rot:" +
+        slot.rot +
+        "deg;--z:" +
+        slot.z +
+        ";--drift:" +
+        drift +
+        "s;--delay:" +
+        delay +
+        's;z-index:' +
+        slot.z +
+        '">' +
+        '<img src="' +
+        src +
+        '" alt="" loading="lazy" decoding="async" />' +
+        "</div>";
+    });
+    host.innerHTML = html;
   }
 
-  function setReelsPlaying(on) {
-    var videos = document.querySelectorAll("[data-stage-reels] video");
-    videos.forEach(function (video, i) {
-      if (on) {
-        if (!video.getAttribute("src")) {
-          video.src = video.getAttribute("data-reel-src");
-        }
-        /* play a subset for perf */
-        if (i % 2 === 0 || window.innerWidth > 900) {
-          var play = video.play();
-          if (play && play.catch) play.catch(function () {});
-        }
-      } else {
-        try {
-          video.pause();
-        } catch (e) {}
-      }
-    });
+  function systemsApi() {
+    return window.__portfolioSystemsStage || null;
   }
 
   function applyTheme(theme) {
     document.body.setAttribute("data-tile-theme", theme || "web");
-    stopWebClips();
-    if (systemsApi) systemsApi.stop();
-    setReelsPlaying(false);
+    if (webFilm) webFilm.stop();
+    if (reelFilm) reelFilm.stop();
+    var sys = systemsApi();
+    if (sys) sys.stop();
 
     if (theme === "web") {
-      startWebClips();
+      if (webFilm) webFilm.start();
     } else if (theme === "systems") {
-      if (systemsApi) systemsApi.start();
+      (function trySystems(n) {
+        var api = systemsApi();
+        if (api) {
+          api.resize();
+          api.start();
+          return;
+        }
+        if (n < 40) window.setTimeout(function () { trySystems(n + 1); }, 50);
+      })(0);
     } else if (theme === "video") {
-      buildReelsField();
-      setReelsPlaying(true);
+      if (reelFilm) reelFilm.start();
+    } else if (theme === "graphics") {
+      buildJuicyField();
     }
   }
 
@@ -362,6 +338,8 @@
     "resize",
     function () {
       scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
+      var sys = systemsApi();
+      if (sys && document.body.getAttribute("data-tile-theme") === "systems") sys.resize();
     },
     { passive: true }
   );
@@ -389,8 +367,7 @@
   );
 
   document.body.classList.add("portfolio-page--tiles");
-  bootWebMosaic();
-  buildReelsField();
+  buildJuicyField();
   scrollToIndex(0, "auto");
   window.setTimeout(function () {
     scrollToIndex(0, "auto");
