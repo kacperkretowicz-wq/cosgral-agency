@@ -60,7 +60,8 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   var isReelsGalleryPage = document.body.classList.contains("reels-gallery-page");
   var isGallerySubpage = isGraphicsGalleryPage || isReelsGalleryPage;
   var isSandHeroSubpage = isAboutPage || isGallerySubpage;
-  var isPortfolioMainPage = isPortfolioPage && !isSandHeroSubpage && !isCasePage;
+  var isPortfolioTilesPage = document.body.classList.contains("portfolio-page--tiles");
+  var isPortfolioMainPage = isPortfolioPage && !isSandHeroSubpage && !isCasePage && !isPortfolioTilesPage;
   var isSandHeroPage = isPortfolioMainPage || isSandHeroSubpage;
   var filmDrive = { p: 0, act: "open" };
   var showcaseDrive = { p: 0, pose: "intro" };

@@ -608,6 +608,36 @@
         "en": "COSGRAL apps, CRM and automations — TelForceOne, Trove, AI chatbots."
       }
     },
+    "web_pages_meta": {
+      "title": {
+        "pl": "Strony internetowe — Portfolio COSGRAL",
+        "en": "Websites — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Wybrane strony internetowe COSGRAL — Juicy Events, Trove Archive, MJ Social Media.",
+        "en": "Selected COSGRAL websites — Juicy Events, Trove Archive, MJ Social Media."
+      }
+    },
+    "tile_open": {
+      "pl": "Zobacz realizacje",
+      "en": "See the work"
+    },
+    "tiles_hint": {
+      "pl": "Przesuń w bok między kategoriami",
+      "en": "Swipe sideways between categories"
+    },
+    "automation_tile_lead": {
+      "pl": "CRM, aplikacje i workflow, które odciążają zespół.",
+      "en": "CRM, apps and workflows that take work off your team."
+    },
+    "grafiki_tile_lead": {
+      "pl": "Posty, stories i key visuale w rytmie pokazu slajdów.",
+      "en": "Posts, stories and key visuals as a slide show."
+    },
+    "web_page_lead": {
+      "pl": "Od landing page po sklepy — wybrane wdrożenia stron, które oddają markę i konwertują.",
+      "en": "From landing pages to stores — selected website deliveries that carry the brand and convert."
+    },
     "hero_title": {
       "pl": "Realizacje",
       "en": "Selected work"
