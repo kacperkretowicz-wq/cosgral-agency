@@ -380,11 +380,13 @@ function fallback_ai_text(string $latestUser = '', array $history = []): string
     }
     $low = mb_strtolower($blob, 'UTF-8');
     $confused = (bool)preg_match('/o czym ty mów|nie rozumiem|co ty bredz/iu', $latestUser);
+    if (preg_match('/^(witam|cześć|czesc|hej|heja|siema|hello|hi|dzień dobry|dzien dobry)[\s!.?,]*$/iu', trim($latestUser))) {
+        return 'Cześć — tu Cosgral AI. Nad czym chcesz poukładać projekt: strona, sklep, CRM, SEO, automatyzacja czy wideo?';
+    }
 
     $service = '';
     $reply = '';
     if (preg_match('/sklep|e-?comm|woo|shopify|shoper|koszyk|katalog produkt/iu', $low)) {
-        $service = 'sklep';
         $reply = $confused
             ? 'Przepraszam — wracam do sklepu. W Cosgral robimy e-commerce (WooCommerce / Shopify): katalog, zamówienia, płatności, panel. Jaka branża, ile produktów i na kiedy start?'
             : 'Sklep internetowy zrobimy w Cosgral — WooCommerce albo Shopify, z zamówieniami, płatnościami i dodawaniem produktów. Jaka branża, ile SKU i na kiedy chcesz start?';
@@ -443,6 +445,9 @@ function is_canned_ai_fallback_text(string $body): bool
         return false;
     }
     if (mb_stripos($t, 'ogarniam temat', 0, 'UTF-8') !== false) {
+        return true;
+    }
+    if (mb_stripos($t, 'napisz krótko, co chcesz ruszyć', 0, 'UTF-8') !== false) {
         return true;
     }
     return (bool)preg_match('/^dzięk\w*\s+za\s+wiadomość/iu', $t);
@@ -505,7 +510,16 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
 {
     @set_time_limit(60);
     $contents = gemini_build_contents($history, $latestUser);
-    $models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+    $preferred = $model !== '' ? $model : 'gemini-2.5-flash';
+    if (strpos($preferred, 'gemini-2.0') === 0) {
+        $preferred = 'gemini-2.5-flash';
+    }
+    $models = array_values(array_unique([
+        $preferred,
+        'gemini-2.5-flash',
+        'gemini-3.6-flash',
+        'gemini-3.8-flash',
+    ]));
     $lastError = 'gemini_failed';
     $payload = [
         'systemInstruction' => [
@@ -523,7 +537,7 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
             . rawurlencode($mName)
             . ':generateContent?key='
             . rawurlencode($apiKey);
-        $res = http_json('POST', $url, $payload, [], 20);
+        $res = http_json('POST', $url, $payload, [], 18);
         if ($res['ok']) {
             $text = gemini_extract_text($res['data']);
             if ($text !== '' && !is_canned_ai_fallback_text($text)) {
@@ -534,10 +548,10 @@ function gemini_reply(string $apiKey, string $model, array $history, string $lat
         }
         $status = (int)($res['status'] ?? 0);
         $lastError = 'gemini_http_' . $status . '_' . $mName . '_' . gemini_error_label($res);
-        if ($status === 429 || $status === 503) {
+        if ($status === 404 || $status === 400 || $status === 429 || $status === 503) {
             continue;
         }
-        if ($status === 400 || $status === 404) {
+        if ($status === 0) {
             continue;
         }
         break;

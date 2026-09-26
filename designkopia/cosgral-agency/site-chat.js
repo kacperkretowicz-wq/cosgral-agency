@@ -92,6 +92,7 @@
       .trim();
     if (!t) return false;
     if (/ogarniam temat/i.test(t)) return true;
+    if (/napisz krótko, co chcesz ruszyć/i.test(t)) return true;
     if (/^dzięk\w*\s+za\s+wiadomość/i.test(t)) return true;
     return false;
   }
@@ -538,8 +539,14 @@
     });
     var low = blob.toLowerCase();
     var confused = /o czym ty mów|nie rozumiem/i.test(String(userBody || ""));
+    var greeting = /^(witam|cześć|czesc|hej|heja|siema|hello|hi|dzień dobry|dzien dobry)[\s!.?,]*$/i.test(
+      String(userBody || "").trim(),
+    );
     var body;
-    if (/sklep|e-?comm|woo|shopify|koszyk/.test(low)) {
+    if (greeting) {
+      body =
+        "Cześć — tu Cosgral AI. Nad czym chcesz poukładać projekt: strona, sklep, CRM, SEO, automatyzacja czy wideo?";
+    } else if (/sklep|e-?comm|woo|shopify|koszyk/.test(low)) {
       body = confused
         ? "Przepraszam — wracam do sklepu. W Cosgral robimy e-commerce (WooCommerce / Shopify): katalog, zamówienia, płatności. Jaka branża, ile produktów i na kiedy start?"
         : "Sklep internetowy zrobimy w Cosgral — WooCommerce albo Shopify, z zamówieniami i dodawaniem produktów. Jaka branża i na kiedy start?";

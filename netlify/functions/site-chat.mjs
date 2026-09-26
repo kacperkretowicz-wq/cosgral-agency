@@ -246,6 +246,7 @@ function isCannedAiFallback(body) {
   const t = stripAiPrefix(String(body || "")).trim();
   if (!t) return false;
   if (/ogarniam temat/i.test(t)) return true;
+  if (/napisz krótko, co chcesz ruszyć/i.test(t)) return true;
   return /^dzięk\w*\s+za\s+wiadomość/i.test(t);
 }
 
@@ -306,7 +307,12 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
     },
   ];
   const models = Array.from(
-    new Set([GEMINI_MODEL || "gemini-2.5-flash", "gemini-2.5-flash", "gemini-flash-latest"]),
+    new Set([
+      GEMINI_MODEL || "gemini-2.5-flash",
+      "gemini-2.5-flash",
+      "gemini-3.6-flash",
+      "gemini-3.8-flash",
+    ]),
   );
 
   let lastErr = new Error("gemini_failed");
