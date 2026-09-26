@@ -1,5 +1,6 @@
 /**
- * Portfolio category WebGL — systems gets a node/workflow field; others stay subtle.
+ * Portfolio WebGL — systems: glassmorphism field that follows the cursor.
+ * Canvas is shown only for systems; other themes use dedicated media layers / home ambient.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 
@@ -13,43 +14,15 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
 
   var THEMES = {
-    web: {
-      clear: 0x070709,
-      base: [0.035, 0.035, 0.045],
-      tint: [0.16, 0.17, 0.22],
-      accent: [0.42, 0.45, 0.55],
-      light: false,
-      mode: 0,
-    },
-    systems: {
-      clear: 0xf4f4f6,
-      base: [0.96, 0.97, 0.99],
-      tint: [0.82, 0.86, 0.93],
-      accent: [0.28, 0.34, 0.48],
-      light: true,
-      mode: 1,
-    },
-    video: {
-      clear: 0x050505,
-      base: [0.02, 0.02, 0.025],
-      tint: [0.14, 0.13, 0.16],
-      accent: [0.55, 0.5, 0.48],
-      light: false,
-      mode: 0,
-    },
-    graphics: {
-      clear: 0xf3ebe2,
-      base: [0.95, 0.92, 0.88],
-      tint: [0.86, 0.8, 0.72],
-      accent: [0.72, 0.62, 0.5],
-      light: true,
-      mode: 0,
-    },
+    web: { clear: 0x070709, light: false, mode: 0 },
+    systems: { clear: 0xeef1f6, light: true, mode: 1 },
+    video: { clear: 0x050505, light: false, mode: 0 },
+    graphics: { clear: 0xf3ebe2, light: true, mode: 0 },
   };
 
   var themeKey = "web";
   var theme = THEMES.web;
-  var pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  var pointer = { x: 0, y: 0, tx: 0, ty: 0, vx: 0, vy: 0 };
   var running = false;
   var renderer = null;
   var uniforms = null;
@@ -63,7 +36,7 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     document.body.classList.toggle("is-tile-bg-light", !!t.light);
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute("content", t.light ? "#f4f4f6" : "#070709");
+      meta.setAttribute("content", t.light ? "#eef1f6" : "#070709");
     }
   }
 
@@ -74,16 +47,16 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     applyDomTheme(key);
     if (!renderer || !uniforms) return;
     renderer.setClearColor(theme.clear, 1);
-    uniforms.uBase.value.fromArray(theme.base);
-    uniforms.uTint.value.fromArray(theme.tint);
-    uniforms.uAccent.value.fromArray(theme.accent);
-    uniforms.uLight.value = theme.light ? 1 : 0;
     uniforms.uMode.value = theme.mode;
   }
 
   function onPointer(e) {
-    pointer.tx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
-    pointer.ty = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
+    var nx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
+    var ny = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
+    pointer.vx += (nx - pointer.tx) * 0.35;
+    pointer.vy += (ny - pointer.ty) * 0.35;
+    pointer.tx = nx;
+    pointer.ty = ny;
   }
 
   function resize() {
@@ -98,10 +71,13 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     if (!running) return;
     window.requestAnimationFrame(tick);
     var t = (now - t0) * 0.001;
-    pointer.x += (pointer.tx - pointer.x) * 0.1;
-    pointer.y += (pointer.ty - pointer.y) * 0.1;
+    pointer.x += (pointer.tx - pointer.x) * 0.12;
+    pointer.y += (pointer.ty - pointer.y) * 0.12;
+    pointer.vx *= 0.9;
+    pointer.vy *= 0.9;
     uniforms.uTime.value = REDUCED ? 0 : t;
     uniforms.uMouse.value.set(pointer.x, pointer.y);
+    uniforms.uVel.value.set(pointer.vx, pointer.vy);
     renderer.render(scene, camera);
   }
 
@@ -130,11 +106,8 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     uniforms = {
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
+      uVel: { value: new THREE.Vector2(0, 0) },
       uRes: { value: new THREE.Vector2(1, 1) },
-      uBase: { value: new THREE.Vector3().fromArray(theme.base) },
-      uTint: { value: new THREE.Vector3().fromArray(theme.tint) },
-      uAccent: { value: new THREE.Vector3().fromArray(theme.accent) },
-      uLight: { value: theme.light ? 1 : 0 },
       uMode: { value: theme.mode },
     };
 
@@ -152,67 +125,62 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
         "varying vec2 vUv;",
         "uniform float uTime;",
         "uniform vec2 uMouse;",
+        "uniform vec2 uVel;",
         "uniform vec2 uRes;",
-        "uniform vec3 uBase;",
-        "uniform vec3 uTint;",
-        "uniform vec3 uAccent;",
-        "uniform float uLight;",
         "uniform float uMode;",
-        "float hash(vec2 p){",
-        "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
-        "}",
-        "vec2 nodePos(vec2 id){",
-        "  float n = hash(id);",
-        "  float m = hash(id + 19.7);",
-        "  return vec2(n, m);",
+        "float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }",
+        "float sdRoundBox(vec2 p, vec2 b, float r){",
+        "  vec2 q = abs(p) - b + r;",
+        "  return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;",
         "}",
         "void main(){",
         "  vec2 uv = vUv;",
         "  vec2 m = uMouse * 0.5 + 0.5;",
-        "  vec2 p = uv - 0.5;",
-        "  p.x *= uRes.x / max(uRes.y, 1.0);",
-        "  float d = length(uv - m);",
-        "  vec3 col = uBase;",
-        "  if (uMode > 0.5) {",
-        "    /* Systems: workflow grid + nodes + pulses */",
-        "    vec2 grid = uv * vec2(7.0, 5.0);",
-        "    vec2 id = floor(grid);",
-        "    vec2 f = fract(grid);",
-        "    float lineX = smoothstep(0.04, 0.0, abs(f.x - 0.5));",
-        "    float lineY = smoothstep(0.04, 0.0, abs(f.y - 0.5));",
-        "    float rails = max(lineX, lineY) * 0.18;",
-        "    float nodes = 0.0;",
-        "    float links = 0.0;",
-        "    for (int y = -1; y <= 1; y++){",
-        "      for (int x = -1; x <= 1; x++){",
-        "        vec2 nid = id + vec2(float(x), float(y));",
-        "        vec2 np = (nid + nodePos(nid) * 0.55 + 0.22) / vec2(7.0, 5.0);",
-        "        float nd = length(uv - np);",
-        "        float pulse = 0.5 + 0.5 * sin(uTime * 2.2 + hash(nid) * 6.28);",
-        "        nodes += smoothstep(0.045, 0.012, nd) * (0.55 + pulse * 0.45);",
-        "        float toMouse = length(np - m);",
-        "        links += smoothstep(0.34, 0.0, toMouse) * smoothstep(0.02, 0.0, abs(nd - toMouse * 0.002));",
-        "        float beam = abs(dot(normalize(m - np + 0.0001), normalize(uv - np + 0.0001)) - 1.0);",
-        "        links += (1.0 - smoothstep(0.0, 0.02, beam)) * smoothstep(0.32, 0.0, length(uv - np)) * smoothstep(0.32, 0.0, toMouse) * 0.35;",
-        "      }",
-        "    }",
-        "    float cursor = smoothstep(0.55, 0.0, d);",
-        "    float packet = sin(d * 28.0 - uTime * 4.5) * exp(-d * 3.2);",
-        "    col = mix(uBase, uTint, rails + cursor * 0.35);",
-        "    col = mix(col, uAccent, clamp(nodes * 0.55 + links * 0.4 + packet * 0.2, 0.0, 0.85));",
-        "    float vig = smoothstep(1.2, 0.25, length(p));",
-        "    col *= mix(0.94, 1.0, vig);",
-        "  } else {",
-        "    float pulse = 0.5 + 0.5 * sin(uTime * 0.9 + d * 10.0);",
-        "    float rip = sin(d * 18.0 - uTime * 2.8) * exp(-d * 2.4);",
-        "    float glow = smoothstep(1.05, 0.0, d) * (0.42 + pulse * 0.22);",
-        "    float band = 0.07 * sin((uv.x + uMouse.x * 0.25) * 18.0 + uTime * 0.55)",
-        "               * sin((uv.y + uMouse.y * 0.2) * 12.0 - uTime * 0.4);",
-        "    col = mix(uBase, uTint, glow);",
-        "    col = mix(col, uAccent, clamp(rip * 0.55 + band, 0.0, 0.65));",
-        "    float vig = smoothstep(1.25, 0.25, length(p));",
-        "    col *= mix(uLight > 0.5 ? 0.94 : 0.72, 1.0, vig);",
+        "  float aspect = uRes.x / max(uRes.y, 1.0);",
+        "  vec2 p = (uv - 0.5) * vec2(aspect, 1.0);",
+        "  vec2 mp = (m - 0.5) * vec2(aspect, 1.0);",
+        "  /* Soft studio base */",
+        "  vec3 col = mix(vec3(0.93, 0.94, 0.97), vec3(0.86, 0.89, 0.95), uv.y);",
+        "  col += vec3(0.04, 0.05, 0.07) * (0.5 + 0.5 * sin(uv.x * 3.0 + uTime * 0.2));",
+        "  /* Floating glass panels */",
+        "  for (int i = 0; i < 5; i++){",
+        "    float fi = float(i);",
+        "    vec2 center = vec2(",
+        "      sin(uTime * (0.18 + fi * 0.04) + fi * 1.7) * 0.55,",
+        "      cos(uTime * (0.15 + fi * 0.03) + fi * 2.1) * 0.32",
+        "    );",
+        "    center += mp * (0.04 + fi * 0.012);",
+        "    vec2 size = vec2(0.22 + fi * 0.035, 0.14 + mod(fi, 3.0) * 0.03);",
+        "    float d = sdRoundBox(p - center, size, 0.045);",
+        "    float glass = smoothstep(0.01, -0.02, d);",
+        "    float edge = smoothstep(0.02, 0.0, abs(d));",
+        "    /* Fake refraction inside panel */",
+        "    vec2 refr = normalize(p - center + 0.0001) * glass * 0.035;",
+        "    vec3 tint = mix(vec3(1.0), vec3(0.78, 0.84, 0.95), fi * 0.12);",
+        "    col = mix(col, col * tint + vec3(0.08), glass * 0.42);",
+        "    col += vec3(0.85, 0.9, 1.0) * edge * 0.55;",
+        "    /* Specular streak */",
+        "    float spec = pow(max(0.0, 1.0 - abs((p.x - center.x) * 1.8 + (p.y - center.y) * 0.4)), 18.0);",
+        "    col += vec3(1.0) * spec * glass * 0.35;",
+        "    col += refr.x * vec3(0.05, 0.08, 0.12) * glass;",
         "  }",
+        "  /* Cursor glass lens */",
+        "  float ld = length(p - mp);",
+        "  float lens = smoothstep(0.28, 0.0, ld);",
+        "  float rim = smoothstep(0.28, 0.22, ld) * smoothstep(0.16, 0.22, ld);",
+        "  vec2 dir = normalize(p - mp + 0.0001);",
+        "  float bend = lens * (0.08 + length(uVel) * 0.12);",
+        "  vec2 sampleUv = uv - dir * bend;",
+        "  vec3 refracted = mix(col, vec3(0.75, 0.82, 0.95), lens * 0.35);",
+        "  refracted += vec3(0.15, 0.2, 0.28) * sin((sampleUv.x + sampleUv.y) * 40.0 - uTime * 3.0) * lens * 0.08;",
+        "  col = mix(col, refracted, lens * 0.85);",
+        "  col += vec3(1.0) * rim * 0.75;",
+        "  col += vec3(0.9, 0.95, 1.0) * pow(max(0.0, 1.0 - ld * 3.2), 6.0) * 0.25;",
+        "  /* Soft caustic rings from cursor */",
+        "  float rings = sin(ld * 42.0 - uTime * 3.8) * exp(-ld * 4.5);",
+        "  col += vec3(0.55, 0.65, 0.85) * rings * 0.12;",
+        "  float vig = smoothstep(1.35, 0.25, length(p));",
+        "  col *= mix(0.92, 1.0, vig);",
         "  gl_FragColor = vec4(col, 1.0);",
         "}",
       ].join("\n"),
