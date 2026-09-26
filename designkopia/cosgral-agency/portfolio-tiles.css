@@ -233,19 +233,21 @@ body.portfolio-page--tiles a.portfolio-tile#automatyzacje {
   -webkit-backdrop-filter: blur(8px) saturate(1.1);
   backdrop-filter: blur(8px) saturate(1.1);
   isolation: isolate;
-  transform: scale(0.96);
+  /* No scale — all tiles stay identical size */
+  transform: none;
   transition:
-    transform 0.45s var(--ease),
     border-color 0.35s ease,
     box-shadow 0.45s var(--ease),
-    background 0.45s ease;
+    background 0.45s ease,
+    opacity 0.35s ease;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+  opacity: 0.78;
 }
 .portfolio-tile.is-active {
-  transform: scale(1);
   border-color: rgba(255, 255, 255, 0.38);
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
   background: rgba(8, 8, 10, 0.1);
+  opacity: 1;
 }
 /* Web theme: glass so the film reads through */
 body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-tile {
@@ -432,7 +434,4 @@ html.reduce-motion .stage-juicy-card,
 html.reduce-motion .portfolio-stage-bg__layer {
   transition: none !important;
   animation: none !important;
-}
-html.reduce-motion .portfolio-tile {
-  transform: none;
 }
