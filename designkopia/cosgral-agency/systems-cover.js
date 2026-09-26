@@ -10,7 +10,7 @@
   function coverProgress() {
     var r = section.getBoundingClientRect();
     var vh = window.innerHeight || 1;
-    var enterRaw = 1 - Math.max(0, Math.min(1, r.top / (vh * 0.88)));
+    var enterRaw = 1 - Math.max(0, Math.min(1, r.top / (vh * 0.38)));
     var enter = easeOut(enterRaw);
     var leave = r.bottom < vh * 0.22 ? Math.max(0, r.bottom / (vh * 0.22)) : 1;
     return Math.max(0, Math.min(1, Math.min(enter, leave)));

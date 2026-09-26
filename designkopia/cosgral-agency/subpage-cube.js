@@ -635,9 +635,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     var r = el.getBoundingClientRect();
     var vh = window.innerHeight || 1;
     if (r.height < 8) return 0;
-    var enter = 1 - Math.max(0, Math.min(1, r.top / (vh * 0.9)));
+    /* Fly in only as the section becomes the frame, not while it is still below. */
+    var enter = 1 - Math.max(0, Math.min(1, r.top / (vh * 0.38)));
     enter = enter * enter * (3 - 2 * enter);
-    var leave = r.bottom < vh * 0.18 ? Math.max(0, r.bottom / (vh * 0.18)) : 1;
+    var leave = r.bottom < vh * 0.22 ? Math.max(0, r.bottom / (vh * 0.22)) : 1;
     return Math.max(0, Math.min(1, Math.min(enter, leave)));
   }
 
@@ -672,28 +673,38 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     root.rotation.set(0, 0, 0);
     cubeGroup.visible = true;
     var u = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-    var z = MOBILE ? 0.08 : 0.1;
-    var left = worldPosFromScreen(MOBILE ? -90 : -140, window.innerHeight * 0.52, z);
-    var center = worldPosFromScreen(window.innerWidth * 0.5, window.innerHeight * 0.5, z);
+    /* Same mesh, scale and rest pose as homepage hero (`home-hero-3d.js`). */
+    var heroSc = MOBILE ? 0.5 * 0.39 * 1.6 : 0.5 * 0.78;
+    var restX = 0;
+    var restY = MOBILE ? 0.12 : 0.18;
+    var restZ = 0.36;
+    var startX = MOBILE ? -5.2 : -6.6;
+    var startY = MOBILE ? 0.35 : 0.28;
+    var startZ = 0.14;
+    var driftX = Math.sin(time * 0.18) * 0.07;
+    var driftY = Math.cos(time * 0.15) * 0.05;
     cubeGroup.position.set(
-      left.x + (center.x - left.x) * u,
-      left.y + (center.y - left.y) * u,
-      z
+      startX + (restX + driftX * u - startX) * u,
+      startY + (restY + driftY * u - startY) * u,
+      startZ + (restZ - startZ) * u
     );
-    var sc = CUBE_SCALE * (MOBILE ? 1.42 : 1.26) * (0.88 + 0.12 * u);
+    var sc = heroSc * (0.82 + 0.18 * u);
     cubeGroup.scale.set(sc, sc, sc);
-    cubeGroup.rotation.x = 0.22 + time * 0.42 + u * 0.55;
-    cubeGroup.rotation.y = -1.15 + u * 1.85 + time * 0.62;
-    cubeGroup.rotation.z = 0.08 + time * 0.2 + u * 0.18;
+    var idleRotX = 0.22 + Math.sin(time * 0.035) * 0.04;
+    var idleRotY = -0.35 + Math.cos(time * 0.028) * 0.05 + time * 0.09;
+    var idleRotZ = Math.sin(time * 0.022) * 0.02;
+    cubeGroup.rotation.x = 0.52 + (idleRotX - 0.52) * u;
+    cubeGroup.rotation.y = -1.18 + (idleRotY + 1.18) * u;
+    cubeGroup.rotation.z = 0.32 + (idleRotZ - 0.32) * u;
     if (sMat && sMat.uniforms && sMat.uniforms.uAlphaMul) {
-      sMat.uniforms.uAlphaMul.value = MOBILE ? 1.35 : 1.55;
+      sMat.uniforms.uAlphaMul.value = MOBILE ? 2.6 : 2.9;
     }
     if (shell && shell.material && shell.material.color) {
-      shell.material.color.setHex(0x8a8a96);
+      shell.material.color.setHex(0x080808);
     }
-    setCubeVisualFade(1);
-    if (shell && shell.material) shell.material.opacity = 0.38;
-    if (edges && edges.material) edges.material.opacity = 1;
+    setCubeVisualFade(Math.min(1, 0.4 + u * 0.6));
+    if (shell && shell.material) shell.material.opacity = MOBILE ? 0.5 : 0.45;
+    if (edges && edges.material) edges.material.opacity = MOBILE ? 0.18 : 0.24;
     if (portal) portal.style.opacity = "1";
   }
 
@@ -2241,6 +2252,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       portfolioFlight.t = 1;
       portfolioFlight.hideAfter = false;
       cubeGroup.visible = false;
+      restoreAutoHeroLook();
       setCubeVisualFade(0);
     });
   }
