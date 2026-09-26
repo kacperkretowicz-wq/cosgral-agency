@@ -3,11 +3,16 @@
 body.portfolio-page--tiles {
   --tile-w: min(70vw, 26rem);
   --tile-h: min(56svh, 32rem);
-  background: #070709;
+  --tile-page-bg: #070709;
+  background: var(--tile-page-bg);
   color: #f5f5f5;
   overflow-x: hidden;
-  transition: color 0.45s ease;
+  transition: color 0.45s ease, background-color 0.45s ease;
 }
+body.portfolio-page--tiles[data-tile-theme="web"] { --tile-page-bg: #070709; }
+body.portfolio-page--tiles[data-tile-theme="systems"] { --tile-page-bg: #f4f4f6; }
+body.portfolio-page--tiles[data-tile-theme="video"] { --tile-page-bg: #050505; }
+body.portfolio-page--tiles[data-tile-theme="graphics"] { --tile-page-bg: #f3ebe2; }
 body.portfolio-page--tiles.is-tile-bg-light {
   color: #111;
 }
@@ -30,6 +35,9 @@ body.portfolio-page--tiles .subpage-cube-portal,
 body.portfolio-page--tiles .portfolio-end {
   display: none !important;
 }
+body.portfolio-page--tiles.subpage::after {
+  opacity: 0.04;
+}
 
 body.portfolio-page--tiles .site-nav {
   z-index: 40;
@@ -50,7 +58,7 @@ body.portfolio-page--tiles #main {
 .portfolio-tile-bg {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   display: block;

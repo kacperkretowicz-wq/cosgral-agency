@@ -16,6 +16,7 @@
   var activeIndex = -1;
   var slideTimers = [];
   var wheelLock = 0;
+  var pendingTheme = null;
 
   function clamp(i) {
     return Math.max(0, Math.min(tiles.length - 1, i));
@@ -86,9 +87,13 @@
   }
 
   function applyTheme(theme) {
-    document.body.setAttribute("data-tile-theme", theme || "web");
+    theme = theme || "web";
+    pendingTheme = theme;
+    document.body.setAttribute("data-tile-theme", theme);
+    var light = theme === "systems" || theme === "graphics";
+    document.body.classList.toggle("is-tile-bg-light", light);
     if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
-      window.__portfolioTileBg.setTheme(theme || "web");
+      window.__portfolioTileBg.setTheme(theme);
     }
   }
 
@@ -165,9 +170,17 @@
     { passive: false }
   );
 
+  window.addEventListener("portfolio-tile-bg-ready", function () {
+    if (pendingTheme) applyTheme(pendingTheme);
+  });
+
   document.body.classList.add("portfolio-page--tiles");
   scrollToIndex(0, "auto");
   window.setTimeout(function () {
     scrollToIndex(0, "auto");
+    if (pendingTheme) applyTheme(pendingTheme);
   }, 80);
+  window.setTimeout(function () {
+    if (pendingTheme) applyTheme(pendingTheme);
+  }, 400);
 })();
