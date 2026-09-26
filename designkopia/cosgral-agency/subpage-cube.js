@@ -74,6 +74,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     driftP: 0,
     hideAfter: false,
   };
+  var autoHero = { p: 0 };
   var portfolioSectionIndex = 0;
   var PORTFOLIO_STRONY_IN_DUR = MOBILE ? 3.1 : 3.9;
   var PORTFOLIO_STRONY_OUT_DUR = MOBILE ? 3.0 : 3.7;
@@ -623,6 +624,46 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     setCubeVisualFade(fade * (grafikiMenuActive ? grafikiFade / 0.68 : 1));
   }
 
+  function setAutoHeroProgress(p) {
+    autoHero.p = Math.max(0, Math.min(1, p || 0));
+    if (autoHero.p > 0.02) {
+      if (portfolioFlight.phase !== "auto-hero") {
+        killPortfolioFlightTweens();
+        portfolioFlight.phase = "auto-hero";
+      }
+      cubeGroup.visible = true;
+      if (portal) portal.style.opacity = "1";
+    } else if (portfolioFlight.phase === "auto-hero") {
+      portfolioFlight.phase = "hidden";
+      cubeGroup.visible = false;
+      setCubeVisualFade(0);
+      if (portal && menuBlend <= 0.001) portal.style.opacity = "0";
+    }
+  }
+
+  function applyAutoHero(p, time) {
+    syncCameraNeutral();
+    root.position.set(0, 0, 0);
+    root.rotation.set(0, 0, 0);
+    cubeGroup.visible = true;
+    var u = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    var z = MOBILE ? 0.2 : 0.26;
+    var left = worldPosFromScreen(MOBILE ? -120 : -180, window.innerHeight * 0.52, z);
+    var center = worldPosFromScreen(window.innerWidth * 0.5, window.innerHeight * 0.5, z);
+    cubeGroup.position.set(
+      left.x + (center.x - left.x) * u,
+      left.y + (center.y - left.y) * u,
+      z
+    );
+    var sc = CUBE_SCALE * (MOBILE ? 2.45 : 2.9) * (0.82 + 0.18 * u);
+    cubeGroup.scale.set(sc, sc, sc);
+    cubeGroup.rotation.x = 0.22 + time * 0.42 + u * 0.55;
+    cubeGroup.rotation.y = -1.15 + u * 1.85 + time * 0.62;
+    cubeGroup.rotation.z = 0.08 + time * 0.2 + u * 0.18;
+    setCubeVisualFade(Math.min(1, 0.18 + u * 0.82));
+    if (portal) portal.style.opacity = "1";
+  }
+
   function applyPortfolioDrift(p, time) {
     menuPhase.time = time;
     var drift = getDriftPose(p, time);
@@ -1037,6 +1078,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     if (!cubeGroup.visible) return false;
     if (isShowcasePage && portfolioFlight.phase === "showcase") return sMat.uniforms.uFade.value > 0.12;
     if (isFilmPage && portfolioFlight.phase === "film") return sMat.uniforms.uFade.value > 0.12;
+    if (autoHero.p > 0.02) return true;
     if (isSandHeroPage && (portfolioFlight.phase === "hidden" || portfolioFlight.phase === "hero-pass")) {
       return false;
     }
@@ -1656,7 +1698,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       document.body.classList.remove("is-cube-menu-front", "is-cube-menu-passing", "is-cube-menu-bg-exit", "is-cube-menu-drift-bg");
       if (portal) {
         if (grafikiMenuActive) portal.style.opacity = String(grafikiFade);
-        else if (isSandHeroPage && portfolioFlight.phase === "hidden") {
+        else if (isSandHeroPage && portfolioFlight.phase === "hidden" && autoHero.p <= 0.02) {
           portal.style.opacity = "0";
         } else portal.style.opacity = "";
       }
@@ -2043,6 +2085,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
         applyPortfolioShowcase(showcaseDrive.p, t);
       } else if (isFilmPage && portfolioFlight.phase === "film") {
         applyPortfolioFilm(filmDrive.p, t);
+      } else if (autoHero.p > 0.01 || portfolioFlight.phase === "auto-hero") {
+        applyAutoHero(autoHero.p, t);
       } else if (isSandHeroPage && portfolioFlight.phase === "hidden") {
         syncCamera();
         root.position.set(0, 0, 0);
@@ -2153,7 +2197,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       }
 
       portfolioSectionIndex = next;
-      /* Keep cube out of non-hero sections; hero pass is unchanged */
+      if (autoHero.p > 0.02) return;
+      /* Keep cube out of non-hero sections unless auto-hero is driving it */
       killPortfolioFlightTweens();
       portfolioFlight.phase = "hidden";
       portfolioFlight.t = 1;
@@ -2283,6 +2328,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     startPortfolioHeroPass: startPortfolioHeroPass,
     cancelPortfolioHeroPass: cancelPortfolioHeroPass,
     applyPortfolioBootSection: applyPortfolioBootSection,
+    setAutoHeroProgress: setAutoHeroProgress,
     openMenu: function () {
       var freshOpen = menuTween.blend < 0.02;
       var wasClosing = menuTween.closing;

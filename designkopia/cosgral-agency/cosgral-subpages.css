@@ -421,8 +421,13 @@ body.about-page .subpage-cube-portal {
   place-items: center;
   opacity: 0.68;
 }
-body.portfolio-page:not(.case-page) .subpage-cube-portal {
-  opacity: 1;
+body.is-auto-cube-hero .subpage-cube-portal {
+  z-index: 1;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+body.is-auto-cube-hero .portfolio-sand-portal--front {
+  opacity: 0.28;
 }
 .subpage-cube__canvas {
   width: 100%;
@@ -2608,7 +2613,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  background: #050505;
+  background: transparent;
   box-shadow: none;
   transform-origin: center center;
 }

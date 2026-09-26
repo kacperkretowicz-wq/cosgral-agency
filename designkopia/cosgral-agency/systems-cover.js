@@ -1,71 +1,51 @@
 (function () {
   "use strict";
-  var video = document.querySelector(".auto-cover__video");
-  if (!video) return;
+  var section = document.getElementById("automatyzacje");
+  if (!section) return;
 
-  var reduced =
-    document.documentElement.classList.contains("reduce-motion") ||
-    (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 2.1);
+  }
 
-  video.muted = true;
-  video.defaultMuted = true;
-  video.playsInline = true;
-  video.setAttribute("muted", "");
-  video.setAttribute("playsinline", "");
-  video.setAttribute("webkit-playsinline", "");
-  video.setAttribute("autoplay", "");
+  function coverProgress() {
+    var r = section.getBoundingClientRect();
+    var vh = window.innerHeight || 1;
+    var enterRaw = 1 - Math.max(0, Math.min(1, r.top / (vh * 0.88)));
+    var enter = easeOut(enterRaw);
+    var leave = r.bottom < vh * 0.22 ? Math.max(0, r.bottom / (vh * 0.22)) : 1;
+    return Math.max(0, Math.min(1, Math.min(enter, leave)));
+  }
 
-  if (reduced) return;
-
-  var trying = false;
-  function play() {
-    if (trying || !video.paused) return;
-    trying = true;
-    var p = video.play();
-    if (p && p.then) {
-      p.then(function () {
-        trying = false;
-      }).catch(function () {
-        trying = false;
-      });
-    } else {
-      trying = false;
+  function sync() {
+    var p = coverProgress();
+    document.body.classList.toggle("is-auto-cube-hero", p > 0.04);
+    if (window.cosgralCube && typeof window.cosgralCube.setAutoHeroProgress === "function") {
+      window.cosgralCube.setAutoHeroProgress(p);
     }
   }
 
-  function inView() {
-    var rect = video.getBoundingClientRect();
-    var vh = window.innerHeight || 1;
-    return rect.bottom > vh * 0.08 && rect.top < vh * 0.92;
+  function boot() {
+    sync();
+    if (!window.ScrollTrigger) {
+      window.addEventListener("scroll", sync, { passive: true });
+      return;
+    }
+    ScrollTrigger.create({
+      id: "auto-cube-hero",
+      start: 0,
+      end: "max",
+      onUpdate: sync,
+      onRefresh: sync,
+    });
   }
 
-  function playIfVisible() {
-    if (inView()) play();
-    else if (!video.paused) video.pause();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
   }
-
-  if (video.readyState >= 2) playIfVisible();
-  video.addEventListener("canplay", playIfVisible);
-  video.addEventListener("loadeddata", playIfVisible);
-
-  if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) play();
-          else video.pause();
-        });
-      },
-      { threshold: [0, 0.12, 0.35], rootMargin: "20% 0px" }
-    );
-    io.observe(video);
-  }
-
-  ["pointerdown", "touchstart", "click"].forEach(function (ev) {
-    window.addEventListener(ev, playIfVisible, { passive: true });
-  });
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible") playIfVisible();
+  window.addEventListener("load", function () {
+    window.setTimeout(sync, 120);
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
   });
 })();
