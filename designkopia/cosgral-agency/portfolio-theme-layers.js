@@ -59,6 +59,10 @@
     setActiveTheme("video");
   } else if (alwaysGraphics) {
     setActiveTheme("graphics");
+  } else {
+    /* Tabs page: bootstrap from current data-tile-theme (event may have fired earlier) */
+    var initial = document.body.getAttribute("data-tile-theme");
+    if (initial) setActiveTheme(initial);
   }
 
   window.addEventListener("portfolio-tile-theme", function (e) {
