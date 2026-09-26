@@ -54,11 +54,46 @@
   var typingEl = null;
   var activeHumanName = "";
   var takeoverNoticeShown = false;
+  var lastVisitorBody = "";
 
   function isAiMessage(m) {
     if (!m) return false;
     if (m.source === AI_SOURCE || m.agent_kind === "ai") return true;
     if (String(m.id || "").indexOf("ai-") === 0) return true;
+    return false;
+  }
+
+  function isHubAutoReply(m) {
+    if (!m || m.role !== "agent") return false;
+    if (isAiMessage(m)) return false;
+    var author = String(m.author || "").toLowerCase();
+    if (author === "ai" || author === "bot" || author === "system" || author === "auto") {
+      return true;
+    }
+    var source = String(m.source || "").toLowerCase();
+    if (
+      source === "ai" ||
+      source === "bot" ||
+      source === "system" ||
+      source === "auto" ||
+      source === "auto-reply"
+    ) {
+      return true;
+    }
+    var body = String(m.body || "")
+      .replace(/^\u200Bcgai\u200B/, "")
+      .trim();
+    return /^dzięk\w*\s+za\s+wiadomość/i.test(body);
+  }
+
+  function isCannedAiFallback(body) {
+    var t = String(body || "")
+      .replace(/^\u200Bcgai\u200B/, "")
+      .trim();
+    if (!t) return false;
+    if (/ogarniam temat/i.test(t)) return true;
+    if (/napisz krótko, co chcesz ruszyć/i.test(t)) return true;
+    if (/^dzięk\w*\s+za\s+wiadomość/i.test(t)) return true;
     return false;
   }
 
@@ -124,7 +159,14 @@
     try {
       var raw = localStorage.getItem(aiStorageKey());
       var list = raw ? JSON.parse(raw) : [];
-      return Array.isArray(list) ? list : [];
+      if (!Array.isArray(list)) return [];
+      var clean = list.filter(function (m) {
+        return m && m.id && m.body && !isCannedAiFallback(m.body);
+      });
+      if (clean.length !== list.length) {
+        localStorage.setItem(aiStorageKey(), JSON.stringify(clean));
+      }
+      return clean;
     } catch (_) {
       return [];
     }
@@ -132,6 +174,7 @@
 
   function saveLocalAi(msg) {
     if (!msg || !msg.id) return;
+    if (isCannedAiFallback(msg.body)) return;
     try {
       var list = loadLocalAi();
       if (list.some(function (m) { return m.id === msg.id; })) return;
@@ -280,6 +323,7 @@
 
   function remember(m) {
     if (!m || !m.body) return;
+    if (m.role === "agent" && isCannedAiFallback(m.body)) return;
     conversation.push({
       role: m.role === "agent" ? "agent" : "visitor",
       body: m.body,
@@ -289,6 +333,18 @@
 
   function renderMessage(m, opts) {
     if (!m || !m.id || knownIds[m.id]) return;
+    if (isHubAutoReply(m) || (m.role === "agent" && isCannedAiFallback(m.body))) {
+      knownIds[m.id] = 1;
+      return;
+    }
+    if (m.role === "visitor") {
+      var vb = String(m.body || "").replace(/\s+/g, " ").trim();
+      if (vb && vb === lastVisitorBody) {
+        knownIds[m.id] = 1;
+        return;
+      }
+      lastVisitorBody = vb;
+    }
     knownIds[m.id] = 1;
     if (empty.parentNode) empty.remove();
 
@@ -450,7 +506,9 @@
         visitor_key: visitorKey,
         body: body,
         page_url: location.href.slice(0, 500),
-        history: conversation.slice(-12),
+        history: conversation.filter(function (m) {
+          return m && m.body && !isCannedAiFallback(m.body);
+        }).slice(-12),
       }),
     })
       .then(function (r) {
@@ -474,13 +532,37 @@
       });
   }
 
-  function localFallbackAi() {
+  function localFallbackAi(userBody) {
+    var blob = String(userBody || "");
+    conversation.forEach(function (m) {
+      if (m && m.role === "visitor" && m.body) blob += " " + m.body;
+    });
+    var low = blob.toLowerCase();
+    var confused = /o czym ty mów|nie rozumiem/i.test(String(userBody || ""));
+    var greeting = /^(witam|cześć|czesc|hej|heja|siema|hello|hi|dzień dobry|dzien dobry)[\s!.?,]*$/i.test(
+      String(userBody || "").trim(),
+    );
+    var body;
+    if (greeting) {
+      body =
+        "Cześć — tu Cosgral AI. Nad czym chcesz poukładać projekt: strona, sklep, CRM, SEO, automatyzacja czy wideo?";
+    } else if (/sklep|e-?comm|woo|shopify|koszyk/.test(low)) {
+      body = confused
+        ? "Przepraszam — wracam do sklepu. W Cosgral robimy e-commerce (WooCommerce / Shopify): katalog, zamówienia, płatności. Jaka branża, ile produktów i na kiedy start?"
+        : "Sklep internetowy zrobimy w Cosgral — WooCommerce albo Shopify, z zamówieniami i dodawaniem produktów. Jaka branża i na kiedy start?";
+    } else if (/crm|leady|hubspot|pipedrive/.test(low)) {
+      body = "CRM ogarniamy: HubSpot, Pipedrive albo panel pod Was. Ile osób w zespole i z czego korzystacie dziś?";
+    } else if (/stron|landing|www|witryn/.test(low)) {
+      body = "Stronę firmową albo landing zrobimy pod zapytania. Jest już witryna, czy start od zera?";
+    } else {
+      body = confused
+        ? "Masz rację, za ogólnie. Napisz w jednym zdaniu: strona, sklep, CRM, SEO, automatyzacja czy wideo?"
+        : "Napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy.";
+    }
     return {
       id: "ai-local-" + uuid(),
       role: "agent",
-      body:
-        "Jasne — ogarniam temat. Doprecyzuj proszę w 1–2 zdaniach, co chcesz (np. sklep, strona, CRM) i na kiedy. " +
-        "Jakub +48 533 790 518 · Kacper +48 571 798 397.",
+      body: body,
       source: AI_SOURCE,
       agent_kind: "ai",
       agent_name: "Cosgral AI",
@@ -521,20 +603,17 @@
           knownIds[res.data.message.id] = 1;
         }
 
-        if (res.data && res.data.ai_message && res.data.ai_message.body) {
-          saveLocalAi(res.data.ai_message);
-          renderMessage(res.data.ai_message);
+        var ai = res.data && res.data.ai_message;
+        if (ai && ai.body && !isCannedAiFallback(ai.body)) {
+          saveLocalAi(ai);
+          renderMessage(ai);
         } else if (!humanTakeover) {
-          var fb = localFallbackAi();
-          saveLocalAi(fb);
-          renderMessage(fb);
+          renderMessage(localFallbackAi(body));
         }
       })
       .catch(function (err) {
         if (err && err.message === "timeout" && !humanTakeover) {
-          var fb = localFallbackAi();
-          saveLocalAi(fb);
-          renderMessage(fb);
+          renderMessage(localFallbackAi(body));
           return;
         }
         input.value = body;

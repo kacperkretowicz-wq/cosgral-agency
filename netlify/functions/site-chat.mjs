@@ -102,10 +102,31 @@ function isAiAgentMessage(m) {
   return false;
 }
 
+function isHubAutoReply(m) {
+  if (!m || m.role !== "agent") return false;
+  if (isAiAgentMessage(m)) return false;
+  const author = String(m.author || "").toLowerCase();
+  if (author === "ai" || author === "bot" || author === "system" || author === "auto") {
+    return true;
+  }
+  const source = String(m.source || "").toLowerCase();
+  if (
+    source === "ai" ||
+    source === "bot" ||
+    source === "system" ||
+    source === "auto" ||
+    source === "auto-reply"
+  ) {
+    return true;
+  }
+  const body = stripAiPrefix(String(m.body || "")).trim();
+  return /^dzięk\w*\s+za\s+wiadomość/i.test(body);
+}
+
 function detectHumanTakeover(messages) {
   const list = Array.isArray(messages) ? messages : [];
   return list.some(function (m) {
-    return m && m.role === "agent" && !isAiAgentMessage(m);
+    return m && m.role === "agent" && !isAiAgentMessage(m) && !isHubAutoReply(m);
   });
 }
 
@@ -200,7 +221,9 @@ function enrichAgentMessage(m) {
 }
 
 function normalizeMessages(messages) {
-  return (Array.isArray(messages) ? messages : []).map(function (m) {
+  return (Array.isArray(messages) ? messages : []).filter(function (m) {
+    return !(m && m.role === "agent" && isHubAutoReply(m));
+  }).map(function (m) {
     if (!m) return m;
     if (m.role === "agent") return enrichAgentMessage(m);
     return m;
@@ -219,21 +242,42 @@ function resolveActiveAgent(messages, takeover) {
   return { kind: "human", name: "Konsultant" };
 }
 
+function isCannedAiFallback(body) {
+  const t = stripAiPrefix(String(body || "")).trim();
+  if (!t) return false;
+  if (/ogarniam temat/i.test(t)) return true;
+  if (/napisz krótko, co chcesz ruszyć/i.test(t)) return true;
+  return /^dzięk\w*\s+za\s+wiadomość/i.test(t);
+}
+
 function toGeminiContents(history, latestUser) {
   const contents = [];
   const hist = Array.isArray(history) ? history.slice(-12) : [];
-  const latest = String(latestUser).slice(0, 2000);
+  const latest = String(latestUser).trim().slice(0, 2000);
   for (const m of hist) {
     if (!m || !m.body) continue;
+    if (isHubAutoReply(m)) continue;
+    const text = stripAiPrefix(String(m.body)).trim();
+    if (!text || isCannedAiFallback(text)) continue;
     const role = m.role === "agent" || m.role === "model" ? "model" : "user";
-    contents.push({ role, parts: [{ text: String(m.body).slice(0, 2000) }] });
+    const chunk = text.slice(0, 2000);
+    const last = contents[contents.length - 1];
+    if (last && last.role === role) {
+      if (last.parts[0].text !== chunk) {
+        last.parts[0].text = (last.parts[0].text + "\n" + chunk).slice(0, 2000);
+      }
+      continue;
+    }
+    contents.push({ role, parts: [{ text: chunk }] });
   }
-  while (
-    contents.length &&
-    contents[contents.length - 1].role === "user" &&
-    contents[contents.length - 1].parts[0].text === latest
-  ) {
-    contents.pop();
+  while (contents.length && contents[0].role !== "user") contents.shift();
+  const last = contents[contents.length - 1];
+  if (last && last.role === "user") {
+    if (last.parts[0].text === latest || last.parts[0].text.endsWith("\n" + latest)) {
+      return contents;
+    }
+    last.parts[0].text = (last.parts[0].text + "\n" + latest).slice(0, 2000);
+    return contents;
   }
   contents.push({ role: "user", parts: [{ text: latest }] });
   return contents;
@@ -251,19 +295,24 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
   const contents = toGeminiContents(history, latestUser);
   const configs = [
     {
-      temperature: 0.9,
+      temperature: 0.85,
       topP: 0.95,
-      maxOutputTokens: 4096,
-      thinkingConfig: { thinkingBudget: 0 },
+      maxOutputTokens: 2048,
     },
     {
-      temperature: 0.9,
+      temperature: 0.85,
       topP: 0.95,
-      maxOutputTokens: 4096,
+      maxOutputTokens: 2048,
+      thinkingConfig: { thinkingBudget: 0 },
     },
   ];
   const models = Array.from(
-    new Set([GEMINI_MODEL || "gemini-3.6-flash", "gemini-flash-latest", "gemini-2.5-flash"]),
+    new Set([
+      GEMINI_MODEL || "gemini-2.5-flash",
+      "gemini-2.5-flash",
+      "gemini-3.6-flash",
+      "gemini-3.8-flash",
+    ]),
   );
 
   let lastErr = new Error("gemini_failed");
@@ -315,18 +364,30 @@ async function generateGeminiReply({ history, latestUser, pageUrl }) {
         })
         .join("")
         .trim();
-      if (text) return text.slice(0, 2200);
+      if (text && !isCannedAiFallback(text)) return text.slice(0, 2200);
       lastErr = new Error("gemini_empty");
     }
   }
   throw lastErr;
 }
 
-function fallbackAiText() {
+function fallbackAiText(latestUser) {
+  const hint = String(latestUser || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 140)
+    .replace(/[<>"„”]/g, "");
+  if (hint && !/^ale o czym/i.test(hint)) {
+    return (
+      "Rozumiem — chodzi o: " +
+      hint +
+      ". W Cosgral robimy strony, sklepy, CRM, SEO, automatyzacje i wideo. " +
+      "Daj branżę i na kiedy, to Jakub albo Kacper dopną kolejny krok: +48 533 790 518 / +48 571 798 397."
+    );
+  }
   return (
-    "Jasne — ogarniam temat. Napisz proszę 1–2 zdania więcej: co dokładnie chcesz wdrożyć " +
-    "(np. sklep, strona firmowa, CRM, SEO) i na kiedy. " +
-    "Na tej podstawie Jakub lub Kacper dopną wycenę: +48 533 790 518 / +48 571 798 397."
+    "Jasne — napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy. " +
+    "Dopasuję ofertę Cosgral i podłączę Jakuba albo Kacpera: +48 533 790 518 / +48 571 798 397."
   );
 }
 
@@ -425,7 +486,7 @@ export async function handler(event) {
       pageUrl,
     });
   } catch (_) {
-    replyText = fallbackAiText();
+    replyText = fallbackAiText(body);
   }
 
   const pin = (process.env.CHAT_HUB_AGENT_PIN || "").trim();

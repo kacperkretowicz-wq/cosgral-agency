@@ -279,9 +279,29 @@ body.service-page .subpage-cube-portal {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: #fff;
+  background: #f3f3f3;
   opacity: 0;
   will-change: opacity;
+}
+/* Hard light wash — ambient WebGL stays near-black even with brightness(); bloom must paint */
+body.is-grafiki-light .subpage-ambient,
+body.is-grafiki-light .subpage-ambient__blur {
+  z-index: 0;
+}
+body.is-grafiki-light .subpage-ambient__shade {
+  z-index: 0 !important;
+  background: rgba(3, 3, 3, 0.28) !important;
+}
+body.is-grafiki-light .grafiki-bloom {
+  z-index: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+body.is-grafiki-light {
+  --bg: #030303;
+}
+body.is-grafiki-light.portfolio-page {
+  background: #030303;
 }
 .portfolio-scene-curtain {
   position: fixed;
@@ -290,8 +310,10 @@ body.service-page .subpage-cube-portal {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  background:
-    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.94) 100%);
+  background: transparent;
+}
+body.portfolio-page .portfolio-scene-curtain {
+  display: none !important;
 }
 body.is-portfolio-scene-bridge .portfolio-scene-curtain {
   visibility: visible;
@@ -331,24 +353,23 @@ body.is-portfolio-scene-bridge .portfolio-scene-curtain {
   text-transform: uppercase;
   color: var(--ink);
 }
-/* Automatyzacje — zawsze czytelna po chapter intro; bez żyroskopu.
-   Shell: pointer-events none — tylko linki/kafelki łapią klik (pass-through przy cover). */
-body.portfolio-page #automatyzacje.is-entered,
-body.portfolio-page #automatyzacje.is-visible {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: none !important;
+/* Automatyzacje — bez żyroskopu; opacity nie blokuje depth-cover (blur / oddalenie / ściemnienie). */
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-recessed):not(.is-depth-gone),
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-recessed):not(.is-depth-gone) {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: none;
 }
-body.portfolio-page #automatyzacje.is-entered a,
-body.portfolio-page #automatyzacje.is-visible a,
-body.portfolio-page #automatyzacje.is-entered button,
-body.portfolio-page #automatyzacje.is-visible button,
-body.portfolio-page #automatyzacje.is-entered .portfolio-case-card,
-body.portfolio-page #automatyzacje.is-visible .portfolio-case-card,
-body.portfolio-page #automatyzacje.is-entered .portfolio-case-card__link,
-body.portfolio-page #automatyzacje.is-visible .portfolio-case-card__link,
-body.portfolio-page #automatyzacje.is-entered .glass-btn,
-body.portfolio-page #automatyzacje.is-visible .glass-btn {
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) a,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) a,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) button,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) button,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) .portfolio-case-card,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) .portfolio-case-card,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) .portfolio-case-card__link,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) .portfolio-case-card__link,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) .glass-btn,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) .glass-btn {
   pointer-events: auto !important;
 }
 body.portfolio-page #automatyzacje.is-entered .portfolio-scene__panel,
@@ -364,6 +385,11 @@ body.portfolio-page #automatyzacje .home-tilt-face {
 body.portfolio-page #automatyzacje {
   --global-tilt-x: 0deg;
   --global-tilt-y: 0deg;
+}
+body.portfolio-page #strony.is-depth-recessed,
+body.portfolio-page #automatyzacje.is-depth-recessed {
+  overflow: visible;
+  contain: none;
 }
 body.portfolio-page #automatyzacje.is-visible .home-tilt-layer {
   opacity: 1;
@@ -394,8 +420,23 @@ body.about-page .subpage-cube-portal {
   place-items: center;
   opacity: 0.68;
 }
-body.portfolio-page:not(.case-page) .subpage-cube-portal {
-  opacity: 1;
+body.is-auto-cube-hero .portfolio-sand-portal--back {
+  z-index: 0;
+}
+body.is-auto-cube-hero .portfolio-sand-portal--front {
+  z-index: 2;
+  opacity: 0.22;
+}
+body.is-auto-cube-hero .subpage-cube-portal {
+  z-index: 3;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+body.is-auto-cube-hero.portfolio-page.is-portfolio-sand-active main,
+body.is-auto-cube-hero.portfolio-page main {
+  position: relative;
+  z-index: 5;
+  background: transparent;
 }
 .subpage-cube__canvas {
   width: 100%;
@@ -1122,9 +1163,41 @@ html.reduce-motion .nav-overlay__char {
   position: relative;
   z-index: 2;
   padding: clamp(3rem, 8vh, 5rem) var(--gutter);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
-  background: linear-gradient(180deg, rgba(3, 3, 3, 0.35) 0%, rgba(3, 3, 3, 0.72) 55%, rgba(3, 3, 3, 0.85) 100%);
+  background: #030303;
+}
+.portfolio-end {
+  position: relative;
+  z-index: 2;
+  background: #030303;
+}
+/* Tall soft leading edge — light Grafiki blends into the audit/footer band */
+.portfolio-end::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -28vh;
+  height: 28vh;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(
+    to bottom,
+    rgba(3, 3, 3, 0) 0%,
+    rgba(3, 3, 3, 0.15) 35%,
+    rgba(3, 3, 3, 0.55) 70%,
+    #030303 100%
+  );
+}
+.portfolio-end .portfolio-contact-cta {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.portfolio-end .site-footer {
+  background: transparent;
+  border-top: none;
+  margin-top: 0;
 }
 .portfolio-contact-cta__inner {
   display: flex;
@@ -1870,6 +1943,14 @@ html.reduce-motion .portfolio-page--film .home-scroll-rail {
   overflow: visible;
   background: transparent;
 }
+.portfolio-page {
+  --portfolio-cover-run: 72vh;
+}
+@media (max-width: 900px) {
+  .portfolio-page {
+    --portfolio-cover-run: 54vh;
+  }
+}
 .portfolio-page .portfolio-section + .portfolio-section {
   margin-top: 0;
 }
@@ -1896,9 +1977,11 @@ body.portfolio-page #main > [data-portfolio-section].is-depth-gone * {
 }
 body.portfolio-page #main > [data-portfolio-section].home-depth.is-depth-gone,
 body.portfolio-page #main > [data-portfolio-section].is-depth-gone {
-  visibility: hidden !important;
+  /* Keep in layout for continuous cover — only fade out, no visibility snap */
+  visibility: visible !important;
   opacity: 0 !important;
   z-index: 0 !important;
+  pointer-events: none !important;
 }
 body.portfolio-page #main > [data-portfolio-section].is-depth-active {
   z-index: var(--depth-z, 20);
@@ -1913,6 +1996,7 @@ body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .glass-
 body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .portfolio-case-card,
 body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .portfolio-case-card__link,
 body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .reels-tiles__cta,
+body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .auto-cover,
 body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) .graphics-frames-cta,
 body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [data-tile-interact],
 body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [href],
@@ -1920,12 +2004,29 @@ body.portfolio-page #main > [data-portfolio-section]:not(.is-depth-gone) [role="
   pointer-events: auto !important;
   visibility: visible !important;
 }
+/* Soft depth cover — allow slight blur bleed, but clip Montaż tiles to avoid ghost duplicates */
 body.portfolio-page #main > [data-portfolio-section].is-depth-recessed {
-  overflow: visible;
+  overflow: hidden;
+  contain: paint;
 }
-body.portfolio-page #grafiki.is-depth-recessed,
-body.portfolio-page #grafiki.is-depth-gone {
+body.portfolio-page #montaz.is-depth-recessed {
+  overflow: hidden !important;
+  max-height: 100svh;
+  contain: paint;
+}
+/* Grafiki: when recessed under footer, keep overflow visible for soft scale-out */
+body.portfolio-page #grafiki.is-depth-recessed {
   overflow: visible !important;
+  contain: none;
+}
+body.portfolio-page #grafiki.is-grafiki-pinned {
+  overflow: hidden !important;
+}
+body.portfolio-page #grafiki.is-grafiki-pinned .graphics-stage {
+  /* Pin active: never keep leftover recess transforms */
+  transform: none;
+  filter: none;
+  opacity: 1;
 }
 .portfolio-section .container {
   position: relative;
@@ -2160,6 +2261,12 @@ body.portfolio-page #grafiki.is-depth-gone {
   overflow: hidden;
   pointer-events: none;
 }
+/* Cinema visible during Montaż cover approach + pin (tiles fly in as previous recesses) */
+#grafiki .graphics-stage__cinema {
+  opacity: 1;
+  visibility: visible;
+}
+/* Keep GRAFIKI title + button through free-scroll into footer (light end-frame) */
 .graphics-stage__overlay {
   position: relative;
   z-index: 3;
@@ -2414,67 +2521,54 @@ body.is-grafiki-overlay-reveal #grafiki .graphics-collage__footer {
   filter: grayscale(0) !important;
 }
 body.is-grafiki-light #grafiki .graphics-stage__copy {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: rgba(255, 255, 255, 0.68);
-  box-shadow:
-    0 14px 44px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.18);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
-body.is-grafiki-light #grafiki .graphics-stage__copy .portfolio-section__title {
-  text-shadow: 0 1px 14px rgba(255, 255, 255, 0.55);
-}
-body.is-grafiki-light #grafiki .graphics-stage__copy .section-lead {
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.4);
+body.is-grafiki-light #grafiki .graphics-stage__copy .portfolio-section__title,
+body.is-grafiki-light #grafiki .graphics-stage__copy .section-lead,
+body.is-grafiki-light #grafiki .graphics-collage__footer .graphics-collage__cta {
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
 }
 body.is-grafiki-light #grafiki .graphics-collage__footer {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: rgba(255, 255, 255, 0.68);
-  box-shadow:
-    0 14px 44px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.18);
-}
-body.is-grafiki-light #grafiki .graphics-collage__footer .graphics-collage__cta {
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.45);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 body.is-grafiki-light #grafiki .portfolio-section__title,
 body.is-grafiki-light #grafiki .graphics-stage__copy .portfolio-section__title,
-body.is-grafiki-light #grafiki .graphics-collage__footer a {
-  color: #111;
+body.is-grafiki-light #grafiki .graphics-collage__footer a,
+body.is-grafiki-light #grafiki .graphics-collage__cta,
+body.is-grafiki-light .graphics-frames-cta,
+body.is-grafiki-light .graphics-frames-cta__title,
+body.is-grafiki-light .graphics-frames-cta__more {
+  color: var(--ink);
 }
 body.is-grafiki-light #grafiki .section-lead,
 body.is-grafiki-light #grafiki .graphics-stage__copy .section-lead,
 body.is-grafiki-light #grafiki .portfolio-section__link {
-  color: #3a3a3a;
+  color: var(--muted);
 }
 body.is-grafiki-light #grafiki .graphics-collage__cta {
   border-color: transparent;
-  color: #111;
 }
 body.is-grafiki-light #grafiki .graphics-collage__cta:hover {
-  border-color: rgba(0, 0, 0, 0.35);
-  background: rgba(0, 0, 0, 0.04);
-}
-body.is-grafiki-light .graphics-frames-cta,
-body.is-grafiki-light .graphics-frames-cta__title {
-  color: #111;
-  text-shadow: none;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
 }
 body.is-grafiki-light .graphics-frames-cta__more {
-  color: #111;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(8, 8, 10, 0.42);
 }
 body.is-grafiki-light .site-nav__toggle,
 body.is-grafiki-light .lang-switch button,
 body.is-grafiki-light .theme-toggle {
-  color: #111;
+  color: var(--ink);
 }
 body.is-grafiki-light .site-nav__toggle-bars span {
-  background: #111;
+  background: var(--ink);
 }
 
-/* Systemy i Automatyzacje — normalna sekcja ze scrollowalnymi case cards */
+/* Systemy i Automatyzacje — lista na podstronie */
 .portfolio-section--automatyzacje {
   min-height: auto;
   overflow: visible;
@@ -2489,6 +2583,126 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   min-height: 0;
   display: block;
   padding: 0;
+}
+
+/* Realizacje: jeden pełnoekranowy film + napis na kadrze (bez kafelka, bez chapter pin) */
+.portfolio-section--auto-film {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  display: block;
+  overflow: hidden;
+  background: transparent;
+  scroll-margin-top: 0;
+}
+.auto-cover {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+  transform-origin: center center;
+}
+.auto-cover:focus-visible {
+  outline: none;
+}
+.auto-cover:focus-visible .auto-cover__title {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 6px;
+}
+.auto-cover__film {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.auto-cover__video {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  filter: none;
+  background: #050505;
+}
+.auto-cover__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: transparent;
+  pointer-events: none;
+}
+.auto-cover__copy {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.1rem, 2.4vw, 1.6rem);
+  padding: clamp(4.5rem, 10vh, 6.5rem) var(--gutter);
+  text-align: center;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+.auto-cover__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 8vw, 5.5rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--ink);
+  max-width: 16ch;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
+}
+.auto-cover__more.glass-btn,
+.auto-cover__more {
+  pointer-events: none;
+  display: inline-block;
+  padding: 0.55rem 1.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border: 0;
+  border-radius: 999px;
+  background: rgba(8, 8, 10, 0.42);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: none;
+  transition: transform 0.3s var(--ease), filter 0.2s ease;
+}
+.auto-cover:hover .auto-cover__more,
+.auto-cover:focus-visible .auto-cover__more {
+  transform: scale(1.04);
+  filter: brightness(1.12);
+}
+.systems-gallery {
+  padding: 0 var(--gutter) clamp(4rem, 10vh, 6rem);
+}
+.systems-gallery .portfolio-case-grid {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+@media (max-width: 720px) {
+  .auto-cover__title {
+    font-size: clamp(2.1rem, 12vw, 3.2rem);
+  }
 }
 .portfolio-section--automatyzacje .portfolio-section__head {
   margin-bottom: clamp(1.25rem, 3.5vw, 2rem);
@@ -2505,26 +2719,55 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  background: rgba(10, 10, 10, 0.92);
+  border-radius: 12px;
+  background: #111;
   overflow: hidden;
   min-height: 100%;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: border-color 0.45s var(--ease), box-shadow 0.45s var(--ease);
+}
+.portfolio-case-card:hover,
+.portfolio-case-card:focus-within {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 .portfolio-case-card__preview {
   position: relative;
   aspect-ratio: 16 / 9;
   display: grid;
   place-items: center;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
-  background: #0a0a0a;
+  background: #111;
+}
+.portfolio-case-card--telforce .portfolio-case-card__preview {
+  background: #0c0a0b;
+}
+.portfolio-case-card--app .portfolio-case-card__preview {
+  background: #080807;
+}
+.portfolio-case-card--crm .portfolio-case-card__preview {
+  background: #0d0b0c;
+}
+.portfolio-case-card--bot .portfolio-case-card__preview {
+  background: #111;
+}
+.portfolio-case-card--flow .portfolio-case-card__preview {
+  background: #0c0a0b;
 }
 .portfolio-case-card__visual {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.portfolio-case-card__preview video.portfolio-case-card__visual {
+  position: absolute;
+  inset: 0;
 }
 .portfolio-case-card__glyph {
   position: absolute;
@@ -2538,6 +2781,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   flex-direction: column;
   gap: 0.4rem;
   padding: clamp(0.95rem, 2.2vw, 1.25rem);
+  background: linear-gradient(180deg, #111 0%, #0c0a0b 100%);
 }
 .portfolio-case-card__tag {
   font-family: var(--font-mono);
@@ -2548,7 +2792,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
 }
 .portfolio-case-card__client {
   font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(245, 245, 245, 0.78);
   letter-spacing: 0.02em;
 }
 .portfolio-case-card__title {
@@ -2563,7 +2807,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   margin-top: 0.15rem;
   font-size: 0.92rem;
   line-height: 1.58;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(136, 136, 136, 0.95);
 }
 @media (max-width: 900px) {
   .portfolio-section--automatyzacje {
@@ -2606,7 +2850,7 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   .portfolio-case-card__desc {
     font-size: 0.92rem;
     line-height: 1.55;
-    color: rgba(255, 255, 255, 0.78);
+    color: rgba(136, 136, 136, 0.95);
   }
   .portfolio-case-card__client {
     font-size: 0.88rem;

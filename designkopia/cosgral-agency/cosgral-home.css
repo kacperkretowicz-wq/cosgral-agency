@@ -1038,23 +1038,24 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 }
 .services-fan.home-scene .services-fan__head { margin-bottom: 0.35rem; }
 
-/* Pełne boczne strefy kliknięcia — pe:auto mimo pe:none na sekcji depth */
+/* Pełne boczne strefy kliknięcia — nad aktywnym kafelkiem (z:100), pe:auto mimo pe:none na sekcji */
 .services-fan__side-hit {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: min(34%, 16rem);
-  z-index: 30;
+  width: 42%;
+  max-width: none;
+  z-index: 120;
   margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
-  cursor: w-resize;
+  cursor: pointer;
   pointer-events: auto !important;
   -webkit-tap-highlight-color: transparent;
 }
-.services-fan__side-hit--prev { left: 0; cursor: w-resize; }
-.services-fan__side-hit--next { right: 0; cursor: e-resize; }
+.services-fan__side-hit--prev { left: 0; }
+.services-fan__side-hit--next { right: 0; }
 .services-fan__side-hit:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.35);
   outline-offset: -4px;

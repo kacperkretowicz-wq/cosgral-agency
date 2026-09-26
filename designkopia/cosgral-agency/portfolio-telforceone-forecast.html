@@ -12,9 +12,10 @@
 <meta name="description" content="Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania." />
 <link rel="canonical" href="https://cosgral.pl/portfolio-telforceone-forecast.html" />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260925mobile2" />
-<link rel="stylesheet" href="telforce-cases.css?v=20260925nofx1" />
-<script src="telforce-previews.js?v=20260924tfo1" defer></script>
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260925fix18" />
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz2" />
+<link rel="stylesheet" href="case-viz-tiles.css?v=20260925viz3" />
+<script src="case-viz-tiles.js?v=20260925viz3" defer></script>
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
 <script>
@@ -24,7 +25,7 @@
     }
   })();
 </script>
-<script src="page-transitions.js?v=20260924hash1"></script>
+<script src="page-transitions.js?v=20260925fix21"></script>
 <script src="cosgral-motion-pref.js?v=20260919a"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
   <link rel="stylesheet" href="site-chat.css?v=20260925fix2" />
@@ -69,37 +70,201 @@
 </div>
 
 <main id="main">
-    <article class="case-study case-study--systems">
-  <div class="case-study__top">
-    <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
-    <div class="case-study__meta">
-      <p class="case-study__eyebrow" data-i18n="portfolio.tf_forecast_tag">Analityka / zapasy</p>
-      <p class="case-study__client">TelForceOne S.A.</p>
+        <article class="case-study case-study--systems case-study--viz">
+  <header class="case-viz-intro">
+    <div class="case-viz-intro__main">
+      <p class="case-study__back"><a href="portfolio-systemy.html" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
+      <h1 class="case-study__title" data-i18n="portfolio.tf_forecast_title">Kontrola stanów i prognozowanie</h1>
+      <p class="case-study__lede" data-i18n="portfolio.tf_forecast_lede">Aplikacja do kontroli stanów i prognozowania zapotrzebowania.</p>
     </div>
-    <h1 class="case-study__title" data-i18n="portfolio.tf_forecast_title">Kontrola stanów i prognozowanie</h1>
-    <p class="case-study__lede" data-i18n="portfolio.tf_forecast_lede">Aplikacja do kontroli stanów i prognozowania zapotrzebowania.</p>
-    <ul class="case-study__signals" aria-label="Zakres">
-      <li data-i18n="portfolio.tf_forecast_s1">Stany magazynowe</li>
-      <li data-i18n="portfolio.tf_forecast_s2">Prognoza popytu</li>
-      <li data-i18n="portfolio.tf_forecast_s3">Alerty braków</li>
-    </ul>
+    <aside class="case-viz-intro__aside">
+      <div class="case-study__meta">
+        <p class="case-study__eyebrow" data-i18n="portfolio.tf_forecast_tag">Analityka / zapasy</p>
+          <p class="case-study__client">TelForceOne S.A.</p>
+      </div>
+      <ol class="case-viz-intro__index" aria-label="Moduły systemu">
+        <li><a href="#viz-stock"><span>01</span>Stany</a></li>
+        <li><a href="#viz-trend"><span>02</span>Trend</a></li>
+        <li><a href="#viz-demand"><span>03</span>Popyt</a></li>
+        <li><a href="#viz-short"><span>04</span>Braki</a></li>
+        <li><a href="#viz-reorder"><span>05</span>Reorder</a></li>
+        <li><a href="#viz-sku"><span>06</span>SKU</a></li>
+        <li><a href="#viz-decide"><span>07</span>Decyzja</a></li>
+      </ol>
+    </aside>
+  </header>
+
+  <div class="case-viz-rail" aria-label="Wizualizacje systemu">
+    <section class="case-viz-tile" id="viz-stock">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">01</span>
+        <h2 class="case-viz-tile__title">Snapshot stanów</h2>
+        <p class="case-viz-tile__text">Aktualne pokrycie magazynu: SKU poniżej minimum, wartość zapasu, rotacja.</p>
+        <span class="case-viz-tile__hint">Snapshot</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="kpi" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget" data-viz-root>
+            <p class="viz-widget__label">Live snapshot</p>
+            <div class="viz-kpi">
+        <div class="viz-kpi__card"><span>SKU</span><b data-to="940" data-suffix="" data-prefix="">940</b></div>
+        <div class="viz-kpi__card"><span>Below min</span><b data-to="23" data-suffix="" data-prefix="">23</b></div>
+        <div class="viz-kpi__card"><span>Dni cover</span><b data-to="18" data-suffix="" data-prefix="">18</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-trend">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">02</span>
+        <h2 class="case-viz-tile__title">Trend zużycia</h2>
+        <p class="case-viz-tile__text">Przesuń sondę po wykresie, by odczytać punkt na historii sprzedaży.</p>
+        <span class="case-viz-tile__hint">Przesuń po linii</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="chart" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Trend · przesuń sondę</p>
+            <div class="viz-chart">
+              <svg viewBox="0 0 320 160" role="img" aria-label="Wykres">
+                <path class="viz-chart__line" d="M10 140 L50 120 L90 128 L130 96 L170 110 L210 78 L250 88 L290 60"/>
+                <circle class="viz-chart__probe" cx="170" cy="110" r="6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-demand">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">03</span>
+        <h2 class="case-viz-tile__title">Prognoza popytu</h2>
+        <p class="case-viz-tile__text">Słupki forecastu na kolejne tygodnie — klik losuje korektę scenariusza.</p>
+        <span class="case-viz-tile__hint">Hover / klik</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="bars" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Stany · hover / klik</p>
+            <div class="viz-bars">
+              <div class="viz-bars__col" data-h="36"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="48"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="52"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="60"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="70"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="66"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="78"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="84"><div class="viz-bars__fill"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-short">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">04</span>
+        <h2 class="case-viz-tile__title">Alerty braków</h2>
+        <p class="case-viz-tile__text">Feed ryzyk: kiedy SKU spadnie poniżej bezpiecznego progu.</p>
+        <span class="case-viz-tile__hint">Pulse</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="alerts" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Alert feed</p>
+            <div class="viz-alert-feed">
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>SKU-220 · 4 dni</span><span>krytyczne</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>SKU-881 · 9 dni</span><span>wysokie</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>SKU-104 · 14 dni</span><span>średnie</span></div>
+              <div class="viz-alert-feed__row"><span class="viz-alert-feed__dot" aria-hidden="true"></span><span>Reorder draft</span><span>gotowe</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-reorder">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">05</span>
+        <h2 class="case-viz-tile__title">Sugestia zamówienia</h2>
+        <p class="case-viz-tile__text">Kroki od sygnału braku do draftu PO.</p>
+        <span class="case-viz-tile__hint">Kliknij krok</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="steps" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Flow · kliknij krok</p>
+            <div class="viz-steps">
+            <button type="button" class="viz-steps__node">Sygnał</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Ilość</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Dostawca</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">PO</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-sku">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">06</span>
+        <h2 class="case-viz-tile__title">Focus SKU</h2>
+        <p class="case-viz-tile__text">Orbit pokazuje powiązania: stan ↔ forecast ↔ zakup ↔ alert.</p>
+        <span class="case-viz-tile__hint">Orbit</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="orbit" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Kanały</p>
+            <div class="viz-orbit">
+              <div class="viz-orbit__ring" aria-hidden="true"></div>
+              <div class="viz-orbit__core">SKU</div>
+              <div class="viz-orbit__node">Stan</div>
+              <div class="viz-orbit__node">FC</div>
+              <div class="viz-orbit__node">Zakup</div>
+              <div class="viz-orbit__node">Alert</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-decide">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">07</span>
+        <h2 class="case-viz-tile__title">Panel decyzji</h2>
+        <p class="case-viz-tile__text">Gauge pewności prognozy — im wyżej, tym bezpieczniejsza decyzja zakupowa.</p>
+        <span class="case-viz-tile__hint">Przesuń</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="gauge" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Confidence · przesuń</p>
+            <div class="viz-gauge">
+              <div class="viz-gauge__arc"><div class="viz-gauge__needle"></div></div>
+              <div class="viz-gauge__value">62%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  <div class="case-study__stage">
-    <div class="case-study__film case-study__film--visual">
-      <div class="case-study__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
-      <img src="assets/cases/telforceone-forecast.svg?v=20260925cases2" width="640" height="360" alt="Poglądowa wizualizacja: stany magazynowe i prognozowanie" fetchpriority="high" />
-      <span class="case-study__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-    </div>
-  </div>
-  <div class="case-study__body">
-    <div class="case-study__copy">
-      <p data-i18n="portfolio.tf_forecast_p1">Trzecia aplikacja dla TelForceOne S.A. skupia się na kontroli stanów i prognozowaniu. Łączy bieżący widok zapasów z perspektywą przyszłego zapotrzebowania.</p>
-      <p data-i18n="portfolio.tf_forecast_p2">Takie zestawienie pomaga zespołowi wychwycić ryzyko braków oraz planować kolejne decyzje zakupowe na podstawie danych. Wizualizacja powyżej pokazuje ideę połączenia stanów, trendu i prognozy.</p>
-      <p data-i18n="portfolio.tf_forecast_p3">W projekcie ważna jest czytelność: najpierw stan, potem zmiana w czasie i sygnał wymagający uwagi. Dzięki temu panel wspiera szybkie decyzje operacyjne.</p>
+
+  <div class="case-viz-close">
+    <div class="case-viz-close__copy">
+        <p data-i18n="portfolio.tf_forecast_p1">Aplikacja łączy bieżący widok zapasów z perspektywą przyszłego zapotrzebowania.</p>
+        <p data-i18n="portfolio.tf_forecast_p3">Czytelność: najpierw stan, potem trend i sygnał wymagający uwagi.</p>
     </div>
     <aside class="case-study__aside">
       <p class="case-study__aside-label">TelForceOne S.A. / <span data-i18n="portfolio.tf_forecast_tag">Analityka / zapasy</span></p>
-      <a class="glass-btn case-study__visit" href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a>
+      <a class="glass-btn case-study__visit" href="portfolio-systemy.html" data-i18n="portfolio.tf_back">← Wróć do realizacji</a>
       <a class="case-study__cta glass-btn" href="index.html#kontakt" data-i18n="about.cta">Porozmawiajmy o projekcie</a>
     </aside>
   </div>
@@ -178,7 +343,7 @@
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script src="sections.js?v=20260814e"></script>
 <script src="portfolio-video.js?v=20260807ag"></script>
-<script defer src="site-chat.js?v=20260925fix2"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
+<script defer src="site-chat.js?v=20260926chat7"></script>
+<script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
 </body>
 </html>

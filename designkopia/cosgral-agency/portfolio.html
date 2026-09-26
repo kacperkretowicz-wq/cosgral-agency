@@ -11,7 +11,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="cosgral-build" content="20260917af" />
+<meta name="cosgral-build" content="20260926tabs6" />
 <script src="site-cache-bust.js?v=20260831e"></script>
 <title>Portfolio — cosgral.agency</title>
 <meta name="description" content="Realizacje — montaż wideo, kreacja graficzna, strony internetowe, systemy i automatyzacje." />
@@ -23,7 +23,7 @@
 <meta property="og:description" content="Realizacje — montaż wideo, kreacja graficzna, strony internetowe, systemy i automatyzacje." />
 <meta property="og:image" content="https://cosgral.pl/og-cover.png" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="theme-color" content="#050505" />
+<meta name="theme-color" content="#070709" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -35,12 +35,10 @@
 }
 </script>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260925anim1" />
-<link rel="stylesheet" href="telforce-cases.css?v=20260925anim1" />
-<script src="telforce-previews.js?v=20260925anim1" defer></script>
-<link rel="stylesheet" href="web-case-panel.css?v=20260924polish1" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260926tabs6" />
+<link rel="stylesheet" href="portfolio-tiles.css?v=20260926tabs6" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
-<link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
+<link rel="stylesheet" href="page-transitions.css?v=20260925webdeck1" />
 <script>
   (function () {
     if (sessionStorage.getItem("cosgral-page-transition")) {
@@ -48,12 +46,12 @@
     }
   })();
 </script>
-<script src="page-transitions.js?v=20260924hash1"></script>
+<script src="page-transitions.js?v=20260925fix21"></script>
 <script src="cosgral-motion-pref.js?v=20260831e"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
   <link rel="stylesheet" href="site-chat.css?v=20260925fix2" />
 </head>
-<body class="subpage portfolio-page">
+<body class="subpage portfolio-page portfolio-page--tiles" data-tile-theme="web">
 <a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
 
 <canvas id="subpage-ambient" class="subpage-ambient" aria-hidden="true"></canvas>
@@ -62,14 +60,6 @@
 <div class="subpage-cube-portal" aria-hidden="true">
   <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
 </div>
-<div class="portfolio-sand-portal portfolio-sand-portal--back" aria-hidden="true">
-  <canvas id="portfolio-sand-back" class="portfolio-sand__canvas"></canvas>
-</div>
-<div class="portfolio-sand-portal portfolio-sand-portal--front" aria-hidden="true">
-  <canvas id="portfolio-sand-front" class="portfolio-sand__canvas"></canvas>
-</div>
-<div class="grafiki-bloom" id="grafiki-bloom" aria-hidden="true"></div>
-<div class="portfolio-scene-curtain" data-portfolio-scene-curtain aria-hidden="true"></div>
 
 <nav class="site-nav" id="site-nav">
   <a href="index.html#top" class="site-nav__logo" data-i18n-aria-label="common.logo_aria" aria-label="COSGRAL — strona główna">
@@ -103,211 +93,124 @@
   </div>
 </div>
 
-<main id="main">
-  <header class="portfolio-hero">
-    <h1 class="portfolio-hero__title" data-i18n="portfolio.hero_title">Realizacje</h1>
-    <p class="portfolio-hero__lead" data-i18n="portfolio.hero_lead">Wybrane projekty stron, wideo, grafiki oraz systemów i automatyzacji.</p>
-  </header>
+<canvas class="portfolio-tile-bg" data-portfolio-tile-bg aria-hidden="true"></canvas>
 
-  <section id="strony" class="portfolio-section portfolio-section--web" data-portfolio-section>
-    <div class="container">
-      <div class="portfolio-section__head" data-portfolio-head>
-        <h2 class="portfolio-section__title" data-i18n="portfolio.web_title">Strony internetowe</h2>
-        <p class="section-lead" data-i18n="portfolio.web_lead">Od landing page po serwisy firmowe i sklepy — projekt i wdrożenie pod cele biznesowe.</p>
-        <a class="portfolio-section__link" href="uslugi/tworzenie-stron-internetowych.html" data-i18n="portfolio.web_service">Usługa: strony internetowe →</a>
+<div class="portfolio-theme-stage" data-portfolio-theme-stage aria-hidden="true">
+  <div class="portfolio-theme-layer" data-theme-layer="web">
+    <video class="portfolio-theme-layer__video" muted loop playsinline preload="metadata" poster="portfolio-media/showcase/web/juicy-events-poster.jpg" data-theme-video src="portfolio-media/showcase/web/juicy-events.mp4"></video>
+    <div class="portfolio-theme-layer__veil portfolio-theme-layer__veil--web"></div>
+  </div>
+
+  <div class="portfolio-theme-layer" data-theme-layer="systems">
+    <div class="portfolio-systems-field" data-systems-field></div>
+  </div>
+
+  <div class="portfolio-theme-layer" data-theme-layer="video">
+    <div class="portfolio-montaz-rail" data-montaz-rail>
+      <div class="portfolio-montaz-rail__belt">
+        <div class="portfolio-montaz-rail__track" data-montaz-track>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--lg"><img src="portfolio-media/reels/orlincy/006-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/006-poster.jpg" data-theme-video src="portfolio-media/reels/orlincy/006.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--sm"><img src="portfolio-media/reels/reklamy/001-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/reklamy/001-poster.jpg" data-theme-video src="portfolio-media/reels/reklamy/001.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--md"><img src="portfolio-media/reels/orlincy/001-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/001-poster.jpg" data-theme-video src="portfolio-media/reels/orlincy/001.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--xl"><img src="portfolio-media/reels/reklamy/002-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/reklamy/002-poster.jpg" data-theme-video src="portfolio-media/reels/reklamy/002.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--sm"><img src="portfolio-media/reels/orlincy/002-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/002-poster.jpg" data-theme-video src="portfolio-media/reels/orlincy/002.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--lg"><img src="portfolio-media/reels/reklamy/003-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/reklamy/003-poster.jpg" data-theme-video src="portfolio-media/reels/reklamy/003.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--md"><img src="portfolio-media/reels/orlincy/003-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/003-poster.jpg" data-theme-video src="portfolio-media/reels/orlincy/003.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--sm"><img src="portfolio-media/reels/reklamy/004-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/reklamy/004-poster.jpg" data-theme-video src="portfolio-media/reels/reklamy/004.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--xl"><img src="portfolio-media/reels/orlincy/004-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/004-poster.jpg" data-theme-video src="portfolio-media/reels/orlincy/004.mp4"></video></div>
+          <div class="portfolio-montaz-rail__card portfolio-montaz-rail__card--md"><img src="portfolio-media/reels/reklamy/005-poster.jpg" alt="" loading="eager" decoding="async" /><video muted loop playsinline preload="metadata" poster="portfolio-media/reels/reklamy/005-poster.jpg" data-theme-video src="portfolio-media/reels/reklamy/005.mp4"></video></div>
+        </div>
       </div>
-      <div class="web-deck" data-web-deck data-portfolio-body data-cursor="drag-x">
-        <div class="web-deck__viewport">
-          <div class="web-deck__track" data-web-deck-track>
-            <button type="button" class="web-deck__card" data-web-case="juicy" aria-label="Juicy Events">
-              <div class="web-deck__preview web-deck__preview--juicy" aria-hidden="true">
-                <div class="web-deck__chrome"><span></span><span></span><span></span></div>
-                <video class="web-deck__video" data-portfolio-video data-video-mode="focus-only" data-video-src="portfolio-media/showcase/web/juicy-events.mp4" poster="portfolio-media/showcase/web/juicy-events-poster.jpg" muted loop playsinline preload="metadata"></video>
-              </div>
-              <div class="web-deck__body">
-                <h3 class="web-deck__title" data-i18n="portfolio.juicy_title">Juicy Events</h3>
-                <p class="web-deck__desc" data-i18n="portfolio.juicy_desc">Agencja eventowa</p>
-              </div>
-            </button>
-            <button type="button" class="web-deck__card" data-web-case="trove" aria-label="Trove Archive">
-              <div class="web-deck__preview web-deck__preview--trove" aria-hidden="true">
-                <div class="web-deck__chrome"><span></span><span></span><span></span></div>
-                <video class="web-deck__video" data-portfolio-video data-video-mode="focus-only" data-video-src="portfolio-media/showcase/web/trove-archive.mp4" poster="portfolio-media/showcase/web/trove-archive-poster.jpg" muted loop playsinline preload="metadata"></video>
-              </div>
-              <div class="web-deck__body">
-                <h3 class="web-deck__title" data-i18n="portfolio.trove_title">Trove Archive</h3>
-                <p class="web-deck__desc" data-i18n="portfolio.trove_desc">Ecommerce fashion</p>
-              </div>
-            </button>
-            <button type="button" class="web-deck__card" data-web-case="mj" aria-label="MJ Social Media">
-              <div class="web-deck__preview web-deck__preview--mj" aria-hidden="true">
-                <div class="web-deck__chrome"><span></span><span></span><span></span></div>
-                <video class="web-deck__video" data-portfolio-video data-video-mode="focus-only" data-video-src="portfolio-media/showcase/web/mj-social-media.mp4" poster="portfolio-media/showcase/web/mj-social-media-poster.jpg" muted loop playsinline preload="metadata"></video>
-              </div>
-              <div class="web-deck__body">
-                <h3 class="web-deck__title" data-i18n="portfolio.mj_title">MJ Social Media</h3>
-                <p class="web-deck__desc" data-i18n="portfolio.mj_desc">Content creator</p>
-              </div>
-            </button>
+    </div>
+    <div class="portfolio-theme-layer__veil portfolio-theme-layer__veil--video"></div>
+  </div>
+
+  <div class="portfolio-theme-layer" data-theme-layer="graphics">
+    <div class="portfolio-grafiki-drift" data-grafiki-drift>
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/001.jpg" alt="" loading="lazy" decoding="async" />
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/005.jpg" alt="" loading="lazy" decoding="async" />
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/008.jpg" alt="" loading="lazy" decoding="async" />
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/012.jpg" alt="" loading="lazy" decoding="async" />
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/015.jpg" alt="" loading="lazy" decoding="async" />
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/018.jpg" alt="" loading="lazy" decoding="async" />
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/021.jpg" alt="" loading="lazy" decoding="async" />
+      <img class="portfolio-grafiki-drift__item" src="portfolio-media/graphics/juicy-events/024.jpg" alt="" loading="lazy" decoding="async" />
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <section class="portfolio-tiles" data-portfolio-tiles aria-label="Kategorie realizacji">
+    <div class="portfolio-tiles__scroller" data-portfolio-tiles-scroller>
+      <a class="portfolio-tile is-active" href="portfolio-strony.html" data-portfolio-tile data-theme="web" id="strony">
+        <div class="portfolio-tile__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="portfolio-tile__media">
+          <video muted loop playsinline preload="metadata" poster="portfolio-media/showcase/web/juicy-events-poster.jpg" data-card-video src="portfolio-media/showcase/web/juicy-events.mp4"></video>
+        </div>
+        <div class="portfolio-tile__body">
+          <h2 class="portfolio-tile__title" data-i18n="portfolio.web_title">Strony internetowe</h2>
+          <p class="portfolio-tile__lead" data-i18n="portfolio.web_lead">Od landing page po serwisy firmowe i sklepy.</p>
+          <span class="portfolio-tile__cta" data-i18n="portfolio.tile_open">Zobacz realizacje</span>
+        </div>
+      </a>
+
+      <a class="portfolio-tile" href="portfolio-systemy.html" data-portfolio-tile data-theme="systems" id="automatyzacje">
+        <div class="portfolio-tile__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="portfolio-tile__media">
+          <div class="portfolio-tile__systems">
+            <div class="portfolio-tile__systems-cube"></div>
           </div>
         </div>
-        <p class="web-deck__hint" data-i18n="portfolio.web_deck_hint">Przesuń trackpadem między projektami</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="montaz" class="portfolio-section" data-portfolio-section>
-    <div class="container">
-      <div class="portfolio-section__head" data-portfolio-head>
-        <h2 class="portfolio-section__title" data-i18n="portfolio.montaz_title">Montaż wideo</h2>
-        <p class="section-lead" data-i18n="portfolio.montaz_lead">Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.</p>
-        <a class="portfolio-section__link" href="uslugi/grafika-i-montaz-wideo.html" data-i18n="portfolio.montaz_service">Usługa: montaż i wideo →</a>
-      </div>
-      <div data-portfolio-body>
-        <div id="reels-tiles" class="reels-tiles"></div>
-        <p class="reels-tiles__footer">
-          <a class="reels-tiles__cta glass-btn" href="portfolio-montaz.html" data-i18n="portfolio.view_more">Zobacz więcej →</a>
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section id="grafiki" class="portfolio-section portfolio-section--grafiki" data-portfolio-section>
-    <div class="graphics-stage">
-      <div class="graphics-stage__cinema" data-portfolio-body>
-        <div id="graphics-collage" class="graphics-collage"></div>
-      </div>
-      <div class="graphics-stage__overlay" aria-hidden="true">
-        <a class="graphics-frames-cta" href="portfolio-grafiki.html" data-graphics-frames-cta>
-          <span class="graphics-frames-cta__title" data-i18n="portfolio.grafiki_title">Grafiki</span>
-          <span class="graphics-frames-cta__more glass-btn" data-i18n="portfolio.see_more_graphics">Zobacz więcej →</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section id="automatyzacje-intro" class="portfolio-chapter" data-portfolio-chapter aria-label="Systemy i automatyzacje">
-    <h2 class="portfolio-chapter__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
-  </section>
-
-  <section id="automatyzacje" class="portfolio-section portfolio-section--automatyzacje portfolio-scene" data-portfolio-section>
-    <div class="portfolio-scene__panel">
-      <div class="container">
-        <div class="portfolio-section__head" data-portfolio-head>
-          <h2 class="portfolio-section__title visually-hidden" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
-          <p class="section-lead" data-i18n="portfolio.automation_lead">Aplikacje, CRM i procesy automatyczne, które porządkują sprzedaż, operacje i komunikację z klientem.</p>
-          <a class="portfolio-section__link" href="uslugi/wdrazanie-automatyzacji.html" data-i18n="portfolio.automation_service">Usługa: automatyzacje →</a>
+        <div class="portfolio-tile__body">
+          <h2 class="portfolio-tile__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
+          <p class="portfolio-tile__lead" data-i18n="portfolio.automation_tile_lead">CRM, aplikacje i workflow, które odciążają zespół.</p>
+          <span class="portfolio-tile__cta" data-i18n="portfolio.tile_open">Zobacz realizacje</span>
         </div>
-        <div class="portfolio-case-grid" data-portfolio-body>
-          <article class="portfolio-case-card portfolio-case-card--telforce" role="article">
-            <a class="portfolio-case-card__link" href="portfolio-telforceone-crm.html" aria-label="TelForceOne S.A. — CRM z mapą dla przedstawicieli handlowych">
-              <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
-                <img class="portfolio-case-card__visual" src="assets/cases/telforceone-crm.svg?v=20260924polish1" alt="Poglądowa wizualizacja CRM z mapą i trasą handlowca" width="640" height="360" loading="lazy" decoding="async" />
-                <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-              </div>
-              <div class="portfolio-case-card__body">
-                <p class="portfolio-case-card__tag" data-i18n="portfolio.tf_crm_tag">CRM / sprzedaż terenowa</p>
-                <p class="portfolio-case-card__client">TelForceOne S.A.</p>
-                <h3 class="portfolio-case-card__title" data-i18n="portfolio.tf_crm_title">CRM z bazą danych i mapą handlowców</h3>
-                <p class="portfolio-case-card__desc" data-i18n="portfolio.tf_crm_description">Jedno miejsce na dane klientów, planowanie wizyt i pracę przedstawicieli w terenie. Mapa pomaga zobaczyć zasięg i kolejność spotkań.</p>
-                <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
-              </div>
-            </a>
-          </article>
-          <article class="portfolio-case-card portfolio-case-card--telforce" role="article">
-            <a class="portfolio-case-card__link" href="portfolio-telforceone-code39.html" aria-label="TelForceOne S.A. — generator kodów kreskowych Code 39">
-              <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
-                <img class="portfolio-case-card__visual" src="assets/cases/telforceone-code39.svg?v=20260924polish1" alt="Poglądowa wizualizacja generatora kodów Code 39 i etykiety" width="640" height="360" loading="lazy" decoding="async" />
-                <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-              </div>
-              <div class="portfolio-case-card__body">
-                <p class="portfolio-case-card__tag" data-i18n="portfolio.tf_code39_tag">Narzędzie / identyfikacja</p>
-                <p class="portfolio-case-card__client">TelForceOne S.A.</p>
-                <h3 class="portfolio-case-card__title" data-i18n="portfolio.tf_code39_title">Generator kodów kreskowych Code 39</h3>
-                <p class="portfolio-case-card__desc" data-i18n="portfolio.tf_code39_description">Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.</p>
-                <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
-              </div>
-            </a>
-          </article>
-          <article class="portfolio-case-card portfolio-case-card--telforce" role="article">
-            <a class="portfolio-case-card__link" href="portfolio-telforceone-forecast.html" aria-label="TelForceOne S.A. — aplikacja stanów magazynowych i prognozowania">
-              <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
-                <img class="portfolio-case-card__visual" src="assets/cases/telforceone-forecast.svg?v=20260924polish1" alt="Poglądowa wizualizacja stanów magazynowych i wykresu prognozy" width="640" height="360" loading="lazy" decoding="async" />
-                <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-              </div>
-              <div class="portfolio-case-card__body">
-                <p class="portfolio-case-card__tag" data-i18n="portfolio.tf_forecast_tag">Analityka / zapasy</p>
-                <p class="portfolio-case-card__client">TelForceOne S.A.</p>
-                <h3 class="portfolio-case-card__title" data-i18n="portfolio.tf_forecast_title">Kontrola stanów i prognozowanie</h3>
-                <p class="portfolio-case-card__desc" data-i18n="portfolio.tf_forecast_description">Widok zapasów i prognoz popytu wspiera planowanie zakupów oraz szybsze wychwytywanie ryzyka braków.</p>
-                <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
-              </div>
-            </a>
-          </article>
-          <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--app" role="article">
-            <a class="portfolio-case-card__link" href="portfolio-trove-panel.html" aria-label="Trove — panel sklepu i monitoring cen">
-              <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
-                <img class="portfolio-case-card__visual" src="assets/cases/shelfsync.svg?v=20260925brand2" alt="Panel sklepu i monitoring cen — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
-                <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-              </div>
-              <div class="portfolio-case-card__body">
-                <p class="portfolio-case-card__tag" data-i18n="portfolio.auto1_tag">Aplikacja</p>
-                <p class="portfolio-case-card__client" data-i18n="portfolio.auto1_client">Trove</p>
-                <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto1_title">Panel sklepu i monitoring cen</h3>
-                <p class="portfolio-case-card__desc" data-i18n="portfolio.auto1_desc">Stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.</p>
-                <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
-              </div>
-            </a>
-          </article>
-          <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--crm" role="article">
-            <a class="portfolio-case-card__link" href="portfolio-crm-leady.html" aria-label="CRM leadów, dealów i operacji sprzedażowych">
-              <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
-                <img class="portfolio-case-card__visual" src="assets/cases/northline-crm.svg?v=20260925brand2" alt="CRM leadów i pipeline — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
-                <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-              </div>
-              <div class="portfolio-case-card__body">
-                <p class="portfolio-case-card__tag" data-i18n="portfolio.auto2_tag">CRM</p>
-                <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto2_title">CRM leadów, dealów i operacji sprzedażowych</h3>
-                <p class="portfolio-case-card__desc" data-i18n="portfolio.auto2_desc">Narzędzie do prowadzenia sprzedaży: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów.</p>
-                <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
-              </div>
-            </a>
-          </article>
-          <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--bot" role="article">
-            <a class="portfolio-case-card__link" href="portfolio-chatbot-ai.html" aria-label="Chatbot AI do wiadomości klientów">
-              <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
-                <img class="portfolio-case-card__visual" src="assets/cases/atelier-bloom.svg?v=20260925brand2" alt="Chatbot AI do wiadomości klientów — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
-                <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-              </div>
-              <div class="portfolio-case-card__body">
-                <p class="portfolio-case-card__tag" data-i18n="portfolio.auto3_tag">Automatyzacja</p>
-                <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto3_title">Chatbot AI do wiadomości klientów</h3>
-                <p class="portfolio-case-card__desc" data-i18n="portfolio.auto3_desc">Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź 24/7.</p>
-                <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
-              </div>
-            </a>
-          </article>
-          <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--flow" role="article">
-            <a class="portfolio-case-card__link" href="portfolio-trove-workflow.html" aria-label="Trove — zamówienie, faktura, status paczki">
-              <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
-                <img class="portfolio-case-card__visual" src="assets/cases/parcel-co.svg?v=20260925brand2" alt="Workflow zamówienie → faktura → status paczki — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
-                <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-              </div>
-              <div class="portfolio-case-card__body">
-                <p class="portfolio-case-card__tag" data-i18n="portfolio.auto4_tag">Automatyzacja</p>
-                <p class="portfolio-case-card__client" data-i18n="portfolio.auto4_client">Trove</p>
-                <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto4_title">Zamówienie → faktura → status paczki</h3>
-                <p class="portfolio-case-card__desc" data-i18n="portfolio.auto4_desc">Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta. Mniej ręcznej pracy przy obsłudze zamówień.</p>
-                <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
-              </div>
-            </a>
-          </article>
+      </a>
+
+      <a class="portfolio-tile" href="portfolio-montaz.html" data-portfolio-tile data-theme="video" id="montaz">
+        <div class="portfolio-tile__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="portfolio-tile__media">
+          <video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/006-poster.jpg" data-card-video src="portfolio-media/reels/orlincy/006-full.mp4"></video>
         </div>
-      </div>
+        <div class="portfolio-tile__body">
+          <h2 class="portfolio-tile__title" data-i18n="portfolio.montaz_title">Montaż wideo</h2>
+          <p class="portfolio-tile__lead" data-i18n="portfolio.montaz_lead">Reels i materiały reklamowe</p>
+          <span class="portfolio-tile__cta" data-i18n="portfolio.tile_open">Zobacz realizacje</span>
+        </div>
+      </a>
+
+      <a class="portfolio-tile" href="portfolio-grafiki.html" data-portfolio-tile data-theme="graphics" id="grafiki">
+        <div class="portfolio-tile__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="portfolio-tile__media">
+          <div class="portfolio-tile__slides">
+            <img class="portfolio-tile__slide is-on" data-tile-slide src="portfolio-media/graphics/juicy-events/001.jpg" alt="" loading="eager" decoding="async" />
+            <img class="portfolio-tile__slide" data-tile-slide src="portfolio-media/graphics/juicy-events/003.jpg" alt="" loading="lazy" decoding="async" />
+            <img class="portfolio-tile__slide" data-tile-slide src="portfolio-media/graphics/juicy-events/005.jpg" alt="" loading="lazy" decoding="async" />
+            <img class="portfolio-tile__slide" data-tile-slide src="portfolio-media/graphics/juicy-events/008.jpg" alt="" loading="lazy" decoding="async" />
+            <img class="portfolio-tile__slide" data-tile-slide src="portfolio-media/graphics/juicy-events/012.jpg" alt="" loading="lazy" decoding="async" />
+            <img class="portfolio-tile__slide" data-tile-slide src="portfolio-media/graphics/juicy-events/015.jpg" alt="" loading="lazy" decoding="async" />
+            <img class="portfolio-tile__slide" data-tile-slide src="portfolio-media/graphics/juicy-events/018.jpg" alt="" loading="lazy" decoding="async" />
+            <img class="portfolio-tile__slide" data-tile-slide src="portfolio-media/graphics/juicy-events/021.jpg" alt="" loading="lazy" decoding="async" />
+          </div>
+        </div>
+        <div class="portfolio-tile__body">
+          <h2 class="portfolio-tile__title" data-i18n="portfolio.grafiki_title">Grafiki</h2>
+          <p class="portfolio-tile__lead" data-i18n="portfolio.grafiki_tile_lead">Posty, stories i key visuale w rytmie pokazu slajdów.</p>
+          <span class="portfolio-tile__cta" data-i18n="portfolio.tile_open">Zobacz realizacje</span>
+        </div>
+      </a>
+    </div>
+    <div class="portfolio-tiles__dots" role="tablist" aria-label="Kategorie">
+      <button type="button" class="portfolio-tiles__dot is-active" data-portfolio-tile-dot aria-label="Strony internetowe"></button>
+      <button type="button" class="portfolio-tiles__dot" data-portfolio-tile-dot aria-label="Systemy i automatyzacje"></button>
+      <button type="button" class="portfolio-tiles__dot" data-portfolio-tile-dot aria-label="Montaż wideo"></button>
+      <button type="button" class="portfolio-tiles__dot" data-portfolio-tile-dot aria-label="Grafiki"></button>
     </div>
   </section>
 </main>
 
+<div class="portfolio-end">
 <section class="portfolio-contact-cta" aria-label="Kontakt">
   <div class="container portfolio-contact-cta__inner">
     <h2 class="portfolio-contact-cta__title" data-i18n="panel.cta">Umów bezpłatny audyt</h2>
@@ -315,27 +218,6 @@
     <a class="glass-btn" href="index.html#kontakt" data-i18n="about.cta">Porozmawiajmy o projekcie</a>
   </div>
 </section>
-
-<div class="reels-lightbox" id="reels-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" data-i18n-aria-label="portfolio.lightbox_reel" aria-label="Podgląd rolki">
-  <button type="button" class="reels-lightbox__backdrop" data-reel-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij"></button>
-  <figure class="reels-lightbox__figure">
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev data-i18n-aria-label="portfolio.lightbox_prev_reel" aria-label="Poprzednia rolka" hidden>‹</button>
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next data-i18n-aria-label="portfolio.lightbox_next_reel" aria-label="Następna rolka" hidden>›</button>
-    <video class="reels-lightbox__video" controls playsinline hidden></video>
-    <button type="button" class="reels-lightbox__close" data-reel-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij">×</button>
-  </figure>
-</div>
-
-<div class="graphics-lightbox" id="graphics-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" data-i18n-aria-label="portfolio.lightbox_graphic" aria-label="Podgląd grafiki">
-  <button type="button" class="graphics-lightbox__backdrop" data-lightbox-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij"></button>
-  <figure class="graphics-lightbox__figure">
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev data-i18n-aria-label="portfolio.lightbox_prev_graphic" aria-label="Poprzednia grafika" hidden>‹</button>
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next data-i18n-aria-label="portfolio.lightbox_next_graphic" aria-label="Następna grafika" hidden>›</button>
-    <img class="graphics-lightbox__img" alt="" hidden />
-    <video class="graphics-lightbox__video" controls playsinline hidden></video>
-    <button type="button" class="graphics-lightbox__close" data-lightbox-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij">×</button>
-  </figure>
-</div>
 
 <footer class="site-footer">
   <div class="container">
@@ -346,9 +228,10 @@
         <ul>
           <li><a href="index.html#top" data-i18n="nav.start">Start</a></li>
           <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
-          <li><a href="portfolio.html#strony" data-i18n="bento.strony">Strony internetowe</a></li>
-          <li><a href="portfolio.html#montaz" data-i18n="bento.montaz">Montaż wideo</a></li>
-          <li><a href="portfolio.html#grafiki" data-i18n="bento.grafiki">Grafiki &amp; social</a></li>
+          <li><a href="portfolio-strony.html" data-i18n="bento.strony">Strony internetowe</a></li>
+          <li><a href="portfolio-systemy.html" data-i18n="portfolio.automation_title">Systemy i automatyzacje</a></li>
+          <li><a href="portfolio-montaz.html" data-i18n="bento.montaz">Montaż wideo</a></li>
+          <li><a href="portfolio-grafiki.html" data-i18n="bento.grafiki">Grafiki &amp; social</a></li>
           <li><a href="index.html#uslugi" data-i18n="nav.services">Usługi</a></li>
           <li><a href="index.html#proces" data-i18n="nav.process">Proces</a></li>
           <li><a href="index.html#faq" data-i18n="nav.faq">FAQ</a></li>
@@ -396,31 +279,18 @@
     </div>
   </div>
 </footer>
+</div>
 
-<script src="i18n.js?v=20260920ui10"></script>
-<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
-<script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="smooth-scroll.js?v=20260924polish1"></script>
+<script src="i18n.js?v=20260926tabs6"></script>
 <script src="home-cursor-field.js?v=20260920ui7"></script>
 <script src="home-cursor.js?v=20260920ui10"></script>
-<script src="home-tile-interact.js?v=20260925cases2"></script>
-<script src="subpage-ambient-bg.js?v=20260924polish1"></script>
+<script src="subpage-ambient-bg.js?v=20260925webdeck1"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
-<script type="module" src="subpage-cube.js?v=20260924polish1"></script>
-<script type="module" src="portfolio-hero-sand.js?v=20260924scrollidle1"></script>
+<script type="module" src="subpage-cube.js?v=20260926tabs6"></script>
+<script type="module" src="portfolio-tile-bg.js?v=20260926tabs6"></script>
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
-<script src="sections.js?v=20260814e"></script>
-<script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
-<script src="portfolio-video.js?v=20260920ui19"></script>
-<script src="portfolio-web-deck.js?v=20260925fix2"></script>
-<script src="portfolio-montaz.js?v=20260920ui36"></script>
-<script src="portfolio-graphics.js?v=20260925anim1"></script>
-<script src="portfolio-page-motion.js?v=20260925end1"></script>
-<script src="portfolio-section-stepper.js?v=20260925fix2"></script>
-<script src="portfolio-scroll-rail.js?v=20260922ui52"></script>
-<script defer src="site-chat.js?v=20260925fix2"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
+<script src="portfolio-tiles.js?v=20260926tabs6"></script>
+<script defer src="site-chat.js?v=20260926chat7"></script>
+<script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
 </body>
 </html>

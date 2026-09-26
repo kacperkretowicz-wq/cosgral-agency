@@ -14,11 +14,6 @@
     return document.querySelector("[data-portfolio-scene-curtain]");
   }
 
-  function smoothstep(edge0, edge1, x) {
-    var t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-    return t * t * (3 - 2 * t);
-  }
-
   function easeInOut(t) {
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
@@ -27,16 +22,24 @@
     if (!next) return 0;
     var top = next.getBoundingClientRect().top;
     var vh = window.innerHeight || 1;
+    var span = vh * (MOBILE ? 1.15 : 1.22);
     if (top <= 0) return 1;
-    return 1 - Math.max(0, Math.min(1, top / vh));
+    return 1 - Math.max(0, Math.min(1, top / span));
   }
 
   function poseTarget(el) {
     if (!el) return null;
+    // Grafiki: recess .graphics-stage only when leaving (pin forces recess 0 while active)
+    if (el.id === "grafiki" || el.classList.contains("portfolio-section--grafiki")) {
+      return el.querySelector(".graphics-stage") || el;
+    }
+    if (el.id === "automatyzacje" || el.classList.contains("portfolio-section--auto-film")) {
+      return el.querySelector(".auto-cover") || el;
+    }
     return (
       el.querySelector(".home-tilt-layer") ||
       el.querySelector(
-        ".graphics-stage, .portfolio-scene__panel, .container, .portfolio-chapter__title"
+        ".graphics-stage, .auto-cover, .portfolio-scene__panel, .container, .portfolio-chapter__title"
       ) ||
       el
     );
@@ -45,31 +48,43 @@
   function applyRecess(el, p) {
     if (!el || !window.gsap) return;
     var target = poseTarget(el);
-    if (target.style.filter !== "none") target.style.filter = "none";
-    var hold = 0.04;
+    var hold = 0.08;
+    var exitScale = MOBILE ? 0.7 : 0.56;
+    var exitBlur = MOBILE ? 10 : 18;
+    var exitY = MOBILE ? -4 : -9;
     if (p <= hold) {
-      gsap.set(target, { opacity: 1, visibility: "visible", yPercent: 0, scale: 1, force3D: true });
-      gsap.set(el, { opacity: 1, visibility: "visible" });
       el.classList.remove("is-depth-recessed", "is-depth-gone");
       el.style.pointerEvents = "";
+      gsap.set(el, { clearProps: "opacity,visibility" });
+      gsap.set(target, {
+        clearProps: "opacity,visibility,transform,filter,yPercent,scale",
+      });
       return;
     }
     var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
-    var fade = u * u;
-    /* opacity (nie autoAlpha) — klikalne w trakcie blur / przejścia */
+    var fade = Math.pow(u, 1.35);
+    var dim = 1 - 0.74 * u;
+    /* Recess the scene itself — no full-screen black plate on top */
     gsap.set(target, {
-      opacity: 1 - fade,
+      opacity: Math.max(0.08, 1 - fade * 0.92),
       visibility: "visible",
-      yPercent: (MOBILE ? -4 : -8) * u,
-      scale: 1 - (MOBILE ? 0.2 : 0.3) * u,
+      yPercent: exitY * u,
+      scale: 1 - (1 - exitScale) * u,
+      filter:
+        "blur(" +
+        (exitBlur * u).toFixed(2) +
+        "px) brightness(" +
+        dim.toFixed(3) +
+        ")",
       transformOrigin: "50% 42%",
       force3D: true,
     });
     el.classList.add("is-depth-recessed");
-    if (u >= 0.98) {
+    if (u >= 0.995) {
       el.classList.add("is-depth-gone");
       el.style.pointerEvents = "none";
-      gsap.set(el, { opacity: 0, visibility: "hidden" });
+      gsap.set(el, { opacity: 0 });
+      gsap.set(target, { opacity: 0, filter: "none" });
     } else {
       el.classList.remove("is-depth-gone");
       gsap.set(el, { opacity: 1, visibility: "visible" });
@@ -77,31 +92,57 @@
     }
   }
 
-  function setCurtain(amount) {
+  function applyEnter(el, p) {
+    if (!el || !window.gsap) return;
+    if (el.id === "grafiki" || el.classList.contains("portfolio-end")) return;
+    var target = poseTarget(el);
+    if (!target) return;
+    if (p <= 0.01 || p >= 0.995) return;
+    var u = easeInOut(p);
+    var fromScale = MOBILE ? 1.045 : 1.08;
+    var fromBlur = MOBILE ? 5 : 9;
+    var fromY = MOBILE ? 6 : 10;
+    gsap.set(target, {
+      opacity: 1,
+      visibility: "visible",
+      yPercent: fromY * (1 - u),
+      scale: fromScale - (fromScale - 1) * u,
+      filter:
+        "blur(" +
+        (fromBlur * (1 - u)).toFixed(2) +
+        "px) brightness(" +
+        (0.68 + 0.32 * u).toFixed(3) +
+        ")",
+      transformOrigin: "50% 62%",
+      force3D: true,
+    });
+  }
+
+  function setCurtain() {
     var curtain = getCurtain();
-    if (!curtain || !window.gsap) return;
-    var a = Math.max(0, Math.min(0.88, amount));
-    gsap.set(curtain, {
-      autoAlpha: a,
-      visibility: a > 0.01 ? "visible" : "hidden",
-    });
-    document.body.classList.toggle("is-portfolio-scene-bridge", a > 0.08);
+    if (curtain && window.gsap) {
+      gsap.set(curtain, { autoAlpha: 0, visibility: "hidden" });
+    }
+    document.body.classList.remove("is-portfolio-scene-bridge");
   }
 
-  function syncCurtainFromCovers(pairs) {
-    var peak = 0;
-    pairs.forEach(function (pair) {
-      var p = coverAmount(pair.enter);
-      var pulse = Math.sin(p * Math.PI) * 0.72;
-      if (pulse > peak) peak = pulse;
-    });
-    setCurtain(peak);
+  function syncCurtainFromCovers() {
+    setCurtain();
   }
 
-  function wireCover(leave, enter) {
+  function wireCover(leave, enter, opts) {
+    opts = opts || {};
     if (!leave || !enter || REDUCED || !window.ScrollTrigger) return;
     function sync() {
+      if (opts.afterPin) {
+        var pin = window.ScrollTrigger && ScrollTrigger.getById(opts.afterPin);
+        if (pin && pin.isActive) {
+          applyRecess(leave, 0);
+          return;
+        }
+      }
       applyRecess(leave, coverAmount(enter));
+      applyEnter(enter, coverAmount(enter));
     }
     ScrollTrigger.create({
       id: (leave.id || "leave") + "-cover-" + (enter.id || "enter"),
@@ -113,54 +154,6 @@
     });
   }
 
-  function initChapterPin() {
-    var chapter = document.getElementById("automatyzacje-intro");
-    if (!chapter || REDUCED || !window.gsap || !window.ScrollTrigger) return;
-
-    var title = chapter.querySelector(".portfolio-chapter__title");
-    if (title) gsap.set(title, { autoAlpha: 0, y: 28, scale: 0.94 });
-
-    gsap.set(chapter, { width: "100%", maxWidth: "none", clearProps: "left" });
-
-    ScrollTrigger.create({
-      id: "auto-chapter-pin",
-      trigger: chapter,
-      start: "top top",
-      end: MOBILE ? "+=72%" : "+=90%",
-      pin: true,
-      pinSpacing: true,
-      scrub: true,
-      anticipatePin: 0.3,
-      invalidateOnRefresh: true,
-      refreshPriority: -2,
-      onUpdate: function (self) {
-        if (!title) return;
-        var p = self.progress;
-        var show = smoothstep(0, 0.22, p);
-        var hold = 1 - smoothstep(0.72, 1, p);
-        var amt = Math.min(show, hold);
-        gsap.set(title, {
-          autoAlpha: amt,
-          y: (1 - amt) * 24,
-          scale: 0.94 + amt * 0.06,
-        });
-      },
-      onRefresh: function (self) {
-        gsap.set(chapter, { width: "100%", maxWidth: "none" });
-        if (!title) return;
-        var p = self.progress || 0;
-        var show = smoothstep(0, 0.22, p);
-        var hold = 1 - smoothstep(0.72, 1, p);
-        var amt = p <= 0 ? 0 : Math.min(show, hold);
-        gsap.set(title, {
-          autoAlpha: amt,
-          y: (1 - amt) * 24,
-          scale: 0.94 + amt * 0.06,
-        });
-      },
-    });
-  }
-
   function initPortfolioCinema() {
     if (sceneBridgeReady || REDUCED || !window.gsap || !window.ScrollTrigger) return;
     sceneBridgeReady = true;
@@ -168,22 +161,41 @@
     var strony = document.getElementById("strony");
     var montaz = document.getElementById("montaz");
     var grafiki = document.getElementById("grafiki");
-    var chapter = document.getElementById("automatyzacje-intro");
     var auto = document.getElementById("automatyzacje");
-    var cta = document.querySelector(".portfolio-contact-cta");
+    var endBand = document.querySelector(".portfolio-end");
+
+    function pinHold(section, end) {
+      if (!section) return;
+      ScrollTrigger.create({
+        id: (section.id || "sec") + "-cine-hold",
+        trigger: section,
+        start: "top top",
+        end: end || (MOBILE ? "+=54%" : "+=72%"),
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 0.4,
+        invalidateOnRefresh: true,
+        refreshPriority: -3,
+      });
+    }
+
+    pinHold(strony);
+    pinHold(auto, MOBILE ? "+=120%" : "+=150%");
+    pinHold(montaz);
 
     var pairs = [
-      { leave: strony, enter: montaz },
+      { leave: strony, enter: auto },
+      { leave: auto, enter: montaz },
       { leave: montaz, enter: grafiki },
-      { leave: grafiki, enter: chapter },
-      { leave: chapter, enter: auto },
-      { leave: auto, enter: cta },
+      { leave: grafiki, enter: endBand, afterPin: "grafiki-pin" },
     ].filter(function (pair) {
       return pair.leave && pair.enter;
     });
 
     pairs.forEach(function (pair) {
-      wireCover(pair.leave, pair.enter);
+      wireCover(pair.leave, pair.enter, {
+        afterPin: pair.afterPin || null,
+      });
     });
 
     ScrollTrigger.create({
@@ -198,7 +210,6 @@
       },
     });
 
-    initChapterPin();
     ScrollTrigger.refresh();
     requestAnimationFrame(function () {
       ScrollTrigger.refresh();
@@ -209,7 +220,7 @@
     if (!auto) return;
     auto.classList.add("is-entered", "is-visible");
     if (window.gsap) {
-      var panel = auto.querySelector(".home-tilt-layer, .portfolio-scene__panel, .container") || auto;
+      var panel = auto.querySelector(".auto-cover, .home-tilt-layer, .portfolio-scene__panel, .container") || auto;
       gsap.set(auto, { clearProps: "opacity,visibility" });
       gsap.set(panel, { clearProps: "opacity,visibility,transform,filter" });
       auto.classList.remove("is-depth-gone", "is-depth-recessed");
@@ -383,16 +394,6 @@
         from: { y: MOBILE ? 60 : 100, scale: 0.88, rotationX: 0, rotationY: 0, rotationZ: 0, z: 0 },
       }
     );
-
-    if (!MOBILE) {
-      bindTileScrollTell("auto", "#automatyzacje .portfolio-case-card", {
-        stagger: 0.09,
-        start: "top 70%",
-        end: "top 32%",
-        scrub: 1.15,
-        from: { y: 72, scale: 0.9, rotationZ: -3, rotationX: 8, z: -80 },
-      });
-    }
 
     initPortfolioCinema();
     ScrollTrigger.refresh();

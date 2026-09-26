@@ -15,7 +15,7 @@ const HUB_API = 'https://cosgralhub.netlify.app/api/site-chat';
 const AI_SOURCE = 'cosgral-ai';
 /** UTF-8 zero-width space wrapper — marks AI replies mirrored into Hub. */
 const AI_BODY_PREFIX = "\xE2\x80\x8Bcgai\xE2\x80\x8B";
-const DEFAULT_GEMINI_MODEL = 'gemini-3.6-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -79,8 +79,14 @@ function http_json(string $method, string $url, ?array $body = null, array $head
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_HTTPHEADER => $hdrs,
         CURLOPT_TIMEOUT => max(5, $timeout),
-        CURLOPT_CONNECTTIMEOUT => min(8, max(3, $timeout)),
+        CURLOPT_CONNECTTIMEOUT => min(10, max(4, $timeout)),
+        CURLOPT_NOSIGNAL => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     ];
+    if (defined('CURL_IPRESOLVE_V4')) {
+        $opts[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
+    }
     if ($body !== null) {
         $json = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $hdrs[] = 'Content-Type: application/json';
@@ -93,7 +99,7 @@ function http_json(string $method, string $url, ?array $body = null, array $head
     $err = curl_error($ch);
     curl_close($ch);
     if ($raw === false) {
-        return ['ok' => false, 'status' => 0, 'data' => ['error' => $err]];
+        return ['ok' => false, 'status' => 0, 'data' => ['error' => $err !== '' ? $err : 'curl_failed']];
     }
     $data = json_decode($raw, true);
     if (!is_array($data)) {
@@ -126,15 +132,39 @@ function is_ai_agent_message(array $m): bool
     return strpos($body, AI_BODY_PREFIX) === 0;
 }
 
+function is_hub_auto_reply(array $m): bool
+{
+    if (($m['role'] ?? '') !== 'agent') {
+        return false;
+    }
+    if (is_ai_agent_message($m)) {
+        return false;
+    }
+    $author = mb_strtolower((string)($m['author'] ?? ''), 'UTF-8');
+    if (in_array($author, ['ai', 'bot', 'system', 'auto'], true)) {
+        return true;
+    }
+    $source = mb_strtolower((string)($m['source'] ?? ''), 'UTF-8');
+    if (in_array($source, ['ai', 'bot', 'system', 'auto', 'auto-reply'], true)) {
+        return true;
+    }
+    $body = trim(strip_ai_prefix((string)($m['body'] ?? '')));
+    return $body !== '' && (bool)preg_match('/^dzięk\w*\s+za\s+wiadomość/iu', $body);
+}
+
 function detect_human_takeover(array $messages): bool
 {
     foreach ($messages as $m) {
         if (!is_array($m)) {
             continue;
         }
-        if (($m['role'] ?? '') === 'agent' && !is_ai_agent_message($m)) {
-            return true;
+        if (($m['role'] ?? '') !== 'agent') {
+            continue;
         }
+        if (is_ai_agent_message($m) || is_hub_auto_reply($m)) {
+            continue;
+        }
+        return true;
     }
     return false;
 }
@@ -278,6 +308,9 @@ function normalize_messages(array $messages): array
         if (!is_array($m)) {
             continue;
         }
+        if (($m['role'] ?? '') === 'agent' && is_hub_auto_reply($m)) {
+            continue;
+        }
         if (($m['role'] ?? '') === 'agent') {
             $m = enrich_agent_message($m);
         }
@@ -334,11 +367,49 @@ function hub_post_agent(string $api, string $visitorKey, string $body, string $p
     return $msg;
 }
 
-function fallback_ai_text(): string
+function fallback_ai_text(string $latestUser = '', array $history = []): string
 {
-    return 'Jasne — ogarniam temat. Napisz proszę 1–2 zdania więcej: co dokładnie chcesz wdrożyć '
-        . '(np. sklep, strona firmowa, CRM, SEO) i na kiedy. '
-        . 'Na tej podstawie Jakub lub Kacper dopną wycenę: +48 533 790 518 / +48 571 798 397.';
+    $blob = $latestUser;
+    foreach ($history as $m) {
+        if (!is_array($m) || empty($m['body'])) {
+            continue;
+        }
+        if (($m['role'] ?? '') === 'visitor' || ($m['role'] ?? '') === 'user') {
+            $blob .= ' ' . (string)$m['body'];
+        }
+    }
+    $low = mb_strtolower($blob, 'UTF-8');
+    $confused = (bool)preg_match('/o czym ty mów|nie rozumiem|co ty bredz/iu', $latestUser);
+    if (preg_match('/^(witam|cześć|czesc|hej|heja|siema|hello|hi|dzień dobry|dzien dobry)[\s!.?,]*$/iu', trim($latestUser))) {
+        return 'Cześć — tu Cosgral AI. Nad czym chcesz poukładać projekt: strona, sklep, CRM, SEO, automatyzacja czy wideo?';
+    }
+
+    $service = '';
+    $reply = '';
+    if (preg_match('/sklep|e-?comm|woo|shopify|shoper|koszyk|katalog produkt/iu', $low)) {
+        $reply = $confused
+            ? 'Przepraszam — wracam do sklepu. W Cosgral robimy e-commerce (WooCommerce / Shopify): katalog, zamówienia, płatności, panel. Jaka branża, ile produktów i na kiedy start?'
+            : 'Sklep internetowy zrobimy w Cosgral — WooCommerce albo Shopify, z zamówieniami, płatnościami i dodawaniem produktów. Jaka branża, ile SKU i na kiedy chcesz start?';
+    } elseif (preg_match('/crm|leady|pipeline|hubspot|pipedrive/iu', $low)) {
+        $reply = $confused
+            ? 'Przepraszam — temat to CRM. Wdrażamy HubSpot, Pipedrive albo panel dedykowany pod wasz lejek. Ile osób w zespole sprzedaży i z czego korzystacie dziś?'
+            : 'CRM ogarniamy: HubSpot, Pipedrive albo coś pod Was. Ile osób korzysta i jaki jest teraz proces leadów?';
+    } elseif (preg_match('/seo|pozycjon|geo|widoczno/iu', $low)) {
+        $reply = 'SEO/GEO robimy od audytu po treści i schema. Masz już stronę, czy startujemy od nowa?';
+    } elseif (preg_match('/automatyz|zapier|make\.com|n8n|chatbot/iu', $low)) {
+        $reply = 'Automatyzacje (Make / n8n / Zapier) i boty do pierwszego kontaktu robimy w Cosgral. Jaki proces chcesz zdjąć ludziom z głowy?';
+    } elseif (preg_match('/apka|aplikacj|panel|b2b|dashboard/iu', $low)) {
+        $reply = 'Aplikacje i panele B2B projektujemy pod konkretny proces. Co ma robić użytkownik w środku — zamówienia, raporty, klienci?';
+    } elseif (preg_match('/stron|landing|www|witryn|wizytówk/iu', $low)) {
+        $reply = $confused
+            ? 'Przepraszam — chodziło o stronę. Robimy strony firmowe i landingi pod leady. Macie obecną witrynę, czy budujemy od zera?'
+            : 'Stronę firmową albo landing zrobimy tak, żeby zbierała zapytania. Jest już jakaś witryna, czy start od zera?';
+    } else {
+        $reply = $confused
+            ? 'Masz rację, za ogólnie. Napisz w jednym zdaniu, o co chodzi: strona, sklep, CRM, SEO, automatyzacja czy wideo?'
+            : 'Jasne — napisz krótko, co chcesz ruszyć (strona, sklep, CRM, SEO, automatyzacja) i na kiedy. Dopasuję ofertę Cosgral i podłączę Jakuba albo Kacpera: +48 533 790 518 / +48 571 798 397.';
+    }
+    return $reply;
 }
 
 function gemini_extract_text(array $data): string
@@ -367,86 +438,123 @@ function gemini_extract_text(array $data): string
     return trim($text);
 }
 
-function gemini_reply(string $apiKey, string $model, array $history, string $latestUser, string $pageUrl): string
+function is_canned_ai_fallback_text(string $body): bool
 {
+    $t = trim(strip_ai_prefix($body));
+    if ($t === '') {
+        return false;
+    }
+    if (mb_stripos($t, 'ogarniam temat', 0, 'UTF-8') !== false) {
+        return true;
+    }
+    if (mb_stripos($t, 'napisz krótko, co chcesz ruszyć', 0, 'UTF-8') !== false) {
+        return true;
+    }
+    return (bool)preg_match('/^dzięk\w*\s+za\s+wiadomość/iu', $t);
+}
+
+function gemini_build_contents(array $history, string $latestUser): array
+{
+    $latest = mb_substr(trim($latestUser), 0, 2000, 'UTF-8');
     $contents = [];
-    $latest = mb_substr($latestUser, 0, 2000, 'UTF-8');
-    $hist = array_slice($history, -12);
-    foreach ($hist as $m) {
+    foreach (array_slice($history, -12) as $m) {
         if (!is_array($m) || empty($m['body'])) {
             continue;
         }
+        if (is_hub_auto_reply($m)) {
+            continue;
+        }
+        $text = trim(strip_ai_prefix((string)$m['body']));
+        if ($text === '' || is_canned_ai_fallback_text($text)) {
+            continue;
+        }
         $role = (($m['role'] ?? '') === 'agent' || ($m['role'] ?? '') === 'model') ? 'model' : 'user';
+        $chunk = mb_substr($text, 0, 2000, 'UTF-8');
+        if ($contents !== [] && ($contents[count($contents) - 1]['role'] ?? '') === $role) {
+            $prev = (string)$contents[count($contents) - 1]['parts'][0]['text'];
+            if ($prev !== $chunk) {
+                $contents[count($contents) - 1]['parts'][0]['text'] = mb_substr($prev . "\n" . $chunk, 0, 2000, 'UTF-8');
+            }
+            continue;
+        }
         $contents[] = [
             'role' => $role,
-            'parts' => [['text' => mb_substr((string)$m['body'], 0, 2000, 'UTF-8')]],
+            'parts' => [['text' => $chunk]],
         ];
     }
-    while (
-        $contents !== []
-        && ($contents[count($contents) - 1]['role'] ?? '') === 'user'
-        && ($contents[count($contents) - 1]['parts'][0]['text'] ?? '') === $latest
-    ) {
-        array_pop($contents);
+    while ($contents !== [] && ($contents[0]['role'] ?? '') !== 'user') {
+        array_shift($contents);
+    }
+    if ($contents !== [] && ($contents[count($contents) - 1]['role'] ?? '') === 'user') {
+        $lastUser = (string)$contents[count($contents) - 1]['parts'][0]['text'];
+        if ($lastUser === $latest || substr($lastUser, -strlen($latest)) === $latest) {
+            return $contents;
+        }
+        $contents[count($contents) - 1]['parts'][0]['text'] = mb_substr($lastUser . "\n" . $latest, 0, 2000, 'UTF-8');
+        return $contents;
     }
     $contents[] = ['role' => 'user', 'parts' => [['text' => $latest]]];
+    return $contents;
+}
 
-    $baseConfig = [
-        'temperature' => 0.9,
-        'topP' => 0.95,
-        'maxOutputTokens' => 4096,
-        'thinkingConfig' => [
-            'thinkingBudget' => 0,
+function gemini_error_label(array $res): string
+{
+    $e = $res['data']['error'] ?? '';
+    if (is_array($e)) {
+        return (string)($e['status'] ?? $e['message'] ?? 'error');
+    }
+    return is_string($e) ? $e : '';
+}
+
+function gemini_reply(string $apiKey, string $model, array $history, string $latestUser, string $pageUrl): string
+{
+    @set_time_limit(60);
+    $contents = gemini_build_contents($history, $latestUser);
+    $preferred = $model !== '' ? $model : 'gemini-2.5-flash';
+    if (strpos($preferred, 'gemini-2.0') === 0) {
+        $preferred = 'gemini-2.5-flash';
+    }
+    $models = array_values(array_unique([
+        $preferred,
+        'gemini-2.5-flash',
+        'gemini-3.6-flash',
+        'gemini-3.8-flash',
+    ]));
+    $lastError = 'gemini_failed';
+    $payload = [
+        'systemInstruction' => [
+            'parts' => [['text' => cosgral_chat_system_instruction($pageUrl)]],
+        ],
+        'contents' => $contents,
+        'generationConfig' => [
+            'temperature' => 0.85,
+            'topP' => 0.95,
+            'maxOutputTokens' => 2048,
         ],
     ];
-    $configNoThink = [
-        'temperature' => 0.9,
-        'topP' => 0.95,
-        'maxOutputTokens' => 4096,
-    ];
-
-    $models = array_values(array_unique(array_filter([
-        $model !== '' ? $model : 'gemini-3.6-flash',
-        'gemini-flash-latest',
-        'gemini-2.5-flash',
-    ])));
-
-    $lastError = 'gemini_failed';
-    foreach ($models as $i => $tryModel) {
+    foreach ($models as $mName) {
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-            . rawurlencode($tryModel)
+            . rawurlencode($mName)
             . ':generateContent?key='
             . rawurlencode($apiKey);
-
-        foreach ([$baseConfig, $configNoThink] as $genConfig) {
-            $payload = [
-                'systemInstruction' => [
-                    'parts' => [['text' => cosgral_chat_system_instruction($pageUrl)]],
-                ],
-                'contents' => $contents,
-                'generationConfig' => $genConfig,
-            ];
-            $timeout = $i === 0 ? 28 : 18;
-            $res = http_json('POST', $url, $payload, [], $timeout);
-            if (!$res['ok']) {
-                $status = (int)($res['status'] ?? 0);
-                $lastError = 'gemini_http_' . $status . '_' . $tryModel;
-                if ($status === 400) {
-                    // next config variant / model
-                    continue;
-                }
-                if ($status === 429 || $status === 503 || $status === 500 || $status === 0) {
-                    usleep(300000);
-                    continue;
-                }
-                break;
-            }
+        $res = http_json('POST', $url, $payload, [], 18);
+        if ($res['ok']) {
             $text = gemini_extract_text($res['data']);
-            if ($text !== '') {
+            if ($text !== '' && !is_canned_ai_fallback_text($text)) {
                 return mb_substr($text, 0, 2200, 'UTF-8');
             }
-            $lastError = 'gemini_empty_' . $tryModel;
+            $lastError = 'gemini_empty_' . $mName;
+            continue;
         }
+        $status = (int)($res['status'] ?? 0);
+        $lastError = 'gemini_http_' . $status . '_' . $mName . '_' . gemini_error_label($res);
+        if ($status === 404 || $status === 400 || $status === 429 || $status === 503) {
+            continue;
+        }
+        if ($status === 0) {
+            continue;
+        }
+        break;
     }
     throw new RuntimeException($lastError);
 }
@@ -562,7 +670,7 @@ try {
         $pageUrl
     );
 } catch (Throwable $e) {
-    $replyText = fallback_ai_text();
+    $replyText = fallback_ai_text($body, $history !== [] ? $history : $existing);
 }
 
 $aiMessage = hub_post_agent($hubApi, $visitorKey, $replyText, $secrets['CHAT_HUB_AGENT_PIN']);

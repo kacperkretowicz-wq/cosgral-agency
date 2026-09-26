@@ -12,9 +12,10 @@
 <meta name="description" content="Workflow Trove: zamówienie uruchamia fakturę, status paczki i powiadomienie klienta." />
 <link rel="canonical" href="https://cosgral.pl/portfolio-trove-workflow.html" />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260925mobile2" />
-<link rel="stylesheet" href="telforce-cases.css?v=20260925nofx1" />
-<script src="telforce-previews.js?v=20260924tfo1" defer></script>
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260925fix18" />
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz2" />
+<link rel="stylesheet" href="case-viz-tiles.css?v=20260925viz3" />
+<script src="case-viz-tiles.js?v=20260925viz3" defer></script>
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
 <script>
@@ -24,7 +25,7 @@
     }
   })();
 </script>
-<script src="page-transitions.js?v=20260924hash1"></script>
+<script src="page-transitions.js?v=20260925fix21"></script>
 <script src="cosgral-motion-pref.js?v=20260919a"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
   <link rel="stylesheet" href="site-chat.css?v=20260925fix2" />
@@ -69,37 +70,212 @@
 </div>
 
 <main id="main">
-    <article class="case-study case-study--systems">
-  <div class="case-study__top">
-    <p class="case-study__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
-    <div class="case-study__meta">
-      <p class="case-study__eyebrow" data-i18n="portfolio.case_trove_workflow_tag">Automatyzacja</p>
-      <p class="case-study__client" data-i18n="portfolio.case_trove_workflow_client">Trove</p>
+        <article class="case-study case-study--systems case-study--viz">
+  <header class="case-viz-intro">
+    <div class="case-viz-intro__main">
+      <p class="case-study__back"><a href="portfolio-systemy.html" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
+      <h1 class="case-study__title" data-i18n="portfolio.case_trove_workflow_title">Zamówienie → faktura → status paczki</h1>
+      <p class="case-study__lede" data-i18n="portfolio.case_trove_workflow_lede">Automatyczny workflow e-commerce dla Trove: od zamówienia przez fakturę po status dostawy.</p>
     </div>
-    <h1 class="case-study__title" data-i18n="portfolio.case_trove_workflow_title">Zamówienie → faktura → status paczki</h1>
-    <p class="case-study__lede" data-i18n="portfolio.case_trove_workflow_lede">Automatyczny workflow e-commerce dla Trove: od zamówienia przez fakturę po status dostawy.</p>
-    <ul class="case-study__signals" aria-label="Zakres">
-      <li data-i18n="portfolio.case_trove_workflow_s1">Nowe zamówienie</li>
-      <li data-i18n="portfolio.case_trove_workflow_s2">Eksport faktury</li>
-      <li data-i18n="portfolio.case_trove_workflow_s3">Status paczki</li>
-    </ul>
+    <aside class="case-viz-intro__aside">
+      <div class="case-study__meta">
+        <p class="case-study__eyebrow" data-i18n="portfolio.case_trove_workflow_tag">Automatyzacja</p>
+          <p class="case-study__client" data-i18n="portfolio.case_trove_workflow_client">Trove</p>
+      </div>
+      <ol class="case-viz-intro__index" aria-label="Moduły systemu">
+        <li><a href="#viz-order"><span>01</span>Order</a></li>
+        <li><a href="#viz-invoice"><span>02</span>Faktura</a></li>
+        <li><a href="#viz-pack"><span>03</span>Pack</a></li>
+        <li><a href="#viz-carrier"><span>04</span>Kurier</a></li>
+        <li><a href="#viz-track"><span>05</span>Track</a></li>
+        <li><a href="#viz-notify"><span>06</span>Notify</a></li>
+        <li><a href="#viz-loop"><span>07</span>Loop</a></li>
+      </ol>
+    </aside>
+  </header>
+
+  <div class="case-viz-rail" aria-label="Wizualizacje systemu">
+    <section class="case-viz-tile" id="viz-order">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">01</span>
+        <h2 class="case-viz-tile__title">Nowe zamówienie</h2>
+        <p class="case-viz-tile__text">Sygnał z checkoutu odpala cały łańcuch. KPI pokazuje wolumen dnia i czas do faktury.</p>
+        <span class="case-viz-tile__hint">Snapshot zamówień</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="kpi" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget" data-viz-root>
+            <p class="viz-widget__label">Live snapshot</p>
+            <div class="viz-kpi">
+        <div class="viz-kpi__card"><span>Dziś</span><b data-to="86" data-suffix="" data-prefix="">86</b></div>
+        <div class="viz-kpi__card"><span>Avg min</span><b data-to="4" data-suffix="" data-prefix="">4</b></div>
+        <div class="viz-kpi__card"><span>Błędy</span><b data-to="0" data-suffix="" data-prefix="">0</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-invoice">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">02</span>
+        <h2 class="case-viz-tile__title">Eksport faktury</h2>
+        <p class="case-viz-tile__text">Dane zamówienia lądują w eksporcie księgowym bez kopiuj-wklej.</p>
+        <span class="case-viz-tile__hint">Krok po kroku</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="steps" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Flow · kliknij krok</p>
+            <div class="viz-steps">
+            <button type="button" class="viz-steps__node">Order</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Mapowanie</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">Faktura</button>
+            <span class="viz-steps__arrow" aria-hidden="true">→</span>
+            <button type="button" class="viz-steps__node">PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-pack">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">03</span>
+        <h2 class="case-viz-tile__title">Stacja pakowania</h2>
+        <p class="case-viz-tile__text">Wizualizacja obciążenia linii — klik słupka podświetla falę zamówień.</p>
+        <span class="case-viz-tile__hint">Hover / klik</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="bars" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Stany · hover / klik</p>
+            <div class="viz-bars">
+              <div class="viz-bars__col" data-h="35"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="48"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="62"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="70"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="55"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="44"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="78"><div class="viz-bars__fill"></div></div>
+              <div class="viz-bars__col" data-h="66"><div class="viz-bars__fill"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-carrier">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">04</span>
+        <h2 class="case-viz-tile__title">Handoff do kuriera</h2>
+        <p class="case-viz-tile__text">Orbit przekazuje paczkę między magazynem, API kuriera i track&trace.</p>
+        <span class="case-viz-tile__hint">Orbit sync</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="orbit" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Kanały</p>
+            <div class="viz-orbit">
+              <div class="viz-orbit__ring" aria-hidden="true"></div>
+              <div class="viz-orbit__core">SHIP</div>
+              <div class="viz-orbit__node">WH</div>
+              <div class="viz-orbit__node">API</div>
+              <div class="viz-orbit__node">Kurier</div>
+              <div class="viz-orbit__node">Track</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-track">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">05</span>
+        <h2 class="case-viz-tile__title">Status paczki</h2>
+        <p class="case-viz-tile__text">Oś zdarzeń: nadanie → sortownia → doręczenie. Scrub pokazuje aktualny stan.</p>
+        <span class="case-viz-tile__hint">Przeciągnij</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="timeline" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Oś czasu · przeciągnij</p>
+            <div class="viz-timeline">
+              <div class="viz-timeline__track">
+                <div class="viz-timeline__fill"></div>
+                <div class="viz-timeline__knob"></div>
+              </div>
+              <div class="viz-timeline__marks">
+              <span>Nadanie</span>
+              <span>Sort</span>
+              <span>W drodze</span>
+              <span>Doręczono</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-notify">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">06</span>
+        <h2 class="case-viz-tile__title">Powiadom klienta</h2>
+        <p class="case-viz-tile__text">Symulacja wiadomości statusowych — kliknij, by odtworzyć sekwencję.</p>
+        <span class="case-viz-tile__hint">Kliknij rozmowę</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="chat" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Rozmowa · kliknij</p>
+            <div class="viz-chat">
+              <div class="viz-chat__bubble viz-chat__bubble--ai">Paczka nadana · nr 8831</div>
+              <div class="viz-chat__bubble viz-chat__bubble--user">Super, kiedy dotrze?</div>
+              <div class="viz-chat__bubble viz-chat__bubble--ai">Jutro 10–14 · śledź link</div>
+              <div class="viz-chat__bubble viz-chat__bubble--ai">Doręczono. Dziękujemy!</div>
+              <div class="viz-chat__actions">
+                <button type="button" data-chat-step="0">Nadanie</button>
+                <button type="button" data-chat-step="1">ETA</button>
+                <button type="button" data-chat-step="2">Doręczenie</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="case-viz-tile" id="viz-loop">
+      <div class="case-viz-tile__copy">
+        <span class="case-viz-tile__num">07</span>
+        <h2 class="case-viz-tile__title">Pętla operacyjna</h2>
+        <p class="case-viz-tile__text">Gauge pokazuje procent zamówień domkniętych bez ręcznej interwencji.</p>
+        <span class="case-viz-tile__hint">Przesuń</span>
+      </div>
+      <div class="case-viz-tile__stage" data-viz="gauge" tabindex="0">
+        <div class="case-viz-chrome" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="case-viz-layer">
+          <div class="viz-widget">
+            <p class="viz-widget__label">Auto-close · przesuń</p>
+            <div class="viz-gauge">
+              <div class="viz-gauge__arc"><div class="viz-gauge__needle"></div></div>
+              <div class="viz-gauge__value">62%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  <div class="case-study__stage">
-    <div class="case-study__film case-study__film--visual">
-      <div class="case-study__chrome" aria-hidden="true"><span></span><span></span><span></span></div>
-      <img src="assets/cases/parcel-co.svg?v=20260925brand2" width="640" height="360" alt="Workflow zamówienie → faktura → status paczki" fetchpriority="high" />
-      <span class="case-study__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
-    </div>
-  </div>
-  <div class="case-study__body">
-    <div class="case-study__copy">
-      <p data-i18n="portfolio.case_trove_workflow_p1">Dla Trove zaprojektowaliśmy łańcuch automatyzacji wokół nowego zamówienia. Zamiast ręcznego przepisywania danych system przygotowuje eksport pod fakturę i aktualizuje status realizacji.</p>
-      <p data-i18n="portfolio.case_trove_workflow_p2">Status paczki i powiadomienie klienta domykają pętlę: kupujący wie, gdzie jest przesyłka, a zespół nie musi ręcznie klikać kolejnych kroków w kilku narzędziach.</p>
-      <p data-i18n="portfolio.case_trove_workflow_p3">Efekt to mniej operacyjnej tarcia przy każdym zamówieniu i spójniejsza obsługa od checkoutu do dostawy.</p>
+
+  <div class="case-viz-close">
+    <div class="case-viz-close__copy">
+        <p data-i18n="portfolio.case_trove_workflow_p1">Dla Trove zaprojektowaliśmy łańcuch automatyzacji wokół nowego zamówienia — bez ręcznego przepisywania.</p>
+        <p data-i18n="portfolio.case_trove_workflow_p2">Status paczki i powiadomienie klienta domykają pętlę od checkoutu do dostawy.</p>
     </div>
     <aside class="case-study__aside">
       <p class="case-study__aside-label">Trove / <span data-i18n="portfolio.case_trove_workflow_tag">Automatyzacja</span></p>
-      <a class="glass-btn case-study__visit" href="portfolio.html#automatyzacje" data-i18n="portfolio.tf_back">← Wróć do realizacji</a>
+      <a class="glass-btn case-study__visit" href="portfolio-systemy.html" data-i18n="portfolio.tf_back">← Wróć do realizacji</a>
       <a class="case-study__cta glass-btn" href="index.html#kontakt" data-i18n="about.cta">Porozmawiajmy o projekcie</a>
     </aside>
   </div>
@@ -178,7 +354,7 @@
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script src="sections.js?v=20260814e"></script>
 <script src="portfolio-video.js?v=20260807ag"></script>
-<script defer src="site-chat.js?v=20260925fix2"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
+<script defer src="site-chat.js?v=20260926chat7"></script>
+<script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
 </body>
 </html>

@@ -1,0 +1,227 @@
+/**
+ * Realizacje — L→R category tabs + per-theme media backgrounds.
+ */
+(function () {
+  "use strict";
+
+  var root = document.querySelector("[data-portfolio-tiles]");
+  if (!root) return;
+
+  var scroller = root.querySelector("[data-portfolio-tiles-scroller]");
+  var tiles = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
+  var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile-dot]"));
+  if (!scroller || !tiles.length) return;
+
+  var REDUCED = document.documentElement.classList.contains("reduce-motion");
+  var activeIndex = -1;
+  var slideTimers = [];
+  var wheelLock = 0;
+  var pendingTheme = null;
+  var montazReady = false;
+
+  function clamp(i) {
+    return Math.max(0, Math.min(tiles.length - 1, i));
+  }
+
+  function centerOf(el) {
+    var r = el.getBoundingClientRect();
+    return r.left + r.width * 0.5;
+  }
+
+  function nearestIndex() {
+    var mid = window.innerWidth * 0.5;
+    var best = 0;
+    var bestDist = Infinity;
+    tiles.forEach(function (tile, i) {
+      var d = Math.abs(centerOf(tile) - mid);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    });
+    return best;
+  }
+
+  function clearSlides() {
+    slideTimers.forEach(function (id) {
+      window.clearInterval(id);
+    });
+    slideTimers = [];
+  }
+
+  function playTileSlides(tile) {
+    var slides = Array.prototype.slice.call(tile.querySelectorAll("[data-tile-slide]"));
+    if (!slides.length) return;
+    var fast = tile.getAttribute("data-theme") === "graphics";
+    var interval = fast ? 700 : 2600;
+    if (slides.length < 2 || REDUCED) {
+      slides.forEach(function (s, i) {
+        s.classList.toggle("is-on", i === 0);
+      });
+      return;
+    }
+    var n = 0;
+    slides.forEach(function (s, i) {
+      s.classList.toggle("is-on", i === 0);
+    });
+    slideTimers.push(
+      window.setInterval(function () {
+        n = (n + 1) % slides.length;
+        slides.forEach(function (s, i) {
+          s.classList.toggle("is-on", i === n);
+        });
+      }, interval)
+    );
+  }
+
+  function syncCardVideos(activeTile) {
+    tiles.forEach(function (tile) {
+      tile.querySelectorAll("[data-card-video]").forEach(function (video) {
+        if (tile === activeTile) {
+          var play = video.play();
+          if (play && play.catch) play.catch(function () {});
+        } else {
+          try {
+            video.pause();
+          } catch (e) {}
+        }
+      });
+    });
+  }
+
+  function setupMontazRail() {
+    var rail = document.querySelector("[data-montaz-rail]");
+    var track = document.querySelector("[data-montaz-track]");
+    if (!rail || !track || montazReady) return;
+    var clone = track.cloneNode(true);
+    clone.removeAttribute("data-montaz-track");
+    rail.querySelector(".portfolio-montaz-rail__belt").appendChild(clone);
+    rail.classList.add("is-ready");
+    montazReady = true;
+  }
+
+  function syncThemeMedia(theme) {
+    var stage = document.querySelector("[data-portfolio-theme-stage]");
+    if (!stage) return;
+
+    if (theme === "video") setupMontazRail();
+
+    stage.querySelectorAll("[data-theme-video]").forEach(function (video) {
+      var layer = video.closest("[data-theme-layer]");
+      var layerTheme = layer && layer.getAttribute("data-theme-layer");
+      var active = layerTheme === theme;
+      if (active) {
+        if (video.readyState < 2) {
+          try {
+            video.load();
+          } catch (e) {}
+        }
+        var play = video.play();
+        if (play && play.catch) play.catch(function () {});
+      } else {
+        try {
+          video.pause();
+        } catch (e) {}
+      }
+    });
+  }
+
+  function applyTheme(theme) {
+    theme = theme || "web";
+    pendingTheme = theme;
+    document.body.setAttribute("data-tile-theme", theme);
+    var light = theme === "systems" || theme === "graphics";
+    document.body.classList.toggle("is-tile-bg-light", light);
+    if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
+      window.__portfolioTileBg.setTheme(theme);
+    }
+    syncThemeMedia(theme);
+  }
+
+  function setActive(index, opts) {
+    opts = opts || {};
+    index = clamp(index);
+    if (index === activeIndex && !opts.force) return;
+    activeIndex = index;
+    clearSlides();
+    tiles.forEach(function (tile, i) {
+      tile.classList.toggle("is-active", i === index);
+    });
+    dots.forEach(function (dot, i) {
+      dot.classList.toggle("is-active", i === index);
+      dot.setAttribute("aria-current", i === index ? "true" : "false");
+    });
+    var tile = tiles[index];
+    applyTheme(tile.getAttribute("data-theme") || "web");
+    syncCardVideos(tile);
+    playTileSlides(tile);
+  }
+
+  function scrollToIndex(index, behavior) {
+    index = clamp(index);
+    var tile = tiles[index];
+    if (!tile) return;
+    var left = scroller.scrollLeft + (centerOf(tile) - window.innerWidth * 0.5);
+    scroller.scrollTo({
+      left: Math.max(0, left),
+      behavior: behavior || "smooth",
+    });
+    setActive(index, { force: true });
+  }
+
+  function syncFromScroll() {
+    setActive(nearestIndex());
+  }
+
+  scroller.addEventListener(
+    "scroll",
+    function () {
+      window.requestAnimationFrame(syncFromScroll);
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "resize",
+    function () {
+      scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
+    },
+    { passive: true }
+  );
+
+  dots.forEach(function (dot, i) {
+    dot.addEventListener("click", function () {
+      scrollToIndex(i);
+    });
+  });
+
+  window.addEventListener(
+    "wheel",
+    function (e) {
+      if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+      if (Math.abs(e.deltaY) < 1.2) return;
+      e.preventDefault();
+      var now = performance.now();
+      if (now - wheelLock < 420) return;
+      wheelLock = now;
+      var next = activeIndex + (e.deltaY > 0 ? 1 : -1);
+      if (next < 0 || next >= tiles.length) return;
+      scrollToIndex(next);
+    },
+    { passive: false }
+  );
+
+  window.addEventListener("portfolio-tile-bg-ready", function () {
+    if (pendingTheme) applyTheme(pendingTheme);
+  });
+
+  document.body.classList.add("portfolio-page--tiles");
+  scrollToIndex(0, "auto");
+  window.setTimeout(function () {
+    scrollToIndex(0, "auto");
+    if (pendingTheme) applyTheme(pendingTheme);
+  }, 80);
+  window.setTimeout(function () {
+    if (pendingTheme) applyTheme(pendingTheme);
+  }, 400);
+})();

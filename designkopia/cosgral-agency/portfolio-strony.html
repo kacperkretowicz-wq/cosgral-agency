@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl" data-i18n-meta="portfolio.grafiki_meta">
+<html lang="pl" data-i18n-meta="portfolio.web_pages_meta">
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" href="favicon.ico" sizes="any" />
@@ -8,10 +8,12 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="manifest" href="site.webmanifest" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Grafiki — Portfolio COSGRAL</title>
-<meta name="description" content="Galeria grafik COSGRAL — Juicy Events, Far East, BTS i więcej." />
+<title>Strony internetowe — Portfolio COSGRAL</title>
+<meta name="description" content="Wybrane strony internetowe COSGRAL — Juicy Events, Trove Archive, MJ Social Media." />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260926g1" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260926tiles1" />
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz2" />
+<script src="telforce-previews.js?v=20260925anim1" defer></script>
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
@@ -77,12 +79,54 @@
 <main id="main">
   <header class="portfolio-hero gallery-hero">
     <span class="section-eyebrow" data-i18n="common.portfolio_eyebrow">Portfolio</span>
-    <h1 class="portfolio-hero__title" data-i18n="portfolio.grafiki_title">Grafiki</h1>
-    <p class="portfolio-hero__lead" data-i18n="portfolio.grafiki_page_lead">Posty, stories i key visuale — od Juicy Events przez Far East po BTS.</p>
+    <h1 class="portfolio-hero__title" data-i18n="portfolio.web_title">Strony internetowe</h1>
+    <p class="portfolio-hero__lead" data-i18n="portfolio.web_page_lead">Od landing page po sklepy — wybrane wdrożenia stron, które oddają markę i konwertują.</p>
     <p class="graphics-gallery-page__back"><a href="portfolio.html" data-i18n="portfolio.back_portfolio">← Wróć do portfolio</a></p>
   </header>
 
-  <div id="graphics-gallery" class="graphics-gallery" aria-live="polite"></div>
+  <div class="systems-gallery">
+    <div class="portfolio-case-grid">
+      <article class="portfolio-case-card portfolio-case-card--linked" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-strona-juicy-events.html" aria-label="Juicy Events — strona internetowa">
+          <div class="portfolio-case-card__preview">
+            <video class="portfolio-case-card__visual" muted loop playsinline preload="metadata" poster="portfolio-media/showcase/web/juicy-events-poster.jpg" data-portfolio-video data-video-src="portfolio-media/showcase/web/juicy-events.mp4" src="portfolio-media/showcase/web/juicy-events.mp4"></video>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.case_eyebrow">Strona internetowa</p>
+            <p class="portfolio-case-card__client" data-i18n="portfolio.juicy_title">Juicy Events</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.juicy_desc">Agencja eventowa</h3>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--linked" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-strona-trove.html" aria-label="Trove Archive — strona internetowa">
+          <div class="portfolio-case-card__preview">
+            <video class="portfolio-case-card__visual" muted loop playsinline preload="metadata" poster="portfolio-media/showcase/web/trove-archive-poster.jpg" data-portfolio-video data-video-src="portfolio-media/showcase/web/trove-archive.mp4" src="portfolio-media/showcase/web/trove-archive.mp4"></video>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.case_eyebrow">Strona internetowa</p>
+            <p class="portfolio-case-card__client" data-i18n="portfolio.trove_title">Trove Archive</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.trove_desc">Ecommerce fashion</h3>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--linked" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-strona-mj.html" aria-label="MJ Social Media — strona internetowa">
+          <div class="portfolio-case-card__preview">
+            <video class="portfolio-case-card__visual" muted loop playsinline preload="metadata" poster="portfolio-media/showcase/web/mj-social-media-poster.jpg" data-portfolio-video data-video-src="portfolio-media/showcase/web/mj-social-media.mp4" src="portfolio-media/showcase/web/mj-social-media.mp4"></video>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.case_eyebrow">Strona internetowa</p>
+            <p class="portfolio-case-card__client" data-i18n="portfolio.mj_title">MJ Social Media</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.mj_desc">Content creator</h3>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+    </div>
+  </div>
 </main>
 
 <section class="portfolio-contact-cta" aria-label="Kontakt">
@@ -92,17 +136,6 @@
     <a class="glass-btn" href="index.html#kontakt" data-i18n="about.cta">Porozmawiajmy o projekcie</a>
   </div>
 </section>
-
-<div class="graphics-lightbox" id="graphics-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" data-i18n-aria-label="portfolio.lightbox_graphic" aria-label="Podgląd grafiki">
-  <button type="button" class="graphics-lightbox__backdrop" data-lightbox-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij"></button>
-  <figure class="graphics-lightbox__figure">
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--prev" data-portfolio-lightbox-prev data-i18n-aria-label="portfolio.lightbox_prev_graphic" aria-label="Poprzednia grafika" hidden>‹</button>
-    <button type="button" class="portfolio-lightbox__nav portfolio-lightbox__nav--next" data-portfolio-lightbox-next data-i18n-aria-label="portfolio.lightbox_next_graphic" aria-label="Następna grafika" hidden>›</button>
-    <img class="graphics-lightbox__img" alt="" hidden />
-    <video class="graphics-lightbox__video" controls playsinline hidden></video>
-    <button type="button" class="graphics-lightbox__close" data-lightbox-close data-i18n-aria-label="portfolio.lightbox_close" aria-label="Zamknij">×</button>
-  </figure>
-</div>
 
 <footer class="site-footer">
   <div class="container">
@@ -164,7 +197,7 @@
   </div>
 </footer>
 
-<script src="i18n.js?v=20260919gyro"></script>
+<script src="i18n.js?v=20260926tiles1"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
@@ -178,10 +211,7 @@
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script src="sand-hero-subpage.js?v=20260816a"></script>
 <script src="sections.js?v=20260814e"></script>
-<script src="portfolio-lightbox-nav.js?v=20260807ak"></script>
 <script src="portfolio-video.js?v=20260920ui19"></script>
-<script src="portfolio-color-zone.js?v=20260814e"></script>
-<script src="portfolio-graphics.js?v=20260926g1"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
 </body>

@@ -1,0 +1,509 @@
+/* Realizacje — L→R category tiles over mouse-reactive WebGL */
+
+body.portfolio-page--tiles {
+  --tile-w: min(70vw, 26rem);
+  --tile-h: min(56svh, 32rem);
+  --tile-page-bg: #070709;
+  background: var(--tile-page-bg);
+  color: #f5f5f5;
+  overflow-x: hidden;
+  transition: color 0.45s ease, background-color 0.45s ease;
+}
+body.portfolio-page--tiles[data-tile-theme="web"] { --tile-page-bg: #070709; }
+body.portfolio-page--tiles[data-tile-theme="systems"] { --tile-page-bg: #f4f4f6; }
+body.portfolio-page--tiles[data-tile-theme="video"] { --tile-page-bg: #050505; }
+body.portfolio-page--tiles[data-tile-theme="graphics"] { --tile-page-bg: #f3ebe2; }
+body.portfolio-page--tiles.is-tile-bg-light {
+  color: #111;
+}
+body.portfolio-page--tiles.is-tile-bg-light .site-nav__toggle,
+body.portfolio-page--tiles.is-tile-bg-light .lang-switch button {
+  color: #111;
+}
+body.portfolio-page--tiles.is-tile-bg-light .site-nav__toggle-bars span {
+  background: #111;
+}
+
+body.portfolio-page--tiles .subpage-ambient,
+body.portfolio-page--tiles .subpage-ambient__blur,
+body.portfolio-page--tiles .subpage-ambient__shade,
+body.portfolio-page--tiles .portfolio-sand-portal,
+body.portfolio-page--tiles .grafiki-bloom,
+body.portfolio-page--tiles .portfolio-scene-curtain,
+body.portfolio-page--tiles .home-scroll-rail,
+body.portfolio-page--tiles .subpage-cube-portal,
+body.portfolio-page--tiles .portfolio-end {
+  display: none !important;
+}
+body.portfolio-page--tiles.subpage::after {
+  opacity: 0.04;
+}
+
+body.portfolio-page--tiles .site-nav {
+  z-index: 40;
+}
+
+body.portfolio-page--tiles #main {
+  position: relative;
+  z-index: 2;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+}
+
+/* Full-bleed WebGL (systems primary; others let media layers show) */
+.portfolio-tile-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-tile-bg {
+  opacity: 1;
+}
+
+/* Theme media layers */
+.portfolio-theme-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.portfolio-theme-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-theme-layer[data-theme-layer="web"],
+body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-theme-layer[data-theme-layer="systems"],
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-theme-layer[data-theme-layer="video"],
+body.portfolio-page--tiles[data-tile-theme="graphics"] .portfolio-theme-layer[data-theme-layer="graphics"] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.portfolio-theme-layer__video {
+  position: absolute;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  object-fit: cover;
+  filter: blur(14px) saturate(1.12) brightness(0.72);
+  transform: scale(1.06);
+}
+.portfolio-theme-layer__veil {
+  position: absolute;
+  inset: 0;
+}
+.portfolio-theme-layer__veil--web {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.48) 72%),
+    linear-gradient(180deg, rgba(7, 7, 9, 0.22), rgba(7, 7, 9, 0.55));
+}
+.portfolio-theme-layer__veil--video {
+  background:
+    linear-gradient(90deg, rgba(5, 5, 5, 0.55), transparent 14%, transparent 86%, rgba(5, 5, 5, 0.55)),
+    linear-gradient(180deg, rgba(5, 5, 5, 0.35), transparent 28%, transparent 72%, rgba(5, 5, 5, 0.4));
+}
+
+/* Systems — soft field under WebGL node network */
+.portfolio-systems-field {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(255, 255, 255, 0.95), transparent 42%),
+    radial-gradient(circle at 72% 60%, rgba(210, 216, 230, 0.7), transparent 40%),
+    linear-gradient(160deg, #f7f7f9, #e8ebf2 55%, #dfe3ec);
+}
+
+/* Montaż — one-line scrolling reel rail */
+.portfolio-montaz-rail {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #050505;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+.portfolio-montaz-rail__belt {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: montaz-rail-drift 48s linear infinite;
+  animation-play-state: paused;
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-montaz-rail.is-ready .portfolio-montaz-rail__belt {
+  animation-play-state: running;
+}
+@keyframes montaz-rail-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.portfolio-montaz-rail__track {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.7rem, 1.6vw, 1.15rem);
+  padding: 0 clamp(1rem, 3vw, 2rem);
+  height: min(58svh, 30rem);
+}
+.portfolio-montaz-rail__card {
+  position: relative;
+  flex: 0 0 auto;
+  aspect-ratio: 9 / 16;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #111;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+.portfolio-montaz-rail__card--sm { height: 48%; }
+.portfolio-montaz-rail__card--md { height: 64%; }
+.portfolio-montaz-rail__card--lg { height: 78%; }
+.portfolio-montaz-rail__card--xl { height: 92%; }
+.portfolio-montaz-rail__card img,
+.portfolio-montaz-rail__card video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.portfolio-montaz-rail__card video {
+  z-index: 1;
+}
+
+/* Grafiki — drifting posters */
+.portfolio-grafiki-drift {
+  position: absolute;
+  inset: -8%;
+  background: #f3ebe2;
+}
+.portfolio-grafiki-drift__item {
+  position: absolute;
+  width: min(22vw, 11rem);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 0.65rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  opacity: 0.72;
+  will-change: transform;
+  animation: grafiki-drift 22s ease-in-out infinite;
+}
+.portfolio-grafiki-drift__item:nth-child(1) { left: 6%; top: 12%; animation-duration: 24s; animation-delay: -2s; }
+.portfolio-grafiki-drift__item:nth-child(2) { left: 28%; top: 58%; width: min(18vw, 9rem); animation-duration: 20s; animation-delay: -6s; }
+.portfolio-grafiki-drift__item:nth-child(3) { left: 52%; top: 8%; width: min(20vw, 10rem); animation-duration: 26s; animation-delay: -4s; }
+.portfolio-grafiki-drift__item:nth-child(4) { left: 72%; top: 42%; animation-duration: 21s; animation-delay: -9s; }
+.portfolio-grafiki-drift__item:nth-child(5) { left: 12%; top: 62%; width: min(16vw, 8rem); animation-duration: 23s; animation-delay: -11s; }
+.portfolio-grafiki-drift__item:nth-child(6) { left: 40%; top: 28%; width: min(17vw, 8.5rem); animation-duration: 19s; animation-delay: -3s; }
+.portfolio-grafiki-drift__item:nth-child(7) { left: 78%; top: 14%; width: min(15vw, 7.5rem); animation-duration: 25s; animation-delay: -7s; }
+.portfolio-grafiki-drift__item:nth-child(8) { left: 60%; top: 66%; width: min(19vw, 9.5rem); animation-duration: 22s; animation-delay: -13s; }
+@keyframes grafiki-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+  33% { transform: translate3d(18px, -22px, 0) rotate(2deg); }
+  66% { transform: translate3d(-14px, 16px, 0) rotate(-1deg); }
+}
+
+/* Kill legacy #montaz etc. */
+body.portfolio-page--tiles a.portfolio-tile#montaz,
+body.portfolio-page--tiles a.portfolio-tile#strony,
+body.portfolio-page--tiles a.portfolio-tile#grafiki,
+body.portfolio-page--tiles a.portfolio-tile#automatyzacje {
+  height: var(--tile-h) !important;
+  min-height: var(--tile-h) !important;
+  max-height: var(--tile-h) !important;
+  width: var(--tile-w) !important;
+  min-width: var(--tile-w) !important;
+  max-width: var(--tile-w) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Strip */
+.portfolio-tiles {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  padding: clamp(4.8rem, 10vh, 6rem) 0 clamp(1.25rem, 3vh, 2rem);
+}
+.portfolio-tiles__scroller {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding: 1.25rem max(var(--gutter, 1.25rem), calc((100vw - var(--tile-w)) / 2));
+  scrollbar-width: none;
+}
+.portfolio-tiles__scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Category tile — website-card feel (chrome + media + body) */
+.portfolio-tile {
+  position: relative;
+  flex: 0 0 var(--tile-w);
+  width: var(--tile-w);
+  min-width: var(--tile-w);
+  max-width: var(--tile-w);
+  height: var(--tile-h);
+  min-height: var(--tile-h);
+  max-height: var(--tile-h);
+  box-sizing: border-box;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  text-decoration: none;
+  color: #f5f5f5;
+  background: rgba(8, 8, 10, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.35);
+  opacity: 0.78;
+  transform: none;
+  transition:
+    opacity 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.45s ease,
+    background 0.45s ease;
+}
+.portfolio-tile.is-active {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile {
+  color: #111;
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.12);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile.is-active {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(0, 0, 0, 0.16);
+}
+
+.portfolio-tile:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 4px;
+}
+
+.portfolio-tile__chrome {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.55rem 0.75rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__chrome {
+  background: rgba(0, 0, 0, 0.06);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+.portfolio-tile__chrome span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__chrome span {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.portfolio-tile__media {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+.portfolio-tile__media video,
+.portfolio-tile__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.portfolio-tile__slides {
+  position: absolute;
+  inset: 0;
+}
+.portfolio-tile__slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.portfolio-tile__slide.is-on {
+  opacity: 1;
+}
+
+.portfolio-tile__systems {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 40% 42%, #ffffff 0%, #eceef3 48%, #c8ccd6 100%);
+}
+.portfolio-tile__systems-cube {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 38%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotateX(18deg) rotateY(-28deg);
+  background: rgba(8, 8, 10, 0.9);
+  border-radius: 18%;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 16px 36px rgba(0, 0, 0, 0.22);
+  animation: tile-cube 8s ease-in-out infinite;
+}
+@keyframes tile-cube {
+  0%, 100% { transform: translate(-50%, -50%) rotateX(18deg) rotateY(-28deg); }
+  50% { transform: translate(-50%, -54%) rotateX(22deg) rotateY(-16deg); }
+}
+
+.portfolio-tile__body {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.95rem 1rem 1.05rem;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55));
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__body {
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.85));
+}
+/* When body sits under media as flex child, use solid bar */
+.portfolio-tile > .portfolio-tile__body {
+  background: rgba(0, 0, 0, 0.55);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile > .portfolio-tile__body {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.portfolio-tile__title {
+  margin: 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-transform: none;
+}
+.portfolio-tile__lead {
+  margin: 0;
+  max-width: 28ch;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: rgba(245, 245, 245, 0.68);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__lead {
+  color: rgba(17, 17, 17, 0.62);
+}
+.portfolio-tile__cta {
+  margin-top: 0.35rem;
+  align-self: flex-start;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.85;
+}
+
+.portfolio-tiles__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  padding: 0 var(--gutter, 1.25rem);
+}
+.portfolio-tiles__dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.portfolio-tiles__dot.is-active {
+  width: 1.35rem;
+  background: rgba(255, 255, 255, 0.92);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tiles__dot {
+  background: rgba(0, 0, 0, 0.22);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tiles__dot.is-active {
+  background: rgba(0, 0, 0, 0.82);
+}
+
+@media (min-width: 901px) {
+  body.portfolio-page--tiles {
+    --tile-w: min(32vw, 26rem);
+    --tile-h: min(56svh, 32rem);
+  }
+}
+
+@media (max-width: 720px) {
+  body.portfolio-page--tiles {
+    --tile-w: min(82vw, 22rem);
+    --tile-h: min(52svh, 28rem);
+  }
+}
+
+html.reduce-motion .portfolio-tile,
+html.reduce-motion .portfolio-tile__slide,
+html.reduce-motion .portfolio-tile__systems-cube,
+html.reduce-motion .portfolio-montaz-rail__belt,
+html.reduce-motion .portfolio-grafiki-drift__item {
+  transition: none !important;
+  animation: none !important;
+}
+
+@media (max-width: 720px) {
+  .portfolio-theme-layer__video {
+    filter: blur(12px) saturate(1.05) brightness(0.55);
+  }
+  .portfolio-montaz-rail__track {
+    height: min(58svh, 28rem);
+  }
+  .portfolio-grafiki-drift__item {
+    width: min(34vw, 8.5rem);
+    opacity: 0.62;
+  }
+}

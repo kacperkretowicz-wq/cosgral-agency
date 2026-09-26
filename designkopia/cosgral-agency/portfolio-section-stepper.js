@@ -12,9 +12,9 @@
   var HOLDS_CONFIG = [
     { id: "portfolio-top", selector: ".portfolio-hero" },
     { id: "strony", selector: "#strony" },
+    { id: "automatyzacje", selector: "#automatyzacje" },
     { id: "montaz", selector: "#montaz" },
-    { stId: "grafiki-pin", hold: 0, id: "grafiki" },
-    { id: "automatyzacje", selector: "#automatyzacje-intro" },
+    { id: "grafiki", stId: "grafiki-pin", hold: 0, selector: "#grafiki" },
     { id: "footer", footer: true },
   ];
   var SECTION_IDS = HOLDS_CONFIG.filter(function (c) {
@@ -30,7 +30,13 @@
     var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : document.documentElement.scrollHeight;
     if (!footer) return max;
-    return Math.min(max, Math.max(0, footer.offsetTop));
+    // offsetTop breaks when footer is nested in .portfolio-end — use viewport + scroll
+    var scrollY = window.scrollY || window.pageYOffset || 0;
+    if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+      scrollY = window.cosgralSmoothScroll.scroll;
+    }
+    var y = footer.getBoundingClientRect().top + scrollY - (MOBILE ? 72 : 96);
+    return Math.min(max, Math.max(0, y));
   }
 
   function sectionHoldY(selector) {
@@ -52,10 +58,16 @@
       }
       if (cfg.stId) {
         var st = ScrollTrigger.getById(cfg.stId);
-        if (st) holds.push(holdY(st, cfg.hold));
+        if (st) {
+          holds.push(holdY(st, cfg.hold != null ? cfg.hold : 0));
+          return;
+        }
+      }
+      if (cfg.selector) {
+        holds.push(sectionHoldY(cfg.selector));
         return;
       }
-      if (cfg.selector) holds.push(sectionHoldY(cfg.selector));
+      if (cfg.id) holds.push(sectionHoldY("#" + cfg.id));
     });
     return holds;
   }
@@ -110,14 +122,11 @@
     }
 
     function nearestIndex(scroll) {
+      // Last hold reached — Grafiki only after its pin start, not midway from Montaż
       var best = 0;
-      var dist = Infinity;
+      var slop = Math.max(48, Math.round(window.innerHeight * 0.06));
       for (var i = 0; i < holds.length; i++) {
-        var d = Math.abs(scroll - holds[i]);
-        if (d < dist) {
-          dist = d;
-          best = i;
-        }
+        if (scroll + slop >= holds[i]) best = i;
       }
       return best;
     }
@@ -164,14 +173,10 @@
 
     function autoFreeRange() {
       var auto = document.getElementById("automatyzacje");
-      var footer = document.querySelector(".site-footer");
       if (!auto) return null;
-      var start = Math.max(0, auto.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
-      var end = footer
-        ? Math.max(0, footer.offsetTop)
-        : window.ScrollTrigger
-          ? ScrollTrigger.maxScroll(window)
-          : document.documentElement.scrollHeight;
+      var top = auto.getBoundingClientRect().top + window.scrollY;
+      var start = Math.max(0, top - (MOBILE ? 72 : 96));
+      var end = Math.max(start + 1, top + auto.offsetHeight);
       return { start: start, end: end };
     }
 
@@ -788,7 +793,16 @@
     ScrollTrigger.addEventListener("refresh", function () {
       holds = buildHolds();
       window.cosgralPortfolioStepper.holds = holds;
+      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
     });
+
+    // Pin starts shift after first layout/media; rebuild holds once more
+    window.setTimeout(function () {
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+      holds = buildHolds();
+      window.cosgralPortfolioStepper.holds = holds;
+      if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
+    }, 420);
   }
 
   function tryInit() {

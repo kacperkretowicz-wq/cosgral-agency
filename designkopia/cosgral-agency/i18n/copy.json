@@ -55,6 +55,22 @@
     "about": {
       "pl": "O nas",
       "en": "About"
+    },
+    "music": {
+      "pl": "Muzyka",
+      "en": "Music"
+    },
+    "music_play": {
+      "pl": "Włącz muzykę",
+      "en": "Play music"
+    },
+    "music_pause": {
+      "pl": "Wycisz muzykę",
+      "en": "Pause music"
+    },
+    "music_next": {
+      "pl": "Następny utwór",
+      "en": "Next track"
     }
   },
   "preloader": {
@@ -582,6 +598,46 @@
         "en": "COSGRAL graphics gallery — Juicy Events, Far East, BTS and more."
       }
     },
+    "automation_systems_meta": {
+      "title": {
+        "pl": "Systemy i automatyzacje — Portfolio COSGRAL",
+        "en": "Systems & automation — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Aplikacje, CRM i automatyzacje COSGRAL — TelForceOne, Trove, chatboty AI.",
+        "en": "COSGRAL apps, CRM and automations — TelForceOne, Trove, AI chatbots."
+      }
+    },
+    "web_pages_meta": {
+      "title": {
+        "pl": "Strony internetowe — Portfolio COSGRAL",
+        "en": "Websites — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Wybrane strony internetowe COSGRAL — Juicy Events, Trove Archive, MJ Social Media.",
+        "en": "Selected COSGRAL websites — Juicy Events, Trove Archive, MJ Social Media."
+      }
+    },
+    "tile_open": {
+      "pl": "Zobacz realizacje",
+      "en": "See the work"
+    },
+    "tiles_hint": {
+      "pl": "Przesuń w bok między kategoriami",
+      "en": "Swipe sideways between categories"
+    },
+    "automation_tile_lead": {
+      "pl": "CRM, aplikacje i workflow, które odciążają zespół.",
+      "en": "CRM, apps and workflows that take work off your team."
+    },
+    "grafiki_tile_lead": {
+      "pl": "Posty, stories i key visuale w rytmie pokazu slajdów.",
+      "en": "Posts, stories and key visuals as a slide show."
+    },
+    "web_page_lead": {
+      "pl": "Od landing page po sklepy — wybrane wdrożenia stron, które oddają markę i konwertują.",
+      "en": "From landing pages to stores — selected website deliveries that carry the brand and convert."
+    },
     "hero_title": {
       "pl": "Realizacje",
       "en": "Selected work"
@@ -829,8 +885,8 @@
       "en": "Video editing"
     },
     "montaz_lead": {
-      "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
-      "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
+      "pl": "Reels i materiały reklamowe",
+      "en": "Reels and advertising films"
     },
     "montaz_service": {
       "pl": "Usługa: montaż i wideo →",
@@ -875,6 +931,18 @@
     "grafiki_service": {
       "pl": "Usługa: grafika i wideo →",
       "en": "Service: design & video →"
+    },
+    "see_more_systems": {
+      "pl": "Zobacz więcej",
+      "en": "See more"
+    },
+    "automation_cover_aria": {
+      "pl": "Systemy i automatyzacje — zobacz więcej",
+      "en": "Systems and automation — see more"
+    },
+    "automation_page_lead": {
+      "pl": "Aplikacje, CRM i automatyzacje, które wdrożyliśmy — od TelForceOne po Trove i chatboty AI.",
+      "en": "Apps, CRM and automations we shipped — from TelForceOne to Trove and AI chatbots."
     },
     "automation_title": {
       "pl": "Systemy i automatyzacje",

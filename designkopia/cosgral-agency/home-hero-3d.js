@@ -2,9 +2,10 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260919mob";
 import { createFxaaPass } from "./three-fxaa-pass.js";
+import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {
   "use strict";
@@ -18,14 +19,13 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     MOBILE || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   if (REDUCED) return;
 
-  var HALF = 1.35;
-  var CUBE_SCALE = 0.5;
-  /* Mobile hero cube — 1.6× previous size */
-  var MOBILE_HERO_CUBE = 1.6;
-  var HERO_SCALE_MUL = MOBILE ? 0.39 * MOBILE_HERO_CUBE : 0.78;
-  var PEAK_SCALE_MUL = MOBILE ? 0.58 * MOBILE_HERO_CUBE : 1.16;
-  var EDGE_OP = MOBILE ? 0.18 : 0.24;
-  var SHELL_OP = MOBILE ? 0.5 : 0.45;
+  var look = heroCubeLook(MOBILE);
+  var HALF = look.half;
+  var CUBE_SCALE = look.cubeScale;
+  var HERO_SCALE_MUL = look.heroScaleMul;
+  var PEAK_SCALE_MUL = look.peakScaleMul;
+  var EDGE_OP = look.edgeOp;
+  var SHELL_OP = look.shellOp;
   var SHARDS = LOW_PERF ? 280 : 1600;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
@@ -395,11 +395,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     return [a, b, -h];
   }
 
-  var SURFACE = MOBILE ? 1200 : 2800;
-  /* Na mobile cubeGroup.scale jest ~2× mniejszy, a gl_PointSize nie skaluje się
-     z obiektem — te same sprite'y dają jaśniejszy glow. Dopasowujemy do desktopu. */
-  var SURFACE_SIZE_MUL = MOBILE ? 0.48 : 1;
-  var SURFACE_ALPHA_MUL = MOBILE ? 0.42 : 1;
+  var SURFACE = look.surfaceCount;
+  var SURFACE_SIZE_MUL = look.surfaceSizeMul;
+  var SURFACE_ALPHA_MUL = look.surfaceAlphaMul;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
@@ -413,46 +411,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
   sGeo.setAttribute("size", new THREE.BufferAttribute(sSize, 1));
 
-  var sMat = new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    uniforms: {
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0, 0) },
-      uFade: { value: 1 },
-      uAlphaMul: { value: SURFACE_ALPHA_MUL },
-    },
-    vertexShader: `
-      attribute float size;
-      uniform float uTime;
-      uniform vec2 uMouse;
-      uniform float uFade;
-      uniform float uAlphaMul;
-      varying float vAlpha;
-      void main() {
-        vec3 pos = position;
-        float pulse = sin(uTime * 0.55 + pos.y * 4.0 + pos.x * 3.0) * 0.012;
-        pos += normalize(pos + 0.0001) * pulse;
-        float dist = length(pos.xy - uMouse * 1.4);
-        float ripple = sin(dist * 9.0 - uTime * 2.8) * smoothstep(2.6, 0.0, dist) * 0.07;
-        pos.xy += normalize(pos.xy + 0.0001) * ripple;
-        vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-        gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);
-        gl_Position = projectionMatrix * mv;
-        vAlpha = (0.16 + smoothstep(2.8, 0.0, dist) * 0.25) * uFade * uAlphaMul;
-      }
-    `,
-    fragmentShader: `
-      varying float vAlpha;
-      void main() {
-        float d = length(gl_PointCoord - 0.5);
-        if (d > 0.5) discard;
-        float glow = 1.0 - smoothstep(0.0, 0.5, d);
-        gl_FragColor = vec4(0.7, 0.7, 0.72, vAlpha * glow * 0.5);
-      }
-    `,
-  });
+  var sMat = createCubeShimmerMaterial(THREE, { alphaMul: SURFACE_ALPHA_MUL });
 
   var cubeParts = createIntactCubeParts(HALF);
   var shell = cubeParts.shell;
