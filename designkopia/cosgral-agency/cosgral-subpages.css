@@ -312,7 +312,7 @@ body.is-grafiki-light.portfolio-page {
   opacity: 0;
   visibility: hidden;
   background:
-    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.94) 100%);
+    radial-gradient(ellipse 88% 78% at 50% 48%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.82) 48%, rgba(0, 0, 0, 0.98) 100%);
 }
 body.is-portfolio-scene-bridge .portfolio-scene-curtain {
   visibility: visible;
@@ -1927,7 +1927,7 @@ html.reduce-motion .portfolio-page--film .home-scroll-rail {
   background: transparent;
 }
 .portfolio-page .portfolio-section + .portfolio-section {
-  margin-top: 0;
+  margin-top: clamp(32vh, 46vh, 58vh);
 }
 /* Separatory między sekcjami — wyłączone */
 .portfolio-section__curtain,

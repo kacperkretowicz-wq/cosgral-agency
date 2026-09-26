@@ -22,8 +22,9 @@
     if (!next) return 0;
     var top = next.getBoundingClientRect().top;
     var vh = window.innerHeight || 1;
+    var span = vh * (MOBILE ? 1.28 : 1.45);
     if (top <= 0) return 1;
-    return 1 - Math.max(0, Math.min(1, top / vh));
+    return 1 - Math.max(0, Math.min(1, top / span));
   }
 
   function poseTarget(el) {
@@ -88,19 +89,19 @@
   function setCurtain(amount) {
     var curtain = getCurtain();
     if (!curtain || !window.gsap) return;
-    var a = Math.max(0, Math.min(0.88, amount));
+    var a = Math.max(0, Math.min(0.97, amount));
     gsap.set(curtain, {
       autoAlpha: a,
       visibility: a > 0.01 ? "visible" : "hidden",
     });
-    document.body.classList.toggle("is-portfolio-scene-bridge", a > 0.08);
+    document.body.classList.toggle("is-portfolio-scene-bridge", a > 0.06);
   }
 
   function syncCurtainFromCovers(pairs) {
     var peak = 0;
     pairs.forEach(function (pair) {
       var p = coverAmount(pair.enter);
-      var pulse = Math.sin(p * Math.PI) * 0.72;
+      var pulse = Math.sin(p * Math.PI) * 0.97;
       if (pulse > peak) peak = pulse;
     });
     setCurtain(peak);
