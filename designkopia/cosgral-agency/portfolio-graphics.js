@@ -1243,12 +1243,6 @@
       }
       section.classList.toggle("is-cinema-done", p > 0.94);
       document.body.classList.toggle("is-grafiki-overlay-reveal", show);
-      if (show) {
-        document.body.classList.add("is-grafiki-light");
-        if (window.cosgralGrafikiBloom?.apply) {
-          window.cosgralGrafikiBloom.apply(1);
-        }
-      }
     }
 
     function clearGrafikiFinale() {
@@ -1635,38 +1629,20 @@
     if (bloom) gsap.set(bloom, { opacity: 0 });
     if (rail) gsap.set(rail, RAIL_LIGHT);
 
-    function applyAmbientLift(t) {
-      t = Math.max(0, Math.min(1, t));
-      if (Math.abs(t - lastLift) < 0.001 && lastLift >= 0) {
-        document.body.classList.toggle("is-grafiki-light", t > 0.04);
-        document.documentElement.style.setProperty("--grafiki-lift", t.toFixed(3));
-        return;
-      }
-      lastLift = t;
-      document.documentElement.style.setProperty("--grafiki-lift", t.toFixed(3));
-      /* CSS var drives visible wash; JS keeps ambient/rail in sync */
-      if (bloom) gsap.set(bloom, { opacity: lerp(0, 0.9, t) });
-      if (shade) {
-        gsap.set(shade, {
-          backgroundColor: mixRgba("rgba(3, 3, 3, 0.28)", "rgba(255, 255, 255, 0.92)", t),
-        });
-      }
+    function applyAmbientLift() {
+      lastLift = 0;
+      document.documentElement.style.setProperty("--grafiki-lift", "0");
+      if (bloom) gsap.set(bloom, { opacity: 0 });
+      if (shade) gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
       if (ambient) {
         gsap.set(ambient, {
-          filter:
-            "grayscale(" +
-            lerp(1, 0, t).toFixed(3) +
-            ") contrast(" +
-            lerp(1.04, 1.02, t).toFixed(3) +
-            ") brightness(" +
-            lerp(0.78, 3.2, t).toFixed(3) +
-            ")",
-          opacity: lerp(1, 0.35, t),
+          filter: "grayscale(1) contrast(1.04) brightness(0.78)",
+          opacity: 1,
         });
       }
-      if (blur) gsap.set(blur, { opacity: lerp(0.55, 0.2, t) });
-      if (rail) gsap.set(rail, mixRail(RAIL_LIGHT, RAIL_DARK, t));
-      document.body.classList.toggle("is-grafiki-light", t > 0.04);
+      if (blur) gsap.set(blur, { opacity: 0.55 });
+      if (rail) gsap.set(rail, RAIL_LIGHT);
+      document.body.classList.remove("is-grafiki-light");
       syncGrafikiCubeFade();
     }
 

@@ -286,23 +286,22 @@ body.service-page .subpage-cube-portal {
 /* Hard light wash — ambient WebGL stays near-black even with brightness(); bloom must paint */
 body.is-grafiki-light .subpage-ambient,
 body.is-grafiki-light .subpage-ambient__blur {
-  z-index: 1;
+  z-index: 0;
 }
 body.is-grafiki-light .subpage-ambient__shade {
-  z-index: 1 !important;
-  background: rgba(255, 255, 255, calc(0.88 * var(--grafiki-lift, 1))) !important;
+  z-index: 0 !important;
+  background: rgba(3, 3, 3, 0.28) !important;
 }
 body.is-grafiki-light .grafiki-bloom {
-  z-index: 1 !important;
-  opacity: calc(0.9 * var(--grafiki-lift, 1)) !important;
-  background: #f0f0f0;
-  visibility: visible !important;
+  z-index: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 body.is-grafiki-light {
-  --bg: color-mix(in srgb, #f0f0f0 calc(var(--grafiki-lift, 1) * 100%), #030303);
+  --bg: #030303;
 }
 body.is-grafiki-light.portfolio-page {
-  background: color-mix(in srgb, #f0f0f0 calc(var(--grafiki-lift, 1) * 100%), #030303);
+  background: #030303;
 }
 .portfolio-scene-curtain {
   position: fixed;
@@ -2522,64 +2521,51 @@ body.is-grafiki-overlay-reveal #grafiki .graphics-collage__footer {
   filter: grayscale(0) !important;
 }
 body.is-grafiki-light #grafiki .graphics-stage__copy {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: rgba(255, 255, 255, 0.68);
-  box-shadow:
-    0 14px 44px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.18);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
-body.is-grafiki-light #grafiki .graphics-stage__copy .portfolio-section__title {
-  text-shadow: 0 1px 14px rgba(255, 255, 255, 0.55);
-}
-body.is-grafiki-light #grafiki .graphics-stage__copy .section-lead {
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.4);
+body.is-grafiki-light #grafiki .graphics-stage__copy .portfolio-section__title,
+body.is-grafiki-light #grafiki .graphics-stage__copy .section-lead,
+body.is-grafiki-light #grafiki .graphics-collage__footer .graphics-collage__cta {
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
 }
 body.is-grafiki-light #grafiki .graphics-collage__footer {
-  background: rgba(255, 255, 255, 0.62);
-  border-color: rgba(255, 255, 255, 0.68);
-  box-shadow:
-    0 14px 44px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.18);
-}
-body.is-grafiki-light #grafiki .graphics-collage__footer .graphics-collage__cta {
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.45);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 body.is-grafiki-light #grafiki .portfolio-section__title,
 body.is-grafiki-light #grafiki .graphics-stage__copy .portfolio-section__title,
-body.is-grafiki-light #grafiki .graphics-collage__footer a {
-  color: #111;
+body.is-grafiki-light #grafiki .graphics-collage__footer a,
+body.is-grafiki-light #grafiki .graphics-collage__cta,
+body.is-grafiki-light .graphics-frames-cta,
+body.is-grafiki-light .graphics-frames-cta__title,
+body.is-grafiki-light .graphics-frames-cta__more {
+  color: var(--ink);
 }
 body.is-grafiki-light #grafiki .section-lead,
 body.is-grafiki-light #grafiki .graphics-stage__copy .section-lead,
 body.is-grafiki-light #grafiki .portfolio-section__link {
-  color: #3a3a3a;
+  color: var(--muted);
 }
 body.is-grafiki-light #grafiki .graphics-collage__cta {
   border-color: transparent;
-  color: #111;
 }
 body.is-grafiki-light #grafiki .graphics-collage__cta:hover {
-  border-color: rgba(0, 0, 0, 0.35);
-  background: rgba(0, 0, 0, 0.04);
-}
-body.is-grafiki-light .graphics-frames-cta,
-body.is-grafiki-light .graphics-frames-cta__title {
-  color: #111;
-  text-shadow: none;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
 }
 body.is-grafiki-light .graphics-frames-cta__more {
-  color: #111;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(8, 8, 10, 0.42);
 }
 body.is-grafiki-light .site-nav__toggle,
 body.is-grafiki-light .lang-switch button,
 body.is-grafiki-light .theme-toggle {
-  color: #111;
+  color: var(--ink);
 }
 body.is-grafiki-light .site-nav__toggle-bars span {
-  background: #111;
+  background: var(--ink);
 }
 
 /* Systemy i Automatyzacje — lista na podstronie */
