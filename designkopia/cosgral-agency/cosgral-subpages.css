@@ -311,8 +311,7 @@ body.is-grafiki-light.portfolio-page {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  background:
-    radial-gradient(ellipse 88% 78% at 50% 48%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.82) 48%, rgba(0, 0, 0, 0.98) 100%);
+  background: #000;
 }
 body.is-portfolio-scene-bridge .portfolio-scene-curtain {
   visibility: visible;
@@ -2612,15 +2611,18 @@ body.is-grafiki-light .site-nav__toggle-bars span {
 .auto-cover__film {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 .auto-cover__video {
   position: absolute;
   inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
   opacity: 1;
   filter: none;
+  background: #050505;
 }
 .auto-cover__shade {
   position: absolute;
@@ -2688,11 +2690,6 @@ body.is-grafiki-light .site-nav__toggle-bars span {
 @media (max-width: 720px) {
   .auto-cover__title {
     font-size: clamp(2.1rem, 12vw, 3.2rem);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .auto-cover__video {
-    display: none;
   }
 }
 .portfolio-section--automatyzacje .portfolio-section__head {
@@ -4464,6 +4461,9 @@ body.case-page .case-study .home-tilt-face {
   }
   .portfolio-section {
     padding-block: clamp(4.5rem, 12vw, 6.5rem);
+  }
+  .portfolio-page .portfolio-section + .portfolio-section {
+    margin-top: clamp(26vh, 34vh, 42vh);
   }
   .portfolio-section__head {
     margin-bottom: clamp(2rem, 6vw, 3rem);
