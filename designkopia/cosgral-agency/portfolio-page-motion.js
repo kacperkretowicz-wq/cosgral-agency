@@ -62,16 +62,27 @@
     }
     var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
     var fade = u * u;
-    /* Continuous fade/scale/blur — no sudden visibility snap mid-cover */
-    gsap.set(target, {
-      opacity: Math.max(0, 1 - fade),
-      visibility: "visible",
-      yPercent: exitY * u,
-      scale: 1 - (1 - exitScale) * u,
-      filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
-      transformOrigin: "50% 42%",
-      force3D: true,
-    });
+    var isFilm = el.id === "automatyzacje" || el.classList.contains("portfolio-section--auto-film");
+    /* Film stays full-bleed — fade only, no tile-style scale/blur chapter */
+    gsap.set(target, isFilm
+      ? {
+          opacity: Math.max(0, 1 - fade),
+          visibility: "visible",
+          yPercent: 0,
+          scale: 1,
+          filter: "none",
+          transformOrigin: "50% 50%",
+          force3D: true,
+        }
+      : {
+          opacity: Math.max(0, 1 - fade),
+          visibility: "visible",
+          yPercent: exitY * u,
+          scale: 1 - (1 - exitScale) * u,
+          filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
+          transformOrigin: "50% 42%",
+          force3D: true,
+        });
     el.classList.add("is-depth-recessed");
     if (u >= 0.995) {
       el.classList.add("is-depth-gone");
