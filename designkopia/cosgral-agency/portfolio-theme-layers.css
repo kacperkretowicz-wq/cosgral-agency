@@ -105,44 +105,77 @@ body.portfolio-theme-page--video .portfolio-theme-layer__veil--video {
     linear-gradient(90deg, rgba(5, 5, 5, 0.22), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.22));
 }
 
-/* —— Montaż: large reel tiles drifting across black field —— */
+/* —— Montaż: one irregular L→R stream of mixed-size reel tiles —— */
 .portfolio-montaz-field {
   position: absolute;
   inset: 0;
   background: #050505;
   overflow: hidden;
 }
-.portfolio-montaz-drift {
+.portfolio-montaz-stream {
   position: absolute;
-  inset: -4%;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+}
+.portfolio-montaz-stream__belt {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  will-change: transform;
+  animation: montaz-stream-ltr 42s linear infinite;
+  animation-play-state: paused;
+}
+.portfolio-montaz-stream.is-ready .portfolio-montaz-stream__belt {
+  animation-play-state: running;
+}
+body.portfolio-page--tiles:not([data-tile-theme="video"]) .portfolio-montaz-stream__belt {
+  animation-play-state: paused;
+}
+@keyframes montaz-stream-ltr {
+  /* belt = [set][set]; move so tiles travel left → right */
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+.portfolio-montaz-stream__set {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(190vw, 110rem);
+  height: 100%;
+}
+.portfolio-montaz-stream__card {
+  position: absolute;
+  left: var(--x, 0%);
+  top: var(--y, 0%);
+  width: min(20vw, 10rem);
+  aspect-ratio: 9 / 16;
+  border-radius: 0.95rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #141414;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.62);
+  transform: rotate(var(--rot, 0deg));
+}
+.portfolio-montaz-stream__card--sm {
+  width: min(13vw, 6.5rem);
   z-index: 1;
 }
-.portfolio-montaz-drift__item {
-  position: absolute;
-  width: min(34vw, 17rem);
-  aspect-ratio: 9 / 16;
-  border-radius: 1rem;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: #141414;
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65);
-  opacity: 1;
-  will-change: transform;
-  transform: rotate(var(--rot, 0deg));
-  animation: montaz-drift var(--dur, 26s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
+.portfolio-montaz-stream__card--md {
+  width: min(20vw, 10rem);
+  z-index: 2;
 }
-.portfolio-montaz-drift__item--md {
-  width: min(30vw, 15rem);
+.portfolio-montaz-stream__card--lg {
+  width: min(28vw, 14rem);
+  z-index: 3;
 }
-.portfolio-montaz-drift__item--lg {
-  width: min(38vw, 18.5rem);
+.portfolio-montaz-stream__card--xl {
+  width: min(36vw, 18rem);
+  z-index: 4;
 }
-.portfolio-montaz-drift__item--xl {
-  width: min(44vw, 21rem);
-}
-.portfolio-montaz-drift__item img,
-.portfolio-montaz-drift__item video {
+.portfolio-montaz-stream__card img,
+.portfolio-montaz-stream__card video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -150,17 +183,8 @@ body.portfolio-theme-page--video .portfolio-theme-layer__veil--video {
   object-fit: cover;
   display: block;
 }
-.portfolio-montaz-drift__item video {
+.portfolio-montaz-stream__card video {
   z-index: 1;
-}
-@keyframes montaz-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); }
-  25% { transform: translate3d(4.5vw, -3vh, 0) rotate(calc(var(--rot, 0deg) + 2deg)); }
-  50% { transform: translate3d(-3vw, 2.5vh, 0) rotate(calc(var(--rot, 0deg) - 1deg)); }
-  75% { transform: translate3d(3.5vw, 1.5vh, 0) rotate(calc(var(--rot, 0deg) + 1deg)); }
-}
-body.portfolio-page--tiles:not([data-tile-theme="video"]) .portfolio-montaz-drift__item {
-  animation-play-state: paused;
 }
 
 /* —— Grafiki: light homepage ambient only (no poster drift) —— */
@@ -244,26 +268,29 @@ body.portfolio-theme-page--systems .portfolio-theme-stage {
 }
 
 /* Hide legacy drift if any leftover markup */
-.portfolio-grafiki-drift {
+.portfolio-grafiki-drift,
+.portfolio-montaz-drift {
   display: none !important;
 }
 
-html.reduce-motion .portfolio-montaz-drift__item {
+html.reduce-motion .portfolio-montaz-stream__belt {
   animation: none !important;
 }
 
 @media (max-width: 720px) {
-  .portfolio-montaz-drift__item {
-    width: min(48vw, 12.5rem);
-    opacity: 0.92;
+  .portfolio-montaz-stream__set {
+    width: 280vw;
   }
-  .portfolio-montaz-drift__item--md {
+  .portfolio-montaz-stream__card--sm {
+    width: min(24vw, 6.5rem);
+  }
+  .portfolio-montaz-stream__card--md {
+    width: min(32vw, 8.5rem);
+  }
+  .portfolio-montaz-stream__card--lg {
     width: min(42vw, 11rem);
   }
-  .portfolio-montaz-drift__item--lg {
-    width: min(54vw, 14rem);
-  }
-  .portfolio-montaz-drift__item--xl {
-    width: min(60vw, 15.5rem);
+  .portfolio-montaz-stream__card--xl {
+    width: min(52vw, 13.5rem);
   }
 }
