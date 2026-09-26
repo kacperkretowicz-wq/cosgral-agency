@@ -421,13 +421,23 @@ body.about-page .subpage-cube-portal {
   place-items: center;
   opacity: 0.68;
 }
+body.is-auto-cube-hero .portfolio-sand-portal--back {
+  z-index: 0;
+}
+body.is-auto-cube-hero .portfolio-sand-portal--front {
+  z-index: 2;
+  opacity: 0.22;
+}
 body.is-auto-cube-hero .subpage-cube-portal {
-  z-index: 1;
+  z-index: 3;
   opacity: 1 !important;
   visibility: visible !important;
 }
-body.is-auto-cube-hero .portfolio-sand-portal--front {
-  opacity: 0.28;
+body.is-auto-cube-hero.portfolio-page.is-portfolio-sand-active main,
+body.is-auto-cube-hero.portfolio-page main {
+  position: relative;
+  z-index: 5;
+  background: transparent;
 }
 .subpage-cube__canvas {
   width: 100%;

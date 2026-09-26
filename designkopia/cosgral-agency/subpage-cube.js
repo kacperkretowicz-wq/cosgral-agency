@@ -1,7 +1,7 @@
 /**
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
@@ -410,6 +410,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     if (!isSandHeroPage) return;
     killPortfolioFlightTweens();
     portfolioSectionIndex = index;
+    if (autoHeroProgressFromDom() > 0.02) {
+      setAutoHeroProgress(autoHeroProgressFromDom());
+      return;
+    }
     /* Cube stays in hero only — never drift into later sections */
     portfolioFlight.phase = "hidden";
     portfolioFlight.t = 1;
@@ -624,6 +628,18 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     setCubeVisualFade(fade * (grafikiMenuActive ? grafikiFade / 0.68 : 1));
   }
 
+  function autoHeroProgressFromDom() {
+    var el = document.getElementById("automatyzacje");
+    if (!el || !isPortfolioMainPage) return 0;
+    var r = el.getBoundingClientRect();
+    var vh = window.innerHeight || 1;
+    if (r.height < 8) return 0;
+    var enter = 1 - Math.max(0, Math.min(1, r.top / (vh * 0.9)));
+    enter = enter * enter * (3 - 2 * enter);
+    var leave = r.bottom < vh * 0.18 ? Math.max(0, r.bottom / (vh * 0.18)) : 1;
+    return Math.max(0, Math.min(1, Math.min(enter, leave)));
+  }
+
   function setAutoHeroProgress(p) {
     autoHero.p = Math.max(0, Math.min(1, p || 0));
     if (autoHero.p > 0.02) {
@@ -655,7 +671,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       left.y + (center.y - left.y) * u,
       z
     );
-    var sc = CUBE_SCALE * (MOBILE ? 2.45 : 2.9) * (0.82 + 0.18 * u);
+    var sc = CUBE_SCALE * (MOBILE ? 4.35 : 3.7) * (0.72 + 0.28 * u);
     cubeGroup.scale.set(sc, sc, sc);
     cubeGroup.rotation.x = 0.22 + time * 0.42 + u * 0.55;
     cubeGroup.rotation.y = -1.15 + u * 1.85 + time * 0.62;
@@ -1980,6 +1996,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       var p = scrollProgress;
       menuBlend = menuTween.blend;
 
+      if (isPortfolioMainPage && menuBlend <= 0.001) {
+        setAutoHeroProgress(autoHeroProgressFromDom());
+      }
+
       if (menuBlend > 0.001) {
         mobileDriftSpinReady = false;
         mobileDriftSeedP = null;
@@ -2197,7 +2217,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       }
 
       portfolioSectionIndex = next;
-      if (autoHero.p > 0.02) return;
+      if (autoHero.p > 0.02 || autoHeroProgressFromDom() > 0.02) return;
       /* Keep cube out of non-hero sections unless auto-hero is driving it */
       killPortfolioFlightTweens();
       portfolioFlight.phase = "hidden";

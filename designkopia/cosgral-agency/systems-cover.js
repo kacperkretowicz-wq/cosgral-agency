@@ -32,7 +32,7 @@
         sync();
         return;
       }
-      if (++tries < 90) window.requestAnimationFrame(waitCube);
+      if (++tries < 240) window.requestAnimationFrame(waitCube);
     })();
     if (!window.ScrollTrigger) {
       window.addEventListener("scroll", sync, { passive: true });
