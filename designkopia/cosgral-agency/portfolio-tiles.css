@@ -295,10 +295,6 @@ body.portfolio-page--tiles a.portfolio-tile#automatyzacje {
   border-color: rgba(255, 255, 255, 0.28);
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
 }
-body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tile:not(.is-active),
-body.portfolio-page--tiles[data-tile-theme="graphics"] .portfolio-tile:not(.is-active) {
-  opacity: 0.7;
-}
 body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile {
   color: #111;
   background: rgba(255, 255, 255, 0.82);
