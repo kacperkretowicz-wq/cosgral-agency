@@ -92,8 +92,8 @@ body.portfolio-theme-page .graphics-masonry {
 }
 .portfolio-theme-layer__veil--video {
   background:
-    linear-gradient(180deg, rgba(5, 5, 5, 0.35), rgba(5, 5, 5, 0.08) 22%, rgba(5, 5, 5, 0.12) 70%, rgba(5, 5, 5, 0.48)),
-    linear-gradient(90deg, rgba(5, 5, 5, 0.28), transparent 18%, transparent 82%, rgba(5, 5, 5, 0.28));
+    linear-gradient(180deg, rgba(5, 5, 5, 0.22), rgba(5, 5, 5, 0.04) 22%, rgba(5, 5, 5, 0.06) 70%, rgba(5, 5, 5, 0.32)),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.16), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.16));
 }
 .portfolio-theme-layer__veil--graphics {
   background:
@@ -126,7 +126,7 @@ body.portfolio-theme-page--video .portfolio-theme-layer__veil--video {
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: #141414;
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65);
-  opacity: 0.95;
+  opacity: 1;
   will-change: transform;
   transform: rotate(var(--rot, 0deg));
   animation: montaz-drift var(--dur, 26s) ease-in-out infinite;
