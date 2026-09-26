@@ -1,5 +1,5 @@
 /**
- * Realizacje — horizontal scroll cards inside Collaboration shell.
+ * Realizacje — L→R category tabs over theme WebGL backgrounds.
  */
 (function () {
   "use strict";
@@ -10,10 +10,6 @@
   var scroller = root.querySelector("[data-portfolio-tiles-scroller]");
   var tiles = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
   var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile-dot]"));
-  var footTitle = root.querySelector("[data-portfolio-foot-title]");
-  var footLead = root.querySelector("[data-portfolio-foot-lead]");
-  var footCta = root.querySelector("[data-portfolio-foot-cta]");
-  var footCount = root.querySelector("[data-portfolio-foot-count]");
   if (!scroller || !tiles.length) return;
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
@@ -23,10 +19,6 @@
 
   function clamp(i) {
     return Math.max(0, Math.min(tiles.length - 1, i));
-  }
-
-  function pad2(n) {
-    return n < 10 ? "0" + n : String(n);
   }
 
   function centerOf(el) {
@@ -80,8 +72,7 @@
 
   function syncVideos(activeTile) {
     tiles.forEach(function (tile) {
-      var videos = tile.querySelectorAll("[data-card-video]");
-      videos.forEach(function (video) {
+      tile.querySelectorAll("[data-card-video]").forEach(function (video) {
         if (tile === activeTile) {
           var play = video.play();
           if (play && play.catch) play.catch(function () {});
@@ -94,26 +85,11 @@
     });
   }
 
-  function i18nText(key, fallback) {
-    try {
-      if (window.CosgralI18n && typeof window.CosgralI18n.t === "function") {
-        var v = window.CosgralI18n.t(key);
-        if (v && v !== key) return v;
-      }
-    } catch (e) {}
-    return fallback;
-  }
-
-  function syncFoot(tile, index) {
-    if (!tile) return;
-    var titleKey = tile.getAttribute("data-i18n-title");
-    var leadKey = tile.getAttribute("data-i18n-lead");
-    var title = i18nText(titleKey, tile.getAttribute("data-title") || "");
-    var lead = i18nText(leadKey, tile.getAttribute("data-lead") || "");
-    if (footTitle) footTitle.textContent = title;
-    if (footLead) footLead.textContent = lead;
-    if (footCta) footCta.setAttribute("href", tile.getAttribute("href") || "#");
-    if (footCount) footCount.textContent = pad2(index + 1);
+  function applyTheme(theme) {
+    document.body.setAttribute("data-tile-theme", theme || "web");
+    if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
+      window.__portfolioTileBg.setTheme(theme || "web");
+    }
   }
 
   function setActive(index, opts) {
@@ -130,10 +106,7 @@
       dot.setAttribute("aria-current", i === index ? "true" : "false");
     });
     var tile = tiles[index];
-    var theme = tile.getAttribute("data-theme") || "web";
-    document.body.setAttribute("data-tile-theme", theme);
-    root.setAttribute("data-section", theme);
-    syncFoot(tile, index);
+    applyTheme(tile.getAttribute("data-theme") || "web");
     syncVideos(tile);
     playTileSlides(tile);
   }
@@ -197,8 +170,4 @@
   window.setTimeout(function () {
     scrollToIndex(0, "auto");
   }, 80);
-
-  document.addEventListener("cosgral:langchange", function () {
-    if (activeIndex >= 0) syncFoot(tiles[activeIndex], activeIndex);
-  });
 })();
