@@ -1930,34 +1930,15 @@ html.reduce-motion .portfolio-page--film .home-scroll-rail {
   background: transparent;
 }
 .portfolio-page {
-  --portfolio-cover-run: 68vh;
+  --portfolio-cover-run: 72vh;
 }
 @media (max-width: 900px) {
   .portfolio-page {
-    --portfolio-cover-run: 48vh;
+    --portfolio-cover-run: 54vh;
   }
 }
 .portfolio-page .portfolio-section + .portfolio-section {
   margin-top: 0;
-}
-/* Cinematic hold: previous shot stays in frame, then the next covers it */
-body.portfolio-page #strony,
-body.portfolio-page #automatyzacje,
-body.portfolio-page #montaz {
-  display: block;
-  padding-bottom: var(--portfolio-cover-run);
-}
-body.portfolio-page #strony > .home-tilt-layer,
-body.portfolio-page #strony > .container,
-body.portfolio-page #montaz > .home-tilt-layer,
-body.portfolio-page #montaz > .container {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
-  box-sizing: border-box;
 }
 /* Separatory między sekcjami — wyłączone */
 .portfolio-section__curtain,
@@ -2605,19 +2586,18 @@ body.is-grafiki-light .site-nav__toggle-bars span {
 
 /* Realizacje: jeden pełnoekranowy film + napis na kadrze (bez kafelka, bez chapter pin) */
 .portfolio-section--auto-film {
-  min-height: calc(100vh + var(--portfolio-cover-run, 68vh));
-  min-height: calc(100dvh + var(--portfolio-cover-run, 68vh));
+  min-height: 100vh;
+  min-height: 100dvh;
   height: auto;
-  padding: 0 0 var(--portfolio-cover-run, 68vh);
+  padding: 0;
   margin: 0;
   display: block;
-  overflow: visible;
+  overflow: hidden;
   background: transparent;
   scroll-margin-top: 0;
 }
 .auto-cover {
-  position: sticky;
-  top: 0;
+  position: relative;
   display: block;
   width: 100%;
   height: 100vh;

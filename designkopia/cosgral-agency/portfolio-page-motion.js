@@ -164,6 +164,25 @@
     var auto = document.getElementById("automatyzacje");
     var endBand = document.querySelector(".portfolio-end");
 
+    function pinHold(section) {
+      if (!section) return;
+      ScrollTrigger.create({
+        id: (section.id || "sec") + "-cine-hold",
+        trigger: section,
+        start: "top top",
+        end: MOBILE ? "+=54%" : "+=72%",
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 0.4,
+        invalidateOnRefresh: true,
+        refreshPriority: -3,
+      });
+    }
+
+    pinHold(strony);
+    pinHold(auto);
+    pinHold(montaz);
+
     var pairs = [
       { leave: strony, enter: auto },
       { leave: auto, enter: montaz },
