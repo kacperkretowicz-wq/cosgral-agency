@@ -598,6 +598,16 @@
         "en": "COSGRAL graphics gallery — Juicy Events, Far East, BTS and more."
       }
     },
+    "automation_systems_meta": {
+      "title": {
+        "pl": "Systemy i automatyzacje — Portfolio COSGRAL",
+        "en": "Systems & automation — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Aplikacje, CRM i automatyzacje COSGRAL — TelForceOne, Trove, chatboty AI.",
+        "en": "COSGRAL apps, CRM and automations — TelForceOne, Trove, AI chatbots."
+      }
+    },
     "hero_title": {
       "pl": "Realizacje",
       "en": "Selected work"
@@ -891,6 +901,18 @@
     "grafiki_service": {
       "pl": "Usługa: grafika i wideo →",
       "en": "Service: design & video →"
+    },
+    "see_more_systems": {
+      "pl": "Zobacz więcej",
+      "en": "See more"
+    },
+    "automation_cover_aria": {
+      "pl": "Systemy i automatyzacje — zobacz więcej",
+      "en": "Systems and automation — see more"
+    },
+    "automation_page_lead": {
+      "pl": "Aplikacje, CRM i automatyzacje, które wdrożyliśmy — od TelForceOne po Trove i chatboty AI.",
+      "en": "Apps, CRM and automations we shipped — from TelForceOne to Trove and AI chatbots."
     },
     "automation_title": {
       "pl": "Systemy i automatyzacje",

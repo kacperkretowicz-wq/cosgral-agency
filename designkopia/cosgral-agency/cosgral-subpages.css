@@ -2552,13 +2552,18 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   background: #111;
 }
 
-/* Systemy i Automatyzacje — normalna sekcja ze scrollowalnymi case cards */
+/* Systemy i Automatyzacje — jeden kafelek-cover, lista na podstronie */
 .portfolio-section--automatyzacje {
   min-height: auto;
   overflow: visible;
   align-items: flex-start;
   padding: clamp(1.25rem, 3vh, 2.25rem) 0 clamp(3.5rem, 9vh, 5.5rem);
   background: linear-gradient(180deg, rgba(3, 3, 3, 0.2) 0%, rgba(3, 3, 3, 0.55) 40%, rgba(3, 3, 3, 0.35) 100%);
+}
+.portfolio-section--auto-cover {
+  min-height: min(92vh, 920px);
+  display: flex;
+  align-items: center;
 }
 .portfolio-section--automatyzacje .portfolio-scene__panel {
   position: relative;
@@ -2567,6 +2572,131 @@ body.is-grafiki-light .site-nav__toggle-bars span {
   min-height: 0;
   display: block;
   padding: 0;
+}
+.auto-cover {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 10;
+  min-height: min(62vh, 560px);
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  transform-origin: center center;
+}
+.auto-cover:hover,
+.auto-cover:focus-visible {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.auto-cover:focus-visible {
+  outline: 2px solid rgba(245, 245, 245, 0.7);
+  outline-offset: 4px;
+}
+.auto-cover__film {
+  position: absolute;
+  inset: 0;
+}
+.auto-cover__chrome {
+  z-index: 4;
+}
+.auto-cover__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.42;
+  filter: saturate(0.55) contrast(1.05);
+}
+.auto-cover__reel {
+  position: absolute;
+  inset: 9% 6% 14%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0a0a0a;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.auto-cover__shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.9s ease, transform 3.2s ease;
+}
+.auto-cover__shot.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+.auto-cover__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    linear-gradient(180deg, rgba(8, 8, 8, 0.15) 0%, rgba(8, 8, 8, 0.2) 45%, rgba(8, 8, 8, 0.72) 100%);
+  pointer-events: none;
+}
+.auto-cover__copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 0 1.25rem 1.35rem;
+  pointer-events: none;
+}
+.auto-cover__more.glass-btn,
+.auto-cover__more {
+  pointer-events: none;
+  padding: 0.55rem 1.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.auto-cover:hover .auto-cover__more,
+.auto-cover:focus-visible .auto-cover__more {
+  background: rgba(255, 255, 255, 0.16);
+}
+.systems-gallery {
+  padding: 0 var(--gutter) clamp(4rem, 10vh, 6rem);
+}
+.systems-gallery .portfolio-case-grid {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+@media (max-width: 720px) {
+  .auto-cover {
+    aspect-ratio: 4 / 5;
+    min-height: 58vh;
+  }
+  .auto-cover__reel {
+    inset: 11% 7% 18%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auto-cover__shot {
+    transition: none;
+  }
+  .auto-cover__video {
+    display: none;
+  }
 }
 .portfolio-section--automatyzacje .portfolio-section__head {
   margin-bottom: clamp(1.25rem, 3.5vw, 2rem);

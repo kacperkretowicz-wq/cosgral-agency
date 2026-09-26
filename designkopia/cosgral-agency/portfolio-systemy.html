@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pl" data-i18n-meta="portfolio.automation_systems_meta">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="site.webmanifest" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Systemy i automatyzacje — Portfolio COSGRAL</title>
+<meta name="description" content="Aplikacje, CRM i automatyzacje COSGRAL — TelForceOne, Trove, chatboty AI." />
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260926sys1" />
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz2" />
+<script src="telforce-previews.js?v=20260925anim1" defer></script>
+<link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
+<link rel="stylesheet" href="page-transitions.css?v=20260810h" />
+<script>
+  (function () {
+    if (sessionStorage.getItem("cosgral-page-transition")) {
+      document.documentElement.classList.add("is-page-enter");
+    }
+  })();
+</script>
+<script src="page-transitions.js?v=20260925fix21"></script>
+<script src="cosgral-motion-pref.js?v=20260919a"></script>
+<script src="theme-mode.js?v=20260920ui34"></script>
+  <link rel="stylesheet" href="site-chat.css?v=20260925fix2" />
+</head>
+<body class="subpage portfolio-page graphics-gallery-page">
+<a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
+
+<canvas id="subpage-ambient" class="subpage-ambient" aria-hidden="true"></canvas>
+<div class="subpage-ambient__blur" aria-hidden="true"></div>
+<div class="subpage-ambient__shade" aria-hidden="true"></div>
+<div class="subpage-cube-portal" aria-hidden="true">
+  <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
+</div>
+<div class="portfolio-sand-portal portfolio-sand-portal--back" aria-hidden="true">
+  <canvas id="portfolio-sand-back" class="portfolio-sand__canvas"></canvas>
+</div>
+<div class="portfolio-sand-portal portfolio-sand-portal--front" aria-hidden="true">
+  <canvas id="portfolio-sand-front" class="portfolio-sand__canvas"></canvas>
+</div>
+
+<nav class="site-nav" id="site-nav">
+  <a href="index.html#top" class="site-nav__logo" data-i18n-aria-label="common.logo_aria" aria-label="COSGRAL — strona główna">
+    <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
+  </a>
+  <div class="site-nav__actions">
+    <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
+      <button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button>
+      <button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
+      <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span data-i18n="nav.menu">Menu</span>
+    </button>
+  </div>
+</nav>
+<div class="nav-overlay" id="nav-overlay" aria-hidden="true">
+  <div class="nav-overlay__backdrop" data-nav-close></div>
+  <div class="nav-overlay__stage">
+    <nav class="nav-overlay__links" aria-label="Menu główne">
+      <ul class="nav-overlay__list">
+        <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
+        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
+        <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
+        <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
+        <li><a href="index.html#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<main id="main">
+  <header class="portfolio-hero gallery-hero">
+    <span class="section-eyebrow" data-i18n="common.portfolio_eyebrow">Portfolio</span>
+    <h1 class="portfolio-hero__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h1>
+    <p class="portfolio-hero__lead" data-i18n="portfolio.automation_page_lead">Aplikacje, CRM i automatyzacje, które wdrożyliśmy — od TelForceOne po Trove i chatboty AI.</p>
+    <p class="graphics-gallery-page__back"><a href="portfolio.html#automatyzacje" data-i18n="portfolio.back_portfolio">← Wróć do portfolio</a></p>
+  </header>
+
+  <div class="systems-gallery">
+    <div class="portfolio-case-grid">
+      <article class="portfolio-case-card portfolio-case-card--telforce" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-telforceone-crm.html" aria-label="TelForceOne S.A. — CRM z mapą dla przedstawicieli handlowych">
+          <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
+            <img class="portfolio-case-card__visual" src="assets/cases/telforceone-crm.svg?v=20260925webdeck1" alt="Poglądowa wizualizacja CRM z mapą i trasą handlowca" width="640" height="360" loading="lazy" decoding="async" />
+            <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.tf_crm_tag">CRM / sprzedaż terenowa</p>
+            <p class="portfolio-case-card__client">TelForceOne S.A.</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.tf_crm_title">CRM z bazą danych i mapą handlowców</h3>
+            <p class="portfolio-case-card__desc" data-i18n="portfolio.tf_crm_description">Jedno miejsce na dane klientów, planowanie wizyt i pracę przedstawicieli w terenie. Mapa pomaga zobaczyć zasięg i kolejność spotkań.</p>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--telforce" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-telforceone-code39.html" aria-label="TelForceOne S.A. — generator kodów kreskowych Code 39">
+          <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
+            <img class="portfolio-case-card__visual" src="assets/cases/telforceone-code39.svg?v=20260925webdeck1" alt="Poglądowa wizualizacja generatora kodów Code 39 i etykiety" width="640" height="360" loading="lazy" decoding="async" />
+            <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.tf_code39_tag">Narzędzie / identyfikacja</p>
+            <p class="portfolio-case-card__client">TelForceOne S.A.</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.tf_code39_title">Generator kodów kreskowych Code 39</h3>
+            <p class="portfolio-case-card__desc" data-i18n="portfolio.tf_code39_description">Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.</p>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--telforce" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-telforceone-forecast.html" aria-label="TelForceOne S.A. — aplikacja stanów magazynowych i prognozowania">
+          <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
+            <img class="portfolio-case-card__visual" src="assets/cases/telforceone-forecast.svg?v=20260925webdeck1" alt="Poglądowa wizualizacja stanów magazynowych i wykresu prognozy" width="640" height="360" loading="lazy" decoding="async" />
+            <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.tf_forecast_tag">Analityka / zapasy</p>
+            <p class="portfolio-case-card__client">TelForceOne S.A.</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.tf_forecast_title">Kontrola stanów i prognozowanie</h3>
+            <p class="portfolio-case-card__desc" data-i18n="portfolio.tf_forecast_description">Widok zapasów i prognoz popytu wspiera planowanie zakupów oraz szybsze wychwytywanie ryzyka braków.</p>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--app" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-trove-panel.html" aria-label="Trove — panel sklepu i monitoring cen">
+          <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
+            <img class="portfolio-case-card__visual" src="assets/cases/shelfsync.svg?v=20260925webdeck1" alt="Panel sklepu i monitoring cen — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
+            <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.auto1_tag">Aplikacja</p>
+            <p class="portfolio-case-card__client" data-i18n="portfolio.auto1_client">Trove</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto1_title">Panel sklepu i monitoring cen</h3>
+            <p class="portfolio-case-card__desc" data-i18n="portfolio.auto1_desc">Stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.</p>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--crm" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-crm-leady.html" aria-label="CRM leadów, dealów i operacji sprzedażowych">
+          <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
+            <img class="portfolio-case-card__visual" src="assets/cases/northline-crm.svg?v=20260925webdeck1" alt="CRM leadów i pipeline — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
+            <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.auto2_tag">CRM</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto2_title">CRM leadów, dealów i operacji sprzedażowych</h3>
+            <p class="portfolio-case-card__desc" data-i18n="portfolio.auto2_desc">Narzędzie do prowadzenia sprzedaży: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów.</p>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--bot" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-chatbot-ai.html" aria-label="Chatbot AI do wiadomości klientów">
+          <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
+            <img class="portfolio-case-card__visual" src="assets/cases/atelier-bloom.svg?v=20260925webdeck1" alt="Chatbot AI do wiadomości klientów — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
+            <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.auto3_tag">Automatyzacja</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto3_title">Chatbot AI do wiadomości klientów</h3>
+            <p class="portfolio-case-card__desc" data-i18n="portfolio.auto3_desc">Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź 24/7.</p>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+      <article class="portfolio-case-card portfolio-case-card--linked portfolio-case-card--flow" role="article">
+        <a class="portfolio-case-card__link" href="portfolio-trove-workflow.html" aria-label="Trove — zamówienie, faktura, status paczki">
+          <div class="portfolio-case-card__preview portfolio-case-card__preview--animated">
+            <img class="portfolio-case-card__visual" src="assets/cases/parcel-co.svg?v=20260925webdeck1" alt="Workflow zamówienie → faktura → status paczki — wizualizacja" width="640" height="360" loading="lazy" decoding="async" />
+            <span class="portfolio-case-card__art-note" data-i18n="portfolio.tf_art_note">Wizualizacja poglądowa</span>
+          </div>
+          <div class="portfolio-case-card__body">
+            <p class="portfolio-case-card__tag" data-i18n="portfolio.auto4_tag">Automatyzacja</p>
+            <p class="portfolio-case-card__client" data-i18n="portfolio.auto4_client">Trove</p>
+            <h3 class="portfolio-case-card__title" data-i18n="portfolio.auto4_title">Zamówienie → faktura → status paczki</h3>
+            <p class="portfolio-case-card__desc" data-i18n="portfolio.auto4_desc">Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta. Mniej ręcznej pracy przy obsłudze zamówień.</p>
+            <span class="portfolio-case-card__more" data-i18n="portfolio.tf_more">Zobacz realizację →</span>
+          </div>
+        </a>
+      </article>
+    </div>
+  </div>
+</main>
+
+<section class="portfolio-contact-cta" aria-label="Kontakt">
+  <div class="container portfolio-contact-cta__inner">
+    <h2 class="portfolio-contact-cta__title" data-i18n="panel.cta">Umów bezpłatny audyt</h2>
+    <p class="portfolio-contact-cta__lead" data-i18n="portfolio.cta_lead">Masz podobny projekt? Napisz — przygotujemy zakres, plan i wycenę.</p>
+    <a class="glass-btn" href="index.html#kontakt" data-i18n="about.cta">Porozmawiajmy o projekcie</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-cta"><p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p></div>
+      <div class="footer-col">
+        <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
+        <ul>
+          <li><a href="index.html#top" data-i18n="nav.start">Start</a></li>
+          <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
+          <li><a href="portfolio.html#strony" data-i18n="bento.strony">Strony internetowe</a></li>
+          <li><a href="portfolio.html#montaz" data-i18n="bento.montaz">Montaż wideo</a></li>
+          <li><a href="portfolio.html#grafiki" data-i18n="bento.grafiki">Grafiki &amp; social</a></li>
+          <li><a href="index.html#uslugi" data-i18n="nav.services">Usługi</a></li>
+          <li><a href="index.html#proces" data-i18n="nav.process">Proces</a></li>
+          <li><a href="index.html#faq" data-i18n="nav.faq">FAQ</a></li>
+          <li><a href="o-nas.html" data-i18n="nav.about">O nas</a></li>
+          <li><a href="index.html#kontakt" data-i18n="nav.contact">Kontakt</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
+        <ul>
+          <li><a href="index.html?service=blue" data-i18n="services.card1">Strony internetowe</a></li>
+          <li><a href="index.html?service=purple" data-i18n="services.card2">Aplikacje</a></li>
+          <li><a href="index.html?service=gold" data-i18n="services.card3">Pozycjonowanie SEO/GEO</a></li>
+          <li><a href="index.html?service=orange" data-i18n="services.card4">Automatyzacje</a></li>
+          <li><a href="index.html?service=crimson" data-i18n="services.card5">Systemy CRM</a></li>
+          <li><a href="index.html?service=green" data-i18n="services.card6">Grafika i wideo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
+        <ul>
+          <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
+          <li><a href="tel:+48533790518" data-i18n="contact.phone_kuba">Kuba · +48 533 790 518</a></li>
+          <li><a href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-col--social">
+        <p class="footer-col__title" data-i18n="footer.social">Social</p>
+        <div class="footer-social" role="list">
+          <a class="footer-social__link" href="https://www.facebook.com/people/cosgralagency/61591582027536/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" data-no-transition>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.027 4.388 11.026 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.099 24 18.1 24 12.073z"/></svg>
+          </a>
+          <a class="footer-social__link" href="https://www.instagram.com/cosgral.agency?igsh=Ynl6dmJucTEzYTk2" target="_blank" rel="noopener noreferrer" aria-label="Instagram" role="listitem" data-no-transition>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.881 0 1.44 1.44 0 012.881 0z"/></svg>
+          </a>
+          <a class="footer-social__link" href="https://www.linkedin.com/company/cosgral-agency" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" role="listitem" data-no-transition>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.062 2.062 0 114.126 0 2.063 2.063 0 01-2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
+      <a href="privacy-policy.html" data-i18n="footer.privacy">Polityka prywatności</a>
+    </div>
+  </div>
+</footer>
+
+<script src="i18n.js?v=20260926sys1"></script>
+<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
+<script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script>gsap.registerPlugin(ScrollTrigger);</script>
+<script src="home-cursor-field.js?v=20260920ui24"></script>
+<script src="home-cursor.js?v=20260916a"></script>
+<script src="home-tile-interact.js?v=20260920ui24"></script>
+<script src="subpage-ambient-bg.js?v=20260916a"></script>
+<script src="subpage-menu-water.js?v=20260814e"></script>
+<script type="module" src="subpage-cube.js?v=20260920ui29"></script>
+<script type="module" src="portfolio-hero-sand.js?v=20260920ui26"></script>
+<script defer src="home-nav-menu.js?v=20260925fix2"></script>
+<script src="sand-hero-subpage.js?v=20260816a"></script>
+<script src="sections.js?v=20260814e"></script>
+<script defer src="site-chat.js?v=20260926chat7"></script>
+<script type="module" src="site-chat-cube.js?v=20260922ai05"></script>
+</body>
+</html>

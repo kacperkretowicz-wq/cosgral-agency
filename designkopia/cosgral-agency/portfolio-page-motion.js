@@ -405,12 +405,12 @@
     );
 
     if (!MOBILE) {
-      bindTileScrollTell("auto", "#automatyzacje .portfolio-case-card", {
-        stagger: 0.09,
-        start: "top 70%",
-        end: "top 32%",
+      bindTileScrollTell("auto", "#automatyzacje .auto-cover", {
+        stagger: 0,
+        start: "top 78%",
+        end: "top 42%",
         scrub: 1.15,
-        from: { y: 72, scale: 0.9, rotationZ: -3, rotationX: 8, z: -80 },
+        from: { y: 56, scale: 0.92, rotationZ: 0, rotationX: 8, z: -80 },
       });
     }
 
