@@ -1,5 +1,5 @@
 /**
- * Realizacje — L→R category tabs over theme WebGL backgrounds.
+ * Realizacje — L→R category tabs + per-theme media backgrounds.
  */
 (function () {
   "use strict";
@@ -17,6 +17,7 @@
   var slideTimers = [];
   var wheelLock = 0;
   var pendingTheme = null;
+  var montazReady = false;
 
   function clamp(i) {
     return Math.max(0, Math.min(tiles.length - 1, i));
@@ -51,6 +52,8 @@
   function playTileSlides(tile) {
     var slides = Array.prototype.slice.call(tile.querySelectorAll("[data-tile-slide]"));
     if (!slides.length) return;
+    var fast = tile.getAttribute("data-theme") === "graphics";
+    var interval = fast ? 700 : 2600;
     if (slides.length < 2 || REDUCED) {
       slides.forEach(function (s, i) {
         s.classList.toggle("is-on", i === 0);
@@ -67,11 +70,11 @@
         slides.forEach(function (s, i) {
           s.classList.toggle("is-on", i === n);
         });
-      }, 2600)
+      }, interval)
     );
   }
 
-  function syncVideos(activeTile) {
+  function syncCardVideos(activeTile) {
     tiles.forEach(function (tile) {
       tile.querySelectorAll("[data-card-video]").forEach(function (video) {
         if (tile === activeTile) {
@@ -86,6 +89,43 @@
     });
   }
 
+  function setupMontazRail() {
+    var rail = document.querySelector("[data-montaz-rail]");
+    var track = document.querySelector("[data-montaz-track]");
+    if (!rail || !track || montazReady) return;
+    var clone = track.cloneNode(true);
+    clone.removeAttribute("data-montaz-track");
+    rail.querySelector(".portfolio-montaz-rail__belt").appendChild(clone);
+    rail.classList.add("is-ready");
+    montazReady = true;
+  }
+
+  function syncThemeMedia(theme) {
+    var stage = document.querySelector("[data-portfolio-theme-stage]");
+    if (!stage) return;
+
+    if (theme === "video") setupMontazRail();
+
+    stage.querySelectorAll("[data-theme-video]").forEach(function (video) {
+      var layer = video.closest("[data-theme-layer]");
+      var layerTheme = layer && layer.getAttribute("data-theme-layer");
+      var active = layerTheme === theme;
+      if (active) {
+        if (video.readyState < 2) {
+          try {
+            video.load();
+          } catch (e) {}
+        }
+        var play = video.play();
+        if (play && play.catch) play.catch(function () {});
+      } else {
+        try {
+          video.pause();
+        } catch (e) {}
+      }
+    });
+  }
+
   function applyTheme(theme) {
     theme = theme || "web";
     pendingTheme = theme;
@@ -95,6 +135,7 @@
     if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
       window.__portfolioTileBg.setTheme(theme);
     }
+    syncThemeMedia(theme);
   }
 
   function setActive(index, opts) {
@@ -112,7 +153,7 @@
     });
     var tile = tiles[index];
     applyTheme(tile.getAttribute("data-theme") || "web");
-    syncVideos(tile);
+    syncCardVideos(tile);
     playTileSlides(tile);
   }
 
