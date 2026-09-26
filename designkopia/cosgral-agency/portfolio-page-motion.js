@@ -63,13 +63,19 @@
     }
     var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
     var fade = u * u;
-    /* Same cover language as the rest of Realizacje: fade + scale-back + blur */
+    var dim = 1 - 0.62 * u;
+    /* Recess the scene itself — no full-screen black plate on top */
     gsap.set(target, {
-      opacity: Math.max(0, 1 - fade),
+      opacity: Math.max(0.08, 1 - fade * 0.92),
       visibility: "visible",
       yPercent: exitY * u,
       scale: 1 - (1 - exitScale) * u,
-      filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
+      filter:
+        "blur(" +
+        (exitBlur * u).toFixed(2) +
+        "px) brightness(" +
+        dim.toFixed(3) +
+        ")",
       transformOrigin: "50% 42%",
       force3D: true,
     });
@@ -78,7 +84,7 @@
       el.classList.add("is-depth-gone");
       el.style.pointerEvents = "none";
       gsap.set(el, { opacity: 0 });
-      gsap.set(target, { opacity: 0, filter: "blur(0px)" });
+      gsap.set(target, { opacity: 0, filter: "none" });
     } else {
       el.classList.remove("is-depth-gone");
       gsap.set(el, { opacity: 1, visibility: "visible" });
@@ -86,25 +92,16 @@
     }
   }
 
-  function setCurtain(amount) {
+  function setCurtain() {
     var curtain = getCurtain();
-    if (!curtain || !window.gsap) return;
-    var a = Math.max(0, Math.min(0.97, amount));
-    gsap.set(curtain, {
-      autoAlpha: a,
-      visibility: a > 0.01 ? "visible" : "hidden",
-    });
-    document.body.classList.toggle("is-portfolio-scene-bridge", a > 0.06);
+    if (curtain && window.gsap) {
+      gsap.set(curtain, { autoAlpha: 0, visibility: "hidden" });
+    }
+    document.body.classList.remove("is-portfolio-scene-bridge");
   }
 
-  function syncCurtainFromCovers(pairs) {
-    var peak = 0;
-    pairs.forEach(function (pair) {
-      var p = coverAmount(pair.enter);
-      var pulse = Math.sin(p * Math.PI) * 0.97;
-      if (pulse > peak) peak = pulse;
-    });
-    setCurtain(peak);
+  function syncCurtainFromCovers() {
+    setCurtain();
   }
 
   function wireCover(leave, enter, opts) {
