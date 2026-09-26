@@ -1946,11 +1946,14 @@ body.portfolio-page #automatyzacje,
 body.portfolio-page #montaz {
   padding-bottom: var(--portfolio-cover-run);
 }
+body.portfolio-page #strony > .home-tilt-layer,
 body.portfolio-page #strony > .container,
+body.portfolio-page #montaz > .home-tilt-layer,
 body.portfolio-page #montaz > .container {
   position: sticky;
   top: 0;
   z-index: 2;
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   box-sizing: border-box;
