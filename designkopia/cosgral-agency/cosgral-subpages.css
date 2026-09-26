@@ -352,24 +352,23 @@ body.is-portfolio-scene-bridge .portfolio-scene-curtain {
   text-transform: uppercase;
   color: var(--ink);
 }
-/* Automatyzacje — zawsze czytelna po chapter intro; bez żyroskopu.
-   Shell: pointer-events none — tylko linki/kafelki łapią klik (pass-through przy cover). */
-body.portfolio-page #automatyzacje.is-entered,
-body.portfolio-page #automatyzacje.is-visible {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: none !important;
+/* Automatyzacje — bez żyroskopu; opacity nie blokuje depth-cover (blur / oddalenie / ściemnienie). */
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-recessed):not(.is-depth-gone),
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-recessed):not(.is-depth-gone) {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: none;
 }
-body.portfolio-page #automatyzacje.is-entered a,
-body.portfolio-page #automatyzacje.is-visible a,
-body.portfolio-page #automatyzacje.is-entered button,
-body.portfolio-page #automatyzacje.is-visible button,
-body.portfolio-page #automatyzacje.is-entered .portfolio-case-card,
-body.portfolio-page #automatyzacje.is-visible .portfolio-case-card,
-body.portfolio-page #automatyzacje.is-entered .portfolio-case-card__link,
-body.portfolio-page #automatyzacje.is-visible .portfolio-case-card__link,
-body.portfolio-page #automatyzacje.is-entered .glass-btn,
-body.portfolio-page #automatyzacje.is-visible .glass-btn {
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) a,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) a,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) button,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) button,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) .portfolio-case-card,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) .portfolio-case-card,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) .portfolio-case-card__link,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) .portfolio-case-card__link,
+body.portfolio-page #automatyzacje.is-entered:not(.is-depth-gone) .glass-btn,
+body.portfolio-page #automatyzacje.is-visible:not(.is-depth-gone) .glass-btn {
   pointer-events: auto !important;
 }
 body.portfolio-page #automatyzacje.is-entered .portfolio-scene__panel,
@@ -382,10 +381,13 @@ body.portfolio-page #automatyzacje .home-tilt-face {
   perspective: none !important;
   -webkit-perspective: none !important;
 }
-body.portfolio-page #automatyzacje.portfolio-section--auto-film {
+body.portfolio-page #automatyzacje {
   --global-tilt-x: 0deg;
   --global-tilt-y: 0deg;
+}
+body.portfolio-page #automatyzacje.is-depth-recessed {
   overflow: hidden;
+  contain: paint;
 }
 body.portfolio-page #automatyzacje.is-visible .home-tilt-layer {
   opacity: 1;
