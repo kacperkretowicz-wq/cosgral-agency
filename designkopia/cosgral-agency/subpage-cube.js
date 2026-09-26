@@ -419,6 +419,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     portfolioFlight.t = 1;
     portfolioFlight.hideAfter = false;
     cubeGroup.visible = false;
+    restoreAutoHeroLook();
     setCubeVisualFade(0);
   }
 
@@ -652,8 +653,16 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     } else if (portfolioFlight.phase === "auto-hero") {
       portfolioFlight.phase = "hidden";
       cubeGroup.visible = false;
+      restoreAutoHeroLook();
       setCubeVisualFade(0);
       if (portal && menuBlend <= 0.001) portal.style.opacity = "0";
+    }
+  }
+
+  function restoreAutoHeroLook() {
+    if (shell && shell.material && shell.material.color) shell.material.color.setHex(0x080808);
+    if (sMat && sMat.uniforms && sMat.uniforms.uAlphaMul) {
+      sMat.uniforms.uAlphaMul.value = SURFACE_ALPHA_MUL;
     }
   }
 
@@ -663,20 +672,28 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     root.rotation.set(0, 0, 0);
     cubeGroup.visible = true;
     var u = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-    var z = MOBILE ? 0.2 : 0.26;
-    var left = worldPosFromScreen(MOBILE ? -120 : -180, window.innerHeight * 0.52, z);
+    var z = MOBILE ? 0.08 : 0.1;
+    var left = worldPosFromScreen(MOBILE ? -90 : -140, window.innerHeight * 0.52, z);
     var center = worldPosFromScreen(window.innerWidth * 0.5, window.innerHeight * 0.5, z);
     cubeGroup.position.set(
       left.x + (center.x - left.x) * u,
       left.y + (center.y - left.y) * u,
       z
     );
-    var sc = CUBE_SCALE * (MOBILE ? 4.35 : 3.7) * (0.72 + 0.28 * u);
+    var sc = CUBE_SCALE * (MOBILE ? 1.42 : 1.26) * (0.88 + 0.12 * u);
     cubeGroup.scale.set(sc, sc, sc);
     cubeGroup.rotation.x = 0.22 + time * 0.42 + u * 0.55;
     cubeGroup.rotation.y = -1.15 + u * 1.85 + time * 0.62;
     cubeGroup.rotation.z = 0.08 + time * 0.2 + u * 0.18;
-    setCubeVisualFade(Math.min(1, 0.18 + u * 0.82));
+    if (sMat && sMat.uniforms && sMat.uniforms.uAlphaMul) {
+      sMat.uniforms.uAlphaMul.value = MOBILE ? 1.35 : 1.55;
+    }
+    if (shell && shell.material && shell.material.color) {
+      shell.material.color.setHex(0x8a8a96);
+    }
+    setCubeVisualFade(1);
+    if (shell && shell.material) shell.material.opacity = 0.38;
+    if (edges && edges.material) edges.material.opacity = 1;
     if (portal) portal.style.opacity = "1";
   }
 
