@@ -20,24 +20,27 @@
   var slideTimers = [];
   var wheelLock = 0;
 
+  /* Prefer highest-bitrate web showcase (juicy ~2Mbps HD); others only as accents */
   var WEB_CLIPS = [
     "portfolio-media/showcase/web/juicy-events.mp4",
+    "portfolio-media/showcase/web/juicy-events.mp4",
     "portfolio-media/showcase/web/trove-archive.mp4",
+    "portfolio-media/showcase/web/juicy-events.mp4",
     "portfolio-media/showcase/web/mj-social-media.mp4",
   ];
 
+  /* Prefer *-full (1080p where available) for montaż stage */
   var REEL_CLIPS = [
-    "portfolio-media/reels/orlincy/001.mp4",
-    "portfolio-media/reels/reklamy/001.mp4",
-    "portfolio-media/reels/orlincy/002.mp4",
-    "portfolio-media/reels/reklamy/002.mp4",
-    "portfolio-media/reels/orlincy/003.mp4",
-    "portfolio-media/reels/reklamy/003.mp4",
-    "portfolio-media/reels/orlincy/004.mp4",
-    "portfolio-media/reels/reklamy/004.mp4",
-    "portfolio-media/reels/orlincy/005.mp4",
-    "portfolio-media/reels/reklamy/005.mp4",
-    "portfolio-media/reels/orlincy/006.mp4",
+    "portfolio-media/reels/orlincy/006-full.mp4",
+    "portfolio-media/reels/reklamy/001-full.mp4",
+    "portfolio-media/reels/orlincy/005-full.mp4",
+    "portfolio-media/reels/reklamy/005-full.mp4",
+    "portfolio-media/reels/orlincy/003-full.mp4",
+    "portfolio-media/reels/reklamy/003-full.mp4",
+    "portfolio-media/reels/orlincy/002-full.mp4",
+    "portfolio-media/reels/reklamy/002-full.mp4",
+    "portfolio-media/reels/orlincy/001-full.mp4",
+    "portfolio-media/reels/orlincy/004-full.mp4",
   ];
 
   var JUICY_IMGS = [];
@@ -117,14 +120,19 @@
     );
   }
 
-  /* ——— Full-bleed film cutters (one video, hard cuts between windows) ——— */
-  function createFilmCutter(video, pool, opts) {
+  /* ——— Dual-buffer full-bleed film (preload next cut on hidden layer) ——— */
+  function createFilmCutter(host, pool, opts) {
     opts = opts || {};
     var holdMin = opts.holdMin || 2.1;
     var holdMax = opts.holdMax || 3.8;
+    var videos = host ? Array.prototype.slice.call(host.querySelectorAll("video")) : [];
+    if (videos.length < 2) return null;
+
+    var active = 0;
     var timer = null;
     var busy = false;
     var lastSrc = "";
+    var running = false;
 
     function pickSrc() {
       if (!pool.length) return "";
@@ -136,94 +144,107 @@
       return next;
     }
 
-    function jumpWindow() {
+    function seekPlay(video) {
       if (!video.duration || !isFinite(video.duration)) return;
       var span = Math.max(holdMin, Math.min(holdMax, video.duration * 0.22));
       var maxStart = Math.max(0.15, video.duration - span);
-      video.currentTime = Math.random() * maxStart;
+      try {
+        video.currentTime = Math.random() * maxStart;
+      } catch (e) {}
       var play = video.play();
       if (play && play.catch) play.catch(function () {});
     }
 
+    function armVideo(video, src, onReady) {
+      video.muted = true;
+      video.playsInline = true;
+      video.loop = true;
+      function ready() {
+        seekPlay(video);
+        if (onReady) onReady();
+      }
+      if (video.getAttribute("src") !== src) {
+        video.src = src;
+        video.addEventListener("loadeddata", ready, { once: true });
+        try {
+          video.load();
+        } catch (e) {
+          if (onReady) onReady();
+        }
+        return;
+      }
+      if (video.readyState >= 2) ready();
+      else video.addEventListener("loadeddata", ready, { once: true });
+    }
+
+    function showActive() {
+      videos.forEach(function (v, i) {
+        v.classList.toggle("is-on", i === active);
+        if (i !== active) {
+          try {
+            v.pause();
+          } catch (e) {}
+        }
+      });
+    }
+
     function scheduleNext() {
       if (timer) window.clearTimeout(timer);
-      if (REDUCED) return;
+      if (!running || REDUCED) return;
       var wait = (holdMin + Math.random() * (holdMax - holdMin)) * 1000;
       timer = window.setTimeout(cut, wait);
     }
 
     function cut() {
-      if (busy) return;
+      if (!running || busy) return;
       busy = true;
+      var next = 1 - active;
       var src = pickSrc();
       if (!src) {
         busy = false;
         return;
       }
-      if (video.getAttribute("src") !== src) {
-        video.src = src;
-        video.addEventListener(
-          "loadedmetadata",
-          function () {
-            jumpWindow();
-            busy = false;
-            scheduleNext();
-          },
-          { once: true }
-        );
-        try {
-          video.load();
-        } catch (e) {
+      armVideo(videos[next], src, function () {
+        if (!running) {
           busy = false;
+          return;
         }
-        return;
-      }
-      jumpWindow();
-      busy = false;
-      scheduleNext();
+        active = next;
+        showActive();
+        busy = false;
+        scheduleNext();
+      });
     }
 
     return {
       start: function () {
-        video.muted = true;
-        video.playsInline = true;
-        video.loop = true;
-        if (!video.getAttribute("src")) {
-          video.src = pickSrc();
-          video.addEventListener(
-            "loadedmetadata",
-            function () {
-              jumpWindow();
-              scheduleNext();
-            },
-            { once: true }
-          );
-          try {
-            video.load();
-          } catch (e) {}
-        } else {
-          jumpWindow();
+        running = true;
+        var src = pickSrc();
+        armVideo(videos[active], src, function () {
+          showActive();
           scheduleNext();
-        }
+        });
       },
       stop: function () {
+        running = false;
         if (timer) {
           window.clearTimeout(timer);
           timer = null;
         }
-        try {
-          video.pause();
-        } catch (e) {}
+        busy = false;
+        videos.forEach(function (v) {
+          try {
+            v.pause();
+          } catch (e) {}
+        });
       },
     };
   }
 
-  var webVideo = document.querySelector("[data-stage-web-film]");
-  var reelVideo = document.querySelector("[data-stage-reel-film]");
-  var webFilm = webVideo ? createFilmCutter(webVideo, WEB_CLIPS, { holdMin: 2.2, holdMax: 3.6 }) : null;
-  var reelFilm = reelVideo
-    ? createFilmCutter(reelVideo, REEL_CLIPS, { holdMin: 1.8, holdMax: 3.2 })
-    : null;
+  var webHost = document.querySelector("[data-stage-web-film]");
+  var reelHost = document.querySelector("[data-stage-reel-film]");
+  var webFilm = createFilmCutter(webHost, WEB_CLIPS, { holdMin: 2.4, holdMax: 4.0 });
+  var reelFilm = createFilmCutter(reelHost, REEL_CLIPS, { holdMin: 2.0, holdMax: 3.4 });
 
   /* ——— JUICY drifting collage ——— */
   function buildJuicyField() {
