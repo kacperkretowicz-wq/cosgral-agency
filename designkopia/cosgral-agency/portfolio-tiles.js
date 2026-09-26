@@ -17,8 +17,6 @@
   var slideTimers = [];
   var wheelLock = 0;
   var pendingTheme = null;
-  var montazReady = false;
-
   function clamp(i) {
     return Math.max(0, Math.min(tiles.length - 1, i));
   }
@@ -89,43 +87,6 @@
     });
   }
 
-  function setupMontazRail() {
-    var rail = document.querySelector("[data-montaz-rail]");
-    var track = document.querySelector("[data-montaz-track]");
-    if (!rail || !track || montazReady) return;
-    var clone = track.cloneNode(true);
-    clone.removeAttribute("data-montaz-track");
-    rail.querySelector(".portfolio-montaz-rail__belt").appendChild(clone);
-    rail.classList.add("is-ready");
-    montazReady = true;
-  }
-
-  function syncThemeMedia(theme) {
-    var stage = document.querySelector("[data-portfolio-theme-stage]");
-    if (!stage) return;
-
-    if (theme === "video") setupMontazRail();
-
-    stage.querySelectorAll("[data-theme-video]").forEach(function (video) {
-      var layer = video.closest("[data-theme-layer]");
-      var layerTheme = layer && layer.getAttribute("data-theme-layer");
-      var active = layerTheme === theme;
-      if (active) {
-        if (video.readyState < 2) {
-          try {
-            video.load();
-          } catch (e) {}
-        }
-        var play = video.play();
-        if (play && play.catch) play.catch(function () {});
-      } else {
-        try {
-          video.pause();
-        } catch (e) {}
-      }
-    });
-  }
-
   function applyTheme(theme) {
     theme = theme || "web";
     pendingTheme = theme;
@@ -135,7 +96,12 @@
     if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
       window.__portfolioTileBg.setTheme(theme);
     }
-    syncThemeMedia(theme);
+    if (window.__portfolioThemeLayers && window.__portfolioThemeLayers.setActiveTheme) {
+      window.__portfolioThemeLayers.setActiveTheme(theme);
+    }
+    window.dispatchEvent(
+      new CustomEvent("portfolio-tile-theme", { detail: { theme: theme } })
+    );
   }
 
   function setActive(index, opts) {
