@@ -26,6 +26,14 @@
 
   function boot() {
     sync();
+    var tries = 0;
+    (function waitCube() {
+      if (window.cosgralCube && window.cosgralCube.setAutoHeroProgress) {
+        sync();
+        return;
+      }
+      if (++tries < 90) window.requestAnimationFrame(waitCube);
+    })();
     if (!window.ScrollTrigger) {
       window.addEventListener("scroll", sync, { passive: true });
       return;
