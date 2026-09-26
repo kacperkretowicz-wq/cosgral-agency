@@ -1,5 +1,5 @@
 /**
- * Shared montaż / grafiki theme layers — works on tabs page and category subpages.
+ * Shared category theme layers — tabs + category subpages.
  */
 (function () {
   "use strict";
@@ -9,17 +9,19 @@
 
   var alwaysVideo = document.body.classList.contains("portfolio-theme-page--video");
   var alwaysGraphics = document.body.classList.contains("portfolio-theme-page--graphics");
+  var alwaysSystems = document.body.classList.contains("portfolio-theme-page--systems");
+  var alwaysWeb = document.body.classList.contains("portfolio-theme-page--web");
 
-  function setupRails() {
-    stage.querySelectorAll("[data-montaz-rail]").forEach(function (rail) {
-      if (rail.classList.contains("is-ready")) return;
-      var track = rail.querySelector("[data-montaz-track]");
-      var belt = rail.querySelector(".portfolio-montaz-rail__belt");
-      if (!track || !belt) return;
-      var clone = track.cloneNode(true);
-      clone.removeAttribute("data-montaz-track");
-      belt.appendChild(clone);
-      rail.classList.add("is-ready");
+  function syncLayerClasses(theme) {
+    stage.querySelectorAll(".portfolio-theme-layer[data-theme-layer]").forEach(function (layer) {
+      var key = layer.getAttribute("data-theme-layer");
+      var on =
+        key === theme ||
+        (alwaysVideo && key === "video") ||
+        (alwaysGraphics && key === "graphics") ||
+        (alwaysSystems && key === "systems") ||
+        (alwaysWeb && key === "web");
+      layer.classList.toggle("is-theme-active", on);
     });
   }
 
@@ -42,8 +44,8 @@
   }
 
   function setActiveTheme(theme) {
+    syncLayerClasses(theme);
     if (theme === "video" || alwaysVideo) {
-      setupRails();
       syncVideos(true);
     } else {
       syncVideos(false);
@@ -52,17 +54,19 @@
 
   window.__portfolioThemeLayers = {
     setActiveTheme: setActiveTheme,
-    setupRails: setupRails,
   };
 
   if (alwaysVideo) {
     setActiveTheme("video");
   } else if (alwaysGraphics) {
     setActiveTheme("graphics");
+  } else if (alwaysSystems) {
+    setActiveTheme("systems");
+  } else if (alwaysWeb) {
+    setActiveTheme("web");
   } else {
-    /* Tabs page: bootstrap from current data-tile-theme (event may have fired earlier) */
-    var initial = document.body.getAttribute("data-tile-theme");
-    if (initial) setActiveTheme(initial);
+    var initial = document.body.getAttribute("data-tile-theme") || "web";
+    setActiveTheme(initial);
   }
 
   window.addEventListener("portfolio-tile-theme", function (e) {

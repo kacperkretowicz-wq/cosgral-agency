@@ -1,4 +1,4 @@
-/* Shared category theme layers — tabs + montaż/grafiki subpages */
+/* Shared category theme layers — tabs + category subpages */
 
 .portfolio-theme-stage {
   position: fixed;
@@ -13,18 +13,22 @@
   inset: 0;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  /* Only fade opacity — transitioning visibility can leave layers stuck invisible */
+  transition: opacity 0.45s ease;
 }
 
-/* Active on tiles page via data-tile-theme */
+/* Active on tiles page via data-tile-theme / is-theme-active class */
 body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-theme-layer[data-theme-layer="video"],
 body.portfolio-page--tiles[data-tile-theme="graphics"] .portfolio-theme-layer[data-theme-layer="graphics"],
 body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-theme-layer[data-theme-layer="systems"],
-/* Always on matching subpages */
+body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-theme-layer[data-theme-layer="web"],
 body.portfolio-theme-page--video .portfolio-theme-layer[data-theme-layer="video"],
-body.portfolio-theme-page--graphics .portfolio-theme-layer[data-theme-layer="graphics"] {
-  opacity: 1;
-  visibility: visible;
+body.portfolio-theme-page--graphics .portfolio-theme-layer[data-theme-layer="graphics"],
+body.portfolio-theme-page--systems .portfolio-theme-layer[data-theme-layer="systems"],
+body.portfolio-theme-page--web .portfolio-theme-layer[data-theme-layer="web"],
+.portfolio-theme-layer.is-theme-active {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 body.portfolio-theme-page--video {
@@ -35,45 +39,48 @@ body.portfolio-theme-page--graphics {
   background: #f2f2f4;
   color: #111;
 }
-body.portfolio-theme-page--graphics .site-nav__toggle,
-body.portfolio-theme-page--graphics .lang-switch button {
+body.portfolio-theme-page--systems {
+  background: #eef1f6;
   color: #111;
 }
-body.portfolio-theme-page--graphics .site-nav__toggle-bars span {
+body.portfolio-theme-page--web {
+  background: #040404;
+  color: #f5f5f5;
+}
+
+body.portfolio-theme-page--graphics .site-nav__toggle,
+body.portfolio-theme-page--graphics .lang-switch button,
+body.portfolio-theme-page--systems .site-nav__toggle,
+body.portfolio-theme-page--systems .lang-switch button {
+  color: #111;
+}
+body.portfolio-theme-page--graphics .site-nav__toggle-bars span,
+body.portfolio-theme-page--systems .site-nav__toggle-bars span {
   background: #111;
 }
 
-body.portfolio-theme-page--video .subpage-ambient,
-body.portfolio-theme-page--video .subpage-ambient__blur,
-body.portfolio-theme-page--video .subpage-ambient__shade,
-body.portfolio-theme-page--graphics .subpage-ambient,
-body.portfolio-theme-page--graphics .subpage-ambient__blur,
-body.portfolio-theme-page--graphics .subpage-ambient__shade,
-body.portfolio-theme-page--video .portfolio-sand-portal,
-body.portfolio-theme-page--graphics .portfolio-sand-portal,
-body.portfolio-theme-page--video .subpage-cube-portal,
-body.portfolio-theme-page--graphics .subpage-cube-portal {
+body.portfolio-theme-page .subpage-ambient,
+body.portfolio-theme-page .subpage-ambient__blur,
+body.portfolio-theme-page .subpage-ambient__shade,
+body.portfolio-theme-page .portfolio-sand-portal,
+body.portfolio-theme-page .subpage-cube-portal {
   display: none !important;
 }
 
-/* Theme stage must sit under content but above body fill */
 body.portfolio-theme-page .portfolio-theme-stage {
   z-index: 0;
 }
-body.portfolio-theme-page--video #main,
-body.portfolio-theme-page--graphics #main,
-body.portfolio-theme-page--video.is-portfolio-sand-active #main,
-body.portfolio-theme-page--graphics.is-portfolio-sand-active #main,
-body.reels-gallery-page.portfolio-theme-page #main,
-body.graphics-gallery-page.portfolio-theme-page #main {
+body.portfolio-theme-page #main,
+body.portfolio-theme-page.is-portfolio-sand-active #main {
   position: relative;
   z-index: 2;
   background: transparent !important;
 }
-body.portfolio-theme-page--video .portfolio-hero,
-body.portfolio-theme-page--graphics .portfolio-hero,
-body.portfolio-theme-page--video .reels-gallery,
-body.portfolio-theme-page--graphics .graphics-gallery {
+body.portfolio-theme-page .portfolio-hero,
+body.portfolio-theme-page .reels-gallery,
+body.portfolio-theme-page .graphics-gallery,
+body.portfolio-theme-page .portfolio-cases,
+body.portfolio-theme-page .graphics-masonry {
   background: transparent !important;
 }
 
@@ -81,115 +88,61 @@ body.portfolio-theme-page--graphics .graphics-gallery {
   position: absolute;
   inset: 0;
   z-index: 2;
+  pointer-events: none;
 }
 .portfolio-theme-layer__veil--video {
   background:
-    linear-gradient(90deg, rgba(5, 5, 5, 0.35), transparent 14%, transparent 86%, rgba(5, 5, 5, 0.35)),
-    linear-gradient(180deg, rgba(5, 5, 5, 0.28), transparent 20%, transparent 80%, rgba(5, 5, 5, 0.38));
+    linear-gradient(180deg, rgba(5, 5, 5, 0.35), rgba(5, 5, 5, 0.08) 22%, rgba(5, 5, 5, 0.12) 70%, rgba(5, 5, 5, 0.48)),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.28), transparent 18%, transparent 82%, rgba(5, 5, 5, 0.28));
 }
 .portfolio-theme-layer__veil--graphics {
   background:
-    radial-gradient(ellipse at 50% 40%, rgba(242, 242, 244, 0.12), rgba(242, 242, 244, 0.45) 72%);
+    linear-gradient(180deg, rgba(242, 242, 244, 0.35), rgba(242, 242, 244, 0.08) 22%, rgba(242, 242, 244, 0.2) 72%, rgba(242, 242, 244, 0.55));
 }
 body.portfolio-theme-page--video .portfolio-theme-layer__veil--video {
   background:
-    linear-gradient(180deg, rgba(5, 5, 5, 0.42), rgba(5, 5, 5, 0.12) 18%, rgba(5, 5, 5, 0.18) 68%, rgba(5, 5, 5, 0.55)),
-    linear-gradient(90deg, rgba(5, 5, 5, 0.32), transparent 18%, transparent 82%, rgba(5, 5, 5, 0.32));
-}
-body.portfolio-theme-page--graphics .portfolio-theme-layer__veil--graphics {
-  background:
-    linear-gradient(180deg, rgba(242, 242, 244, 0.42), rgba(242, 242, 244, 0.12) 20%, rgba(242, 242, 244, 0.28) 70%, rgba(242, 242, 244, 0.62));
+    linear-gradient(180deg, rgba(5, 5, 5, 0.4), rgba(5, 5, 5, 0.1) 20%, rgba(5, 5, 5, 0.14) 68%, rgba(5, 5, 5, 0.52)),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.22), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.22));
 }
 
-/* —— Montaż: multi-lane large reel rails —— */
+/* —— Montaż: large reel tiles drifting across black field —— */
 .portfolio-montaz-field {
   position: absolute;
   inset: 0;
   background: #050505;
   overflow: hidden;
 }
-.portfolio-montaz-rail {
+.portfolio-montaz-drift {
   position: absolute;
-  left: -4%;
-  right: -4%;
-  height: clamp(12.5rem, 42vh, 26rem);
-  display: flex;
-  align-items: stretch;
-  overflow: hidden;
-  opacity: 0.92;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  inset: -4%;
+  z-index: 1;
 }
-.portfolio-montaz-rail--a {
-  top: 1%;
-  transform: rotate(-2.4deg);
-}
-.portfolio-montaz-rail--b {
-  top: 30%;
-  height: clamp(14rem, 48vh, 30rem);
-  opacity: 1;
-  transform: rotate(1.6deg);
-}
-.portfolio-montaz-rail--c {
-  bottom: -2%;
-  transform: rotate(-1.2deg);
-}
-.portfolio-montaz-rail__belt {
-  display: flex;
-  align-items: stretch;
-  height: 100%;
-  width: max-content;
-  will-change: transform;
-  animation: montaz-rail-drift 38s linear infinite;
-  animation-play-state: paused;
-}
-.portfolio-montaz-rail--b .portfolio-montaz-rail__belt {
-  animation-name: montaz-rail-drift-rev;
-  animation-duration: 52s;
-}
-.portfolio-montaz-rail--c .portfolio-montaz-rail__belt {
-  animation-duration: 44s;
-  animation-delay: -14s;
-}
-.portfolio-montaz-rail.is-ready .portfolio-montaz-rail__belt {
-  animation-play-state: running;
-}
-body.portfolio-page--tiles:not([data-tile-theme="video"]) .portfolio-montaz-rail .portfolio-montaz-rail__belt {
-  animation-play-state: paused;
-}
-@keyframes montaz-rail-drift {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-50%, 0, 0); }
-}
-@keyframes montaz-rail-drift-rev {
-  from { transform: translate3d(-50%, 0, 0); }
-  to { transform: translate3d(0, 0, 0); }
-}
-.portfolio-montaz-rail__track {
-  display: flex;
-  align-items: center;
-  gap: clamp(1rem, 2.2vw, 1.75rem);
-  padding: 0 clamp(0.85rem, 2.2vw, 1.75rem);
-  height: 100%;
-}
-.portfolio-montaz-rail__card {
-  position: relative;
-  flex: 0 0 auto;
-  height: 100%;
-  width: auto;
+.portfolio-montaz-drift__item {
+  position: absolute;
+  width: min(34vw, 17rem);
   aspect-ratio: 9 / 16;
   border-radius: 1rem;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: #151515;
-  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: #141414;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65);
+  opacity: 0.95;
+  will-change: transform;
+  transform: rotate(var(--rot, 0deg));
+  animation: montaz-drift var(--dur, 26s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
 }
-.portfolio-montaz-rail__card--sm { height: 64%; }
-.portfolio-montaz-rail__card--md { height: 80%; }
-.portfolio-montaz-rail__card--lg { height: 94%; }
-.portfolio-montaz-rail__card--xl { height: 100%; }
-.portfolio-montaz-rail__card img,
-.portfolio-montaz-rail__card video {
+.portfolio-montaz-drift__item--md {
+  width: min(30vw, 15rem);
+}
+.portfolio-montaz-drift__item--lg {
+  width: min(38vw, 18.5rem);
+}
+.portfolio-montaz-drift__item--xl {
+  width: min(44vw, 21rem);
+}
+.portfolio-montaz-drift__item img,
+.portfolio-montaz-drift__item video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -197,12 +150,22 @@ body.portfolio-page--tiles:not([data-tile-theme="video"]) .portfolio-montaz-rail
   object-fit: cover;
   display: block;
 }
-.portfolio-montaz-rail__card video {
+.portfolio-montaz-drift__item video {
   z-index: 1;
 }
+@keyframes montaz-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--rot, 0deg)); }
+  25% { transform: translate3d(4.5vw, -3vh, 0) rotate(calc(var(--rot, 0deg) + 2deg)); }
+  50% { transform: translate3d(-3vw, 2.5vh, 0) rotate(calc(var(--rot, 0deg) - 1deg)); }
+  75% { transform: translate3d(3.5vw, 1.5vh, 0) rotate(calc(var(--rot, 0deg) + 1deg)); }
+}
+body.portfolio-page--tiles:not([data-tile-theme="video"]) .portfolio-montaz-drift__item {
+  animation-play-state: paused;
+}
 
-/* —— Grafiki: light homepage ambient + drifting posters —— */
-.portfolio-grafiki-ambient-wrap {
+/* —— Grafiki: light homepage ambient only (no poster drift) —— */
+.portfolio-grafiki-ambient-wrap,
+.portfolio-web-ambient-wrap {
   position: absolute;
   inset: 0;
 }
@@ -218,12 +181,18 @@ body.portfolio-page--tiles:not([data-tile-theme="video"]) .portfolio-montaz-rail
   background:
     radial-gradient(ellipse 140% 90% at 50% 38%, #f6f6f8 0%, #ececf0 42%, #e4e4ea 100%);
 }
-body.portfolio-page--tiles[data-tile-theme="graphics"] .portfolio-home-ambient,
-body.portfolio-theme-page--graphics .portfolio-home-ambient.home-ambient__blur,
-body.portfolio-theme-page--graphics .portfolio-home-ambient.home-ambient__shade {
-  display: none !important;
+.portfolio-web-ambient-wrap .home-ambient,
+.portfolio-web-ambient-wrap canvas.home-ambient {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background:
+    radial-gradient(ellipse 140% 90% at 50% 38%, #0e0e0e 0%, #040404 42%, #000 100%);
 }
-.portfolio-grafiki-ambient-wrap .home-ambient__blur {
+.portfolio-grafiki-ambient-wrap .home-ambient__blur,
+.portfolio-web-ambient-wrap .home-ambient__blur {
   position: absolute;
   top: 0;
   left: 0;
@@ -231,6 +200,10 @@ body.portfolio-theme-page--graphics .portfolio-home-ambient.home-ambient__shade 
   height: 80vmax;
   margin: -40vmax 0 0 -40vmax;
   opacity: 0.35;
+  transform: translate3d(50vw, 50vh, 0);
+  will-change: transform;
+}
+.portfolio-grafiki-ambient-wrap .home-ambient__blur {
   background:
     radial-gradient(
       circle closest-side,
@@ -238,62 +211,59 @@ body.portfolio-theme-page--graphics .portfolio-home-ambient.home-ambient__shade 
       rgba(40, 40, 50, 0.06) 30%,
       transparent 66%
     );
-  transform: translate3d(50vw, 50vh, 0);
-  will-change: transform;
+}
+.portfolio-web-ambient-wrap .home-ambient__blur {
+  opacity: 0.55;
+  background:
+    radial-gradient(
+      circle closest-side,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.055) 22%,
+      rgba(255, 255, 255, 0.012) 50%,
+      transparent 66%
+    );
 }
 .portfolio-grafiki-ambient-wrap .home-ambient__shade {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.22);
+}
+.portfolio-web-ambient-wrap .home-ambient__shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 3, 3, 0.28);
 }
 
-.portfolio-grafiki-drift {
-  position: absolute;
-  inset: -6%;
+/* Systems field (shared with tiles) */
+body.portfolio-theme-page--systems .portfolio-tile-bg {
+  opacity: 1 !important;
   z-index: 1;
 }
-.portfolio-grafiki-drift__item {
-  position: absolute;
-  width: min(24vw, 12rem);
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  border-radius: 0.7rem;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
-  opacity: 0.78;
-  will-change: transform;
-  animation: grafiki-drift 22s ease-in-out infinite;
-}
-.portfolio-grafiki-drift__item:nth-child(1) { left: 4%; top: 10%; animation-duration: 24s; animation-delay: -2s; }
-.portfolio-grafiki-drift__item:nth-child(2) { left: 26%; top: 56%; width: min(20vw, 10rem); animation-duration: 20s; animation-delay: -6s; }
-.portfolio-grafiki-drift__item:nth-child(3) { left: 50%; top: 6%; width: min(22vw, 11rem); animation-duration: 26s; animation-delay: -4s; }
-.portfolio-grafiki-drift__item:nth-child(4) { left: 70%; top: 40%; animation-duration: 21s; animation-delay: -9s; }
-.portfolio-grafiki-drift__item:nth-child(5) { left: 10%; top: 60%; width: min(18vw, 9rem); animation-duration: 23s; animation-delay: -11s; }
-.portfolio-grafiki-drift__item:nth-child(6) { left: 38%; top: 26%; width: min(19vw, 9.5rem); animation-duration: 19s; animation-delay: -3s; }
-.portfolio-grafiki-drift__item:nth-child(7) { left: 76%; top: 12%; width: min(17vw, 8.5rem); animation-duration: 25s; animation-delay: -7s; }
-.portfolio-grafiki-drift__item:nth-child(8) { left: 58%; top: 64%; width: min(21vw, 10.5rem); animation-duration: 22s; animation-delay: -13s; }
-@keyframes grafiki-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
-  33% { transform: translate3d(18px, -22px, 0) rotate(2deg); }
-  66% { transform: translate3d(-14px, 16px, 0) rotate(-1deg); }
+body.portfolio-theme-page--systems .portfolio-theme-stage {
+  z-index: 0;
 }
 
-html.reduce-motion .portfolio-montaz-rail__belt,
-html.reduce-motion .portfolio-grafiki-drift__item {
+/* Hide legacy drift if any leftover markup */
+.portfolio-grafiki-drift {
+  display: none !important;
+}
+
+html.reduce-motion .portfolio-montaz-drift__item {
   animation: none !important;
 }
 
 @media (max-width: 720px) {
-  .portfolio-montaz-rail {
-    height: clamp(9.5rem, 34vh, 16rem);
-    left: -8%;
-    right: -8%;
+  .portfolio-montaz-drift__item {
+    width: min(48vw, 12.5rem);
+    opacity: 0.92;
   }
-  .portfolio-montaz-rail--b {
-    top: 28%;
-    height: clamp(11rem, 40vh, 18rem);
+  .portfolio-montaz-drift__item--md {
+    width: min(42vw, 11rem);
   }
-  .portfolio-grafiki-drift__item {
-    width: min(36vw, 9rem);
-    opacity: 0.65;
+  .portfolio-montaz-drift__item--lg {
+    width: min(54vw, 14rem);
+  }
+  .portfolio-montaz-drift__item--xl {
+    width: min(60vw, 15.5rem);
   }
 }

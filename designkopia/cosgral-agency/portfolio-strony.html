@@ -7,11 +7,14 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="manifest" href="site.webmanifest" />
+<meta name="cosgral-build" content="20260926tabs12" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Strony internetowe — Portfolio COSGRAL</title>
 <meta name="description" content="Wybrane strony internetowe COSGRAL — Juicy Events, Trove Archive, MJ Social Media." />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260926tiles1" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20260926tabs12" />
+<link rel="stylesheet" href="portfolio-theme-layers.css?v=20260926tabs12" />
+
 <link rel="stylesheet" href="telforce-cases.css?v=20260925viz2" />
 <script src="telforce-previews.js?v=20260925anim1" defer></script>
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
@@ -28,7 +31,7 @@
 <script src="theme-mode.js?v=20260920ui34"></script>
   <link rel="stylesheet" href="site-chat.css?v=20260925fix2" />
 </head>
-<body class="subpage portfolio-page graphics-gallery-page">
+<body class="subpage portfolio-page graphics-gallery-page portfolio-theme-page portfolio-theme-page--web" data-tile-theme="web">
 <a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
 
 <canvas id="subpage-ambient" class="subpage-ambient" aria-hidden="true"></canvas>
@@ -42,6 +45,16 @@
 </div>
 <div class="portfolio-sand-portal portfolio-sand-portal--front" aria-hidden="true">
   <canvas id="portfolio-sand-front" class="portfolio-sand__canvas"></canvas>
+</div>
+
+<div class="portfolio-theme-stage" data-portfolio-theme-stage aria-hidden="true">
+  <div class="portfolio-theme-layer" data-theme-layer="web">
+    <div class="portfolio-web-ambient-wrap">
+      <canvas class="home-ambient" data-home-ambient aria-hidden="true"></canvas>
+      <div class="home-ambient__blur" aria-hidden="true"></div>
+      <div class="home-ambient__shade" aria-hidden="true"></div>
+    </div>
+  </div>
 </div>
 
 <nav class="site-nav" id="site-nav">
@@ -207,12 +220,14 @@
 <script src="subpage-ambient-bg.js?v=20260916a"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
 <script type="module" src="subpage-cube.js?v=20260926cube1"></script>
-<script type="module" src="portfolio-hero-sand.js?v=20260920ui26"></script>
+<script type="module" src="portfolio-hero-sand.js?v=20260926tabs12"></script>
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script src="sand-hero-subpage.js?v=20260816a"></script>
 <script src="sections.js?v=20260814e"></script>
 <script src="portfolio-video.js?v=20260920ui19"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
+<script src="home-ambient-bg.js?v=20260926tabs12"></script>
+<script src="portfolio-theme-layers.js?v=20260926tabs12"></script>
 </body>
 </html>
