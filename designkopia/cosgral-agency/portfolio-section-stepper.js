@@ -12,7 +12,7 @@
   var HOLDS_CONFIG = [
     { id: "portfolio-top", selector: ".portfolio-hero" },
     { id: "strony", selector: "#strony" },
-    { id: "automatyzacje", stId: "auto-chapter-pin", hold: 0.18, selector: "#automatyzacje-intro" },
+    { id: "automatyzacje", selector: "#automatyzacje" },
     { id: "montaz", selector: "#montaz" },
     { id: "grafiki", stId: "grafiki-pin", hold: 0, selector: "#grafiki" },
     { id: "footer", footer: true },
@@ -173,14 +173,10 @@
 
     function autoFreeRange() {
       var auto = document.getElementById("automatyzacje");
-      var footer = document.querySelector(".site-footer");
       if (!auto) return null;
-      var start = Math.max(0, auto.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
-      var end = footer
-        ? Math.max(0, footer.getBoundingClientRect().top + window.scrollY)
-        : window.ScrollTrigger
-          ? ScrollTrigger.maxScroll(window)
-          : document.documentElement.scrollHeight;
+      var top = auto.getBoundingClientRect().top + window.scrollY;
+      var start = Math.max(0, top - (MOBILE ? 72 : 96));
+      var end = Math.max(start + 1, top + auto.offsetHeight);
       return { start: start, end: end };
     }
 

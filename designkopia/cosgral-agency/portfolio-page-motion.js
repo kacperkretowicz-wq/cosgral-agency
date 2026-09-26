@@ -14,11 +14,6 @@
     return document.querySelector("[data-portfolio-scene-curtain]");
   }
 
-  function smoothstep(edge0, edge1, x) {
-    var t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-    return t * t * (3 - 2 * t);
-  }
-
   function easeInOut(t) {
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
@@ -37,10 +32,13 @@
     if (el.id === "grafiki" || el.classList.contains("portfolio-section--grafiki")) {
       return el.querySelector(".graphics-stage") || el;
     }
+    if (el.id === "automatyzacje" || el.classList.contains("portfolio-section--auto-film")) {
+      return el.querySelector(".auto-cover") || el;
+    }
     return (
       el.querySelector(".home-tilt-layer") ||
       el.querySelector(
-        ".graphics-stage, .portfolio-scene__panel, .container, .portfolio-chapter__title"
+        ".graphics-stage, .auto-cover, .portfolio-scene__panel, .container, .portfolio-chapter__title"
       ) ||
       el
     );
@@ -131,54 +129,6 @@
     });
   }
 
-  function initChapterPin() {
-    var chapter = document.getElementById("automatyzacje-intro");
-    if (!chapter || REDUCED || !window.gsap || !window.ScrollTrigger) return;
-
-    var title = chapter.querySelector(".portfolio-chapter__title");
-    if (title) gsap.set(title, { autoAlpha: 0, y: 28, scale: 0.94 });
-
-    gsap.set(chapter, { width: "100%", maxWidth: "none", clearProps: "left" });
-
-    ScrollTrigger.create({
-      id: "auto-chapter-pin",
-      trigger: chapter,
-      start: "top top",
-      end: MOBILE ? "+=72%" : "+=90%",
-      pin: true,
-      pinSpacing: true,
-      scrub: true,
-      anticipatePin: 0.3,
-      invalidateOnRefresh: true,
-      refreshPriority: -2,
-      onUpdate: function (self) {
-        if (!title) return;
-        var p = self.progress;
-        var show = smoothstep(0, 0.22, p);
-        var hold = 1 - smoothstep(0.72, 1, p);
-        var amt = Math.min(show, hold);
-        gsap.set(title, {
-          autoAlpha: amt,
-          y: (1 - amt) * 24,
-          scale: 0.94 + amt * 0.06,
-        });
-      },
-      onRefresh: function (self) {
-        gsap.set(chapter, { width: "100%", maxWidth: "none" });
-        if (!title) return;
-        var p = self.progress || 0;
-        var show = smoothstep(0, 0.22, p);
-        var hold = 1 - smoothstep(0.72, 1, p);
-        var amt = p <= 0 ? 0 : Math.min(show, hold);
-        gsap.set(title, {
-          autoAlpha: amt,
-          y: (1 - amt) * 24,
-          scale: 0.94 + amt * 0.06,
-        });
-      },
-    });
-  }
-
   function initPortfolioCinema() {
     if (sceneBridgeReady || REDUCED || !window.gsap || !window.ScrollTrigger) return;
     sceneBridgeReady = true;
@@ -186,13 +136,11 @@
     var strony = document.getElementById("strony");
     var montaz = document.getElementById("montaz");
     var grafiki = document.getElementById("grafiki");
-    var chapter = document.getElementById("automatyzacje-intro");
     var auto = document.getElementById("automatyzacje");
     var endBand = document.querySelector(".portfolio-end");
 
     var pairs = [
-      { leave: strony, enter: chapter },
-      { leave: chapter, enter: auto },
+      { leave: strony, enter: auto },
       { leave: auto, enter: montaz },
       { leave: montaz, enter: grafiki },
       { leave: grafiki, enter: endBand, afterPin: "grafiki-pin" },
@@ -218,7 +166,6 @@
       },
     });
 
-    initChapterPin();
     ScrollTrigger.refresh();
     requestAnimationFrame(function () {
       ScrollTrigger.refresh();
@@ -229,7 +176,7 @@
     if (!auto) return;
     auto.classList.add("is-entered", "is-visible");
     if (window.gsap) {
-      var panel = auto.querySelector(".home-tilt-layer, .portfolio-scene__panel, .container") || auto;
+      var panel = auto.querySelector(".auto-cover, .home-tilt-layer, .portfolio-scene__panel, .container") || auto;
       gsap.set(auto, { clearProps: "opacity,visibility" });
       gsap.set(panel, { clearProps: "opacity,visibility,transform,filter" });
       auto.classList.remove("is-depth-gone", "is-depth-recessed");
@@ -403,16 +350,6 @@
         from: { y: MOBILE ? 60 : 100, scale: 0.88, rotationX: 0, rotationY: 0, rotationZ: 0, z: 0 },
       }
     );
-
-    if (!MOBILE) {
-      bindTileScrollTell("auto", "#automatyzacje .auto-cover", {
-        stagger: 0,
-        start: "top 78%",
-        end: "top 42%",
-        scrub: 1.15,
-        from: { y: 56, scale: 0.92, rotationZ: 0, rotationX: 8, z: -80 },
-      });
-    }
 
     initPortfolioCinema();
     ScrollTrigger.refresh();

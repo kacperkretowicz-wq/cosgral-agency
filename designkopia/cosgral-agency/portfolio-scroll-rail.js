@@ -32,7 +32,7 @@
     : [
         { id: "portfolio-top", selector: ".portfolio-hero", label: "Portfolio", i18n: "portfolio.rail_portfolio" },
         { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony", showTitle: true },
-        { id: "automatyzacje", selector: "#automatyzacje-intro", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: true },
+        { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: false },
         { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz", showTitle: true },
         { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki", showTitle: true },
         { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
@@ -343,8 +343,7 @@
         return Math.max(0, footer.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
       }
       if (scene.id === "automatyzacje") {
-        var chapterPin = window.ScrollTrigger && ScrollTrigger.getById("auto-chapter-pin");
-        if (chapterPin) return chapterPin.start + (chapterPin.end - chapterPin.start) * 0.18;
+        return sceneY(scene.selector);
       }
       if (scene.id === "grafiki") {
         var grafikiPin = window.ScrollTrigger && ScrollTrigger.getById("grafiki-pin");

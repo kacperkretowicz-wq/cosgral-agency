@@ -21,6 +21,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://cosgral.pl/portfolio-systemy.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://cosgral.pl/portfolio-strona-juicy-events.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
