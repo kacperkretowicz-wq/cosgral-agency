@@ -1,20 +1,19 @@
-/* Realizacje — horizontal category tiles (Pinterest-style strip) */
+/* Realizacje — equal tiles over theme-driven stage backgrounds */
 body.portfolio-page--tiles {
-  --tile-bg: #050505;
-  background: var(--tile-bg);
-  transition: background-color 0.7s var(--ease);
-}
-body.portfolio-page--tiles[data-tile-theme="web"] {
-  --tile-bg: #071018;
-}
-body.portfolio-page--tiles[data-tile-theme="systems"] {
-  --tile-bg: #0a0712;
+  --tile-w: min(72vw, 22.5rem);
+  --tile-h: min(58svh, 34rem);
+  background: #050505;
+  overflow-x: hidden;
 }
 body.portfolio-page--tiles[data-tile-theme="video"] {
-  --tile-bg: #120808;
+  color: #111;
 }
-body.portfolio-page--tiles[data-tile-theme="graphics"] {
-  --tile-bg: #0b0d12;
+body.portfolio-page--tiles[data-tile-theme="video"] .site-nav__toggle,
+body.portfolio-page--tiles[data-tile-theme="video"] .lang-switch button {
+  color: #111;
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .site-nav__toggle-bars span {
+  background: #111;
 }
 
 body.portfolio-page--tiles .subpage-ambient,
@@ -23,14 +22,10 @@ body.portfolio-page--tiles .subpage-ambient__shade,
 body.portfolio-page--tiles .portfolio-sand-portal,
 body.portfolio-page--tiles .grafiki-bloom,
 body.portfolio-page--tiles .portfolio-scene-curtain,
-body.portfolio-page--tiles .home-scroll-rail {
+body.portfolio-page--tiles .home-scroll-rail,
+body.portfolio-page--tiles .subpage-cube-portal,
+body.portfolio-page--tiles .portfolio-end {
   display: none !important;
-}
-
-body.portfolio-page--tiles .subpage-cube-portal {
-  opacity: 0.22;
-  z-index: 0;
-  pointer-events: none;
 }
 
 body.portfolio-page--tiles .site-nav {
@@ -43,54 +38,207 @@ body.portfolio-page--tiles #main {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   padding: 0;
   background: transparent;
 }
 
-.portfolio-tiles-hero {
-  position: relative;
-  z-index: 3;
-  padding: clamp(5.5rem, 12vh, 7rem) var(--gutter) 0.75rem;
-  max-width: 42rem;
+/* ——— Stage backgrounds ——— */
+.portfolio-stage-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #050505;
 }
-.portfolio-tiles-hero__title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 7vw, 4.5rem);
-  font-weight: 300;
-  letter-spacing: -0.03em;
-  line-height: 0.95;
-  text-transform: uppercase;
-  color: var(--ink);
+.portfolio-stage-bg__layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.7s var(--ease), visibility 0.7s;
 }
-.portfolio-tiles-hero__lead {
-  margin: 0.85rem 0 0;
-  max-width: 34ch;
-  color: rgba(245, 245, 245, 0.62);
-  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
-  line-height: 1.4;
+body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-stage-bg__layer--web,
+body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-stage-bg__layer--systems,
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-stage-bg__layer--video,
+body.portfolio-page--tiles[data-tile-theme="graphics"] .portfolio-stage-bg__layer--graphics {
+  opacity: 1;
+  visibility: visible;
 }
 
+/* Web: edge-to-edge film of random website clips */
+.portfolio-stage-bg__layer--web {
+  background: #05070a;
+}
+.stage-web-mosaic {
+  position: absolute;
+  inset: -2%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0;
+  filter: saturate(0.9) contrast(1.08) brightness(0.92);
+}
+.stage-web-mosaic__cell {
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+.stage-web-mosaic__cell video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.9;
+  transform: scale(1.06);
+}
+.portfolio-stage-bg__layer--web::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 45%, transparent 15%, rgba(0, 0, 0, 0.42) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, transparent 28%, transparent 72%, rgba(0, 0, 0, 0.38) 100%);
+  pointer-events: none;
+}
+
+/* Systems: black/white thinking lines */
+.portfolio-stage-bg__layer--systems {
+  background: #050505;
+}
+.stage-systems-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Montaż: white stage + drifting reel cards */
+.portfolio-stage-bg__layer--video {
+  background: #ffffff;
+}
+.stage-reels-field {
+  position: absolute;
+  inset: -8% -20%;
+  width: 140%;
+  height: 116%;
+}
+.stage-reels-row {
+  position: absolute;
+  left: 0;
+  display: flex;
+  gap: clamp(0.8rem, 2vw, 1.4rem);
+  will-change: transform;
+  animation: stage-reels-drift linear infinite;
+}
+.stage-reels-row--a {
+  top: 8%;
+  animation-duration: 42s;
+}
+.stage-reels-row--b {
+  top: 38%;
+  animation-duration: 54s;
+  animation-direction: reverse;
+}
+.stage-reels-row--c {
+  top: 68%;
+  animation-duration: 48s;
+}
+.stage-reel-card {
+  flex: 0 0 auto;
+  width: clamp(7.5rem, 16vw, 11rem);
+  aspect-ratio: 9 / 16;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #ddd;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  transform-origin: center center;
+}
+.stage-reel-card video,
+.stage-reel-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.stage-reel-card--near {
+  width: clamp(9.5rem, 20vw, 13.5rem);
+  transform: rotate(-6deg) scale(1.05);
+  z-index: 2;
+}
+.stage-reel-card--mid {
+  transform: rotate(4deg) scale(0.92);
+  opacity: 0.92;
+}
+.stage-reel-card--far {
+  width: clamp(6.2rem, 13vw, 8.8rem);
+  transform: rotate(-2deg) scale(0.78);
+  opacity: 0.78;
+  filter: blur(0.4px);
+}
+@keyframes stage-reels-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-33.333%); }
+}
+
+/* Graphics: floating stills */
+.portfolio-stage-bg__layer--graphics {
+  background: #08090c;
+}
+.stage-gfx-field {
+  position: absolute;
+  inset: 0;
+}
+.stage-gfx-card {
+  position: absolute;
+  width: clamp(8rem, 18vw, 14rem);
+  aspect-ratio: 4 / 5;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  opacity: 0.55;
+  animation: stage-gfx-float 18s ease-in-out infinite;
+}
+.stage-gfx-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.stage-gfx-card:nth-child(1) { left: 6%; top: 12%; animation-delay: 0s; }
+.stage-gfx-card:nth-child(2) { right: 8%; top: 18%; width: clamp(7rem, 15vw, 11rem); animation-delay: -4s; }
+.stage-gfx-card:nth-child(3) { left: 18%; bottom: 14%; width: clamp(9rem, 20vw, 15rem); animation-delay: -8s; }
+.stage-gfx-card:nth-child(4) { right: 16%; bottom: 10%; animation-delay: -11s; }
+.stage-gfx-card:nth-child(5) { left: 42%; top: 22%; width: clamp(6.5rem, 14vw, 10rem); opacity: 0.4; animation-delay: -6s; }
+@keyframes stage-gfx-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-18px) rotate(2deg); }
+}
+
+/* ——— Tile strip ——— */
 .portfolio-tiles {
   position: relative;
   z-index: 2;
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-height: 0;
-  padding: 0 0 clamp(1.5rem, 4vh, 2.5rem);
+  padding: clamp(4.8rem, 10vh, 6rem) 0 clamp(1.25rem, 3vh, 2rem);
 }
 .portfolio-tiles__scroller {
   display: flex;
-  align-items: stretch;
-  gap: clamp(0.85rem, 1.8vw, 1.35rem);
+  align-items: center;
+  gap: clamp(0.9rem, 1.8vw, 1.25rem);
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  padding: clamp(1.25rem, 3vh, 2rem) var(--gutter) 1rem;
+  padding: 1rem max(var(--gutter), calc((100vw - var(--tile-w)) / 2));
   scrollbar-width: none;
 }
 .portfolio-tiles__scroller::-webkit-scrollbar {
@@ -98,32 +246,76 @@ body.portfolio-page--tiles #main {
 }
 
 .portfolio-tile {
-  --tile-accent: rgba(255, 255, 255, 0.14);
   position: relative;
-  flex: 0 0 min(78vw, 34rem);
-  width: min(78vw, 34rem);
-  height: min(68svh, 36rem);
-  max-height: 70svh;
+  flex: 0 0 var(--tile-w);
+  width: var(--tile-w);
+  height: var(--tile-h);
   scroll-snap-align: center;
-  border-radius: 1.35rem;
+  border-radius: 1.25rem;
   overflow: hidden;
   text-decoration: none;
-  color: var(--ink);
-  border: 1px solid var(--tile-accent);
-  background: #0a0a0a;
+  color: #f5f5f5;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(8, 8, 10, 0.16);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  backdrop-filter: blur(8px) saturate(1.1);
   isolation: isolate;
   transform: scale(0.96);
   transition:
     transform 0.45s var(--ease),
     border-color 0.35s ease,
-    box-shadow 0.45s var(--ease);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    box-shadow 0.45s var(--ease),
+    background 0.45s ease;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
 }
 .portfolio-tile.is-active {
   transform: scale(1);
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.38);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+  background: rgba(8, 8, 10, 0.1);
 }
+/* Web theme: glass so the film reads through */
+body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-tile {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(6px) saturate(1.05);
+  backdrop-filter: blur(6px) saturate(1.05);
+}
+body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-tile.is-active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.42);
+}
+body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-tile {
+  background: rgba(0, 0, 0, 0.22);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-tile.is-active {
+  background: rgba(0, 0, 0, 0.14);
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tile {
+  color: #111;
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tile.is-active {
+  border-color: rgba(0, 0, 0, 0.22);
+  background: rgba(255, 255, 255, 0.72);
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tile__lead {
+  color: rgba(17, 17, 17, 0.62);
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tile__cta {
+  color: #111;
+  background: rgba(255, 255, 255, 0.7);
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tiles__dot {
+  background: rgba(0, 0, 0, 0.22);
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tiles__dot.is-active {
+  background: rgba(0, 0, 0, 0.82);
+}
+
 .portfolio-tile:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.45);
   outline-offset: 4px;
@@ -134,17 +326,26 @@ body.portfolio-page--tiles #main {
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  background: #090909;
+  opacity: 0.35;
 }
 .portfolio-tile__media::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 2;
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.18) 42%, rgba(0, 0, 0, 0.86) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.55) 100%);
   pointer-events: none;
 }
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tile__media {
+  opacity: 0.22;
+}
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-tile__media::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.55) 100%);
+}
+body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-tile__media {
+  opacity: 0.12;
+}
+
 .portfolio-tile__video,
 .portfolio-tile__slide {
   position: absolute;
@@ -173,59 +374,49 @@ body.portfolio-page--tiles #main {
   right: 0;
   bottom: 0;
   z-index: 3;
-  padding: 1.35rem 1.35rem 1.45rem;
+  padding: 1.25rem 1.25rem 1.35rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.4rem;
   pointer-events: none;
 }
 .portfolio-tile__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.55rem, 3.4vw, 2.35rem);
+  font-size: clamp(1.45rem, 3.2vw, 2.05rem);
   font-weight: 300;
   letter-spacing: -0.03em;
   line-height: 0.98;
   text-transform: uppercase;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
 }
 .portfolio-tile__lead {
   margin: 0;
-  max-width: 28ch;
+  max-width: 26ch;
   color: rgba(245, 245, 245, 0.72);
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   line-height: 1.35;
 }
 .portfolio-tile__cta {
-  margin-top: 0.55rem;
+  margin-top: 0.5rem;
   align-self: flex-start;
   display: inline-block;
-  padding: 0.5rem 1.15rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink);
-  border-radius: 999px;
-  background: rgba(8, 8, 10, 0.45);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  backdrop-filter: blur(16px) saturate(1.4);
-}
-
-.portfolio-tiles__hint {
-  margin: 0.35rem var(--gutter) 0;
+  padding: 0.48rem 1.05rem;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.42);
+  color: #f5f5f5;
+  border-radius: 999px;
+  background: rgba(8, 8, 10, 0.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.35);
+  backdrop-filter: blur(14px) saturate(1.35);
 }
 
 .portfolio-tiles__dots {
   display: flex;
   justify-content: center;
   gap: 0.45rem;
-  margin-top: 0.95rem;
+  margin-top: 1rem;
   padding: 0 var(--gutter);
 }
 .portfolio-tiles__dot {
@@ -243,42 +434,34 @@ body.portfolio-page--tiles #main {
   background: rgba(255, 255, 255, 0.9);
 }
 
-body.portfolio-page--tiles .portfolio-end {
-  position: relative;
-  z-index: 2;
-  background: transparent;
-}
-body.portfolio-page--tiles .portfolio-contact-cta {
-  padding-top: 1.5rem;
-}
-
 @media (min-width: 901px) {
-  .portfolio-tile {
-    flex-basis: min(42vw, 38rem);
-    width: min(42vw, 38rem);
-    height: min(62svh, 38rem);
-  }
-  .portfolio-tiles__scroller {
-    padding-left: max(var(--gutter), calc((100vw - min(42vw, 38rem)) / 2 - 0.5rem));
-    padding-right: max(var(--gutter), calc((100vw - min(42vw, 38rem)) / 2 - 0.5rem));
+  body.portfolio-page--tiles {
+    --tile-w: min(28vw, 22.5rem);
+    --tile-h: min(58svh, 34rem);
   }
 }
 
 @media (max-width: 720px) {
-  .portfolio-tile {
-    flex-basis: 84vw;
-    width: 84vw;
-    height: min(62svh, 30rem);
-    border-radius: 1.15rem;
+  body.portfolio-page--tiles {
+    --tile-w: min(78vw, 20rem);
+    --tile-h: min(56svh, 30rem);
   }
-  .portfolio-tiles-hero {
-    padding-top: 5.1rem;
+  .portfolio-tile {
+    border-radius: 1.1rem;
+  }
+  .stage-web-mosaic {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
   }
 }
 
 html.reduce-motion .portfolio-tile,
-html.reduce-motion .portfolio-tile__slide {
-  transition: none;
+html.reduce-motion .portfolio-tile__slide,
+html.reduce-motion .stage-reel-card,
+html.reduce-motion .stage-gfx-card,
+html.reduce-motion .portfolio-stage-bg__layer {
+  transition: none !important;
+  animation: none !important;
 }
 html.reduce-motion .portfolio-tile {
   transform: none;
