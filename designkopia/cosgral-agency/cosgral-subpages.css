@@ -1944,6 +1944,7 @@ html.reduce-motion .portfolio-page--film .home-scroll-rail {
 body.portfolio-page #strony,
 body.portfolio-page #automatyzacje,
 body.portfolio-page #montaz {
+  display: block;
   padding-bottom: var(--portfolio-cover-run);
 }
 body.portfolio-page #strony > .home-tilt-layer,
