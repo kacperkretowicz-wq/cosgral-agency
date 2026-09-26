@@ -187,15 +187,15 @@
       canvas.style.height = h + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (!lines.length) {
-        for (var i = 0; i < 28; i++) {
+        for (var i = 0; i < 36; i++) {
           lines.push({
             y: Math.random() * h,
-            amp: 8 + Math.random() * 42,
-            freq: 0.0015 + Math.random() * 0.0045,
-            speed: 0.25 + Math.random() * 0.85,
+            amp: 6 + Math.random() * 56,
+            freq: 0.0012 + Math.random() * 0.0055,
+            speed: 0.35 + Math.random() * 1.1,
             phase: Math.random() * Math.PI * 2,
-            alpha: 0.08 + Math.random() * 0.28,
-            width: 0.6 + Math.random() * 1.4,
+            alpha: 0.1 + Math.random() * 0.35,
+            width: 0.5 + Math.random() * 1.8,
           });
         }
       }
