@@ -164,13 +164,13 @@
     var auto = document.getElementById("automatyzacje");
     var endBand = document.querySelector(".portfolio-end");
 
-    function pinHold(section) {
+    function pinHold(section, end) {
       if (!section) return;
       ScrollTrigger.create({
         id: (section.id || "sec") + "-cine-hold",
         trigger: section,
         start: "top top",
-        end: MOBILE ? "+=54%" : "+=72%",
+        end: end || (MOBILE ? "+=54%" : "+=72%"),
         pin: true,
         pinSpacing: true,
         anticipatePin: 0.4,
@@ -180,7 +180,7 @@
     }
 
     pinHold(strony);
-    pinHold(auto);
+    pinHold(auto, MOBILE ? "+=120%" : "+=150%");
     pinHold(montaz);
 
     var pairs = [

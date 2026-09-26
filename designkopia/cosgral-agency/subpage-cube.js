@@ -4,6 +4,7 @@
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
 import { createFxaaPass } from "./three-fxaa-pass.js";
+import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from "./cube-look.js?v=20260926cube1";
 
 (function () {
   "use strict";
@@ -14,19 +15,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
 
   var portal = document.querySelector(".subpage-cube-portal");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
-  var HALF = 1.35;
+  var look = heroCubeLook(MOBILE);
+  var HALF = look.half;
   var CUBE_SCALE = MOBILE ? 0.23 : 0.46;
-  var EDGE_OP = MOBILE ? 0.12 : 0.16;
-  var SHELL_OP = MOBILE ? 0.58 : 0.55;
+  var EDGE_OP = look.edgeOp;
+  var SHELL_OP = look.shellOp;
   var WIRE_OP = 0.08;
   var isPortfolioPage = document.body.classList.contains("portfolio-page");
   var isCasePage = document.body.classList.contains("case-page");
-  /* Realizacje (portfolio list) — cube 2× jaśniejszy vs poprzedni hero */
-  if (isPortfolioPage && !isCasePage) {
-    EDGE_OP = Math.min(1, 0.44 * 2);
-    SHELL_OP = Math.min(1, 0.62 * 2);
-    WIRE_OP = Math.min(1, 0.1 * 2);
-  }
   var MENU_OPEN_DUR = 2.4;
   var MENU_CLOSE_DUR = 2.0;
   var MENU_OPEN_SIDE_DUR = 4.1;
@@ -74,7 +70,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     driftP: 0,
     hideAfter: false,
   };
-  var autoHero = { p: 0 };
+  var autoHero = { p: 0, enter: 0, exit: 0 };
   var portfolioSectionIndex = 0;
   var PORTFOLIO_STRONY_IN_DUR = MOBILE ? 3.1 : 3.9;
   var PORTFOLIO_STRONY_OUT_DUR = MOBILE ? 3.0 : 3.7;
@@ -411,7 +407,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     killPortfolioFlightTweens();
     portfolioSectionIndex = index;
     if (autoHeroProgressFromDom() > 0.02) {
-      setAutoHeroProgress(autoHeroProgressFromDom());
+      setAutoHeroProgress(autoHeroStateFromDom());
       return;
     }
     /* Cube stays in hero only — never drift into later sections */
@@ -629,21 +625,62 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     setCubeVisualFade(fade * (grafikiMenuActive ? grafikiFade / 0.68 : 1));
   }
 
-  function autoHeroProgressFromDom() {
+  function autoHeroStateFromDom() {
+    var empty = { enter: 0, exit: 0 };
     var el = document.getElementById("automatyzacje");
-    if (!el || !isPortfolioMainPage) return 0;
+    if (!el || !isPortfolioMainPage) return empty;
     var r = el.getBoundingClientRect();
     var vh = window.innerHeight || 1;
-    if (r.height < 8) return 0;
-    /* Fly in only as the section becomes the frame, not while it is still below. */
-    var enter = 1 - Math.max(0, Math.min(1, r.top / (vh * 0.38)));
-    enter = enter * enter * (3 - 2 * enter);
-    var leave = r.bottom < vh * 0.22 ? Math.max(0, r.bottom / (vh * 0.22)) : 1;
-    return Math.max(0, Math.min(1, Math.min(enter, leave)));
+    if (r.height < 8) return empty;
+    if (r.bottom < -vh * 0.05 || r.top > vh * 1.12) return empty;
+
+    function clamp01(v) {
+      return Math.max(0, Math.min(1, v));
+    }
+
+    var pin = window.ScrollTrigger && ScrollTrigger.getById("automatyzacje-cine-hold");
+    var pinP = pin ? pin.progress : 0;
+    var atStage = r.top <= vh * 0.1;
+
+    var enter;
+    var exit = 0;
+    if (pin && atStage) {
+      enter = clamp01(pinP / 0.72);
+      enter = Math.pow(enter, 1.65);
+      exit = clamp01((pinP - 0.76) / 0.24);
+    } else if (atStage) {
+      var local = clamp01(-r.top / Math.max(vh * 0.85, 1));
+      enter = Math.pow(clamp01(local / 0.58), 1.65);
+      exit = clamp01((local - 0.68) / 0.32);
+    } else {
+      var pre = 1 - clamp01(r.top / (vh * 0.95));
+      enter = Math.pow(pre, 2.4) * 0.12;
+      exit = 0;
+    }
+    return { enter: clamp01(enter), exit: clamp01(exit) };
   }
 
-  function setAutoHeroProgress(p) {
-    autoHero.p = Math.max(0, Math.min(1, p || 0));
+  function autoHeroProgressFromDom() {
+    var s = autoHeroStateFromDom();
+    if (s.exit >= 0.98) return 0;
+    if (s.enter > 0.015 || (s.exit > 0.001 && s.exit < 0.98)) return Math.max(s.enter, 0.2);
+    return 0;
+  }
+
+  function setAutoHeroProgress(pOrState) {
+    var enter = 0;
+    var exit = 0;
+    if (pOrState && typeof pOrState === "object") {
+      enter = pOrState.enter || 0;
+      exit = pOrState.exit || 0;
+    } else {
+      enter = Math.max(0, Math.min(1, pOrState || 0));
+    }
+    autoHero.enter = enter;
+    autoHero.exit = exit;
+    autoHero.p =
+      enter > 0.015 && exit < 0.98 ? 1 : exit > 0.001 && exit < 0.98 ? 1 : 0;
+    document.body.classList.toggle("is-auto-cube-hero", autoHero.p > 0.04);
     if (autoHero.p > 0.02) {
       if (portfolioFlight.phase !== "auto-hero") {
         killPortfolioFlightTweens();
@@ -661,51 +698,54 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   }
 
   function restoreAutoHeroLook() {
-    if (shell && shell.material && shell.material.color) shell.material.color.setHex(0x080808);
+    applyHeroCubeMaterials(shell, edges, 1, look);
     if (sMat && sMat.uniforms && sMat.uniforms.uAlphaMul) {
       sMat.uniforms.uAlphaMul.value = SURFACE_ALPHA_MUL;
     }
   }
 
-  function applyAutoHero(p, time) {
+  function applyAutoHero(enter, exit, time) {
     syncCameraNeutral();
     root.position.set(0, 0, 0);
     root.rotation.set(0, 0, 0);
     cubeGroup.visible = true;
-    var u = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-    /* Same mesh, scale and rest pose as homepage hero (`home-hero-3d.js`). */
-    var heroSc = MOBILE ? 0.5 * 0.39 * 1.6 : 0.5 * 0.78;
+    var u = Math.pow(Math.max(0, Math.min(1, enter || 0)), 1.55);
+    var out = Math.pow(Math.max(0, Math.min(1, exit || 0)), 1.12);
+    var heroSc = look.cubeScale * look.heroScaleMul;
     var restX = 0;
     var restY = MOBILE ? 0.12 : 0.18;
     var restZ = 0.36;
     var startX = MOBILE ? -5.2 : -6.6;
     var startY = MOBILE ? 0.35 : 0.28;
     var startZ = 0.14;
-    var driftX = Math.sin(time * 0.18) * 0.07;
-    var driftY = Math.cos(time * 0.15) * 0.05;
-    cubeGroup.position.set(
-      startX + (restX + driftX * u - startX) * u,
-      startY + (restY + driftY * u - startY) * u,
-      startZ + (restZ - startZ) * u
-    );
-    var sc = heroSc * (0.82 + 0.18 * u);
+    var endX = MOBILE ? 5.6 : 7.1;
+    var endY = MOBILE ? 0.22 : 0.3;
+    var endZ = 0.08;
+    var driftX = Math.sin(time * 0.18) * 0.07 * (1 - out);
+    var driftY = Math.cos(time * 0.15) * 0.05 * (1 - out);
+    var x = startX + (restX + driftX - startX) * u;
+    var y = startY + (restY + driftY - startY) * u;
+    var z = startZ + (restZ - startZ) * u;
+    x = x + (endX - x) * out;
+    y = y + (endY - y) * out;
+    z = z + (endZ - z) * out;
+    cubeGroup.position.set(x, y, z);
+    var sc = heroSc * (0.82 + 0.18 * u) * (1 - out * 0.12);
     cubeGroup.scale.set(sc, sc, sc);
-    var idleRotX = 0.22 + Math.sin(time * 0.035) * 0.04;
-    var idleRotY = -0.35 + Math.cos(time * 0.028) * 0.05 + time * 0.09;
-    var idleRotZ = Math.sin(time * 0.022) * 0.02;
-    cubeGroup.rotation.x = 0.52 + (idleRotX - 0.52) * u;
-    cubeGroup.rotation.y = -1.18 + (idleRotY + 1.18) * u;
-    cubeGroup.rotation.z = 0.32 + (idleRotZ - 0.32) * u;
+    var idleRotX = look.restRot.x + Math.sin(time * 0.035) * 0.04;
+    var idleRotY = look.restRot.y + Math.cos(time * 0.028) * 0.05 + time * 0.09;
+    var idleRotZ = look.restRot.z + Math.sin(time * 0.022) * 0.02;
+    var rx = 0.52 + (idleRotX - 0.52) * u + out * 0.22;
+    var ry = -1.18 + (idleRotY + 1.18) * u + out * 0.85;
+    var rz = 0.32 + (idleRotZ - 0.32) * u + out * 0.12;
+    cubeGroup.rotation.set(rx, ry, rz);
     if (sMat && sMat.uniforms && sMat.uniforms.uAlphaMul) {
-      sMat.uniforms.uAlphaMul.value = MOBILE ? 2.6 : 2.9;
+      sMat.uniforms.uAlphaMul.value = look.surfaceAlphaMul;
     }
-    if (shell && shell.material && shell.material.color) {
-      shell.material.color.setHex(0x080808);
-    }
-    setCubeVisualFade(Math.min(1, 0.4 + u * 0.6));
-    if (shell && shell.material) shell.material.opacity = MOBILE ? 0.5 : 0.45;
-    if (edges && edges.material) edges.material.opacity = MOBILE ? 0.18 : 0.24;
-    if (portal) portal.style.opacity = "1";
+    var fade = Math.max(0, Math.min(1, 0.35 + u * 0.65)) * (1 - out * 0.85);
+    applyHeroCubeMaterials(shell, edges, fade, look);
+    if (sMat && sMat.uniforms) sMat.uniforms.uFade.value = fade;
+    if (portal) portal.style.opacity = fade < 0.04 ? "0" : "1";
   }
 
   function applyPortfolioDrift(p, time) {
@@ -1930,9 +1970,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var menuAnchorGroup = new THREE.Group();
   root.add(menuAnchorGroup);
 
-  var SURFACE = MOBILE ? 1200 : 2800;
-  var SURFACE_SIZE_MUL = MOBILE ? 0.5 : 1;
-  var SURFACE_ALPHA_MUL = MOBILE ? 0.42 : 1;
+  var SURFACE = look.surfaceCount;
+  var SURFACE_SIZE_MUL = look.surfaceSizeMul;
+  var SURFACE_ALPHA_MUL = look.surfaceAlphaMul;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
@@ -1947,46 +1987,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
   sGeo.setAttribute("size", new THREE.BufferAttribute(sSize, 1));
 
-  var sMat = new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    uniforms: {
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0, 0) },
-      uFade: { value: 1 },
-      uAlphaMul: { value: SURFACE_ALPHA_MUL },
-    },
-    vertexShader: `
-      attribute float size;
-      uniform float uTime;
-      uniform vec2 uMouse;
-      uniform float uFade;
-      uniform float uAlphaMul;
-      varying float vAlpha;
-      void main() {
-        vec3 pos = position;
-        float pulse = sin(uTime * 0.55 + pos.y * 4.0 + pos.x * 3.0) * 0.012;
-        pos += normalize(pos + 0.0001) * pulse;
-        float dist = length(pos.xy - uMouse * 1.4);
-        float ripple = sin(dist * 9.0 - uTime * 2.8) * smoothstep(2.6, 0.0, dist) * 0.07;
-        pos.xy += normalize(pos.xy + 0.0001) * ripple;
-        vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-        gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);
-        gl_Position = projectionMatrix * mv;
-        vAlpha = (0.05 + smoothstep(2.8, 0.0, dist) * 0.14) * uFade * uAlphaMul;
-      }
-    `,
-    fragmentShader: `
-      varying float vAlpha;
-      void main() {
-        float d = length(gl_PointCoord - 0.5);
-        if (d > 0.5) discard;
-        float glow = 1.0 - smoothstep(0.0, 0.5, d);
-        gl_FragColor = vec4(0.7, 0.7, 0.72, vAlpha * glow * 0.4);
-      }
-    `,
-  });
+  var sMat = createCubeShimmerMaterial(THREE, { alphaMul: SURFACE_ALPHA_MUL });
 
   var cubeParts = createIntactCubeParts(HALF);
   var shell = cubeParts.shell;
@@ -2025,7 +2026,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       menuBlend = menuTween.blend;
 
       if (isPortfolioMainPage && menuBlend <= 0.001) {
-        setAutoHeroProgress(autoHeroProgressFromDom());
+        setAutoHeroProgress(autoHeroStateFromDom());
       }
 
       if (menuBlend > 0.001) {
@@ -2134,7 +2135,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       } else if (isFilmPage && portfolioFlight.phase === "film") {
         applyPortfolioFilm(filmDrive.p, t);
       } else if (autoHero.p > 0.01 || portfolioFlight.phase === "auto-hero") {
-        applyAutoHero(autoHero.p, t);
+        applyAutoHero(autoHero.enter, autoHero.exit, t);
       } else if (isSandHeroPage && portfolioFlight.phase === "hidden") {
         syncCamera();
         root.position.set(0, 0, 0);

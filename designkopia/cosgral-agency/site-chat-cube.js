@@ -3,8 +3,9 @@
  * Materials + surface shimmer match home-hero-3d.js (same look on mobile & desktop).
  * Framed with padding so rotated cube never clips the canvas.
  */
-import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {
   "use strict";
@@ -26,11 +27,12 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
 
   function boot() {
     var MOBILE = window.matchMedia("(max-width: 900px)").matches;
-    var HALF = 1.35;
+    var look = heroCubeLook(MOBILE);
+    var HALF = look.half;
     /* Same visual recipe as hero; framing only differs (camera / scale). */
     var CUBE_SCALE = MOBILE ? 0.72 : 0.76;
-    var SHELL_OP = 0.45;
-    var EDGE_OP = 0.24;
+    var SHELL_OP = look.shellOp;
+    var EDGE_OP = look.edgeOp;
 
     var renderer = new THREE.WebGLRenderer({
       canvas: canvas,
@@ -85,48 +87,7 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
     sGeo.setAttribute("size", new THREE.BufferAttribute(sSize, 1));
 
-    /* Identical shimmer shader to home-hero-3d.js */
-    var sMat = new THREE.ShaderMaterial({
-      transparent: true,
-      depthWrite: false,
-      depthTest: true,
-      blending: THREE.AdditiveBlending,
-      uniforms: {
-        uTime: { value: 0 },
-        uMouse: { value: new THREE.Vector2(0, 0) },
-        uFade: { value: 1 },
-        uAlphaMul: { value: 1 },
-      },
-      vertexShader: [
-        "attribute float size;",
-        "uniform float uTime;",
-        "uniform vec2 uMouse;",
-        "uniform float uFade;",
-        "uniform float uAlphaMul;",
-        "varying float vAlpha;",
-        "void main() {",
-        "  vec3 pos = position;",
-        "  float pulse = sin(uTime * 0.55 + pos.y * 4.0 + pos.x * 3.0) * 0.012;",
-        "  pos += normalize(pos + 0.0001) * pulse;",
-        "  float dist = length(pos.xy - uMouse * 1.4);",
-        "  float ripple = sin(dist * 9.0 - uTime * 2.8) * smoothstep(2.6, 0.0, dist) * 0.07;",
-        "  pos.xy += normalize(pos.xy + 0.0001) * ripple;",
-        "  vec4 mv = modelViewMatrix * vec4(pos, 1.0);",
-        "  gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);",
-        "  gl_Position = projectionMatrix * mv;",
-        "  vAlpha = (0.16 + smoothstep(2.8, 0.0, dist) * 0.25) * uFade * uAlphaMul;",
-        "}",
-      ].join("\n"),
-      fragmentShader: [
-        "varying float vAlpha;",
-        "void main() {",
-        "  float d = length(gl_PointCoord - 0.5);",
-        "  if (d > 0.5) discard;",
-        "  float glow = 1.0 - smoothstep(0.0, 0.5, d);",
-        "  gl_FragColor = vec4(0.7, 0.7, 0.72, vAlpha * glow * 0.5);",
-        "}",
-      ].join("\n"),
-    });
+    var sMat = createCubeShimmerMaterial(THREE, { alphaMul: 1 });
 
     root.add(parts.shell, parts.edges, new THREE.Points(sGeo, sMat));
 
