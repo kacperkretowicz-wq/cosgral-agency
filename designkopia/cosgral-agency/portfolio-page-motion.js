@@ -22,7 +22,7 @@
     if (!next) return 0;
     var top = next.getBoundingClientRect().top;
     var vh = window.innerHeight || 1;
-    var span = vh * (MOBILE ? 1.28 : 1.45);
+    var span = vh * (MOBILE ? 1.15 : 1.22);
     if (top <= 0) return 1;
     return 1 - Math.max(0, Math.min(1, top / span));
   }
@@ -48,10 +48,10 @@
   function applyRecess(el, p) {
     if (!el || !window.gsap) return;
     var target = poseTarget(el);
-    var hold = 0.02;
-    var exitScale = MOBILE ? 0.82 : 0.72;
-    var exitBlur = MOBILE ? 6 : 12;
-    var exitY = MOBILE ? -2 : -5;
+    var hold = 0.08;
+    var exitScale = MOBILE ? 0.7 : 0.56;
+    var exitBlur = MOBILE ? 10 : 18;
+    var exitY = MOBILE ? -4 : -9;
     if (p <= hold) {
       el.classList.remove("is-depth-recessed", "is-depth-gone");
       el.style.pointerEvents = "";
@@ -62,8 +62,8 @@
       return;
     }
     var u = easeInOut((p - hold) / Math.max(1 - hold, 0.001));
-    var fade = u * u;
-    var dim = 1 - 0.62 * u;
+    var fade = Math.pow(u, 1.35);
+    var dim = 1 - 0.74 * u;
     /* Recess the scene itself — no full-screen black plate on top */
     gsap.set(target, {
       opacity: Math.max(0.08, 1 - fade * 0.92),
@@ -92,6 +92,32 @@
     }
   }
 
+  function applyEnter(el, p) {
+    if (!el || !window.gsap) return;
+    if (el.id === "grafiki" || el.classList.contains("portfolio-end")) return;
+    var target = poseTarget(el);
+    if (!target) return;
+    if (p <= 0.01 || p >= 0.995) return;
+    var u = easeInOut(p);
+    var fromScale = MOBILE ? 1.045 : 1.08;
+    var fromBlur = MOBILE ? 5 : 9;
+    var fromY = MOBILE ? 6 : 10;
+    gsap.set(target, {
+      opacity: 1,
+      visibility: "visible",
+      yPercent: fromY * (1 - u),
+      scale: fromScale - (fromScale - 1) * u,
+      filter:
+        "blur(" +
+        (fromBlur * (1 - u)).toFixed(2) +
+        "px) brightness(" +
+        (0.68 + 0.32 * u).toFixed(3) +
+        ")",
+      transformOrigin: "50% 62%",
+      force3D: true,
+    });
+  }
+
   function setCurtain() {
     var curtain = getCurtain();
     if (curtain && window.gsap) {
@@ -116,6 +142,7 @@
         }
       }
       applyRecess(leave, coverAmount(enter));
+      applyEnter(enter, coverAmount(enter));
     }
     ScrollTrigger.create({
       id: (leave.id || "leave") + "-cover-" + (enter.id || "enter"),

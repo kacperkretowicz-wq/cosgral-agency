@@ -387,9 +387,10 @@ body.portfolio-page #automatyzacje {
   --global-tilt-x: 0deg;
   --global-tilt-y: 0deg;
 }
+body.portfolio-page #strony.is-depth-recessed,
 body.portfolio-page #automatyzacje.is-depth-recessed {
-  overflow: hidden;
-  contain: paint;
+  overflow: visible;
+  contain: none;
 }
 body.portfolio-page #automatyzacje.is-visible .home-tilt-layer {
   opacity: 1;
@@ -1928,8 +1929,31 @@ html.reduce-motion .portfolio-page--film .home-scroll-rail {
   overflow: visible;
   background: transparent;
 }
+.portfolio-page {
+  --portfolio-cover-run: 68vh;
+}
+@media (max-width: 900px) {
+  .portfolio-page {
+    --portfolio-cover-run: 48vh;
+  }
+}
 .portfolio-page .portfolio-section + .portfolio-section {
   margin-top: 0;
+}
+/* Cinematic hold: previous shot stays in frame, then the next covers it */
+body.portfolio-page #strony,
+body.portfolio-page #automatyzacje,
+body.portfolio-page #montaz {
+  padding-bottom: var(--portfolio-cover-run);
+}
+body.portfolio-page #strony > .container,
+body.portfolio-page #montaz > .container {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
 }
 /* Separatory między sekcjami — wyłączone */
 .portfolio-section__curtain,
@@ -2577,23 +2601,23 @@ body.is-grafiki-light .site-nav__toggle-bars span {
 
 /* Realizacje: jeden pełnoekranowy film + napis na kadrze (bez kafelka, bez chapter pin) */
 .portfolio-section--auto-film {
-  min-height: 100vh;
-  min-height: 100dvh;
-  height: 100vh;
-  height: 100dvh;
-  padding: 0;
+  min-height: calc(100vh + var(--portfolio-cover-run, 68vh));
+  min-height: calc(100dvh + var(--portfolio-cover-run, 68vh));
+  height: auto;
+  padding: 0 0 var(--portfolio-cover-run, 68vh);
   margin: 0;
   display: block;
-  overflow: hidden;
+  overflow: visible;
   background: transparent;
   scroll-margin-top: 0;
 }
 .auto-cover {
-  position: absolute;
-  inset: 0;
+  position: sticky;
+  top: 0;
   display: block;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
   margin: 0;
   border: 0;
   border-radius: 0;
