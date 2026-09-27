@@ -171,6 +171,8 @@ body.portfolio-page--tiles a.portfolio-tile#automatyzacje {
   overscroll-behavior-x: contain;
   padding: 1.25rem max(var(--gutter, 1.25rem), calc((100vw - var(--tile-w)) / 2));
   scrollbar-width: none;
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
 }
 .portfolio-tiles__scroller::-webkit-scrollbar {
   display: none;
@@ -178,6 +180,9 @@ body.portfolio-page--tiles a.portfolio-tile#automatyzacje {
 
 /* Category tile — website-card feel (chrome + media + body) */
 .portfolio-tile {
+  --tile-scale: 0.92;
+  --tile-rotz: 0deg;
+  --tile-ty: 0px;
   position: relative;
   flex: 0 0 var(--tile-w);
   width: var(--tile-w);
@@ -197,18 +202,27 @@ body.portfolio-page--tiles a.portfolio-tile#automatyzacje {
   background: rgba(8, 8, 10, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 22px 55px rgba(0, 0, 0, 0.35);
-  opacity: 0.78;
-  transform: none;
+  opacity: 0.72;
+  transform: translate3d(0, var(--tile-ty), 0) scale(var(--tile-scale)) rotateY(var(--tile-rotz));
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
   transition:
-    opacity 0.35s ease,
+    opacity 0.4s ease,
     border-color 0.35s ease,
     box-shadow 0.45s ease,
-    background 0.45s ease;
+    background 0.45s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .portfolio-tile.is-active {
+  --tile-scale: 1.06;
+  --tile-rotz: 0deg;
+  --tile-ty: -6px;
   opacity: 1;
   border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    0 34px 80px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  z-index: 2;
 }
 body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile {
   color: #111;
@@ -219,6 +233,16 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile {
 body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile.is-active {
   background: rgba(255, 255, 255, 0.94);
   border-color: rgba(0, 0, 0, 0.16);
+  box-shadow:
+    0 34px 70px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+html.reduce-motion .portfolio-tile {
+  --tile-scale: 1 !important;
+  --tile-rotz: 0deg !important;
+  --tile-ty: 0px !important;
+  transition: opacity 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
 }
 
 .portfolio-tile:focus-visible {
@@ -281,6 +305,45 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__chrome span {
 }
 .portfolio-tile__slide.is-on {
   opacity: 1;
+}
+
+/* Montaż tile — compilation mosaic of all reels */
+.portfolio-tile__reel-comp {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 3px;
+  padding: 3px;
+  background: #050505;
+}
+.portfolio-tile__reel-comp-cell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: #111;
+  min-height: 0;
+}
+.portfolio-tile__reel-comp-cell img,
+.portfolio-tile__reel-comp-cell video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.portfolio-tile__reel-comp-cell video {
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.portfolio-tile__reel-comp-cell.is-playing video {
+  opacity: 1;
+}
+.portfolio-tile.is-active .portfolio-tile__reel-comp-cell.is-playing {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
 }
 
 .portfolio-tile__systems {

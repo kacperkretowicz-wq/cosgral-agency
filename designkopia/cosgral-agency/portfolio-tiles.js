@@ -15,8 +15,11 @@
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var activeIndex = -1;
   var slideTimers = [];
+  var reelCompTimer = null;
   var wheelLock = 0;
   var pendingTheme = null;
+  var depthRaf = 0;
+
   function clamp(i) {
     return Math.max(0, Math.min(tiles.length - 1, i));
   }
@@ -40,11 +43,37 @@
     return best;
   }
 
+  function updateTileDepth() {
+    if (REDUCED) return;
+    var mid = window.innerWidth * 0.5;
+    var span = Math.max(220, window.innerWidth * 0.42);
+    tiles.forEach(function (tile, i) {
+      var dist = (centerOf(tile) - mid) / span;
+      var abs = Math.min(1.35, Math.abs(dist));
+      var focus = 1 - Math.min(1, abs);
+      var scale = 0.9 + focus * 0.16;
+      var rot = Math.max(-11, Math.min(11, -dist * 10));
+      var ty = -focus * 8;
+      if (i === activeIndex) {
+        scale = Math.max(scale, 1.06);
+        rot *= 0.35;
+        ty = Math.min(ty, -6);
+      }
+      tile.style.setProperty("--tile-scale", scale.toFixed(3));
+      tile.style.setProperty("--tile-rotz", rot.toFixed(2) + "deg");
+      tile.style.setProperty("--tile-ty", ty.toFixed(1) + "px");
+    });
+  }
+
   function clearSlides() {
     slideTimers.forEach(function (id) {
       window.clearInterval(id);
     });
     slideTimers = [];
+    if (reelCompTimer) {
+      window.clearInterval(reelCompTimer);
+      reelCompTimer = null;
+    }
   }
 
   function playTileSlides(tile) {
@@ -74,8 +103,9 @@
 
   function syncCardVideos(activeTile) {
     tiles.forEach(function (tile) {
+      var isReelComp = !!tile.querySelector("[data-tile-reel-comp]");
       tile.querySelectorAll("[data-card-video]").forEach(function (video) {
-        if (tile === activeTile) {
+        if (tile === activeTile && !isReelComp) {
           var play = video.play();
           if (play && play.catch) play.catch(function () {});
         } else {
@@ -85,6 +115,48 @@
         }
       });
     });
+  }
+
+  function playReelCompilation(tile) {
+    var cells = Array.prototype.slice.call(tile.querySelectorAll("[data-reel-cell]"));
+    if (!cells.length) return;
+    cells.forEach(function (cell) {
+      cell.classList.remove("is-playing");
+      var v = cell.querySelector("video");
+      if (v) {
+        try {
+          v.pause();
+        } catch (e) {}
+      }
+    });
+    if (REDUCED) {
+      cells.slice(0, 3).forEach(function (cell) {
+        cell.classList.add("is-playing");
+      });
+      return;
+    }
+    var n = 0;
+    function activate(index) {
+      cells.forEach(function (cell, i) {
+        var on = i === index || i === (index + 3) % cells.length || i === (index + 7) % cells.length;
+        cell.classList.toggle("is-playing", on);
+        var video = cell.querySelector("video");
+        if (!video) return;
+        if (on) {
+          var play = video.play();
+          if (play && play.catch) play.catch(function () {});
+        } else {
+          try {
+            video.pause();
+          } catch (e) {}
+        }
+      });
+    }
+    activate(0);
+    reelCompTimer = window.setInterval(function () {
+      n = (n + 1) % cells.length;
+      activate(n);
+    }, 1600);
   }
 
   function applyTheme(theme) {
@@ -120,7 +192,12 @@
     var tile = tiles[index];
     applyTheme(tile.getAttribute("data-theme") || "web");
     syncCardVideos(tile);
-    playTileSlides(tile);
+    if (tile.querySelector("[data-tile-reel-comp]")) {
+      playReelCompilation(tile);
+    } else {
+      playTileSlides(tile);
+    }
+    updateTileDepth();
   }
 
   function scrollToIndex(index, behavior) {
@@ -142,7 +219,12 @@
   scroller.addEventListener(
     "scroll",
     function () {
-      window.requestAnimationFrame(syncFromScroll);
+      if (depthRaf) return;
+      depthRaf = window.requestAnimationFrame(function () {
+        depthRaf = 0;
+        syncFromScroll();
+        updateTileDepth();
+      });
     },
     { passive: true }
   );

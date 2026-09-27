@@ -29,6 +29,7 @@ body.portfolio-theme-page--web .portfolio-theme-layer[data-theme-layer="web"],
 .portfolio-theme-layer.is-theme-active {
   opacity: 1 !important;
   visibility: visible !important;
+  transition: none;
 }
 
 body.portfolio-theme-page--video {
