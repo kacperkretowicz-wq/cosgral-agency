@@ -184,17 +184,17 @@ body.portfolio-page--tiles .portfolio-theme-stage {
 .portfolio-chapter[data-theme="video"] .portfolio-chapter__bg .portfolio-tile__media::after {
   background:
     linear-gradient(
-      90deg,
-      rgba(8, 8, 10, 0.58) 0%,
-      rgba(8, 8, 10, 0.22) 46%,
-      rgba(8, 8, 10, 0.05) 78%,
-      rgba(8, 8, 10, 0.16) 100%
+      180deg,
+      transparent 0%,
+      transparent 52%,
+      rgba(8, 8, 10, 0.42) 78%,
+      rgba(8, 8, 10, 0.72) 100%
     ),
     linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 34%,
-      rgba(8, 8, 10, 0.58) 100%
+      90deg,
+      rgba(8, 8, 10, 0.28) 0%,
+      rgba(8, 8, 10, 0.08) 38%,
+      transparent 68%
     );
 }
 .portfolio-chapter__bg .portfolio-tile__media video,
@@ -364,13 +364,13 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   --os-z: 1;
   position: absolute;
   left: 50%;
-  top: 48%;
-  width: min(22vw, 11rem);
+  top: 44%;
+  width: min(28vw, 14rem);
   aspect-ratio: 3 / 4;
   margin: 0;
   overflow: hidden;
   background: #ddd;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
   opacity: var(--os-o);
   transform: translate(calc(-50% + var(--os-x)), calc(-50% + var(--os-y))) scale(var(--os-s));
   z-index: var(--os-z);
@@ -379,6 +379,13 @@ body.portfolio-page--tiles .portfolio-theme-stage {
     opacity 0.55s ease,
     width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform, opacity;
+}
+.chapter-os__stage.is-stack .chapter-os__card {
+  width: min(30vw, 15rem);
+}
+.chapter-os__stage.is-field .chapter-os__card {
+  width: min(12vw, 5.8rem);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 .chapter-os__card img {
   width: 100%;

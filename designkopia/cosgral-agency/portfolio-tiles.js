@@ -134,22 +134,22 @@
   ];
 
   var OS_MEDIA = [
+    REEL + "orlincy/001-poster.jpg",
+    REEL + "orlincy/003-poster.jpg",
+    REEL + "orlincy/005-poster.jpg",
+    REEL + "reklamy/001-poster.jpg",
+    REEL + "reklamy/003-poster.jpg",
     STILL + "systems/crm-0-5.jpg",
     STILL + "systems/auto-1-5.jpg",
     STILL + "systems/app-2-5.jpg",
-    STILL + "systems/crm-2-5.jpg",
-    STILL + "systems/auto-0-5.jpg",
-    STILL + "systems/app-1-5.jpg",
     "assets/cases/telforceone-crm.svg",
     "assets/cases/shelfsync.svg",
-    "assets/cases/northline-crm.svg",
-    "assets/cases/parcel-co.svg",
-    REEL + "orlincy/001-poster.jpg",
-    REEL + "orlincy/003-poster.jpg",
-    REEL + "reklamy/002-poster.jpg",
+    REEL + "orlincy/002-poster.jpg",
+    REEL + "orlincy/006-poster.jpg",
     ACC + "accent-halftone.svg",
     ACC + "accent-halftone.svg",
-    STILL + "systems/crm-3-5.jpg",
+    STILL + "systems/crm-2-5.jpg",
+    REEL + "reklamy/005-poster.jpg",
   ];
 
   var SHOW_WORDS = [
@@ -211,31 +211,31 @@
   ];
 
   var OS_STACK = [
-    { x: "-6%", y: "-8%", s: 1.05, z: 8 },
-    { x: "10%", y: "-2%", s: 0.92, z: 7 },
-    { x: "-16%", y: "6%", s: 0.88, z: 6 },
-    { x: "18%", y: "10%", s: 0.84, z: 5 },
-    { x: "-4%", y: "16%", s: 0.78, z: 4 },
-    { x: "8%", y: "-18%", s: 0.72, z: 3 },
-    { x: "-20%", y: "-14%", s: 0.7, z: 2 },
-    { x: "22%", y: "-12%", s: 0.68, z: 2 },
-    { x: "-12%", y: "22%", s: 0.64, z: 1 },
-    { x: "14%", y: "20%", s: 0.62, z: 1 },
-    { x: "0%", y: "-22%", s: 0.58, z: 1 },
-    { x: "-24%", y: "2%", s: 0.56, z: 1 },
-    { x: "26%", y: "4%", s: 0.54, z: 1 },
-    { x: "-8%", y: "-26%", s: 0.5, z: 1 },
-    { x: "6%", y: "26%", s: 0.48, z: 1 },
-    { x: "20%", y: "-24%", s: 0.46, z: 1 },
+    { x: "-4%", y: "-6%", s: 1.12, z: 10 },
+    { x: "14%", y: "0%", s: 0.98, z: 9 },
+    { x: "-18%", y: "8%", s: 0.94, z: 8 },
+    { x: "20%", y: "12%", s: 0.9, z: 7 },
+    { x: "-2%", y: "18%", s: 0.86, z: 6 },
+    { x: "10%", y: "-20%", s: 0.8, z: 5 },
+    { x: "-22%", y: "-16%", s: 0.76, z: 4 },
+    { x: "24%", y: "-14%", s: 0.74, z: 4 },
+    { x: "-14%", y: "24%", s: 0.7, z: 3 },
+    { x: "16%", y: "22%", s: 0.68, z: 3 },
+    { x: "2%", y: "-26%", s: 0.64, z: 2 },
+    { x: "-28%", y: "2%", s: 0.62, z: 2 },
+    { x: "30%", y: "4%", s: 0.6, z: 2 },
+    { x: "-10%", y: "-30%", s: 0.56, z: 1 },
+    { x: "8%", y: "30%", s: 0.54, z: 1 },
+    { x: "22%", y: "-28%", s: 0.52, z: 1 },
   ];
 
   function osFieldPos(i, n) {
-    var cols = 5;
+    var cols = 6;
     var row = Math.floor(i / cols);
     var col = i % cols;
-    var x = (col - (cols - 1) / 2) * 16 + ((row % 2) * 4 - 2);
-    var y = (row - 1.4) * 18 + ((col % 2) * 3 - 1.5);
-    return { x: x + "%", y: y + "%", s: 0.42, z: 1 + (n - i) };
+    var x = (col - (cols - 1) / 2) * 15 + ((row % 2) * 5 - 2.5);
+    var y = (row - 1.2) * 20 + ((col % 2) * 4 - 2);
+    return { x: x + "vw", y: y + "vh", s: 1, z: 1 + (n - i) };
   }
 
   function lang() {
@@ -350,9 +350,7 @@
         card.style.setProperty("--os-y", pos.y);
         card.style.setProperty("--os-s", String(pos.s));
         card.style.setProperty("--os-z", String(pos.z));
-        card.style.setProperty("--os-o", mode === "field" && i > 13 ? "0.55" : "1");
-        if (mode === "field") card.style.width = "min(11vw, 5.4rem)";
-        else card.style.width = "";
+        card.style.setProperty("--os-o", mode === "field" && i > 13 ? "0.65" : "1");
       });
     }
 
