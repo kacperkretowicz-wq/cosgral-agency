@@ -32,9 +32,15 @@ body.portfolio-page--tiles .portfolio-sand-portal,
 body.portfolio-page--tiles .grafiki-bloom,
 body.portfolio-page--tiles .portfolio-scene-curtain,
 body.portfolio-page--tiles .home-scroll-rail,
-body.portfolio-page--tiles .subpage-cube-portal,
 body.portfolio-page--tiles .portfolio-end {
   display: none !important;
+}
+/* Cube stays available for mega-menu; hide only while menu is closed */
+body.portfolio-page--tiles:not(.is-nav-menu-open) .subpage-cube-portal {
+  display: none !important;
+}
+body.portfolio-page--tiles.is-nav-menu-open .subpage-cube-portal {
+  display: block !important;
 }
 /* Homepage liquid ambient — only on Strony */
 body.portfolio-page--tiles .portfolio-home-ambient {
