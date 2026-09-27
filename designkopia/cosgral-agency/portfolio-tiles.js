@@ -498,20 +498,25 @@
   });
 
   tiles.forEach(function (tile, i) {
-    tile.addEventListener("click", function (e) {
-      var expandKey = tile.getAttribute("data-tile-expand");
-      if (!expandKey) return;
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
-      e.preventDefault();
-      if (i !== activeIndex) {
-        scrollToIndex(i);
-        window.setTimeout(function () {
+    tile.addEventListener(
+      "click",
+      function (e) {
+        var expandKey = tile.getAttribute("data-tile-expand");
+        if (!expandKey) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (i !== activeIndex) {
+          scrollToIndex(i);
+          window.setTimeout(function () {
+            openExpand(tile);
+          }, REDUCED ? 0 : 280);
+        } else {
           openExpand(tile);
-        }, REDUCED ? 0 : 280);
-      } else {
-        openExpand(tile);
-      }
-    });
+        }
+      },
+      true
+    );
   });
 
   if (expandSource) {
