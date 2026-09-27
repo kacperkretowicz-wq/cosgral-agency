@@ -21,6 +21,7 @@
   var activeIndex = -1;
   var slideTimers = [];
   var reelCompTimer = null;
+  var vizShowTimer = null;
   var wheelLock = 0;
   var pendingTheme = null;
   var depthRaf = 0;
@@ -153,6 +154,33 @@
     }
   }
 
+  function startVizShowLoop() {
+    if (vizShowTimer || REDUCED) return;
+    var tile = tiles.find(function (t) {
+      return !!t.querySelector("[data-tile-viz-show]");
+    });
+    if (!tile) return;
+    var root = tile.querySelector("[data-tile-viz-show]");
+    var cards = Array.prototype.slice.call(root.querySelectorAll("[data-viz-card]"));
+    if (cards.length < 3) return;
+    var n = cards.length;
+    var cursor = 0;
+
+    function apply() {
+      cards.forEach(function (card, i) {
+        var rel = (i - cursor + n) % n;
+        if (rel <= 4) card.setAttribute("data-viz-slot", String(rel));
+        else card.setAttribute("data-viz-slot", "out");
+      });
+    }
+
+    apply();
+    vizShowTimer = window.setInterval(function () {
+      cursor = (cursor + 1) % n;
+      apply();
+    }, 1100);
+  }
+
   function playTileSlides(tile) {
     var slides = Array.prototype.slice.call(tile.querySelectorAll("[data-tile-slide]"));
     if (!slides.length) return;
@@ -272,9 +300,10 @@
     syncCardVideos(tile);
     if (tile.querySelector("[data-tile-reel-comp]")) {
       playReelCompilation(tile);
-    } else {
+    } else if (!tile.querySelector("[data-tile-viz-show]")) {
       playTileSlides(tile);
     }
+    startVizShowLoop();
     updateTileDepth();
   }
 
@@ -572,6 +601,7 @@
   });
 
   document.body.classList.add("portfolio-page--tiles");
+  startVizShowLoop();
   scrollToIndex(0, "auto");
   window.setTimeout(function () {
     scrollToIndex(0, "auto");
