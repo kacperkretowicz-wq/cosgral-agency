@@ -1,5 +1,5 @@
 /**
- * Realizacje — L→R category tabs + per-theme media backgrounds.
+ * Realizacje — L→R category tabs + expand-to-case-rail for Strony / Systemy.
  */
 (function () {
   "use strict";
@@ -10,6 +10,11 @@
   var scroller = root.querySelector("[data-portfolio-tiles-scroller]");
   var tiles = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
   var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile-dot]"));
+  var expandStage = root.querySelector("[data-tile-expand-stage]");
+  var expandSource = root.querySelector("[data-tile-expand-source]");
+  var expandSourceMedia = root.querySelector("[data-tile-expand-source-media]");
+  var expandSourceTitle = root.querySelector("[data-tile-expand-source-title]");
+  var expandTrack = root.querySelector("[data-tile-expand-track]");
   if (!scroller || !tiles.length) return;
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
@@ -19,6 +24,78 @@
   var wheelLock = 0;
   var pendingTheme = null;
   var depthRaf = 0;
+  var expandedKey = null;
+  var caseVideoTimer = null;
+
+  var CASE_SETS = {
+    web: [
+      {
+        href: "portfolio-strona-juicy-events.html",
+        title: "Juicy Events",
+        lead: "Agencja eventowa",
+        video: "portfolio-media/showcase/web/juicy-events.mp4",
+        poster: "portfolio-media/showcase/web/juicy-events-poster.jpg",
+      },
+      {
+        href: "portfolio-strona-trove.html",
+        title: "Trove Archive",
+        lead: "Ecommerce fashion",
+        video: "portfolio-media/showcase/web/trove-archive.mp4",
+        poster: "portfolio-media/showcase/web/trove-archive-poster.jpg",
+      },
+      {
+        href: "portfolio-strona-mj.html",
+        title: "MJ Social Media",
+        lead: "Content creator",
+        video: "portfolio-media/showcase/web/mj-social-media.mp4",
+        poster: "portfolio-media/showcase/web/mj-social-media-poster.jpg",
+      },
+    ],
+    systems: [
+      {
+        href: "portfolio-telforceone-crm.html",
+        title: "CRM z mapą handlowców",
+        lead: "TelForceOne S.A.",
+        img: "assets/cases/telforceone-crm.svg",
+      },
+      {
+        href: "portfolio-telforceone-code39.html",
+        title: "Generator Code 39",
+        lead: "TelForceOne S.A.",
+        img: "assets/cases/telforceone-code39.svg",
+      },
+      {
+        href: "portfolio-telforceone-forecast.html",
+        title: "Stany i prognozowanie",
+        lead: "TelForceOne S.A.",
+        img: "assets/cases/telforceone-forecast.svg",
+      },
+      {
+        href: "portfolio-trove-panel.html",
+        title: "Panel sklepu i monitoring cen",
+        lead: "Trove",
+        img: "assets/cases/shelfsync.svg",
+      },
+      {
+        href: "portfolio-crm-leady.html",
+        title: "CRM leadów i dealów",
+        lead: "Sprzedaż",
+        img: "assets/cases/northline-crm.svg",
+      },
+      {
+        href: "portfolio-chatbot-ai.html",
+        title: "Chatbot AI",
+        lead: "Automatyzacja",
+        img: "assets/cases/atelier-bloom.svg",
+      },
+      {
+        href: "portfolio-trove-workflow.html",
+        title: "Zamówienie → faktura → paczka",
+        lead: "Trove",
+        img: "assets/cases/parcel-co.svg",
+      },
+    ],
+  };
 
   function clamp(i) {
     return Math.max(0, Math.min(tiles.length - 1, i));
@@ -44,7 +121,7 @@
   }
 
   function updateTileDepth() {
-    if (REDUCED) return;
+    if (REDUCED || expandedKey) return;
     var mid = window.innerWidth * 0.5;
     var span = Math.max(220, window.innerWidth * 0.42);
     tiles.forEach(function (tile, i) {
@@ -105,7 +182,7 @@
     tiles.forEach(function (tile) {
       var isReelComp = !!tile.querySelector("[data-tile-reel-comp]");
       tile.querySelectorAll("[data-card-video]").forEach(function (video) {
-        if (tile === activeTile && !isReelComp) {
+        if (tile === activeTile && !isReelComp && !expandedKey) {
           var play = video.play();
           if (play && play.catch) play.catch(function () {});
         } else {
@@ -180,6 +257,7 @@
     opts = opts || {};
     index = clamp(index);
     if (index === activeIndex && !opts.force) return;
+    if (expandedKey) return;
     activeIndex = index;
     clearSlides();
     tiles.forEach(function (tile, i) {
@@ -201,6 +279,7 @@
   }
 
   function scrollToIndex(index, behavior) {
+    if (expandedKey) return;
     index = clamp(index);
     var tile = tiles[index];
     if (!tile) return;
@@ -213,13 +292,186 @@
   }
 
   function syncFromScroll() {
+    if (expandedKey) return;
     setActive(nearestIndex());
+  }
+
+  function stopCaseVideos() {
+    if (caseVideoTimer) {
+      window.clearInterval(caseVideoTimer);
+      caseVideoTimer = null;
+    }
+    if (!expandTrack) return;
+    expandTrack.querySelectorAll("video").forEach(function (video) {
+      try {
+        video.pause();
+      } catch (e) {}
+    });
+  }
+
+  function playVisibleCaseVideos() {
+    if (!expandTrack) return;
+    stopCaseVideos();
+    var cards = Array.prototype.slice.call(expandTrack.querySelectorAll("[data-case-card]"));
+    if (!cards.length) return;
+    function sync() {
+      var mid = expandTrack.getBoundingClientRect();
+      var center = mid.left + mid.width * 0.35;
+      var best = null;
+      var bestDist = Infinity;
+      cards.forEach(function (card) {
+        var r = card.getBoundingClientRect();
+        var c = r.left + r.width * 0.5;
+        var d = Math.abs(c - center);
+        if (d < bestDist) {
+          bestDist = d;
+          best = card;
+        }
+      });
+      cards.forEach(function (card) {
+        var video = card.querySelector("video");
+        if (!video) return;
+        if (card === best) {
+          var play = video.play();
+          if (play && play.catch) play.catch(function () {});
+        } else {
+          try {
+            video.pause();
+          } catch (e) {}
+        }
+      });
+    }
+    sync();
+    caseVideoTimer = window.setInterval(sync, 900);
+  }
+
+  function buildCaseCards(key) {
+    if (!expandTrack) return;
+    var items = CASE_SETS[key] || [];
+    expandTrack.innerHTML = "";
+    items.forEach(function (item) {
+      var a = document.createElement("a");
+      a.className = "portfolio-case-tile";
+      a.href = item.href;
+      a.setAttribute("data-case-card", "");
+      a.setAttribute("aria-label", item.title);
+
+      var media = document.createElement("div");
+      media.className = "portfolio-case-tile__media";
+      if (item.video) {
+        var video = document.createElement("video");
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.preload = "metadata";
+        if (item.poster) video.poster = item.poster;
+        video.src = item.video;
+        media.appendChild(video);
+      } else if (item.img) {
+        var img = document.createElement("img");
+        img.src = item.img;
+        img.alt = "";
+        img.loading = "lazy";
+        img.decoding = "async";
+        media.appendChild(img);
+      }
+      a.appendChild(media);
+
+      var body = document.createElement("div");
+      body.className = "portfolio-case-tile__body";
+      var title = document.createElement("h3");
+      title.className = "portfolio-case-tile__title";
+      title.textContent = item.title;
+      var lead = document.createElement("p");
+      lead.className = "portfolio-case-tile__lead";
+      lead.textContent = item.lead;
+      body.appendChild(title);
+      body.appendChild(lead);
+      a.appendChild(body);
+
+      expandTrack.appendChild(a);
+    });
+  }
+
+  function fillSourceFromTile(tile) {
+    if (!expandSourceMedia || !expandSourceTitle) return;
+    expandSourceMedia.innerHTML = "";
+    var media = tile.querySelector(".portfolio-tile__media");
+    if (media) {
+      var clone = media.cloneNode(true);
+      clone.querySelectorAll("video").forEach(function (v) {
+        v.removeAttribute("data-card-video");
+        v.muted = true;
+        v.loop = true;
+        v.playsInline = true;
+        v.autoplay = true;
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      });
+      expandSourceMedia.appendChild(clone);
+    }
+    var titleEl = tile.querySelector(".portfolio-tile__title");
+    expandSourceTitle.textContent = titleEl ? titleEl.textContent : "";
+  }
+
+  function openExpand(tile) {
+    if (!expandStage || !expandTrack) return;
+    var key = tile.getAttribute("data-tile-expand");
+    if (!key || !CASE_SETS[key] || expandedKey === key) return;
+
+    expandedKey = key;
+    clearSlides();
+    syncCardVideos(null);
+    applyTheme(tile.getAttribute("data-theme") || key);
+    fillSourceFromTile(tile);
+    buildCaseCards(key);
+
+    document.body.classList.add("is-tile-expanded");
+    root.classList.add("is-expanded");
+    expandStage.hidden = false;
+    expandStage.setAttribute("aria-hidden", "false");
+    expandStage.setAttribute("data-expand-theme", key);
+
+    window.requestAnimationFrame(function () {
+      expandStage.classList.add("is-open");
+      playVisibleCaseVideos();
+    });
+
+    try {
+      history.replaceState(null, "", "#" + (key === "web" ? "strony" : "automatyzacje") + "-cases");
+    } catch (e) {}
+  }
+
+  function closeExpand() {
+    if (!expandedKey || !expandStage) return;
+    expandedKey = null;
+    stopCaseVideos();
+    expandStage.classList.remove("is-open");
+    document.body.classList.remove("is-tile-expanded");
+    root.classList.remove("is-expanded");
+
+    window.setTimeout(
+      function () {
+        if (expandedKey) return;
+        expandStage.hidden = true;
+        expandStage.setAttribute("aria-hidden", "true");
+        expandStage.removeAttribute("data-expand-theme");
+        if (expandTrack) expandTrack.innerHTML = "";
+        if (expandSourceMedia) expandSourceMedia.innerHTML = "";
+        setActive(activeIndex < 0 ? 0 : activeIndex, { force: true });
+      },
+      REDUCED ? 0 : 420
+    );
+
+    try {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    } catch (e) {}
   }
 
   scroller.addEventListener(
     "scroll",
     function () {
-      if (depthRaf) return;
+      if (depthRaf || expandedKey) return;
       depthRaf = window.requestAnimationFrame(function () {
         depthRaf = 0;
         syncFromScroll();
@@ -232,6 +484,7 @@
   window.addEventListener(
     "resize",
     function () {
+      if (expandedKey) return;
       scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
     },
     { passive: true }
@@ -239,13 +492,63 @@
 
   dots.forEach(function (dot, i) {
     dot.addEventListener("click", function () {
+      if (expandedKey) closeExpand();
       scrollToIndex(i);
     });
+  });
+
+  tiles.forEach(function (tile, i) {
+    tile.addEventListener("click", function (e) {
+      var expandKey = tile.getAttribute("data-tile-expand");
+      if (!expandKey) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+      e.preventDefault();
+      if (i !== activeIndex) {
+        scrollToIndex(i);
+        window.setTimeout(function () {
+          openExpand(tile);
+        }, REDUCED ? 0 : 280);
+      } else {
+        openExpand(tile);
+      }
+    });
+  });
+
+  if (expandSource) {
+    expandSource.addEventListener("click", function () {
+      closeExpand();
+    });
+  }
+
+  if (expandTrack) {
+    expandTrack.addEventListener(
+      "scroll",
+      function () {
+        if (!expandedKey) return;
+        playVisibleCaseVideos();
+      },
+      { passive: true }
+    );
+  }
+
+  window.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && expandedKey) {
+      e.preventDefault();
+      closeExpand();
+    }
   });
 
   window.addEventListener(
     "wheel",
     function (e) {
+      if (expandedKey) {
+        if (!expandTrack) return;
+        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+        if (Math.abs(e.deltaY) < 1.2) return;
+        e.preventDefault();
+        expandTrack.scrollBy({ left: e.deltaY, behavior: "auto" });
+        return;
+      }
       if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
       if (Math.abs(e.deltaY) < 1.2) return;
       e.preventDefault();
@@ -271,5 +574,23 @@
   }, 80);
   window.setTimeout(function () {
     if (pendingTheme) applyTheme(pendingTheme);
+    var hash = (window.location.hash || "").replace("#", "");
+    if (hash === "strony-cases") {
+      var webTile = tiles.find(function (t) {
+        return t.getAttribute("data-tile-expand") === "web";
+      });
+      if (webTile) {
+        scrollToIndex(tiles.indexOf(webTile), "auto");
+        openExpand(webTile);
+      }
+    } else if (hash === "automatyzacje-cases") {
+      var sysTile = tiles.find(function (t) {
+        return t.getAttribute("data-tile-expand") === "systems";
+      });
+      if (sysTile) {
+        scrollToIndex(tiles.indexOf(sysTile), "auto");
+        openExpand(sysTile);
+      }
+    }
   }, 400);
 })();
