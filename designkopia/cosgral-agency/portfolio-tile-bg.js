@@ -50,15 +50,6 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     uniforms.uMode.value = theme.mode;
   }
 
-  function onPointer(e) {
-    var nx = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1;
-    var ny = -((e.clientY / Math.max(1, window.innerHeight)) * 2 - 1);
-    pointer.vx += (nx - pointer.tx) * 0.35;
-    pointer.vy += (ny - pointer.ty) * 0.35;
-    pointer.tx = nx;
-    pointer.ty = ny;
-  }
-
   function resize() {
     if (!renderer || !uniforms) return;
     var w = window.innerWidth;
@@ -71,6 +62,15 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     if (!running) return;
     window.requestAnimationFrame(tick);
     var t = (now - t0) * 0.001;
+    var ptr = window.cosgralPointer;
+    if (ptr) {
+      var nx = ptr.nx;
+      var ny = ptr.ny;
+      pointer.vx += (nx - pointer.tx) * 0.35;
+      pointer.vy += (ny - pointer.ty) * 0.35;
+      pointer.tx = nx;
+      pointer.ty = ny;
+    }
     pointer.x += (pointer.tx - pointer.x) * 0.12;
     pointer.y += (pointer.ty - pointer.y) * 0.12;
     pointer.vx *= 0.9;
@@ -188,7 +188,6 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
 
     scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
 
-    window.addEventListener("pointermove", onPointer, { passive: true });
     window.addEventListener("resize", resize, { passive: true });
     resize();
     setTheme(document.body.getAttribute("data-tile-theme") || "web");

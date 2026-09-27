@@ -12,19 +12,6 @@
   var alwaysSystems = document.body.classList.contains("portfolio-theme-page--systems");
   var alwaysWeb = document.body.classList.contains("portfolio-theme-page--web");
 
-  function setupStream() {
-    stage.querySelectorAll("[data-montaz-stream]").forEach(function (stream) {
-      if (stream.classList.contains("is-ready")) return;
-      var belt = stream.querySelector("[data-montaz-belt]");
-      var set = stream.querySelector("[data-montaz-set]");
-      if (!belt || !set) return;
-      var clone = set.cloneNode(true);
-      clone.removeAttribute("data-montaz-set");
-      belt.appendChild(clone);
-      stream.classList.add("is-ready");
-    });
-  }
-
   function syncLayerClasses(theme) {
     stage.querySelectorAll(".portfolio-theme-layer[data-theme-layer]").forEach(function (layer) {
       var key = layer.getAttribute("data-theme-layer");
@@ -38,37 +25,12 @@
     });
   }
 
-  function syncVideos(active) {
-    stage.querySelectorAll("[data-theme-video]").forEach(function (video) {
-      if (active) {
-        if (video.readyState < 2) {
-          try {
-            video.load();
-          } catch (e) {}
-        }
-        var play = video.play();
-        if (play && play.catch) play.catch(function () {});
-      } else {
-        try {
-          video.pause();
-        } catch (e) {}
-      }
-    });
-  }
-
   function setActiveTheme(theme) {
     syncLayerClasses(theme);
-    if (theme === "video" || alwaysVideo) {
-      setupStream();
-      syncVideos(true);
-    } else {
-      syncVideos(false);
-    }
   }
 
   window.__portfolioThemeLayers = {
     setActiveTheme: setActiveTheme,
-    setupStream: setupStream,
   };
 
   if (alwaysVideo) {

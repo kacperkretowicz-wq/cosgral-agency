@@ -93,8 +93,8 @@ body.portfolio-theme-page .graphics-masonry {
 }
 .portfolio-theme-layer__veil--video {
   background:
-    linear-gradient(180deg, rgba(5, 5, 5, 0.22), rgba(5, 5, 5, 0.04) 22%, rgba(5, 5, 5, 0.06) 70%, rgba(5, 5, 5, 0.32)),
-    linear-gradient(90deg, rgba(5, 5, 5, 0.16), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.16));
+    linear-gradient(180deg, rgba(5, 5, 5, 0.28), rgba(5, 5, 5, 0.06) 22%, rgba(5, 5, 5, 0.08) 70%, rgba(5, 5, 5, 0.38)),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.18), transparent 18%, transparent 82%, rgba(5, 5, 5, 0.18));
 }
 .portfolio-theme-layer__veil--graphics {
   background:
@@ -102,93 +102,29 @@ body.portfolio-theme-page .graphics-masonry {
 }
 body.portfolio-theme-page--video .portfolio-theme-layer__veil--video {
   background:
-    linear-gradient(180deg, rgba(5, 5, 5, 0.4), rgba(5, 5, 5, 0.1) 20%, rgba(5, 5, 5, 0.14) 68%, rgba(5, 5, 5, 0.52)),
-    linear-gradient(90deg, rgba(5, 5, 5, 0.22), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.22));
+    linear-gradient(180deg, rgba(5, 5, 5, 0.42), rgba(5, 5, 5, 0.1) 20%, rgba(5, 5, 5, 0.14) 68%, rgba(5, 5, 5, 0.55)),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.24), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.24));
 }
 
-/* —— Montaż: one irregular L→R stream of mixed-size reel tiles —— */
+/* —— Montaż: animated abstract aesthetic field (no reel stream) —— */
 .portfolio-montaz-field {
   position: absolute;
   inset: 0;
   background: #050505;
   overflow: hidden;
 }
-.portfolio-montaz-stream {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
-}
-.portfolio-montaz-stream__belt {
-  display: flex;
-  width: max-content;
-  height: 100%;
-  will-change: transform;
-  animation: montaz-stream-ltr 42s linear infinite;
-  animation-play-state: paused;
-}
-.portfolio-montaz-stream.is-ready .portfolio-montaz-stream__belt {
-  animation-play-state: running;
-}
-body.portfolio-page--tiles:not([data-tile-theme="video"]) .portfolio-montaz-stream__belt {
-  animation-play-state: paused;
-}
-@keyframes montaz-stream-ltr {
-  /* belt = [set][set]; move so tiles travel left → right */
-  from { transform: translate3d(-50%, 0, 0); }
-  to { transform: translate3d(0, 0, 0); }
-}
-.portfolio-montaz-stream__set {
-  position: relative;
-  flex: 0 0 auto;
-  width: min(190vw, 110rem);
-  height: 100%;
-}
-.portfolio-montaz-stream__card {
-  position: absolute;
-  left: var(--x, 0%);
-  top: var(--y, 0%);
-  width: min(20vw, 10rem);
-  aspect-ratio: 9 / 16;
-  border-radius: 0.95rem;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: #141414;
-  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.62);
-  transform: rotate(var(--rot, 0deg));
-}
-.portfolio-montaz-stream__card--sm {
-  width: min(13vw, 6.5rem);
-  z-index: 1;
-}
-.portfolio-montaz-stream__card--md {
-  width: min(20vw, 10rem);
-  z-index: 2;
-}
-.portfolio-montaz-stream__card--lg {
-  width: min(28vw, 14rem);
-  z-index: 3;
-}
-.portfolio-montaz-stream__card--xl {
-  width: min(36vw, 18rem);
-  z-index: 4;
-}
-.portfolio-montaz-stream__card img,
-.portfolio-montaz-stream__card video {
+.portfolio-montaz-field canvas[data-montaz-ambient],
+.portfolio-montaz-field .portfolio-montaz-ambient {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
-}
-.portfolio-montaz-stream__card video {
-  z-index: 1;
+  background:
+    radial-gradient(ellipse 120% 80% at 40% 35%, #2a2a2e 0%, #0a0a0a 55%, #050505 100%);
 }
 
-/* —— Grafiki: light homepage ambient only (no poster drift) —— */
+/* —— Grafiki / Strony: light or dark homepage ambient only (no drifting media) —— */
 .portfolio-grafiki-ambient-wrap,
 .portfolio-web-ambient-wrap {
   position: absolute;
@@ -301,67 +237,9 @@ body.case-page.portfolio-theme-page--systems .site-nav__toggle-bars span {
   background: #111;
 }
 
-/* Tabs only: drifting graphics on Grafiki theme. Subpages = ambient only. */
-.portfolio-grafiki-drift {
-  display: none;
-}
-body.portfolio-page--tiles .portfolio-grafiki-drift {
-  display: block;
-  position: absolute;
-  inset: -6%;
-  z-index: 1;
-}
-.portfolio-grafiki-drift__item {
-  position: absolute;
-  width: min(24vw, 12rem);
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  border-radius: 0.7rem;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
-  opacity: 0.78;
-  will-change: transform;
-  animation: grafiki-drift 22s ease-in-out infinite;
-}
-.portfolio-grafiki-drift__item:nth-child(1) { left: 4%; top: 10%; animation-duration: 24s; animation-delay: -2s; }
-.portfolio-grafiki-drift__item:nth-child(2) { left: 26%; top: 56%; width: min(20vw, 10rem); animation-duration: 20s; animation-delay: -6s; }
-.portfolio-grafiki-drift__item:nth-child(3) { left: 50%; top: 6%; width: min(22vw, 11rem); animation-duration: 26s; animation-delay: -4s; }
-.portfolio-grafiki-drift__item:nth-child(4) { left: 70%; top: 40%; animation-duration: 21s; animation-delay: -9s; }
-.portfolio-grafiki-drift__item:nth-child(5) { left: 10%; top: 60%; width: min(18vw, 9rem); animation-duration: 23s; animation-delay: -11s; }
-.portfolio-grafiki-drift__item:nth-child(6) { left: 38%; top: 26%; width: min(19vw, 9.5rem); animation-duration: 19s; animation-delay: -3s; }
-.portfolio-grafiki-drift__item:nth-child(7) { left: 76%; top: 12%; width: min(17vw, 8.5rem); animation-duration: 25s; animation-delay: -7s; }
-.portfolio-grafiki-drift__item:nth-child(8) { left: 58%; top: 64%; width: min(21vw, 10.5rem); animation-duration: 22s; animation-delay: -13s; }
-@keyframes grafiki-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
-  33% { transform: translate3d(18px, -22px, 0) rotate(2deg); }
-  66% { transform: translate3d(-14px, 16px, 0) rotate(-1deg); }
-}
-
-/* Subpages: no reel stream / no poster drift — plain theme fills only */
-body.portfolio-theme-page--video .portfolio-montaz-stream,
-body.portfolio-theme-page .portfolio-grafiki-drift,
+/* Legacy drift / stream markup — never show */
+.portfolio-grafiki-drift,
+.portfolio-montaz-stream,
 .portfolio-montaz-drift {
   display: none !important;
-}
-
-html.reduce-motion .portfolio-montaz-stream__belt,
-html.reduce-motion .portfolio-grafiki-drift__item {
-  animation: none !important;
-}
-
-@media (max-width: 720px) {
-  .portfolio-montaz-stream__set {
-    width: 280vw;
-  }
-  .portfolio-montaz-stream__card--sm {
-    width: min(24vw, 6.5rem);
-  }
-  .portfolio-montaz-stream__card--md {
-    width: min(32vw, 8.5rem);
-  }
-  .portfolio-montaz-stream__card--lg {
-    width: min(42vw, 11rem);
-  }
-  .portfolio-montaz-stream__card--xl {
-    width: min(52vw, 13.5rem);
-  }
 }

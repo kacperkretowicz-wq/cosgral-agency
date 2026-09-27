@@ -9,10 +9,6 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
-  var noGyroPages =
-    document.body.classList.contains("graphics-gallery-page") ||
-    document.body.classList.contains("reels-gallery-page");
-
   var COARSE = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
@@ -296,7 +292,7 @@
     }
   }
 
-  if (!noGyroPages) armMobileGyro();
+  armMobileGyro();
   applyPointer();
   requestAnimationFrame(tick);
 })();
