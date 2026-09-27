@@ -416,30 +416,6 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__body {
 body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__lead {
   color: rgba(255, 255, 255, 0.78);
 }
-.portfolio-tile__cta {
-  margin-top: 0.55rem;
-  align-self: flex-start;
-  padding: 0.45rem 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 0.55rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-family: var(--font-body, "Satoshi", sans-serif);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: #fff;
-  opacity: 1;
-  transition: background 0.25s ease, border-color 0.25s ease;
-}
-.portfolio-tile.is-active .portfolio-tile__cta,
-.portfolio-tile:hover .portfolio-tile__cta {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.42);
-}
-
 .portfolio-tiles__dots {
   display: flex;
   justify-content: center;
