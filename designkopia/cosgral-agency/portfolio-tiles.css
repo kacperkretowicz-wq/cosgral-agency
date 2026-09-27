@@ -329,21 +329,23 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__media::after {
 .portfolio-tile__viz-word {
   position: absolute;
   left: 50%;
-  top: 46%;
+  top: 38%;
   z-index: 0;
   margin: 0;
   transform: translate(-50%, -50%);
+  width: 96%;
   font-family: var(--font-display, "Satoshi", sans-serif);
-  font-size: clamp(3.4rem, 14vw, 5.6rem);
+  font-size: clamp(4.2rem, 18vw, 7rem);
   font-weight: 700;
-  letter-spacing: -0.06em;
-  line-height: 0.85;
+  letter-spacing: -0.07em;
+  line-height: 0.82;
+  text-align: center;
   text-transform: none;
-  color: #0a0a0a;
+  color: #111;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
-  opacity: 0.92;
+  opacity: 1;
 }
 .portfolio-tile__viz-stage {
   position: absolute;
@@ -352,6 +354,7 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__media::after {
   display: grid;
   place-items: center;
   perspective: 900px;
+  padding-top: 12%;
 }
 .portfolio-tile__viz-card {
   --viz-x: 0%;
@@ -361,7 +364,7 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__media::after {
   --viz-o: 0;
   --viz-z: 0;
   position: absolute;
-  width: min(46%, 11.5rem);
+  width: min(38%, 9.5rem);
   aspect-ratio: 4 / 5;
   margin: 0;
   border-radius: 0.85rem;
@@ -390,43 +393,43 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile__media::after {
 }
 /* Slot roles driven by data-viz-slot on cards */
 .portfolio-tile__viz-card[data-viz-slot="0"] {
-  --viz-x: -118%;
-  --viz-y: 10%;
-  --viz-s: 0.62;
-  --viz-r: -14deg;
-  --viz-o: 0.55;
+  --viz-x: -108%;
+  --viz-y: 18%;
+  --viz-s: 0.58;
+  --viz-r: -12deg;
+  --viz-o: 0.5;
   --viz-z: 1;
 }
 .portfolio-tile__viz-card[data-viz-slot="1"] {
-  --viz-x: -52%;
-  --viz-y: 4%;
-  --viz-s: 0.82;
-  --viz-r: -7deg;
-  --viz-o: 0.88;
+  --viz-x: -48%;
+  --viz-y: 10%;
+  --viz-s: 0.78;
+  --viz-r: -6deg;
+  --viz-o: 0.9;
   --viz-z: 3;
 }
 .portfolio-tile__viz-card[data-viz-slot="2"] {
   --viz-x: 0%;
-  --viz-y: -2%;
-  --viz-s: 1;
+  --viz-y: 6%;
+  --viz-s: 0.96;
   --viz-r: 0deg;
   --viz-o: 1;
   --viz-z: 5;
 }
 .portfolio-tile__viz-card[data-viz-slot="3"] {
-  --viz-x: 52%;
-  --viz-y: 4%;
-  --viz-s: 0.82;
-  --viz-r: 7deg;
-  --viz-o: 0.88;
+  --viz-x: 48%;
+  --viz-y: 10%;
+  --viz-s: 0.78;
+  --viz-r: 6deg;
+  --viz-o: 0.9;
   --viz-z: 3;
 }
 .portfolio-tile__viz-card[data-viz-slot="4"] {
-  --viz-x: 118%;
-  --viz-y: 10%;
-  --viz-s: 0.62;
-  --viz-r: 14deg;
-  --viz-o: 0.55;
+  --viz-x: 108%;
+  --viz-y: 18%;
+  --viz-s: 0.58;
+  --viz-r: 12deg;
+  --viz-o: 0.5;
   --viz-z: 1;
 }
 .portfolio-tile__viz-card[data-viz-slot="out"] {
