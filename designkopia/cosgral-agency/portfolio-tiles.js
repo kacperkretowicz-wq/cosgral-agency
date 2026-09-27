@@ -1,5 +1,5 @@
 /**
- * Realizacje — L→R category tabs + expand-to-case-rail for Strony / Systemy.
+ * Realizacje — vertical chapters (media as page BG) + expand case rail for Strony/Systemy.
  */
 (function () {
   "use strict";
@@ -7,24 +7,19 @@
   var root = document.querySelector("[data-portfolio-tiles]");
   if (!root) return;
 
-  var scroller = root.querySelector("[data-portfolio-tiles-scroller]");
-  var tiles = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
-  var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile-dot]"));
+  var chapters = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
   var expandStage = root.querySelector("[data-tile-expand-stage]");
   var expandSource = root.querySelector("[data-tile-expand-source]");
   var expandSourceMedia = root.querySelector("[data-tile-expand-source-media]");
   var expandSourceTitle = root.querySelector("[data-tile-expand-source-title]");
   var expandTrack = root.querySelector("[data-tile-expand-track]");
-  if (!scroller || !tiles.length) return;
+  if (!chapters.length) return;
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var activeIndex = -1;
-  var slideTimers = [];
   var reelCompTimer = null;
   var vizShowTimer = null;
-  var wheelLock = 0;
   var pendingTheme = null;
-  var depthRaf = 0;
   var expandedKey = null;
   var caseVideoTimer = null;
 
@@ -98,122 +93,38 @@
     ],
   };
 
-  function clamp(i) {
-    return Math.max(0, Math.min(tiles.length - 1, i));
+  function applyTheme(theme) {
+    theme = theme || "web";
+    pendingTheme = theme;
+    document.body.setAttribute("data-tile-theme", theme);
+    var light = theme === "systems" || theme === "graphics";
+    document.body.classList.toggle("is-tile-bg-light", light);
+    if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
+      window.__portfolioTileBg.setTheme(theme);
+    }
+    if (window.__portfolioThemeLayers && window.__portfolioThemeLayers.setActiveTheme) {
+      window.__portfolioThemeLayers.setActiveTheme(theme);
+    }
+    window.dispatchEvent(
+      new CustomEvent("portfolio-tile-theme", { detail: { theme: theme } })
+    );
   }
 
-  function centerOf(el) {
-    var r = el.getBoundingClientRect();
-    return r.left + r.width * 0.5;
-  }
-
-  function nearestIndex() {
-    var mid = window.innerWidth * 0.5;
-    var best = 0;
-    var bestDist = Infinity;
-    tiles.forEach(function (tile, i) {
-      var d = Math.abs(centerOf(tile) - mid);
-      if (d < bestDist) {
-        bestDist = d;
-        best = i;
-      }
-    });
-    return best;
-  }
-
-  function updateTileDepth() {
-    if (REDUCED || expandedKey) return;
-    var mid = window.innerWidth * 0.5;
-    var span = Math.max(220, window.innerWidth * 0.42);
-    tiles.forEach(function (tile, i) {
-      var dist = (centerOf(tile) - mid) / span;
-      var abs = Math.min(1.35, Math.abs(dist));
-      var focus = 1 - Math.min(1, abs);
-      var scale = 0.9 + focus * 0.16;
-      var rot = Math.max(-11, Math.min(11, -dist * 10));
-      var ty = -focus * 8;
-      if (i === activeIndex) {
-        scale = Math.max(scale, 1.06);
-        rot *= 0.35;
-        ty = Math.min(ty, -6);
-      }
-      tile.style.setProperty("--tile-scale", scale.toFixed(3));
-      tile.style.setProperty("--tile-rotz", rot.toFixed(2) + "deg");
-      tile.style.setProperty("--tile-ty", ty.toFixed(1) + "px");
-    });
-  }
-
-  function clearSlides() {
-    slideTimers.forEach(function (id) {
-      window.clearInterval(id);
-    });
-    slideTimers = [];
+  function clearReel() {
     if (reelCompTimer) {
       window.clearInterval(reelCompTimer);
       reelCompTimer = null;
     }
   }
 
-  function startVizShowLoop() {
-    if (vizShowTimer || REDUCED) return;
-    var tile = tiles.find(function (t) {
-      return !!t.querySelector("[data-tile-viz-show]");
-    });
-    if (!tile) return;
-    var root = tile.querySelector("[data-tile-viz-show]");
-    var cards = Array.prototype.slice.call(root.querySelectorAll("[data-viz-card]"));
-    if (cards.length < 3) return;
-    var n = cards.length;
-    var cursor = 0;
-
-    function apply() {
-      cards.forEach(function (card, i) {
-        var rel = (i - cursor + n) % n;
-        if (rel <= 4) card.setAttribute("data-viz-slot", String(rel));
-        else card.setAttribute("data-viz-slot", "out");
-      });
-    }
-
-    apply();
-    vizShowTimer = window.setInterval(function () {
-      cursor = (cursor + 1) % n;
-      apply();
-    }, 1100);
-  }
-
-  function playTileSlides(tile) {
-    var slides = Array.prototype.slice.call(tile.querySelectorAll("[data-tile-slide]"));
-    if (!slides.length) return;
-    var fast = tile.getAttribute("data-theme") === "graphics";
-    var interval = fast ? 700 : 2600;
-    if (slides.length < 2 || REDUCED) {
-      slides.forEach(function (s, i) {
-        s.classList.toggle("is-on", i === 0);
-      });
-      return;
-    }
-    var n = 0;
-    slides.forEach(function (s, i) {
-      s.classList.toggle("is-on", i === 0);
-    });
-    slideTimers.push(
-      window.setInterval(function () {
-        n = (n + 1) % slides.length;
-        slides.forEach(function (s, i) {
-          s.classList.toggle("is-on", i === n);
-        });
-      }, interval)
-    );
-  }
-
-  function syncCardVideos(activeTile) {
-    tiles.forEach(function (tile) {
-      var isReelComp = !!tile.querySelector("[data-tile-reel-comp]");
-      tile.querySelectorAll("[data-card-video]").forEach(function (video) {
-        if (tile === activeTile && !isReelComp && !expandedKey) {
+  function syncCardVideos(activeChapter) {
+    chapters.forEach(function (chapter) {
+      var isReel = !!chapter.querySelector("[data-tile-reel-comp]");
+      chapter.querySelectorAll("[data-card-video]").forEach(function (video) {
+        if (chapter === activeChapter && !isReel && !expandedKey) {
           var play = video.play();
           if (play && play.catch) play.catch(function () {});
-        } else {
+        } else if (!isReel) {
           try {
             video.pause();
           } catch (e) {}
@@ -222,8 +133,9 @@
     });
   }
 
-  function playReelCompilation(tile) {
-    var cells = Array.prototype.slice.call(tile.querySelectorAll("[data-reel-cell]"));
+  function playReelCompilation(chapter) {
+    clearReel();
+    var cells = Array.prototype.slice.call(chapter.querySelectorAll("[data-reel-cell]"));
     if (!cells.length) return;
     cells.forEach(function (cell) {
       cell.classList.remove("is-playing");
@@ -264,65 +176,47 @@
     }, 1600);
   }
 
-  function applyTheme(theme) {
-    theme = theme || "web";
-    pendingTheme = theme;
-    document.body.setAttribute("data-tile-theme", theme);
-    var light = theme === "systems" || theme === "graphics";
-    document.body.classList.toggle("is-tile-bg-light", light);
-    if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
-      window.__portfolioTileBg.setTheme(theme);
+  function startVizShowLoop() {
+    if (vizShowTimer || REDUCED) return;
+    var chapter = chapters.find(function (t) {
+      return !!t.querySelector("[data-tile-viz-show]");
+    });
+    if (!chapter) return;
+    var rootViz = chapter.querySelector("[data-tile-viz-show]");
+    var cards = Array.prototype.slice.call(rootViz.querySelectorAll("[data-viz-card]"));
+    if (cards.length < 3) return;
+    var n = cards.length;
+    var cursor = 0;
+
+    function apply() {
+      cards.forEach(function (card, i) {
+        var rel = (i - cursor + n) % n;
+        if (rel <= 4) card.setAttribute("data-viz-slot", String(rel));
+        else card.setAttribute("data-viz-slot", "out");
+      });
     }
-    if (window.__portfolioThemeLayers && window.__portfolioThemeLayers.setActiveTheme) {
-      window.__portfolioThemeLayers.setActiveTheme(theme);
-    }
-    window.dispatchEvent(
-      new CustomEvent("portfolio-tile-theme", { detail: { theme: theme } })
-    );
+
+    apply();
+    vizShowTimer = window.setInterval(function () {
+      cursor = (cursor + 1) % n;
+      apply();
+    }, 1100);
   }
 
-  function setActive(index, opts) {
-    opts = opts || {};
-    index = clamp(index);
-    if (index === activeIndex && !opts.force) return;
-    if (expandedKey) return;
+  function setActive(index) {
+    index = Math.max(0, Math.min(chapters.length - 1, index));
+    if (index === activeIndex) return;
     activeIndex = index;
-    clearSlides();
-    tiles.forEach(function (tile, i) {
-      tile.classList.toggle("is-active", i === index);
+    clearReel();
+    chapters.forEach(function (chapter, i) {
+      chapter.classList.toggle("is-active", i === index);
     });
-    dots.forEach(function (dot, i) {
-      dot.classList.toggle("is-active", i === index);
-      dot.setAttribute("aria-current", i === index ? "true" : "false");
-    });
-    var tile = tiles[index];
-    applyTheme(tile.getAttribute("data-theme") || "web");
-    syncCardVideos(tile);
-    if (tile.querySelector("[data-tile-reel-comp]")) {
-      playReelCompilation(tile);
-    } else if (!tile.querySelector("[data-tile-viz-show]")) {
-      playTileSlides(tile);
+    var chapter = chapters[index];
+    applyTheme(chapter.getAttribute("data-theme") || "web");
+    syncCardVideos(chapter);
+    if (chapter.querySelector("[data-tile-reel-comp]")) {
+      playReelCompilation(chapter);
     }
-    startVizShowLoop();
-    updateTileDepth();
-  }
-
-  function scrollToIndex(index, behavior) {
-    if (expandedKey) return;
-    index = clamp(index);
-    var tile = tiles[index];
-    if (!tile) return;
-    var left = scroller.scrollLeft + (centerOf(tile) - window.innerWidth * 0.5);
-    scroller.scrollTo({
-      left: Math.max(0, left),
-      behavior: behavior || "smooth",
-    });
-    setActive(index, { force: true });
-  }
-
-  function syncFromScroll() {
-    if (expandedKey) return;
-    setActive(nearestIndex());
   }
 
   function stopCaseVideos() {
@@ -417,15 +311,14 @@
       body.appendChild(title);
       body.appendChild(lead);
       a.appendChild(body);
-
       expandTrack.appendChild(a);
     });
   }
 
-  function fillSourceFromTile(tile) {
+  function fillSourceFromChapter(chapter) {
     if (!expandSourceMedia || !expandSourceTitle) return;
     expandSourceMedia.innerHTML = "";
-    var media = tile.querySelector(".portfolio-tile__media");
+    var media = chapter.querySelector(".portfolio-tile__media");
     if (media) {
       var clone = media.cloneNode(true);
       clone.querySelectorAll("video").forEach(function (v) {
@@ -433,42 +326,35 @@
         v.muted = true;
         v.loop = true;
         v.playsInline = true;
-        v.autoplay = true;
         var p = v.play();
         if (p && p.catch) p.catch(function () {});
       });
       expandSourceMedia.appendChild(clone);
     }
-    var titleEl = tile.querySelector(".portfolio-tile__title");
+    var titleEl = chapter.querySelector(".portfolio-chapter__title");
     expandSourceTitle.textContent = titleEl ? titleEl.textContent : "";
   }
 
-  function openExpand(tile) {
+  function openExpand(chapter) {
     if (!expandStage || !expandTrack) return;
-    var key = tile.getAttribute("data-tile-expand");
+    var more = chapter.querySelector("[data-tile-expand]");
+    var key = more && more.getAttribute("data-tile-expand");
     if (!key || !CASE_SETS[key] || expandedKey === key) return;
 
     expandedKey = key;
-    clearSlides();
-    syncCardVideos(null);
-    applyTheme(tile.getAttribute("data-theme") || key);
-    fillSourceFromTile(tile);
+    applyTheme(chapter.getAttribute("data-theme") || key);
+    fillSourceFromChapter(chapter);
     buildCaseCards(key);
 
     document.body.classList.add("is-tile-expanded");
     root.classList.add("is-expanded");
     expandStage.hidden = false;
     expandStage.setAttribute("aria-hidden", "false");
-    expandStage.setAttribute("data-expand-theme", key);
 
     window.requestAnimationFrame(function () {
       expandStage.classList.add("is-open");
       playVisibleCaseVideos();
     });
-
-    try {
-      history.replaceState(null, "", "#" + (key === "web" ? "strony" : "automatyzacje") + "-cases");
-    } catch (e) {}
   }
 
   function closeExpand() {
@@ -484,65 +370,85 @@
         if (expandedKey) return;
         expandStage.hidden = true;
         expandStage.setAttribute("aria-hidden", "true");
-        expandStage.removeAttribute("data-expand-theme");
         if (expandTrack) expandTrack.innerHTML = "";
         if (expandSourceMedia) expandSourceMedia.innerHTML = "";
-        setActive(activeIndex < 0 ? 0 : activeIndex, { force: true });
+        if (activeIndex >= 0) syncCardVideos(chapters[activeIndex]);
       },
       REDUCED ? 0 : 420
     );
-
-    try {
-      history.replaceState(null, "", window.location.pathname + window.location.search);
-    } catch (e) {}
   }
 
-  scroller.addEventListener(
-    "scroll",
-    function () {
-      if (depthRaf || expandedKey) return;
-      depthRaf = window.requestAnimationFrame(function () {
-        depthRaf = 0;
-        syncFromScroll();
-        updateTileDepth();
-      });
-    },
-    { passive: true }
-  );
+  /* IntersectionObserver — theme + media follow scroll */
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(
+      function (entries) {
+        if (expandedKey) return;
+        var best = null;
+        var bestRatio = 0;
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            best = entry.target;
+          }
+        });
+        if (!best) {
+          /* pick nearest to viewport center */
+          var mid = window.innerHeight * 0.45;
+          var nearest = 0;
+          var nearestDist = Infinity;
+          chapters.forEach(function (ch, i) {
+            var r = ch.getBoundingClientRect();
+            var c = r.top + r.height * 0.35;
+            var d = Math.abs(c - mid);
+            if (d < nearestDist) {
+              nearestDist = d;
+              nearest = i;
+            }
+          });
+          setActive(nearest);
+          return;
+        }
+        setActive(chapters.indexOf(best));
+      },
+      { root: null, threshold: [0.25, 0.45, 0.65], rootMargin: "-10% 0px -25% 0px" }
+    );
+    chapters.forEach(function (ch) {
+      io.observe(ch);
+    });
+  }
 
   window.addEventListener(
-    "resize",
+    "scroll",
     function () {
       if (expandedKey) return;
-      scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
+      var mid = window.innerHeight * 0.42;
+      var nearest = 0;
+      var nearestDist = Infinity;
+      chapters.forEach(function (ch, i) {
+        var r = ch.getBoundingClientRect();
+        var c = r.top + r.height * 0.35;
+        var d = Math.abs(c - mid);
+        if (d < nearestDist) {
+          nearestDist = d;
+          nearest = i;
+        }
+      });
+      setActive(nearest);
     },
     { passive: true }
   );
 
-  dots.forEach(function (dot, i) {
-    dot.addEventListener("click", function () {
-      if (expandedKey) closeExpand();
-      scrollToIndex(i);
-    });
-  });
-
-  tiles.forEach(function (tile, i) {
-    tile.addEventListener(
+  root.querySelectorAll("[data-tile-expand]").forEach(function (link) {
+    link.addEventListener(
       "click",
       function (e) {
-        var expandKey = tile.getAttribute("data-tile-expand");
-        if (!expandKey) return;
+        var key = link.getAttribute("data-tile-expand");
+        if (!key || !CASE_SETS[key]) return;
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
         e.preventDefault();
         e.stopPropagation();
-        if (i !== activeIndex) {
-          scrollToIndex(i);
-          window.setTimeout(function () {
-            openExpand(tile);
-          }, REDUCED ? 0 : 280);
-        } else {
-          openExpand(tile);
-        }
+        var chapter = link.closest("[data-portfolio-tile]");
+        if (chapter) openExpand(chapter);
       },
       true
     );
@@ -575,23 +481,11 @@
   window.addEventListener(
     "wheel",
     function (e) {
-      if (expandedKey) {
-        if (!expandTrack) return;
-        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-        if (Math.abs(e.deltaY) < 1.2) return;
-        e.preventDefault();
-        expandTrack.scrollBy({ left: e.deltaY, behavior: "auto" });
-        return;
-      }
+      if (!expandedKey || !expandTrack) return;
       if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
       if (Math.abs(e.deltaY) < 1.2) return;
       e.preventDefault();
-      var now = performance.now();
-      if (now - wheelLock < 420) return;
-      wheelLock = now;
-      var next = activeIndex + (e.deltaY > 0 ? 1 : -1);
-      if (next < 0 || next >= tiles.length) return;
-      scrollToIndex(next);
+      expandTrack.scrollBy({ left: e.deltaY, behavior: "auto" });
     },
     { passive: false }
   );
@@ -602,30 +496,8 @@
 
   document.body.classList.add("portfolio-page--tiles");
   startVizShowLoop();
-  scrollToIndex(0, "auto");
+  setActive(0);
   window.setTimeout(function () {
-    scrollToIndex(0, "auto");
     if (pendingTheme) applyTheme(pendingTheme);
   }, 80);
-  window.setTimeout(function () {
-    if (pendingTheme) applyTheme(pendingTheme);
-    var hash = (window.location.hash || "").replace("#", "");
-    if (hash === "strony-cases") {
-      var webTile = tiles.find(function (t) {
-        return t.getAttribute("data-tile-expand") === "web";
-      });
-      if (webTile) {
-        scrollToIndex(tiles.indexOf(webTile), "auto");
-        openExpand(webTile);
-      }
-    } else if (hash === "automatyzacje-cases") {
-      var sysTile = tiles.find(function (t) {
-        return t.getAttribute("data-tile-expand") === "systems";
-      });
-      if (sysTile) {
-        scrollToIndex(tiles.indexOf(sysTile), "auto");
-        openExpand(sysTile);
-      }
-    }
-  }, 400);
 })();
