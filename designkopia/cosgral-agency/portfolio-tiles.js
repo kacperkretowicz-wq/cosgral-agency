@@ -1,5 +1,5 @@
 /**
- * Realizacje — vertical chapters (pin-matched BGs) + expand case rail for Strony/Systemy.
+ * Realizacje — full-viewport horizontal chapters (pin-matched BGs) + dots + expand rail.
  */
 (function () {
   "use strict";
@@ -7,13 +7,15 @@
   var root = document.querySelector("[data-portfolio-tiles]");
   if (!root) return;
 
+  var scroller = root.querySelector("[data-chapters-scroller]");
   var chapters = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
+  var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-chapter-dot]"));
   var expandStage = root.querySelector("[data-tile-expand-stage]");
   var expandSource = root.querySelector("[data-tile-expand-source]");
   var expandSourceMedia = root.querySelector("[data-tile-expand-source-media]");
   var expandSourceTitle = root.querySelector("[data-tile-expand-source-title]");
   var expandTrack = root.querySelector("[data-tile-expand-track]");
-  if (!chapters.length) return;
+  if (!scroller || !chapters.length) return;
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var activeIndex = -1;
@@ -24,6 +26,8 @@
   var pendingTheme = null;
   var expandedKey = null;
   var caseVideoTimer = null;
+  var wheelLock = 0;
+  var scrollRaf = 0;
 
   var STILL = "portfolio-media/showcase/chapter-stills/";
   var ACC = STILL + "accents/";
@@ -423,15 +427,47 @@
     }, 2400);
   }
 
-  function setActive(index) {
+  function nearestIndex() {
+    var mid = scroller.scrollLeft + scroller.clientWidth * 0.5;
+    var best = 0;
+    var bestDist = Infinity;
+    chapters.forEach(function (ch, i) {
+      var left = ch.offsetLeft + ch.offsetWidth * 0.5;
+      var d = Math.abs(left - mid);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    });
+    return best;
+  }
+
+  function setActive(index, opts) {
+    opts = opts || {};
     index = Math.max(0, Math.min(chapters.length - 1, index));
-    if (index === activeIndex) return;
+    if (index === activeIndex && !opts.force) return;
     activeIndex = index;
     chapters.forEach(function (chapter, i) {
       chapter.classList.toggle("is-active", i === index);
     });
+    dots.forEach(function (dot, i) {
+      dot.classList.toggle("is-active", i === index);
+      dot.setAttribute("aria-current", i === index ? "true" : "false");
+    });
     var chapter = chapters[index];
     applyTheme(chapter.getAttribute("data-theme") || "web");
+  }
+
+  function scrollToIndex(index, behavior) {
+    index = Math.max(0, Math.min(chapters.length - 1, index));
+    var chapter = chapters[index];
+    if (!chapter) return;
+    var left = chapter.offsetLeft;
+    scroller.scrollTo({
+      left: left,
+      behavior: behavior || (REDUCED ? "auto" : "smooth"),
+    });
+    setActive(index, { force: true });
   }
 
   function stopCaseVideos() {
@@ -592,63 +628,24 @@
     );
   }
 
-  if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(
-      function (entries) {
-        if (expandedKey) return;
-        var best = null;
-        var bestRatio = 0;
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
-            bestRatio = entry.intersectionRatio;
-            best = entry.target;
-          }
-        });
-        if (!best) {
-          var mid = window.innerHeight * 0.45;
-          var nearest = 0;
-          var nearestDist = Infinity;
-          chapters.forEach(function (ch, i) {
-            var r = ch.getBoundingClientRect();
-            var c = r.top + r.height * 0.35;
-            var d = Math.abs(c - mid);
-            if (d < nearestDist) {
-              nearestDist = d;
-              nearest = i;
-            }
-          });
-          setActive(nearest);
-          return;
-        }
-        setActive(chapters.indexOf(best));
-      },
-      { root: null, threshold: [0.25, 0.45, 0.65], rootMargin: "-10% 0px -25% 0px" }
-    );
-    chapters.forEach(function (ch) {
-      io.observe(ch);
-    });
-  }
-
-  window.addEventListener(
+  scroller.addEventListener(
     "scroll",
     function () {
       if (expandedKey) return;
-      var mid = window.innerHeight * 0.42;
-      var nearest = 0;
-      var nearestDist = Infinity;
-      chapters.forEach(function (ch, i) {
-        var r = ch.getBoundingClientRect();
-        var c = r.top + r.height * 0.35;
-        var d = Math.abs(c - mid);
-        if (d < nearestDist) {
-          nearestDist = d;
-          nearest = i;
-        }
+      if (scrollRaf) return;
+      scrollRaf = window.requestAnimationFrame(function () {
+        scrollRaf = 0;
+        setActive(nearestIndex());
       });
-      setActive(nearest);
     },
     { passive: true }
   );
+
+  dots.forEach(function (dot, i) {
+    dot.addEventListener("click", function () {
+      scrollToIndex(i);
+    });
+  });
 
   root.querySelectorAll("[data-tile-expand]").forEach(function (link) {
     link.addEventListener(
@@ -684,23 +681,54 @@
   }
 
   window.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && expandedKey) {
+    if (expandedKey) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeExpand();
+      }
+      return;
+    }
+    if (e.key === "ArrowRight" || e.key === "PageDown") {
       e.preventDefault();
-      closeExpand();
+      scrollToIndex(activeIndex + 1);
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+      e.preventDefault();
+      scrollToIndex(activeIndex - 1);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      scrollToIndex(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      scrollToIndex(chapters.length - 1);
     }
   });
 
   window.addEventListener(
     "wheel",
     function (e) {
-      if (!expandedKey || !expandTrack) return;
-      if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-      if (Math.abs(e.deltaY) < 1.2) return;
+      if (expandedKey) {
+        if (!expandTrack) return;
+        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+        if (Math.abs(e.deltaY) < 1.2) return;
+        e.preventDefault();
+        expandTrack.scrollBy({ left: e.deltaY, behavior: "auto" });
+        return;
+      }
+      if (Math.abs(e.deltaY) < 1.2 && Math.abs(e.deltaX) < 1.2) return;
+      var delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (Math.abs(delta) < 8) return;
       e.preventDefault();
-      expandTrack.scrollBy({ left: e.deltaY, behavior: "auto" });
+      var now = Date.now();
+      if (now - wheelLock < 480) return;
+      wheelLock = now;
+      scrollToIndex(activeIndex + (delta > 0 ? 1 : -1));
     },
     { passive: false }
   );
+
+  window.addEventListener("resize", function () {
+    scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
+  });
 
   window.addEventListener("portfolio-tile-bg-ready", function () {
     if (pendingTheme) applyTheme(pendingTheme);
@@ -711,8 +739,9 @@
   initOs();
   initShow();
   startVizShowLoop();
-  setActive(0);
+  scrollToIndex(0, "auto");
   window.setTimeout(function () {
+    scrollToIndex(0, "auto");
     if (pendingTheme) applyTheme(pendingTheme);
   }, 80);
 })();
