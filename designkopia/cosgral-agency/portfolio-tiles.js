@@ -1,5 +1,5 @@
 /**
- * Realizacje — vertical chapters (media as page BG) + expand case rail for Strony/Systemy.
+ * Realizacje — vertical chapters (pin-matched BGs) + expand case rail for Strony/Systemy.
  */
 (function () {
   "use strict";
@@ -17,11 +17,18 @@
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var activeIndex = -1;
-  var reelCompTimer = null;
   var vizShowTimer = null;
+  var luxTimer = null;
+  var osTimer = null;
+  var showTimer = null;
   var pendingTheme = null;
   var expandedKey = null;
   var caseVideoTimer = null;
+
+  var STILL = "portfolio-media/showcase/chapter-stills/";
+  var ACC = STILL + "accents/";
+  var GFX = "portfolio-media/graphics/juicy-events/";
+  var REEL = "portfolio-media/reels/";
 
   var CASE_SETS = {
     web: [
@@ -93,12 +100,153 @@
     ],
   };
 
+  var LUX_SETS = [
+    {
+      word: { pl: "New Sites", en: "New Sites" },
+      shots: [
+        STILL + "web/trove-0-5.jpg",
+        STILL + "web/juicy-1-5.jpg",
+        STILL + "web/mj-2-5.jpg",
+        STILL + "web/trove-3-5.jpg",
+        STILL + "web/juicy-4-5.jpg",
+      ],
+    },
+    {
+      word: { pl: "New Craft", en: "New Craft" },
+      shots: [
+        STILL + "web/juicy-0-5.jpg",
+        STILL + "web/mj-1-5.jpg",
+        STILL + "web/trove-2-5.jpg",
+        STILL + "web/juicy-3-5.jpg",
+        STILL + "web/mj-4-5.jpg",
+      ],
+    },
+    {
+      word: { pl: "New Values", en: "New Values" },
+      shots: [
+        STILL + "web/mj-0-5.jpg",
+        STILL + "web/trove-1-5.jpg",
+        STILL + "web/juicy-2-5.jpg",
+        STILL + "web/mj-3-5.jpg",
+        STILL + "web/trove-4-5.jpg",
+      ],
+    },
+  ];
+
+  var OS_MEDIA = [
+    STILL + "systems/crm-0-5.jpg",
+    STILL + "systems/auto-1-5.jpg",
+    STILL + "systems/app-2-5.jpg",
+    STILL + "systems/crm-2-5.jpg",
+    STILL + "systems/auto-0-5.jpg",
+    STILL + "systems/app-1-5.jpg",
+    "assets/cases/telforceone-crm.svg",
+    "assets/cases/shelfsync.svg",
+    "assets/cases/northline-crm.svg",
+    "assets/cases/parcel-co.svg",
+    REEL + "orlincy/001-poster.jpg",
+    REEL + "orlincy/003-poster.jpg",
+    REEL + "reklamy/002-poster.jpg",
+    ACC + "accent-halftone.svg",
+    ACC + "accent-halftone.svg",
+    STILL + "systems/crm-3-5.jpg",
+  ];
+
+  var SHOW_WORDS = [
+    { pl: "Grafiki", en: "Visuals" },
+    { pl: "Showcase", en: "Showcase" },
+    { pl: "Cosgral", en: "Cosgral" },
+  ];
+
+  var SHOW_POOL = [
+    GFX + "001.jpg",
+    GFX + "003.jpg",
+    GFX + "005.jpg",
+    GFX + "008.jpg",
+    GFX + "010.jpg",
+    GFX + "012.jpg",
+    GFX + "015.jpg",
+    GFX + "018.jpg",
+    GFX + "021.jpg",
+    GFX + "024.jpg",
+    ACC + "accent-yellow.svg",
+    ACC + "accent-green.svg",
+    ACC + "accent-blue.svg",
+    ACC + "accent-red.svg",
+    ACC + "accent-grad.svg",
+    ACC + "accent-type.svg",
+  ];
+
+  var SHOW_LAYOUTS = [
+    [
+      { x: "-28vw", y: "-26vh", w: "min(12vw, 6.5rem)", r: "-4deg", z: 2 },
+      { x: "26vw", y: "-22vh", w: "min(16vw, 8.5rem)", r: "3deg", z: 3, wide: true },
+      { x: "-32vw", y: "4vh", w: "min(14vw, 7.5rem)", r: "0deg", z: 4 },
+      { x: "0vw", y: "-2vh", w: "min(13vw, 7rem)", r: "0deg", z: 6, portrait: true },
+      { x: "30vw", y: "8vh", w: "min(15vw, 8rem)", r: "2deg", z: 3 },
+      { x: "-22vw", y: "26vh", w: "min(13vw, 7rem)", r: "-2deg", z: 2 },
+      { x: "8vw", y: "28vh", w: "min(12vw, 6.5rem)", r: "0deg", z: 5 },
+      { x: "28vw", y: "30vh", w: "min(14vw, 7.5rem)", r: "4deg", z: 2 },
+    ],
+    [
+      { x: "-30vw", y: "-20vh", w: "min(14vw, 7.5rem)", r: "0deg", z: 3, portrait: true },
+      { x: "4vw", y: "-28vh", w: "min(11vw, 6rem)", r: "0deg", z: 2 },
+      { x: "28vw", y: "-18vh", w: "min(13vw, 7rem)", r: "0deg", z: 4 },
+      { x: "-26vw", y: "10vh", w: "min(15vw, 8rem)", r: "-3deg", z: 5 },
+      { x: "24vw", y: "6vh", w: "min(12vw, 6.5rem)", r: "0deg", z: 3 },
+      { x: "-8vw", y: "26vh", w: "min(13vw, 7rem)", r: "0deg", z: 4 },
+      { x: "18vw", y: "28vh", w: "min(14vw, 7.5rem)", r: "2deg", z: 2 },
+      { x: "32vw", y: "22vh", w: "min(12vw, 6.5rem)", r: "0deg", z: 3 },
+    ],
+    [
+      { x: "-24vw", y: "-28vh", w: "min(13vw, 7rem)", r: "0deg", z: 3 },
+      { x: "22vw", y: "-26vh", w: "min(12vw, 6.5rem)", r: "0deg", z: 2 },
+      { x: "-32vw", y: "0vh", w: "min(12vw, 6.5rem)", r: "0deg", z: 4, portrait: true },
+      { x: "0vw", y: "2vh", w: "min(15vw, 8rem)", r: "0deg", z: 5 },
+      { x: "30vw", y: "2vh", w: "min(14vw, 7.5rem)", r: "0deg", z: 3 },
+      { x: "-20vw", y: "28vh", w: "min(13vw, 7rem)", r: "-2deg", z: 2 },
+      { x: "10vw", y: "26vh", w: "min(12vw, 6.5rem)", r: "0deg", z: 4 },
+      { x: "28vw", y: "28vh", w: "min(13vw, 7rem)", r: "3deg", z: 2, wide: true },
+    ],
+  ];
+
+  var OS_STACK = [
+    { x: "-6%", y: "-8%", s: 1.05, z: 8 },
+    { x: "10%", y: "-2%", s: 0.92, z: 7 },
+    { x: "-16%", y: "6%", s: 0.88, z: 6 },
+    { x: "18%", y: "10%", s: 0.84, z: 5 },
+    { x: "-4%", y: "16%", s: 0.78, z: 4 },
+    { x: "8%", y: "-18%", s: 0.72, z: 3 },
+    { x: "-20%", y: "-14%", s: 0.7, z: 2 },
+    { x: "22%", y: "-12%", s: 0.68, z: 2 },
+    { x: "-12%", y: "22%", s: 0.64, z: 1 },
+    { x: "14%", y: "20%", s: 0.62, z: 1 },
+    { x: "0%", y: "-22%", s: 0.58, z: 1 },
+    { x: "-24%", y: "2%", s: 0.56, z: 1 },
+    { x: "26%", y: "4%", s: 0.54, z: 1 },
+    { x: "-8%", y: "-26%", s: 0.5, z: 1 },
+    { x: "6%", y: "26%", s: 0.48, z: 1 },
+    { x: "20%", y: "-24%", s: 0.46, z: 1 },
+  ];
+
+  function osFieldPos(i, n) {
+    var cols = 5;
+    var row = Math.floor(i / cols);
+    var col = i % cols;
+    var x = (col - (cols - 1) / 2) * 16 + ((row % 2) * 4 - 2);
+    var y = (row - 1.4) * 18 + ((col % 2) * 3 - 1.5);
+    return { x: x + "%", y: y + "%", s: 0.42, z: 1 + (n - i) };
+  }
+
+  function lang() {
+    return (document.documentElement.lang || "pl").toLowerCase().indexOf("en") === 0 ? "en" : "pl";
+  }
+
   function applyTheme(theme) {
     theme = theme || "web";
     pendingTheme = theme;
     document.body.setAttribute("data-tile-theme", theme);
-    var light = theme === "systems" || theme === "graphics";
-    document.body.classList.toggle("is-tile-bg-light", light);
+    document.body.classList.add("is-tile-bg-light");
     if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
       window.__portfolioTileBg.setTheme(theme);
     }
@@ -110,72 +258,11 @@
     );
   }
 
-  function clearReel() {
-    if (reelCompTimer) {
-      window.clearInterval(reelCompTimer);
-      reelCompTimer = null;
-    }
+  function syncCardVideos() {
+    /* Chapter BGs are now CSS/JS compositions — no full-bleed card videos. */
   }
 
-  function syncCardVideos(activeChapter) {
-    chapters.forEach(function (chapter) {
-      var isReel = !!chapter.querySelector("[data-tile-reel-comp]");
-      chapter.querySelectorAll("[data-card-video]").forEach(function (video) {
-        if (chapter === activeChapter && !isReel && !expandedKey) {
-          var play = video.play();
-          if (play && play.catch) play.catch(function () {});
-        } else if (!isReel) {
-          try {
-            video.pause();
-          } catch (e) {}
-        }
-      });
-    });
-  }
-
-  function playReelCompilation(chapter) {
-    clearReel();
-    var cells = Array.prototype.slice.call(chapter.querySelectorAll("[data-reel-cell]"));
-    if (!cells.length) return;
-    cells.forEach(function (cell) {
-      cell.classList.remove("is-playing");
-      var v = cell.querySelector("video");
-      if (v) {
-        try {
-          v.pause();
-        } catch (e) {}
-      }
-    });
-    if (REDUCED) {
-      cells.slice(0, 3).forEach(function (cell) {
-        cell.classList.add("is-playing");
-      });
-      return;
-    }
-    var n = 0;
-    function activate(index) {
-      cells.forEach(function (cell, i) {
-        var on = i === index || i === (index + 3) % cells.length || i === (index + 7) % cells.length;
-        cell.classList.toggle("is-playing", on);
-        var video = cell.querySelector("video");
-        if (!video) return;
-        if (on) {
-          var play = video.play();
-          if (play && play.catch) play.catch(function () {});
-        } else {
-          try {
-            video.pause();
-          } catch (e) {}
-        }
-      });
-    }
-    activate(0);
-    reelCompTimer = window.setInterval(function () {
-      n = (n + 1) % cells.length;
-      activate(n);
-    }, 1600);
-  }
-
+  /* —— Montaż viz fan (former Grafiki) —— */
   function startVizShowLoop() {
     if (vizShowTimer || REDUCED) return;
     var chapter = chapters.find(function (t) {
@@ -203,20 +290,150 @@
     }, 1100);
   }
 
+  /* —— Strony New Luxury —— */
+  function initLux() {
+    var lux = root.querySelector("[data-chapter-lux]");
+    if (!lux) return;
+    var wordEl = lux.querySelector("[data-lux-word]");
+    var shots = Array.prototype.slice.call(lux.querySelectorAll("[data-lux-shot]"));
+    var idx = 0;
+
+    function paint(set) {
+      if (wordEl) wordEl.textContent = set.word[lang()] || set.word.pl;
+      shots.forEach(function (fig, i) {
+        var img = fig.querySelector("img");
+        if (!img || !set.shots[i]) return;
+        img.src = set.shots[i];
+      });
+    }
+
+    paint(LUX_SETS[0]);
+    if (REDUCED) return;
+
+    function cycle() {
+      lux.classList.add("is-stretch");
+      window.setTimeout(function () {
+        idx = (idx + 1) % LUX_SETS.length;
+        paint(LUX_SETS[idx]);
+        lux.classList.remove("is-stretch");
+      }, 520);
+    }
+
+    luxTimer = window.setInterval(cycle, 2800);
+  }
+
+  /* —— Systemy OS stack↔field —— */
+  function initOs() {
+    var stage = root.querySelector("[data-os-stage]");
+    if (!stage) return;
+    var cards = [];
+    OS_MEDIA.forEach(function (src, i) {
+      var fig = document.createElement("figure");
+      fig.className = "chapter-os__card";
+      if (src.indexOf("halftone") !== -1 || i % 5 === 3) fig.classList.add("is-texture");
+      var img = document.createElement("img");
+      img.src = src;
+      img.alt = "";
+      img.decoding = "async";
+      img.loading = i < 6 ? "eager" : "lazy";
+      fig.appendChild(img);
+      stage.appendChild(fig);
+      cards.push(fig);
+    });
+
+    function applyMode(mode) {
+      stage.classList.toggle("is-stack", mode === "stack");
+      stage.classList.toggle("is-field", mode === "field");
+      cards.forEach(function (card, i) {
+        var pos = mode === "stack" ? OS_STACK[i] || OS_STACK[OS_STACK.length - 1] : osFieldPos(i, cards.length);
+        card.style.setProperty("--os-x", pos.x);
+        card.style.setProperty("--os-y", pos.y);
+        card.style.setProperty("--os-s", String(pos.s));
+        card.style.setProperty("--os-z", String(pos.z));
+        card.style.setProperty("--os-o", mode === "field" && i > 13 ? "0.55" : "1");
+        if (mode === "field") card.style.width = "min(11vw, 5.4rem)";
+        else card.style.width = "";
+      });
+    }
+
+    applyMode("stack");
+    if (REDUCED) return;
+    var mode = "stack";
+    osTimer = window.setInterval(function () {
+      mode = mode === "stack" ? "field" : "stack";
+      applyMode(mode);
+    }, 2200);
+  }
+
+  /* —— Grafiki Showcase 14 —— */
+  function initShow() {
+    var show = root.querySelector("[data-chapter-show]");
+    if (!show) return;
+    var stage = show.querySelector("[data-show-stage]");
+    var wordEl = show.querySelector("[data-show-word]");
+    if (!stage) return;
+    var tiles = [];
+    for (var i = 0; i < 8; i++) {
+      var fig = document.createElement("figure");
+      fig.className = "chapter-show__tile";
+      var img = document.createElement("img");
+      img.alt = "";
+      img.decoding = "async";
+      img.loading = i < 4 ? "eager" : "lazy";
+      fig.appendChild(img);
+      stage.appendChild(fig);
+      tiles.push(fig);
+    }
+
+    var layoutIdx = 0;
+    var wordIdx = 0;
+    var poolCursor = 0;
+
+    function paint() {
+      var layout = SHOW_LAYOUTS[layoutIdx];
+      if (wordEl) {
+        var w = SHOW_WORDS[wordIdx];
+        wordEl.textContent = w[lang()] || w.pl;
+      }
+      tiles.forEach(function (tile, i) {
+        var L = layout[i] || layout[0];
+        var src = SHOW_POOL[(poolCursor + i) % SHOW_POOL.length];
+        var img = tile.querySelector("img");
+        if (img) img.src = src;
+        tile.classList.toggle("is-portrait", !!L.portrait);
+        tile.classList.toggle("is-wide", !!L.wide);
+        tile.style.setProperty("--sh-x", L.x);
+        tile.style.setProperty("--sh-y", L.y);
+        tile.style.setProperty("--sh-w", L.w);
+        tile.style.setProperty("--sh-r", L.r);
+        tile.style.setProperty("--sh-z", String(L.z));
+      });
+    }
+
+    paint();
+    if (REDUCED) return;
+
+    showTimer = window.setInterval(function () {
+      show.classList.add("is-swap");
+      window.setTimeout(function () {
+        layoutIdx = (layoutIdx + 1) % SHOW_LAYOUTS.length;
+        wordIdx = (wordIdx + 1) % SHOW_WORDS.length;
+        poolCursor = (poolCursor + 3) % SHOW_POOL.length;
+        paint();
+        show.classList.remove("is-swap");
+      }, 280);
+    }, 2400);
+  }
+
   function setActive(index) {
     index = Math.max(0, Math.min(chapters.length - 1, index));
     if (index === activeIndex) return;
     activeIndex = index;
-    clearReel();
     chapters.forEach(function (chapter, i) {
       chapter.classList.toggle("is-active", i === index);
     });
     var chapter = chapters[index];
     applyTheme(chapter.getAttribute("data-theme") || "web");
-    syncCardVideos(chapter);
-    if (chapter.querySelector("[data-tile-reel-comp]")) {
-      playReelCompilation(chapter);
-    }
   }
 
   function stopCaseVideos() {
@@ -372,13 +589,11 @@
         expandStage.setAttribute("aria-hidden", "true");
         if (expandTrack) expandTrack.innerHTML = "";
         if (expandSourceMedia) expandSourceMedia.innerHTML = "";
-        if (activeIndex >= 0) syncCardVideos(chapters[activeIndex]);
       },
       REDUCED ? 0 : 420
     );
   }
 
-  /* IntersectionObserver — theme + media follow scroll */
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(
       function (entries) {
@@ -392,7 +607,6 @@
           }
         });
         if (!best) {
-          /* pick nearest to viewport center */
           var mid = window.innerHeight * 0.45;
           var nearest = 0;
           var nearestDist = Infinity;
@@ -495,6 +709,9 @@
   });
 
   document.body.classList.add("portfolio-page--tiles");
+  initLux();
+  initOs();
+  initShow();
   startVizShowLoop();
   setActive(0);
   window.setTimeout(function () {

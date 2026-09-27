@@ -178,21 +178,23 @@ body.portfolio-page--tiles .portfolio-theme-stage {
       rgba(0, 0, 0, 0.55) 100%
     );
 }
+.portfolio-chapter[data-theme="web"] .portfolio-chapter__bg .portfolio-tile__media::after,
 .portfolio-chapter[data-theme="graphics"] .portfolio-chapter__bg .portfolio-tile__media::after,
-.portfolio-chapter[data-theme="systems"] .portfolio-chapter__bg .portfolio-tile__media::after {
+.portfolio-chapter[data-theme="systems"] .portfolio-chapter__bg .portfolio-tile__media::after,
+.portfolio-chapter[data-theme="video"] .portfolio-chapter__bg .portfolio-tile__media::after {
   background:
     linear-gradient(
       90deg,
-      rgba(8, 8, 10, 0.62) 0%,
-      rgba(8, 8, 10, 0.28) 46%,
-      rgba(8, 8, 10, 0.08) 78%,
-      rgba(8, 8, 10, 0.2) 100%
+      rgba(8, 8, 10, 0.58) 0%,
+      rgba(8, 8, 10, 0.22) 46%,
+      rgba(8, 8, 10, 0.05) 78%,
+      rgba(8, 8, 10, 0.16) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      transparent 36%,
-      rgba(8, 8, 10, 0.55) 100%
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 34%,
+      rgba(8, 8, 10, 0.58) 100%
     );
 }
 .portfolio-chapter__bg .portfolio-tile__media video,
@@ -253,7 +255,242 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   outline: none;
 }
 
-/* Grafiki chapter — Showcase-style looping reel */
+/* —— Strony — New Luxury editorial —— */
+.chapter-lux {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #f7f7f5;
+  color: #111;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+}
+.chapter-lux__meta,
+.chapter-lux__foot {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 2.4rem);
+  left: 1.2rem;
+  font-size: clamp(0.62rem, 1.1vw, 0.78rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  pointer-events: none;
+}
+.chapter-lux__meta { top: 1.1rem; }
+.chapter-lux__foot { bottom: 1.1rem; left: 1.2rem; width: auto; }
+.chapter-lux__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.chapter-lux__word {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  margin: 0;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  transform-origin: center;
+  font-size: clamp(3.2rem, 9vw, 6.4rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  white-space: nowrap;
+  color: #111;
+  pointer-events: none;
+  transition:
+    transform 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.35s ease,
+    letter-spacing 0.55s ease;
+}
+.chapter-lux.is-stretch .chapter-lux__word {
+  transform: translate(-50%, -50%) rotate(-90deg) scaleY(8) scaleX(0.22);
+  letter-spacing: 0.35em;
+  opacity: 0.35;
+}
+.chapter-lux__shot {
+  --lux-x: 0%;
+  --lux-y: 0%;
+  --lux-w: 18%;
+  --lux-r: 0deg;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lux-w);
+  margin: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #ddd;
+  transform: translate(calc(-50% + var(--lux-x)), calc(-50% + var(--lux-y))) rotate(var(--lux-r));
+  transition:
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease,
+    width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+.chapter-lux__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.04);
+  transition: opacity 0.45s ease, transform 0.9s ease;
+}
+.chapter-lux__shot[data-lux-shot="0"] { --lux-x: -34vw; --lux-y: -26vh; --lux-w: min(18vw, 9.5rem); }
+.chapter-lux__shot[data-lux-shot="1"] { --lux-x: -30vw; --lux-y: 18vh; --lux-w: min(22vw, 11rem); aspect-ratio: 5 / 4; }
+.chapter-lux__shot[data-lux-shot="2"] { --lux-x: 8vw; --lux-y: 24vh; --lux-w: min(16vw, 8.5rem); }
+.chapter-lux__shot[data-lux-shot="3"] { --lux-x: 30vw; --lux-y: -28vh; --lux-w: min(15vw, 8rem); }
+.chapter-lux__shot[data-lux-shot="4"] { --lux-x: 32vw; --lux-y: 6vh; --lux-w: min(20vw, 10.5rem); aspect-ratio: 5 / 3; }
+
+/* —— Systemy — Bleed/Sanity content OS stack↔field —— */
+.chapter-os {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #efefef;
+}
+.chapter-os__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.chapter-os__card {
+  --os-x: 0%;
+  --os-y: 0%;
+  --os-s: 1;
+  --os-o: 1;
+  --os-z: 1;
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: min(22vw, 11rem);
+  aspect-ratio: 3 / 4;
+  margin: 0;
+  overflow: hidden;
+  background: #ddd;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  opacity: var(--os-o);
+  transform: translate(calc(-50% + var(--os-x)), calc(-50% + var(--os-y))) scale(var(--os-s));
+  z-index: var(--os-z);
+  transition:
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.55s ease,
+    width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+.chapter-os__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.chapter-os__card.is-texture {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #d8d8d8 0 2px,
+      #ececec 2px 4px
+    );
+}
+.chapter-os__card.is-texture img { opacity: 0.35; mix-blend-mode: multiply; }
+
+/* —— Grafiki — Showcase 14 scatter —— */
+.chapter-show {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #e6e6e6;
+  color: #111;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+}
+.chapter-show__meta,
+.chapter-show__foot {
+  position: absolute;
+  z-index: 4;
+  left: 1.1rem;
+  right: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: clamp(0.58rem, 1vw, 0.72rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.chapter-show__meta { top: 1rem; justify-content: flex-start; flex-wrap: wrap; }
+.chapter-show__meta span:nth-child(2) { margin-left: auto; }
+.chapter-show__foot { bottom: 1rem; justify-content: space-between; }
+.chapter-show__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.55rem;
+  background: #f5e54a;
+  color: #111;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.chapter-show__word {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 2;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  text-align: center;
+  font-size: clamp(3.4rem, 10vw, 7.2rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.88;
+  color: #111;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.55s ease;
+}
+.chapter-show.is-swap .chapter-show__word {
+  opacity: 0.15;
+  transform: translate(-50%, -50%) scale(1.04);
+  filter: blur(2px);
+}
+.chapter-show__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.chapter-show__tile {
+  --sh-x: 0%;
+  --sh-y: 0%;
+  --sh-w: 14%;
+  --sh-r: 0deg;
+  --sh-z: 1;
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: var(--sh-w);
+  margin: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #ccc;
+  transform: translate(calc(-50% + var(--sh-x)), calc(-50% + var(--sh-y))) rotate(var(--sh-r));
+  z-index: var(--sh-z);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease,
+    width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+.chapter-show__tile.is-portrait { aspect-ratio: 3 / 4; }
+.chapter-show__tile.is-wide { aspect-ratio: 5 / 3; }
+.chapter-show__tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Montaż chapter — previous Grafiki viz-show fan */
 .portfolio-tile__viz-show {
   position: absolute;
   inset: 0;
@@ -658,6 +895,20 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand__panel {
   .portfolio-tile__viz-card {
     width: min(34vw, 8.5rem);
   }
+  .chapter-lux__word {
+    font-size: clamp(2.6rem, 14vw, 4rem);
+  }
+  .chapter-lux__shot[data-lux-shot="0"] { --lux-x: -28vw; --lux-y: -22vh; --lux-w: min(28vw, 6.5rem); }
+  .chapter-lux__shot[data-lux-shot="1"] { --lux-x: -26vw; --lux-y: 16vh; --lux-w: min(32vw, 7.5rem); }
+  .chapter-lux__shot[data-lux-shot="2"] { --lux-x: 10vw; --lux-y: 22vh; --lux-w: min(26vw, 6rem); }
+  .chapter-lux__shot[data-lux-shot="3"] { --lux-x: 28vw; --lux-y: -24vh; --lux-w: min(24vw, 5.5rem); }
+  .chapter-lux__shot[data-lux-shot="4"] { --lux-x: 30vw; --lux-y: 4vh; --lux-w: min(30vw, 7rem); }
+  .chapter-show__word {
+    font-size: clamp(2.8rem, 16vw, 4.4rem);
+  }
+  .chapter-os__card {
+    width: min(34vw, 7.5rem);
+  }
   .portfolio-tile-expand__layout {
     flex-direction: column;
     height: auto;
@@ -692,6 +943,11 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand__panel {
 }
 
 html.reduce-motion .portfolio-tile__viz-card,
+html.reduce-motion .chapter-lux__word,
+html.reduce-motion .chapter-lux__shot,
+html.reduce-motion .chapter-os__card,
+html.reduce-motion .chapter-show__word,
+html.reduce-motion .chapter-show__tile,
 html.reduce-motion .portfolio-tile-expand,
 html.reduce-motion .portfolio-tile-expand__source,
 html.reduce-motion .portfolio-tile-expand__panel,

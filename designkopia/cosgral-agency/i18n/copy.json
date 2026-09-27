@@ -908,6 +908,34 @@
       "pl": "Grafiki",
       "en": "Visuals"
     },
+    "montaz_word": {
+      "pl": "Montaż",
+      "en": "Edit"
+    },
+    "lux_meta_a": {
+      "pl": "COSGRAL",
+      "en": "COSGRAL"
+    },
+    "lux_meta_b": {
+      "pl": "DIGITAL",
+      "en": "DIGITAL"
+    },
+    "lux_meta_c": {
+      "pl": "STUDIO",
+      "en": "STUDIO"
+    },
+    "lux_foot": {
+      "pl": "WEB",
+      "en": "WEB"
+    },
+    "show_meta": {
+      "pl": "Jitter Template",
+      "en": "Jitter Template"
+    },
+    "show_formats": {
+      "pl": "Output formats(5)",
+      "en": "Output formats(5)"
+    },
     "brands_label_side": {
       "pl": "Wybrane realizacje",
       "en": "Selected work"
