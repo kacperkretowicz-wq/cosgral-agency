@@ -250,7 +250,8 @@
     theme = theme || "web";
     pendingTheme = theme;
     document.body.setAttribute("data-tile-theme", theme);
-    document.body.classList.add("is-tile-bg-light");
+    /* Homepage dark WebGL is the shared ground under all chapters */
+    document.body.classList.remove("is-tile-bg-light");
     if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
       window.__portfolioTileBg.setTheme(theme);
     }

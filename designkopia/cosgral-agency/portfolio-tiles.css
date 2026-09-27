@@ -46,12 +46,10 @@ body.portfolio-page--tiles:not(.is-nav-menu-open) .subpage-cube-portal {
 body.portfolio-page--tiles.is-nav-menu-open .subpage-cube-portal {
   display: block !important;
 }
-body.portfolio-page--tiles .portfolio-home-ambient {
-  display: none !important;
-}
-body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-home-ambient.home-ambient,
-body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-home-ambient.home-ambient__blur,
-body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-home-ambient.home-ambient__shade {
+/* Homepage WebGL ambient — always under chapter animations */
+body.portfolio-page--tiles .portfolio-home-ambient.home-ambient,
+body.portfolio-page--tiles .portfolio-home-ambient.home-ambient__blur,
+body.portfolio-page--tiles .portfolio-home-ambient.home-ambient__shade {
   display: block !important;
 }
 body.portfolio-page--tiles .home-ambient {
@@ -124,7 +122,7 @@ body.portfolio-page--tiles #main {
   transition: opacity 0.45s ease;
 }
 body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-tile-bg {
-  opacity: 1;
+  opacity: 0;
 }
 
 .portfolio-systems-field {
@@ -136,11 +134,9 @@ body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-tile-bg {
     linear-gradient(160deg, #f7f7f9, #e8ebf2 55%, #dfe3ec);
 }
 
-/* Pin-matched chapter BGs own the canvas — mute fixed theme stage behind them */
+/* Per-theme layers off — homepage WebGL is the shared ground */
 body.portfolio-page--tiles .portfolio-theme-stage {
-  z-index: 1;
-  opacity: 0.18;
-  filter: saturate(0.7);
+  display: none !important;
 }
 
 /* —— Full-viewport horizontal chapters —— */
@@ -221,13 +217,6 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   width: 1.4rem;
   background: rgba(255, 255, 255, 0.95);
 }
-body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot {
-  background: rgba(0, 0, 0, 0.32);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
-}
-body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
-  background: rgba(0, 0, 0, 0.88);
-}
 .portfolio-chapters.is-expanded .portfolio-chapters__dots {
   opacity: 0;
   visibility: hidden;
@@ -243,7 +232,7 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  background: #0a0a0a;
+  background: transparent;
 }
 .portfolio-chapter__bg .portfolio-tile__media::after {
   content: "";
@@ -253,36 +242,17 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   pointer-events: none;
   background:
     linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.72) 0%,
-      rgba(0, 0, 0, 0.38) 42%,
-      rgba(0, 0, 0, 0.12) 72%,
-      rgba(0, 0, 0, 0.28) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.28) 0%,
-      transparent 32%,
-      rgba(0, 0, 0, 0.55) 100%
-    );
-}
-.portfolio-chapter[data-theme="web"] .portfolio-chapter__bg .portfolio-tile__media::after,
-.portfolio-chapter[data-theme="graphics"] .portfolio-chapter__bg .portfolio-tile__media::after,
-.portfolio-chapter[data-theme="systems"] .portfolio-chapter__bg .portfolio-tile__media::after,
-.portfolio-chapter[data-theme="video"] .portfolio-chapter__bg .portfolio-tile__media::after {
-  background:
-    linear-gradient(
       180deg,
       transparent 0%,
-      transparent 52%,
-      rgba(8, 8, 10, 0.42) 78%,
-      rgba(8, 8, 10, 0.72) 100%
+      transparent 48%,
+      rgba(0, 0, 0, 0.35) 76%,
+      rgba(0, 0, 0, 0.72) 100%
     ),
     linear-gradient(
       90deg,
-      rgba(8, 8, 10, 0.28) 0%,
-      rgba(8, 8, 10, 0.08) 38%,
-      transparent 68%
+      rgba(0, 0, 0, 0.22) 0%,
+      rgba(0, 0, 0, 0.06) 40%,
+      transparent 70%
     );
 }
 .portfolio-chapter__bg .portfolio-tile__media video,
@@ -348,8 +318,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #f7f7f5;
-  color: #111;
+  background: transparent;
+  color: #f5f5f5;
   font-family: var(--font-display, "Satoshi", sans-serif);
 }
 .chapter-lux__meta,
@@ -386,7 +356,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   letter-spacing: -0.05em;
   line-height: 0.9;
   white-space: nowrap;
-  color: #111;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
   pointer-events: none;
   transition:
     transform 0.55s cubic-bezier(0.65, 0, 0.35, 1),
@@ -437,7 +408,7 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #efefef;
+  background: transparent;
 }
 .chapter-os__stage {
   position: absolute;
@@ -496,8 +467,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #e6e6e6;
-  color: #111;
+  background: transparent;
+  color: #f5f5f5;
   font-family: var(--font-display, "Satoshi", sans-serif);
 }
 .chapter-show__meta,
@@ -539,7 +510,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   font-weight: 700;
   letter-spacing: -0.06em;
   line-height: 0.88;
-  color: #111;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.55s ease;
 }
@@ -590,8 +562,7 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 120% 80% at 50% 42%, #f7f5f2 0%, #ebe8e3 55%, #ddd8d1 100%);
+  background: transparent;
 }
 .portfolio-tile__viz-word {
   position: absolute;
@@ -607,7 +578,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
   letter-spacing: -0.07em;
   line-height: 0.82;
   text-align: center;
-  color: #111;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
