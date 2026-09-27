@@ -222,10 +222,11 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   background: rgba(255, 255, 255, 0.95);
 }
 body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot {
-  background: rgba(0, 0, 0, 0.22);
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
-  background: rgba(0, 0, 0, 0.82);
+  background: rgba(0, 0, 0, 0.88);
 }
 .portfolio-chapters.is-expanded .portfolio-chapters__dots {
   opacity: 0;
