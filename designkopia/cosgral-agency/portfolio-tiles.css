@@ -123,8 +123,11 @@ body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-tile-bg {
     linear-gradient(160deg, #f7f7f9, #e8ebf2 55%, #dfe3ec);
 }
 
+/* Pin-matched chapter BGs own the canvas — mute fixed theme stage behind them */
 body.portfolio-page--tiles .portfolio-theme-stage {
   z-index: 1;
+  opacity: 0.18;
+  filter: saturate(0.7);
 }
 
 /* —— Vertical chapters —— */
