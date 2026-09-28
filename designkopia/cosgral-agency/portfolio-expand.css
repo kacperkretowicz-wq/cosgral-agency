@@ -718,7 +718,7 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
 .expand-gallery--video .reels-masonry__item.is-reel-focus video,
 .expand-gallery--video .reels-masonry__item:hover video,
 .expand-gallery--video .reels-masonry__item:focus-visible video {
-  filter: grayscale(0);
+  filter: grayscale(0) contrast(1.04) !important;
 }
 .expand-gallery--video.is-ready .reels-masonry__item.is-reel-focus {
   transform: scale(1.14);
