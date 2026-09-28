@@ -78,26 +78,28 @@
     },
   ];
 
-  /* Systemy — only systems / automation chapter stills + system case art */
+  /* Systemy — unique B&W tiles only (no repeats, no color / SVG case dupes) */
   var OS_MEDIA = [
-    STILL + "systems/crm-0-5.jpg",
-    STILL + "systems/crm-1-5.jpg",
-    STILL + "systems/crm-2-5.jpg",
-    STILL + "systems/crm-3-5.jpg",
-    STILL + "systems/auto-0-5.jpg",
-    STILL + "systems/auto-1-5.jpg",
-    STILL + "systems/auto-2-5.jpg",
-    STILL + "systems/auto-3-5.jpg",
-    STILL + "systems/app-0-5.jpg",
-    STILL + "systems/app-1-5.jpg",
-    STILL + "systems/app-2-5.jpg",
-    STILL + "systems/app-3-5.jpg",
-    "assets/cases/telforceone-crm.svg",
-    "assets/cases/telforceone-code39.svg",
-    "assets/cases/telforceone-forecast.svg",
-    "assets/cases/shelfsync.svg",
-    "assets/cases/northline-crm.svg",
-    "assets/cases/parcel-co.svg",
+    STILL + "systems/bw/ui-ai-agent-bw.jpg",
+    STILL + "systems/bw/ui-forecast-bw.jpg",
+    STILL + "systems/bw/ui-invoice-flow-bw.jpg",
+    STILL + "systems/bw/ui-code-keyboard-bw.jpg",
+    STILL + "systems/bw/ui-crm-map-bw.jpg",
+    STILL + "systems/bw/ui-barcode-bw.jpg",
+    STILL + "systems/bw/ui-chatbot-bw.jpg",
+    STILL + "systems/bw/ui-price-monitor-bw.jpg",
+    STILL + "systems/bw/still-crm0-bw.jpg",
+    STILL + "systems/bw/still-crm1-bw.jpg",
+    STILL + "systems/bw/still-crm2-bw.jpg",
+    STILL + "systems/bw/still-crm3-bw.jpg",
+    STILL + "systems/bw/still-auto0-bw.jpg",
+    STILL + "systems/bw/still-auto1-bw.jpg",
+    STILL + "systems/bw/still-auto2-bw.jpg",
+    STILL + "systems/bw/still-auto3-bw.jpg",
+    STILL + "systems/bw/still-app0-bw.jpg",
+    STILL + "systems/bw/still-app1-bw.jpg",
+    STILL + "systems/bw/still-app2-bw.jpg",
+    STILL + "systems/bw/still-app3-bw.jpg",
   ];
 
   var SHOW_WORDS = [
@@ -182,11 +184,11 @@
   ];
 
   function osFieldPos(i, n) {
-    var cols = 6;
+    var cols = 5;
     var row = Math.floor(i / cols);
     var col = i % cols;
-    var x = (col - (cols - 1) / 2) * 15 + ((row % 2) * 5 - 2.5);
-    var y = (row - 1.2) * 20 + ((col % 2) * 4 - 2);
+    var x = (col - (cols - 1) / 2) * 16 + ((row % 2) * 4 - 2);
+    var y = (row - 1.4) * 18 + ((col % 3) * 3 - 3);
     return { x: x + "vw", y: y + "vh", s: 1, z: 1 + (n - i) };
   }
 
@@ -197,17 +199,19 @@
   function applyTheme(theme) {
     theme = theme || "web";
     pendingTheme = theme;
+    /* Keep chapter key for copy/logic, but force homepage dark ground always */
     document.body.setAttribute("data-tile-theme", theme);
-    /* Homepage dark WebGL is the shared ground under all chapters */
-    document.body.classList.remove("is-tile-bg-light");
+    document.body.setAttribute("data-tile-ground", "home");
+    document.body.classList.remove("is-tile-bg-light", "is-home-ambient-light");
+    document.documentElement.classList.remove("is-home-ambient-light");
     if (window.__portfolioTileBg && window.__portfolioTileBg.setTheme) {
-      window.__portfolioTileBg.setTheme(theme);
+      window.__portfolioTileBg.setTheme("web");
     }
     if (window.__portfolioThemeLayers && window.__portfolioThemeLayers.setActiveTheme) {
-      window.__portfolioThemeLayers.setActiveTheme(theme);
+      window.__portfolioThemeLayers.setActiveTheme("web");
     }
     window.dispatchEvent(
-      new CustomEvent("portfolio-tile-theme", { detail: { theme: theme } })
+      new CustomEvent("portfolio-tile-theme", { detail: { theme: "web" } })
     );
   }
 
@@ -215,32 +219,9 @@
     /* Chapter BGs are now CSS/JS compositions — no full-bleed card videos. */
   }
 
-  /* —— Montaż viz fan (former Grafiki) —— */
+  /* Montaż diagonal belt is driven by portfolio-montaz.js (#reels-tiles) */
   function startVizShowLoop() {
-    if (vizShowTimer || REDUCED) return;
-    var chapter = chapters.find(function (t) {
-      return !!t.querySelector("[data-tile-viz-show]");
-    });
-    if (!chapter) return;
-    var rootViz = chapter.querySelector("[data-tile-viz-show]");
-    var cards = Array.prototype.slice.call(rootViz.querySelectorAll("[data-viz-card]"));
-    if (cards.length < 3) return;
-    var n = cards.length;
-    var cursor = 0;
-
-    function apply() {
-      cards.forEach(function (card, i) {
-        var rel = (i - cursor + n) % n;
-        if (rel <= 4) card.setAttribute("data-viz-slot", String(rel));
-        else card.setAttribute("data-viz-slot", "out");
-      });
-    }
-
-    apply();
-    vizShowTimer = window.setInterval(function () {
-      cursor = (cursor + 1) % n;
-      apply();
-    }, 1100);
+    /* no-op — reels belt scrolls continuously */
   }
 
   /* —— Strony New Luxury: tiles exit L / enter R, word rotateY flat —— */
@@ -315,7 +296,7 @@
     restartLux();
   }
 
-  /* —— Systemy OS stack↔field —— */
+  /* —— Systemy: unique B&W scattered field (no stack toggle / no repeats) —— */
   function initOs() {
     var stage = root.querySelector("[data-os-stage]");
     if (!stage) return;
@@ -324,39 +305,50 @@
       OS_MEDIA.forEach(function (src, i) {
         var fig = document.createElement("figure");
         fig.className = "chapter-os__card";
+        fig.setAttribute("data-os-card", String(i));
         var img = document.createElement("img");
         img.src = src;
         img.alt = "";
         img.decoding = "async";
-        img.loading = i < 6 ? "eager" : "lazy";
+        img.loading = i < 8 ? "eager" : "lazy";
         fig.appendChild(img);
         stage.appendChild(fig);
         cards.push(fig);
       });
     }
 
-    function applyMode(mode) {
-      stage.classList.toggle("is-stack", mode === "stack");
-      stage.classList.toggle("is-field", mode === "field");
+    function applyField() {
+      stage.classList.add("is-field");
+      stage.classList.remove("is-stack");
       cards.forEach(function (card, i) {
-        var pos = mode === "stack" ? OS_STACK[i] || OS_STACK[OS_STACK.length - 1] : osFieldPos(i, cards.length);
+        var pos = osFieldPos(i, cards.length);
         card.style.setProperty("--os-x", pos.x);
         card.style.setProperty("--os-y", pos.y);
-        card.style.setProperty("--os-s", String(pos.s));
+        card.style.setProperty("--os-s", String(0.92 + (i % 3) * 0.04));
         card.style.setProperty("--os-z", String(pos.z));
-        card.style.setProperty("--os-o", mode === "field" && i > 13 ? "0.65" : "1");
+        card.style.setProperty("--os-o", "1");
+        card.style.setProperty("--os-r", ((i % 5) - 2) * 2 + "deg");
       });
     }
 
-    applyMode("stack");
+    applyField();
     if (REDUCED) return;
-    var mode = "stack";
+    /* gentle float — positions stay unique, no mode swap that feels like repeats */
     restartOs = function () {
       if (osTimer || REDUCED || loopsPaused) return;
+      var t = 0;
       osTimer = window.setInterval(function () {
-        mode = mode === "stack" ? "field" : "stack";
-        applyMode(mode);
-      }, 2200);
+        t += 1;
+        cards.forEach(function (card, i) {
+          var base = osFieldPos(i, cards.length);
+          var ox = parseFloat(base.x) || 0;
+          var oy = parseFloat(base.y) || 0;
+          var wobbleX = Math.sin(t * 0.35 + i * 0.7) * 1.1;
+          var wobbleY = Math.cos(t * 0.28 + i * 0.55) * 1.2;
+          card.style.setProperty("--os-x", ox + wobbleX + "vw");
+          card.style.setProperty("--os-y", oy + wobbleY + "vh");
+        });
+      }, 900);
     };
     restartOs();
   }
@@ -458,6 +450,11 @@
     if (nextBtn) nextBtn.disabled = index >= chapters.length - 1;
     var chapter = chapters[index];
     applyTheme(chapter.getAttribute("data-theme") || "web");
+    /* Montaż belt must scroll while the chapter is active (IO can miss horizontal slides) */
+    if (chapter && chapter.id === "montaz") {
+      var belt = chapter.querySelector("#reels-tiles");
+      if (belt) belt.classList.add("is-ready");
+    }
   }
 
   function scrollToIndex(index, behavior) {
