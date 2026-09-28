@@ -164,6 +164,10 @@
 
   function isInteractiveTarget(el) {
     if (!el || !el.closest) return false;
+    /* Detail popup: only Visit stays interactive — anywhere else dismisses to deck */
+    if (webDetailOpen) {
+      return !!el.closest("a.expand-web-visit, .expand-web-visit");
+    }
     return !!el.closest(
       "a, button, video, .expand-deck__card, .expand-web-panel, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__dot, .sys-fan__nav, .sys-fan__copy, .sys-fan__more, .sys-fan__article, .sys-fan__stage"
     );
@@ -248,7 +252,10 @@
     if (prev) prev.disabled = n <= 0;
     if (next) next.disabled = n >= deckCards.length - 1;
     var arrows = bodyEl.querySelector(".expand-deck__arrows");
-    if (arrows) arrows.style.opacity = detail ? "0.35" : "1";
+    if (arrows) {
+      arrows.style.opacity = detail ? "0.35" : "1";
+      arrows.style.pointerEvents = detail ? "none" : "";
+    }
   }
 
   function setDeckIndex(next) {
@@ -291,11 +298,21 @@
     };
   }
 
+  function removeWebVisitCta() {
+    var visit = bodyEl.querySelector(".expand-web-visit");
+    if (!visit) return;
+    visit.classList.remove("is-ready");
+    window.setTimeout(function () {
+      if (visit.parentNode) visit.parentNode.removeChild(visit);
+    }, 420);
+  }
+
   function closeWebCaseDetail() {
     var deck = bodyEl.querySelector(".expand-deck");
     var panel = bodyEl.querySelector(".expand-web-panel");
     if (!deck) {
       webDetailOpen = false;
+      removeWebVisitCta();
       return;
     }
     deck.classList.remove("is-case-detail");
@@ -308,6 +325,7 @@
         if (panel.parentNode) panel.parentNode.removeChild(panel);
       }, 420);
     }
+    removeWebVisitCta();
     webDetailOpen = false;
     layoutDeck();
   }
@@ -356,15 +374,23 @@
           copyWrap.appendChild(p);
         });
         panel.appendChild(copyWrap);
+        /* Visit CTA sits under the site tile, not in the copy panel */
+        removeWebVisitCta();
         if (data.visitHref) {
           var visit = document.createElement("a");
-          visit.className = "glass-btn expand-web-panel__visit";
+          visit.className = "glass-btn expand-web-visit";
           visit.href = data.visitHref;
           visit.target = "_blank";
           visit.rel = "noopener noreferrer";
           visit.setAttribute("data-no-transition", "");
           visit.textContent = data.visitLabel || "Odwiedź stronę";
-          panel.appendChild(visit);
+          visit.addEventListener("click", function (e) {
+            e.stopPropagation();
+          });
+          bodyEl.appendChild(visit);
+          requestAnimationFrame(function () {
+            visit.classList.add("is-ready");
+          });
         }
       })
       .catch(function () {
@@ -404,6 +430,8 @@
       body.querySelector(".expand-deck__lead").textContent = item.lead;
       card.appendChild(body);
       card.addEventListener("click", function () {
+        /* Detail dismiss is handled by the capture click on document/stage */
+        if (webDetailOpen) return;
         var i = WEB_CASES.indexOf(item);
         if (Math.round(deckIndex) === i) openWebCaseDetail(item, card);
         else setDeckIndex(i);
@@ -1472,6 +1500,11 @@
 
   stage.addEventListener("click", function (e) {
     if (!expandedKey) return;
+    if (webDetailOpen) {
+      if (e.target.closest && e.target.closest("a.expand-web-visit, .expand-web-visit")) return;
+      closeWebCaseDetail();
+      return;
+    }
     if (isInteractiveTarget(e.target)) return;
     close();
   });
@@ -1481,8 +1514,16 @@
       if (!expandedKey || closing) return;
       if (!stage.classList.contains("is-open")) return;
       if (document.body.classList.contains("is-sys-fan-dragging")) return;
-      if (isInteractiveTarget(e.target)) return;
       if (e.target.closest && e.target.closest(".site-nav, .nav-overlay")) return;
+      /* Detail → lista: klik gdziekolwiek (poza Odwiedź) zamyka popup, nie katalog */
+      if (webDetailOpen) {
+        if (e.target.closest && e.target.closest("a.expand-web-visit, .expand-web-visit")) return;
+        e.preventDefault();
+        e.stopPropagation();
+        closeWebCaseDetail();
+        return;
+      }
+      if (isInteractiveTarget(e.target)) return;
       close();
     },
     true
@@ -1495,7 +1536,7 @@
       close();
       return;
     }
-    if (expandedKey === "web") {
+    if (expandedKey === "web" && !webDetailOpen) {
       if (e.key === "ArrowRight") {
         e.preventDefault();
         setDeckIndex(Math.round(deckIndex) + 1);
@@ -1511,6 +1552,15 @@
     "wheel",
     function (e) {
       if (expandedKey !== "web" || !deckCards.length) return;
+      /* Popup z opisem — zablokuj coverflow; panel opisu może scrollować w pionie */
+      if (webDetailOpen) {
+        var panel = bodyEl.querySelector(".expand-web-panel");
+        var overPanel = panel && e.target && panel.contains(e.target);
+        if (!overPanel || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) {
+          e.preventDefault();
+        }
+        return;
+      }
       var delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if (Math.abs(delta) < 8) return;
       e.preventDefault();

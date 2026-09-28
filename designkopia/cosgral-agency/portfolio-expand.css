@@ -281,15 +281,31 @@ body.is-tile-expanded .site-nav {
   line-height: 1.62;
   color: rgba(255, 255, 255, 0.78);
 }
-.expand-web-panel__visit {
-  display: inline-flex;
-  margin-top: 1.25rem;
-  justify-content: center;
-}
 .expand-web-panel__loading {
   margin: 0;
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.9rem;
+}
+/* Visit CTA under the parked site tile (left of description) */
+.expand-web-visit {
+  position: absolute;
+  z-index: 9;
+  left: calc(50% - min(28vw, 12rem));
+  top: calc(50% + min(46vw, 28rem) * 0.2875 + 0.85rem);
+  transform: translate3d(-50%, 0.4rem, 0);
+  display: inline-flex;
+  justify-content: center;
+  min-width: 10.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.expand-web-visit.is-ready {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(-50%, 0, 0);
 }
 @media (max-width: 820px) {
   .expand-deck.is-case-detail .expand-deck__card.is-detail-hero {
@@ -308,6 +324,15 @@ body.is-tile-expanded .site-nav {
   }
   .expand-deck.is-case-detail .expand-deck__card.is-detail-hero {
     transform: translate3d(-50%, calc(-50% - 12vh), 0) rotateY(0deg) scale(0.78) !important;
+  }
+  .expand-web-visit {
+    left: 50%;
+    top: auto;
+    bottom: max(7.5rem, calc(38svh + 1.25rem));
+    transform: translate3d(-50%, 0.35rem, 0);
+  }
+  .expand-web-visit.is-ready {
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
