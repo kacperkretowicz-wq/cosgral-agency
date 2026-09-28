@@ -308,11 +308,10 @@
           articleEl.style.maxHeight = full + "px";
           /* slow scroll so the expanded block slides into view under the fan */
           var scroller = getScrollParent();
-          var head = root.querySelector("[data-sys-fan-head]");
-          var targetTop = Math.max(
-            0,
-            (head ? head.offsetHeight : copyEl ? copyEl.offsetTop + copyEl.offsetHeight : stage.offsetHeight) -
-              Math.min(120, window.innerHeight * 0.14)
+          /* Keep fan+copy sticky in view; ease just far enough to reveal article start */
+          var targetTop = Math.min(
+            160,
+            Math.max(48, Math.round(window.innerHeight * 0.12))
           );
           if (reduced) {
             scroller.scrollTop = targetTop;
@@ -435,11 +434,9 @@
         if (articleOpen && !articleLoading) {
           /* already open for this case — soft scroll to it */
           var scroller = getScrollParent();
-          var head = root.querySelector("[data-sys-fan-head]");
-          var targetTop = Math.max(
-            0,
-            (head ? head.offsetHeight : copyEl.offsetTop + copyEl.offsetHeight) -
-              Math.min(120, window.innerHeight * 0.14)
+          var targetTop = Math.min(
+            160,
+            Math.max(48, Math.round(window.innerHeight * 0.12))
           );
           scroller.scrollTo({ top: targetTop, behavior: reduced ? "auto" : "smooth" });
           return;

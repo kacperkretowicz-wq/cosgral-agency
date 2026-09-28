@@ -266,8 +266,7 @@ body.is-tile-expanded .site-nav {
   position: relative;
   inset: auto;
   min-height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: block;
   touch-action: pan-y;
 }
 .expand-systems .sys-fan__head {
@@ -278,36 +277,33 @@ body.is-tile-expanded .site-nav {
   right: auto;
   bottom: auto;
   z-index: 6;
-  flex: 0 0 auto;
   width: 100%;
-  min-height: min(72vh, 38rem);
+  height: min(58vh, 32rem);
+  overflow: hidden;
   background: linear-gradient(
     180deg,
-    rgba(4, 4, 4, 0.92) 0%,
-    rgba(4, 4, 4, 0.78) 70%,
-    rgba(4, 4, 4, 0.35) 100%
+    rgba(4, 4, 4, 0.96) 0%,
+    rgba(4, 4, 4, 0.88) 78%,
+    rgba(4, 4, 4, 0.55) 100%
   );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: 50% 32%;
 }
 .expand-systems .sys-fan__stage {
   touch-action: none;
+  height: 54%;
 }
 .expand-systems .sys-fan--detail {
-  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+  /* No persistent transform on fan root — it breaks position:sticky */
+  transition: opacity 0.4s ease;
 }
-.expand-systems .sys-fan--detail.is-entering,
-.expand-systems .sys-fan--detail.is-from-catalog {
+.expand-systems .sys-fan--detail.is-entering .sys-fan__head,
+.expand-systems .sys-fan--detail.is-from-catalog .sys-fan__head {
   /* Match large catalog fan, then settle so copy fits under arc */
   transform: translate3d(0, 3vh, 0) scale(1.35);
-  transform-origin: 50% 32%;
 }
-.expand-systems .sys-fan--detail.is-settled {
-  transform: translate3d(0, -1vh, 0) scale(1);
-  transform-origin: 50% 32%;
-}
-.expand-systems .sys-fan__stage {
-  height: 54%;
+.expand-systems .sys-fan--detail.is-settled .sys-fan__head {
+  transform: none;
 }
 .expand-systems .sys-fan__arc {
   top: 40%;
@@ -457,7 +453,7 @@ body.is-tile-expanded .site-nav {
 }
 @media (max-width: 720px) {
   .expand-systems .sys-fan__head {
-    min-height: min(68vh, 34rem);
+    height: min(54vh, 28rem);
   }
   .sys-fan__case .case-viz-tile {
     grid-template-columns: 1fr;
