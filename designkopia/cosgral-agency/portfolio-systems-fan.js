@@ -356,11 +356,11 @@
     function layout() {
       if (destroyed) return;
       var nearest = clampIndex(Math.round(index), n);
-      /* Wider / flatter arc so ~2× cards leave a hollow for copy */
-      var span = mode === "catalog" ? 158 : 136;
-      var step = span / Math.max(9, n - 1);
-      var radiusX = mode === "catalog" ? 54 : 48;
-      var radiusY = mode === "catalog" ? 24 : 12;
+      /* Wide arc — side tiles bleed past screen edges */
+      var span = mode === "catalog" ? 175 : 168;
+      var step = span / Math.max(8, n - 1);
+      var radiusX = mode === "catalog" ? 68 : 72;
+      var radiusY = mode === "catalog" ? 22 : 14;
       var baseScale = 1;
 
       cards.forEach(function (card, i) {
@@ -372,9 +372,9 @@
         var x = Math.sin(ang) * radiusX;
         var y = (1 - Math.cos(ang)) * radiusY;
         var depth = Math.cos(ang);
-        var s = baseScale * (0.7 + 0.3 * depth);
-        var o = 0.22 + 0.78 * Math.pow(Math.max(0, depth), 1.1);
-        var rot = angDeg * 0.85;
+        var s = baseScale * (0.62 + 0.38 * depth);
+        var o = Math.max(0, 0.95 * Math.pow(Math.max(0, depth), 1.4));
+        var rot = angDeg * 0.9;
         card.style.transform =
           "translate3d(calc(-50% + " +
           x.toFixed(3) +
@@ -385,7 +385,9 @@
           "deg) scale(" +
           s.toFixed(3) +
           ")";
-        card.style.opacity = String(Math.max(0.16, Math.min(1, o)));
+        card.style.opacity = String(Math.max(0, Math.min(1, o)));
+        card.style.visibility = o < 0.04 ? "hidden" : "visible";
+        card.style.pointerEvents = o < 0.12 ? "none" : "auto";
         card.style.zIndex = String(Math.round(20 + depth * 30));
         card.classList.toggle("is-front", i === nearest);
         card.classList.toggle("is-side", Math.abs(raw) > 0.55);

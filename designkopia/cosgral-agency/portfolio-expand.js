@@ -22,6 +22,7 @@
   var closing = false;
   var activeGhosts = [];
   var systemsDetailFan = null;
+  var openChapter = null;
 
   var WEB_CASES = [
     {
@@ -724,8 +725,9 @@
   function open(key, chapter) {
     if (!key || expandedKey === key || closing) return;
     expandedKey = key;
+    openChapter = chapter || null;
     clearBody();
-    root.classList.remove("is-morphing");
+    root.classList.remove("is-morphing", "is-systems-exiting");
     setOpen(true);
     dispatch("portfolio-expand-open", { key: key });
     if (key === "web") openWeb(chapter);
@@ -734,28 +736,174 @@
     else if (key === "graphics") openGraphics(chapter);
   }
 
+  function finishClose(prev, resumeIdx) {
+    expandedKey = null;
+    closing = false;
+    openChapter = null;
+    setOpen(false);
+    stage.classList.remove("is-closing");
+    root.classList.remove("is-morphing", "is-systems-detail", "is-systems-exiting");
+    clearBody();
+    var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
+    if (catalog && resumeIdx != null) {
+      catalog.setIndex(resumeIdx);
+      catalog.resume();
+    }
+    dispatch("portfolio-expand-close", { key: prev });
+  }
+
+  /* Reverse of openSystems: settle → catalog scale, copy out, catalog back */
+  function closeSystemsReverse(resumeIdx) {
+    var mount = systemsDetailFan && systemsDetailFan.root;
+    if (systemsDetailFan && systemsDetailFan.collapseArticle) {
+      systemsDetailFan.collapseArticle(true);
+    }
+    root.classList.add("is-systems-exiting");
+    if (mount && !REDUCED) {
+      mount.classList.remove("is-settled", "is-article-open");
+      mount.classList.add("is-exiting");
+      void mount.offsetWidth;
+      mount.classList.add("is-from-catalog");
+      window.setTimeout(function () {
+        finishClose("systems", resumeIdx);
+      }, 1500);
+      return;
+    }
+    stage.classList.add("is-closing");
+    window.setTimeout(function () {
+      finishClose("systems", resumeIdx);
+    }, REDUCED ? 0 : 640);
+  }
+
+  /* Reverse of openWeb: deck → fly back into chapter hero shot */
+  function closeWebReverse() {
+    var chapter = openChapter;
+    var front = deckCards[Math.round(deckIndex)];
+    var hero = chapter ? pickHeroShot(chapter) : null;
+    var deck = bodyEl.querySelector(".expand-deck");
+    if (front && hero && !REDUCED) {
+      var fr = front.getBoundingClientRect();
+      var fly = document.createElement("figure");
+      fly.className = "expand-fly";
+      fly.style.left = fr.left + "px";
+      fly.style.top = fr.top + "px";
+      fly.style.width = fr.width + "px";
+      fly.style.height = fr.height + "px";
+      fly.style.borderRadius = "1.15rem";
+      var img = document.createElement("img");
+      var media = front.querySelector("video, img");
+      img.src = (media && (media.currentSrc || media.poster || media.src)) || hero.src;
+      fly.appendChild(img);
+      document.body.appendChild(fly);
+      activeGhosts.push(fly);
+      if (deck) {
+        deck.style.transition = "opacity 0.45s ease";
+        deck.style.opacity = "0";
+      }
+      root.classList.remove("is-morphing");
+      requestAnimationFrame(function () {
+        morphGhostToRect(fly, hero.rect, { radius: getComputedStyle(hero.img).borderRadius || "0.55rem" });
+      });
+      window.setTimeout(function () {
+        fly.style.opacity = "0";
+        finishClose("web", null);
+      }, 1450);
+      return;
+    }
+    stage.classList.add("is-closing");
+    root.classList.remove("is-morphing");
+    window.setTimeout(function () {
+      finishClose("web", null);
+    }, REDUCED ? 0 : 640);
+  }
+
+  /* Reverse of openVideo: gallery slides down, chapter belt returns */
+  function closeVideoReverse() {
+    var gallery = bodyEl.querySelector(".expand-gallery");
+    if (gallery && !REDUCED) {
+      gallery.classList.remove("is-ready", "is-slide-up");
+      gallery.style.transition =
+        "opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.35s cubic-bezier(0.22, 1, 0.36, 1)";
+      gallery.style.opacity = "0";
+      gallery.style.transform = "translate3d(0, 28%, 0)";
+      root.classList.remove("is-morphing");
+      window.setTimeout(function () {
+        finishClose("video", null);
+      }, 1400);
+      return;
+    }
+    stage.classList.add("is-closing");
+    root.classList.remove("is-morphing");
+    window.setTimeout(function () {
+      finishClose("video", null);
+    }, REDUCED ? 0 : 640);
+  }
+
+  /* Reverse of openGraphics: masonry fades, fly back to scatter hero */
+  function closeGraphicsReverse() {
+    var chapter = openChapter;
+    var gallery = bodyEl.querySelector(".expand-gallery");
+    var first = gallery && gallery.querySelector(".graphics-masonry__item");
+    var tiles = chapter ? captureTiles(".chapter-show__tile", chapter) : [];
+    var hero = tiles[Math.floor(tiles.length / 2)] || tiles[0];
+    if (first && hero && !REDUCED) {
+      var srcRect = first.getBoundingClientRect();
+      var fly = placeGhost(
+        {
+          rect: srcRect,
+          src: (first.querySelector("img") && first.querySelector("img").src) || hero.src,
+        },
+        "is-hero"
+      );
+      if (gallery) {
+        gallery.style.transition = "opacity 0.55s ease";
+        gallery.style.opacity = "0";
+      }
+      root.classList.remove("is-morphing");
+      requestAnimationFrame(function () {
+        morphGhostToRect(fly, hero.rect, { radius: "0.55rem" });
+      });
+      window.setTimeout(function () {
+        if (fly) fly.style.opacity = "0";
+        finishClose("graphics", null);
+      }, 1450);
+      return;
+    }
+    stage.classList.add("is-closing");
+    root.classList.remove("is-morphing");
+    window.setTimeout(function () {
+      finishClose("graphics", null);
+    }, REDUCED ? 0 : 640);
+  }
+
   function close() {
     if (!expandedKey || closing) return;
     closing = true;
     var prev = expandedKey;
     var resumeIdx = systemsDetailFan ? systemsDetailFan.getIndex() : null;
+    if (prev === "systems") {
+      closeSystemsReverse(resumeIdx);
+      return;
+    }
+    if (prev === "web") {
+      closeWebReverse();
+      return;
+    }
+    if (prev === "video") {
+      closeVideoReverse();
+      return;
+    }
+    if (prev === "graphics") {
+      closeGraphicsReverse();
+      return;
+    }
     stage.classList.add("is-closing");
     root.classList.remove("is-morphing", "is-systems-detail");
     activeGhosts.forEach(function (g) {
       if (g) g.style.opacity = "0";
     });
-    setTimeout(function () {
-      expandedKey = null;
-      closing = false;
-      setOpen(false);
-      stage.classList.remove("is-closing");
-      clearBody();
-      var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
-      if (catalog && resumeIdx != null) {
-        catalog.setIndex(resumeIdx);
-        catalog.resume();
-      }
-      dispatch("portfolio-expand-close", { key: prev });
+    window.setTimeout(function () {
+      finishClose(prev, resumeIdx);
     }, REDUCED ? 0 : 640);
   }
 
