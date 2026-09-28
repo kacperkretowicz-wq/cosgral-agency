@@ -198,6 +198,8 @@
     var articleOpen = false;
     var articleLoading = false;
     var scrollParent = null;
+    var articleWheelLock = 0;
+    var ARTICLE_WHEEL_MS = 780;
 
     root.classList.add("sys-fan");
     root.classList.toggle("sys-fan--catalog", mode === "catalog");
@@ -280,6 +282,68 @@
       return scrollParent;
     }
 
+    function setCaseSnap(on) {
+      var scroller = getScrollParent();
+      if (!scroller || scroller === root) return;
+      scroller.classList.toggle("is-case-snap", !!on);
+    }
+
+    function stickyArticlePad() {
+      var head = root.querySelector("[data-sys-fan-head]");
+      if (!head) return 16;
+      return Math.round(head.getBoundingClientRect().height) + 16;
+    }
+
+    function getArticleSnapTargets() {
+      if (!articleEl) return [];
+      var caseRoot = articleEl.querySelector(".sys-fan__case");
+      if (!caseRoot) return [];
+      return Array.prototype.slice.call(caseRoot.querySelectorAll(".case-viz-tile"));
+    }
+
+    function targetScrollTop(el, scroller, pad) {
+      var sRect = scroller.getBoundingClientRect();
+      var r = el.getBoundingClientRect();
+      return Math.max(0, r.top - sRect.top + scroller.scrollTop - pad);
+    }
+
+    function snapArticleBy(dir) {
+      var scroller = getScrollParent();
+      var tiles = getArticleSnapTargets();
+      if (!scroller || !tiles.length) return;
+      var pad = stickyArticlePad();
+      var scrollTop = scroller.scrollTop;
+      var maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+      var nextTop = null;
+
+      if (dir > 0) {
+        for (var i = 0; i < tiles.length; i++) {
+          var down = targetScrollTop(tiles[i], scroller, pad);
+          if (down > scrollTop + 28) {
+            nextTop = down;
+            break;
+          }
+        }
+        if (nextTop == null) nextTop = maxScroll;
+      } else {
+        for (var j = tiles.length - 1; j >= 0; j--) {
+          var up = targetScrollTop(tiles[j], scroller, pad);
+          if (up < scrollTop - 28) {
+            nextTop = up;
+            break;
+          }
+        }
+        if (nextTop == null) nextTop = 0;
+      }
+
+      nextTop = Math.max(0, Math.min(maxScroll, nextTop));
+      if (Math.abs(nextTop - scrollTop) < 2) return;
+      scroller.scrollTo({
+        top: nextTop,
+        behavior: reduced ? "auto" : "smooth",
+      });
+    }
+
     function restoreNav() {
       if (!navEl || !root) return;
       if (navEl.parentNode !== root) root.appendChild(navEl);
@@ -302,6 +366,7 @@
       articleLoading = false;
       root.classList.remove("is-article-open");
       articleEl.classList.remove("is-open");
+      setCaseSnap(false);
       restoreNav();
       if (immediate) {
         articleEl.hidden = true;
@@ -354,6 +419,7 @@
           articleOpen = true;
           root.classList.add("is-article-open");
           articleEl.classList.add("is-open");
+          setCaseSnap(true);
           articleEl.style.maxHeight = "0px";
           void articleEl.offsetHeight;
           var full = articleEl.scrollHeight;
@@ -362,6 +428,7 @@
           var scroller = getScrollParent();
           if (scroller) scroller.scrollTop = 0;
           articleLoading = false;
+          articleWheelLock = 0;
           window.setTimeout(function () {
             if (articleOpen) articleEl.style.maxHeight = "none";
           }, reduced ? 0 : 1400);
@@ -376,6 +443,7 @@
           articleOpen = true;
           root.classList.add("is-article-open");
           articleEl.classList.add("is-open");
+          setCaseSnap(true);
           articleEl.style.maxHeight = "12rem";
         });
     }
@@ -610,22 +678,23 @@
 
     function onWheel(e) {
       if (destroyed) return;
-      /* Vertical scroll over open article = page scroll, not fan rotate */
-      if (
-        mode === "detail" &&
-        articleOpen &&
-        e.target &&
-        e.target.closest &&
-        e.target.closest("[data-sys-fan-article]")
-      ) {
-        return;
-      }
       if (mode === "catalog" && !root.matches(":hover")) return;
-      /* Prefer horizontal / intentional fan gestures */
       var dominantX = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.15;
-      if (mode === "detail" && articleOpen && !dominantX && !e.target.closest("[data-sys-fan-stage]")) {
+      var overStage = !!(e.target && e.target.closest && e.target.closest("[data-sys-fan-stage]"));
+
+      /* After „Zobacz więcej”: one wheel tick → one viz tile (no free salvo scroll) */
+      if (mode === "detail" && articleOpen && !dominantX) {
+        var dy = e.deltaY;
+        if (Math.abs(dy) < 4 && Math.abs(e.deltaX) < 4) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var now = Date.now();
+        if (now - articleWheelLock < ARTICLE_WHEEL_MS) return;
+        articleWheelLock = now;
+        snapArticleBy(dy > 0 ? 1 : -1);
         return;
       }
+
       var delta = dominantX ? e.deltaX : e.deltaY;
       if (Math.abs(delta) < 4) return;
       e.preventDefault();
@@ -642,6 +711,11 @@
       }, 280);
     }
     root.addEventListener("wheel", onWheel, { passive: false });
+    /* Capture on scroller too — wheel often targets article children inside .expand-systems */
+    var caseSnapScroller = getScrollParent();
+    if (caseSnapScroller && caseSnapScroller !== root) {
+      caseSnapScroller.addEventListener("wheel", onWheel, { passive: false });
+    }
 
     layout();
     if (autoplay) startAuto();
@@ -666,11 +740,15 @@
       destroy: function () {
         destroyed = true;
         stopAuto();
+        setCaseSnap(false);
         if (raf) cancelAnimationFrame(raf);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
         root.removeEventListener("wheel", onWheel);
+        if (caseSnapScroller && caseSnapScroller !== root) {
+          caseSnapScroller.removeEventListener("wheel", onWheel);
+        }
         document.body.classList.remove("is-sys-fan-dragging");
         instances = instances.filter(function (x) {
           return x !== api;
