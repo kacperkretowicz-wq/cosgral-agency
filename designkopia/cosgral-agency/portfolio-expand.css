@@ -3,7 +3,7 @@
 .portfolio-tile-expand {
   position: fixed;
   inset: 0;
-  z-index: 30;
+  z-index: 560;
   display: flex;
   flex-direction: column;
   padding:
@@ -214,7 +214,7 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand__title {
 
 .expand-fly {
   position: fixed;
-  z-index: 40;
+  z-index: 570;
   margin: 0;
   overflow: hidden;
   border-radius: 0.65rem;
