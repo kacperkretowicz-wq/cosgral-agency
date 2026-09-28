@@ -382,10 +382,6 @@ body.is-tile-expanded .site-nav {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
 }
-/* After „Zobacz więcej”: JS owns one-tile wheel steps (no CSS scroll-padding — it double-counts) */
-.expand-systems.is-case-snap {
-  scroll-behavior: auto;
-}
 .expand-systems::-webkit-scrollbar { width: 6px; }
 .expand-systems::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.22);
