@@ -190,7 +190,7 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   scroll-snap-stop: always;
 }
 
-.portfolio-chapters__dots {
+.portfolio-chapters__pager {
   position: absolute;
   left: 50%;
   bottom: max(1.1rem, env(safe-area-inset-bottom, 0px));
@@ -199,9 +199,16 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.5rem;
+  gap: 0.55rem;
+  padding: 0.2rem 0.15rem;
   pointer-events: auto;
+}
+.portfolio-chapters__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0.1rem;
 }
 .portfolio-chapters__dot {
   width: 0.45rem;
@@ -217,7 +224,50 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   width: 1.4rem;
   background: rgba(255, 255, 255, 0.95);
 }
-.portfolio-chapters.is-expanded .portfolio-chapters__dots {
+.portfolio-chapters__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: color 0.25s ease, opacity 0.25s ease, background 0.25s ease;
+}
+.portfolio-chapters__arrow:hover:not(:disabled),
+.portfolio-chapters__arrow:focus-visible:not(:disabled) {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+.portfolio-chapters__arrow:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+.portfolio-chapters__arrow svg {
+  display: block;
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot {
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
+  background: rgba(0, 0, 0, 0.88);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow {
+  color: rgba(0, 0, 0, 0.45);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:hover:not(:disabled),
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-visible:not(:disabled) {
+  color: rgba(0, 0, 0, 0.88);
+  background: rgba(0, 0, 0, 0.08);
+}
+.portfolio-chapters.is-expanded .portfolio-chapters__pager {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -1029,8 +1079,13 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand__panel {
     padding-right: var(--gutter, 1.25rem);
     padding-bottom: clamp(5.2rem, 14vh, 7rem);
   }
-  .portfolio-chapters__dots {
+  .portfolio-chapters__pager {
     bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+    gap: 0.4rem;
+  }
+  .portfolio-chapters__arrow {
+    width: 1.7rem;
+    height: 1.7rem;
   }
   .portfolio-chapter__title {
     font-size: clamp(1.85rem, 9vw, 2.4rem);

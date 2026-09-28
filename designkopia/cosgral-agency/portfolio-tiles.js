@@ -10,6 +10,8 @@
   var scroller = root.querySelector("[data-chapters-scroller]");
   var chapters = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
   var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-chapter-dot]"));
+  var prevBtn = root.querySelector("[data-portfolio-chapter-prev]");
+  var nextBtn = root.querySelector("[data-portfolio-chapter-next]");
   var expandStage = root.querySelector("[data-tile-expand-stage]");
   var expandSource = root.querySelector("[data-tile-expand-source]");
   var expandSourceMedia = root.querySelector("[data-tile-expand-source-media]");
@@ -506,6 +508,8 @@
       dot.classList.toggle("is-active", i === index);
       dot.setAttribute("aria-current", i === index ? "true" : "false");
     });
+    if (prevBtn) prevBtn.disabled = index <= 0;
+    if (nextBtn) nextBtn.disabled = index >= chapters.length - 1;
     var chapter = chapters[index];
     applyTheme(chapter.getAttribute("data-theme") || "web");
   }
@@ -698,6 +702,17 @@
       scrollToIndex(i);
     });
   });
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function () {
+      scrollToIndex(activeIndex - 1);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function () {
+      scrollToIndex(activeIndex + 1);
+    });
+  }
 
   root.querySelectorAll("[data-tile-expand]").forEach(function (link) {
     link.addEventListener(
