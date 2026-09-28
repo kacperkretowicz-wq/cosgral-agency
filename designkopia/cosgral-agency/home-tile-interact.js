@@ -262,8 +262,16 @@
       if (block.hasAttribute("data-portfolio-section")) return;
       /* GSAP pin-spacer + chapter title: wrapping breaks full-bleed pin bounds */
       if (block.classList.contains("pin-spacer") || (block.className && String(block.className).indexOf("pin-spacer") !== -1)) return;
-      /* Tile catalogs wrap via dedicated path above; skip legacy chapter hosts here */
-      if (block.hasAttribute("data-portfolio-chapter") || block.classList.contains("portfolio-chapter")) return;
+      /* Tile catalogs: only chapter media tilts — never wrap the chapters shell / copy */
+      if (
+        block.hasAttribute("data-portfolio-tiles") ||
+        block.hasAttribute("data-portfolio-chapter") ||
+        block.hasAttribute("data-portfolio-tile") ||
+        block.classList.contains("portfolio-chapters") ||
+        block.classList.contains("portfolio-chapter")
+      ) {
+        return;
+      }
       if (block.classList.contains("about-scene") || block.classList.contains("about-scene-curtain")) return;
       if (block.querySelector(":scope > .home-scene__panel")) return;
       if (block.classList.contains("home-tilt-layer") || block.classList.contains("home-tilt-face")) return;

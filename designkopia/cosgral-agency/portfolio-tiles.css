@@ -199,6 +199,7 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   min-height: 100svh;
   max-height: 100svh;
   display: flex;
+  justify-content: flex-start; /* override subpages legacy center */
   align-items: flex-end;
   padding:
     clamp(5.5rem, 12vh, 7rem)
@@ -209,6 +210,11 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   scroll-snap-align: start;
   scroll-snap-stop: always;
   perspective: 1200px;
+}
+body.portfolio-page--tiles .portfolio-chapter {
+  justify-content: flex-start;
+  align-items: flex-end;
+  text-align: left;
 }
 /* Gyro / pointer tilt — media only; copy stays in chapter padding (unmoved) */
 body.portfolio-page--tiles .portfolio-chapter__bg > .home-tilt-layer,
