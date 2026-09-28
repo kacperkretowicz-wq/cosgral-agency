@@ -1040,6 +1040,9 @@ body.portfolio-page--tiles #montaz .reels-tiles__card {
 body.portfolio-page--tiles.is-tile-expanded #montaz .reels-tiles__belt {
   animation-play-state: paused;
 }
+body.portfolio-page--tiles.is-montaz-belt-hold #montaz .reels-tiles__belt {
+  animation-play-state: paused;
+}
 
 /* Montaż chapter — reel mosaic BG */
 .portfolio-tile__reel-comp {

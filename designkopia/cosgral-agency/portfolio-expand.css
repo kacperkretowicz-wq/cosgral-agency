@@ -218,6 +218,99 @@ body.is-tile-expanded .site-nav {
   background: rgba(255, 255, 255, 0.95);
 }
 
+/* Web case detail — card parks left, description panel on the right */
+.expand-deck.is-case-detail .expand-deck__track {
+  pointer-events: none;
+}
+.expand-deck.is-case-detail .expand-deck__card.is-detail-hero {
+  pointer-events: auto;
+  width: min(46vw, 28rem);
+}
+.expand-web-panel {
+  position: absolute;
+  top: 50%;
+  right: max(1.25rem, env(safe-area-inset-right, 0px));
+  transform: translate3d(1.5rem, -50%, 0);
+  z-index: 8;
+  width: min(28rem, 42vw);
+  max-height: min(78svh, 36rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.15rem 0.25rem 0.15rem 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.expand-web-panel.is-ready {
+  opacity: 1;
+  transform: translate3d(0, -50%, 0);
+  pointer-events: auto;
+}
+.expand-web-panel__eyebrow {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+.expand-web-panel__title {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: rgba(255, 255, 255, 0.96);
+}
+.expand-web-panel__lead {
+  margin: 0.45rem 0 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+.expand-web-panel__copy {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.expand-web-panel__copy p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.78);
+}
+.expand-web-panel__visit {
+  display: inline-flex;
+  margin-top: 1.25rem;
+  justify-content: center;
+}
+.expand-web-panel__loading {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+}
+@media (max-width: 820px) {
+  .expand-deck.is-case-detail .expand-deck__card.is-detail-hero {
+    width: min(88vw, 22rem);
+  }
+  .expand-web-panel {
+    top: auto;
+    bottom: max(4.5rem, env(safe-area-inset-bottom, 0px));
+    right: 50%;
+    width: min(92vw, 26rem);
+    max-height: 38svh;
+    transform: translate3d(50%, 1rem, 0);
+  }
+  .expand-web-panel.is-ready {
+    transform: translate3d(50%, 0, 0);
+  }
+  .expand-deck.is-case-detail .expand-deck__card.is-detail-hero {
+    transform: translate3d(-50%, calc(-50% - 12vh), 0) rotateY(0deg) scale(0.78) !important;
+  }
+}
+
 /* —— Shared scroll galleries —— */
 .expand-gallery {
   position: absolute;
@@ -260,6 +353,7 @@ body.is-tile-expanded .site-nav {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  scroll-padding-top: 0.5rem;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
 }
@@ -289,13 +383,24 @@ body.is-tile-expanded .site-nav {
   /* No panel fill — home ambient shows through, no section seam */
   background: transparent;
   transition:
-    height 1.35s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    height 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
   transform-origin: 50% 42%;
 }
 .expand-systems .sys-fan.is-article-open .sys-fan__head {
-  height: min(52vh, 28rem);
+  height: min(48vh, 26rem);
   background: transparent;
+  /* Avoid clipping the first article pixels under the sticky plane */
+  overflow: visible;
+  pointer-events: none;
+}
+.expand-systems .sys-fan.is-article-open .sys-fan__stage,
+.expand-systems .sys-fan.is-article-open .sys-fan__copy,
+.expand-systems .sys-fan.is-article-open .sys-fan__nav {
+  pointer-events: auto;
+}
+.expand-systems .sys-fan__article.is-open {
+  padding-top: 1.25rem;
 }
 .expand-systems .sys-fan__stage {
   touch-action: none;
@@ -714,7 +819,7 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
   vertical-align: middle;
 }
 
-/* Montaż expand — half-size 2-col feed, grayscale → color on hover/focus */
+/* Montaż expand — half-size 2-col GRID (not CSS columns — scale won't reflow) */
 .expand-gallery--video {
   padding-top: 0.35rem;
 }
@@ -722,15 +827,32 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
   max-width: min(560px, 94vw);
 }
 .expand-gallery--video .reels-masonry {
-  column-gap: clamp(0.45rem, 1.2vw, 0.7rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(0.45rem, 1.2vw, 0.7rem);
+  columns: unset;
+  column-gap: unset;
 }
 .expand-gallery--video .reels-masonry__item {
-  margin-bottom: clamp(0.45rem, 1.2vw, 0.7rem);
+  position: relative;
+  margin: 0;
   border-radius: 8px;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  transform: none;
+}
+.expand-gallery--video .reels-masonry__item.is-anchor,
+.expand-gallery--video.is-ready .reels-masonry__item {
+  transform: none;
 }
 .expand-gallery--video .reels-masonry__item video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   filter: grayscale(1) contrast(1.06);
-  transition: filter 0.45s ease;
+  transition: filter 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .expand-gallery--video .reels-masonry__item.is-reel-hover video,
 .expand-gallery--video .reels-masonry__item.is-reel-focus video,
@@ -738,15 +860,16 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
 .expand-gallery--video .reels-masonry__item:focus-visible video {
   filter: grayscale(0) contrast(1.04) !important;
 }
+/* Enlarge media only — cell stays put in the grid */
 .expand-gallery--video.is-ready .reels-masonry__item.is-reel-focus {
-  transform: scale(1.14);
   z-index: 3;
-  position: relative;
   overflow: visible;
   box-shadow: 0 22px 56px rgba(0, 0, 0, 0.55);
   transition-delay: 0s;
+  transform: none;
 }
 .expand-gallery--video.is-ready .reels-masonry__item.is-reel-focus video {
+  transform: scale(1.08);
   border-radius: 8px;
 }
 

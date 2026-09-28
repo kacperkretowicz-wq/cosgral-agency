@@ -350,27 +350,9 @@
           void articleEl.offsetHeight;
           var full = articleEl.scrollHeight;
           articleEl.style.maxHeight = full + "px";
-          /* slow scroll so the expanded block slides into view under the fan */
+          /* Stay at top — forced scroll was clipping the sticky head / first tiles */
           var scroller = getScrollParent();
-          /* Keep fan+copy sticky in view; ease just far enough to reveal article start */
-          var targetTop = Math.min(
-            160,
-            Math.max(48, Math.round(window.innerHeight * 0.12))
-          );
-          if (reduced) {
-            scroller.scrollTop = targetTop;
-          } else {
-            var from = scroller.scrollTop;
-            var t0 = performance.now();
-            var dur = 2000;
-            function tick(now) {
-              var p = Math.min(1, (now - t0) / dur);
-              var e = 1 - Math.pow(1 - p, 4);
-              scroller.scrollTop = from + (targetTop - from) * e;
-              if (p < 1) requestAnimationFrame(tick);
-            }
-            requestAnimationFrame(tick);
-          }
+          if (scroller) scroller.scrollTop = 0;
           articleLoading = false;
           window.setTimeout(function () {
             if (articleOpen) articleEl.style.maxHeight = "none";

@@ -19,11 +19,13 @@
   var deckCards = [];
   var deckRaf = 0;
   var manifests = { reels: null, graphics: null };
+  var pageCache = {};
   var closing = false;
   var activeGhosts = [];
   var systemsDetailFan = null;
   var openChapter = null;
   var videoOpenState = null;
+  var webDetailOpen = false;
 
   var WEB_CASES = [
     {
@@ -157,12 +159,13 @@
     deckCards = [];
     deckIndex = 0;
     videoOpenState = null;
+    webDetailOpen = false;
   }
 
   function isInteractiveTarget(el) {
     if (!el || !el.closest) return false;
     return !!el.closest(
-      "a, button, video, .expand-deck__card, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__dot, .sys-fan__nav, .sys-fan__copy, .sys-fan__more, .sys-fan__article, .sys-fan__stage"
+      "a, button, video, .expand-deck__card, .expand-web-panel, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__dot, .sys-fan__nav, .sys-fan__copy, .sys-fan__more, .sys-fan__article, .sys-fan__stage"
     );
   }
 
@@ -194,22 +197,37 @@
   function layoutDeck() {
     if (!deckCards.length) return;
     var n = Math.round(Math.max(0, Math.min(deckCards.length - 1, deckIndex)));
+    var detail = webDetailOpen;
     deckCards.forEach(function (card, i) {
       var offset = i - deckIndex;
       var abs = Math.abs(offset);
-      card.style.transform =
-        "translate3d(calc(-50% + " +
-        offset * 62 +
-        "%), -50%, " +
-        -abs * 160 +
-        "px) rotateY(" +
-        offset * -16 +
-        "deg) scale(" +
-        Math.max(0.7, 1 - abs * 0.1) +
-        ")";
-      card.style.opacity = String(Math.max(0.28, 1 - abs * 0.36));
-      card.style.zIndex = String(Math.round(40 - abs * 10));
+      if (detail && i === n) {
+        /* Active site card parks on the left; description sits on the right */
+        card.style.transform =
+          "translate3d(calc(-50% - min(28vw, 12rem)), -50%, 0) rotateY(0deg) scale(0.92)";
+        card.style.opacity = "1";
+        card.style.zIndex = "50";
+      } else if (detail) {
+        card.style.transform =
+          "translate3d(calc(-50% + " + offset * 70 + "%), -50%, -220px) rotateY(" + offset * -18 + "deg) scale(0.62)";
+        card.style.opacity = "0";
+        card.style.zIndex = "1";
+      } else {
+        card.style.transform =
+          "translate3d(calc(-50% + " +
+          offset * 62 +
+          "%), -50%, " +
+          -abs * 160 +
+          "px) rotateY(" +
+          offset * -16 +
+          "deg) scale(" +
+          Math.max(0.7, 1 - abs * 0.1) +
+          ")";
+        card.style.opacity = String(Math.max(0.28, 1 - abs * 0.36));
+        card.style.zIndex = String(Math.round(40 - abs * 10));
+      }
       card.classList.toggle("is-front", i === n);
+      card.classList.toggle("is-detail-hero", detail && i === n);
       var video = card.querySelector("video");
       if (video) {
         if (i === n) {
@@ -229,6 +247,8 @@
     var next = bodyEl.querySelector("[data-expand-deck-next]");
     if (prev) prev.disabled = n <= 0;
     if (next) next.disabled = n >= deckCards.length - 1;
+    var arrows = bodyEl.querySelector(".expand-deck__arrows");
+    if (arrows) arrows.style.opacity = detail ? "0.35" : "1";
   }
 
   function setDeckIndex(next) {
@@ -240,8 +260,123 @@
     });
   }
 
+  function fetchPageHtml(href) {
+    if (pageCache[href]) return Promise.resolve(pageCache[href]);
+    return fetch(href, { credentials: "same-origin" })
+      .then(function (r) {
+        return r.text();
+      })
+      .then(function (html) {
+        pageCache[href] = html;
+        return html;
+      });
+  }
+
+  function parseWebCasePage(html, fallback) {
+    var doc = new DOMParser().parseFromString(html, "text/html");
+    var titleEl = doc.querySelector(".case-study__title");
+    var ledeEl = doc.querySelector(".case-study__lede");
+    var visitEl = doc.querySelector(".case-study__visit");
+    var copy = [];
+    doc.querySelectorAll(".case-study__copy p").forEach(function (p) {
+      var t = (p.textContent || "").trim();
+      if (t) copy.push(t);
+    });
+    return {
+      title: (titleEl && titleEl.textContent.trim()) || fallback.title,
+      lead: (ledeEl && ledeEl.textContent.trim()) || fallback.lead,
+      visitHref: (visitEl && visitEl.getAttribute("href")) || "",
+      visitLabel: (visitEl && visitEl.textContent.trim()) || "Odwiedź stronę",
+      copy: copy,
+    };
+  }
+
+  function closeWebCaseDetail() {
+    var deck = bodyEl.querySelector(".expand-deck");
+    var panel = bodyEl.querySelector(".expand-web-panel");
+    if (!deck) {
+      webDetailOpen = false;
+      return;
+    }
+    deck.classList.remove("is-case-detail");
+    deckCards.forEach(function (c) {
+      c.classList.remove("is-detail-hero");
+    });
+    if (panel) {
+      panel.classList.remove("is-ready");
+      window.setTimeout(function () {
+        if (panel.parentNode) panel.parentNode.removeChild(panel);
+      }, 420);
+    }
+    webDetailOpen = false;
+    layoutDeck();
+  }
+
+  function openWebCaseDetail(item, card) {
+    if (!item || webDetailOpen) return;
+    webDetailOpen = true;
+    var deck = bodyEl.querySelector(".expand-deck");
+    if (deck) deck.classList.add("is-case-detail");
+    deckCards.forEach(function (c) {
+      c.classList.toggle("is-detail-hero", c === card);
+    });
+    layoutDeck();
+
+    var panel = document.createElement("aside");
+    panel.className = "expand-web-panel";
+    panel.innerHTML =
+      '<p class="expand-web-panel__loading">Ładowanie opisu…</p>';
+    bodyEl.appendChild(panel);
+    requestAnimationFrame(function () {
+      panel.classList.add("is-ready");
+    });
+
+    fetchPageHtml(item.href)
+      .then(function (html) {
+        if (!webDetailOpen || expandedKey !== "web") return;
+        var data = parseWebCasePage(html, item);
+        panel.innerHTML = "";
+        var eye = document.createElement("p");
+        eye.className = "expand-web-panel__eyebrow";
+        eye.textContent = "Strona internetowa";
+        var h = document.createElement("h3");
+        h.className = "expand-web-panel__title";
+        h.textContent = data.title;
+        var lead = document.createElement("p");
+        lead.className = "expand-web-panel__lead";
+        lead.textContent = data.lead;
+        panel.appendChild(eye);
+        panel.appendChild(h);
+        panel.appendChild(lead);
+        var copyWrap = document.createElement("div");
+        copyWrap.className = "expand-web-panel__copy";
+        data.copy.forEach(function (t) {
+          var p = document.createElement("p");
+          p.textContent = t;
+          copyWrap.appendChild(p);
+        });
+        panel.appendChild(copyWrap);
+        if (data.visitHref) {
+          var visit = document.createElement("a");
+          visit.className = "glass-btn expand-web-panel__visit";
+          visit.href = data.visitHref;
+          visit.target = "_blank";
+          visit.rel = "noopener noreferrer";
+          visit.setAttribute("data-no-transition", "");
+          visit.textContent = data.visitLabel || "Odwiedź stronę";
+          panel.appendChild(visit);
+        }
+      })
+      .catch(function () {
+        if (!webDetailOpen) return;
+        panel.innerHTML =
+          '<p class="expand-web-panel__lead">Nie udało się wczytać opisu.</p>';
+      });
+  }
+
   function buildWebDeck(startIdx) {
     bodyEl.setAttribute("data-expand-mode", "web");
+    webDetailOpen = false;
     var deck = document.createElement("div");
     deck.className = "expand-deck";
     var track = document.createElement("div");
@@ -270,7 +405,7 @@
       card.appendChild(body);
       card.addEventListener("click", function () {
         var i = WEB_CASES.indexOf(item);
-        if (Math.round(deckIndex) === i) window.location.href = item.href;
+        if (Math.round(deckIndex) === i) openWebCaseDetail(item, card);
         else setDeckIndex(i);
       });
       track.appendChild(card);
@@ -291,14 +426,17 @@
       d.className = "expand-deck__dot";
       d.setAttribute("data-expand-deck-dot", "");
       d.addEventListener("click", function () {
+        if (webDetailOpen) closeWebCaseDetail();
         setDeckIndex(i);
       });
       dots.appendChild(d);
     });
     arrows.querySelector("[data-expand-deck-prev]").onclick = function () {
+      if (webDetailOpen) closeWebCaseDetail();
       setDeckIndex(Math.round(deckIndex) - 1);
     };
     arrows.querySelector("[data-expand-deck-next]").onclick = function () {
+      if (webDetailOpen) closeWebCaseDetail();
       setDeckIndex(Math.round(deckIndex) + 1);
     };
     deck.appendChild(track);
@@ -932,10 +1070,12 @@
           video.setAttribute("muted", "");
           video.preload = ii < 4 ? "metadata" : "none";
           if (item.poster) video.poster = item.poster;
-          video.src = item.src;
+          /* Expand uses full files (AAC). Silent previews break click-to-unmute. */
+          video.src = (kind === "reels" && item.full) ? item.full : item.src;
           if (kind === "reels") {
             btn.setAttribute("data-reel-preview", item.src || "");
             btn.setAttribute("data-reel-full", item.full || item.src || "");
+            if (item.full) video.dataset.usingFull = "1";
           }
           btn.appendChild(video);
           if (kind !== "reels") {
@@ -983,6 +1123,7 @@
     expandedKey = null;
     closing = false;
     openChapter = null;
+    if (prev === "video") document.body.classList.add("is-montaz-belt-hold");
     setOpen(false);
     stage.classList.remove("is-closing");
     root.classList.remove("is-morphing", "is-systems-detail", "is-systems-exiting");
@@ -992,6 +1133,11 @@
       if (catalog.root) catalog.root.classList.remove("is-under-detail");
       if (resumeIdx != null) catalog.setIndex(resumeIdx);
       catalog.resume();
+    }
+    if (prev === "video") {
+      window.setTimeout(function () {
+        document.body.classList.remove("is-montaz-belt-hold");
+      }, 900);
     }
     dispatch("portfolio-expand-close", { key: prev });
   }
@@ -1023,6 +1169,13 @@
 
   /* Reverse of openWeb: deck → fly back into chapter hero shot */
   function closeWebReverse() {
+    if (webDetailOpen) {
+      closeWebCaseDetail();
+      window.setTimeout(function () {
+        if (expandedKey === "web" && closing) closeWebReverse();
+      }, REDUCED ? 0 : 480);
+      return;
+    }
     var chapter = openChapter;
     var front = deckCards[Math.round(deckIndex)];
     var hero = chapter ? pickHeroShot(chapter) : null;
@@ -1067,6 +1220,7 @@
   function closeVideoReverse() {
     var gallery = bodyEl.querySelector(".expand-gallery");
     var state = videoOpenState;
+    var chapter = openChapter || document.getElementById("montaz");
     if (gallery) {
       gallery.querySelectorAll("video").forEach(function (v) {
         try {
@@ -1076,7 +1230,58 @@
       });
     }
 
-    if (gallery && state && state.heroes && state.heroes.length && !REDUCED) {
+    /* Re-read live belt rects (paused under expand) so return lands on catalog */
+    var liveAll = [];
+    if (chapter) {
+      liveAll = captureTiles(
+        "#reels-tiles .reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card",
+        chapter
+      );
+      if (liveAll.length < 2) liveAll = captureTiles("#reels-tiles .reels-tiles__card", chapter);
+    }
+    var liveHeroes = [];
+    if (state && state.heroes && liveAll.length) {
+      state.heroes.forEach(function (h) {
+        var match = null;
+        var best = Infinity;
+        liveAll.forEach(function (t) {
+          var same =
+            (h.src && t.src && (t.src.indexOf(mediaFileBase(h.src)) !== -1 || h.src.indexOf(mediaFileBase(t.src)) !== -1)) ||
+            (h.poster && t.poster && t.poster.indexOf(mediaFileBase(h.poster)) !== -1);
+          var mx = t.rect.left + t.rect.width * 0.5;
+          var my = t.rect.top + t.rect.height * 0.5;
+          var hx = h.rect.left + h.rect.width * 0.5;
+          var hy = h.rect.top + h.rect.height * 0.5;
+          var dist = (mx - hx) * (mx - hx) + (my - hy) * (my - hy);
+          if (same || dist < best) {
+            if (same || !match) {
+              best = dist;
+              match = t;
+            }
+          }
+        });
+        liveHeroes.push(
+          match
+            ? {
+                rect: {
+                  left: match.rect.left,
+                  top: match.rect.top,
+                  width: match.rect.width,
+                  height: match.rect.height,
+                },
+                src: match.src || h.src,
+              }
+            : h
+        );
+      });
+      liveHeroes.sort(function (a, b) {
+        return a.rect.left - b.rect.left;
+      });
+    } else if (state) {
+      liveHeroes = state.heroes.slice();
+    }
+
+    if (gallery && liveHeroes.length && !REDUCED) {
       var anchors = gallery.querySelectorAll(".reels-masonry__item.is-anchor");
       if (anchors.length < 2) anchors = gallery.querySelectorAll(".reels-masonry__item");
 
@@ -1085,7 +1290,7 @@
       document.body.appendChild(beltLayer);
       activeGhosts.push(beltLayer);
 
-      var heroGhosts = state.heroes.map(function (h, i) {
+      var heroGhosts = liveHeroes.map(function (h, i) {
         var from = anchors[i] ? anchors[i].getBoundingClientRect() : null;
         var g = document.createElement("figure");
         g.className = "expand-belt__card is-hero";
@@ -1112,9 +1317,13 @@
         return g;
       });
 
-      /* Side belt cards fade back in at original spots */
-      (state.all || []).forEach(function (t) {
-        if (t.hero) return;
+      /* Side belt cards from live catalog positions */
+      var heroSrcSet = liveHeroes.map(function (h) {
+        return mediaFileBase(h.src);
+      });
+      (liveAll.length ? liveAll : state.all || []).forEach(function (t) {
+        var base = mediaFileBase(t.src);
+        if (heroSrcSet.indexOf(base) !== -1) return;
         var g = document.createElement("figure");
         g.className = "expand-belt__card";
         g.style.left = t.rect.left + "px";
@@ -1138,16 +1347,15 @@
 
       gallery.classList.remove("is-ready", "is-slide-up");
       gallery.style.transition =
-        "opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.35s cubic-bezier(0.22, 1, 0.36, 1)";
+        "opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 1.2s cubic-bezier(0.22, 1, 0.36, 1)";
       gallery.style.opacity = "0";
-      gallery.style.transform = "translate3d(0, 28%, 0)";
+      gallery.style.transform = "translate3d(0, 22%, 0)";
 
       requestAnimationFrame(function () {
         heroGhosts.forEach(function (g, i) {
-          var h = state.heroes[i];
+          var h = liveHeroes[i];
           if (!h) return;
-          /* Slight zoom then settle into original belt rect */
-          g.style.transform = "rotate(0deg) scale(1.08)";
+          g.style.transform = "rotate(0deg) scale(1.06)";
           morphGhostToRect(g, h.rect, { radius: "0.55rem" });
           window.setTimeout(function () {
             g.style.transform = "rotate(0deg) scale(1)";
@@ -1156,16 +1364,15 @@
       });
 
       window.setTimeout(function () {
-        /* Reveal chapter belt under returning tiles, then hand off */
         root.classList.remove("is-morphing");
-      }, 1100);
+      }, 900);
       window.setTimeout(function () {
         beltLayer.style.opacity = "0";
         window.setTimeout(function () {
           videoOpenState = null;
           finishClose("video", null);
-        }, 420);
-      }, 1450);
+        }, 380);
+      }, 1280);
       return;
     }
 
@@ -1229,6 +1436,11 @@
 
   function close() {
     if (!expandedKey || closing) return;
+    /* Web case detail collapses first, then a second dismiss closes the deck */
+    if (expandedKey === "web" && webDetailOpen && !closing) {
+      closeWebCaseDetail();
+      return;
+    }
     closing = true;
     var prev = expandedKey;
     var resumeIdx = systemsDetailFan ? systemsDetailFan.getIndex() : null;
