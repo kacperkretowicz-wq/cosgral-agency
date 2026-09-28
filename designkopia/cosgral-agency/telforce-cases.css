@@ -406,12 +406,10 @@ body.case-page--no-fx #portfolio-sand-front {
 }
 .case-study--systems .case-study__visit,
 .case-study--systems .case-study__cta {
-  width: 100%;
-  justify-content: center;
-  text-align: center;
-}
-.case-study--systems .case-study__cta {
-  background: rgba(255, 255, 255, 0.08);
+  width: fit-content;
+  justify-content: flex-start;
+  text-align: left;
+  background: none;
 }
 
 @media (max-width: 900px) {

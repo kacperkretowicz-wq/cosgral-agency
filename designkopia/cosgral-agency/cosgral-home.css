@@ -856,17 +856,38 @@ html.reduce-motion .nav-overlay__char {
 }
 
 .btn {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  padding: 0.9rem 1.75rem; border-radius: 999px;
-  font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(12px);
-  transition: transform 0.35s var(--ease), background 0.25s, border-color 0.25s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.12rem 0;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  background: none;
+  backdrop-filter: none;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--ink);
+  transition: border-color 0.45s ease;
 }
-.btn:hover { transform: scale(1.04); border-color: rgba(255,255,255,0.35); }
-.btn--primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.btn--primary:hover { background: #ddd; }
+.btn:hover,
+.btn:focus-visible {
+  transform: none;
+  border-color: #fff;
+  outline: none;
+}
+.btn--primary {
+  background: none;
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.btn--primary:hover {
+  background: none;
+  border-color: #fff;
+}
 
 .section-label {
   font-family: var(--font-mono);
@@ -1604,40 +1625,45 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 .home-work__link {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.75rem 1.4rem;
-  font-size: 0.88rem;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 0.12rem 0;
+  font-size: 0.92rem;
   text-decoration: none;
 }
+/* Text links — same underline motif as „Zobacz więcej” (no pill / glass box) */
 .glass-btn {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   border: 0;
-  border-radius: 999px;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 0.12rem 0;
+  min-height: 0;
   color: var(--ink);
-  background: rgba(245, 240, 235, 0.04);
-  -webkit-backdrop-filter: blur(10px) saturate(1.4);
-  backdrop-filter: blur(10px) saturate(1.4);
-  box-shadow:
-    0 0 8px rgba(0, 0, 0, 0.03),
-    0 2px 6px rgba(0, 0, 0, 0.08),
-    inset 3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.09),
-    inset -3px -3px 0.5px -3.5px rgba(255, 255, 255, 0.85),
-    inset 1px 1px 1px -0.5px rgba(255, 255, 255, 0.6),
-    inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.6),
-    inset 0 0 6px 6px rgba(255, 255, 255, 0.12),
-    inset 0 0 2px 2px rgba(255, 255, 255, 0.06),
-    0 0 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s var(--ease-out), filter 0.2s ease;
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  text-decoration: none;
+  transition: border-color 0.45s ease;
 }
 .glass-btn:hover,
 .glass-btn:focus-visible {
-  transform: scale(1.05);
-  filter: brightness(1.15);
+  transform: none;
+  filter: none;
+  border-color: #fff;
+  outline: none;
 }
 .glass-btn:active {
-  transform: scale(0.98);
-  filter: brightness(0.9);
+  transform: none;
+  filter: none;
 }
 @media (max-height: 820px) and (min-width: 901px) {
   .home-work.home-scene {

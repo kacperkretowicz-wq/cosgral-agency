@@ -930,20 +930,27 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   color: rgba(255, 255, 255, 0.7);
 }
 .sys-fan__more {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   margin-top: 1rem;
-  padding: 0;
+  padding: 0.12rem 0;
   border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
   background: none;
-  color: rgba(255, 255, 255, 0.88);
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-  font: inherit;
-  font-size: 0.88rem;
-  cursor: pointer;
-}
-.sys-fan__more:hover {
   color: #fff;
+  text-decoration: none;
+  font-family: var(--font-body, "Satoshi", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.45s ease;
+}
+.sys-fan__more:hover,
+.sys-fan__more:focus-visible {
+  color: #fff;
+  border-color: #fff;
+  outline: none;
 }
 
 /* Catalog matches detail framing (closer); click only pulls back slightly */
@@ -1152,7 +1159,8 @@ body.portfolio-page--tiles.is-montaz-belt-hold #montaz .reels-tiles__belt {
 /* Legacy expand rail styles removed — see portfolio-expand.css */
 
 @media (max-width: 720px) {
-  .portfolio-chapter {
+  .portfolio-chapter,
+  body.portfolio-page--tiles #montaz.portfolio-chapter {
     padding-left: var(--gutter, 1.25rem);
     padding-right: var(--gutter, 1.25rem);
     padding-bottom: clamp(5.2rem, 14vh, 7rem);
