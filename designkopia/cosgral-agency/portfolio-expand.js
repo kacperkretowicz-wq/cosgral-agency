@@ -83,14 +83,31 @@
   }
 
   /**
-   * After reverse morph: catalog TILES bloom back slowly, shuffled.
-   * Section copy / center words stay put (no transform — they must not “flee”).
+   * After reverse morph.
+   * opts.mode === "fan": tiles already shown by fan ghosts — only fade copy in slowly.
+   * default: shuffle-fade tiles (graphics etc.), copy stays put.
    */
-  function beginCatalogReveal(chapter) {
+  function beginCatalogReveal(chapter, opts) {
+    opts = opts || {};
     if (!chapter || REDUCED) return 0;
     if (catalogRevealTimer) window.clearTimeout(catalogRevealTimer);
     root.classList.add("is-catalog-revealing");
-    root.classList.remove("is-morphing");
+    root.classList.remove("is-morphing", "is-copy-in");
+
+    if (opts.mode === "fan") {
+      /* Fan handoff already shows the belt — keep cards visible, bloom copy last */
+      root.classList.add("is-fan-handoff");
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          root.classList.add("is-copy-in");
+        });
+      });
+      catalogRevealTimer = window.setTimeout(function () {
+        root.classList.remove("is-catalog-revealing", "is-fan-handoff", "is-copy-in");
+        catalogRevealTimer = 0;
+      }, 2200);
+      return 1800;
+    }
 
     var sel =
       ".chapter-show__tile, " +
@@ -112,7 +129,7 @@
     });
     var totalMs = Math.round(Math.min(3600, 1100 + span * 1000 + 700));
     catalogRevealTimer = window.setTimeout(function () {
-      root.classList.remove("is-catalog-revealing");
+      root.classList.remove("is-catalog-revealing", "is-fan-handoff", "is-copy-in");
       order.forEach(clearInlineReveal);
       catalogRevealTimer = 0;
     }, totalMs + 450);
@@ -873,6 +890,106 @@
     return poster || src || videoSrc || "";
   }
 
+  var FAN_BELT_ROTATE = -16; /* matches .chapter-montaz__belt rotate */
+
+  function readCssScale(el) {
+    var t = window.getComputedStyle(el).transform;
+    if (!t || t === "none") return 1;
+    var m = t.match(/matrix\(([^)]+)\)/);
+    if (!m) return 1;
+    var p = m[1].split(",").map(parseFloat);
+    var s = Math.sqrt(p[0] * p[0] + p[1] * p[1]);
+    return s > 0.05 ? s : 1;
+  }
+
+  /**
+   * True fan-card face geometry (not AABB of the rotated belt).
+   * Ghosts use width/height = face size and rotate(FAN_BELT_ROTATE) around center.
+   */
+  function captureFanGeometry(el) {
+    var aabb = el.getBoundingClientRect();
+    var scale = readCssScale(el);
+    var faceW = el.offsetWidth * scale;
+    var faceH = el.offsetHeight * scale;
+    if (faceW < 8 || faceH < 8) {
+      /* Fallback: derotate AABB roughly for -16deg */
+      var cos = Math.cos((FAN_BELT_ROTATE * Math.PI) / 180);
+      var sin = Math.abs(Math.sin((FAN_BELT_ROTATE * Math.PI) / 180));
+      faceW = aabb.width * Math.abs(cos) - aabb.height * sin;
+      faceH = aabb.height * Math.abs(cos) - aabb.width * sin;
+      if (faceW < 8) faceW = aabb.width * 0.72;
+      if (faceH < 8) faceH = aabb.height * 0.85;
+    }
+    var cx = aabb.left + aabb.width * 0.5;
+    var cy = aabb.top + aabb.height * 0.5;
+    var media = el.querySelector("img, video");
+    var poster = media ? media.getAttribute("poster") || "" : "";
+    var videoSrc = media
+      ? media.getAttribute("data-video-src") || media.getAttribute("src") || media.src || ""
+      : "";
+    var src = poster || (media && media.tagName !== "VIDEO" ? media.currentSrc || media.src : "") || videoSrc;
+    return {
+      el: el,
+      cx: cx,
+      cy: cy,
+      left: cx - faceW * 0.5,
+      top: cy - faceH * 0.5,
+      width: faceW,
+      height: faceH,
+      rotate: FAN_BELT_ROTATE,
+      scale: scale,
+      src: src,
+      poster: poster,
+      videoSrc: videoSrc,
+      rect: { left: cx - faceW * 0.5, top: cy - faceH * 0.5, width: faceW, height: faceH },
+    };
+  }
+
+  function captureFanSlots(chapter) {
+    if (!chapter) return [];
+    var nodes = chapter.querySelectorAll(
+      "#reels-tiles .reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card"
+    );
+    if (nodes.length < 2) nodes = chapter.querySelectorAll("#reels-tiles .reels-tiles__card");
+    var slots = [];
+    Array.prototype.forEach.call(nodes, function (el) {
+      var g = captureFanGeometry(el);
+      if (g.width > 8 && g.height > 8 && g.cy > -40 && g.cy < window.innerHeight + 40) {
+        slots.push(g);
+      }
+    });
+    slots.sort(function (a, b) {
+      return a.left - b.left;
+    });
+    return slots;
+  }
+
+  function applyGhostBox(g, box, opts) {
+    opts = opts || {};
+    g.style.left = box.left + "px";
+    g.style.top = box.top + "px";
+    g.style.width = box.width + "px";
+    g.style.height = box.height + "px";
+    if (opts.radius != null) g.style.borderRadius = opts.radius;
+    var rot = opts.rotate != null ? opts.rotate : box.rotate != null ? box.rotate : 0;
+    g.style.transform = "rotate(" + rot + "deg) scale(1)";
+  }
+
+  function makeBeltGhost(src, box, cls) {
+    var g = document.createElement("figure");
+    g.className = "expand-belt__card" + (cls ? " " + cls : "");
+    applyGhostBox(g, box, { radius: "10px", rotate: box.rotate != null ? box.rotate : 0 });
+    g.style.opacity = "1";
+    var still = ghostStillSrc({ src: src, poster: box.poster, videoSrc: box.videoSrc }) || src;
+    if (still) {
+      var img = document.createElement("img");
+      img.src = still;
+      img.alt = "";
+      g.appendChild(img);
+    }
+    return g;
+  }
+
   function hideChapterMedia() {
     root.classList.add("is-morphing");
   }
@@ -919,87 +1036,69 @@
     });
   }
 
-  /* Montaż: 2 center tiles level + zoom → pin top → brand feed (half tiles) */
+  /* Montaż: fan (true sizes + -16°) → level into grid — reverse of close */
   function openVideo(chapter) {
     bodyEl.setAttribute("data-expand-mode", "video");
     hideChapterMedia();
-    var all = captureTiles(
-      "#reels-tiles .reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card",
-      chapter
-    );
-    if (all.length < 2) all = captureTiles("#reels-tiles .reels-tiles__card", chapter);
 
+    var fanSlots = captureFanSlots(chapter);
     var cx = window.innerWidth * 0.5;
-    var cy = window.innerHeight * 0.5;
-    var ranked = all
-      .map(function (t) {
-        var mx = t.rect.left + t.rect.width * 0.5;
-        var my = t.rect.top + t.rect.height * 0.5;
-        return { tile: t, dist: (mx - cx) * (mx - cx) + (my - cy) * (my - cy) };
+    var ranked = fanSlots
+      .map(function (t, i) {
+        return { slot: t, i: i, dist: (t.cx - cx) * (t.cx - cx) + (t.cy - window.innerHeight * 0.45) * (t.cy - window.innerHeight * 0.45) };
       })
       .sort(function (a, b) {
         return a.dist - b.dist;
       });
-    var heroes = ranked.slice(0, 2).map(function (r) {
-      return r.tile;
+    var heroIdx = ranked.slice(0, 2).map(function (r) {
+      return r.i;
     });
-    /* Keep left→right order */
-    heroes.sort(function (a, b) {
-      return a.rect.left - b.rect.left;
+    heroIdx.sort(function (a, b) {
+      return fanSlots[a].left - fanSlots[b].left;
+    });
+    var heroes = heroIdx.map(function (i) {
+      return fanSlots[i];
     });
 
     videoOpenState = {
       chapter: chapter,
       heroes: heroes.map(function (h) {
         return {
-          rect: {
-            left: h.rect.left,
-            top: h.rect.top,
-            width: h.rect.width,
-            height: h.rect.height,
-          },
+          rect: { left: h.left, top: h.top, width: h.width, height: h.height },
           src: h.src,
           poster: h.poster,
           videoSrc: h.videoSrc,
+          rotate: h.rotate,
         };
       }),
-      all: all.map(function (t) {
+      all: fanSlots.map(function (t, i) {
         return {
-          rect: {
-            left: t.rect.left,
-            top: t.rect.top,
-            width: t.rect.width,
-            height: t.rect.height,
-          },
+          rect: { left: t.left, top: t.top, width: t.width, height: t.height },
           src: t.src,
-          hero: heroes.indexOf(t) !== -1,
+          poster: t.poster,
+          hero: heroIdx.indexOf(i) !== -1,
+          rotate: t.rotate,
         };
       }),
       brand: null,
     };
 
     var beltLayer = document.createElement("div");
-    beltLayer.className = "expand-belt";
+    beltLayer.className = "expand-belt is-fan-open";
     document.body.appendChild(beltLayer);
     activeGhosts.push(beltLayer);
 
-    var beltGhosts = all.map(function (t) {
-      var g = document.createElement("figure");
-      g.className = "expand-belt__card";
-      g.style.left = t.rect.left + "px";
-      g.style.top = t.rect.top + "px";
-      g.style.width = t.rect.width + "px";
-      g.style.height = t.rect.height + "px";
-      if (t.src) {
-        var img = document.createElement("img");
-        img.src = t.src;
-        img.alt = "";
-        g.appendChild(img);
-      }
-      var isHero = heroes.indexOf(t) !== -1;
-      if (isHero) g.classList.add("is-hero");
+    var mid = (fanSlots.length - 1) / 2;
+    var beltGhosts = fanSlots.map(function (slot, i) {
+      var isHero = heroIdx.indexOf(i) !== -1;
+      var g = makeBeltGhost(slot.src, slot, isHero ? "is-hero" : "");
+      g.style.zIndex = String(10 + Math.round(10 - Math.abs(i - mid)));
+      g.style.transition =
+        "left 1.35s cubic-bezier(0.22, 1, 0.36, 1), top 1.35s cubic-bezier(0.22, 1, 0.36, 1), " +
+        "width 1.35s cubic-bezier(0.22, 1, 0.36, 1), height 1.35s cubic-bezier(0.22, 1, 0.36, 1), " +
+        "transform 1.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s ease, border-radius 1.1s ease";
       beltLayer.appendChild(g);
-      return { el: g, tile: t, hero: isHero };
+      return { el: g, slot: slot, hero: isHero, index: i };
     });
 
     var gallery = document.createElement("div");
@@ -1007,7 +1106,6 @@
     gallery.style.opacity = "0";
     bodyEl.appendChild(gallery);
 
-    /* Half of previous ~1120px gallery → ~560px / 2-col */
     var galleryW = Math.min(560, window.innerWidth * 0.92);
     var gap = 28;
     var colW = (galleryW - gap) / 2;
@@ -1016,27 +1114,43 @@
     var topY = Math.max(56, window.innerHeight * 0.07);
     var heroH = colW * (16 / 9);
 
-    /* Phase 1: straighten diagonal, slight zoom, park 2 heroes at top */
+    /* Phase 1: un-tilt fan, park center pair as grid heroes, sides ease out */
     requestAnimationFrame(function () {
       beltLayer.classList.add("is-level");
       beltGhosts.forEach(function (item) {
         var g = item.el;
+        var delay = (Math.abs(item.index - mid) * 0.05).toFixed(2) + "s";
+        g.style.transitionDelay = delay;
         if (item.hero) {
-          var hi = heroes.indexOf(item.tile);
-          g.style.left = startX + hi * (colW + gap) + "px";
-          g.style.top = topY + "px";
-          g.style.width = colW + "px";
-          g.style.height = heroH + "px";
-          g.style.borderRadius = "10px";
+          var hi = heroes.indexOf(item.slot);
+          applyGhostBox(
+            g,
+            {
+              left: startX + hi * (colW + gap),
+              top: topY,
+              width: colW,
+              height: heroH,
+              rotate: 0,
+            },
+            { radius: "10px", rotate: 0 }
+          );
           g.style.zIndex = "20";
           g.style.opacity = "1";
-          g.style.transform = "rotate(0deg) scale(1.08)";
+          g.style.transform = "rotate(0deg) scale(1.06)";
         } else {
-          var side = item.tile.rect.left < cx ? -1 : 1;
-          g.style.left = item.tile.rect.left + side * 40 + "px";
-          g.style.top = item.tile.rect.top + 28 + "px";
+          var side = item.slot.cx < cx ? -1 : 1;
+          applyGhostBox(
+            g,
+            {
+              left: item.slot.left + side * 36,
+              top: item.slot.top + 24,
+              width: item.slot.width * 0.92,
+              height: item.slot.height * 0.92,
+              rotate: 0,
+            },
+            { radius: "10px", rotate: 0 }
+          );
           g.style.opacity = "0";
-          g.style.transform = "rotate(0deg) scale(0.92)";
         }
       });
     });
@@ -1059,26 +1173,41 @@
         prioritizeGroup: brand,
       });
 
-      /* Measure first two masonry cells — heroes land there */
       gallery.classList.add("is-measuring", "is-video-anchor");
       gallery.style.opacity = "1";
       var firstItems = gallery.querySelectorAll(".reels-masonry__item");
       var dest = [];
-      for (var i = 0; i < 2 && i < firstItems.length; i++) {
+      var gridN = Math.min(firstItems.length, Math.max(2, Math.min(6, fanSlots.length)));
+      for (var i = 0; i < gridN; i++) {
         dest.push(firstItems[i].getBoundingClientRect());
       }
       gallery.classList.remove("is-measuring");
       gallery.style.opacity = "0";
 
       setTimeout(function () {
-        /* Phase 2: settle zoom into masonry slots, slide list from under */
-        beltGhosts.forEach(function (item) {
-          if (!item.hero) return;
-          var hi = heroes.indexOf(item.tile);
-          var r = dest[hi];
-          item.el.style.transform = "rotate(0deg) scale(1)";
-          if (r && r.width > 4) {
-            morphGhostToRect(item.el, r, { radius: "8px" });
+        /* Phase 2: land into measured grid cells (bidirectional with close) */
+        var land = beltGhosts
+          .slice()
+          .sort(function (a, b) {
+            if (a.hero && !b.hero) return -1;
+            if (!a.hero && b.hero) return 1;
+            return a.slot.left - b.slot.left;
+          });
+        land.forEach(function (item, li) {
+          var g = item.el;
+          g.style.transitionDelay = (0.02 + li * 0.04).toFixed(2) + "s";
+          var r = dest[li];
+          if (r && r.width > 4 && li < dest.length) {
+            g.style.opacity = "1";
+            applyGhostBox(
+              g,
+              { left: r.left, top: r.top, width: r.width, height: r.height, rotate: 0 },
+              { radius: "8px", rotate: 0 }
+            );
+            g.style.transform = "rotate(0deg) scale(1)";
+            g.style.zIndex = String(20 - li);
+          } else if (!item.hero) {
+            g.style.opacity = "0";
           }
         });
         gallery.style.opacity = "1";
@@ -1086,8 +1215,8 @@
         setTimeout(function () {
           beltLayer.style.opacity = "0";
           removeGhosts(640);
-        }, 560);
-      }, REDUCED ? 0 : 1400);
+        }, 620);
+      }, REDUCED ? 0 : 1280);
     });
   }
 
@@ -1275,6 +1404,7 @@
   function finishClose(prev, resumeIdx, opts) {
     opts = opts || {};
     var chapterForReveal = opts.revealChapter || null;
+    var revealMode = opts.revealMode || null;
     expandedKey = null;
     closing = false;
     openChapter = null;
@@ -1285,9 +1415,16 @@
     root.classList.remove("is-closing-reverse");
     clearBody();
     if (chapterForReveal && (prev === "video" || prev === "graphics") && !REDUCED) {
-      beginCatalogReveal(chapterForReveal);
+      beginCatalogReveal(chapterForReveal, { mode: revealMode || (prev === "video" ? "fan" : "") });
     } else {
-      root.classList.remove("is-morphing", "is-systems-detail", "is-systems-exiting", "is-catalog-revealing");
+      root.classList.remove(
+        "is-morphing",
+        "is-systems-detail",
+        "is-systems-exiting",
+        "is-catalog-revealing",
+        "is-fan-handoff",
+        "is-copy-in"
+      );
     }
     root.classList.remove("is-systems-detail", "is-systems-exiting");
     var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
@@ -1438,11 +1575,10 @@
     return !!(ca && cb && ca === cb);
   }
 
-  /* Reverse of openVideo: grid tiles fly back into the catalog diagonal fan */
+  /* Reverse of openVideo: grid → fan at exact catalog sizes + -16°, then slow copy */
   function closeVideoReverse() {
     document.body.classList.add("is-closing-reverse");
     root.classList.add("is-closing-reverse");
-    /* Cancel pending open-handoff ghost clears so they don't wipe the fan. */
     if (ghostClearTimer) {
       window.clearTimeout(ghostClearTimer);
       ghostClearTimer = 0;
@@ -1458,19 +1594,7 @@
       });
     }
 
-    /* Live fan slots from the paused catalog belt */
-    var fanSlots = [];
-    if (chapter) {
-      fanSlots = captureTiles(
-        "#reels-tiles .reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card",
-        chapter
-      );
-      if (fanSlots.length < 2) fanSlots = captureTiles("#reels-tiles .reels-tiles__card", chapter);
-    }
-    fanSlots.sort(function (a, b) {
-      return a.rect.left - b.rect.left;
-    });
-
+    var fanSlots = captureFanSlots(chapter);
     var gridItems = captureExpandReelItems(gallery, Math.max(fanSlots.length, 8));
 
     if (gallery && fanSlots.length >= 2 && gridItems.length >= 2 && !REDUCED) {
@@ -1480,7 +1604,11 @@
         var i;
         for (i = 0; i < gridItems.length; i++) {
           if (used[i]) continue;
-          if (mediaBasesMatch(fan.src, gridItems[i].src)) {
+          if (
+            mediaBasesMatch(fan.src, gridItems[i].src) ||
+            mediaBasesMatch(fan.poster, gridItems[i].poster) ||
+            mediaBasesMatch(fan.poster, gridItems[i].src)
+          ) {
             idx = i;
             break;
           }
@@ -1506,88 +1634,89 @@
       var ghosts = pairs.map(function (pair, i) {
         var fan = pair.fan;
         var from = pair.from;
-        var g = document.createElement("figure");
-        g.className = "expand-belt__card" + (Math.abs(i - mid) < 1 ? " is-hero" : "");
-        g.style.borderRadius = "8px";
+        var startBox = from
+          ? {
+              left: from.rect.left,
+              top: from.rect.top,
+              width: from.rect.width,
+              height: from.rect.height,
+              rotate: 0,
+              poster: from.poster,
+              videoSrc: from.videoSrc,
+            }
+          : {
+              left: fan.left + fan.width * 0.12,
+              top: fan.top + fan.height * 0.1,
+              width: fan.width * 0.76,
+              height: fan.height * 0.76,
+              rotate: 0,
+              poster: fan.poster,
+              videoSrc: fan.videoSrc,
+            };
+        var g = makeBeltGhost(
+          ghostStillSrc(from) || ghostStillSrc(fan),
+          startBox,
+          Math.abs(i - mid) < 1 ? "is-hero" : ""
+        );
         g.style.zIndex = String(10 + Math.round(10 - Math.abs(i - mid)));
-        var src = ghostStillSrc(from) || ghostStillSrc(fan);
-        if (src) {
-          var img = document.createElement("img");
-          img.src = src;
-          img.alt = "";
-          g.appendChild(img);
-        }
-        if (from && from.rect.width > 4) {
-          g.style.left = from.rect.left + "px";
-          g.style.top = from.rect.top + "px";
-          g.style.width = from.rect.width + "px";
-          g.style.height = from.rect.height + "px";
-          g.style.opacity = "1";
-          g.style.transform = "rotate(0deg) scale(1)";
-        } else {
-          /* No grid source — bloom into the fan slot */
-          g.style.left = fan.rect.left + fan.rect.width * 0.15 + "px";
-          g.style.top = fan.rect.top + fan.rect.height * 0.12 + "px";
-          g.style.width = fan.rect.width * 0.7 + "px";
-          g.style.height = fan.rect.height * 0.7 + "px";
-          g.style.opacity = "0";
-          g.style.transform = "rotate(0deg) scale(0.88)";
-        }
+        if (!from) g.style.opacity = "0";
         beltLayer.appendChild(g);
-        return { el: g, fan: fan, delay: Math.abs(i - mid) * 0.09 + Math.random() * 0.05 };
+        return {
+          el: g,
+          fan: fan,
+          delay: Math.abs(i - mid) * 0.08 + Math.random() * 0.04,
+        };
       });
 
-      /* Grid soft-exits while ghosts peel off into the fan */
       gallery.classList.remove("is-ready", "is-slide-up");
       gallery.style.transition =
-        "opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1)";
+        "opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1)";
       window.setTimeout(function () {
         gallery.style.opacity = "0";
-        gallery.style.transform = "translate3d(0, 10%, 0)";
-      }, 80);
+        gallery.style.transform = "translate3d(0, 8%, 0)";
+      }, 60);
 
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           ghosts.forEach(function (item) {
             var g = item.el;
-            var r = item.fan.rect;
+            var fan = item.fan;
+            var d = item.delay.toFixed(2) + "s";
             g.style.transition =
               "left 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
-              item.delay.toFixed(2) +
-              "s, top 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
-              item.delay.toFixed(2) +
-              "s, width 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
-              item.delay.toFixed(2) +
-              "s, height 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
-              item.delay.toFixed(2) +
-              "s, opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) " +
-              item.delay.toFixed(2) +
-              "s, transform 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
-              item.delay.toFixed(2) +
-              "s, border-radius 1.2s ease " +
-              item.delay.toFixed(2) +
-              "s";
-            morphGhostToRect(g, r, { radius: "0.55rem" });
+              d +
+              ", top 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              d +
+              ", width 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              d +
+              ", height 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              d +
+              ", opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1) " +
+              d +
+              ", transform 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              d +
+              ", border-radius 1.15s ease " +
+              d;
+            /* Land on exact fan face size + belt tilt */
+            applyGhostBox(g, fan, { radius: "10px", rotate: FAN_BELT_ROTATE });
             g.style.opacity = "1";
-            g.style.transform = "rotate(0deg) scale(1)";
           });
-          /* Settle the whole fan onto the catalog diagonal */
           window.setTimeout(function () {
             beltLayer.classList.add("is-fan-settled");
-          }, 420);
+          }, 380);
         });
       });
 
       var maxDelay = ghosts.reduce(function (m, item) {
         return Math.max(m, item.delay);
       }, 0);
-      var handoff = Math.round(420 + maxDelay * 1000 + 1550);
+      var handoff = Math.round(480 + maxDelay * 1000 + 1550);
       window.setTimeout(function () {
         beltLayer.style.opacity = "0";
         window.setTimeout(function () {
           videoOpenState = null;
-          finishClose("video", null, { revealChapter: chapter });
-        }, 380);
+          finishClose("video", null, { revealChapter: chapter, revealMode: "fan" });
+        }, 320);
       }, handoff);
       return;
     }
@@ -1601,14 +1730,14 @@
       gallery.style.transform = "translate3d(0, 22%, 0)";
       window.setTimeout(function () {
         videoOpenState = null;
-        finishClose("video", null, { revealChapter: chapter });
+        finishClose("video", null, { revealChapter: chapter, revealMode: "fan" });
       }, Math.max(1400, softExit + 400));
       return;
     }
     stage.classList.add("is-closing");
     window.setTimeout(function () {
       videoOpenState = null;
-      finishClose("video", null, { revealChapter: chapter });
+      finishClose("video", null, { revealChapter: chapter, revealMode: "fan" });
     }, REDUCED ? 0 : 640);
   }
 

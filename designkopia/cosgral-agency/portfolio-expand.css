@@ -47,10 +47,30 @@ body.is-tile-expanded .site-nav {
   opacity: 1 !important;
   pointer-events: none;
 }
+/* Default: copy visible. Fan handoff: copy waits, then fades in slowly. */
 .portfolio-chapters.is-catalog-revealing .portfolio-chapter.is-active .portfolio-chapter__copy {
   opacity: 1 !important;
   pointer-events: auto;
   transform: none !important;
+}
+.portfolio-chapters.is-catalog-revealing.is-fan-handoff .portfolio-chapter.is-active .portfolio-chapter__copy {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: none !important;
+  transition: opacity 1.65s cubic-bezier(0.22, 1, 0.36, 1) 0.35s !important;
+}
+.portfolio-chapters.is-catalog-revealing.is-fan-handoff.is-copy-in .portfolio-chapter.is-active .portfolio-chapter__copy {
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+.portfolio-chapters.is-catalog-revealing.is-fan-handoff .portfolio-tile__viz-word {
+  opacity: 0 !important;
+  filter: none !important;
+  animation: none !important;
+  transition: opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.55s !important;
+}
+.portfolio-chapters.is-catalog-revealing.is-fan-handoff.is-copy-in .portfolio-tile__viz-word {
+  opacity: 1 !important;
 }
 .portfolio-chapters.is-catalog-revealing .chapter-show__word,
 .portfolio-chapters.is-catalog-revealing .chapter-show__badge,
@@ -72,6 +92,11 @@ body.is-tile-expanded .site-nav {
   animation: none !important;
   transition: opacity 1.55s cubic-bezier(0.22, 1, 0.36, 1) !important;
   transition-delay: var(--reveal-delay, 0s) !important;
+}
+/* Fan handoff: belt already rebuilt — keep cards visible, no second stagger */
+.portfolio-chapters.is-catalog-revealing.is-fan-handoff .reels-tiles__card {
+  opacity: 1 !important;
+  transition: none !important;
 }
 .portfolio-chapters.is-catalog-revealing .chapter-show__tile.is-reveal-in,
 .portfolio-chapters.is-catalog-revealing .reels-tiles__card.is-reveal-in,
@@ -151,10 +176,12 @@ body.is-tile-expanded.is-closing-reverse .expand-belt__card {
 .expand-belt.is-level .expand-belt__card {
   transform: rotate(0deg);
 }
-/* Close: ghosts reforming the catalog diagonal fan */
-.expand-belt.is-fan-return .expand-belt__card {
+/* Fan ↔ grid morph ghosts (true face size + belt tilt) */
+.expand-belt.is-fan-return .expand-belt__card,
+.expand-belt.is-fan-open .expand-belt__card {
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.52);
   will-change: left, top, width, height, transform, opacity;
+  transform-origin: 50% 50%;
 }
 .expand-belt.is-fan-return.is-fan-settled .expand-belt__card {
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
