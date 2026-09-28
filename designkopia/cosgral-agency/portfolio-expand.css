@@ -656,7 +656,8 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
   transform: translate3d(0, 18px, 0);
   transition:
     opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
 }
 .expand-gallery .reels-masonry__item.is-anchor,
 .expand-gallery .graphics-masonry__item.is-anchor {
@@ -693,6 +694,42 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
   height: auto;
   display: block;
   vertical-align: middle;
+}
+
+/* Montaż expand — half-size 2-col feed, grayscale → color on hover/focus */
+.expand-gallery--video {
+  padding-top: 0.35rem;
+}
+.expand-gallery--video .expand-gallery__group {
+  max-width: min(560px, 94vw);
+}
+.expand-gallery--video .reels-masonry {
+  column-gap: clamp(0.45rem, 1.2vw, 0.7rem);
+}
+.expand-gallery--video .reels-masonry__item {
+  margin-bottom: clamp(0.45rem, 1.2vw, 0.7rem);
+  border-radius: 8px;
+}
+.expand-gallery--video .reels-masonry__item video {
+  filter: grayscale(1) contrast(1.06);
+  transition: filter 0.45s ease;
+}
+.expand-gallery--video .reels-masonry__item.is-reel-hover video,
+.expand-gallery--video .reels-masonry__item.is-reel-focus video,
+.expand-gallery--video .reels-masonry__item:hover video,
+.expand-gallery--video .reels-masonry__item:focus-visible video {
+  filter: grayscale(0);
+}
+.expand-gallery--video.is-ready .reels-masonry__item.is-reel-focus {
+  transform: scale(1.14);
+  z-index: 3;
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.55);
+  transition-delay: 0s;
+}
+.expand-gallery--video.is-ready .reels-masonry__item.is-reel-focus video {
+  border-radius: 8px;
 }
 
 @media (max-width: 720px) {

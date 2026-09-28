@@ -23,6 +23,7 @@
   var activeGhosts = [];
   var systemsDetailFan = null;
   var openChapter = null;
+  var videoOpenState = null;
 
   var WEB_CASES = [
     {
@@ -155,6 +156,7 @@
     bodyEl.removeAttribute("data-expand-mode");
     deckCards = [];
     deckIndex = 0;
+    videoOpenState = null;
   }
 
   function isInteractiveTarget(el) {
@@ -352,17 +354,150 @@
     return Array.prototype.slice.call(scope.querySelectorAll(selector)).map(function (el) {
       var img = el.querySelector("img, video");
       var src = "";
+      var poster = "";
+      var videoSrc = "";
       if (img) {
+        poster = img.getAttribute("poster") || "";
+        videoSrc = img.getAttribute("data-video-src") || img.getAttribute("src") || img.src || "";
         src =
           img.currentSrc ||
+          poster ||
+          videoSrc ||
           img.src ||
-          img.getAttribute("poster") ||
-          img.getAttribute("data-video-src") ||
           "";
       }
-      return { el: el, rect: el.getBoundingClientRect(), src: src };
+      return { el: el, rect: el.getBoundingClientRect(), src: src, poster: poster, videoSrc: videoSrc };
     }).filter(function (t) {
       return t.rect.width > 8 && t.rect.height > 8 && t.rect.bottom > 0 && t.rect.top < window.innerHeight;
+    });
+  }
+
+  function mediaFileBase(path) {
+    if (!path) return "";
+    var clean = String(path).split("?")[0];
+    var parts = clean.split("/");
+    return parts[parts.length - 1] || "";
+  }
+
+  function reelItemMatchesSeed(item, seed) {
+    if (!item || !seed) return false;
+    var seedBase = mediaFileBase(seed);
+    var seedCore = seedBase.replace(/-poster\.(jpe?g|png|webp)$/i, "").replace(/\.(mp4|webm|mov)$/i, "");
+    var candidates = [item.poster, item.src, item.full];
+    for (var i = 0; i < candidates.length; i++) {
+      var c = candidates[i];
+      if (!c) continue;
+      if (seed.indexOf(c) !== -1 || c.indexOf(seedBase) !== -1) return true;
+      var cBase = mediaFileBase(c);
+      var cCore = cBase.replace(/-poster\.(jpe?g|png|webp)$/i, "").replace(/\.(mp4|webm|mov)$/i, "");
+      if (seedCore && cCore && seedCore === cCore) return true;
+    }
+    return false;
+  }
+
+  function detectReelBrand(heroes, data) {
+    var scores = {};
+    (data.groups || []).forEach(function (g) {
+      scores[g.id] = 0;
+    });
+    (heroes || []).forEach(function (h) {
+      var seeds = [h.src, h.poster, h.videoSrc].filter(Boolean);
+      (data.groups || []).forEach(function (g) {
+        (g.items || []).forEach(function (item) {
+          for (var i = 0; i < seeds.length; i++) {
+            if (reelItemMatchesSeed(item, seeds[i])) {
+              scores[g.id] = (scores[g.id] || 0) + 1;
+              break;
+            }
+          }
+        });
+      });
+    });
+    if ((scores.trove || 0) >= (scores.wiktoria || 0) && (scores.trove || 0) > 0) return "trove";
+    if ((scores.wiktoria || 0) > 0) return "wiktoria";
+    var best = null;
+    var bestN = 0;
+    Object.keys(scores).forEach(function (id) {
+      if (scores[id] > bestN) {
+        bestN = scores[id];
+        best = id;
+      }
+    });
+    return best || "trove";
+  }
+
+  function orderReelGroups(groups, prioritizeId) {
+    var list = (groups || []).slice();
+    list.sort(function (a, b) {
+      if (a.id === prioritizeId && b.id !== prioritizeId) return -1;
+      if (b.id === prioritizeId && a.id !== prioritizeId) return 1;
+      return 0;
+    });
+    return list;
+  }
+
+  function bindReelsExpandInteractions(gallery) {
+    var items = gallery.querySelectorAll(".reels-masonry__item");
+    var active = null;
+
+    function setMuted(video, muted) {
+      if (!video) return;
+      video.muted = muted;
+      if (muted) video.setAttribute("muted", "");
+      else {
+        video.removeAttribute("muted");
+        video.volume = 1;
+      }
+    }
+
+    function deactivate(btn) {
+      if (!btn) return;
+      btn.classList.remove("is-reel-focus");
+      var video = btn.querySelector("video");
+      if (video) {
+        setMuted(video, true);
+        if (!btn.classList.contains("is-reel-hover")) {
+          try {
+            video.pause();
+          } catch (e) {}
+        }
+      }
+    }
+
+    items.forEach(function (btn) {
+      var video = btn.querySelector("video");
+      if (!video) return;
+
+      btn.addEventListener("mouseenter", function () {
+        btn.classList.add("is-reel-hover");
+        if (active !== btn) setMuted(video, true);
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {});
+      });
+
+      btn.addEventListener("mouseleave", function () {
+        btn.classList.remove("is-reel-hover");
+        if (active === btn) return;
+        try {
+          video.pause();
+        } catch (e) {}
+      });
+
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (active === btn) {
+          deactivate(btn);
+          active = null;
+          return;
+        }
+        if (active) deactivate(active);
+        active = btn;
+        btn.classList.add("is-reel-focus");
+        setMuted(video, false);
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {});
+      });
     });
   }
 
@@ -449,7 +584,7 @@
     });
   }
 
-  /* Montaż: straighten diagonal → pin 2 center tiles → list slides from under */
+  /* Montaż: 2 center tiles level + zoom → pin top → brand feed (half tiles) */
   function openVideo(chapter) {
     bodyEl.setAttribute("data-expand-mode", "video");
     hideChapterMedia();
@@ -477,6 +612,36 @@
     heroes.sort(function (a, b) {
       return a.rect.left - b.rect.left;
     });
+
+    videoOpenState = {
+      chapter: chapter,
+      heroes: heroes.map(function (h) {
+        return {
+          rect: {
+            left: h.rect.left,
+            top: h.rect.top,
+            width: h.rect.width,
+            height: h.rect.height,
+          },
+          src: h.src,
+          poster: h.poster,
+          videoSrc: h.videoSrc,
+        };
+      }),
+      all: all.map(function (t) {
+        return {
+          rect: {
+            left: t.rect.left,
+            top: t.rect.top,
+            width: t.rect.width,
+            height: t.rect.height,
+          },
+          src: t.src,
+          hero: heroes.indexOf(t) !== -1,
+        };
+      }),
+      brand: null,
+    };
 
     var beltLayer = document.createElement("div");
     beltLayer.className = "expand-belt";
@@ -507,17 +672,19 @@
     gallery.style.opacity = "0";
     bodyEl.appendChild(gallery);
 
-    var colW = Math.min(300, window.innerWidth * 0.4);
-    var gap = 18;
+    /* Half of previous ~1120px gallery → ~560px / 2-col */
+    var galleryW = Math.min(560, window.innerWidth * 0.92);
+    var gap = 12;
+    var colW = (galleryW - gap) / 2;
     var total = colW * 2 + gap;
     var startX = (window.innerWidth - total) / 2;
-    var topY = Math.max(64, window.innerHeight * 0.08);
+    var topY = Math.max(56, window.innerHeight * 0.07);
     var heroH = colW * (16 / 9);
 
-    /* Phase 1: straighten diagonal (+ derotate belt) and park 2 heroes as columns */
+    /* Phase 1: straighten diagonal, slight zoom, park 2 heroes at top */
     requestAnimationFrame(function () {
       beltLayer.classList.add("is-level");
-      beltGhosts.forEach(function (item, i) {
+      beltGhosts.forEach(function (item) {
         var g = item.el;
         if (item.hero) {
           var hi = heroes.indexOf(item.tile);
@@ -525,12 +692,11 @@
           g.style.top = topY + "px";
           g.style.width = colW + "px";
           g.style.height = heroH + "px";
-          g.style.borderRadius = "12px";
+          g.style.borderRadius = "10px";
           g.style.zIndex = "20";
           g.style.opacity = "1";
-          g.style.transform = "rotate(0deg)";
+          g.style.transform = "rotate(0deg) scale(1.08)";
         } else {
-          /* Side tiles level out and fade while heroes hold the frame */
           var side = item.tile.rect.left < cx ? -1 : 1;
           g.style.left = item.tile.rect.left + side * 40 + "px";
           g.style.top = item.tile.rect.top + 28 + "px";
@@ -542,12 +708,23 @@
 
     fetchManifest("reels").then(function (data) {
       if (expandedKey !== "video") return;
-      buildMediaInto(gallery, "reels", data, {
-        seedPosters: heroes.map(function (h) {
-          return h.src;
-        }),
+      var brand = detectReelBrand(heroes, data);
+      if (videoOpenState) videoOpenState.brand = brand;
+      gallery.setAttribute("data-reel-brand", brand);
+
+      var seedList = [];
+      heroes.forEach(function (h) {
+        if (h.src) seedList.push(h.src);
+        if (h.poster && seedList.indexOf(h.poster) === -1) seedList.push(h.poster);
+        if (h.videoSrc && seedList.indexOf(h.videoSrc) === -1) seedList.push(h.videoSrc);
       });
-      /* Measure first two masonry cells — heroes should land there */
+
+      buildMediaInto(gallery, "reels", data, {
+        seedPosters: seedList,
+        prioritizeGroup: brand,
+      });
+
+      /* Measure first two masonry cells — heroes land there */
       gallery.classList.add("is-measuring", "is-video-anchor");
       gallery.style.opacity = "1";
       var firstItems = gallery.querySelectorAll(".reels-masonry__item");
@@ -559,13 +736,14 @@
       gallery.style.opacity = "0";
 
       setTimeout(function () {
-        /* Phase 2: snap heroes onto first masonry slots, slide list from under */
+        /* Phase 2: settle zoom into masonry slots, slide list from under */
         beltGhosts.forEach(function (item) {
           if (!item.hero) return;
           var hi = heroes.indexOf(item.tile);
           var r = dest[hi];
+          item.el.style.transform = "rotate(0deg) scale(1)";
           if (r && r.width > 4) {
-            morphGhostToRect(item.el, r, { radius: "10px" });
+            morphGhostToRect(item.el, r, { radius: "8px" });
           }
         });
         gallery.style.opacity = "1";
@@ -654,24 +832,29 @@
     opts = opts || {};
     gallery.innerHTML = "";
     var seeds = opts.seedPosters || [];
-    (data.groups || []).forEach(function (group, gi) {
+    var groups = data.groups || [];
+    if (kind === "reels" && opts.prioritizeGroup) {
+      groups = orderReelGroups(groups, opts.prioritizeGroup);
+    }
+    groups.forEach(function (group, gi) {
       var section = document.createElement("section");
       section.className = "expand-gallery__group";
+      if (group.id) section.setAttribute("data-reel-group", group.id);
       var head = document.createElement("header");
       head.className = "expand-gallery__head";
       head.innerHTML = '<h3 class="expand-gallery__heading"></h3><p class="expand-gallery__count"></p>';
       head.querySelector(".expand-gallery__heading").textContent = group.name || group.id;
       var items = (group.items || []).slice();
-      /* Prefer seeded posters at the front of the first group for seamless morph */
+      /* Prefer seeded posters at the front of the prioritized group for seamless morph */
       if (gi === 0 && seeds.length) {
         items = items.slice().sort(function (a, b) {
           var as = seeds.some(function (s) {
-            return s && ((a.poster && a.poster.indexOf(s.split("/").pop()) !== -1) || (a.src && s.indexOf(a.src.split("/").pop()) !== -1));
+            return reelItemMatchesSeed(a, s);
           })
             ? 0
             : 1;
           var bs = seeds.some(function (s) {
-            return s && ((b.poster && b.poster.indexOf(s.split("/").pop()) !== -1) || (b.src && s.indexOf(b.src.split("/").pop()) !== -1));
+            return reelItemMatchesSeed(b, s);
           })
             ? 0
             : 1;
@@ -687,7 +870,12 @@
         var btn = document.createElement("button");
         btn.type = "button";
         btn.className = kind === "reels" ? "reels-masonry__item" : "graphics-masonry__item";
-        if (gi === 0 && ii < seeds.length) btn.classList.add("is-anchor");
+        var isSeed =
+          gi === 0 &&
+          seeds.some(function (s) {
+            return reelItemMatchesSeed(item, s);
+          });
+        if (isSeed && ii < 2) btn.classList.add("is-anchor");
         if (kind === "reels" || item.type === "video") btn.classList.add("is-video");
         if (item.w && item.h) btn.style.aspectRatio = item.w + " / " + item.h;
         if (kind === "reels" || item.type === "video") {
@@ -695,22 +883,23 @@
           video.muted = true;
           video.loop = true;
           video.playsInline = true;
-          video.preload = "none";
+          video.preload = ii < 4 ? "metadata" : "none";
           if (item.poster) video.poster = item.poster;
           video.src = item.src;
           btn.appendChild(video);
-          btn.addEventListener("mouseenter", function () {
-            var p = video.play();
-            if (p && p.catch) p.catch(function () {});
-          });
-          btn.addEventListener("mouseleave", function () {
-            try {
-              video.pause();
-            } catch (e) {}
-          });
+          if (kind !== "reels") {
+            btn.addEventListener("mouseenter", function () {
+              var p = video.play();
+              if (p && p.catch) p.catch(function () {});
+            });
+            btn.addEventListener("mouseleave", function () {
+              try {
+                video.pause();
+              } catch (e) {}
+            });
+          }
         } else {
           var img = document.createElement("img");
-          /* Prefer seeded hero image for the first cell */
           if (gi === 0 && ii === 0 && seeds[0]) img.src = seeds[0];
           else img.src = item.src;
           img.alt = "";
@@ -722,6 +911,7 @@
       section.appendChild(masonry);
       gallery.appendChild(section);
     });
+    if (kind === "reels") bindReelsExpandInteractions(gallery);
   }
 
   function open(key, chapter) {
@@ -822,9 +1012,109 @@
     }, REDUCED ? 0 : 640);
   }
 
-  /* Reverse of openVideo: gallery slides down, chapter belt returns */
+  /* Reverse of openVideo: masonry → 2 heroes zoom back into diagonal belt */
   function closeVideoReverse() {
     var gallery = bodyEl.querySelector(".expand-gallery");
+    var state = videoOpenState;
+    if (gallery) {
+      gallery.querySelectorAll("video").forEach(function (v) {
+        try {
+          v.pause();
+          v.muted = true;
+        } catch (e) {}
+      });
+    }
+
+    if (gallery && state && state.heroes && state.heroes.length && !REDUCED) {
+      var anchors = gallery.querySelectorAll(".reels-masonry__item.is-anchor");
+      if (anchors.length < 2) anchors = gallery.querySelectorAll(".reels-masonry__item");
+
+      var beltLayer = document.createElement("div");
+      beltLayer.className = "expand-belt is-level";
+      document.body.appendChild(beltLayer);
+      activeGhosts.push(beltLayer);
+
+      var heroGhosts = state.heroes.map(function (h, i) {
+        var from = anchors[i] ? anchors[i].getBoundingClientRect() : null;
+        var g = document.createElement("figure");
+        g.className = "expand-belt__card is-hero";
+        if (from && from.width > 4) {
+          g.style.left = from.left + "px";
+          g.style.top = from.top + "px";
+          g.style.width = from.width + "px";
+          g.style.height = from.height + "px";
+        } else {
+          g.style.left = h.rect.left + "px";
+          g.style.top = h.rect.top + "px";
+          g.style.width = h.rect.width + "px";
+          g.style.height = h.rect.height + "px";
+        }
+        g.style.borderRadius = "8px";
+        g.style.transform = "rotate(0deg) scale(1)";
+        if (h.src) {
+          var img = document.createElement("img");
+          img.src = h.src;
+          img.alt = "";
+          g.appendChild(img);
+        }
+        beltLayer.appendChild(g);
+        return g;
+      });
+
+      /* Side belt cards fade back in at original spots */
+      (state.all || []).forEach(function (t) {
+        if (t.hero) return;
+        var g = document.createElement("figure");
+        g.className = "expand-belt__card";
+        g.style.left = t.rect.left + "px";
+        g.style.top = t.rect.top + "px";
+        g.style.width = t.rect.width + "px";
+        g.style.height = t.rect.height + "px";
+        g.style.opacity = "0";
+        g.style.transform = "rotate(0deg) scale(0.92)";
+        if (t.src) {
+          var img2 = document.createElement("img");
+          img2.src = t.src;
+          img2.alt = "";
+          g.appendChild(img2);
+        }
+        beltLayer.appendChild(g);
+        requestAnimationFrame(function () {
+          g.style.opacity = "1";
+          g.style.transform = "rotate(0deg) scale(1)";
+        });
+      });
+
+      gallery.classList.remove("is-ready", "is-slide-up");
+      gallery.style.transition =
+        "opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.35s cubic-bezier(0.22, 1, 0.36, 1)";
+      gallery.style.opacity = "0";
+      gallery.style.transform = "translate3d(0, 28%, 0)";
+
+      requestAnimationFrame(function () {
+        heroGhosts.forEach(function (g, i) {
+          var h = state.heroes[i];
+          if (!h) return;
+          /* Slight zoom then settle into original belt rect */
+          g.style.transform = "rotate(0deg) scale(1.08)";
+          morphGhostToRect(g, h.rect, { radius: "0.55rem" });
+          window.setTimeout(function () {
+            g.style.transform = "rotate(0deg) scale(1)";
+          }, 40);
+        });
+      });
+
+      window.setTimeout(function () {
+        root.classList.remove("is-morphing");
+        beltLayer.style.opacity = "0";
+        window.setTimeout(function () {
+          videoOpenState = null;
+          finishClose("video", null);
+        }, 420);
+      }, 1400);
+      return;
+    }
+
     if (gallery && !REDUCED) {
       gallery.classList.remove("is-ready", "is-slide-up");
       gallery.style.transition =
@@ -833,6 +1123,7 @@
       gallery.style.transform = "translate3d(0, 28%, 0)";
       root.classList.remove("is-morphing");
       window.setTimeout(function () {
+        videoOpenState = null;
         finishClose("video", null);
       }, 1400);
       return;
@@ -840,6 +1131,7 @@
     stage.classList.add("is-closing");
     root.classList.remove("is-morphing");
     window.setTimeout(function () {
+      videoOpenState = null;
       finishClose("video", null);
     }, REDUCED ? 0 : 640);
   }
