@@ -646,11 +646,11 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   position: absolute;
   left: 0;
   top: 0;
-  /* Shared catalog/detail size — arc bleeds past viewport edges */
-  width: min(14vw, 7.6rem);
+  /* Shared catalog/detail size — ~2×; arc bleeds past viewport edges */
+  width: min(28vw, 15.2rem);
   aspect-ratio: 1;
   margin: 0;
-  border-radius: 1.35rem;
+  border-radius: 1.65rem;
   overflow: hidden;
   background: #141414;
   border: 1px solid rgba(255, 255, 255, 0.12);
