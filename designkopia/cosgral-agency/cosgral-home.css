@@ -1609,12 +1609,20 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   text-transform: uppercase;
 }
 .home-work__card-cta {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #fff;
   white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  padding-bottom: 0.12rem;
+  transition: border-color 0.45s ease;
+}
+.home-work__card:hover .home-work__card-cta,
+.home-work__card:focus-visible .home-work__card-cta {
+  border-color: #fff;
 }
 .home-work__footer {
   margin-top: 0;
