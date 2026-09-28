@@ -137,23 +137,28 @@
     },
   ];
 
+  /* Systemy — only systems / automation materials */
   var OS_MEDIA = [
-    REEL + "orlincy/001-poster.jpg",
-    REEL + "orlincy/003-poster.jpg",
-    REEL + "orlincy/005-poster.jpg",
-    REEL + "reklamy/001-poster.jpg",
-    REEL + "reklamy/003-poster.jpg",
     STILL + "systems/crm-0-5.jpg",
-    STILL + "systems/auto-1-5.jpg",
-    STILL + "systems/app-2-5.jpg",
-    "assets/cases/telforceone-crm.svg",
-    "assets/cases/shelfsync.svg",
-    REEL + "orlincy/002-poster.jpg",
-    REEL + "orlincy/006-poster.jpg",
-    ACC + "accent-halftone.svg",
-    ACC + "accent-halftone.svg",
+    STILL + "systems/crm-1-5.jpg",
     STILL + "systems/crm-2-5.jpg",
-    REEL + "reklamy/005-poster.jpg",
+    STILL + "systems/crm-3-5.jpg",
+    STILL + "systems/auto-0-5.jpg",
+    STILL + "systems/auto-1-5.jpg",
+    STILL + "systems/auto-2-5.jpg",
+    STILL + "systems/auto-3-5.jpg",
+    STILL + "systems/app-0-5.jpg",
+    STILL + "systems/app-1-5.jpg",
+    STILL + "systems/app-2-5.jpg",
+    STILL + "systems/app-3-5.jpg",
+    "assets/cases/telforceone-crm.svg",
+    "assets/cases/telforceone-code39.svg",
+    "assets/cases/telforceone-forecast.svg",
+    "assets/cases/shelfsync.svg",
+    "assets/cases/northline-crm.svg",
+    "assets/cases/parcel-co.svg",
+    "assets/cases/atelier-bloom.svg",
+    "assets/services/automatyzacje-poster.jpg",
   ];
 
   var SHOW_WORDS = [
@@ -215,22 +220,26 @@
   ];
 
   var OS_STACK = [
-    { x: "-4%", y: "-6%", s: 1.12, z: 10 },
-    { x: "14%", y: "0%", s: 0.98, z: 9 },
-    { x: "-18%", y: "8%", s: 0.94, z: 8 },
-    { x: "20%", y: "12%", s: 0.9, z: 7 },
-    { x: "-2%", y: "18%", s: 0.86, z: 6 },
-    { x: "10%", y: "-20%", s: 0.8, z: 5 },
-    { x: "-22%", y: "-16%", s: 0.76, z: 4 },
-    { x: "24%", y: "-14%", s: 0.74, z: 4 },
-    { x: "-14%", y: "24%", s: 0.7, z: 3 },
-    { x: "16%", y: "22%", s: 0.68, z: 3 },
-    { x: "2%", y: "-26%", s: 0.64, z: 2 },
-    { x: "-28%", y: "2%", s: 0.62, z: 2 },
-    { x: "30%", y: "4%", s: 0.6, z: 2 },
-    { x: "-10%", y: "-30%", s: 0.56, z: 1 },
-    { x: "8%", y: "30%", s: 0.54, z: 1 },
-    { x: "22%", y: "-28%", s: 0.52, z: 1 },
+    { x: "-4%", y: "-6%", s: 1.12, z: 12 },
+    { x: "14%", y: "0%", s: 0.98, z: 11 },
+    { x: "-18%", y: "8%", s: 0.94, z: 10 },
+    { x: "20%", y: "12%", s: 0.9, z: 9 },
+    { x: "-2%", y: "18%", s: 0.86, z: 8 },
+    { x: "10%", y: "-20%", s: 0.8, z: 7 },
+    { x: "-22%", y: "-16%", s: 0.76, z: 6 },
+    { x: "24%", y: "-14%", s: 0.74, z: 6 },
+    { x: "-14%", y: "24%", s: 0.7, z: 5 },
+    { x: "16%", y: "22%", s: 0.68, z: 5 },
+    { x: "2%", y: "-26%", s: 0.64, z: 4 },
+    { x: "-28%", y: "2%", s: 0.62, z: 4 },
+    { x: "30%", y: "4%", s: 0.6, z: 3 },
+    { x: "-10%", y: "-30%", s: 0.56, z: 3 },
+    { x: "8%", y: "30%", s: 0.54, z: 2 },
+    { x: "22%", y: "-28%", s: 0.52, z: 2 },
+    { x: "-32%", y: "14%", s: 0.48, z: 1 },
+    { x: "34%", y: "16%", s: 0.46, z: 1 },
+    { x: "-6%", y: "32%", s: 0.44, z: 1 },
+    { x: "12%", y: "-32%", s: 0.42, z: 1 },
   ];
 
   function osFieldPos(i, n) {
@@ -295,13 +304,26 @@
     }, 1100);
   }
 
-  /* —— Strony New Luxury —— */
+  /* —— Strony New Luxury: tiles exit L / enter R, word rotateY flat —— */
   function initLux() {
     var lux = root.querySelector("[data-chapter-lux]");
     if (!lux) return;
     var wordEl = lux.querySelector("[data-lux-word]");
     var shots = Array.prototype.slice.call(lux.querySelectorAll("[data-lux-shot]"));
     var idx = 0;
+    var busy = false;
+
+    function clearPhases() {
+      lux.classList.remove(
+        "is-stretch",
+        "is-flip-out",
+        "is-flip-in",
+        "is-flip-settle",
+        "is-exit-left",
+        "is-enter-right",
+        "is-enter-settle"
+      );
+    }
 
     function paint(set) {
       if (wordEl) wordEl.textContent = set.word[lang()] || set.word.pl;
@@ -316,15 +338,31 @@
     if (REDUCED) return;
 
     function cycle() {
-      lux.classList.add("is-stretch");
+      if (busy) return;
+      busy = true;
+      clearPhases();
+      /* 1) tiles whip left + word turns edge-on */
+      lux.classList.add("is-exit-left", "is-flip-out");
       window.setTimeout(function () {
+        /* 2) swap content while off-screen / flat */
         idx = (idx + 1) % LUX_SETS.length;
         paint(LUX_SETS[idx]);
-        lux.classList.remove("is-stretch");
-      }, 520);
+        clearPhases();
+        lux.classList.add("is-enter-right", "is-flip-in");
+        /* force reflow so enter positions stick before settle */
+        void lux.offsetWidth;
+        window.requestAnimationFrame(function () {
+          clearPhases();
+          lux.classList.add("is-enter-settle", "is-flip-settle");
+          window.setTimeout(function () {
+            clearPhases();
+            busy = false;
+          }, 780);
+        });
+      }, 480);
     }
 
-    luxTimer = window.setInterval(cycle, 2800);
+    luxTimer = window.setInterval(cycle, 3000);
   }
 
   /* —— Systemy OS stack↔field —— */
@@ -335,7 +373,6 @@
     OS_MEDIA.forEach(function (src, i) {
       var fig = document.createElement("figure");
       fig.className = "chapter-os__card";
-      if (src.indexOf("halftone") !== -1 || i % 5 === 3) fig.classList.add("is-texture");
       var img = document.createElement("img");
       img.src = src;
       img.alt = "";

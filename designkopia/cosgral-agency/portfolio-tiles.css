@@ -342,6 +342,8 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   position: absolute;
   inset: 0;
   z-index: 1;
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
 }
 .chapter-lux__word {
   position: absolute;
@@ -349,31 +351,48 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   top: 50%;
   z-index: 2;
   margin: 0;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(-90deg) rotateY(0deg);
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
   font-size: clamp(3.2rem, 9vw, 6.4rem);
   font-weight: 700;
   letter-spacing: -0.05em;
   line-height: 0.9;
   white-space: nowrap;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
   pointer-events: none;
+  will-change: transform, opacity, filter;
   transition:
-    transform 0.55s cubic-bezier(0.65, 0, 0.35, 1),
-    opacity 0.35s ease,
-    letter-spacing 0.55s ease;
+    transform 0.55s cubic-bezier(0.65, 0.05, 0.35, 1),
+    opacity 0.4s ease,
+    filter 0.4s ease;
 }
-.chapter-lux.is-stretch .chapter-lux__word {
-  transform: translate(-50%, -50%) rotate(-90deg) scaleY(8) scaleX(0.22);
-  letter-spacing: 0.35em;
-  opacity: 0.35;
+/* Text turns edge-on (flat from the side) during set change */
+.chapter-lux.is-flip-out .chapter-lux__word {
+  transform: translate(-50%, -50%) rotate(-90deg) rotateY(88deg);
+  opacity: 0.15;
+  filter: blur(0.4px);
+}
+.chapter-lux.is-flip-in .chapter-lux__word {
+  transform: translate(-50%, -50%) rotate(-90deg) rotateY(-88deg);
+  opacity: 0.15;
+  transition: none;
+}
+.chapter-lux.is-flip-settle .chapter-lux__word {
+  transform: translate(-50%, -50%) rotate(-90deg) rotateY(0deg);
+  opacity: 1;
+  filter: none;
 }
 .chapter-lux__shot {
   --lux-x: 0%;
   --lux-y: 0%;
   --lux-w: 18%;
   --lux-r: 0deg;
+  --lux-drift: 0vw;
+  --lux-blur: 0px;
+  --lux-o: 1;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -381,13 +400,18 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   margin: 0;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: #ddd;
-  transform: translate(calc(-50% + var(--lux-x)), calc(-50% + var(--lux-y))) rotate(var(--lux-r));
+  background: #1a1a1a;
+  opacity: var(--lux-o);
+  filter: blur(var(--lux-blur));
+  transform:
+    translate(calc(-50% + var(--lux-x) + var(--lux-drift)), calc(-50% + var(--lux-y)))
+    rotate(var(--lux-r));
   transition:
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.62s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.45s ease,
-    width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform, opacity;
+    filter 0.45s ease,
+    width 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity, filter;
 }
 .chapter-lux__shot img {
   width: 100%;
@@ -395,8 +419,43 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   object-fit: cover;
   display: block;
   transform: scale(1.04);
-  transition: opacity 0.45s ease, transform 0.9s ease;
 }
+/* Exit left — fast wipe off screen */
+.chapter-lux.is-exit-left .chapter-lux__shot {
+  --lux-drift: -120vw;
+  --lux-blur: 6px;
+  --lux-o: 0;
+  transition:
+    transform 0.48s cubic-bezier(0.55, 0.05, 0.85, 0.35),
+    opacity 0.35s ease,
+    filter 0.35s ease;
+}
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="0"] { transition-delay: 0s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="1"] { transition-delay: 0.04s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="2"] { transition-delay: 0.08s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="3"] { transition-delay: 0.02s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="4"] { transition-delay: 0.06s; }
+/* Enter from right */
+.chapter-lux.is-enter-right .chapter-lux__shot {
+  --lux-drift: 110vw;
+  --lux-blur: 5px;
+  --lux-o: 0;
+  transition: none;
+}
+.chapter-lux.is-enter-settle .chapter-lux__shot {
+  --lux-drift: 0vw;
+  --lux-blur: 0px;
+  --lux-o: 1;
+  transition:
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.45s ease,
+    filter 0.45s ease;
+}
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="0"] { transition-delay: 0.06s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="1"] { transition-delay: 0.02s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="2"] { transition-delay: 0.1s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="3"] { transition-delay: 0s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="4"] { transition-delay: 0.08s; }
 .chapter-lux__shot[data-lux-shot="0"] { --lux-x: -34vw; --lux-y: -26vh; --lux-w: min(18vw, 9.5rem); }
 .chapter-lux__shot[data-lux-shot="1"] { --lux-x: -30vw; --lux-y: 18vh; --lux-w: min(22vw, 11rem); aspect-ratio: 5 / 4; }
 .chapter-lux__shot[data-lux-shot="2"] { --lux-x: 8vw; --lux-y: 24vh; --lux-w: min(16vw, 8.5rem); }
@@ -1016,6 +1075,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand__panel {
 html.reduce-motion .portfolio-tile__viz-card,
 html.reduce-motion .chapter-lux__word,
 html.reduce-motion .chapter-lux__shot,
+html.reduce-motion .chapter-lux.is-exit-left .chapter-lux__shot,
+html.reduce-motion .chapter-lux.is-enter-settle .chapter-lux__shot,
 html.reduce-motion .chapter-os__card,
 html.reduce-motion .chapter-show__word,
 html.reduce-motion .chapter-show__tile,
