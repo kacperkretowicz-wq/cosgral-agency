@@ -356,20 +356,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   background: transparent;
 }
 .portfolio-chapter__bg .portfolio-tile__media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  /* Soft veil only — keep homepage ambient visible */
-  background:
-    linear-gradient(
-      180deg,
-      transparent 0%,
-      transparent 58%,
-      rgba(0, 0, 0, 0.18) 82%,
-      rgba(0, 0, 0, 0.38) 100%
-    );
+  /* No dark veil — homepage ambient stays fully visible behind tiles */
+  content: none;
 }
 .portfolio-chapter__bg .portfolio-tile__media video,
 .portfolio-chapter__bg .portfolio-tile__media > img {
