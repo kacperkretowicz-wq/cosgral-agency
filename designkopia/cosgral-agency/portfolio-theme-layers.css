@@ -62,9 +62,12 @@ body.portfolio-theme-page--systems .site-nav__toggle-bars span {
 
 body.portfolio-theme-page .subpage-ambient,
 body.portfolio-theme-page .subpage-ambient__blur,
-body.portfolio-theme-page .subpage-ambient__shade,
-body.portfolio-theme-page .portfolio-sand-portal {
+body.portfolio-theme-page .subpage-ambient__shade {
   display: none !important;
+}
+/* Keep sand ribbon + cube for megamenu (homepage-parity) */
+body.portfolio-theme-page .portfolio-sand-portal {
+  display: block !important;
 }
 body.portfolio-theme-page:not(.is-nav-menu-open) .subpage-cube-portal {
   display: none !important;

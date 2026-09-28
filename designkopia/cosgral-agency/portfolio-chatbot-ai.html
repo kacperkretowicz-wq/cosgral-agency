@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="cosgral-subpages.css?v=20260925fix18" />
 <link rel="stylesheet" href="portfolio-tiles.css?v=20260928camzoom2" />
-<link rel="stylesheet" href="portfolio-theme-layers.css?v=20260927themebg1" />
+<link rel="stylesheet" href="portfolio-theme-layers.css?v=20260928sand1" />
 <link rel="stylesheet" href="telforce-cases.css?v=20260925viz2" />
 <link rel="stylesheet" href="case-viz-tiles.css?v=20260925viz3" />
 <script src="case-viz-tiles.js?v=20260925viz3" defer></script>
@@ -39,6 +39,15 @@
 <canvas id="home-ambient" class="home-ambient portfolio-home-ambient" aria-hidden="true"></canvas>
 <div class="home-ambient__blur portfolio-home-ambient" aria-hidden="true"></div>
 <div class="home-ambient__shade portfolio-home-ambient" aria-hidden="true"></div>
+<div class="subpage-cube-portal" aria-hidden="true">
+  <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
+</div>
+<div class="portfolio-sand-portal portfolio-sand-portal--back" aria-hidden="true">
+  <canvas id="portfolio-sand-back" class="portfolio-sand__canvas"></canvas>
+</div>
+<div class="portfolio-sand-portal portfolio-sand-portal--front" aria-hidden="true">
+  <canvas id="portfolio-sand-front" class="portfolio-sand__canvas"></canvas>
+</div>
 
 <canvas class="portfolio-tile-bg" data-portfolio-tile-bg aria-hidden="true"></canvas>
 <div class="portfolio-theme-stage" data-portfolio-theme-stage aria-hidden="true">
@@ -371,6 +380,8 @@
 <script src="home-tile-interact.js?v=20260928gyro1"></script>
 <script src="home-ambient-bg.js?v=20260928camzoom2"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
+<script type="module" src="subpage-cube.js?v=20260928sand1"></script>
+<script type="module" src="portfolio-hero-sand.js?v=20260928sand1"></script>
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script src="sections.js?v=20260814e"></script>
 <script src="portfolio-video.js?v=20260807ag"></script>

@@ -36,7 +36,6 @@ body.portfolio-page--tiles.is-tile-bg-light .site-nav__toggle-bars span {
 body.portfolio-page--tiles .subpage-ambient,
 body.portfolio-page--tiles .subpage-ambient__blur,
 body.portfolio-page--tiles .subpage-ambient__shade,
-body.portfolio-page--tiles .portfolio-sand-portal,
 body.portfolio-page--tiles .grafiki-bloom,
 body.portfolio-page--tiles .portfolio-scene-curtain,
 body.portfolio-page--tiles .home-scroll-rail,
@@ -45,13 +44,17 @@ body.portfolio-page--tiles .site-footer,
 body.portfolio-page--tiles footer.site-footer {
   display: none !important;
 }
+/* Cube + sand ribbon — visible for megamenu (homepage-parity) */
 body.portfolio-page--tiles:not(.is-nav-menu-open) .subpage-cube-portal {
   display: none !important;
 }
 body.portfolio-page--tiles.is-nav-menu-open .subpage-cube-portal {
   display: block !important;
 }
-/* Homepage WebGL ambient — same ground as index.html */
+body.portfolio-page--tiles .portfolio-sand-portal {
+  display: block !important;
+}
+/* Homepage WebGL ambient — full viewport (same as index.html) */
 body.portfolio-page .portfolio-home-ambient.home-ambient,
 body.portfolio-page .portfolio-home-ambient.home-ambient__blur,
 body.portfolio-page .portfolio-home-ambient.home-ambient__shade {
@@ -60,18 +63,51 @@ body.portfolio-page .portfolio-home-ambient.home-ambient__shade {
 body.portfolio-page--tiles {
   background: #040404;
 }
-body.portfolio-page .home-ambient.portfolio-home-ambient,
-body.portfolio-page .home-ambient__blur.portfolio-home-ambient,
-body.portfolio-page .home-ambient__shade.portfolio-home-ambient {
-  /* Inherit homepage look from cosgral-home.css — only ensure fixed stacking */
+body.portfolio-page .home-ambient.portfolio-home-ambient {
   position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 140% 90% at 50% 38%, #0e0e0e 0%, #040404 42%, #000 100%);
+}
+body.portfolio-page .home-ambient__blur.portfolio-home-ambient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 80vmax;
+  height: 80vmax;
+  margin: -40vmax 0 0 -40vmax;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle closest-side,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.085) 10%,
+      rgba(255, 255, 255, 0.055) 22%,
+      rgba(255, 255, 255, 0.04) 30%,
+      rgba(255, 255, 255, 0.028) 40%,
+      rgba(255, 255, 255, 0.012) 50%,
+      rgba(255, 255, 255, 0.004) 58%,
+      transparent 66%
+    );
+  opacity: 0.55;
+  transform: translate3d(50vw, 50vh, 0);
+  will-change: transform;
+}
+body.portfolio-page .home-ambient__shade.portfolio-home-ambient {
+  position: fixed;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
+  background: rgba(3, 3, 3, 0.28);
 }
-/* Hide light theme layers / sand when using homepage ground */
+/* Theme stage off — keep sand portals */
 body.portfolio-page[data-tile-ground="home"] .portfolio-systems-field,
-body.portfolio-page[data-tile-ground="home"] .portfolio-theme-stage,
-body.portfolio-page[data-tile-ground="home"] .portfolio-sand-portal {
+body.portfolio-page[data-tile-ground="home"] .portfolio-theme-stage {
   display: none !important;
 }
 body.portfolio-page[data-tile-ground="home"] {
@@ -174,8 +210,7 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   min-height: 100svh;
   max-height: 100svh;
   display: flex;
-  /* Pre-gyro position: bottom-centered titles + Zobacz więcej */
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-end;
   padding:
     clamp(5.5rem, 12vh, 7rem)
@@ -186,12 +221,12 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   scroll-snap-align: start;
   scroll-snap-stop: always;
   perspective: 1200px;
-  text-align: center;
+  text-align: left;
 }
 body.portfolio-page--tiles .portfolio-chapter {
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-end;
-  text-align: center;
+  text-align: left;
 }
 /* Gyro hosts — tiles + center word only */
 body.portfolio-page--tiles .chapter-lux__stage > .home-tilt-layer,
@@ -374,10 +409,12 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   max-width: min(36rem, 92vw);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.65rem;
-  text-align: center;
+  text-align: left;
   pointer-events: auto;
+  /* Further left into empty ambient */
+  margin-left: calc(-1 * min(1.75rem, 3.5vw));
 }
 .portfolio-chapter__title {
   margin: 0;

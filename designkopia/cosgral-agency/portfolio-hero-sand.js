@@ -12,13 +12,11 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     !document.body.classList.contains("graphics-gallery-page") &&
     !document.body.classList.contains("reels-gallery-page") &&
     !document.body.classList.contains("privacy-page") &&
-    !document.body.classList.contains("case-page")
+    !document.body.classList.contains("case-page") &&
+    !document.body.classList.contains("about-page")
   ) {
     return;
   }
-  /* Category theme pages use media backgrounds — skip sand intro */
-  if (document.body.classList.contains("portfolio-theme-page")) return;
-  /* O nas: bez sand/cząsteczek — tylko sticky depth między intro a zespołem */
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
   var backCanvas = document.getElementById("portfolio-sand-back");

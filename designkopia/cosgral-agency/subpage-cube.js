@@ -1697,8 +1697,8 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   }
 
   function isHeroMenuContext() {
-    /* Megamenu always matches hero (no sand absorb) — cube is hero-only now */
-    return true;
+    /* Subpage cube never runs on homepage — always allow sand megamenu pass */
+    return false;
   }
 
   function notifyMenuOpen() {
