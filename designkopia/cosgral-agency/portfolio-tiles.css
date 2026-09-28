@@ -234,6 +234,14 @@ body.portfolio-page--tiles .portfolio-chapter {
   align-items: flex-end;
   text-align: left;
 }
+/* Legacy #montaz section padding from cosgral-subpages.css was pulling
+   Montaż copy ~80px lower than Strony / Systemy / Grafiki — match them. */
+body.portfolio-page--tiles #montaz.portfolio-chapter {
+  padding:
+    clamp(5.5rem, 12vh, 7rem)
+    max(var(--gutter, 1.25rem), 4vw)
+    clamp(4.5rem, 12vh, 6.5rem);
+}
 /* Gyro hosts — tiles + center word only */
 body.portfolio-page--tiles .chapter-lux__stage > .home-tilt-layer,
 body.portfolio-page--tiles .chapter-lux__stage > .home-tilt-layer > .home-tilt-face,
