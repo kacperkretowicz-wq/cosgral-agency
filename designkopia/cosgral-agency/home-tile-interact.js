@@ -232,6 +232,10 @@
         var montaz = chapter.querySelector(".chapter-montaz");
         if (montaz) wrapChildren(montaz);
 
+        /* Systems fan — whole stage like other catalogs (per-card tilt was invisible under arc rotate) */
+        var chapterOs = chapter.querySelector(".chapter-os");
+        if (chapterOs) wrapChildren(chapterOs);
+
         var show = chapter.querySelector(".chapter-show");
         if (show) {
           /* Word + tile stage only (meta/foot removed or left outside) */
@@ -246,21 +250,16 @@
             wrapChildren(host);
           }
         }
-
-        /* Systems fan cards — tilt inner face; card keeps arc transform */
-        chapter.querySelectorAll(".sys-fan__card").forEach(function (card) {
-          wrapChildren(card);
-        });
       });
     }
     wrapTileCatalogTilts();
-    /* Fan cards mount async */
+    /* Fan mounts async into .chapter-os — re-wrap once host exists */
     if (!window.__portfolioTileTiltWatch) {
       window.__portfolioTileTiltWatch = true;
       var tiltMo = new MutationObserver(function () {
         wrapTileCatalogTilts();
       });
-      document.querySelectorAll("body.portfolio-page--tiles [data-systems-fan-catalog]").forEach(function (node) {
+      document.querySelectorAll("body.portfolio-page--tiles #automatyzacje .portfolio-tile__media, body.portfolio-page--tiles [data-chapter-os]").forEach(function (node) {
         tiltMo.observe(node, { childList: true, subtree: true });
       });
     }
