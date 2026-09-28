@@ -434,7 +434,7 @@
       autoplay: false,
     });
 
-    /* Start matching catalog fan, then ease into centered composition */
+    /* Same framing as catalog → gentle pull-back for copy */
     requestAnimationFrame(function () {
       mount.classList.add("is-from-catalog");
       requestAnimationFrame(function () {
@@ -442,7 +442,9 @@
           mount.classList.remove("is-entering", "is-from-catalog");
           mount.classList.add("is-settled");
           wrap.classList.add("is-ready");
-        }, REDUCED ? 0 : 60);
+          var catRoot = catalog && catalog.root;
+          if (catRoot) catRoot.classList.add("is-under-detail");
+        }, REDUCED ? 0 : 80);
       });
     });
   }
@@ -745,19 +747,22 @@
     root.classList.remove("is-morphing", "is-systems-detail", "is-systems-exiting");
     clearBody();
     var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
-    if (catalog && resumeIdx != null) {
-      catalog.setIndex(resumeIdx);
+    if (catalog) {
+      if (catalog.root) catalog.root.classList.remove("is-under-detail");
+      if (resumeIdx != null) catalog.setIndex(resumeIdx);
       catalog.resume();
     }
     dispatch("portfolio-expand-close", { key: prev });
   }
 
-  /* Reverse of openSystems: settle → catalog scale, copy out, catalog back */
+  /* Reverse of openSystems: settle → catalog framing, copy out, catalog back */
   function closeSystemsReverse(resumeIdx) {
     var mount = systemsDetailFan && systemsDetailFan.root;
+    var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
     if (systemsDetailFan && systemsDetailFan.collapseArticle) {
       systemsDetailFan.collapseArticle(true);
     }
+    if (catalog && catalog.root) catalog.root.classList.remove("is-under-detail");
     root.classList.add("is-systems-exiting");
     if (mount && !REDUCED) {
       mount.classList.remove("is-settled", "is-article-open");

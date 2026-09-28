@@ -356,11 +356,11 @@
     function layout() {
       if (destroyed) return;
       var nearest = clampIndex(Math.round(index), n);
-      /* Wide arc — side tiles stay readable until they clip past edges */
-      var span = mode === "catalog" ? 178 : 172;
+      /* Same geometry in catalog + detail — click only pulls the camera back */
+      var span = 172;
       var step = span / Math.max(8, n - 1);
-      var radiusX = mode === "catalog" ? 72 : 78;
-      var radiusY = mode === "catalog" ? 20 : 12;
+      var radiusX = 78;
+      var radiusY = 12;
       var baseScale = 1;
 
       cards.forEach(function (card, i) {

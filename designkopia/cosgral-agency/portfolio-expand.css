@@ -299,11 +299,11 @@ body.is-tile-expanded .site-nav {
 }
 .expand-systems .sys-fan__stage {
   touch-action: none;
-  height: 64%;
-  top: 2%;
+  height: 68%;
+  top: 0;
 }
 .expand-systems .sys-fan.is-article-open .sys-fan__stage {
-  height: 52%;
+  height: 54%;
   top: 0;
 }
 .expand-systems .sys-fan--detail {
@@ -313,15 +313,15 @@ body.is-tile-expanded .site-nav {
 .expand-systems .sys-fan--detail.is-entering .sys-fan__head,
 .expand-systems .sys-fan--detail.is-from-catalog .sys-fan__head,
 .expand-systems .sys-fan--detail.is-exiting .sys-fan__head {
-  /* Catalog scale — used both entering and reverse-exiting */
-  transform: translate3d(0, 2vh, 0) scale(1.22);
+  /* Match catalog framing exactly, then ease a gentle pull-back */
+  transform: translate3d(0, -1vh, 0) scale(1.1);
 }
 .expand-systems .sys-fan--detail.is-settled .sys-fan__head {
-  /* Slightly above true center */
-  transform: translate3d(0, -2vh, 0);
+  /* Pulled back just enough for copy in the hollow */
+  transform: translate3d(0, -2vh, 0) scale(1);
 }
 .expand-systems .sys-fan--detail.is-settled.is-article-open .sys-fan__head {
-  transform: none;
+  transform: translate3d(0, 0, 0) scale(1);
 }
 .expand-systems .sys-fan--detail.is-exiting .sys-fan__copy {
   opacity: 0 !important;
@@ -504,13 +504,6 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-}
-.portfolio-chapters.is-systems-detail .chapter-os .sys-fan--catalog {
-  opacity: 0.22;
-  transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.portfolio-chapters.is-systems-detail.is-systems-exiting .chapter-os .sys-fan--catalog {
-  opacity: 1;
 }
 .portfolio-tile-expand.is-closing:has([data-expand-mode="systems"]) {
   opacity: 1; /* systems reverse owns the fade via fan exit */
