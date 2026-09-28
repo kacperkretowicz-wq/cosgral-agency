@@ -23,6 +23,9 @@
   opacity: 1;
   visibility: visible;
 }
+body.is-tile-expanded .site-nav {
+  pointer-events: none;
+}
 .portfolio-chapters.is-expanded .portfolio-chapter__copy,
 .portfolio-chapters.is-expanded .portfolio-chapter__bg .portfolio-tile__media {
   opacity: 0;
