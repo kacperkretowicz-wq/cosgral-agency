@@ -1,0 +1,1262 @@
+/* Realizacje — vertical chapters: tile media as page BG, left copy + Zobacz więcej */
+
+html:has(body.portfolio-page--tiles) {
+  height: 100%;
+  overflow: hidden;
+}
+body.portfolio-page--tiles {
+  --tile-radius: 1.35rem;
+  --tile-page-bg: #070709;
+  background: var(--tile-page-bg);
+  color: #f5f5f5;
+  overflow: hidden;
+  height: 100%;
+  transition: color 0.45s ease, background-color 0.45s ease;
+}
+/* Homepage dark ground for every Realizacje chapter */
+body.portfolio-page--tiles[data-tile-theme="web"],
+body.portfolio-page--tiles[data-tile-theme="systems"],
+body.portfolio-page--tiles[data-tile-theme="video"],
+body.portfolio-page--tiles[data-tile-theme="graphics"],
+body.portfolio-page--tiles[data-tile-ground="home"] {
+  --tile-page-bg: #040404;
+  color: #f5f5f5;
+}
+body.portfolio-page--tiles.is-tile-bg-light {
+  color: #111;
+}
+body.portfolio-page--tiles.is-tile-bg-light .site-nav__toggle,
+body.portfolio-page--tiles.is-tile-bg-light .lang-switch button {
+  color: #111;
+}
+body.portfolio-page--tiles.is-tile-bg-light .site-nav__toggle-bars span {
+  background: #111;
+}
+
+body.portfolio-page--tiles .subpage-ambient,
+body.portfolio-page--tiles .subpage-ambient__blur,
+body.portfolio-page--tiles .subpage-ambient__shade,
+body.portfolio-page--tiles .grafiki-bloom,
+body.portfolio-page--tiles .portfolio-scene-curtain,
+body.portfolio-page--tiles .home-scroll-rail,
+body.portfolio-page--tiles .portfolio-end,
+body.portfolio-page--tiles .site-footer,
+body.portfolio-page--tiles footer.site-footer {
+  display: none !important;
+}
+/* Cube kept laid out (WebGL sized) but hidden until megamenu — avoids white blob */
+body.portfolio-page--tiles:not(.is-nav-menu-open) .subpage-cube-portal {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+body.portfolio-page--tiles.is-nav-menu-open .subpage-cube-portal {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  /* Subpage glass reads hotter than homepage at 2.76 — keep cube readable, not a white slab */
+  filter: brightness(1.55) saturate(1.08);
+}
+body.portfolio-page--tiles .portfolio-sand-portal {
+  display: block !important;
+}
+/* Homepage WebGL ambient — full viewport (same as index.html) */
+body.portfolio-page .portfolio-home-ambient.home-ambient,
+body.portfolio-page .portfolio-home-ambient.home-ambient__blur,
+body.portfolio-page .portfolio-home-ambient.home-ambient__shade {
+  display: block !important;
+}
+body.portfolio-page--tiles {
+  background: #040404;
+}
+body.portfolio-page .home-ambient.portfolio-home-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 140% 90% at 50% 38%, #0e0e0e 0%, #040404 42%, #000 100%);
+}
+body.portfolio-page .home-ambient__blur.portfolio-home-ambient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 80vmax;
+  height: 80vmax;
+  margin: -40vmax 0 0 -40vmax;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle closest-side,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.085) 10%,
+      rgba(255, 255, 255, 0.055) 22%,
+      rgba(255, 255, 255, 0.04) 30%,
+      rgba(255, 255, 255, 0.028) 40%,
+      rgba(255, 255, 255, 0.012) 50%,
+      rgba(255, 255, 255, 0.004) 58%,
+      transparent 66%
+    );
+  opacity: 0.55;
+  transform: translate3d(50vw, 50vh, 0);
+  will-change: transform;
+}
+body.portfolio-page .home-ambient__shade.portfolio-home-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(3, 3, 3, 0.28);
+}
+/* Theme stage off — keep sand portals */
+body.portfolio-page[data-tile-ground="home"] .portfolio-systems-field,
+body.portfolio-page[data-tile-ground="home"] .portfolio-theme-stage {
+  display: none !important;
+}
+body.portfolio-page[data-tile-ground="home"] {
+  background: #040404;
+  color: #f5f5f5;
+}
+body.portfolio-page[data-tile-ground="home"].is-home-ambient-light,
+body.portfolio-page[data-tile-ground="home"] .home-ambient[data-ambient-tone="light"] {
+  /* keep homepage dark ground — ignore leftover light flags */
+  filter: none;
+}
+body.portfolio-page--tiles.subpage::after {
+  opacity: 0.04;
+}
+
+body.portfolio-page--tiles .site-nav {
+  z-index: 40;
+}
+
+body.portfolio-page--tiles #main {
+  position: relative;
+  z-index: 2;
+  height: 100svh;
+  min-height: 100svh;
+  max-height: 100svh;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.portfolio-tile-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+/* Catalogs use homepage ambient — never the separate tile-bg canvas */
+body.portfolio-page--tiles .portfolio-tile-bg {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+.portfolio-systems-field {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(255, 255, 255, 0.95), transparent 42%),
+    radial-gradient(circle at 72% 60%, rgba(210, 216, 230, 0.7), transparent 40%),
+    linear-gradient(160deg, #f7f7f9, #e8ebf2 55%, #dfe3ec);
+}
+
+/* Per-theme layers off — homepage WebGL is the shared ground */
+body.portfolio-page--tiles .portfolio-theme-stage {
+  display: none !important;
+}
+
+/* —— Full-viewport horizontal chapters —— */
+.portfolio-chapters {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100svh;
+  min-height: 100svh;
+  max-height: 100svh;
+  overflow: hidden;
+}
+.portfolio-chapters__scroller {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+.portfolio-chapters__scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.portfolio-chapter {
+  position: relative;
+  flex: 0 0 100vw;
+  width: 100vw;
+  min-width: 100vw;
+  max-width: 100vw;
+  height: 100svh;
+  min-height: 100svh;
+  max-height: 100svh;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding:
+    clamp(5.5rem, 12vh, 7rem)
+    max(var(--gutter, 1.25rem), 4vw)
+    clamp(4.5rem, 12vh, 6.5rem);
+  overflow: hidden;
+  color: #f7f7f7;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  perspective: 1200px;
+  text-align: left;
+}
+body.portfolio-page--tiles .portfolio-chapter {
+  justify-content: flex-start;
+  align-items: flex-end;
+  text-align: left;
+}
+/* Legacy #montaz section padding from cosgral-subpages.css was pulling
+   Montaż copy ~80px lower than Strony / Systemy / Grafiki — match them. */
+body.portfolio-page--tiles #montaz.portfolio-chapter {
+  padding:
+    clamp(5.5rem, 12vh, 7rem)
+    max(var(--gutter, 1.25rem), 4vw)
+    clamp(4.5rem, 12vh, 6.5rem);
+}
+/* Gyro hosts — tiles + center word / whole systems fan (same viewport origin) */
+body.portfolio-page--tiles .chapter-lux__stage > .home-tilt-layer,
+body.portfolio-page--tiles .chapter-lux__stage > .home-tilt-layer > .home-tilt-face,
+body.portfolio-page--tiles .chapter-montaz > .home-tilt-layer,
+body.portfolio-page--tiles .chapter-montaz > .home-tilt-layer > .home-tilt-face,
+body.portfolio-page--tiles .chapter-os > .home-tilt-layer,
+body.portfolio-page--tiles .chapter-os > .home-tilt-layer > .home-tilt-face,
+body.portfolio-page--tiles .chapter-show__tilt-host,
+body.portfolio-page--tiles .chapter-show__tilt-host > .home-tilt-layer,
+body.portfolio-page--tiles .chapter-show__tilt-host > .home-tilt-layer > .home-tilt-face {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  transform-origin: 50vw 50vh;
+}
+body.portfolio-page--tiles .portfolio-chapter__bg {
+  pointer-events: none;
+}
+/* Systems: only cards + nav catch pointer — empty stage passes through to hit zone */
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan {
+  pointer-events: none;
+}
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__card,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__nav,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__arrow,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__dot,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__more {
+  pointer-events: auto;
+}
+
+/* Center hit zone — open expand like „Zobacz więcej” */
+.portfolio-chapter__hit {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  z-index: 5;
+  width: min(52vmin, 22rem);
+  height: min(52vmin, 22rem);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Automatyzacje — wide center band so expand opens between fan cards */
+.portfolio-chapter[data-theme="systems"] .portfolio-chapter__hit {
+  top: 40%;
+  width: min(78vw, 42rem);
+  height: min(52vh, 26rem);
+  border-radius: 2.5rem;
+  z-index: 5;
+}
+.portfolio-chapter:not(.is-active) .portfolio-chapter__hit,
+.portfolio-chapters.is-expanded .portfolio-chapter__hit {
+  pointer-events: none;
+}
+
+.portfolio-chapters__pager {
+  position: absolute;
+  left: 50%;
+  bottom: max(1.1rem, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.2rem 0.15rem;
+  pointer-events: auto;
+}
+.portfolio-chapters__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0.1rem;
+}
+.portfolio-chapters__dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.34);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease, opacity 0.3s ease;
+}
+.portfolio-chapters__dot.is-active {
+  width: 1.4rem;
+  background: rgba(255, 255, 255, 0.95);
+}
+.portfolio-chapters__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: color 0.25s ease, opacity 0.25s ease, background 0.25s ease;
+}
+.portfolio-chapters__arrow:hover:not(:disabled),
+.portfolio-chapters__arrow:focus-visible:not(:disabled) {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+.portfolio-chapters__arrow:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+.portfolio-chapters__arrow svg {
+  display: block;
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot {
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__dot.is-active {
+  background: rgba(0, 0, 0, 0.88);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow {
+  color: rgba(0, 0, 0, 0.45);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:hover:not(:disabled),
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-visible:not(:disabled) {
+  color: rgba(0, 0, 0, 0.88);
+  background: rgba(0, 0, 0, 0.08);
+}
+.portfolio-chapters.is-expanded .portfolio-chapters__pager {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.portfolio-chapter__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.portfolio-chapter__bg .portfolio-tile__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: transparent;
+}
+.portfolio-chapter__bg .portfolio-tile__media::after {
+  /* No dark veil — homepage ambient stays fully visible behind tiles */
+  content: none;
+}
+.portfolio-chapter__bg .portfolio-tile__media video,
+.portfolio-chapter__bg .portfolio-tile__media > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.03);
+}
+
+.portfolio-chapter__copy {
+  position: relative;
+  z-index: 6;
+  max-width: min(36rem, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  text-align: left;
+  pointer-events: auto;
+  /* Further left into empty ambient */
+  margin-left: calc(-1 * min(1.75rem, 3.5vw));
+}
+.portfolio-chapter__title {
+  margin: 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  opacity: 0.22;
+  filter: brightness(0.45);
+  transform: translate3d(-1.6rem, 0.4rem, 0);
+  transition:
+    opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.25s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1.15s ease;
+}
+.portfolio-chapter__lead {
+  margin: 0;
+  max-width: 38ch;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.35);
+  opacity: 0.18;
+  filter: brightness(0.4);
+  transform: translate3d(0, 1.1rem, 0);
+  transition:
+    opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.12s,
+    transform 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.12s,
+    filter 1.2s ease 0.12s;
+}
+.portfolio-chapter__more {
+  position: relative;
+  z-index: 5;
+  margin-top: 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body, "Satoshi", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  padding-bottom: 0.12rem;
+  opacity: 0.12;
+  transform: translate3d(1.2rem, 0.35rem, 0);
+  pointer-events: auto;
+  cursor: pointer;
+  transition:
+    border-color 0.45s ease,
+    opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.22s,
+    transform 1.25s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+}
+.portfolio-chapter.is-active .portfolio-chapter__title,
+.portfolio-chapter.is-active .portfolio-chapter__lead,
+.portfolio-chapter.is-active .portfolio-chapter__more {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+.portfolio-chapter.is-active .portfolio-chapter__more:hover,
+.portfolio-chapter.is-active .portfolio-chapter__more:focus-visible {
+  border-color: #fff;
+  opacity: 1;
+  outline: none;
+}
+
+/* Chapter media: rise from dark when becoming active */
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-show {
+  opacity: 0.28;
+  filter: brightness(0.35) saturate(0.7);
+  transform: scale(0.94) translate3d(0, 2.5vh, 0);
+  transform-origin: 50% 45%;
+  transition:
+    opacity 1.35s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1.35s ease,
+    transform 1.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, filter, transform;
+}
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-show {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+/* Soft word blooms (centered labels) — no layout transforms conflict */
+.portfolio-chapter.is-active .chapter-lux__word-3d,
+.portfolio-chapter.is-active .portfolio-tile__viz-word,
+.portfolio-chapter.is-active .chapter-show__word {
+  animation: chapter-word-bloom 1.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+@keyframes chapter-word-bloom {
+  from { opacity: 0; filter: brightness(0.2) blur(4px); }
+  to { opacity: 1; filter: none; }
+}
+
+/* —— Strony — New Luxury editorial —— */
+.chapter-lux {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+  color: #f5f5f5;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+}
+.chapter-lux__meta,
+.chapter-lux__foot {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 2.4rem);
+  left: 1.2rem;
+  font-size: clamp(0.62rem, 1.1vw, 0.78rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  pointer-events: none;
+}
+.chapter-lux__meta { top: 1.1rem; }
+.chapter-lux__foot { bottom: 1.1rem; left: 1.2rem; width: auto; }
+.chapter-lux__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  perspective: 1400px;
+  perspective-origin: 50% 45%;
+  transform-style: preserve-3d;
+}
+/* Wrapper owns screen-space rotateY — word itself stays vertical via rotateZ(-90) */
+.chapter-lux__word-3d {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  transform: translate3d(-50%, -50%, 0) rotateY(0deg);
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transition:
+    transform 0.96s cubic-bezier(0.55, 0.02, 0.4, 1),
+    opacity 0.72s ease;
+}
+.chapter-lux__word {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.02em;
+  transform: rotate(-90deg);
+  transform-origin: center center;
+  font-size: clamp(3.2rem, 9vw, 6.4rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  line-height: 0.88;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
+}
+.chapter-lux__word-line {
+  display: block;
+}
+/* Edge-on: thin vertical sliver (flat from the side) */
+.chapter-lux.is-flip-out .chapter-lux__word-3d {
+  transform: translate3d(-50%, -50%, 0) rotateY(88deg);
+  opacity: 0.55;
+}
+.chapter-lux.is-flip-in .chapter-lux__word-3d {
+  transform: translate3d(-50%, -50%, 0) rotateY(-88deg);
+  opacity: 0.55;
+  transition: none;
+}
+.chapter-lux.is-flip-settle .chapter-lux__word-3d {
+  transform: translate3d(-50%, -50%, 0) rotateY(0deg);
+  opacity: 1;
+}
+.chapter-lux__shot {
+  --lux-x: 0%;
+  --lux-y: 0%;
+  --lux-w: 18%;
+  --lux-r: 0deg;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lux-w);
+  margin: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #1a1a1a;
+  opacity: 1;
+  filter: blur(0px);
+  /* Animate real transform/opacity/filter — CSS vars alone won't interpolate */
+  transform:
+    translate3d(calc(-50% + var(--lux-x)), calc(-50% + var(--lux-y)), 0)
+    rotate(var(--lux-r));
+  transition:
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s ease,
+    filter 0.8s ease;
+  will-change: transform, opacity, filter;
+}
+.chapter-lux__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.04);
+}
+/* Exit left — whip off fast with motion blur */
+.chapter-lux.is-exit-left .chapter-lux__shot {
+  opacity: 0;
+  filter: blur(10px);
+  transform:
+    translate3d(calc(-50% + var(--lux-x) - 125vw), calc(-50% + var(--lux-y)), 0)
+    rotate(var(--lux-r));
+  transition:
+    transform 0.72s cubic-bezier(0.55, 0.02, 0.9, 0.35),
+    opacity 0.55s ease,
+    filter 0.55s ease;
+}
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="0"] { transition-delay: 0s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="1"] { transition-delay: 0.03s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="2"] { transition-delay: 0.06s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="3"] { transition-delay: 0.015s; }
+.chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="4"] { transition-delay: 0.045s; }
+/* Park off-screen right before settle (no transition) */
+.chapter-lux.is-enter-right .chapter-lux__shot {
+  opacity: 0;
+  filter: blur(8px);
+  transform:
+    translate3d(calc(-50% + var(--lux-x) + 115vw), calc(-50% + var(--lux-y)), 0)
+    rotate(var(--lux-r));
+  transition: none;
+}
+/* Enter from right — smooth settle */
+.chapter-lux.is-enter-settle .chapter-lux__shot {
+  opacity: 1;
+  filter: blur(0px);
+  transform:
+    translate3d(calc(-50% + var(--lux-x)), calc(-50% + var(--lux-y)), 0)
+    rotate(var(--lux-r));
+  transition:
+    transform 1.35s cubic-bezier(0.14, 1, 0.28, 1),
+    opacity 0.85s ease,
+    filter 0.85s ease;
+}
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="0"] { transition-delay: 0.1s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="1"] { transition-delay: 0.03s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="2"] { transition-delay: 0.18s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="3"] { transition-delay: 0s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="4"] { transition-delay: 0.14s; }
+.chapter-lux__shot[data-lux-shot="0"] { --lux-x: -34vw; --lux-y: -26vh; --lux-w: min(18vw, 9.5rem); }
+.chapter-lux__shot[data-lux-shot="1"] { --lux-x: -30vw; --lux-y: 18vh; --lux-w: min(22vw, 11rem); aspect-ratio: 5 / 4; }
+.chapter-lux__shot[data-lux-shot="2"] { --lux-x: 8vw; --lux-y: 24vh; --lux-w: min(16vw, 8.5rem); }
+.chapter-lux__shot[data-lux-shot="3"] { --lux-x: 30vw; --lux-y: -28vh; --lux-w: min(15vw, 8rem); }
+.chapter-lux__shot[data-lux-shot="4"] { --lux-x: 32vw; --lux-y: 6vh; --lux-w: min(20vw, 10.5rem); aspect-ratio: 5 / 3; }
+
+/* —— Systemy — arc fan (wachlarz), shared catalog/detail —— */
+.chapter-os {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+}
+.sys-fan {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: auto;
+  user-select: none;
+  touch-action: none;
+}
+.sys-fan__head {
+  position: absolute;
+  inset: 0;
+}
+.sys-fan__stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 72%;
+  perspective: 1600px;
+  cursor: grab;
+}
+.sys-fan__stage.is-dragging { cursor: grabbing; }
+.sys-fan__arc {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 0;
+  height: 0;
+}
+.sys-fan__card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* Shared catalog/detail size — ~2×; arc bleeds past viewport edges */
+  width: min(28vw, 15.2rem);
+  aspect-ratio: 1;
+  margin: 0;
+  border-radius: 1.65rem;
+  overflow: hidden;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform, opacity;
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.sys-fan__card.is-front {
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow:
+    0 34px 80px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+.sys-fan__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.08);
+  pointer-events: none;
+}
+.sys-fan__cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.8rem 0.55rem 0.55rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.82));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+/* Same language as portfolio-chapters__pager — bottom dots + arrows, no side stack */
+.sys-fan__nav {
+  position: absolute;
+  left: 50%;
+  bottom: max(1.15rem, env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  transform: translateX(-50%);
+  padding: 0.2rem 0.15rem;
+  pointer-events: auto;
+}
+.sys-fan--catalog .sys-fan__nav {
+  bottom: max(4.6rem, calc(env(safe-area-inset-bottom, 0px) + 3.6rem));
+  opacity: 0.85;
+}
+.sys-fan--catalog:hover .sys-fan__nav,
+.sys-fan--detail .sys-fan__nav {
+  opacity: 1;
+}
+.sys-fan__nav.is-in-case {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  width: 100%;
+  margin: 0.85rem 0 0.35rem;
+  padding: 0.15rem 0;
+}
+.sys-fan__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-width: min(72vw, 22rem);
+  padding: 0.1rem 0;
+}
+.sys-fan__dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.34);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease, opacity 0.3s ease;
+}
+.sys-fan__dot.is-active {
+  width: 1.4rem;
+  background: rgba(255, 255, 255, 0.95);
+}
+.sys-fan__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: color 0.25s ease, opacity 0.25s ease, background 0.25s ease;
+}
+.sys-fan__arrow:hover,
+.sys-fan__arrow:focus-visible {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+.sys-fan__arrow svg {
+  display: block;
+}
+
+/* Detail copy sits in the hollow under the arc */
+.sys-fan__copy {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  transform: translate(-50%, 0.8rem);
+  width: min(36rem, 86vw);
+  z-index: 30;
+  text-align: center;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.9s ease 0.2s, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+}
+.sys-fan--detail.is-settled .sys-fan__copy {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.sys-fan__copy.is-swapping {
+  opacity: 0;
+  transform: translate(-50%, 0.6rem);
+  transition-duration: 0.35s, 0.4s;
+  transition-delay: 0s, 0s;
+}
+.sys-fan__copy .sys-fan__tag,
+.sys-fan__copy .sys-fan__client,
+.sys-fan__copy .sys-fan__title,
+.sys-fan__copy .sys-fan__desc,
+.sys-fan__copy .sys-fan__more {
+  opacity: 0;
+  transform: translate3d(0, 0.55rem, 0);
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__tag { opacity: 1; transform: none; transition-delay: 0.05s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__client { opacity: 1; transform: none; transition-delay: 0.12s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__title { opacity: 1; transform: none; transition-delay: 0.2s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__desc { opacity: 1; transform: none; transition-delay: 0.3s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__more { opacity: 1; transform: none; transition-delay: 0.4s; }
+.sys-fan__tag {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+.sys-fan__client {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(245, 245, 245, 0.75);
+}
+.sys-fan__title {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(1.7rem, 4vw, 2.55rem);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: #fff;
+}
+.sys-fan__desc {
+  margin: 0.75rem auto 0;
+  max-width: 32rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}
+.sys-fan__more {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.12rem 0;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  background: none;
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--font-body, "Satoshi", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.45s ease;
+}
+.sys-fan__more:hover,
+.sys-fan__more:focus-visible {
+  color: #fff;
+  border-color: #fff;
+  outline: none;
+}
+
+/* Catalog matches detail framing (closer); click only pulls back slightly */
+.sys-fan--catalog .sys-fan__stage {
+  height: 68%;
+  top: 0;
+}
+.sys-fan--catalog .sys-fan__arc {
+  top: 46%;
+}
+.sys-fan--catalog .sys-fan__head {
+  transform: translate3d(0, -1vh, 0) scale(1.1);
+  transform-origin: 50% 42%;
+}
+
+/* Catalog stays under detail (identical look) until settle, then hides */
+.portfolio-chapters.is-systems-detail .chapter-os .sys-fan--catalog {
+  opacity: 1;
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.portfolio-chapters.is-systems-detail .chapter-os .sys-fan--catalog.is-under-detail {
+  opacity: 0;
+}
+.portfolio-chapters.is-systems-detail.is-systems-exiting .chapter-os .sys-fan--catalog {
+  opacity: 1;
+}
+.portfolio-chapters.is-systems-detail .portfolio-chapter__copy {
+  opacity: 0 !important;
+  transition: opacity 0.7s ease;
+}
+.portfolio-chapters.is-systems-detail.is-systems-exiting .portfolio-chapter__copy {
+  opacity: 1 !important;
+  transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+}
+
+/* —— Grafiki — Showcase 14 scatter —— */
+.chapter-show {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+  color: #f5f5f5;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+}
+/* Catalog Grafiki — no header/foot chrome (Output formats, YR25, …) */
+body.portfolio-page--tiles .chapter-show__meta,
+body.portfolio-page--tiles .chapter-show__foot {
+  display: none !important;
+}
+.chapter-show__word {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 2;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  text-align: center;
+  font-size: clamp(3.4rem, 10vw, 7.2rem);
+  font-weight: 300;
+  letter-spacing: -0.06em;
+  line-height: 0.88;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  transition: opacity 0.7s ease, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), filter 1.1s ease;
+}
+.chapter-show.is-swap .chapter-show__word {
+  opacity: 0.15;
+  transform: translate(-50%, -50%) scale(1.04);
+  filter: blur(2px);
+}
+.chapter-show__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.chapter-show__tile {
+  --sh-x: 0%;
+  --sh-y: 0%;
+  --sh-w: 14%;
+  --sh-r: 0deg;
+  --sh-z: 1;
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: var(--sh-w);
+  margin: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #ccc;
+  transform: translate(calc(-50% + var(--sh-x)), calc(-50% + var(--sh-y))) rotate(var(--sh-r));
+  z-index: var(--sh-z);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s ease,
+    width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+.chapter-show__tile.is-portrait { aspect-ratio: 3 / 4; }
+.chapter-show__tile.is-wide { aspect-ratio: 5 / 3; }
+.chapter-show__tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Montaż — diagonal drifting reel belt (TROVE + Wiktoria) */
+.chapter-montaz {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+}
+.portfolio-tile__viz-word {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 0;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  width: 96%;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(5rem, 14vw, 9rem);
+  font-weight: 300;
+  letter-spacing: -0.07em;
+  line-height: 0.82;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.chapter-montaz__belt.reels-tiles,
+body.portfolio-page--tiles #montaz .reels-tiles {
+  position: absolute;
+  inset: -18% -10%;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0;
+  transform: rotate(-16deg);
+  transform-origin: center center;
+}
+body.portfolio-page--tiles #montaz .reels-tiles__stage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+body.portfolio-page--tiles #montaz .reels-tiles__belt {
+  height: min(58vh, 28rem);
+  align-items: center;
+}
+body.portfolio-page--tiles #montaz .reels-tiles__card {
+  height: 86%;
+}
+body.portfolio-page--tiles.is-tile-expanded #montaz .reels-tiles__belt {
+  animation-play-state: paused;
+}
+body.portfolio-page--tiles.is-montaz-belt-hold #montaz .reels-tiles__belt {
+  animation-play-state: paused;
+}
+
+/* Montaż chapter — reel mosaic BG */
+.portfolio-tile__reel-comp {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 2px;
+  padding: 0;
+  background: #050505;
+}
+.portfolio-tile__reel-comp-cell {
+  position: relative;
+  overflow: hidden;
+  background: #111;
+  min-height: 0;
+}
+.portfolio-tile__reel-comp-cell img,
+.portfolio-tile__reel-comp-cell video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.portfolio-tile__reel-comp-cell video {
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.portfolio-tile__reel-comp-cell.is-playing video {
+  opacity: 1;
+}
+
+/* Expand overlay — fixed over viewport when Zobacz więcej opens cases */
+/* Legacy expand rail styles removed — see portfolio-expand.css */
+
+@media (max-width: 720px) {
+  .portfolio-chapter,
+  body.portfolio-page--tiles #montaz.portfolio-chapter {
+    padding-left: var(--gutter, 1.25rem);
+    padding-right: var(--gutter, 1.25rem);
+    padding-bottom: clamp(5.2rem, 14vh, 7rem);
+  }
+  .portfolio-chapters__pager {
+    bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
+    gap: 0.4rem;
+  }
+  .portfolio-chapters__arrow {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+  .portfolio-chapter__title {
+    font-size: clamp(1.7rem, 7.5vw, 2.15rem);
+    font-weight: 300;
+  }
+  .portfolio-chapter__lead {
+    font-size: clamp(0.88rem, 3.6vw, 1rem);
+  }
+  .portfolio-tile__viz-card {
+    width: min(28vw, 7.2rem);
+  }
+  .chapter-lux__word {
+    font-size: clamp(2.2rem, 11vw, 3.4rem);
+  }
+  .chapter-lux__shot[data-lux-shot="0"] { --lux-x: -26vw; --lux-y: -20vh; --lux-w: min(22vw, 5.4rem); }
+  .chapter-lux__shot[data-lux-shot="1"] { --lux-x: -24vw; --lux-y: 14vh; --lux-w: min(26vw, 6.2rem); }
+  .chapter-lux__shot[data-lux-shot="2"] { --lux-x: 8vw; --lux-y: 20vh; --lux-w: min(20vw, 5rem); }
+  .chapter-lux__shot[data-lux-shot="3"] { --lux-x: 26vw; --lux-y: -22vh; --lux-w: min(19vw, 4.6rem); }
+  .chapter-lux__shot[data-lux-shot="4"] { --lux-x: 28vw; --lux-y: 4vh; --lux-w: min(24vw, 5.8rem); }
+  .chapter-show__word {
+    font-size: clamp(2.4rem, 13vw, 3.6rem);
+  }
+  .chapter-show__tile {
+    --sh-w: 11%;
+    border-radius: 0.35rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  }
+  .portfolio-tile__viz-word {
+    font-size: clamp(3.2rem, 16vw, 5rem);
+  }
+  body.portfolio-page--tiles #montaz .reels-tiles__belt {
+    height: min(42vh, 18rem);
+  }
+  body.portfolio-page--tiles #montaz .reels-tiles__card {
+    height: 82%;
+  }
+  .sys-fan__card {
+    width: min(34vw, 9rem);
+    border-radius: 1.1rem;
+  }
+  .sys-fan__cap {
+    font-size: 0.5rem;
+    padding: 1.2rem 0.4rem 0.4rem;
+  }
+  .sys-fan__copy {
+    top: 58%;
+    width: min(30rem, 90vw);
+  }
+  .sys-fan__title {
+    font-size: clamp(1.35rem, 6.5vw, 1.85rem);
+  }
+  .sys-fan--catalog .sys-fan__nav {
+    bottom: max(4.2rem, calc(env(safe-area-inset-bottom, 0px) + 3.2rem));
+  }
+  .sys-fan__dots {
+    gap: 0.32rem;
+    max-width: min(78vw, 18rem);
+  }
+  .sys-fan__dot {
+    width: 0.4rem;
+    height: 0.4rem;
+  }
+  .sys-fan__dot.is-active {
+    width: 1.15rem;
+  }
+}
+
+html.reduce-motion .portfolio-tile__viz-card,
+html.reduce-motion .chapter-lux__word-3d,
+html.reduce-motion .chapter-lux__word,
+html.reduce-motion .chapter-lux__shot,
+html.reduce-motion .chapter-lux.is-exit-left .chapter-lux__shot,
+html.reduce-motion .chapter-lux.is-enter-settle .chapter-lux__shot,
+html.reduce-motion .sys-fan__card,
+html.reduce-motion .chapter-os__card,
+html.reduce-motion .chapter-show__word,
+html.reduce-motion .chapter-show__tile,
+html.reduce-motion .portfolio-tile-expand,
+html.reduce-motion .portfolio-chapter__title,
+html.reduce-motion .portfolio-chapter__lead,
+html.reduce-motion .portfolio-chapter__more,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-show,
+html.reduce-motion .sys-fan__copy,
+html.reduce-motion .sys-fan__copy .sys-fan__tag,
+html.reduce-motion .sys-fan__copy .sys-fan__client,
+html.reduce-motion .sys-fan__copy .sys-fan__title,
+html.reduce-motion .sys-fan__copy .sys-fan__desc,
+html.reduce-motion .sys-fan__copy .sys-fan__more {
+  transition: none !important;
+  animation: none !important;
+}

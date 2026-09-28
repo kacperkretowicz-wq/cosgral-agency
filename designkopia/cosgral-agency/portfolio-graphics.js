@@ -401,7 +401,8 @@
     var spread = mobile ? 1.02 : 1.14;
     heroEnd = { x: heroEnd.x * m * spread, y: heroEnd.y * m * spread - (mobile ? 40 : 80) };
     var endScale = mobile ? 0.78 : 0.92;
-    var startScale = mobile ? 1.4 : 1.65;
+    /* Lower zoom so intro tiles aren't clipped by the viewport edges */
+    var startScale = mobile ? 1.08 : 1.18;
     var start = cameraFocus(clusterCenter(FOCUS_JUICY), startScale);
     var mid = cameraFocus(clusterCenter(FOCUS_FAR), mobile ? 1.12 : 1.22);
     var full = cameraFocus(heroEnd, endScale);
@@ -415,6 +416,7 @@
       var pos = WORLD[idx] || { s: 1, r: 0 };
       var fromLeft = i % 2 === 0;
       gsap.set(tile, {
+        /* Hidden until pin — avoids bleeding into Montaż */
         opacity: 0,
         x: fromLeft ? -(mobile ? 56 : 96) : mobile ? 56 : 96,
         y: (i % 5) * (mobile ? 10 : 14) - 18,
@@ -425,16 +427,16 @@
     });
 
     var tl = gsap.timeline({ paused: true, defaults: { ease: "sine.inOut" } });
-    /* Dłuższy spokój na starcie — ruch zaczyna się później w pinie */
-    tl.to({}, { duration: 1.1 });
 
-    var tileStart = 1.1;
-    var tileStep = mobile ? 0.12 : 0.145;
-    var tileDur = mobile ? 1.85 : 2.15;
+    /* Fly-in starts at progress 0 once pinned (no empty lead). */
+    var tileStart = 0;
+    var tileStep = mobile ? 0.1 : 0.12;
+    var tileDur = mobile ? 1.7 : 2.0;
 
     tileArr.forEach(function (tile, i) {
       var idx = Number(tile.getAttribute("data-idx"));
       var pos = WORLD[idx] || { s: 1, r: 0 };
+      var isIntro = INTRO_TILES.indexOf(idx) !== -1;
       tl.to(
         tile,
         {
@@ -443,17 +445,17 @@
           y: 0,
           scale: pos.s,
           rotation: pos.r,
-          duration: tileDur,
+          duration: isIntro ? tileDur * 0.75 : tileDur,
           ease: "power1.out",
         },
-        tileStart + i * tileStep
+        isIntro ? 0 : tileStart + i * tileStep
       );
     });
 
-    var camMidAt = tileStart + 1.2;
-    var camFullAt = tileStart + tileArr.length * tileStep * 0.5 + 1.8;
-    tl.to(camera, Object.assign({ duration: 3.2, ease: "sine.inOut" }, mid), camMidAt);
-    tl.to(camera, Object.assign({ duration: 3.8, ease: "sine.inOut" }, full), camFullAt);
+    var camMidAt = 0.55;
+    var camFullAt = tileArr.length * tileStep * 0.45 + 1.35;
+    tl.to(camera, Object.assign({ duration: 3.0, ease: "sine.inOut" }, mid), camMidAt);
+    tl.to(camera, Object.assign({ duration: 3.6, ease: "sine.inOut" }, full), camFullAt);
 
     if (watermark) {
       tl.to(
@@ -463,8 +465,8 @@
       );
     }
 
-    /* Hold na końcu — CTA później */
-    tl.to({}, { duration: 1.4 });
+    /* Short end hold — long hold made the finale feel duplicated after unpin */
+    tl.to({}, { duration: 0.55 });
 
     return tl;
   }
@@ -1182,6 +1184,10 @@
     var section = document.getElementById("grafiki");
     if (!cinema || !section) return;
 
+    /* Prevent double init (fetch/media-ready / HMR) which breaks pin + duplicates UI */
+    if (section.dataset.cinemaScrollInit === "1") return;
+    section.dataset.cinemaScrollInit = "1";
+
     var camera = cinema.querySelector(".graphics-cinema__camera");
     var world = cinema.querySelector(".graphics-cinema__world");
     var watermark = cinema.querySelector(".graphics-cinema__watermark");
@@ -1206,12 +1212,13 @@
 
     var overlay = section.querySelector(".graphics-stage__overlay");
     var framesCta = section.querySelector("[data-graphics-frames-cta]");
+    var stage = section.querySelector(".graphics-stage");
 
     function setOverlay(p) {
-      /* CTA dopiero pod sam koniec — opacity (nie autoAlpha), żeby klik działał */
-      var show = p > 0.82;
-      var amt = Math.max(0, Math.min(1, (p - 0.82) / 0.12));
-      var clickable = show && amt > 0.2;
+      /* CTA near the end of the pin only — clear fully when p is low / unpinned */
+      var show = p > 0.88;
+      var amt = Math.max(0, Math.min(1, (p - 0.88) / 0.08));
+      var clickable = show && amt > 0.25;
       if (overlay) {
         overlay.setAttribute("aria-hidden", show ? "false" : "true");
         gsap.set(overlay, {
@@ -1234,8 +1241,35 @@
           framesCta.style.visibility = "visible";
         }
       }
-      section.classList.toggle("is-cinema-done", p > 0.9);
-      document.body.classList.toggle("is-grafiki-overlay-reveal", p > 0.82);
+      section.classList.toggle("is-cinema-done", p > 0.94);
+      document.body.classList.toggle("is-grafiki-overlay-reveal", show);
+    }
+
+    function clearGrafikiFinale() {
+      section.classList.remove("is-cinema-done");
+      document.body.classList.remove(
+        "is-grafiki-overlay-reveal",
+        "is-grafiki-cinema-end"
+      );
+      setOverlay(0);
+    }
+
+    function setGrafikiPinned(on) {
+      section.classList.toggle("is-grafiki-pinned", !!on);
+      document.body.classList.toggle("is-grafiki-pinned", !!on);
+    }
+
+    function clearGrafikiRecess() {
+      section.classList.remove("is-depth-recessed", "is-depth-gone");
+      section.style.pointerEvents = "";
+      if (window.gsap) {
+        gsap.set(section, { clearProps: "opacity,visibility" });
+        if (stage) {
+          gsap.set(stage, {
+            clearProps: "opacity,visibility,transform,filter,yPercent,scale",
+          });
+        }
+      }
     }
 
     if (overlay) gsap.set(overlay, { opacity: 0, visibility: "hidden" });
@@ -1283,6 +1317,24 @@
     }
 
     var pinHandlers = {};
+    var APPROACH_END = mobile ? 0.12 : 0.15;
+    var APPROACH_TILE_START = mobile ? 0.3 : 0.35;
+
+    function cinemaFromPinProgress(p) {
+      return APPROACH_END + Math.max(0, Math.min(1, p)) * (1 - APPROACH_END);
+    }
+
+    function approachCinemaProgress(p) {
+      var t = Math.max(0, Math.min(1, p));
+      if (t <= APPROACH_TILE_START) return 0;
+      return ((t - APPROACH_TILE_START) / (1 - APPROACH_TILE_START)) * APPROACH_END;
+    }
+
+    /* Kill stale triggers from a prior boot */
+    ["grafiki-pin", "grafiki-approach", "grafiki-cinema-sync"].forEach(function (id) {
+      var old = ScrollTrigger.getById(id);
+      if (old) old.kill();
+    });
 
     var pinST = ScrollTrigger.create({
       id: "grafiki-pin",
@@ -1291,36 +1343,95 @@
       end: pinLen,
       pin: true,
       pinSpacing: true,
-      /* Większy lag = płynniejszy, wolniejszy odczucie ruchu */
-      scrub: freeScroll ? (mobile ? 1.85 : 2.4) : false,
-      anticipatePin: 0.35,
+      /* Tight scrub = same feel up & down; high scrub lagged and “broke” on reverse */
+      scrub: freeScroll ? (mobile ? 0.75 : 0.95) : false,
+      anticipatePin: 0.05,
       invalidateOnRefresh: true,
       refreshPriority: -1,
+      onToggle: function (self) {
+        setGrafikiPinned(self.isActive);
+        if (self.isActive) clearGrafikiRecess();
+      },
       onEnter: function () {
+        setGrafikiPinned(true);
+        clearGrafikiRecess();
         if (pinHandlers.onEnter) pinHandlers.onEnter();
       },
       onEnterBack: function () {
+        setGrafikiPinned(true);
+        clearGrafikiRecess();
         if (pinHandlers.onEnterBack) pinHandlers.onEnterBack();
       },
-      onUpdate: function (self) {
+      onLeave: function () {
+        setGrafikiPinned(false);
         if (freeScroll) {
-          cinemaTl.progress(self.progress);
-          setOverlay(self.progress);
+          cinemaTl.progress(1);
+          setOverlay(1);
         }
+        if (pinHandlers.onLeave) pinHandlers.onLeave();
+      },
+      onLeaveBack: function () {
+        setGrafikiPinned(false);
+        clearGrafikiFinale();
+        /* Don’t hard-snap to 0 — cinema-sync will set approach progress */
+        if (pinHandlers.onLeaveBack) pinHandlers.onLeaveBack();
+      },
+      onUpdate: function (self) {
         if (pinHandlers.onUpdate) pinHandlers.onUpdate(self);
       },
       onRefresh: function (self) {
-        if (freeScroll) {
-          cinemaTl.progress(self.progress || 0);
-          setOverlay(self.progress || 0);
-        }
+        setGrafikiPinned(!!self.isActive);
+        if (self.isActive) clearGrafikiRecess();
       },
+    });
+
+    /**
+     * Single bidirectional cinema scrub: approach → pin → post-pin end frame.
+     * Avoids approach/pin fighting (which duplicated Grafiki on scroll-up).
+     */
+    function syncCinemaFromScroll() {
+      if (!freeScroll || !pinST) return;
+      var y = typeof pinST.scroll === "function" ? pinST.scroll() : window.scrollY || 0;
+      var start = pinST.start;
+      var end = pinST.end;
+      var vh = window.innerHeight || 1;
+      var approachStart = start - vh;
+      var cp = 0;
+
+      if (y <= approachStart) {
+        cp = 0;
+      } else if (y < start) {
+        var ap = (y - approachStart) / Math.max(1, start - approachStart);
+        cp = approachCinemaProgress(ap);
+      } else if (y <= end) {
+        var pp = (y - start) / Math.max(1, end - start);
+        cp = cinemaFromPinProgress(pp);
+      } else {
+        cp = 1;
+      }
+
+      cinemaTl.progress(cp);
+      setOverlay(cp);
+      if (window.cosgralGrafikiBloom?.syncFromPin) {
+        window.cosgralGrafikiBloom.syncFromPin(pinST);
+      }
+    }
+
+    ScrollTrigger.create({
+      id: "grafiki-cinema-sync",
+      start: 0,
+      end: "max",
+      invalidateOnRefresh: true,
+      refreshPriority: -2,
+      onUpdate: syncCinemaFromScroll,
+      onRefresh: syncCinemaFromScroll,
     });
 
     if (freeScroll) {
       window.cosgralGrafikiStepper = {
         refresh: function () {
           if (pinST) pinST.refresh();
+          syncCinemaFromScroll();
         },
         snapToHold: function () {},
         revealHold: function () {},
@@ -1328,9 +1439,10 @@
         resetForReentry: function () {
           cinemaTl.progress(0);
           setOverlay(0);
+          clearGrafikiRecess();
         },
         getBeat: function () {
-          return pinST && pinST.progress > 0.82 ? 1 : 0;
+          return pinST && cinemaFromPinProgress(pinST.progress) > 0.88 ? 1 : 0;
         },
         isAnimating: function () {
           return false;
@@ -1352,9 +1464,11 @@
 
     collageRoot.classList.add("is-ready");
     section.classList.add("is-cinema-ready");
+    syncCinemaFromScroll();
 
     window.addEventListener("load", function () {
       ScrollTrigger.refresh();
+      syncCinemaFromScroll();
       if (window.cosgralGrafikiStepper?.refresh) window.cosgralGrafikiStepper.refresh();
       if (window.cosgralPortfolioRail?.refresh) window.cosgralPortfolioRail.refresh();
     });
@@ -1506,60 +1620,79 @@
     var cube = document.querySelector(".subpage-cube-portal");
     var bloom = document.getElementById("grafiki-bloom");
     var rail = getScrollRail();
-    var grafikiCta = document.querySelector("#grafiki .graphics-collage__footer");
+    var lastLift = -1;
 
     grafikiMenuState.cube = cube;
-    gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
-    gsap.set(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)" });
-    gsap.set(blur, { opacity: 0.55 });
-    gsap.set(bloom, { opacity: 0 });
+    if (shade) gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
+    if (ambient) gsap.set(ambient, { filter: "grayscale(1) contrast(1.04) brightness(0.78)" });
+    if (blur) gsap.set(blur, { opacity: 0.55 });
+    if (bloom) gsap.set(bloom, { opacity: 0 });
     if (rail) gsap.set(rail, RAIL_LIGHT);
 
-    function applyAmbientLift(t) {
-      t = Math.max(0, Math.min(1, t));
-      gsap.set(bloom, { opacity: lerp(0, 0.66, t) });
-      gsap.set(shade, { backgroundColor: mixRgba("rgba(3, 3, 3, 0.28)", "rgba(255, 255, 255, 0.84)", t) });
-      gsap.set(ambient, {
-        filter:
-          "grayscale(" +
-          lerp(1, 0, t).toFixed(3) +
-          ") contrast(" +
-          lerp(1.04, 1.01, t).toFixed(3) +
-          ") brightness(" +
-          lerp(0.78, 2.52, t).toFixed(3) +
-          ")",
-      });
-      gsap.set(blur, { opacity: lerp(0.55, 0.82, t) });
-      if (rail) gsap.set(rail, mixRail(RAIL_LIGHT, RAIL_DARK, t));
-      /* Jasny tryb przez całą widoczność Grafiki — ściemnianie dopiero gdy sekcja zniknie ze scrolla */
-      document.body.classList.toggle("is-grafiki-light", t > 0.18);
+    function applyAmbientLift() {
+      lastLift = 0;
+      document.documentElement.style.setProperty("--grafiki-lift", "0");
+      if (bloom) gsap.set(bloom, { opacity: 0 });
+      if (shade) gsap.set(shade, { backgroundColor: "rgba(3, 3, 3, 0.28)" });
+      if (ambient) {
+        gsap.set(ambient, {
+          filter: "grayscale(1) contrast(1.04) brightness(0.78)",
+          opacity: 1,
+        });
+      }
+      if (blur) gsap.set(blur, { opacity: 0.55 });
+      if (rail) gsap.set(rail, RAIL_LIGHT);
+      document.body.classList.remove("is-grafiki-light");
       syncGrafikiCubeFade();
     }
 
-    function liftFromScroll(self) {
-      var pin = ScrollTrigger.getById("grafiki-pin");
-      var y = self.scroll();
-      var pinStart = pin ? pin.start : self.start;
-      var pinEnd = pin ? pin.end : self.end;
-      var pinSpan = Math.max(1, pinEnd - pinStart);
-      /* Rozjaśnianie później i wolniej — dopiero po ~22% pinu, pełne ~58% */
-      var liftStart = pinStart + pinSpan * 0.22;
-      var liftFull = pinStart + pinSpan * 0.58;
-      var darkenStart = pinEnd;
-      var darkenEnd = self.end;
-      var t;
-      if (y <= liftStart) {
-        t = 0;
-      } else if (y < liftFull) {
-        var raw = (y - liftStart) / Math.max(1, liftFull - liftStart);
-        /* Ease-in: dłużej ciemno, potem spokojny wzrost */
-        t = Math.pow(Math.max(0, Math.min(1, raw)), 1.65);
-      } else if (y <= darkenStart) {
-        t = 1;
-      } else {
-        t = 1 - (y - darkenStart) / Math.max(1, darkenEnd - darkenStart);
+    function liftAmountFromPinProgress(p) {
+      p = Math.max(0, Math.min(1, p));
+      var liftStart = 0.18;
+      var liftFull = 0.48;
+      if (p <= liftStart) return 0;
+      if (p >= liftFull) return 1;
+      var raw = (p - liftStart) / (liftFull - liftStart);
+      return Math.pow(raw, 1.2);
+    }
+
+    function endBandCover() {
+      var endBand = document.querySelector(".portfolio-end");
+      if (!endBand) return 0;
+      var top = endBand.getBoundingClientRect().top;
+      var vh = window.innerHeight || 1;
+      if (top <= 0) return 1;
+      if (top >= vh) return 0;
+      /* Ease cover so light→dark is gradual across ~full viewport */
+      var raw = 1 - top / vh;
+      return raw * raw * (3 - 2 * raw);
+    }
+
+    function syncLiftFromPin(pin) {
+      if (!pin) return;
+      var t = 0;
+
+      if (pin.isActive) {
+        t = liftAmountFromPinProgress(pin.progress || 0);
+      } else if (typeof pin.scroll === "function" && pin.scroll() > pin.end) {
+        /* After pin: start full light, then smoothly darken as footer covers */
+        t = Math.max(0, 1 - endBandCover());
+      } else if ((pin.progress || 0) > 0.18) {
+        t = liftAmountFromPinProgress(pin.progress || 0);
+      }
+
+      if (
+        document.body.classList.contains("is-grafiki-overlay-reveal") ||
+        section.classList.contains("is-cinema-done")
+      ) {
+        /* Finale stays light until footer begins covering */
+        t = Math.max(t, 1 - endBandCover());
       }
       applyAmbientLift(t);
+    }
+
+    function liftFromScroll() {
+      syncLiftFromPin(ScrollTrigger.getById("grafiki-pin"));
     }
 
     var bloomST = ScrollTrigger.create({
@@ -1567,22 +1700,33 @@
       trigger: section,
       start: function () {
         var pin = ScrollTrigger.getById("grafiki-pin");
-        /* Bez wczesnego rozjaśniania przed pinem */
         return pin ? pin.start : "top top";
       },
       end: function () {
         var pin = ScrollTrigger.getById("grafiki-pin");
-        return pin ? pin.end + window.innerHeight * 0.85 : "bottom top";
+        /* Cover pin + free-scroll while section is still on screen */
+        return pin
+          ? pin.end + Math.round((window.innerHeight || 0) * 1.6)
+          : "bottom top";
       },
       invalidateOnRefresh: true,
       onUpdate: liftFromScroll,
       onRefresh: liftFromScroll,
+      onLeave: function () {
+        /* Only darken once Grafiki has left the viewport */
+        var vh = window.innerHeight || 1;
+        var rect = section.getBoundingClientRect();
+        if (rect.bottom <= vh * 0.08) applyAmbientLift(0);
+        else applyAmbientLift(1);
+      },
+      onLeaveBack: function () {
+        applyAmbientLift(0);
+      },
     });
 
     var zoneST = ScrollTrigger.create({
       trigger: section,
       start: "top bottom",
-      endTrigger: grafikiCta || section,
       end: "bottom top",
       onEnter: function () {
         document.body.classList.add("is-grafiki-zone");
@@ -1591,6 +1735,8 @@
       },
       onLeave: function () {
         document.body.classList.remove("is-grafiki-zone");
+        document.body.classList.remove("is-grafiki-light");
+        applyAmbientLift(0);
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },
@@ -1598,9 +1744,12 @@
         document.body.classList.add("is-grafiki-zone");
         window.cosgralCube?.setGrafikiMenuActive?.(true);
         syncGrafikiCubeFade();
+        liftFromScroll();
       },
       onLeaveBack: function () {
         document.body.classList.remove("is-grafiki-zone");
+        document.body.classList.remove("is-grafiki-light");
+        applyAmbientLift(0);
         window.cosgralCube?.setGrafikiMenuActive?.(false);
         restoreCubePortalOutsideGrafiki();
       },
@@ -1610,7 +1759,14 @@
     grafikiMenuState.darkenTl = null;
     grafikiMenuState.triggers = [bloomST, zoneST];
 
+    window.cosgralGrafikiBloom = {
+      apply: applyAmbientLift,
+      syncFromPin: syncLiftFromPin,
+      refresh: liftFromScroll,
+    };
+
     syncGrafikiCubeFade();
+    liftFromScroll();
   }
 
   function renderGallery(data) {

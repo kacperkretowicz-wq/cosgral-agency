@@ -68,29 +68,35 @@
     { re: /(shelfsync|northline-crm|atelier-bloom|parcel-co)\.svg/, keyFrom: (m) => m[1] },
   ];
 
-  for (const img of document.querySelectorAll(".portfolio-case-card__preview img, .case-study__film--visual img")) {
-    const src = img.getAttribute("src") || "";
-    let key = null;
-    for (const matcher of srcMatchers) {
-      const match = src.match(matcher.re);
-      if (match) {
-        key = matcher.keyFrom(match);
-        break;
+  function enhanceCasePreviews(root) {
+    const scope = root || document;
+    for (const img of scope.querySelectorAll(".portfolio-case-card__preview img, .case-study__film--visual img")) {
+      const src = img.getAttribute("src") || "";
+      let key = null;
+      for (const matcher of srcMatchers) {
+        const match = src.match(matcher.re);
+        if (match) {
+          key = matcher.keyFrom(match);
+          break;
+        }
       }
-    }
-    if (!key || !overlays[key]) continue;
-    const parent = img.parentElement;
-    if (!parent || !parent.matches(".portfolio-case-card__preview, .case-study__film--visual")) continue;
-    if (parent.querySelector(".tf-preview-motion")) continue;
+      if (!key || !overlays[key]) continue;
+      const parent = img.parentElement;
+      if (!parent || !parent.matches(".portfolio-case-card__preview, .case-study__film--visual")) continue;
+      if (parent.querySelector(".tf-preview-motion")) continue;
 
-    parent.classList.add("portfolio-case-card__preview--animated");
-    const spec = overlays[key];
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("class", `tf-preview-motion tf-preview-motion--${key}`);
-    svg.setAttribute("viewBox", spec.viewBox);
-    svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
-    svg.setAttribute("aria-hidden", "true");
-    svg.innerHTML = spec.html;
-    img.after(svg);
+      parent.classList.add("portfolio-case-card__preview--animated");
+      const spec = overlays[key];
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", `tf-preview-motion tf-preview-motion--${key}`);
+      svg.setAttribute("viewBox", spec.viewBox);
+      svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+      svg.setAttribute("aria-hidden", "true");
+      svg.innerHTML = spec.html;
+      img.after(svg);
+    }
   }
+
+  window.CosgralEnhanceCasePreviews = enhanceCasePreviews;
+  enhanceCasePreviews(document);
 })();

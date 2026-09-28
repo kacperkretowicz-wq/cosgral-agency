@@ -348,7 +348,7 @@
 
   // ——— Nawigacja: boczne strefy (nawet nad kafelkiem) = prev/next;
   // środek aktywnego kafelka nadal otwiera panel usługi ———
-  var SIDE_ZONE = MOBILE ? 0.3 : 0.28;
+  var SIDE_ZONE = MOBILE ? 0.36 : 0.42;
 
   function sideZoneFromX(clientX) {
     var rect = section.getBoundingClientRect();

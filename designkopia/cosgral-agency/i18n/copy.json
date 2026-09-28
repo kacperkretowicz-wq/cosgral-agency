@@ -55,6 +55,22 @@
     "about": {
       "pl": "O nas",
       "en": "About"
+    },
+    "music": {
+      "pl": "Muzyka",
+      "en": "Music"
+    },
+    "music_play": {
+      "pl": "Włącz muzykę",
+      "en": "Play music"
+    },
+    "music_pause": {
+      "pl": "Wycisz muzykę",
+      "en": "Pause music"
+    },
+    "music_next": {
+      "pl": "Następny utwór",
+      "en": "Next track"
     }
   },
   "preloader": {
@@ -582,6 +598,46 @@
         "en": "COSGRAL graphics gallery — Juicy Events, Far East, BTS and more."
       }
     },
+    "automation_systems_meta": {
+      "title": {
+        "pl": "Systemy i automatyzacje — Portfolio COSGRAL",
+        "en": "Systems & automation — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Aplikacje, CRM i automatyzacje COSGRAL — TelForceOne, Trove, chatboty AI.",
+        "en": "COSGRAL apps, CRM and automations — TelForceOne, Trove, AI chatbots."
+      }
+    },
+    "web_pages_meta": {
+      "title": {
+        "pl": "Strony internetowe — Portfolio COSGRAL",
+        "en": "Websites — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Wybrane strony internetowe COSGRAL — Juicy Events, Trove Archive, MJ Social Media.",
+        "en": "Selected COSGRAL websites — Juicy Events, Trove Archive, MJ Social Media."
+      }
+    },
+    "tile_open": {
+      "pl": "Zobacz realizacje",
+      "en": "See the work"
+    },
+    "tiles_hint": {
+      "pl": "Przesuń w bok między kategoriami",
+      "en": "Swipe sideways between categories"
+    },
+    "automation_tile_lead": {
+      "pl": "CRM, aplikacje i workflow, które odciążają zespół.",
+      "en": "CRM, apps and workflows that take work off your team."
+    },
+    "grafiki_tile_lead": {
+      "pl": "Posty, stories i key visuale w rytmie pokazu slajdów.",
+      "en": "Posts, stories and key visuals as a slide show."
+    },
+    "web_page_lead": {
+      "pl": "Od landing page po sklepy — wybrane wdrożenia stron, które oddają markę i konwertują.",
+      "en": "From landing pages to stores — selected website deliveries that carry the brand and convert."
+    },
     "hero_title": {
       "pl": "Realizacje",
       "en": "Selected work"
@@ -703,8 +759,8 @@
       "en": "Websites"
     },
     "web_lead": {
-      "pl": "Od landing page po serwisy firmowe i sklepy — projekt i wdrożenie pod cele biznesowe.",
-      "en": "From landing pages to company sites and stores — design and delivery aligned to business goals."
+      "pl": "eCommerce, landing page, strony jako część systemu dla działalności",
+      "en": "eCommerce, landing pages, sites as part of a business system"
     },
     "web_service": {
       "pl": "Usługa: strony internetowe →",
@@ -829,8 +885,8 @@
       "en": "Video editing"
     },
     "montaz_lead": {
-      "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
-      "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
+      "pl": "Reels i materiały reklamowe",
+      "en": "Reels and advertising films"
     },
     "montaz_service": {
       "pl": "Usługa: montaż i wideo →",
@@ -849,8 +905,36 @@
       "en": "VISUALS"
     },
     "brands_word": {
-      "pl": "GRAFIKI",
-      "en": "VISUALS"
+      "pl": "Grafiki",
+      "en": "Visuals"
+    },
+    "montaz_word": {
+      "pl": "Montaż",
+      "en": "Edit"
+    },
+    "lux_meta_a": {
+      "pl": "COSGRAL",
+      "en": "COSGRAL"
+    },
+    "lux_meta_b": {
+      "pl": "DIGITAL",
+      "en": "DIGITAL"
+    },
+    "lux_meta_c": {
+      "pl": "STUDIO",
+      "en": "STUDIO"
+    },
+    "lux_foot": {
+      "pl": "WEB",
+      "en": "WEB"
+    },
+    "show_meta": {
+      "pl": "Jitter Template",
+      "en": "Jitter Template"
+    },
+    "show_formats": {
+      "pl": "Output formats(5)",
+      "en": "Output formats(5)"
     },
     "brands_label_side": {
       "pl": "Wybrane realizacje",
@@ -875,6 +959,18 @@
     "grafiki_service": {
       "pl": "Usługa: grafika i wideo →",
       "en": "Service: design & video →"
+    },
+    "see_more_systems": {
+      "pl": "Zobacz więcej",
+      "en": "See more"
+    },
+    "automation_cover_aria": {
+      "pl": "Systemy i automatyzacje — zobacz więcej",
+      "en": "Systems and automation — see more"
+    },
+    "automation_page_lead": {
+      "pl": "Aplikacje, CRM i automatyzacje, które wdrożyliśmy — od TelForceOne po Trove i chatboty AI.",
+      "en": "Apps, CRM and automations we shipped — from TelForceOne to Trove and AI chatbots."
     },
     "automation_title": {
       "pl": "Systemy i automatyzacje",
@@ -901,8 +997,8 @@
       "en": "Store panel & price monitoring"
     },
     "auto1_desc": {
-      "pl": "Stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.",
-      "en": "Stock levels, marketplace price checks and markdown alerts. Less manual control — faster response to price changes."
+      "pl": "Trove ręcznie porównywało ceny na Allegro i własnym sklepie w arkuszach. Panel zbiera stany i ceny kanałów z alertami przecen — reakcja na spadek marży tego samego dnia, nie po tygodniu.",
+      "en": "Trove compared Allegro and own-shop prices in spreadsheets. The panel unifies stock and channel prices with markdown alerts — same-day reaction when margin slips, not a week later."
     },
     "auto2_tag": {
       "pl": "CRM",
@@ -917,8 +1013,8 @@
       "en": "CRM for leads, deals and sales operations"
     },
     "auto2_desc": {
-      "pl": "Narzędzie do prowadzenia sprzedaży: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów.",
-      "en": "A sales tool: leads → deals → pipeline, notes, statuses and reminders in one place. Full contact history without lost leads."
+      "pl": "Leady ginęły między skrzynką, czatem i karteczkami — follow-upy się spóźniały. CRM prowadzi od pierwszego kontaktu do deala: pipeline, notatki i przypomnienia w jednym lejku.",
+      "en": "Leads died between inbox, chat and sticky notes — follow-ups slipped. The CRM runs first contact to deal: pipeline, notes and reminders in one funnel."
     },
     "auto3_tag": {
       "pl": "Automatyzacja",
@@ -933,8 +1029,8 @@
       "en": "AI chatbot for customer messages"
     },
     "auto3_desc": {
-      "pl": "Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź 24/7.",
-      "en": "An AI assistant answering Instagram, Facebook and website messages — FAQ, opening hours, preliminary quotes and handoff to a consultant. First reply 24/7."
+      "pl": "Po godzinach Instagram i Messenger zasypywały te same pytania, a zespół odpisywał rano z opóźnieniem. Bot zamyka FAQ 24/7, zbiera lead i oddaje rozmowę konsultantowi z kontekstem.",
+      "en": "After hours, Instagram and Messenger repeated the same questions; the team replied late in the morning. The bot closes FAQ 24/7, captures the lead and hands the thread to a consultant with context."
     },
     "auto4_tag": {
       "pl": "Automatyzacja",
@@ -949,8 +1045,8 @@
       "en": "Order → invoice → parcel status"
     },
     "auto4_desc": {
-      "pl": "Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta. Mniej ręcznej pracy przy obsłudze zamówień.",
-      "en": "An e-commerce workflow: a new order triggers invoice-ready export, parcel status updates and a customer notification. Less manual work in order operations."
+      "pl": "Każde zamówienie Trove wymagało ręcznego klejenia faktury, statusu i maila do klienta. Workflow odpala cały łańcuch sam — mniej klikania, mniej pomyłek przy fulfillmentcie.",
+      "en": "Every Trove order meant manually gluing invoice, status and customer email. The workflow runs the full chain — less clicking, fewer fulfilment mistakes."
     },
     "view_all": {
       "pl": "Zobacz wszystko →",
@@ -967,6 +1063,10 @@
     "back_portfolio": {
       "pl": "← Wróć do portfolio",
       "en": "← Back to portfolio"
+    },
+    "expand_back": {
+      "pl": "Wróć",
+      "en": "Back"
     },
     "lightbox_reel": {
       "pl": "Podgląd rolki",
@@ -1030,41 +1130,41 @@
     },
     "tf_crm_title": {
       "pl": "CRM z mapą dla handlowców",
-      "en": "CRM with a map for sales representatives"
+      "en": "CRM with a map for field sales"
     },
     "tf_crm_tag": {
       "pl": "CRM / sprzedaż terenowa",
       "en": "CRM / field sales"
     },
     "tf_crm_lede": {
-      "pl": "Baza danych klientów i zintegrowana mapa dla przedstawicieli handlowych.",
-      "en": "A customer database and integrated map for field sales representatives."
+      "pl": "Gdy trasa dnia powstaje w Excelu, a notatka z wizyty w telefonie — sprzedaż terenowa traci czas i kontekst. CRM z mapą zbiera to w jednym panelu.",
+      "en": "When the day’s route lives in Excel and the visit note lives in a phone, field sales lose time and context. A CRM with a map puts it in one panel."
     },
     "tf_crm_description": {
-      "pl": "Aplikacja CRM dla TelForceOne S.A. z bazą danych i mapą wspierającą pracę przedstawicieli handlowych.",
-      "en": "A CRM app for TelForceOne S.A. with a database and a map supporting field sales representatives."
+      "pl": "Handlowcy TelForceOne planowali wizyty w arkuszach i raportowali mailami. CRM z mapą trzyma klientów, trasy i log wizyt razem — plan dnia w minutach, pełna historia w terenie.",
+      "en": "TelForceOne reps planned visits in spreadsheets and reported by email. A CRM with a map keeps customers, routes and visit logs together — a day’s plan in minutes, full history in the field."
     },
     "tf_crm_meta": {
       "title": {
         "pl": "CRM z mapą dla handlowców — TelForceOne S.A. | COSGRAL",
-        "en": "CRM with a map for sales representatives — TelForceOne S.A. | COSGRAL"
+        "en": "CRM with a map for field sales — TelForceOne S.A. | COSGRAL"
       },
       "description": {
-        "pl": "Aplikacja CRM dla TelForceOne S.A. z bazą danych i mapą wspierającą pracę przedstawicieli handlowych.",
-        "en": "A CRM app for TelForceOne S.A. with a database and a map supporting field sales representatives."
+        "pl": "Handlowcy TelForceOne planowali wizyty w arkuszach i raportowali mailami. CRM z mapą trzyma klientów, trasy i log wizyt razem — plan dnia w minutach, pełna historia w terenie.",
+        "en": "TelForceOne reps planned visits in spreadsheets and reported by email. A CRM with a map keeps customers, routes and visit logs together — a day’s plan in minutes, full history in the field."
       }
     },
     "tf_crm_p1": {
-      "pl": "Dla TelForceOne S.A. powstała aplikacja CRM dla zespołu przedstawicieli handlowych. Łączy bazę danych klientów z widokiem mapy, dzięki czemu informacje potrzebne do pracy w terenie są dostępne w jednym miejscu.",
-      "en": "We built a CRM app for TelForceOne S.A.’s sales representatives. It combines a customer database with a map view, keeping the information needed in the field in one place."
+      "pl": "Problem: przedstawiciele jeździli z listami w Excelu i notatkami w telefonie. Szef sprzedaży nie widział na żywo, kto u kogo był, trasy dublowały się albo omijały ważnych klientów, a raport dnia ginął w skrzynce.",
+      "en": "Problem: reps worked from Excel lists and phone notes. Sales leadership couldn’t see who visited whom, routes overlapped or skipped key accounts, and the day report vanished in inboxes."
     },
     "tf_crm_p2": {
-      "pl": "Mapa nadaje danym kontekst przestrzenny: pomaga zorientować się, gdzie znajdują się klienci i planować kolejne wizyty. Widok klienta oraz praca na trasie tworzą spójny proces dla handlowca.",
-      "en": "The map gives customer data a spatial context: it helps the team see where customers are and plan upcoming visits. Customer records and route work form a coherent workflow."
+      "pl": "Rozwiązanie: aplikacja CRM z bazą klientów, mapą pinów, planem trasy i logiem wizyty. Handlowiec check-inuje się u klienta, dopisuje temat i follow-up — wszystko wpada od razu do karty, bez drugiej aplikacji.",
+      "en": "Solution: a CRM with customer records, map pins, a route plan and a visit log. The rep checks in, adds the topic and follow-up — it lands on the account instantly, without a second app."
     },
     "tf_crm_p3": {
-      "pl": "Projekt pokazuje, jak narzędzie sprzedażowe można zbudować wokół codziennego sposobu pracy zespołu, zamiast wymagać przełączania się między oddzielną bazą kontaktów i mapą.",
-      "en": "The project shows how a sales tool can follow the team’s daily work instead of making them switch between a separate contact database and map."
+      "pl": "Efekt: planowanie trasy skraca się z godzinnego układania w arkuszu do krótkiego przeglądu mapy. Zespół ma jedną historię kontaktu, mniej pustych wyjazdów i raport dnia bez ręcznego przepisywania.",
+      "en": "Result: route planning shrinks from an hour in a spreadsheet to a short map review. The team shares one contact history, fewer wasted trips, and a day report without retyping."
     },
     "tf_code39_title": {
       "pl": "Generator kodów kreskowych Code 39",
@@ -1075,12 +1175,12 @@
       "en": "Tool / identification"
     },
     "tf_code39_lede": {
-      "pl": "Aplikacja do generowania kodów kreskowych Code 39.",
-      "en": "An app for generating Code 39 barcodes."
+      "pl": "Oznaczanie SKU nie powinno zajmować pół zmiany magazynu. Generator Code 39 robi etykietę z podglądem i idzie prosto na drukarkę.",
+      "en": "Labeling SKUs shouldn’t eat half a warehouse shift. The Code 39 generator builds a label with a live preview and sends it straight to print."
     },
     "tf_code39_description": {
-      "pl": "Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.",
-      "en": "An app for TelForceOne S.A. generating barcodes in the Code 39 standard."
+      "pl": "TelForceOne generowało etykiety w kilku programach — wolno i z błędami skanowania. Jedna aplikacja: wartość → podgląd Code 39 → druk, także w batchu.",
+      "en": "TelForceOne built labels in several tools — slowly, with scan errors. One app: value → Code 39 preview → print, including batches."
     },
     "tf_code39_meta": {
       "title": {
@@ -1088,21 +1188,21 @@
         "en": "Code 39 barcode generator — TelForceOne S.A. | COSGRAL"
       },
       "description": {
-        "pl": "Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.",
-        "en": "An app for TelForceOne S.A. generating barcodes in the Code 39 standard."
+        "pl": "TelForceOne generowało etykiety w kilku programach — wolno i z błędami skanowania. Jedna aplikacja: wartość → podgląd Code 39 → druk, także w batchu.",
+        "en": "TelForceOne built labels in several tools — slowly, with scan errors. One app: value → Code 39 preview → print, including batches."
       }
     },
     "tf_code39_p1": {
-      "pl": "Drugim narzędziem dla TelForceOne S.A. jest aplikacja do generowania kodów kreskowych w standardzie Code 39. Ułatwia przygotowanie oznaczeń potrzebnych do identyfikacji produktów i materiałów.",
-      "en": "The second tool for TelForceOne S.A. generates barcodes in the Code 39 standard. It helps prepare labels used to identify products and materials."
+      "pl": "Problem: magazyn i produkcja oznaczały towary w rozproszonych narzędziach. Błędny kod wracał od skanera, a przygotowanie paczki etykiet na nową dostawę zajmowało nieproporcjonalnie dużo czasu.",
+      "en": "Problem: warehouse and production labeled goods across scattered tools. Bad codes bounced at the scanner, and preparing a batch for a new delivery took far too long."
     },
     "tf_code39_p2": {
-      "pl": "Interfejs skupia się na krótkim zadaniu: wprowadzeniu wartości, obejrzeniu wyniku i przygotowaniu kodu do wykorzystania. Poglądowa wizualizacja powyżej pokazuje tę prostą ścieżkę.",
-      "en": "The interface focuses on a short task: entering a value, reviewing the result and preparing the code for use. The illustrative visual above shows this simple flow."
+      "pl": "Rozwiązanie: lekka aplikacja Code 39 z podglądem na żywo, kontrolą parametrów etykiety i kolejką do druku. Operator wpisuje wartość, widzi paski i wysyła batch bez przełączania programów.",
+      "en": "Solution: a light Code 39 app with live preview, label checks and a print queue. The operator enters a value, sees the bars and sends a batch without switching tools."
     },
     "tf_code39_p3": {
-      "pl": "Projekt należy do tej samej rodziny narzędzi operacyjnych: pomaga przełożyć powtarzalny proces na czytelną aplikację dostępną dla zespołu.",
-      "en": "It belongs to the same family of operational tools: turning a repetitive process into a clear app for the team."
+      "pl": "Efekt: pojedyncza etykieta w sekundach zamiast minut, mniej poprawek przy skanowaniu i powtarzalny proces oznaczania SKU dla całego zespołu — nie tylko dla „osoby od kodów”.",
+      "en": "Result: a single label in seconds instead of minutes, fewer scan rework loops, and a repeatable SKU labeling process for the whole team — not just the “barcode person”."
     },
     "tf_forecast_title": {
       "pl": "Kontrola stanów i prognozowanie",
@@ -1113,12 +1213,12 @@
       "en": "Analytics / inventory"
     },
     "tf_forecast_lede": {
-      "pl": "Aplikacja do kontroli stanów i prognozowania zapotrzebowania.",
-      "en": "An app for monitoring stock and forecasting demand."
+      "pl": "Brak na półce boli sprzedaż, a nadmiar zamraża gotówkę. Panel stanów i prognoz pokazuje, co dokupić zanim będzie za późno.",
+      "en": "Stockouts hurt sales; overstock freezes cash. The inventory and forecast panel shows what to reorder before it’s too late."
     },
     "tf_forecast_description": {
-      "pl": "Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania.",
-      "en": "An app for TelForceOne S.A. supporting inventory control and demand forecasting."
+      "pl": "TelForceOne planowało zakupy z opóźnionych raportów. Aplikacja łączy stany, rotację i prognozę z alertami — decyzja zakupowa na danych, nie na wyczuciu.",
+      "en": "TelForceOne planned purchases from delayed reports. The app joins stock, velocity and forecast with alerts — buy decisions on data, not gut feel."
     },
     "tf_forecast_meta": {
       "title": {
@@ -1126,21 +1226,21 @@
         "en": "Inventory control and forecasting — TelForceOne S.A. | COSGRAL"
       },
       "description": {
-        "pl": "Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania.",
-        "en": "An app for TelForceOne S.A. supporting inventory control and demand forecasting."
+        "pl": "TelForceOne planowało zakupy z opóźnionych raportów. Aplikacja łączy stany, rotację i prognozę z alertami — decyzja zakupowa na danych, nie na wyczuciu.",
+        "en": "TelForceOne planned purchases from delayed reports. The app joins stock, velocity and forecast with alerts — buy decisions on data, not gut feel."
       }
     },
     "tf_forecast_p1": {
-      "pl": "Trzecia aplikacja dla TelForceOne S.A. skupia się na kontroli stanów i prognozowaniu. Łączy bieżący widok zapasów z perspektywą przyszłego zapotrzebowania.",
-      "en": "The third app for TelForceOne S.A. focuses on inventory control and forecasting. It combines a current view of stock with a view of future demand."
+      "pl": "Problem: decyzje zakupowe opierały się na spóźnionych arkuszach. Albo towaru brakowało w kluczowym momencie, albo magazyn trzymał nadwyżkę „na wszelki wypadek” — bez wspólnego widoku ryzyka.",
+      "en": "Problem: purchasing ran on stale spreadsheets. Either a key SKU ran out at the wrong time, or the warehouse held “just in case” overstock — with no shared view of risk."
     },
     "tf_forecast_p2": {
-      "pl": "Takie zestawienie pomaga zespołowi wychwycić ryzyko braków oraz planować kolejne decyzje zakupowe na podstawie danych. Wizualizacja powyżej pokazuje ideę połączenia stanów, trendu i prognozy.",
-      "en": "This combination helps the team spot shortage risk and plan purchasing decisions using data. The visual above illustrates stock, trend and forecast together."
+      "pl": "Rozwiązanie: panel z bieżącym stanem, historią sprzedaży, prognozą na kolejne tygodnie i feedem alertów poniżej minimum. Od sygnału braku do draftu zamówienia zakupowego jest jedna ścieżka.",
+      "en": "Solution: a panel with live stock, sales history, a multi-week forecast and alerts below minimum. From shortage signal to a purchase-order draft is one path."
     },
     "tf_forecast_p3": {
-      "pl": "W projekcie ważna jest czytelność: najpierw stan, potem zmiana w czasie i sygnał wymagający uwagi. Dzięki temu panel wspiera szybkie decyzje operacyjne.",
-      "en": "Clarity matters here: first the current state, then change over time, then the signal requiring attention. The panel supports quick operational decisions."
+      "pl": "Efekt: cotygodniowe planowanie zakupów zajmuje wyraźnie mniej czasu, braki widać wcześniej, a zespół rozmawia o tych samych liczbach zamiast o trzech wersjach Excela.",
+      "en": "Result: weekly purchasing planning takes clearly less time, shortages show up earlier, and the team debates the same numbers instead of three Excel versions."
     },
     "case_trove_panel_tag": {
       "pl": "Aplikacja",
@@ -1151,8 +1251,8 @@
       "en": "Store panel & price monitoring"
     },
     "case_trove_panel_lede": {
-      "pl": "Jeden panel na stany, ceny marketplace i alerty przecen dla Trove.",
-      "en": "One panel for stock, marketplace prices and markdown alerts for Trove."
+      "pl": "Gdy ceny na Allegro zmieniają się szybciej niż arkusz w biurze, marża ucieka po cichu. Panel Trove pilnuje stanów i cen w jednym widoku.",
+      "en": "When Allegro prices move faster than the office spreadsheet, margin slips away quietly. Trove’s panel watches stock and prices in one view."
     },
     "case_trove_panel_meta": {
       "title": {
@@ -1160,21 +1260,21 @@
         "en": "Store panel & price monitoring — Trove | COSGRAL"
       },
       "description": {
-        "pl": "Panel sklepu i monitoring cen dla Trove — stany, marketplace i alerty.",
-        "en": "Store panel and price monitoring for Trove — stock, marketplaces and alerts."
+        "pl": "Gdy ceny na Allegro zmieniają się szybciej niż arkusz w biurze, marża ucieka po cichu. Panel Trove pilnuje stanów i cen w jednym widoku.",
+        "en": "When Allegro prices move faster than the office spreadsheet, margin slips away quietly. Trove’s panel watches stock and prices in one view."
       }
     },
     "case_trove_panel_p1": {
-      "pl": "Dla Trove zbudowaliśmy panel, który zbiera stany magazynowe i ceny z kanałów sprzedaży w jednym widoku. Zamiast ręcznego sprawdzania marketplace’ów zespół widzi różnice i ryzyka od razu.",
-      "en": "For Trove we built a panel that gathers stock levels and channel prices in one view. Instead of checking marketplaces by hand, the team sees gaps and risks immediately."
+      "pl": "Problem: zespół Trove porównywał stany i ceny marketplace’ów ręcznie. Przecena konkurencji albo własna oferta poza rynkiem wychodziła z opóźnieniem — często dopiero gdy spadła sprzedaż.",
+      "en": "Problem: Trove’s team compared marketplace stock and prices by hand. A competitor markdown or an off-market listing showed up late — often only after sales dipped."
     },
     "case_trove_panel_p2": {
-      "pl": "Monitoring cen porównuje oferty i sygnalizuje przeceny oraz odchylenia. Alerty skracają czas reakcji, gdy konkurencja zmienia warunki albo gdy własna oferta wypada z rynku.",
-      "en": "Price monitoring compares offers and flags markdowns and outliers. Alerts cut reaction time when competitors move or when your listing falls behind."
+      "pl": "Rozwiązanie: panel operacyjny ze stanami, porównaniem cen (własny sklep / Allegro / konkurencja) i alertami przecen. Zdarzenia w feedzie mówią, kiedy trzeba skorygować ofertę.",
+      "en": "Solution: an ops panel with stock, price comparison (own shop / Allegro / competitors) and markdown alerts. The event feed says when a listing needs a fix."
     },
     "case_trove_panel_p3": {
-      "pl": "Cel był prosty: mniej ręcznej kontroli, więcej kontroli nad marżą i dostępnością — bez kolejnego arkusza Excel.",
-      "en": "The goal was simple: less manual checking, more control over margin and availability — without another spreadsheet."
+      "pl": "Efekt: kontrola cen i dostępności zajmuje minuty dziennie zamiast godzin w Excelu. Reakcja na spadek marży dzieje się tego samego dnia — bez kolejnego arkusza „do pilnowania”.",
+      "en": "Result: price and availability checks take minutes a day instead of hours in Excel. Margin dips get a same-day response — without another “watch this” spreadsheet."
     },
     "case_trove_panel_client": {
       "pl": "Trove",
@@ -1186,33 +1286,33 @@
     },
     "case_crm_leady_title": {
       "pl": "CRM leadów, dealów i operacji sprzedażowych",
-      "en": "CRM for leads, deals and sales operations"
+      "en": "CRM for leads, deals and sales ops"
     },
     "case_crm_leady_lede": {
-      "pl": "Narzędzie do prowadzenia sprzedaży: leady, deale, pipeline i historia kontaktu w jednym miejscu.",
-      "en": "A sales tool: leads, deals, pipeline and contact history in one place."
+      "pl": "Lead bez właściciela i follow-upu to stracona sprzedaż. CRM trzyma lejek, historię kontaktu i przypomnienia w jednym procesie.",
+      "en": "A lead without an owner and a follow-up is lost revenue. The CRM keeps the funnel, contact history and reminders in one process."
     },
     "case_crm_leady_meta": {
       "title": {
         "pl": "CRM leadów, dealów i operacji sprzedażowych | COSGRAL",
-        "en": "CRM for leads, deals and sales operations | COSGRAL"
+        "en": "CRM for leads, deals and sales ops | COSGRAL"
       },
       "description": {
-        "pl": "CRM do leadów, dealów i pipeline — notatki, statusy i przypomnienia w jednym narzędziu.",
-        "en": "CRM for leads, deals and pipeline — notes, statuses and reminders in one tool."
+        "pl": "Lead bez właściciela i follow-upu to stracona sprzedaż. CRM trzyma lejek, historię kontaktu i przypomnienia w jednym procesie.",
+        "en": "A lead without an owner and a follow-up is lost revenue. The CRM keeps the funnel, contact history and reminders in one process."
       }
     },
     "case_crm_leady_p1": {
-      "pl": "To narzędzie CRM do prowadzenia sprzedaży od pierwszego kontaktu do domknięcia deala. Leady, deale i pipeline żyją w jednym procesie, zamiast ginąć między skrzynkami i notatkami.",
-      "en": "This CRM tool runs sales from first contact to a closed deal. Leads, deals and pipeline live in one process instead of getting lost between inboxes and notes."
+      "pl": "Problem: zespół B2B łapał zapytania z formularza, maila i poleceń — a potem gubił je między skrzynkami. Nikt nie wiedział, który deal stoi, kto miał oddzwonić i co ustalono tydzień temu.",
+      "en": "Problem: a B2B team caught inquiries from forms, email and referrals — then lost them between inboxes. No one knew which deal was stuck, who should call back, or what was agreed last week."
     },
     "case_crm_leady_p2": {
-      "pl": "Notatki, statusy i przypomnienia trzymają historię kontaktu przy karcie klienta. Zespół widzi, kto prowadzi rozmowę i co zostało ustalone — bez dopytywania się nawzajem.",
-      "en": "Notes, statuses and reminders keep contact history on the account. The team sees who owns the conversation and what was agreed — without chasing each other."
+      "pl": "Rozwiązanie: CRM od leada do zamkniętego deala — kolejka, kwalifikacja, kanban pipeline, alerty bez follow-upu i oś historii kontaktu. Każda rozmowa i mail siedzą przy karcie, nie w prywatnej skrzynce.",
+      "en": "Solution: CRM from lead to closed deal — intake, qualification, kanban pipeline, no-follow-up alerts and a contact timeline. Every call and email lives on the account, not in a private inbox."
     },
     "case_crm_leady_p3": {
-      "pl": "Efekt: mniej utraconych leadów, czytelniejszy pipeline i sprzedaż, którą da się kontynuować nawet gdy zmienia się osoba odpowiedzialna.",
-      "en": "Result: fewer lost leads, a clearer pipeline, and sales that can continue even when ownership changes."
+      "pl": "Efekt: mniej zimnych leadów, szybsza pierwsza reakcja i sprzedaż, którą da się przekazać koledze bez briefingu „z głowy”. Pipeline widać na co dzień, nie dopiero na statusie miesięcznym.",
+      "en": "Result: fewer cold leads, faster first response, and deals you can hand off without a “from memory” briefing. The pipeline is visible daily — not only at the monthly status meeting."
     },
     "case_chatbot_ai_tag": {
       "pl": "Automatyzacja",
@@ -1223,8 +1323,8 @@
       "en": "AI chatbot for customer messages"
     },
     "case_chatbot_ai_lede": {
-      "pl": "Asystent AI odpowiadający na wiadomości z social i WWW — z przekazaniem rozmowy do człowieka.",
-      "en": "An AI assistant answering social and website messages — with handoff to a human."
+      "pl": "Klienci piszą wieczorem te same pytania — zespół odpisywał rano. Bot zamyka FAQ od razu i oddaje trudniejsze sprawy człowiekowi z kontekstem.",
+      "en": "Customers ask the same questions at night — the team replied in the morning. The bot closes FAQ instantly and hands harder cases to a human with context."
     },
     "case_chatbot_ai_meta": {
       "title": {
@@ -1232,21 +1332,21 @@
         "en": "AI chatbot for customer messages | COSGRAL"
       },
       "description": {
-        "pl": "Chatbot AI do wiadomości z Instagram, Facebook i WWW — FAQ, wyceny i handoff do konsultanta.",
-        "en": "AI chatbot for Instagram, Facebook and website messages — FAQ, quotes and consultant handoff."
+        "pl": "Klienci piszą wieczorem te same pytania — zespół odpisywał rano. Bot zamyka FAQ od razu i oddaje trudniejsze sprawy człowiekowi z kontekstem.",
+        "en": "Customers ask the same questions at night — the team replied in the morning. The bot closes FAQ instantly and hands harder cases to a human with context."
       }
     },
     "case_chatbot_ai_p1": {
-      "pl": "Chatbot AI odbiera wiadomości z Instagrama, Facebooka i formularza WWW. Odpowiada na FAQ, godziny otwarcia i typowe pytania o ofertę, zanim do rozmowy wejdzie konsultant.",
-      "en": "The AI chatbot takes messages from Instagram, Facebook and the website form. It answers FAQ, opening hours and common offer questions before a consultant joins."
+      "pl": "Problem: Instagram, Facebook i formularz WWW zasypywały skrzynkę powtarzalnymi pytaniami o godziny, ofertę i wycenę. Po godzinach nikt nie odpowiadał, a rano kolejka rosła szybciej niż zespół zdążył odpisać.",
+      "en": "Problem: Instagram, Facebook and the website form flooded the inbox with repeat questions about hours, offer and pricing. After hours nobody answered, and by morning the queue grew faster than the team could reply."
     },
     "case_chatbot_ai_p2": {
-      "pl": "Gdy temat wykracza poza automat, rozmowa jest przekazywana człowiekowi wraz z kontekstem. Klient nie zaczyna od zera, a zespół dostaje już wstępnie zebrane informacje.",
-      "en": "When the topic goes beyond automation, the chat is handed to a human with context. The customer does not start from zero, and the team gets pre-collected details."
+      "pl": "Rozwiązanie: chatbot AI w jednym inboxie na social i WWW. Klasyfikuje sprawę, odpowiada na FAQ, zbiera zakres i budżet, a gdy pewność spada — przekazuje rozmowę konsultantowi z pełnym wątkiem.",
+      "en": "Solution: an AI chatbot in one inbox for social and web. It classifies the case, answers FAQ, collects scope and budget, and when confidence drops — hands the thread to a consultant with full context."
     },
     "case_chatbot_ai_p3": {
-      "pl": "Narzędzie daje pierwszą odpowiedź 24/7 i odciąża skrzynkę, bez utraty ścieżki do realnej rozmowy sprzedażowej lub obsługowej.",
-      "en": "The tool gives a first reply 24/7 and lightens the inbox, without losing the path to a real sales or support conversation."
+      "pl": "Efekt: pierwsza odpowiedź 24/7, mniej kopiowania tych samych replyi i leady, które nie stygną do rana. Konsultant wchodzi tylko tam, gdzie naprawdę potrzeba człowieka — z gotowym briefem rozmowy.",
+      "en": "Result: a first reply 24/7, less copy-pasting the same answers, and leads that don’t go cold overnight. Consultants only join where a human is needed — with a ready conversation brief."
     },
     "case_trove_workflow_tag": {
       "pl": "Automatyzacja",
@@ -1257,8 +1357,8 @@
       "en": "Order → invoice → parcel status"
     },
     "case_trove_workflow_lede": {
-      "pl": "Automatyczny workflow e-commerce dla Trove: od zamówienia przez fakturę po status dostawy.",
-      "en": "An automated e-commerce workflow for Trove: from order through invoice to delivery status."
+      "pl": "Fulfillment nie powinien być listą ręcznych kliknięć po każdym checkoutcie. U Trove zamówienie samo odpala fakturę, paczkę i mail do klienta.",
+      "en": "Fulfilment shouldn’t be a checklist of manual clicks after every checkout. At Trove, an order triggers invoice, parcel and the customer email by itself."
     },
     "case_trove_workflow_meta": {
       "title": {
@@ -1266,21 +1366,21 @@
         "en": "Order → invoice → parcel status — Trove | COSGRAL"
       },
       "description": {
-        "pl": "Workflow Trove: zamówienie uruchamia fakturę, status paczki i powiadomienie klienta.",
-        "en": "Trove workflow: an order triggers invoice, parcel status and customer notification."
+        "pl": "Fulfillment nie powinien być listą ręcznych kliknięć po każdym checkoutcie. U Trove zamówienie samo odpala fakturę, paczkę i mail do klienta.",
+        "en": "Fulfilment shouldn’t be a checklist of manual clicks after every checkout. At Trove, an order triggers invoice, parcel and the customer email by itself."
       }
     },
     "case_trove_workflow_p1": {
-      "pl": "Dla Trove zaprojektowaliśmy łańcuch automatyzacji wokół nowego zamówienia. Zamiast ręcznego przepisywania danych system przygotowuje eksport pod fakturę i aktualizuje status realizacji.",
-      "en": "For Trove we designed an automation chain around a new order. Instead of retyping data by hand, the system prepares invoice export and updates fulfilment status."
+      "pl": "Problem: po każdym zamówieniu ktoś przepisywał dane do faktury, aktualizował status w drugim narzędziu i wysyłał wiadomość do klienta. Przy wzroście zamówień rosła też liczba pomyłek i opóźnień.",
+      "en": "Problem: after every order someone retyped data into an invoice, updated status in a second tool and emailed the customer. As order volume grew, so did mistakes and delays."
     },
     "case_trove_workflow_p2": {
-      "pl": "Status paczki i powiadomienie klienta domykają pętlę: kupujący wie, gdzie jest przesyłka, a zespół nie musi ręcznie klikać kolejnych kroków w kilku narzędziach.",
-      "en": "Parcel status and customer notification close the loop: the buyer knows where the shipment is, and the team does not click the same steps across several tools."
+      "pl": "Rozwiązanie: automatyczny łańcuch od checkoutu — eksport pod fakturę, przekazanie do magazynu/API kuriera, track&trace i powiadomienie statusowe. Człowiek wkracza tylko przy wyjątkach.",
+      "en": "Solution: an automated chain from checkout — invoice export, handoff to warehouse/courier API, track & trace and status notification. People step in only for exceptions."
     },
     "case_trove_workflow_p3": {
-      "pl": "Efekt to mniej operacyjnej tarcia przy każdym zamówieniu i spójniejsza obsługa od checkoutu do dostawy.",
-      "en": "The result is less operational friction on every order and a more coherent path from checkout to delivery."
+      "pl": "Efekt: minuty ręcznej roboty przy zamówieniu spadają do obsługi wyjątków. Klient dostaje spójny status, a zespół nie klei tego samego procesu w trzech systemach.",
+      "en": "Result: minutes of manual work per order shrink to exception handling. Customers get a coherent status, and the team stops gluing the same process across three systems."
     },
     "case_trove_workflow_client": {
       "pl": "Trove",

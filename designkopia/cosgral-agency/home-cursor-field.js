@@ -9,10 +9,6 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
-  var noGyroPages =
-    document.body.classList.contains("graphics-gallery-page") ||
-    document.body.classList.contains("reels-gallery-page");
-
   var COARSE = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
@@ -121,8 +117,8 @@
     gateEl.type = "button";
     gateEl.className = "gyro-enable";
     gateEl.setAttribute("data-no-transition", "");
-    gateEl.setAttribute("aria-label", "TURN ON 3D");
-    gateEl.textContent = "TURN ON 3D";
+    gateEl.setAttribute("aria-label", "Włącz żyroskop");
+    gateEl.textContent = "Włącz żyroskop";
     gateEl.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -296,7 +292,7 @@
     }
   }
 
-  if (!noGyroPages) armMobileGyro();
+  armMobileGyro();
   applyPointer();
   requestAnimationFrame(tick);
 })();

@@ -102,5 +102,8 @@
   requestAnimationFrame(function () {
     ScrollTrigger.refresh();
     readyResolve(lenis);
+    try {
+      window.dispatchEvent(new CustomEvent("cosgral:smooth-ready", { detail: { lenis: lenis } }));
+    } catch (eReady) {}
   });
 })();

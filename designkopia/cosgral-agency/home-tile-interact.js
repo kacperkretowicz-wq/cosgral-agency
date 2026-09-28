@@ -223,6 +223,47 @@
       wrapChildren(section, ".portfolio-section__curtain");
     });
 
+    /* Realizacje: gyro only on tiles + center word — never chapter titles / chrome */
+    function wrapTileCatalogTilts() {
+      document.querySelectorAll("body.portfolio-page--tiles [data-portfolio-tile]").forEach(function (chapter) {
+        var luxStage = chapter.querySelector(".chapter-lux__stage");
+        if (luxStage) wrapChildren(luxStage);
+
+        var montaz = chapter.querySelector(".chapter-montaz");
+        if (montaz) wrapChildren(montaz);
+
+        /* Systems fan — whole stage like other catalogs (per-card tilt was invisible under arc rotate) */
+        var chapterOs = chapter.querySelector(".chapter-os");
+        if (chapterOs) wrapChildren(chapterOs);
+
+        var show = chapter.querySelector(".chapter-show");
+        if (show) {
+          /* Word + tile stage only (meta/foot removed or left outside) */
+          var showWord = show.querySelector(":scope > .chapter-show__word");
+          var showStage = show.querySelector(":scope > .chapter-show__stage");
+          if (showStage && !showStage.closest(".home-tilt-face")) {
+            var host = document.createElement("div");
+            host.className = "chapter-show__tilt-host";
+            show.insertBefore(host, showStage);
+            if (showWord) host.appendChild(showWord);
+            host.appendChild(showStage);
+            wrapChildren(host);
+          }
+        }
+      });
+    }
+    wrapTileCatalogTilts();
+    /* Fan mounts async into .chapter-os — re-wrap once host exists */
+    if (!window.__portfolioTileTiltWatch) {
+      window.__portfolioTileTiltWatch = true;
+      var tiltMo = new MutationObserver(function () {
+        wrapTileCatalogTilts();
+      });
+      document.querySelectorAll("body.portfolio-page--tiles #automatyzacje .portfolio-tile__media, body.portfolio-page--tiles [data-chapter-os]").forEach(function (node) {
+        tiltMo.observe(node, { childList: true, subtree: true });
+      });
+    }
+
     var tiltHosts = document.querySelectorAll(
       [
         "#main > header",
@@ -255,7 +296,16 @@
       if (block.hasAttribute("data-portfolio-section")) return;
       /* GSAP pin-spacer + chapter title: wrapping breaks full-bleed pin bounds */
       if (block.classList.contains("pin-spacer") || (block.className && String(block.className).indexOf("pin-spacer") !== -1)) return;
-      if (block.hasAttribute("data-portfolio-chapter") || block.classList.contains("portfolio-chapter")) return;
+      /* Tile catalogs: only chapter media tilts — never wrap the chapters shell / copy */
+      if (
+        block.hasAttribute("data-portfolio-tiles") ||
+        block.hasAttribute("data-portfolio-chapter") ||
+        block.hasAttribute("data-portfolio-tile") ||
+        block.classList.contains("portfolio-chapters") ||
+        block.classList.contains("portfolio-chapter")
+      ) {
+        return;
+      }
       if (block.classList.contains("about-scene") || block.classList.contains("about-scene-curtain")) return;
       if (block.querySelector(":scope > .home-scene__panel")) return;
       if (block.classList.contains("home-tilt-layer") || block.classList.contains("home-tilt-face")) return;

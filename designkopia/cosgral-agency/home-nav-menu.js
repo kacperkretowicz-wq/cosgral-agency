@@ -335,8 +335,24 @@
     return Math.max(0, fullDelay - blend * openDur);
   }
 
+  function showLinksImmediate() {
+    Array.prototype.forEach.call(links, function (a) {
+      a.style.opacity = "1";
+      a.style.clipPath = "inset(0 0% 0 0)";
+      a.style.pointerEvents = "auto";
+    });
+    Array.prototype.forEach.call(menuChars(), function (ch) {
+      ch.style.opacity = "1";
+      ch.style.transform = "none";
+      ch.style.filter = "none";
+    });
+  }
+
   function animateLinksForOpen() {
-    if (REDUCED || !window.gsap) return;
+    if (REDUCED || !window.gsap) {
+      showLinksImmediate();
+      return;
+    }
     var chars = menuChars();
     var delay = linksDelayForBlend();
 

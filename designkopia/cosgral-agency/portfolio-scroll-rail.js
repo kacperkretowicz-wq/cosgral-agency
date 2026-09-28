@@ -15,36 +15,36 @@
         { id: "intro", selector: "#portfolio-intro", label: "Start", i18n: "portfolio.rail_portfolio" },
         { id: "collage", selector: "#portfolio-collage", label: "Overview", i18n: "portfolio.selected_title" },
         { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony" },
+        { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz" },
         { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki" },
-        { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
       ]
     : FILM
     ? [
         { id: "open", act: "open", label: "Start", i18n: "portfolio.rail_portfolio" },
         { id: "strony", act: "web", label: "Strony", i18n: "portfolio.rail_strony" },
+        { id: "automatyzacje", act: "auto", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "montaz", act: "reels", label: "Montaż", i18n: "portfolio.rail_montaz" },
         { id: "grafiki", act: "gfx", label: "Grafiki", i18n: "portfolio.rail_grafiki" },
-        { id: "automatyzacje", act: "auto", label: "Automatyzacje", i18n: "portfolio.rail_automation" },
         { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
       ]
     : [
         { id: "portfolio-top", selector: ".portfolio-hero", label: "Portfolio", i18n: "portfolio.rail_portfolio" },
         { id: "strony", selector: "#strony", label: "Strony", i18n: "portfolio.rail_strony", showTitle: true },
+        { id: "automatyzacje", selector: "#automatyzacje", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: false },
         { id: "montaz", selector: "#montaz", label: "Montaż", i18n: "portfolio.rail_montaz", showTitle: true },
         { id: "grafiki", selector: "#grafiki", label: "Grafiki", i18n: "portfolio.rail_grafiki", showTitle: true },
-        { id: "automatyzacje", selector: "#automatyzacje-intro", label: "Automatyzacje", i18n: "portfolio.rail_automation", showTitle: true },
         { id: "footer", selector: ".site-footer", label: "Stopka", i18n: "rail.footer", footer: true },
       ];
 
   /* Film act midpoints within pin progress (0–1) */
   var FILM_ACT_PROGRESS = {
     open: 0.04,
-    web: 0.18,
-    reels: 0.38,
-    gfx: 0.6,
-    auto: 0.86,
+    web: 0.16,
+    auto: 0.38,
+    reels: 0.62,
+    gfx: 0.84,
   };
 
   function sceneLabel(scene) {
@@ -80,18 +80,62 @@
   }
 
   function ensureIncreasing(positions) {
+    // Keep a meaningful scroll gap so rail labels never stack on one %
+    var minGap = Math.max(280, Math.round(window.innerHeight * 0.38));
     for (var i = 1; i < positions.length; i++) {
-      if (positions[i] < positions[i - 1] + 1) positions[i] = positions[i - 1] + 1;
+      if (!(positions[i] > positions[i - 1] + minGap)) {
+        positions[i] = positions[i - 1] + minGap;
+      }
     }
     return positions;
   }
 
+  /** Map scroll holds → rail % with a hard minimum visual gap between dots. */
+  function layoutPercents(positions) {
+    if (!positions || positions.length < 1) return [];
+    var pcts = positions.map(function (y) {
+      return yToRailPct(y ?? 0, positions);
+    });
+    var n = pcts.length;
+    if (n < 2) return pcts;
+    // ~label height on a ~560px track ≈ 3–4%; keep ≥ 9% so titles never collide
+    var minPct = Math.max(9, Math.min(16, 92 / (n - 1)));
+    pcts[0] = 0;
+    for (var i = 1; i < n; i++) {
+      if (!(pcts[i] > pcts[i - 1] + minPct)) {
+        pcts[i] = pcts[i - 1] + minPct;
+      }
+    }
+    // If we overshot 100%, compress proportionally while keeping order
+    if (pcts[n - 1] > 100) {
+      var span = pcts[n - 1] || 1;
+      for (var j = 0; j < n; j++) {
+        pcts[j] = (pcts[j] / span) * 100;
+      }
+      // Re-assert min gap after compress if still feasible
+      var fitGap = Math.min(minPct, 100 / (n - 1));
+      pcts[0] = 0;
+      for (var k = 1; k < n; k++) {
+        if (!(pcts[k] > pcts[k - 1] + fitGap)) {
+          pcts[k] = pcts[k - 1] + fitGap;
+        }
+      }
+      if (pcts[n - 1] > 100) {
+        for (var m = 0; m < n; m++) {
+          pcts[m] = (m / (n - 1)) * 100;
+        }
+      }
+    }
+    return pcts;
+  }
+
   function layoutDots(ui, positions) {
     if (!positions || positions.length < 1) return;
+    var pcts = layoutPercents(positions);
     ui.dots.forEach(function (dot, i) {
       var li = dot.closest(".home-scroll-rail__item");
       if (!li) return;
-      li.style.top = yToRailPct(positions[i] ?? 0, positions).toFixed(2) + "%";
+      li.style.top = (pcts[i] ?? 0).toFixed(2) + "%";
     });
   }
 
@@ -291,37 +335,68 @@
       }
     }
 
+    function sceneHoldY(scene) {
+      if (!scene) return 0;
+      if (scene.footer) {
+        var footer = document.querySelector(".site-footer");
+        if (!footer) return document.documentElement.scrollHeight;
+        return Math.max(0, footer.getBoundingClientRect().top + window.scrollY - (MOBILE ? 72 : 96));
+      }
+      if (scene.id === "automatyzacje") {
+        return sceneY(scene.selector);
+      }
+      if (scene.id === "grafiki") {
+        var grafikiPin = window.ScrollTrigger && ScrollTrigger.getById("grafiki-pin");
+        if (grafikiPin) return grafikiPin.start;
+      }
+      return sceneY(scene.selector);
+    }
+
     function refreshMetrics() {
-      if (window.cosgralPortfolioStepper?.holds) {
-        holdPositions = window.cosgralPortfolioStepper.holds.slice();
+      // Always rebuild — stepper.holds can go stale after pinSpacing settles
+      var live = null;
+      if (typeof window.cosgralPortfolioStepper?.refreshHolds === "function") {
+        live = window.cosgralPortfolioStepper.refreshHolds();
+        if (live && live.length) window.cosgralPortfolioStepper.holds = live;
+      }
+      if (live && live.length === SCENES.length) {
+        holdPositions = live.slice();
       } else {
-        holdPositions = SCENES.map(function (scene) {
-          return sceneY(scene.selector);
-        });
+        holdPositions = SCENES.map(sceneHoldY);
       }
       ensureIncreasing(holdPositions);
       layoutDots(ui, holdPositions);
     }
 
     function activeIndex() {
-      if (window.cosgralPortfolioStepper?.getIndex) {
-        return window.cosgralPortfolioStepper.getIndex();
-      }
+      // Prefer live last-hold over stepper cache (can lag one frame behind Lenis)
       var scroll = window.scrollY;
+      if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+        scroll = window.cosgralSmoothScroll.scroll;
+      }
       var best = 0;
-      var bestDist = Infinity;
-      holdPositions.forEach(function (y, i) {
-        var dist = Math.abs(scroll - y);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
-      });
+      var slop = Math.max(24, Math.round(window.innerHeight * 0.04));
+      for (var i = 0; i < holdPositions.length; i++) {
+        if (scroll + slop >= (holdPositions[i] ?? 0)) best = i;
+      }
       return best;
     }
 
     function fillHeightForScroll(scroll) {
-      return yToRailPct(scroll, holdPositions);
+      if (!holdPositions.length) return 0;
+      var pcts = layoutPercents(holdPositions);
+      if (scroll <= holdPositions[0]) return pcts[0] || 0;
+      var last = holdPositions.length - 1;
+      if (scroll >= holdPositions[last]) return pcts[last] || 100;
+      for (var i = 1; i <= last; i++) {
+        if (scroll <= holdPositions[i]) {
+          var a = holdPositions[i - 1];
+          var b = holdPositions[i];
+          var t = b === a ? 0 : (scroll - a) / (b - a);
+          return (pcts[i - 1] || 0) + ((pcts[i] || 0) - (pcts[i - 1] || 0)) * t;
+        }
+      }
+      return pcts[last] || 100;
     }
 
     function update() {
