@@ -27,6 +27,7 @@
   var videoOpenState = null;
   var webDetailOpen = false;
   var catalogRevealTimer = 0;
+  var ghostClearTimer = 0;
 
   function shuffleList(list) {
     var a = Array.prototype.slice.call(list);
@@ -234,6 +235,10 @@
   }
 
   function clearBody() {
+    if (ghostClearTimer) {
+      window.clearTimeout(ghostClearTimer);
+      ghostClearTimer = 0;
+    }
     activeGhosts.forEach(function (g) {
       if (g && g.parentNode) g.parentNode.removeChild(g);
     });
@@ -836,12 +841,36 @@
   }
 
   function removeGhosts(delay) {
-    setTimeout(function () {
-      activeGhosts.forEach(function (g) {
+    if (ghostClearTimer) window.clearTimeout(ghostClearTimer);
+    /* Snapshot — don't wipe ghosts created later (e.g. close fan-return). */
+    var snapshot = activeGhosts.slice();
+    ghostClearTimer = window.setTimeout(function () {
+      snapshot.forEach(function (g) {
         if (g && g.parentNode) g.parentNode.removeChild(g);
+        activeGhosts = activeGhosts.filter(function (x) {
+          return x !== g;
+        });
       });
-      activeGhosts = [];
+      ghostClearTimer = 0;
     }, delay || 0);
+  }
+
+  /** Prefer still posters for <img> ghosts — video URLs render as broken images. */
+  function ghostStillSrc(tile) {
+    if (!tile) return "";
+    var poster = tile.poster || "";
+    var src = tile.src || "";
+    var videoSrc = tile.videoSrc || "";
+    if (poster) return poster;
+    if (src && !/\.(mp4|webm|mov)(\?|$)/i.test(src)) return src;
+    if (videoSrc && !/\.(mp4|webm|mov)(\?|$)/i.test(videoSrc)) return videoSrc;
+    if (src) {
+      var guess = String(src)
+        .split("?")[0]
+        .replace(/\.(mp4|webm|mov)$/i, "-poster.jpg");
+      if (guess !== src.split("?")[0]) return guess;
+    }
+    return poster || src || videoSrc || "";
   }
 
   function hideChapterMedia() {
@@ -1356,17 +1385,30 @@
       gallery.querySelectorAll(".reels-masonry__item")
     );
     function pack(el) {
-      var img = el.querySelector("img, video");
+      var media = el.querySelector("img, video");
+      var poster = "";
+      var videoSrc = "";
       var src = "";
-      if (img) {
-        src =
-          img.currentSrc ||
-          img.getAttribute("poster") ||
-          img.getAttribute("src") ||
-          img.src ||
+      if (media) {
+        poster = media.getAttribute("poster") || "";
+        videoSrc =
+          media.getAttribute("data-video-src") ||
+          media.getAttribute("src") ||
+          media.src ||
           "";
+        if (media.tagName === "VIDEO") {
+          src = poster || videoSrc;
+        } else {
+          src = media.currentSrc || media.src || poster || "";
+        }
       }
-      return { el: el, rect: el.getBoundingClientRect(), src: src };
+      return {
+        el: el,
+        rect: el.getBoundingClientRect(),
+        src: src,
+        poster: poster,
+        videoSrc: videoSrc,
+      };
     }
     var visible = [];
     var rest = [];
@@ -1400,6 +1442,11 @@
   function closeVideoReverse() {
     document.body.classList.add("is-closing-reverse");
     root.classList.add("is-closing-reverse");
+    /* Cancel pending open-handoff ghost clears so they don't wipe the fan. */
+    if (ghostClearTimer) {
+      window.clearTimeout(ghostClearTimer);
+      ghostClearTimer = 0;
+    }
     var gallery = bodyEl.querySelector(".expand-gallery");
     var chapter = openChapter || document.getElementById("montaz");
     if (gallery) {
@@ -1463,7 +1510,7 @@
         g.className = "expand-belt__card" + (Math.abs(i - mid) < 1 ? " is-hero" : "");
         g.style.borderRadius = "8px";
         g.style.zIndex = String(10 + Math.round(10 - Math.abs(i - mid)));
-        var src = (from && from.src) || fan.src;
+        var src = ghostStillSrc(from) || ghostStillSrc(fan);
         if (src) {
           var img = document.createElement("img");
           img.src = src;
