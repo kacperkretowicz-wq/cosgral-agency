@@ -246,37 +246,222 @@ body.is-tile-expanded .site-nav {
   border-radius: 999px;
 }
 
-/* Systems expand — fan pulls back, copy appears in the hollow */
+/* Systems expand — fan + short copy sticky; full case scrolls under them */
 .expand-systems {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+.expand-systems::-webkit-scrollbar { width: 6px; }
+.expand-systems::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
 }
 .expand-systems .sys-fan {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  inset: auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  touch-action: pan-y;
+}
+.expand-systems .sys-fan__head {
+  position: sticky;
+  top: 0;
+  inset: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  z-index: 6;
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: min(72vh, 38rem);
+  background: linear-gradient(
+    180deg,
+    rgba(4, 4, 4, 0.92) 0%,
+    rgba(4, 4, 4, 0.78) 70%,
+    rgba(4, 4, 4, 0.35) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.expand-systems .sys-fan__stage {
+  touch-action: none;
 }
 .expand-systems .sys-fan--detail {
   transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
 }
 .expand-systems .sys-fan--detail.is-entering,
 .expand-systems .sys-fan--detail.is-from-catalog {
-  /* Match large catalog fan, then settle smaller / higher */
-  transform: translate3d(0, 4vh, 0) scale(1.45);
-  transform-origin: 50% 38%;
+  /* Match large catalog fan, then settle so copy fits under arc */
+  transform: translate3d(0, 3vh, 0) scale(1.35);
+  transform-origin: 50% 32%;
 }
 .expand-systems .sys-fan--detail.is-settled {
-  transform: translate3d(0, -2vh, 0) scale(1);
-  transform-origin: 50% 38%;
+  transform: translate3d(0, -1vh, 0) scale(1);
+  transform-origin: 50% 32%;
 }
 .expand-systems .sys-fan__stage {
-  height: 58%;
+  height: 54%;
 }
 .expand-systems .sys-fan__arc {
-  top: 46%;
+  top: 40%;
 }
 .expand-systems .sys-fan__copy {
-  top: 56%;
+  top: 58%;
+  padding-bottom: 1.25rem;
+}
+.expand-systems .sys-fan__nav {
+  position: fixed;
+  top: 36%;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+/* Full case description expands only under fan + short copy */
+.sys-fan__article {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: min(52rem, 92vw);
+  margin: 0 auto;
+  padding: 0 1rem 4.5rem;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease,
+    padding-top 0.45s ease;
+  touch-action: pan-y;
+  pointer-events: auto;
+}
+.sys-fan__article.is-open {
+  opacity: 1;
+  padding-top: 0.5rem;
+}
+.sys-fan__article-loading,
+.sys-fan__article-fallback {
+  margin: 0;
+  padding: 1.25rem 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.95rem;
+}
+.sys-fan__article-fallback a {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+/* Dark, compact restyle of injected case-study markup */
+.sys-fan__case {
+  color: rgba(245, 245, 245, 0.88);
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+.sys-fan__case .case-viz-intro {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0 0 1.75rem;
+  padding: 1.25rem 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.sys-fan__case .case-study__title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(1.45rem, 3.2vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: #fff;
+}
+.sys-fan__case .case-study__lede,
+.sys-fan__case .case-study__copy p,
+.sys-fan__case .case-viz-tile__text {
+  color: rgba(255, 255, 255, 0.7);
+}
+.sys-fan__case .case-study__eyebrow,
+.sys-fan__case .case-study__client,
+.sys-fan__case .case-viz-tile__num,
+.sys-fan__case .case-viz-tile__hint,
+.sys-fan__case .case-study__aside-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.sys-fan__case .case-viz-intro__index {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+}
+.sys-fan__case .case-viz-intro__index a {
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  font-size: 0.82rem;
+}
+.sys-fan__case .case-viz-intro__index a:hover {
+  color: #fff;
+}
+.sys-fan__case .case-viz-intro__index span {
+  opacity: 0.45;
+  margin-right: 0.35rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+}
+.sys-fan__case .case-viz-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+.sys-fan__case .case-viz-tile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 1rem 1.35rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.sys-fan__case .case-viz-tile__title {
+  margin: 0.35rem 0 0;
+  font-size: 1.15rem;
+  color: #fff;
+}
+.sys-fan__case .case-viz-tile__stage {
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  min-height: 11rem;
+}
+.sys-fan__case .case-study__aside {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.sys-fan__case .case-study__visit {
+  display: inline-flex;
+  margin-top: 0.85rem;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+@media (max-width: 720px) {
+  .expand-systems .sys-fan__head {
+    min-height: min(68vh, 34rem);
+  }
+  .sys-fan__case .case-viz-tile {
+    grid-template-columns: 1fr;
+  }
 }
 body.is-tile-expanded .portfolio-tile-expand[data-expand-mode],
 .portfolio-tile-expand:has([data-expand-mode="systems"]) {

@@ -1,6 +1,7 @@
 /**
  * Systems fan (wachlarz) — arc carousel shared by catalog + expand.
- * Catalog: larger, slow auto-rotate. Detail: smaller, manual drag, copy below.
+ * Catalog: larger, slow auto-rotate.
+ * Detail: manual drag + short copy; "Zobacz więcej" expands full case under the fan.
  */
 (function () {
   "use strict";
@@ -110,19 +111,68 @@
   ];
 
   var instances = [];
+  var pageCache = {};
 
   function clampIndex(i, n) {
     var x = i % n;
     return x < 0 ? x + n : x;
   }
 
+  function fetchCaseHtml(href) {
+    if (pageCache[href]) return Promise.resolve(pageCache[href]);
+    return fetch(href, { credentials: "same-origin" })
+      .then(function (r) {
+        return r.text();
+      })
+      .then(function (html) {
+        pageCache[href] = html;
+        return html;
+      });
+  }
+
+  function extractCaseBody(html) {
+    var doc = new DOMParser().parseFromString(html, "text/html");
+    var article = doc.querySelector("article.case-study");
+    if (!article) return null;
+    var wrap = document.createElement("div");
+    wrap.className = "sys-fan__case";
+    var intro = article.querySelector(".case-viz-intro");
+    var rail = article.querySelector(".case-viz-rail");
+    var aside = article.querySelector(".case-study__aside");
+    if (intro) {
+      var introClone = intro.cloneNode(true);
+      var back = introClone.querySelector(".case-study__back");
+      if (back && back.parentNode) back.parentNode.removeChild(back);
+      wrap.appendChild(introClone);
+    }
+    if (rail) wrap.appendChild(rail.cloneNode(true));
+    if (aside) wrap.appendChild(aside.cloneNode(true));
+    if (!wrap.childNodes.length) {
+      wrap.innerHTML = article.innerHTML;
+      var b2 = wrap.querySelector(".case-study__back");
+      if (b2 && b2.parentNode) b2.parentNode.removeChild(b2);
+    }
+    /* neutralize in-page hash jumps escaping the panel */
+    wrap.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        var id = a.getAttribute("href").slice(1);
+        var target = wrap.querySelector("#" + CSS.escape(id));
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+    return wrap;
+  }
+
   function createFan(root, opts) {
     opts = opts || {};
-    var mode = opts.mode || "catalog"; /* catalog | detail */
+    var mode = opts.mode || "catalog";
     var reduced =
       document.documentElement.classList.contains("reduce-motion") || !!opts.reduced;
     var n = CASES.length;
     var index = typeof opts.index === "number" ? clampIndex(opts.index, n) : 0;
+    var painted = -1;
     var autoplay = mode === "catalog" && !reduced && opts.autoplay !== false;
     var destroyed = false;
     var dragging = false;
@@ -132,16 +182,25 @@
     var raf = 0;
     var autoTimer = 0;
     var copyEl = null;
+    var articleEl = null;
+    var articleOpen = false;
+    var articleLoading = false;
+    var scrollParent = null;
 
     root.classList.add("sys-fan");
     root.classList.toggle("sys-fan--catalog", mode === "catalog");
     root.classList.toggle("sys-fan--detail", mode === "detail");
     root.innerHTML =
+      '<div class="sys-fan__head" data-sys-fan-head>' +
       '<div class="sys-fan__stage" data-sys-fan-stage>' +
       '<div class="sys-fan__arc" data-sys-fan-arc></div>' +
       "</div>" +
       (mode === "detail"
         ? '<div class="sys-fan__copy" data-sys-fan-copy aria-live="polite"></div>'
+        : "") +
+      "</div>" +
+      (mode === "detail"
+        ? '<div class="sys-fan__article" data-sys-fan-article hidden></div>'
         : "") +
       '<div class="sys-fan__nav" data-sys-fan-nav>' +
       '<button type="button" class="sys-fan__arrow" data-sys-fan-prev aria-label="Poprzedni">' +
@@ -155,6 +214,7 @@
     var arc = root.querySelector("[data-sys-fan-arc]");
     var stage = root.querySelector("[data-sys-fan-stage]");
     copyEl = root.querySelector("[data-sys-fan-copy]");
+    articleEl = root.querySelector("[data-sys-fan-article]");
     var cards = [];
 
     CASES.forEach(function (item, i) {
@@ -172,41 +232,149 @@
       cap.className = "sys-fan__cap";
       cap.textContent = item.tag;
       fig.appendChild(cap);
-      fig.addEventListener("click", function (e) {
-        if (Math.abs(vel) > 0.08) return;
-        var nearest = Math.round(index);
-        if (i === clampIndex(nearest, n)) {
-          if (mode === "detail") window.location.href = item.href;
-          else setIndex(i, true);
-        } else {
-          setIndex(i, true);
-        }
+      fig.addEventListener("click", function () {
+        if (Math.abs(vel) > 0.08 || didDrag) return;
+        setIndex(i, true);
       });
       arc.appendChild(fig);
       cards.push(fig);
     });
 
+    function getScrollParent() {
+      if (scrollParent && scrollParent.isConnected) return scrollParent;
+      scrollParent = root.closest(".expand-systems") || root;
+      return scrollParent;
+    }
+
+    function collapseArticle(immediate) {
+      if (!articleEl) return;
+      articleOpen = false;
+      articleLoading = false;
+      root.classList.remove("is-article-open");
+      articleEl.classList.remove("is-open");
+      if (immediate) {
+        articleEl.hidden = true;
+        articleEl.innerHTML = "";
+        return;
+      }
+      articleEl.style.maxHeight = articleEl.scrollHeight + "px";
+      void articleEl.offsetHeight;
+      articleEl.style.maxHeight = "0px";
+      window.setTimeout(function () {
+        if (articleOpen) return;
+        articleEl.hidden = true;
+        articleEl.innerHTML = "";
+        articleEl.style.maxHeight = "";
+      }, reduced ? 0 : 520);
+    }
+
+    function expandArticle(item) {
+      if (!articleEl || articleLoading) return;
+      articleLoading = true;
+      articleEl.hidden = false;
+      articleEl.classList.add("is-loading");
+      articleEl.innerHTML = '<p class="sys-fan__article-loading">Ładowanie opisu…</p>';
+      articleEl.style.maxHeight = "4rem";
+      fetchCaseHtml(item.href)
+        .then(function (html) {
+          if (destroyed || clampIndex(Math.round(index), n) !== CASES.indexOf(item) && CASES[clampIndex(Math.round(index), n)].href !== item.href) {
+            /* index moved — abort */
+            articleLoading = false;
+            return;
+          }
+          var nearest = CASES[clampIndex(Math.round(index), n)];
+          if (nearest.id !== item.id && nearest.href !== item.href) {
+            articleLoading = false;
+            return;
+          }
+          var body = extractCaseBody(html);
+          articleEl.classList.remove("is-loading");
+          articleEl.innerHTML = "";
+          if (!body) {
+            articleEl.innerHTML =
+              '<p class="sys-fan__article-fallback">Nie udało się wczytać opisu. <a href="' +
+              item.href +
+              '">Otwórz stronę realizacji →</a></p>';
+          } else {
+            articleEl.appendChild(body);
+            enhanceInjectedCase(body);
+          }
+          articleOpen = true;
+          root.classList.add("is-article-open");
+          articleEl.classList.add("is-open");
+          articleEl.style.maxHeight = "0px";
+          void articleEl.offsetHeight;
+          var full = articleEl.scrollHeight;
+          articleEl.style.maxHeight = full + "px";
+          /* slow scroll so the expanded block slides into view under the fan */
+          var scroller = getScrollParent();
+          var head = root.querySelector("[data-sys-fan-head]");
+          var targetTop = Math.max(
+            0,
+            (head ? head.offsetHeight : copyEl ? copyEl.offsetTop + copyEl.offsetHeight : stage.offsetHeight) -
+              Math.min(120, window.innerHeight * 0.14)
+          );
+          if (reduced) {
+            scroller.scrollTop = targetTop;
+          } else {
+            var from = scroller.scrollTop;
+            var t0 = performance.now();
+            var dur = 1100;
+            function tick(now) {
+              var p = Math.min(1, (now - t0) / dur);
+              var e = 1 - Math.pow(1 - p, 3);
+              scroller.scrollTop = from + (targetTop - from) * e;
+              if (p < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+          }
+          articleLoading = false;
+          window.setTimeout(function () {
+            if (articleOpen) articleEl.style.maxHeight = "none";
+          }, reduced ? 0 : 750);
+        })
+        .catch(function () {
+          articleLoading = false;
+          articleEl.classList.remove("is-loading");
+          articleEl.innerHTML =
+            '<p class="sys-fan__article-fallback">Nie udało się wczytać opisu. <a href="' +
+            item.href +
+            '">Otwórz stronę realizacji →</a></p>';
+          articleOpen = true;
+          root.classList.add("is-article-open");
+          articleEl.classList.add("is-open");
+          articleEl.style.maxHeight = "12rem";
+        });
+    }
+
+    function enhanceInjectedCase(rootEl) {
+      if (!rootEl) return;
+      rootEl.querySelectorAll(".case-viz-tile").forEach(function (tile) {
+        tile.classList.add("is-entered");
+      });
+    }
+
     function layout() {
       if (destroyed) return;
       var nearest = clampIndex(Math.round(index), n);
-      var span = mode === "catalog" ? 168 : 150; /* degrees of visible arc */
+      /* Wider / flatter arc so ~2× cards leave a hollow for copy */
+      var span = mode === "catalog" ? 158 : 136;
       var step = span / Math.max(9, n - 1);
-      var radiusX = mode === "catalog" ? 46 : 36; /* vw */
-      var radiusY = mode === "catalog" ? 34 : 22; /* vh — taller arch like the pin */
-      var baseScale = mode === "catalog" ? 1 : 0.92;
+      var radiusX = mode === "catalog" ? 54 : 48;
+      var radiusY = mode === "catalog" ? 24 : 12;
+      var baseScale = 1;
 
       cards.forEach(function (card, i) {
         var raw = i - index;
-        /* wrap shortest path on ring */
         if (raw > n / 2) raw -= n;
         if (raw < -n / 2) raw += n;
         var angDeg = raw * step;
         var ang = (angDeg * Math.PI) / 180;
         var x = Math.sin(ang) * radiusX;
-        var y = (1 - Math.cos(ang)) * radiusY - (mode === "catalog" ? 2 : 0);
+        var y = (1 - Math.cos(ang)) * radiusY;
         var depth = Math.cos(ang);
-        var s = baseScale * (0.72 + 0.28 * depth);
-        var o = 0.28 + 0.72 * Math.pow(Math.max(0, depth), 1.15);
+        var s = baseScale * (0.7 + 0.3 * depth);
+        var o = 0.22 + 0.78 * Math.pow(Math.max(0, depth), 1.1);
         var rot = angDeg * 0.85;
         card.style.transform =
           "translate3d(calc(-50% + " +
@@ -218,13 +386,31 @@
           "deg) scale(" +
           s.toFixed(3) +
           ")";
-        card.style.opacity = String(Math.max(0.18, Math.min(1, o)));
+        card.style.opacity = String(Math.max(0.16, Math.min(1, o)));
         card.style.zIndex = String(Math.round(20 + depth * 30));
         card.classList.toggle("is-front", i === nearest);
         card.classList.toggle("is-side", Math.abs(raw) > 0.55);
       });
 
-      if (copyEl) paintCopy(nearest);
+      if (copyEl && nearest !== painted) {
+        if (articleOpen || articleLoading) collapseArticle(false);
+        paintCopy(nearest);
+        painted = nearest;
+        var scroller = getScrollParent();
+        if (scroller.scrollTop > 8) {
+          if (reduced) scroller.scrollTop = 0;
+          else {
+            var from = scroller.scrollTop;
+            var t0 = performance.now();
+            function tick(now) {
+              var p = Math.min(1, (now - t0) / 420);
+              scroller.scrollTop = from * (1 - p);
+              if (p < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+          }
+        }
+      }
       if (typeof opts.onChange === "function") opts.onChange(nearest, CASES[nearest]);
     }
 
@@ -236,14 +422,30 @@
         (item.client ? '<p class="sys-fan__client"></p>' : "") +
         '<h3 class="sys-fan__title"></h3>' +
         '<p class="sys-fan__desc"></p>' +
-        '<a class="sys-fan__more" data-no-transition></a>';
+        '<button type="button" class="sys-fan__more" data-sys-fan-more></button>';
       copyEl.querySelector(".sys-fan__tag").textContent = item.tag;
       if (item.client) copyEl.querySelector(".sys-fan__client").textContent = item.client;
       copyEl.querySelector(".sys-fan__title").textContent = item.title;
       copyEl.querySelector(".sys-fan__desc").textContent = item.desc;
-      var more = copyEl.querySelector(".sys-fan__more");
-      more.href = item.href;
-      more.textContent = "Zobacz realizację →";
+      var more = copyEl.querySelector("[data-sys-fan-more]");
+      more.textContent = "Zobacz więcej";
+      more.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (articleOpen && !articleLoading) {
+          /* already open for this case — soft scroll to it */
+          var scroller = getScrollParent();
+          var head = root.querySelector("[data-sys-fan-head]");
+          var targetTop = Math.max(
+            0,
+            (head ? head.offsetHeight : copyEl.offsetTop + copyEl.offsetHeight) -
+              Math.min(120, window.innerHeight * 0.14)
+          );
+          scroller.scrollTo({ top: targetTop, behavior: reduced ? "auto" : "smooth" });
+          return;
+        }
+        expandArticle(item);
+      });
     }
 
     function setIndex(next, animate) {
@@ -254,7 +456,6 @@
         layout();
         return;
       }
-      /* shortest wrap on the ring */
       var delta = to - from;
       while (delta > n / 2) delta -= n;
       while (delta < -n / 2) delta += n;
@@ -282,7 +483,7 @@
       if (autoplay) startAuto(2400);
     }
 
-    function startAuto(delay) {
+    function startAuto() {
       stopAuto();
       if (!autoplay || destroyed) return;
       autoTimer = window.setInterval(function () {
@@ -324,16 +525,13 @@
       layout();
       if (e.cancelable) e.preventDefault();
     }
-    function onPointerUp(e) {
+    function onPointerUp() {
       if (!dragging) return;
       dragging = false;
       stage.classList.remove("is-dragging");
-      /* inertia snap */
-      var target = index - vel * 8;
-      setIndex(target, true);
-      if (autoplay) startAuto(1800);
+      setIndex(index - vel * 8, true);
+      if (autoplay) startAuto();
       if (didDrag) {
-        /* swallow the click that follows a drag so expand doesn't close */
         var swallow = function (ev) {
           ev.stopPropagation();
           ev.preventDefault();
@@ -365,9 +563,23 @@
 
     function onWheel(e) {
       if (destroyed) return;
-      /* Only when pointer is over fan or in detail mode */
+      /* Vertical scroll over open article = page scroll, not fan rotate */
+      if (
+        mode === "detail" &&
+        articleOpen &&
+        e.target &&
+        e.target.closest &&
+        e.target.closest("[data-sys-fan-article]")
+      ) {
+        return;
+      }
       if (mode === "catalog" && !root.matches(":hover")) return;
-      var delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      /* Prefer horizontal / intentional fan gestures */
+      var dominantX = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.15;
+      if (mode === "detail" && articleOpen && !dominantX && !e.target.closest("[data-sys-fan-stage]")) {
+        return;
+      }
+      var delta = dominantX ? e.deltaX : e.deltaY;
       if (Math.abs(delta) < 4) return;
       e.preventDefault();
       e.stopPropagation();
@@ -379,7 +591,7 @@
       window.clearTimeout(onWheel._t);
       onWheel._t = window.setTimeout(function () {
         setIndex(Math.round(index), true);
-        if (autoplay) startAuto(1600);
+        if (autoplay) startAuto();
       }, 140);
     }
     root.addEventListener("wheel", onWheel, { passive: false });
@@ -401,21 +613,8 @@
       resume: function () {
         if (autoplay) startAuto();
       },
-      setMode: function (nextMode) {
-        mode = nextMode;
-        root.classList.toggle("sys-fan--catalog", mode === "catalog");
-        root.classList.toggle("sys-fan--detail", mode === "detail");
-        autoplay = mode === "catalog" && !reduced;
-        if (mode === "detail" && !copyEl) {
-          copyEl = document.createElement("div");
-          copyEl.className = "sys-fan__copy";
-          copyEl.setAttribute("data-sys-fan-copy", "");
-          copyEl.setAttribute("aria-live", "polite");
-          root.appendChild(copyEl);
-        }
-        if (mode === "catalog") stopAuto();
-        layout();
-        if (autoplay) startAuto();
+      collapseArticle: function () {
+        collapseArticle(true);
       },
       destroy: function () {
         destroyed = true;
@@ -425,6 +624,7 @@
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
         root.removeEventListener("wheel", onWheel);
+        document.body.classList.remove("is-sys-fan-dragging");
         instances = instances.filter(function (x) {
           return x !== api;
         });
