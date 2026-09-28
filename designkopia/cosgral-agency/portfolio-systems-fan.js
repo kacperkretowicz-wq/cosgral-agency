@@ -199,6 +199,7 @@
     var articleLoading = false;
     var scrollParent = null;
     var articleWheelLock = 0;
+    var articleSnapIndex = -1; /* -1 = top (intro/story), then 0..tiles-1 */
     var ARTICLE_WHEEL_MS = 780;
 
     root.classList.add("sys-fan");
@@ -312,32 +313,19 @@
       var tiles = getArticleSnapTargets();
       if (!scroller || !tiles.length) return;
       var pad = stickyArticlePad();
-      var scrollTop = scroller.scrollTop;
       var maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-      var nextTop = null;
+      var nextIdx = articleSnapIndex + (dir > 0 ? 1 : -1);
+      if (nextIdx < -1) nextIdx = -1;
+      if (nextIdx > tiles.length - 1) nextIdx = tiles.length - 1;
+      if (nextIdx === articleSnapIndex && scroller.scrollTop <= 2 && dir < 0) return;
+      if (nextIdx === articleSnapIndex && scroller.scrollTop >= maxScroll - 2 && dir > 0) return;
+      articleSnapIndex = nextIdx;
 
-      if (dir > 0) {
-        for (var i = 0; i < tiles.length; i++) {
-          var down = targetScrollTop(tiles[i], scroller, pad);
-          if (down > scrollTop + 28) {
-            nextTop = down;
-            break;
-          }
-        }
-        if (nextTop == null) nextTop = maxScroll;
-      } else {
-        for (var j = tiles.length - 1; j >= 0; j--) {
-          var up = targetScrollTop(tiles[j], scroller, pad);
-          if (up < scrollTop - 28) {
-            nextTop = up;
-            break;
-          }
-        }
-        if (nextTop == null) nextTop = 0;
+      var nextTop = 0;
+      if (articleSnapIndex >= 0) {
+        nextTop = targetScrollTop(tiles[articleSnapIndex], scroller, pad);
       }
-
       nextTop = Math.max(0, Math.min(maxScroll, nextTop));
-      if (Math.abs(nextTop - scrollTop) < 2) return;
       scroller.scrollTo({
         top: nextTop,
         behavior: reduced ? "auto" : "smooth",
@@ -429,6 +417,7 @@
           if (scroller) scroller.scrollTop = 0;
           articleLoading = false;
           articleWheelLock = 0;
+          articleSnapIndex = -1;
           window.setTimeout(function () {
             if (articleOpen) articleEl.style.maxHeight = "none";
           }, reduced ? 0 : 1400);
