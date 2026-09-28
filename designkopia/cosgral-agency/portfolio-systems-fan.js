@@ -292,7 +292,10 @@
     function stickyArticlePad() {
       var head = root.querySelector("[data-sys-fan-head]");
       if (!head) return 16;
-      return Math.round(head.getBoundingClientRect().height) + 16;
+      /* clientHeight = CSS sticky band; getBoundingClientRect grows with overflow:visible fan */
+      var h = head.clientHeight || head.offsetHeight || 0;
+      if (h < 80) h = Math.min(window.innerHeight * 0.48, 26 * 16);
+      return Math.round(h) + 16;
     }
 
     function getArticleSnapTargets() {
@@ -326,10 +329,8 @@
         nextTop = targetScrollTop(tiles[articleSnapIndex], scroller, pad);
       }
       nextTop = Math.max(0, Math.min(maxScroll, nextTop));
-      scroller.scrollTo({
-        top: nextTop,
-        behavior: reduced ? "auto" : "smooth",
-      });
+      /* Instant step — smooth + trackpad salvos stacked and skipped tiles */
+      scroller.scrollTo({ top: nextTop, behavior: "auto" });
     }
 
     function restoreNav() {
@@ -700,10 +701,10 @@
       }, 280);
     }
     root.addEventListener("wheel", onWheel, { passive: false });
-    /* Capture on scroller too — wheel often targets article children inside .expand-systems */
+    /* Capture on scroller so article wheel is handled once before native scroll */
     var caseSnapScroller = getScrollParent();
     if (caseSnapScroller && caseSnapScroller !== root) {
-      caseSnapScroller.addEventListener("wheel", onWheel, { passive: false });
+      caseSnapScroller.addEventListener("wheel", onWheel, { passive: false, capture: true });
     }
 
     layout();
@@ -736,7 +737,7 @@
         window.removeEventListener("pointercancel", onPointerUp);
         root.removeEventListener("wheel", onWheel);
         if (caseSnapScroller && caseSnapScroller !== root) {
-          caseSnapScroller.removeEventListener("wheel", onWheel);
+          caseSnapScroller.removeEventListener("wheel", onWheel, { capture: true });
         }
         document.body.classList.remove("is-sys-fan-dragging");
         instances = instances.filter(function (x) {
