@@ -429,12 +429,17 @@
       body.querySelector(".expand-deck__name").textContent = item.title;
       body.querySelector(".expand-deck__lead").textContent = item.lead;
       card.appendChild(body);
-      card.addEventListener("click", function () {
+      card.addEventListener("click", function (e) {
         /* Detail dismiss is handled by the capture click on document/stage */
         if (webDetailOpen) return;
         var i = WEB_CASES.indexOf(item);
-        if (Math.round(deckIndex) === i) openWebCaseDetail(item, card);
-        else setDeckIndex(i);
+        if (Math.round(deckIndex) === i) {
+          /* Stop bubble so stage click does not immediately close the new detail */
+          e.stopPropagation();
+          openWebCaseDetail(item, card);
+        } else {
+          setDeckIndex(i);
+        }
       });
       track.appendChild(card);
       deckCards.push(card);
@@ -1502,6 +1507,8 @@
     if (!expandedKey) return;
     if (webDetailOpen) {
       if (e.target.closest && e.target.closest("a.expand-web-visit, .expand-web-visit")) return;
+      /* Ignore the same click that just opened detail (card → stage bubble) */
+      if (e.target.closest && e.target.closest(".expand-deck__card")) return;
       closeWebCaseDetail();
       return;
     }
