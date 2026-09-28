@@ -58,24 +58,11 @@
     return Number(t.toFixed(2));
   }
 
-  /** Shuffled enter delays on expand masonry (skip anchors already morphing). */
-  function staggerGalleryEnter(gallery) {
-    if (!gallery || REDUCED) return;
-    var items = gallery.querySelectorAll(
-      ".reels-masonry__item:not(.is-anchor), .graphics-masonry__item:not(.is-anchor), .expand-gallery__heading, .expand-gallery__count"
-    );
-    var order = shuffleList(items);
-    var span = Math.min(1.9, 0.55 + order.length * 0.04);
-    order.forEach(function (el, i) {
-      el.style.transitionDelay = staggeredDelay(i, order.length, 0.14, span, 0.1) + "s";
-    });
-  }
-
-  /** Shuffled fade-out before reverse morph. Returns ms until mostly gone. */
+  /** Shuffled fade-out of expand tiles only (close path). Returns ms until mostly gone. */
   function staggerGalleryExit(gallery) {
     if (!gallery || REDUCED) return 0;
     var items = gallery.querySelectorAll(
-      ".reels-masonry__item, .graphics-masonry__item, .expand-gallery__heading, .expand-gallery__count"
+      ".reels-masonry__item, .graphics-masonry__item"
     );
     var order = shuffleList(items);
     var span = Math.min(1.15, 0.35 + order.length * 0.028);
@@ -89,12 +76,15 @@
         "s";
       el.classList.add("is-stagger-out");
       el.style.opacity = "0";
-      el.style.transform = "translate3d(0, 18px, 0) scale(0.98)";
+      el.style.transform = "translate3d(0, 14px, 0) scale(0.985)";
     });
     return Math.round(Math.min(2000, 700 + span * 1000 + 400));
   }
 
-  /** After reverse morph: catalog labels + tiles bloom back slowly, shuffled. */
+  /**
+   * After reverse morph: catalog TILES bloom back slowly, shuffled.
+   * Section copy / center words stay put (no transform — they must not “flee”).
+   */
   function beginCatalogReveal(chapter) {
     if (!chapter || REDUCED) return 0;
     if (catalogRevealTimer) window.clearTimeout(catalogRevealTimer);
@@ -102,11 +92,9 @@
     root.classList.remove("is-morphing");
 
     var sel =
-      ".portfolio-chapter__title, .portfolio-chapter__lead, .portfolio-chapter__more, " +
-      ".chapter-show__tile, .chapter-show__word, .chapter-show__badge, " +
-      ".chapter-show__meta span, .chapter-show__foot span, " +
+      ".chapter-show__tile, " +
       ".reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card, " +
-      ".chapter-lux [data-lux-shot], .chapter-lux__word-3d, .portfolio-tile__viz-word";
+      ".chapter-lux [data-lux-shot]";
     var nodes = chapter.querySelectorAll(sel);
     var order = shuffleList(nodes);
     var span = Math.min(2.35, 0.7 + order.length * 0.055);
@@ -1064,14 +1052,13 @@
             morphGhostToRect(item.el, r, { radius: "8px" });
           }
         });
-        staggerGalleryEnter(gallery);
         gallery.style.opacity = "1";
         gallery.classList.add("is-ready", "is-slide-up");
         setTimeout(function () {
           beltLayer.style.opacity = "0";
-          removeGhosts(720);
-        }, 720);
-      }, REDUCED ? 0 : 1500);
+          removeGhosts(640);
+        }, 560);
+      }, REDUCED ? 0 : 1400);
     });
   }
 
@@ -1122,13 +1109,12 @@
       }
 
       setTimeout(function () {
-        staggerGalleryEnter(gallery);
         gallery.style.opacity = "1";
-        gallery.classList.add("is-ready", "is-slide-up");
+        gallery.classList.add("is-ready");
         /* Hero becomes first cell — fade ghost only after gallery is solid */
         if (fly) fly.style.opacity = "0";
-        removeGhosts(640);
-      }, REDUCED ? 0 : 1480);
+        removeGhosts(520);
+      }, REDUCED ? 0 : 1360);
     });
   }
 
@@ -1266,6 +1252,8 @@
     if (prev === "video") document.body.classList.add("is-montaz-belt-hold");
     setOpen(false);
     stage.classList.remove("is-closing");
+    document.body.classList.remove("is-closing-reverse");
+    root.classList.remove("is-closing-reverse");
     clearBody();
     if (chapterForReveal && (prev === "video" || prev === "graphics") && !REDUCED) {
       beginCatalogReveal(chapterForReveal);
@@ -1363,6 +1351,8 @@
 
   /* Reverse of openVideo: masonry → 2 heroes zoom back into diagonal belt */
   function closeVideoReverse() {
+    document.body.classList.add("is-closing-reverse");
+    root.classList.add("is-closing-reverse");
     var gallery = bodyEl.querySelector(".expand-gallery");
     var state = videoOpenState;
     var chapter = openChapter || document.getElementById("montaz");
@@ -1553,6 +1543,8 @@
 
   /* Reverse of openGraphics: masonry fades staggered, fly back, catalog blooms */
   function closeGraphicsReverse() {
+    document.body.classList.add("is-closing-reverse");
+    root.classList.add("is-closing-reverse");
     var chapter = openChapter;
     var gallery = bodyEl.querySelector(".expand-gallery");
     var first = gallery && gallery.querySelector(".graphics-masonry__item");
