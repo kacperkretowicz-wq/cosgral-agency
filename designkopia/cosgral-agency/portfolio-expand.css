@@ -57,7 +57,8 @@
 body.is-tile-expanded .site-nav {
   pointer-events: none;
 }
-.portfolio-chapters.is-expanded .portfolio-chapter__copy {
+.portfolio-chapters.is-expanded .portfolio-chapter__copy,
+.portfolio-chapters.is-expanded .portfolio-chapter__hit {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.55s ease;

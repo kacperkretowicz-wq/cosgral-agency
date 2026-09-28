@@ -528,6 +528,12 @@
     });
   }
 
+  function expandFromChapter(chapter) {
+    if (!chapter || !chapter.classList.contains("is-active")) return;
+    if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) return;
+    openExpand(chapter);
+  }
+
   root.querySelectorAll("[data-tile-expand]").forEach(function (link) {
     link.addEventListener(
       "click",
@@ -538,41 +544,23 @@
         e.preventDefault();
         e.stopPropagation();
         var chapter = link.closest("[data-portfolio-tile]");
-        if (chapter) openExpand(chapter);
+        expandFromChapter(chapter);
       },
       true
     );
   });
 
-  /* Click center / tiles / chapter chrome → same as „Zobacz więcej” */
-  function canChapterClickOpen(el) {
-    if (!el || !el.closest) return false;
-    if (
-      el.closest(
-        ".portfolio-chapters__pager, .site-nav, .nav-overlay, .site-footer, .portfolio-end, .site-chat, .gyro-enable"
-      )
-    ) {
-      return false;
-    }
-    /* Systems fan keeps its own card / nav interaction */
-    if (
-      el.closest(
-        ".sys-fan__card, .sys-fan__arrow, .sys-fan__dot, .sys-fan__nav, .sys-fan__more, .sys-fan__stage"
-      )
-    ) {
-      return false;
-    }
-    if (el.closest("a[href]:not([data-tile-expand]), button:not([data-tile-expand])")) return false;
-    return true;
-  }
-
-  scroller.addEventListener("click", function (e) {
-    if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) return;
-    if (!canChapterClickOpen(e.target)) return;
-    var chapter = e.target.closest("[data-portfolio-tile].is-active");
-    if (!chapter) return;
-    e.preventDefault();
-    openExpand(chapter);
+  /* Dedicated center hit area → same as „Zobacz więcej” */
+  root.querySelectorAll("[data-tile-expand-hit]").forEach(function (hit) {
+    hit.addEventListener(
+      "click",
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        expandFromChapter(hit.closest("[data-portfolio-tile]"));
+      },
+      true
+    );
   });
 
   window.addEventListener("portfolio-expand-open", function (e) {

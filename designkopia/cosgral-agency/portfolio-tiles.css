@@ -210,28 +210,48 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   scroll-snap-stop: always;
   perspective: 1200px;
 }
-/* Gyro / pointer tilt wrapper inside tile chapters */
-body.portfolio-page--tiles .portfolio-chapter:has(> .home-tilt-layer) {
-  padding: 0;
-}
-body.portfolio-page--tiles .portfolio-chapter > .home-tilt-layer {
+/* Gyro / pointer tilt — media only; copy stays in chapter padding (unmoved) */
+body.portfolio-page--tiles .portfolio-chapter__bg > .home-tilt-layer,
+body.portfolio-page--tiles .portfolio-chapter__bg > .home-tilt-layer > .home-tilt-face {
   position: absolute;
   inset: 0;
   width: auto;
   height: auto;
-  z-index: 0;
-}
-body.portfolio-page--tiles .portfolio-chapter > .home-tilt-layer > .home-tilt-face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  box-sizing: border-box;
-  padding:
-    clamp(5.5rem, 12vh, 7rem)
-    max(var(--gutter, 1.25rem), 4vw)
-    clamp(4.5rem, 12vh, 6.5rem);
   transform-origin: 50vw 50vh;
+}
+body.portfolio-page--tiles .portfolio-chapter__bg {
+  pointer-events: none;
+}
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__card,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__nav,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__arrow,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__dot,
+body.portfolio-page--tiles .portfolio-chapter__bg .sys-fan__more {
+  pointer-events: auto;
+}
+
+/* Center hit zone — open expand like „Zobacz więcej” */
+.portfolio-chapter__hit {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  z-index: 2;
+  width: min(46vmin, 18rem);
+  height: min(46vmin, 18rem);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.portfolio-chapter:not(.is-active) .portfolio-chapter__hit,
+.portfolio-chapters.is-expanded .portfolio-chapter__hit {
+  pointer-events: none;
 }
 
 .portfolio-chapters__pager {
@@ -360,13 +380,14 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
 
 .portfolio-chapter__copy {
   position: relative;
-  z-index: 3;
+  z-index: 4;
   max-width: min(36rem, 92vw);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.65rem;
   text-align: left;
+  pointer-events: auto;
 }
 .portfolio-chapter__title {
   margin: 0;
@@ -401,6 +422,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
     filter 1.2s ease 0.12s;
 }
 .portfolio-chapter__more {
+  position: relative;
+  z-index: 5;
   margin-top: 0.55rem;
   display: inline-flex;
   align-items: center;
@@ -414,6 +437,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   padding-bottom: 0.12rem;
   opacity: 0.12;
   transform: translate3d(1.2rem, 0.35rem, 0);
+  pointer-events: auto;
+  cursor: pointer;
   transition:
     border-color 0.45s ease,
     opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.22s,

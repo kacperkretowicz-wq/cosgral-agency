@@ -223,10 +223,12 @@
       wrapChildren(section, ".portfolio-section__curtain");
     });
 
-    /* Realizacje tile catalogs — wrap each chapter for homepage-style gyro */
-    document.querySelectorAll("body.portfolio-page--tiles [data-portfolio-tile]").forEach(function (chapter) {
-      wrapChildren(chapter);
-    });
+    /* Realizacje: tilt only chapter media — leave titles / Zobacz więcej put */
+    document
+      .querySelectorAll("body.portfolio-page--tiles [data-portfolio-tile] > .portfolio-chapter__bg")
+      .forEach(function (bg) {
+        wrapChildren(bg);
+      });
 
     var tiltHosts = document.querySelectorAll(
       [
