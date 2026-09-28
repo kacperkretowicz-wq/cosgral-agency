@@ -1071,8 +1071,8 @@ body.portfolio-page--tiles.is-tile-expanded #montaz .reels-tiles__belt {
     font-size: clamp(2.8rem, 16vw, 4.4rem);
   }
   .sys-fan__card {
-    width: min(22vw, 5.8rem);
-    border-radius: 1.1rem;
+    width: min(44vw, 11.6rem);
+    border-radius: 1.35rem;
   }
   .sys-fan__copy {
     top: 60%;
