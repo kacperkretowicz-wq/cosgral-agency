@@ -49,15 +49,25 @@
     el.style.removeProperty("--reveal-delay");
   }
 
+  /** Spread shuffled indices across a capped time window (keeps order random, not endless). */
+  function staggeredDelay(index, count, start, span, jitter) {
+    var t =
+      count <= 1
+        ? start
+        : start + (index / (count - 1)) * span + Math.random() * (jitter || 0);
+    return Number(t.toFixed(2));
+  }
+
   /** Shuffled enter delays on expand masonry (skip anchors already morphing). */
   function staggerGalleryEnter(gallery) {
     if (!gallery || REDUCED) return;
     var items = gallery.querySelectorAll(
       ".reels-masonry__item:not(.is-anchor), .graphics-masonry__item:not(.is-anchor), .expand-gallery__heading, .expand-gallery__count"
     );
-    shuffleList(items).forEach(function (el, i) {
-      var delay = 0.12 + i * 0.11 + Math.random() * 0.1;
-      el.style.transitionDelay = delay.toFixed(2) + "s";
+    var order = shuffleList(items);
+    var span = Math.min(1.9, 0.55 + order.length * 0.04);
+    order.forEach(function (el, i) {
+      el.style.transitionDelay = staggeredDelay(i, order.length, 0.14, span, 0.1) + "s";
     });
   }
 
@@ -68,19 +78,20 @@
       ".reels-masonry__item, .graphics-masonry__item, .expand-gallery__heading, .expand-gallery__count"
     );
     var order = shuffleList(items);
+    var span = Math.min(1.15, 0.35 + order.length * 0.028);
     order.forEach(function (el, i) {
-      var delay = i * 0.09 + Math.random() * 0.07;
+      var delay = staggeredDelay(i, order.length, 0.02, span, 0.07);
       el.style.transition =
         "opacity 1.05s cubic-bezier(0.22, 1, 0.36, 1) " +
-        delay.toFixed(2) +
+        delay +
         "s, transform 1.2s cubic-bezier(0.22, 1, 0.36, 1) " +
-        delay.toFixed(2) +
+        delay +
         "s";
       el.classList.add("is-stagger-out");
       el.style.opacity = "0";
       el.style.transform = "translate3d(0, 18px, 0) scale(0.98)";
     });
-    return Math.min(2200, 520 + order.length * 90);
+    return Math.round(Math.min(2000, 700 + span * 1000 + 400));
   }
 
   /** After reverse morph: catalog labels + tiles bloom back slowly, shuffled. */
@@ -98,23 +109,24 @@
       ".chapter-lux [data-lux-shot], .chapter-lux__word-3d, .portfolio-tile__viz-word";
     var nodes = chapter.querySelectorAll(sel);
     var order = shuffleList(nodes);
+    var span = Math.min(2.35, 0.7 + order.length * 0.055);
     order.forEach(function (el) {
       el.classList.remove("is-reveal-in");
       el.style.setProperty("--reveal-delay", "0s");
     });
     requestAnimationFrame(function () {
       order.forEach(function (el, i) {
-        var delay = 0.18 + i * 0.13 + Math.random() * 0.12;
-        el.style.setProperty("--reveal-delay", delay.toFixed(2) + "s");
+        var delay = staggeredDelay(i, order.length, 0.2, span, 0.12);
+        el.style.setProperty("--reveal-delay", delay + "s");
         el.classList.add("is-reveal-in");
       });
     });
-    var totalMs = Math.min(3400, 900 + order.length * 130);
+    var totalMs = Math.round(Math.min(3600, 1100 + span * 1000 + 700));
     catalogRevealTimer = window.setTimeout(function () {
       root.classList.remove("is-catalog-revealing");
       order.forEach(clearInlineReveal);
       catalogRevealTimer = 0;
-    }, totalMs + 400);
+    }, totalMs + 450);
     return totalMs;
   }
 
@@ -1478,10 +1490,11 @@
         sideCards.push(g);
       });
       shuffleList(sideCards).forEach(function (g, i) {
+        var d = staggeredDelay(i, sideCards.length, 0.38, Math.min(1.6, 0.4 + sideCards.length * 0.05), 0.08);
         window.setTimeout(function () {
           g.style.opacity = "1";
           g.style.transform = "rotate(0deg) scale(1)";
-        }, 380 + i * 110 + Math.random() * 80);
+        }, Math.round(d * 1000));
       });
 
       var exitMs = staggerGalleryExit(gallery);
@@ -1578,10 +1591,11 @@
         otherGhosts.push(g);
       });
       shuffleList(otherGhosts).forEach(function (g, i) {
+        var d = staggeredDelay(i, otherGhosts.length, 0.48, Math.min(1.85, 0.45 + otherGhosts.length * 0.055), 0.09);
         window.setTimeout(function () {
           g.style.opacity = "1";
           g.style.transform = "scale(1)";
-        }, 520 + i * 120 + Math.random() * 90);
+        }, Math.round(d * 1000));
       });
 
       var handoff = Math.max(1800, exitMs + 900);
