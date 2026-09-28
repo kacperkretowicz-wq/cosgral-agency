@@ -1349,12 +1349,58 @@
     }, REDUCED ? 0 : 640);
   }
 
-  /* Reverse of openVideo: masonry → 2 heroes zoom back into diagonal belt */
+  /** Collect expand-grid reel cells (prefer on-screen, then pad from DOM). */
+  function captureExpandReelItems(gallery, need) {
+    if (!gallery) return [];
+    var nodes = Array.prototype.slice.call(
+      gallery.querySelectorAll(".reels-masonry__item")
+    );
+    function pack(el) {
+      var img = el.querySelector("img, video");
+      var src = "";
+      if (img) {
+        src =
+          img.currentSrc ||
+          img.getAttribute("poster") ||
+          img.getAttribute("src") ||
+          img.src ||
+          "";
+      }
+      return { el: el, rect: el.getBoundingClientRect(), src: src };
+    }
+    var visible = [];
+    var rest = [];
+    nodes.forEach(function (el) {
+      var item = pack(el);
+      if (item.rect.width < 8 || item.rect.height < 8) return;
+      var onScreen =
+        item.rect.bottom > 40 &&
+        item.rect.top < window.innerHeight - 40 &&
+        item.rect.right > 0 &&
+        item.rect.left < window.innerWidth;
+      (onScreen ? visible : rest).push(item);
+    });
+    var out = visible.slice();
+    for (var i = 0; i < rest.length && out.length < need; i++) out.push(rest[i]);
+    return out;
+  }
+
+  function mediaBasesMatch(a, b) {
+    if (!a || !b) return false;
+    var ba = mediaFileBase(a);
+    var bb = mediaFileBase(b);
+    if (!ba || !bb) return false;
+    if (ba === bb) return true;
+    var ca = ba.replace(/-poster\.(jpe?g|png|webp)$/i, "").replace(/\.(mp4|webm|mov)$/i, "");
+    var cb = bb.replace(/-poster\.(jpe?g|png|webp)$/i, "").replace(/\.(mp4|webm|mov)$/i, "");
+    return !!(ca && cb && ca === cb);
+  }
+
+  /* Reverse of openVideo: grid tiles fly back into the catalog diagonal fan */
   function closeVideoReverse() {
     document.body.classList.add("is-closing-reverse");
     root.classList.add("is-closing-reverse");
     var gallery = bodyEl.querySelector(".expand-gallery");
-    var state = videoOpenState;
     var chapter = openChapter || document.getElementById("montaz");
     if (gallery) {
       gallery.querySelectorAll("video").forEach(function (v) {
@@ -1365,158 +1411,136 @@
       });
     }
 
-    /* Re-read live belt rects (paused under expand) so return lands on catalog */
-    var liveAll = [];
+    /* Live fan slots from the paused catalog belt */
+    var fanSlots = [];
     if (chapter) {
-      liveAll = captureTiles(
+      fanSlots = captureTiles(
         "#reels-tiles .reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card",
         chapter
       );
-      if (liveAll.length < 2) liveAll = captureTiles("#reels-tiles .reels-tiles__card", chapter);
+      if (fanSlots.length < 2) fanSlots = captureTiles("#reels-tiles .reels-tiles__card", chapter);
     }
-    var liveHeroes = [];
-    if (state && state.heroes && liveAll.length) {
-      state.heroes.forEach(function (h) {
-        var match = null;
-        var best = Infinity;
-        liveAll.forEach(function (t) {
-          var same =
-            (h.src && t.src && (t.src.indexOf(mediaFileBase(h.src)) !== -1 || h.src.indexOf(mediaFileBase(t.src)) !== -1)) ||
-            (h.poster && t.poster && t.poster.indexOf(mediaFileBase(h.poster)) !== -1);
-          var mx = t.rect.left + t.rect.width * 0.5;
-          var my = t.rect.top + t.rect.height * 0.5;
-          var hx = h.rect.left + h.rect.width * 0.5;
-          var hy = h.rect.top + h.rect.height * 0.5;
-          var dist = (mx - hx) * (mx - hx) + (my - hy) * (my - hy);
-          if (same || dist < best) {
-            if (same || !match) {
-              best = dist;
-              match = t;
+    fanSlots.sort(function (a, b) {
+      return a.rect.left - b.rect.left;
+    });
+
+    var gridItems = captureExpandReelItems(gallery, Math.max(fanSlots.length, 8));
+
+    if (gallery && fanSlots.length >= 2 && gridItems.length >= 2 && !REDUCED) {
+      var used = {};
+      var pairs = fanSlots.map(function (fan) {
+        var idx = -1;
+        var i;
+        for (i = 0; i < gridItems.length; i++) {
+          if (used[i]) continue;
+          if (mediaBasesMatch(fan.src, gridItems[i].src)) {
+            idx = i;
+            break;
+          }
+        }
+        if (idx < 0) {
+          for (i = 0; i < gridItems.length; i++) {
+            if (!used[i]) {
+              idx = i;
+              break;
             }
           }
-        });
-        liveHeroes.push(
-          match
-            ? {
-                rect: {
-                  left: match.rect.left,
-                  top: match.rect.top,
-                  width: match.rect.width,
-                  height: match.rect.height,
-                },
-                src: match.src || h.src,
-              }
-            : h
-        );
+        }
+        if (idx >= 0) used[idx] = true;
+        return { fan: fan, from: idx >= 0 ? gridItems[idx] : null };
       });
-      liveHeroes.sort(function (a, b) {
-        return a.rect.left - b.rect.left;
-      });
-    } else if (state) {
-      liveHeroes = state.heroes.slice();
-    }
-
-    if (gallery && liveHeroes.length && !REDUCED) {
-      var anchors = gallery.querySelectorAll(".reels-masonry__item.is-anchor");
-      if (anchors.length < 2) anchors = gallery.querySelectorAll(".reels-masonry__item");
 
       var beltLayer = document.createElement("div");
-      beltLayer.className = "expand-belt is-level";
+      beltLayer.className = "expand-belt is-level is-fan-return";
       document.body.appendChild(beltLayer);
       activeGhosts.push(beltLayer);
 
-      var heroGhosts = liveHeroes.map(function (h, i) {
-        var from = anchors[i] ? anchors[i].getBoundingClientRect() : null;
+      var mid = (pairs.length - 1) / 2;
+      var ghosts = pairs.map(function (pair, i) {
+        var fan = pair.fan;
+        var from = pair.from;
         var g = document.createElement("figure");
-        g.className = "expand-belt__card is-hero";
-        if (from && from.width > 4) {
-          g.style.left = from.left + "px";
-          g.style.top = from.top + "px";
-          g.style.width = from.width + "px";
-          g.style.height = from.height + "px";
-        } else {
-          g.style.left = h.rect.left + "px";
-          g.style.top = h.rect.top + "px";
-          g.style.width = h.rect.width + "px";
-          g.style.height = h.rect.height + "px";
-        }
+        g.className = "expand-belt__card" + (Math.abs(i - mid) < 1 ? " is-hero" : "");
         g.style.borderRadius = "8px";
-        g.style.transform = "rotate(0deg) scale(1)";
-        if (h.src) {
+        g.style.zIndex = String(10 + Math.round(10 - Math.abs(i - mid)));
+        var src = (from && from.src) || fan.src;
+        if (src) {
           var img = document.createElement("img");
-          img.src = h.src;
+          img.src = src;
           img.alt = "";
           g.appendChild(img);
         }
-        beltLayer.appendChild(g);
-        return g;
-      });
-
-      /* Side belt cards — bloom back slowly in shuffled order */
-      var heroSrcSet = liveHeroes.map(function (h) {
-        return mediaFileBase(h.src);
-      });
-      var sideCards = [];
-      (liveAll.length ? liveAll : state.all || []).forEach(function (t) {
-        var base = mediaFileBase(t.src);
-        if (heroSrcSet.indexOf(base) !== -1) return;
-        var g = document.createElement("figure");
-        g.className = "expand-belt__card";
-        g.style.left = t.rect.left + "px";
-        g.style.top = t.rect.top + "px";
-        g.style.width = t.rect.width + "px";
-        g.style.height = t.rect.height + "px";
-        g.style.opacity = "0";
-        g.style.transform = "rotate(0deg) scale(0.9)";
-        g.style.transition =
-          "opacity 1.35s cubic-bezier(0.22, 1, 0.36, 1), transform 1.5s cubic-bezier(0.22, 1, 0.36, 1)";
-        if (t.src) {
-          var img2 = document.createElement("img");
-          img2.src = t.src;
-          img2.alt = "";
-          g.appendChild(img2);
-        }
-        beltLayer.appendChild(g);
-        sideCards.push(g);
-      });
-      shuffleList(sideCards).forEach(function (g, i) {
-        var d = staggeredDelay(i, sideCards.length, 0.38, Math.min(1.6, 0.4 + sideCards.length * 0.05), 0.08);
-        window.setTimeout(function () {
+        if (from && from.rect.width > 4) {
+          g.style.left = from.rect.left + "px";
+          g.style.top = from.rect.top + "px";
+          g.style.width = from.rect.width + "px";
+          g.style.height = from.rect.height + "px";
           g.style.opacity = "1";
           g.style.transform = "rotate(0deg) scale(1)";
-        }, Math.round(d * 1000));
+        } else {
+          /* No grid source — bloom into the fan slot */
+          g.style.left = fan.rect.left + fan.rect.width * 0.15 + "px";
+          g.style.top = fan.rect.top + fan.rect.height * 0.12 + "px";
+          g.style.width = fan.rect.width * 0.7 + "px";
+          g.style.height = fan.rect.height * 0.7 + "px";
+          g.style.opacity = "0";
+          g.style.transform = "rotate(0deg) scale(0.88)";
+        }
+        beltLayer.appendChild(g);
+        return { el: g, fan: fan, delay: Math.abs(i - mid) * 0.09 + Math.random() * 0.05 };
       });
 
-      var exitMs = staggerGalleryExit(gallery);
+      /* Grid soft-exits while ghosts peel off into the fan */
       gallery.classList.remove("is-ready", "is-slide-up");
       gallery.style.transition =
-        "opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1), transform 1.45s cubic-bezier(0.22, 1, 0.36, 1)";
+        "opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1)";
       window.setTimeout(function () {
         gallery.style.opacity = "0";
-        gallery.style.transform = "translate3d(0, 16%, 0)";
-      }, Math.min(420, exitMs * 0.35));
+        gallery.style.transform = "translate3d(0, 10%, 0)";
+      }, 80);
 
-      window.setTimeout(function () {
-        heroGhosts.forEach(function (g, i) {
-          var h = liveHeroes[i];
-          if (!h) return;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          ghosts.forEach(function (item) {
+            var g = item.el;
+            var r = item.fan.rect;
+            g.style.transition =
+              "left 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              item.delay.toFixed(2) +
+              "s, top 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              item.delay.toFixed(2) +
+              "s, width 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              item.delay.toFixed(2) +
+              "s, height 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              item.delay.toFixed(2) +
+              "s, opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) " +
+              item.delay.toFixed(2) +
+              "s, transform 1.55s cubic-bezier(0.16, 1, 0.3, 1) " +
+              item.delay.toFixed(2) +
+              "s, border-radius 1.2s ease " +
+              item.delay.toFixed(2) +
+              "s";
+            morphGhostToRect(g, r, { radius: "0.55rem" });
+            g.style.opacity = "1";
+            g.style.transform = "rotate(0deg) scale(1)";
+          });
+          /* Settle the whole fan onto the catalog diagonal */
           window.setTimeout(function () {
-            g.style.transform = "rotate(0deg) scale(1.05)";
-            morphGhostToRect(g, h.rect, { radius: "0.55rem" });
-            window.setTimeout(function () {
-              g.style.transform = "rotate(0deg) scale(1)";
-            }, 50);
-          }, i * 90);
+            beltLayer.classList.add("is-fan-settled");
+          }, 420);
         });
-      }, Math.max(280, exitMs * 0.4));
+      });
 
-      var handoff = Math.max(1600, exitMs + 700);
+      var maxDelay = ghosts.reduce(function (m, item) {
+        return Math.max(m, item.delay);
+      }, 0);
+      var handoff = Math.round(420 + maxDelay * 1000 + 1550);
       window.setTimeout(function () {
         beltLayer.style.opacity = "0";
         window.setTimeout(function () {
           videoOpenState = null;
           finishClose("video", null, { revealChapter: chapter });
-        }, 420);
+        }, 380);
       }, handoff);
       return;
     }
