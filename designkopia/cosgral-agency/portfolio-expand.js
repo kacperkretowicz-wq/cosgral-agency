@@ -442,11 +442,56 @@
 
     function setMuted(video, muted) {
       if (!video) return;
-      video.muted = muted;
+      video.muted = !!muted;
+      video.defaultMuted = !!muted;
       if (muted) video.setAttribute("muted", "");
       else {
         video.removeAttribute("muted");
-        video.volume = 1;
+        try {
+          video.volume = 1;
+        } catch (e) {}
+      }
+    }
+
+    function sameMediaUrl(a, b) {
+      if (!a || !b) return false;
+      var strip = function (u) {
+        return String(u).split("?")[0].replace(/^\.\//, "");
+      };
+      return strip(a) === strip(b) || String(a).indexOf(strip(b)) !== -1 || String(b).indexOf(strip(a)) !== -1;
+    }
+
+    /* Preview MP4s are silent — full files carry AAC. Swap on click inside the gesture. */
+    function ensureFullAudioSource(video, btn) {
+      var full = btn.getAttribute("data-reel-full") || "";
+      if (!full) return;
+      if (video.dataset.usingFull === "1" || sameMediaUrl(video.currentSrc || video.src, full)) {
+        video.dataset.usingFull = "1";
+        return;
+      }
+      var t = video.currentTime || 0;
+      video.dataset.usingFull = "1";
+      video.src = full;
+      if (t > 0.05) {
+        var onMeta = function () {
+          video.removeEventListener("loadedmetadata", onMeta);
+          try {
+            if (Number.isFinite(t)) video.currentTime = t;
+          } catch (e) {}
+        };
+        video.addEventListener("loadedmetadata", onMeta);
+      }
+    }
+
+    function playUnmuted(video) {
+      setMuted(video, false);
+      var p = video.play();
+      if (p && p.catch) {
+        p.catch(function () {
+          setMuted(video, false);
+          var p2 = video.play();
+          if (p2 && p2.catch) p2.catch(function () {});
+        });
       }
     }
 
@@ -494,9 +539,8 @@
         if (active) deactivate(active);
         active = btn;
         btn.classList.add("is-reel-focus");
-        setMuted(video, false);
-        var p = video.play();
-        if (p && p.catch) p.catch(function () {});
+        ensureFullAudioSource(video, btn);
+        playUnmuted(video);
       });
     });
   }
@@ -881,11 +925,18 @@
         if (kind === "reels" || item.type === "video") {
           var video = document.createElement("video");
           video.muted = true;
+          video.defaultMuted = true;
           video.loop = true;
           video.playsInline = true;
+          video.setAttribute("playsinline", "");
+          video.setAttribute("muted", "");
           video.preload = ii < 4 ? "metadata" : "none";
           if (item.poster) video.poster = item.poster;
           video.src = item.src;
+          if (kind === "reels") {
+            btn.setAttribute("data-reel-preview", item.src || "");
+            btn.setAttribute("data-reel-full", item.full || item.src || "");
+          }
           btn.appendChild(video);
           if (kind !== "reels") {
             btn.addEventListener("mouseenter", function () {
