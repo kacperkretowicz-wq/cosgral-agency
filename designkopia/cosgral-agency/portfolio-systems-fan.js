@@ -356,11 +356,11 @@
     function layout() {
       if (destroyed) return;
       var nearest = clampIndex(Math.round(index), n);
-      /* Wide arc — side tiles bleed past screen edges */
-      var span = mode === "catalog" ? 175 : 168;
+      /* Wide arc — side tiles stay readable until they clip past edges */
+      var span = mode === "catalog" ? 178 : 172;
       var step = span / Math.max(8, n - 1);
-      var radiusX = mode === "catalog" ? 68 : 72;
-      var radiusY = mode === "catalog" ? 22 : 14;
+      var radiusX = mode === "catalog" ? 72 : 78;
+      var radiusY = mode === "catalog" ? 20 : 12;
       var baseScale = 1;
 
       cards.forEach(function (card, i) {
@@ -372,9 +372,9 @@
         var x = Math.sin(ang) * radiusX;
         var y = (1 - Math.cos(ang)) * radiusY;
         var depth = Math.cos(ang);
-        var s = baseScale * (0.62 + 0.38 * depth);
-        var o = Math.max(0, 0.95 * Math.pow(Math.max(0, depth), 1.4));
-        var rot = angDeg * 0.9;
+        var s = baseScale * (0.58 + 0.42 * depth);
+        var o = Math.max(0, 0.18 + 0.82 * Math.pow(Math.max(0, depth), 1.05));
+        var rot = angDeg * 0.92;
         card.style.transform =
           "translate3d(calc(-50% + " +
           x.toFixed(3) +
