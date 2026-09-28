@@ -39,6 +39,7 @@
   max-width: 14ch;
   margin: 0 0 0.9rem;
   font-size: clamp(2.5rem, 7.4vw, 5.1rem);
+  font-weight: 300;
   line-height: 0.92;
   letter-spacing: -0.03em;
   color: var(--viz-ink);
@@ -142,7 +143,7 @@
   color: var(--viz-ink);
   font-family: var(--font-display);
   font-size: clamp(1.85rem, 4.2vw, 3.05rem);
-  font-weight: 500;
+  font-weight: 300;
   line-height: 1.02;
   letter-spacing: -0.025em;
 }
@@ -849,10 +850,12 @@
   }
   .case-viz-intro .case-study__title {
     max-width: none;
-    font-size: clamp(2rem, 9vw, 3rem);
+    font-size: clamp(1.85rem, 8vw, 2.65rem);
+    font-weight: 300;
   }
   .case-viz-intro .case-study__lede {
     max-width: none;
+    font-size: 1rem;
   }
   .case-viz-intro__aside {
     order: -1;
@@ -864,7 +867,7 @@
     grid-template-columns: 1fr;
     gap: 1.15rem;
     min-height: 0;
-    padding: 1.75rem 0;
+    padding: 1.45rem 0;
   }
   .case-viz-tile__copy {
     position: static;
@@ -873,12 +876,15 @@
   }
   .case-viz-tile__title {
     max-width: none;
+    font-size: clamp(1.45rem, 6.4vw, 2rem);
+    font-weight: 300;
   }
   .case-viz-tile__text {
     max-width: none;
+    font-size: 0.95rem;
   }
   .case-viz-tile__stage {
-    min-height: 15rem;
+    min-height: 12.5rem;
   }
   .case-viz-rail {
     padding: 0;
