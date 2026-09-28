@@ -21,6 +21,7 @@
   var manifests = { reels: null, graphics: null };
   var closing = false;
   var activeGhosts = [];
+  var systemsDetailFan = null;
 
   var WEB_CASES = [
     {
@@ -142,6 +143,13 @@
       if (g && g.parentNode) g.parentNode.removeChild(g);
     });
     activeGhosts = [];
+    if (systemsDetailFan) {
+      try {
+        systemsDetailFan.destroy();
+      } catch (e) {}
+      systemsDetailFan = null;
+    }
+    root.classList.remove("is-systems-detail");
     bodyEl.innerHTML = "";
     bodyEl.removeAttribute("data-expand-mode");
     deckCards = [];
@@ -151,7 +159,7 @@
   function isInteractiveTarget(el) {
     if (!el || !el.closest) return false;
     return !!el.closest(
-      "a, button, video, .expand-deck__card, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly"
+      "a, button, video, .expand-deck__card, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__copy, .sys-fan__more"
     );
   }
 
@@ -398,105 +406,42 @@
     root.classList.add("is-morphing");
   }
 
-  /* Systems: scatter FLIP → scrollable feed (tile + automation copy) */
+  /* systems open already dims catalog via is-systems-detail — skip full media hide flash */
+
+  /* Systems: catalog fan zooms out → detail fan + description in the hollow */
   function openSystems(chapter) {
     bodyEl.setAttribute("data-expand-mode", "systems");
-    hideChapterMedia();
-    var tiles = captureTiles(".chapter-os__card", chapter);
-    if (tiles.length < 4) tiles = captureTiles(".chapter-os__card");
+    var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
+    var startIdx = catalog ? catalog.getIndex() : 0;
+    if (catalog) catalog.pause();
 
-    var gallery = document.createElement("div");
-    gallery.className = "expand-gallery expand-gallery--systems expand-feed";
-    var feed = document.createElement("div");
-    feed.className = "expand-feed__list";
+    /* Hide chapter copy; catalog fan fades under detail fan */
+    root.classList.add("is-systems-detail");
 
-    var mediaTargets = [];
-    SYSTEM_CASES.forEach(function (item, i) {
-      var article = document.createElement("article");
-      article.className = "expand-feed__item " + (item.cls || "");
-      var link = document.createElement("a");
-      link.className = "expand-feed__link";
-      link.href = item.href;
-      var media = document.createElement("div");
-      media.className = "expand-feed__media";
-      var img = document.createElement("img");
-      img.src = item.still || item.img;
-      img.alt = "";
-      img.decoding = "async";
-      media.appendChild(img);
-      /* Keep case SVG as secondary layer for motion previews */
-      var viz = document.createElement("img");
-      viz.className = "expand-feed__viz";
-      viz.src = item.img;
-      viz.alt = "";
-      media.appendChild(viz);
-      var copy = document.createElement("div");
-      copy.className = "expand-feed__copy";
-      copy.innerHTML =
-        '<p class="expand-feed__tag"></p>' +
-        (item.client ? '<p class="expand-feed__client"></p>' : "") +
-        '<h3 class="expand-feed__title"></h3>' +
-        '<p class="expand-feed__desc"></p>' +
-        '<span class="expand-feed__more">Zobacz realizację →</span>';
-      copy.querySelector(".expand-feed__tag").textContent = item.tag;
-      if (item.client) copy.querySelector(".expand-feed__client").textContent = item.client;
-      copy.querySelector(".expand-feed__title").textContent = item.title;
-      copy.querySelector(".expand-feed__desc").textContent = item.desc;
-      link.appendChild(media);
-      link.appendChild(copy);
-      article.appendChild(link);
-      feed.appendChild(article);
-      mediaTargets.push(media);
+    var wrap = document.createElement("div");
+    wrap.className = "expand-systems";
+    bodyEl.appendChild(wrap);
+
+    var mount = document.createElement("div");
+    mount.className = "sys-fan sys-fan--detail is-entering";
+    wrap.appendChild(mount);
+
+    if (!window.CosgralSystemsFan) return;
+    systemsDetailFan = window.CosgralSystemsFan.create(mount, {
+      mode: "detail",
+      index: startIdx,
+      autoplay: false,
     });
-    gallery.appendChild(feed);
-    bodyEl.appendChild(gallery);
 
-    /* Force layout, then FLIP scatter → feed media slots */
-    gallery.classList.add("is-measuring");
-    var targetRects = mediaTargets.map(function (el) {
-      return el.getBoundingClientRect();
-    });
-    gallery.classList.remove("is-measuring");
-    gallery.classList.add("is-waiting");
-
-    var pairCount = Math.min(tiles.length, SYSTEM_CASES.length, 8);
-    var ghosts = [];
-    for (var i = 0; i < pairCount; i++) {
-      ghosts.push(placeGhost(tiles[i]));
-    }
-
+    /* Start visually matching the large catalog fan, then pull back for copy */
     requestAnimationFrame(function () {
-      ghosts.forEach(function (g, i) {
-        var r = targetRects[i];
-        if (!r || r.width < 4) return;
-        morphGhostToRect(g, r, { radius: "14px", rotate: "0deg" });
+      mount.classList.add("is-from-catalog");
+      requestAnimationFrame(function () {
+        mount.classList.remove("is-entering", "is-from-catalog");
+        mount.classList.add("is-settled");
+        wrap.classList.add("is-ready");
       });
-      /* leftover scatter tiles drift out softly */
-      for (var j = pairCount; j < tiles.length && j < pairCount + 6; j++) {
-        var extra = placeGhost(tiles[j]);
-        requestAnimationFrame(function (node, idx) {
-          return function () {
-            node.style.opacity = "0";
-            node.style.transform = "scale(0.86) translateY(" + (idx % 2 ? 40 : -40) + "px)";
-          };
-        }(extra, j));
-      }
     });
-
-    setTimeout(function () {
-      gallery.classList.remove("is-waiting");
-      gallery.classList.add("is-ready");
-      /* Handoff: ghosts sit exactly on feed media — fade together */
-      activeGhosts.forEach(function (g) {
-        g.style.opacity = "0";
-      });
-      if (window.CosgralEnhanceCasePreviews) {
-        try {
-          window.CosgralEnhanceCasePreviews(gallery);
-        } catch (e) {}
-      }
-      removeGhosts(280);
-    }, REDUCED ? 0 : 720);
   }
 
   /* Montaż: straighten diagonal → pin 2 center tiles → list slides from under */
@@ -791,8 +736,9 @@
     if (!expandedKey || closing) return;
     closing = true;
     var prev = expandedKey;
+    var resumeIdx = systemsDetailFan ? systemsDetailFan.getIndex() : null;
     stage.classList.add("is-closing");
-    root.classList.remove("is-morphing");
+    root.classList.remove("is-morphing", "is-systems-detail");
     activeGhosts.forEach(function (g) {
       if (g) g.style.opacity = "0";
     });
@@ -802,6 +748,11 @@
       setOpen(false);
       stage.classList.remove("is-closing");
       clearBody();
+      var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
+      if (catalog && resumeIdx != null) {
+        catalog.setIndex(resumeIdx);
+        catalog.resume();
+      }
       dispatch("portfolio-expand-close", { key: prev });
     }, REDUCED ? 0 : 320);
   }
@@ -816,6 +767,7 @@
     function (e) {
       if (!expandedKey || closing) return;
       if (!stage.classList.contains("is-open")) return;
+      if (document.body.classList.contains("is-sys-fan-dragging")) return;
       if (isInteractiveTarget(e.target)) return;
       if (e.target.closest && e.target.closest(".site-nav, .nav-overlay")) return;
       close();

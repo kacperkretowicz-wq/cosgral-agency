@@ -246,7 +246,46 @@ body.is-tile-expanded .site-nav {
   border-radius: 999px;
 }
 
-/* Systems — Pinterest-like vertical feed: tile + automation text */
+/* Systems expand — fan pulls back, copy appears in the hollow */
+.expand-systems {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.expand-systems .sys-fan {
+  position: absolute;
+  inset: 0;
+}
+.expand-systems .sys-fan--detail {
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+}
+.expand-systems .sys-fan--detail.is-entering,
+.expand-systems .sys-fan--detail.is-from-catalog {
+  /* Match large catalog fan, then settle smaller / higher */
+  transform: translate3d(0, 4vh, 0) scale(1.45);
+  transform-origin: 50% 38%;
+}
+.expand-systems .sys-fan--detail.is-settled {
+  transform: translate3d(0, -2vh, 0) scale(1);
+  transform-origin: 50% 38%;
+}
+.expand-systems .sys-fan__stage {
+  height: 58%;
+}
+.expand-systems .sys-fan__arc {
+  top: 46%;
+}
+.expand-systems .sys-fan__copy {
+  top: 56%;
+}
+body.is-tile-expanded .portfolio-tile-expand[data-expand-mode],
+.portfolio-tile-expand:has([data-expand-mode="systems"]) {
+  background: rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Legacy feed (unused by systems fan, kept for safety) */
 .expand-feed__list {
   display: flex;
   flex-direction: column;

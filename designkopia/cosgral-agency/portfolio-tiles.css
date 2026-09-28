@@ -545,71 +545,206 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
 .chapter-lux__shot[data-lux-shot="3"] { --lux-x: 30vw; --lux-y: -28vh; --lux-w: min(15vw, 8rem); }
 .chapter-lux__shot[data-lux-shot="4"] { --lux-x: 32vw; --lux-y: 6vh; --lux-w: min(20vw, 10.5rem); aspect-ratio: 5 / 3; }
 
-/* —— Systemy — Bleed/Sanity content OS stack↔field —— */
+/* —— Systemy — arc fan (wachlarz), shared catalog/detail —— */
 .chapter-os {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background: transparent;
 }
-.chapter-os__stage {
+.sys-fan {
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: auto;
+  user-select: none;
+  touch-action: none;
 }
-.chapter-os__card {
-  --os-x: 0%;
-  --os-y: 0%;
-  --os-s: 1;
-  --os-o: 1;
-  --os-z: 1;
-  --os-r: 0deg;
+.sys-fan__stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 72%;
+  perspective: 1400px;
+  cursor: grab;
+}
+.sys-fan__stage.is-dragging { cursor: grabbing; }
+.sys-fan__arc {
   position: absolute;
   left: 50%;
-  top: 42%;
-  width: min(28vw, 14rem);
-  aspect-ratio: 3 / 4;
+  top: 58%;
+  width: 0;
+  height: 0;
+}
+.sys-fan__card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(11.5vw, 6.4rem);
+  aspect-ratio: 1;
   margin: 0;
+  border-radius: 1.35rem;
   overflow: hidden;
-  border-radius: 0.55rem;
-  background: #111;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
-  opacity: var(--os-o);
-  transform:
-    translate(calc(-50% + var(--os-x)), calc(-50% + var(--os-y)))
-    rotate(var(--os-r))
-    scale(var(--os-s));
-  z-index: var(--os-z);
-  filter: grayscale(1) contrast(1.08);
-  transition:
-    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.55s ease,
-    width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  transform: translate3d(-50%, -50%, 0);
   will-change: transform, opacity;
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
 }
-.chapter-os__stage.is-stack .chapter-os__card {
-  width: min(30vw, 15rem);
+.sys-fan--catalog .sys-fan__card {
+  /* ~50% larger than detail */
+  width: min(17.2vw, 9.6rem);
+  border-radius: 1.55rem;
 }
-.chapter-os__stage.is-field .chapter-os__card {
-  width: min(14vw, 6.8rem);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+.sys-fan__card.is-front {
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
-.chapter-os__card img {
+.sys-fan__card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: grayscale(1);
+  filter: grayscale(1) contrast(1.08);
+  pointer-events: none;
 }
-.chapter-os__card.is-texture {
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #d8d8d8 0 2px,
-      #ececec 2px 4px
-    );
+.sys-fan__cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.4rem 0.45rem 0.45rem;
+  font-size: 0.48rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.82));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }
-.chapter-os__card.is-texture img { opacity: 0.35; mix-blend-mode: multiply; }
+.sys-fan--catalog .sys-fan__cap {
+  font-size: 0.55rem;
+  padding: 1.6rem 0.55rem 0.55rem;
+}
+.sys-fan__nav {
+  position: absolute;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  top: 42%;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  transform: translateY(-50%);
+}
+.sys-fan__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+.sys-fan__arrow:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.sys-fan--catalog .sys-fan__nav {
+  opacity: 0.55;
+}
+.sys-fan--catalog:hover .sys-fan__nav,
+.sys-fan--detail .sys-fan__nav {
+  opacity: 1;
+}
+
+/* Detail copy sits in the hollow under the arc */
+.sys-fan__copy {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, 0);
+  width: min(36rem, 86vw);
+  z-index: 30;
+  text-align: center;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.45s ease 0.12s, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sys-fan--detail.is-settled .sys-fan__copy {
+  opacity: 1;
+}
+.sys-fan__tag {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+.sys-fan__client {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(245, 245, 245, 0.75);
+}
+.sys-fan__title {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(1.7rem, 4vw, 2.55rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: #fff;
+}
+.sys-fan__desc {
+  margin: 0.75rem auto 0;
+  max-width: 32rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}
+.sys-fan__more {
+  display: inline-block;
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  font-size: 0.88rem;
+}
+
+/* Catalog sits higher / fuller; chapter copy stays bottom-left */
+.sys-fan--catalog .sys-fan__stage {
+  height: 92%;
+  top: -6%;
+}
+.sys-fan--catalog .sys-fan__arc {
+  top: 48%;
+}
+
+/* When systems expand opens, fade catalog fan under overlay */
+.portfolio-chapters.is-systems-detail .chapter-os .sys-fan--catalog {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.portfolio-chapters.is-systems-detail .portfolio-chapter__copy {
+  opacity: 0 !important;
+}
 
 /* —— Grafiki — Showcase 14 scatter —— */
 .chapter-show {
@@ -832,8 +967,19 @@ body.portfolio-page--tiles.is-tile-expanded #montaz .reels-tiles__belt {
   .chapter-show__word {
     font-size: clamp(2.8rem, 16vw, 4.4rem);
   }
-  .chapter-os__card {
-    width: min(34vw, 7.5rem);
+  .sys-fan--catalog .sys-fan__card {
+    width: min(22vw, 5.8rem);
+  }
+  .sys-fan__card {
+    width: min(18vw, 4.8rem);
+    border-radius: 1.1rem;
+  }
+  .sys-fan__nav {
+    right: 0.55rem;
+  }
+  .sys-fan__arrow {
+    width: 2.1rem;
+    height: 2.1rem;
   }
 }
 
@@ -843,6 +989,7 @@ html.reduce-motion .chapter-lux__word,
 html.reduce-motion .chapter-lux__shot,
 html.reduce-motion .chapter-lux.is-exit-left .chapter-lux__shot,
 html.reduce-motion .chapter-lux.is-enter-settle .chapter-lux__shot,
+html.reduce-motion .sys-fan__card,
 html.reduce-motion .chapter-os__card,
 html.reduce-motion .chapter-show__word,
 html.reduce-motion .chapter-show__tile,

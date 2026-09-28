@@ -296,61 +296,18 @@
     restartLux();
   }
 
-  /* —— Systemy: unique B&W scattered field (no stack toggle / no repeats) —— */
+  /* —— Systemy: shared fan (wachlarz) — catalog auto-rotates —— */
+  var systemsFan = null;
   function initOs() {
-    var stage = root.querySelector("[data-os-stage]");
-    if (!stage) return;
-    var cards = Array.prototype.slice.call(stage.querySelectorAll(".chapter-os__card"));
-    if (!cards.length) {
-      OS_MEDIA.forEach(function (src, i) {
-        var fig = document.createElement("figure");
-        fig.className = "chapter-os__card";
-        fig.setAttribute("data-os-card", String(i));
-        var img = document.createElement("img");
-        img.src = src;
-        img.alt = "";
-        img.decoding = "async";
-        img.loading = i < 8 ? "eager" : "lazy";
-        fig.appendChild(img);
-        stage.appendChild(fig);
-        cards.push(fig);
-      });
-    }
-
-    function applyField() {
-      stage.classList.add("is-field");
-      stage.classList.remove("is-stack");
-      cards.forEach(function (card, i) {
-        var pos = osFieldPos(i, cards.length);
-        card.style.setProperty("--os-x", pos.x);
-        card.style.setProperty("--os-y", pos.y);
-        card.style.setProperty("--os-s", String(0.92 + (i % 3) * 0.04));
-        card.style.setProperty("--os-z", String(pos.z));
-        card.style.setProperty("--os-o", "1");
-        card.style.setProperty("--os-r", ((i % 5) - 2) * 2 + "deg");
-      });
-    }
-
-    applyField();
-    if (REDUCED) return;
-    /* gentle float — positions stay unique, no mode swap that feels like repeats */
+    var mount = root.querySelector("[data-systems-fan-catalog]");
+    if (!mount || !window.CosgralSystemsFan) return;
+    systemsFan = window.CosgralSystemsFan.create(mount, {
+      mode: "catalog",
+      autoplay: !REDUCED,
+    });
     restartOs = function () {
-      if (osTimer || REDUCED || loopsPaused) return;
-      var t = 0;
-      osTimer = window.setInterval(function () {
-        t += 1;
-        cards.forEach(function (card, i) {
-          var base = osFieldPos(i, cards.length);
-          var ox = parseFloat(base.x) || 0;
-          var oy = parseFloat(base.y) || 0;
-          var wobbleX = Math.sin(t * 0.35 + i * 0.7) * 1.1;
-          var wobbleY = Math.cos(t * 0.28 + i * 0.55) * 1.2;
-          card.style.setProperty("--os-x", ox + wobbleX + "vw");
-          card.style.setProperty("--os-y", oy + wobbleY + "vh");
-        });
-      }, 900);
+      if (systemsFan && !loopsPaused) systemsFan.resume();
     };
-    restartOs();
   }
 
   /* —— Grafiki Showcase 14 —— */
@@ -480,6 +437,7 @@
       window.clearInterval(osTimer);
       osTimer = null;
     }
+    if (systemsFan) systemsFan.pause();
     if (showTimer) {
       window.clearInterval(showTimer);
       showTimer = null;
@@ -496,6 +454,7 @@
     if (REDUCED) return;
     if (restartLux) restartLux();
     if (restartOs) restartOs();
+    if (systemsFan) systemsFan.resume();
     if (restartShow) restartShow();
     startVizShowLoop();
   }
@@ -593,9 +552,10 @@
     "wheel",
     function (e) {
       if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
-        /* gallery / deck handle their own scroll */
+        /* gallery / deck / fan handle their own scroll */
         return;
       }
+      if (e.target && e.target.closest && e.target.closest(".sys-fan")) return;
       if (Math.abs(e.deltaY) < 1.2 && Math.abs(e.deltaX) < 1.2) return;
       var delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if (Math.abs(delta) < 8) return;
