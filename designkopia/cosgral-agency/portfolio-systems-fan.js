@@ -265,7 +265,7 @@
         articleEl.hidden = true;
         articleEl.innerHTML = "";
         articleEl.style.maxHeight = "";
-      }, reduced ? 0 : 520);
+      }, reduced ? 0 : 1000);
     }
 
     function expandArticle(item) {
@@ -318,10 +318,10 @@
           } else {
             var from = scroller.scrollTop;
             var t0 = performance.now();
-            var dur = 1100;
+            var dur = 2000;
             function tick(now) {
               var p = Math.min(1, (now - t0) / dur);
-              var e = 1 - Math.pow(1 - p, 3);
+              var e = 1 - Math.pow(1 - p, 4);
               scroller.scrollTop = from + (targetTop - from) * e;
               if (p < 1) requestAnimationFrame(tick);
             }
@@ -330,7 +330,7 @@
           articleLoading = false;
           window.setTimeout(function () {
             if (articleOpen) articleEl.style.maxHeight = "none";
-          }, reduced ? 0 : 750);
+          }, reduced ? 0 : 1400);
         })
         .catch(function () {
           articleLoading = false;
@@ -402,8 +402,9 @@
             var from = scroller.scrollTop;
             var t0 = performance.now();
             function tick(now) {
-              var p = Math.min(1, (now - t0) / 420);
-              scroller.scrollTop = from * (1 - p);
+              var p = Math.min(1, (now - t0) / 840);
+              var e = 1 - Math.pow(1 - p, 4);
+              scroller.scrollTop = from * (1 - e);
               if (p < 1) requestAnimationFrame(tick);
             }
             requestAnimationFrame(tick);
@@ -416,6 +417,7 @@
     function paintCopy(i) {
       if (!copyEl) return;
       var item = CASES[i];
+      copyEl.classList.add("is-swapping");
       copyEl.innerHTML =
         '<p class="sys-fan__tag"></p>' +
         (item.client ? '<p class="sys-fan__client"></p>' : "") +
@@ -443,6 +445,11 @@
         }
         expandArticle(item);
       });
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          copyEl.classList.remove("is-swapping");
+        });
+      });
     }
 
     function setIndex(next, animate) {
@@ -458,7 +465,7 @@
       while (delta < -n / 2) delta += n;
       to = from + delta;
       var t0 = performance.now();
-      var dur = 520;
+      var dur = 1040;
       if (raf) cancelAnimationFrame(raf);
       function tick(now) {
         var p = Math.min(1, (now - t0) / dur);
@@ -485,7 +492,7 @@
       if (!autoplay || destroyed) return;
       autoTimer = window.setInterval(function () {
         if (dragging || destroyed) return;
-        index += 0.028;
+        index += 0.014;
         if (index >= n) index -= n;
         layout();
       }, 40);
@@ -515,8 +522,8 @@
       var dx = x - lastX;
       lastX = x;
       if (Math.abs(dx) > 2) didDrag = true;
-      vel = dx * 0.012;
-      index -= dx * 0.012;
+      vel = dx * 0.006;
+      index -= dx * 0.006;
       while (index < 0) index += n;
       while (index >= n) index -= n;
       layout();
@@ -581,7 +588,7 @@
       e.preventDefault();
       e.stopPropagation();
       stopAuto();
-      index += delta > 0 ? 0.35 : -0.35;
+      index += delta > 0 ? 0.18 : -0.18;
       while (index < 0) index += n;
       while (index >= n) index -= n;
       layout();
@@ -589,7 +596,7 @@
       onWheel._t = window.setTimeout(function () {
         setIndex(Math.round(index), true);
         if (autoplay) startAuto();
-      }, 140);
+      }, 280);
     }
     root.addEventListener("wheel", onWheel, { passive: false });
 

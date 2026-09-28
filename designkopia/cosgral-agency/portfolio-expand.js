@@ -340,9 +340,9 @@
           activeGhosts = activeGhosts.filter(function (g) {
             return g !== fly;
           });
-        }, 220);
+        }, 440);
       });
-    }, REDUCED ? 0 : 680);
+    }, REDUCED ? 0 : 1360);
   }
 
   /* —— Shared helpers —— */
@@ -433,13 +433,15 @@
       autoplay: false,
     });
 
-    /* Start visually matching the large catalog fan, then pull back for copy */
+    /* Start matching catalog fan, then ease into centered composition */
     requestAnimationFrame(function () {
       mount.classList.add("is-from-catalog");
       requestAnimationFrame(function () {
-        mount.classList.remove("is-entering", "is-from-catalog");
-        mount.classList.add("is-settled");
-        wrap.classList.add("is-ready");
+        window.setTimeout(function () {
+          mount.classList.remove("is-entering", "is-from-catalog");
+          mount.classList.add("is-settled");
+          wrap.classList.add("is-ready");
+        }, REDUCED ? 0 : 60);
       });
     });
   }
@@ -567,9 +569,9 @@
         gallery.classList.add("is-ready", "is-slide-up");
         setTimeout(function () {
           beltLayer.style.opacity = "0";
-          removeGhosts(320);
-        }, 280);
-      }, REDUCED ? 0 : 700);
+          removeGhosts(640);
+        }, 560);
+      }, REDUCED ? 0 : 1400);
     });
   }
 
@@ -624,8 +626,8 @@
         gallery.classList.add("is-ready");
         /* Hero becomes first cell — fade ghost only after gallery is solid */
         if (fly) fly.style.opacity = "0";
-        removeGhosts(260);
-      }, REDUCED ? 0 : 680);
+        removeGhosts(520);
+      }, REDUCED ? 0 : 1360);
     });
   }
 
@@ -754,7 +756,7 @@
         catalog.resume();
       }
       dispatch("portfolio-expand-close", { key: prev });
-    }, REDUCED ? 0 : 320);
+    }, REDUCED ? 0 : 640);
   }
 
   stage.addEventListener("click", function (e) {
@@ -802,7 +804,7 @@
       if (Math.abs(delta) < 8) return;
       e.preventDefault();
       var now = Date.now();
-      if (now - deckWheelLock < 420) return;
+      if (now - deckWheelLock < 840) return;
       deckWheelLock = now;
       setDeckIndex(Math.round(deckIndex) + (delta > 0 ? 1 : -1));
     },

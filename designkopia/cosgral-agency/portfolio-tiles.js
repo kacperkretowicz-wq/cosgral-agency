@@ -24,6 +24,7 @@
   var expandedKey = null;
   var wheelLock = 0;
   var scrollRaf = 0;
+  var scrollAnim = 0;
   var loopsPaused = false;
   var restartLux = null;
   var restartOs = null;
@@ -284,14 +285,14 @@
           window.setTimeout(function () {
             clearPhases();
             busy = false;
-          }, 760);
+          }, 1500);
         });
-      }, 380);
+      }, 760);
     }
 
     restartLux = function () {
       if (luxTimer || REDUCED || loopsPaused) return;
-      luxTimer = window.setInterval(cycle, 2800);
+      luxTimer = window.setInterval(cycle, 5600);
     };
     restartLux();
   }
@@ -370,8 +371,8 @@
           poolCursor = (poolCursor + 3) % SHOW_POOL.length;
           paint();
           show.classList.remove("is-swap");
-        }, 280);
-      }, 2400);
+        }, 560);
+      }, 4800);
     };
     restartShow();
   }
@@ -419,11 +420,34 @@
     var chapter = chapters[index];
     if (!chapter) return;
     var left = chapter.offsetLeft;
-    scroller.scrollTo({
-      left: left,
-      behavior: behavior || (REDUCED ? "auto" : "smooth"),
-    });
+    if (scrollAnim) {
+      cancelAnimationFrame(scrollAnim);
+      scrollAnim = 0;
+    }
     setActive(index, { force: true });
+    if (behavior === "auto" || REDUCED) {
+      scroller.scrollLeft = left;
+      return;
+    }
+    var from = scroller.scrollLeft;
+    var dist = left - from;
+    if (Math.abs(dist) < 2) return;
+    var prevBehavior = scroller.style.scrollBehavior;
+    scroller.style.scrollBehavior = "auto";
+    var t0 = performance.now();
+    var dur = 1100;
+    function tick(now) {
+      var p = Math.min(1, (now - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 4);
+      scroller.scrollLeft = from + dist * e;
+      if (p < 1) {
+        scrollAnim = requestAnimationFrame(tick);
+      } else {
+        scrollAnim = 0;
+        scroller.style.scrollBehavior = prevBehavior;
+      }
+    }
+    scrollAnim = requestAnimationFrame(tick);
   }
 
   function pauseChapterLoops() {
@@ -561,7 +585,7 @@
       if (Math.abs(delta) < 8) return;
       e.preventDefault();
       var now = Date.now();
-      if (now - wheelLock < 480) return;
+      if (now - wheelLock < 960) return;
       wheelLock = now;
       scrollToIndex(activeIndex + (delta > 0 ? 1 : -1));
     },

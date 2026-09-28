@@ -353,6 +353,13 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   line-height: 1.02;
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
   color: #fff;
+  opacity: 0.22;
+  filter: brightness(0.45);
+  transform: translate3d(-1.6rem, 0.4rem, 0);
+  transition:
+    opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.25s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1.15s ease;
 }
 .portfolio-chapter__lead {
   margin: 0;
@@ -361,6 +368,13 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   line-height: 1.45;
   color: rgba(255, 255, 255, 0.82);
   text-shadow: 0 1px 16px rgba(0, 0, 0, 0.35);
+  opacity: 0.18;
+  filter: brightness(0.4);
+  transform: translate3d(0, 1.1rem, 0);
+  transition:
+    opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.12s,
+    transform 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.12s,
+    filter 1.2s ease 0.12s;
 }
 .portfolio-chapter__more {
   margin-top: 0.55rem;
@@ -374,13 +388,60 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   text-decoration: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.45);
   padding-bottom: 0.12rem;
-  transition: border-color 0.25s ease, opacity 0.25s ease;
+  opacity: 0.12;
+  transform: translate3d(1.2rem, 0.35rem, 0);
+  transition:
+    border-color 0.45s ease,
+    opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.22s,
+    transform 1.25s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
 }
-.portfolio-chapter__more:hover,
-.portfolio-chapter__more:focus-visible {
+.portfolio-chapter.is-active .portfolio-chapter__title,
+.portfolio-chapter.is-active .portfolio-chapter__lead,
+.portfolio-chapter.is-active .portfolio-chapter__more {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+.portfolio-chapter.is-active .portfolio-chapter__more:hover,
+.portfolio-chapter.is-active .portfolio-chapter__more:focus-visible {
   border-color: #fff;
   opacity: 1;
   outline: none;
+}
+
+/* Chapter media: rise from dark when becoming active */
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+.portfolio-chapter__bg .portfolio-tile__media > .chapter-show {
+  opacity: 0.28;
+  filter: brightness(0.35) saturate(0.7);
+  transform: scale(0.94) translate3d(0, 2.5vh, 0);
+  transform-origin: 50% 45%;
+  transition:
+    opacity 1.35s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1.35s ease,
+    transform 1.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, filter, transform;
+}
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+.portfolio-chapter.is-active .portfolio-chapter__bg .portfolio-tile__media > .chapter-show {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+/* Soft word blooms (centered labels) — no layout transforms conflict */
+.portfolio-chapter.is-active .chapter-lux__word-3d,
+.portfolio-chapter.is-active .portfolio-tile__viz-word,
+.portfolio-chapter.is-active .chapter-show__word {
+  animation: chapter-word-bloom 1.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+@keyframes chapter-word-bloom {
+  from { opacity: 0; filter: brightness(0.2) blur(4px); }
+  to { opacity: 1; filter: none; }
 }
 
 /* —— Strony — New Luxury editorial —— */
@@ -428,8 +489,8 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   pointer-events: none;
   will-change: transform, opacity;
   transition:
-    transform 0.48s cubic-bezier(0.55, 0.02, 0.4, 1),
-    opacity 0.36s ease;
+    transform 0.96s cubic-bezier(0.55, 0.02, 0.4, 1),
+    opacity 0.72s ease;
 }
 .chapter-lux__word {
   margin: 0;
@@ -484,9 +545,9 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
     translate3d(calc(-50% + var(--lux-x)), calc(-50% + var(--lux-y)), 0)
     rotate(var(--lux-r));
   transition:
-    transform 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s ease,
-    filter 0.4s ease;
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s ease,
+    filter 0.8s ease;
   will-change: transform, opacity, filter;
 }
 .chapter-lux__shot img {
@@ -504,9 +565,9 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
     translate3d(calc(-50% + var(--lux-x) - 125vw), calc(-50% + var(--lux-y)), 0)
     rotate(var(--lux-r));
   transition:
-    transform 0.36s cubic-bezier(0.55, 0.02, 0.9, 0.35),
-    opacity 0.28s ease,
-    filter 0.28s ease;
+    transform 0.72s cubic-bezier(0.55, 0.02, 0.9, 0.35),
+    opacity 0.55s ease,
+    filter 0.55s ease;
 }
 .chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="0"] { transition-delay: 0s; }
 .chapter-lux.is-exit-left .chapter-lux__shot[data-lux-shot="1"] { transition-delay: 0.03s; }
@@ -530,15 +591,15 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
     translate3d(calc(-50% + var(--lux-x)), calc(-50% + var(--lux-y)), 0)
     rotate(var(--lux-r));
   transition:
-    transform 0.68s cubic-bezier(0.14, 1, 0.28, 1),
-    opacity 0.42s ease,
-    filter 0.42s ease;
+    transform 1.35s cubic-bezier(0.14, 1, 0.28, 1),
+    opacity 0.85s ease,
+    filter 0.85s ease;
 }
-.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="0"] { transition-delay: 0.05s; }
-.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="1"] { transition-delay: 0.015s; }
-.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="2"] { transition-delay: 0.09s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="0"] { transition-delay: 0.1s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="1"] { transition-delay: 0.03s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="2"] { transition-delay: 0.18s; }
 .chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="3"] { transition-delay: 0s; }
-.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="4"] { transition-delay: 0.07s; }
+.chapter-lux.is-enter-settle .chapter-lux__shot[data-lux-shot="4"] { transition-delay: 0.14s; }
 .chapter-lux__shot[data-lux-shot="0"] { --lux-x: -34vw; --lux-y: -26vh; --lux-w: min(18vw, 9.5rem); }
 .chapter-lux__shot[data-lux-shot="1"] { --lux-x: -30vw; --lux-y: 18vh; --lux-w: min(22vw, 11rem); aspect-ratio: 5 / 4; }
 .chapter-lux__shot[data-lux-shot="2"] { --lux-x: 8vw; --lux-y: 24vh; --lux-w: min(16vw, 8.5rem); }
@@ -684,17 +745,40 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   position: absolute;
   left: 50%;
   top: 62%;
-  transform: translate(-50%, 0);
+  transform: translate(-50%, 0.8rem);
   width: min(36rem, 86vw);
   z-index: 30;
   text-align: center;
   pointer-events: auto;
   opacity: 0;
-  transition: opacity 0.45s ease 0.12s, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.9s ease 0.2s, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
 }
 .sys-fan--detail.is-settled .sys-fan__copy {
   opacity: 1;
+  transform: translate(-50%, 0);
 }
+.sys-fan__copy.is-swapping {
+  opacity: 0;
+  transform: translate(-50%, 0.6rem);
+  transition-duration: 0.35s, 0.4s;
+  transition-delay: 0s, 0s;
+}
+.sys-fan__copy .sys-fan__tag,
+.sys-fan__copy .sys-fan__client,
+.sys-fan__copy .sys-fan__title,
+.sys-fan__copy .sys-fan__desc,
+.sys-fan__copy .sys-fan__more {
+  opacity: 0;
+  transform: translate3d(0, 0.55rem, 0);
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__tag { opacity: 1; transform: none; transition-delay: 0.05s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__client { opacity: 1; transform: none; transition-delay: 0.12s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__title { opacity: 1; transform: none; transition-delay: 0.2s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__desc { opacity: 1; transform: none; transition-delay: 0.3s; }
+.sys-fan--detail.is-settled .sys-fan__copy:not(.is-swapping) .sys-fan__more { opacity: 1; transform: none; transition-delay: 0.4s; }
 .sys-fan__tag {
   margin: 0;
   font-family: var(--font-mono, ui-monospace, monospace);
@@ -810,7 +894,7 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
   pointer-events: none;
-  transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.55s ease;
+  transition: opacity 0.7s ease, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), filter 1.1s ease;
 }
 .chapter-show.is-swap .chapter-show__word {
   opacity: 0.15;
@@ -840,9 +924,9 @@ body.portfolio-page--tiles.is-tile-bg-light .portfolio-chapters__arrow:focus-vis
   z-index: var(--sh-z);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
   transition:
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s ease,
-    width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s ease,
+    width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform, opacity;
 }
 .chapter-show__tile.is-portrait { aspect-ratio: 3 / 4; }
@@ -1010,6 +1094,20 @@ html.reduce-motion .sys-fan__card,
 html.reduce-motion .chapter-os__card,
 html.reduce-motion .chapter-show__word,
 html.reduce-motion .chapter-show__tile,
-html.reduce-motion .portfolio-tile-expand {
+html.reduce-motion .portfolio-tile-expand,
+html.reduce-motion .portfolio-chapter__title,
+html.reduce-motion .portfolio-chapter__lead,
+html.reduce-motion .portfolio-chapter__more,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+html.reduce-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-show,
+html.reduce-motion .sys-fan__copy,
+html.reduce-motion .sys-fan__copy .sys-fan__tag,
+html.reduce-motion .sys-fan__copy .sys-fan__client,
+html.reduce-motion .sys-fan__copy .sys-fan__title,
+html.reduce-motion .sys-fan__copy .sys-fan__desc,
+html.reduce-motion .sys-fan__copy .sys-fan__more {
   transition: none !important;
+  animation: none !important;
 }
