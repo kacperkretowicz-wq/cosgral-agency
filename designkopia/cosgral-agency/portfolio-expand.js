@@ -1105,13 +1105,16 @@
       });
 
       window.setTimeout(function () {
+        /* Reveal chapter belt under returning tiles, then hand off */
         root.classList.remove("is-morphing");
+      }, 1100);
+      window.setTimeout(function () {
         beltLayer.style.opacity = "0";
         window.setTimeout(function () {
           videoOpenState = null;
           finishClose("video", null);
         }, 420);
-      }, 1400);
+      }, 1450);
       return;
     }
 
