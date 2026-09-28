@@ -44,12 +44,18 @@ body.portfolio-page--tiles .site-footer,
 body.portfolio-page--tiles footer.site-footer {
   display: none !important;
 }
-/* Cube + sand ribbon — visible for megamenu (homepage-parity) */
+/* Cube kept laid out (WebGL sized) but hidden until megamenu — avoids white blob */
 body.portfolio-page--tiles:not(.is-nav-menu-open) .subpage-cube-portal {
-  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 body.portfolio-page--tiles.is-nav-menu-open .subpage-cube-portal {
-  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  /* Match homepage glass cube — no over-bright white mass */
+  filter: brightness(1.35) saturate(1.04);
 }
 body.portfolio-page--tiles .portfolio-sand-portal {
   display: block !important;

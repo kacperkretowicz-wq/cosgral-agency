@@ -1428,7 +1428,8 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
       return;
     }
 
-    if (isSandHeroPage || isGallerySubpage) {
+    /* Tiles/case/sand-hero: fly cube in from corner like homepage — never particle-pass blob */
+    if (isSandHeroPage || isGallerySubpage || isPortfolioTilesPage || isCasePage) {
       captureHomeSideEntryMenuFrom();
       return;
     }
@@ -2386,6 +2387,10 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
       if (freshOpen) prepareMenuOpenFromClosed();
       else if (wasClosing) notifyMenuOpen();
       menuTween.closing = false;
+      /* Portal may have been visibility-hidden — resize so glass cube isn't a white blob */
+      resize();
+      cubeGroup.visible = true;
+      if (menuFrom.sideEntry) setCubeVisualFade(1);
       var openDur = resolveMenuOpenDuration();
       var remaining = Math.max(MENU_SEG_MIN_DUR, openDur * (1 - menuTween.blend));
       if (window.gsap) {

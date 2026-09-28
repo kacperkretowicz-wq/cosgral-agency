@@ -70,10 +70,15 @@ body.portfolio-theme-page .portfolio-sand-portal {
   display: block !important;
 }
 body.portfolio-theme-page:not(.is-nav-menu-open) .subpage-cube-portal {
-  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 body.portfolio-theme-page.is-nav-menu-open .subpage-cube-portal {
-  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  filter: brightness(1.35) saturate(1.04);
 }
 
 body.portfolio-theme-page .portfolio-theme-stage {

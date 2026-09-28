@@ -670,7 +670,7 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     menuSandHold = null;
   });
 
-  document.body.classList.add("is-portfolio-sand-active", "is-portfolio-intro-pending");
+  document.body.classList.add("is-portfolio-sand-active");
 
   var introBootHandled = false;
 
@@ -686,6 +686,7 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       displayStream = 0;
       window.cosgralCube?.applyPortfolioBootSection?.(sectionIndex);
     } else {
+      state.hero = 1;
       displayBreak = 0.98;
       displayStream = 0.98;
     }
@@ -723,55 +724,6 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     displayStream = state.stream * state.hero;
   }
 
-  function runIntro() {
-    var breakDelay = MOBILE ? 0.55 : 0.72;
-    var breakDur = MOBILE ? 2.6 : 3.35;
-    var isShowcase = document.body.classList.contains("portfolio-page--showcase");
-
-    /* Showcase drives the cube via scroll — skip the one-shot hero pass */
-    if (!isShowcase) {
-      window.cosgralCube?.startPortfolioHeroPass?.({
-        delay: breakDelay,
-        duration: breakDur,
-        ease: "power2.inOut",
-      });
-    }
-
-    if (!window.gsap) {
-      state.cube = 1;
-      state.break = 0.98;
-      state.stream = 0.98;
-      document.body.classList.remove("is-portfolio-intro-pending");
-      return;
-    }
-
-    gsap.timeline({
-      defaults: { ease: "power3.out" },
-    })
-      .to(
-        state,
-        {
-          cube: 1,
-          duration: MOBILE ? 1.05 : 1.35,
-          ease: "power2.out",
-        },
-        0
-      )
-      .to(
-        state,
-        {
-          break: 0.98,
-          stream: 0.98,
-          duration: breakDur,
-          ease: "power2.inOut",
-        },
-        breakDelay
-      )
-      .add(function () {
-        document.body.classList.remove("is-portfolio-intro-pending");
-      }, MOBILE ? 0.95 : 1.1);
-  }
-
   function introSectionIndex() {
     if (window.scrollY < 64) return 0;
     var idx = 0;
@@ -793,6 +745,9 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
         var reelsTop = reelsGallery.getBoundingClientRect().top + window.scrollY;
         idx = window.scrollY + window.innerHeight * 0.42 < reelsTop ? 0 : 1;
       }
+    } else if (document.body.classList.contains("portfolio-page--tiles")) {
+      /* Catalog: sand ribbon always on — no hero scroll fade */
+      return 0;
     } else if (document.body.classList.contains("portfolio-page")) {
       idx = window.cosgralPortfolioStepper?.getIndex?.();
       if (typeof idx !== "number") {
@@ -816,10 +771,7 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
   function handleIntroBoot(sectionIndex) {
     if (introBootHandled) return;
     introBootHandled = true;
-    if (sectionIndex === 0) {
-      window.setTimeout(runIntro, MOBILE ? 120 : 80);
-      return;
-    }
+    /* No shatter/build animation — ribbon is fully formed from first paint */
     skipIntro(sectionIndex);
   }
 
@@ -830,23 +782,7 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     }
   });
 
-  if (window.cosgralCube) {
-    queueMicrotask(function () {
-      bootIntroIfNeeded();
-    });
-  } else {
-    window.addEventListener(
-      "cosgral:cube-ready",
-      function () {
-        queueMicrotask(function () {
-          bootIntroIfNeeded();
-        });
-      },
-      { once: true }
-    );
-  }
-
-  window.setTimeout(function () {
-    bootIntroIfNeeded();
-  }, 900);
+  /* Instant sand — do not wait for cube-ready / delayed intro */
+  skipIntro(introSectionIndex());
+  introBootHandled = true;
 })();

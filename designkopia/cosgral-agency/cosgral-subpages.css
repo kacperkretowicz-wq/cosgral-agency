@@ -593,7 +593,8 @@ body.is-nav-menu-open .subpage-cube-portal {
   z-index: 518 !important;
   opacity: 1 !important;
   visibility: visible !important;
-  filter: brightness(2.76) saturate(1.06);
+  /* Softer than homepage 2.76 — avoids blown-out white glass blob on subpages */
+  filter: brightness(1.45) saturate(1.05);
 }
 body.is-nav-menu-open.is-cube-menu-front .subpage-cube-portal {
   z-index: 518 !important;
