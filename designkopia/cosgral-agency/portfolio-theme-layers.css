@@ -78,7 +78,7 @@ body.portfolio-theme-page.is-nav-menu-open .subpage-cube-portal {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: none !important;
-  filter: brightness(2.76) saturate(1.06);
+  filter: brightness(1.55) saturate(1.08);
 }
 
 body.portfolio-theme-page .portfolio-theme-stage {

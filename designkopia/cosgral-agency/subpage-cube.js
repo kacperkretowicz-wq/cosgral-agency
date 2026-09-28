@@ -1979,6 +1979,9 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   var cubeGroup = new THREE.Group();
   cubeGroup.scale.set(CUBE_SCALE, CUBE_SCALE, CUBE_SCALE);
   cubeGroup.rotation.set(0.22, -0.35, 0);
+  if (isMenuOnlyCubePage || portfolioFlight.phase === "hidden") {
+    cubeGroup.visible = false;
+  }
   root.add(cubeGroup);
 
   var menuSandTarget = new THREE.Group();
