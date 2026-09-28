@@ -152,6 +152,10 @@
       var b2 = wrap.querySelector(".case-study__back");
       if (b2 && b2.parentNode) b2.parentNode.removeChild(b2);
     }
+    /* Case footer: keep CTA only — no "Wróć do realizacji" */
+    wrap.querySelectorAll(".case-study__visit").forEach(function (el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
     /* neutralize in-page hash jumps escaping the panel */
     wrap.querySelectorAll('a[href^="#"]').forEach(function (a) {
       a.addEventListener("click", function (e) {
@@ -202,12 +206,13 @@
       (mode === "detail"
         ? '<div class="sys-fan__article" data-sys-fan-article hidden></div>'
         : "") +
-      '<div class="sys-fan__nav" data-sys-fan-nav>' +
+      '<div class="sys-fan__nav" data-sys-fan-nav aria-label="Nawigacja systemów">' +
       '<button type="button" class="sys-fan__arrow" data-sys-fan-prev aria-label="Poprzedni">' +
-      '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M14.5 5.5L8.5 12l6 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M10.2 2.6L5.4 8l4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       "</button>" +
+      '<div class="sys-fan__dots" data-sys-fan-dots role="tablist" aria-label="Systemy"></div>' +
       '<button type="button" class="sys-fan__arrow" data-sys-fan-next aria-label="Następny">' +
-      '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9.5 5.5L15.5 12l-6 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M5.8 2.6L10.6 8l-4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       "</button>" +
       "</div>";
 
@@ -215,7 +220,28 @@
     var stage = root.querySelector("[data-sys-fan-stage]");
     copyEl = root.querySelector("[data-sys-fan-copy]");
     articleEl = root.querySelector("[data-sys-fan-article]");
+    var navEl = root.querySelector("[data-sys-fan-nav]");
+    var dotsEl = root.querySelector("[data-sys-fan-dots]");
     var cards = [];
+    var dotButtons = [];
+
+    CASES.forEach(function (item, i) {
+      var dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "sys-fan__dot" + (i === index ? " is-active" : "");
+      dot.setAttribute("data-sys-fan-dot", String(i));
+      dot.setAttribute("role", "tab");
+      dot.setAttribute("aria-label", item.title);
+      if (i === index) dot.setAttribute("aria-current", "true");
+      dot.addEventListener("click", function (e) {
+        e.stopPropagation();
+        stopAuto();
+        setIndex(i, true);
+        if (autoplay) startAuto();
+      });
+      dotsEl.appendChild(dot);
+      dotButtons.push(dot);
+    });
 
     CASES.forEach(function (item, i) {
       var fig = document.createElement("figure");
@@ -246,12 +272,29 @@
       return scrollParent;
     }
 
+    function restoreNav() {
+      if (!navEl || !root) return;
+      if (navEl.parentNode !== root) root.appendChild(navEl);
+      navEl.classList.remove("is-in-case");
+    }
+
+    function placeNavInCaseAside(caseRoot) {
+      if (!navEl || !caseRoot) return;
+      var aside = caseRoot.querySelector(".case-study__aside");
+      if (!aside) return;
+      var cta = aside.querySelector(".case-study__cta");
+      navEl.classList.add("is-in-case");
+      if (cta && cta.parentNode === aside) aside.insertBefore(navEl, cta);
+      else aside.appendChild(navEl);
+    }
+
     function collapseArticle(immediate) {
       if (!articleEl) return;
       articleOpen = false;
       articleLoading = false;
       root.classList.remove("is-article-open");
       articleEl.classList.remove("is-open");
+      restoreNav();
       if (immediate) {
         articleEl.hidden = true;
         articleEl.innerHTML = "";
@@ -298,6 +341,7 @@
           } else {
             articleEl.appendChild(body);
             enhanceInjectedCase(body);
+            placeNavInCaseAside(body);
           }
           articleOpen = true;
           root.classList.add("is-article-open");
@@ -391,6 +435,13 @@
         card.style.zIndex = String(Math.round(20 + depth * 30));
         card.classList.toggle("is-front", i === nearest);
         card.classList.toggle("is-side", Math.abs(raw) > 0.55);
+      });
+
+      dotButtons.forEach(function (dot, i) {
+        var on = i === nearest;
+        dot.classList.toggle("is-active", on);
+        if (on) dot.setAttribute("aria-current", "true");
+        else dot.removeAttribute("aria-current");
       });
 
       if (copyEl && nearest !== painted) {

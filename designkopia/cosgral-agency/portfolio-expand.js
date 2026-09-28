@@ -162,7 +162,7 @@
   function isInteractiveTarget(el) {
     if (!el || !el.closest) return false;
     return !!el.closest(
-      "a, button, video, .expand-deck__card, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__nav, .sys-fan__copy, .sys-fan__more, .sys-fan__article, .sys-fan__stage"
+      "a, button, video, .expand-deck__card, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__dot, .sys-fan__nav, .sys-fan__copy, .sys-fan__more, .sys-fan__article, .sys-fan__stage"
     );
   }
 

@@ -346,12 +346,21 @@ body.is-tile-expanded .site-nav {
   top: 52%;
 }
 .expand-systems .sys-fan__nav {
-  position: fixed;
-  top: 42%;
-  right: max(1rem, env(safe-area-inset-right, 0px));
+  position: absolute;
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: max(1.2rem, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
 }
-.expand-systems .sys-fan.is-article-open .sys-fan__nav {
-  top: 32%;
+.expand-systems .sys-fan.is-article-open .sys-fan__nav:not(.is-in-case) {
+  bottom: max(1.2rem, env(safe-area-inset-bottom, 0px));
+}
+.expand-systems .sys-fan__nav.is-in-case {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
 }
 
 /* Full case description expands only under fan + short copy */
@@ -479,13 +488,22 @@ body.is-tile-expanded .site-nav {
   margin-top: 2rem;
   padding-top: 1.25rem;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
 }
 .sys-fan__case .case-study__visit {
+  display: none !important;
+}
+.sys-fan__case .case-study__cta {
   display: inline-flex;
-  margin-top: 0.85rem;
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+.sys-fan__case .sys-fan__nav.is-in-case {
+  order: 0;
 }
 @media (max-width: 720px) {
   .expand-systems .sys-fan__head {
