@@ -106,7 +106,10 @@
 
   var LUX_SETS = [
     {
-      word: { pl: "New Sites", en: "New Sites" },
+      lines: [
+        { pl: "New", en: "New" },
+        { pl: "Sites", en: "Sites" },
+      ],
       shots: [
         STILL + "web/trove-0-5.jpg",
         STILL + "web/juicy-1-5.jpg",
@@ -116,7 +119,10 @@
       ],
     },
     {
-      word: { pl: "New Craft", en: "New Craft" },
+      lines: [
+        { pl: "New", en: "New" },
+        { pl: "Craft", en: "Craft" },
+      ],
       shots: [
         STILL + "web/juicy-0-5.jpg",
         STILL + "web/mj-1-5.jpg",
@@ -126,7 +132,10 @@
       ],
     },
     {
-      word: { pl: "New Values", en: "New Values" },
+      lines: [
+        { pl: "New", en: "New" },
+        { pl: "Values", en: "Values" },
+      ],
       shots: [
         STILL + "web/mj-0-5.jpg",
         STILL + "web/trove-1-5.jpg",
@@ -137,7 +146,7 @@
     },
   ];
 
-  /* Systemy — only systems / automation materials */
+  /* Systemy — only systems / automation chapter stills + system case art */
   var OS_MEDIA = [
     STILL + "systems/crm-0-5.jpg",
     STILL + "systems/crm-1-5.jpg",
@@ -157,8 +166,6 @@
     "assets/cases/shelfsync.svg",
     "assets/cases/northline-crm.svg",
     "assets/cases/parcel-co.svg",
-    "assets/cases/atelier-bloom.svg",
-    "assets/services/automatyzacje-poster.jpg",
   ];
 
   var SHOW_WORDS = [
@@ -326,7 +333,15 @@
     }
 
     function paint(set) {
-      if (wordEl) wordEl.textContent = set.word[lang()] || set.word.pl;
+      if (wordEl && set.lines) {
+        var loc = lang();
+        wordEl.innerHTML = set.lines
+          .map(function (line) {
+            var t = line[loc] || line.pl;
+            return '<span class="chapter-lux__word-line">' + t + "</span>";
+          })
+          .join("");
+      }
       shots.forEach(function (fig, i) {
         var img = fig.querySelector("img");
         if (!img || !set.shots[i]) return;
@@ -341,15 +356,14 @@
       if (busy) return;
       busy = true;
       clearPhases();
-      /* 1) tiles whip left + word turns edge-on */
+      /* 1) tiles whip left + word turns edge-on (flat from the side) */
       lux.classList.add("is-exit-left", "is-flip-out");
       window.setTimeout(function () {
-        /* 2) swap content while off-screen / flat */
+        /* 2) swap while off-screen / edge-on */
         idx = (idx + 1) % LUX_SETS.length;
         paint(LUX_SETS[idx]);
         clearPhases();
         lux.classList.add("is-enter-right", "is-flip-in");
-        /* force reflow so enter positions stick before settle */
         void lux.offsetWidth;
         window.requestAnimationFrame(function () {
           clearPhases();
@@ -357,12 +371,12 @@
           window.setTimeout(function () {
             clearPhases();
             busy = false;
-          }, 780);
+          }, 760);
         });
-      }, 480);
+      }, 380);
     }
 
-    luxTimer = window.setInterval(cycle, 3000);
+    luxTimer = window.setInterval(cycle, 2800);
   }
 
   /* —— Systemy OS stack↔field —— */
