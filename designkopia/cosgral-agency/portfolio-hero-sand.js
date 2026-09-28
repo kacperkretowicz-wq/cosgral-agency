@@ -30,10 +30,11 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
   var cA = Math.cos(DIAG);
   var sA = Math.sin(DIAG);
 
-  var state = { cube: 0, break: 0, stream: 0, hero: 1 };
+  /* Fully formed ribbon from first paint — no shatter/build on refresh */
+  var state = { cube: 1, break: 0.98, stream: 0.98, hero: 1 };
   var layers = [];
-  var displayBreak = 0;
-  var displayStream = 0;
+  var displayBreak = 0.98;
+  var displayStream = 0.98;
   var menuSandHold = null;
   var menuSandBoost = false;
   var menuSandBoostClosing = false;
@@ -619,59 +620,6 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     });
   }
 
-  animate();
-
-  window.addEventListener("cosgral:cube-menu", function (e) {
-    if (e.detail && e.detail.open) {
-      if (e.detail.heroMenu) {
-        suppressMenuSand();
-        return;
-      }
-      releaseMenuSandSuppress();
-      if (e.detail.particlePass) {
-        armParticlePassMenu();
-        return;
-      }
-      if (e.detail.showSand) {
-        armMenuSandVisible();
-      }
-      if (e.detail.boostSand) {
-        armMenuSandBoost();
-        return;
-      }
-      if (sandLineActive()) {
-        lockMenuSandLine();
-      } else {
-        menuSandHold = null;
-      }
-      return;
-    }
-    if (menuSandSuppressed) {
-      releaseMenuSandSuppress();
-      return;
-    }
-    if (menuSandBoost) {
-      menuSandBoostClosing = true;
-      document.body.classList.remove("is-grafiki-menu-sand");
-      return;
-    }
-    if (menuSandVisible) {
-      releaseMenuSandVisible();
-      return;
-    }
-    if (menuParticlePass) {
-      menuParticlePassClosing = true;
-      return;
-    }
-    if (menuSandHold) {
-      displayBreak = menuSandHold.break;
-      displayStream = menuSandHold.stream;
-    }
-    menuSandHold = null;
-  });
-
-  document.body.classList.add("is-portfolio-sand-active");
-
   var introBootHandled = false;
 
   function skipIntro(sectionIndex) {
@@ -775,6 +723,57 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     skipIntro(sectionIndex);
   }
 
+  window.addEventListener("cosgral:cube-menu", function (e) {
+    if (e.detail && e.detail.open) {
+      if (e.detail.heroMenu) {
+        suppressMenuSand();
+        return;
+      }
+      releaseMenuSandSuppress();
+      if (e.detail.particlePass) {
+        armParticlePassMenu();
+        return;
+      }
+      if (e.detail.showSand) {
+        armMenuSandVisible();
+      }
+      if (e.detail.boostSand) {
+        armMenuSandBoost();
+        return;
+      }
+      if (sandLineActive()) {
+        lockMenuSandLine();
+      } else {
+        menuSandHold = null;
+      }
+      return;
+    }
+    if (menuSandSuppressed) {
+      releaseMenuSandSuppress();
+      return;
+    }
+    if (menuSandBoost) {
+      menuSandBoostClosing = true;
+      document.body.classList.remove("is-grafiki-menu-sand");
+      return;
+    }
+    if (menuSandVisible) {
+      releaseMenuSandVisible();
+      return;
+    }
+    if (menuParticlePass) {
+      menuParticlePassClosing = true;
+      return;
+    }
+    if (menuSandHold) {
+      displayBreak = menuSandHold.break;
+      displayStream = menuSandHold.stream;
+    }
+    menuSandHold = null;
+  });
+
+  document.body.classList.add("is-portfolio-sand-active");
+
   window.addEventListener("cosgral:section-step", function (e) {
     if (e.detail && e.detail.initial) bootIntroIfNeeded(e.detail.index);
     if (e.detail && typeof e.detail.index === "number") {
@@ -782,7 +781,8 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     }
   });
 
-  /* Instant sand — do not wait for cube-ready / delayed intro */
+  /* Instant sand before first rAF — no shatter/build on refresh */
   skipIntro(introSectionIndex());
   introBootHandled = true;
+  animate();
 })();

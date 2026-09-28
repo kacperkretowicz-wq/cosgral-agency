@@ -54,8 +54,8 @@ body.portfolio-page--tiles.is-nav-menu-open .subpage-cube-portal {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: none !important;
-  /* Match homepage glass cube — no over-bright white mass */
-  filter: brightness(1.35) saturate(1.04);
+  /* Same glass lift as homepage megamenu */
+  filter: brightness(2.76) saturate(1.06);
 }
 body.portfolio-page--tiles .portfolio-sand-portal {
   display: block !important;

@@ -63,10 +63,18 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   var isPortfolioTilesPage = document.body.classList.contains("portfolio-page--tiles");
   var isPortfolioMainPage = isPortfolioPage && !isSandHeroSubpage && !isCasePage && !isPortfolioTilesPage;
   var isSandHeroPage = isPortfolioMainPage || isSandHeroSubpage;
+  /* Catalog/case: no idle drift cube — only fly in for megamenu (homepage-like) */
+  var isMenuOnlyCubePage = isPortfolioTilesPage || isCasePage;
   var filmDrive = { p: 0, act: "open" };
   var showcaseDrive = { p: 0, pose: "intro" };
   var portfolioFlight = {
-    phase: isShowcasePage ? "showcase" : isFilmPage ? "film" : isSandHeroPage ? "hidden" : "drift",
+    phase: isShowcasePage
+      ? "showcase"
+      : isFilmPage
+        ? "film"
+        : isSandHeroPage || isMenuOnlyCubePage
+          ? "hidden"
+          : "drift",
     t: isShowcasePage || isFilmPage ? 1 : 0,
     driftP: 0,
     hideAfter: false,
@@ -1423,13 +1431,20 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
     delete menuFrom.driftMatrix;
     menuFrom.driftP = 0;
 
+    /* Catalog/case first: never treat CSS-hidden drift cube as visible gallery mesh
+       (that froze a white blob off-hero and hid the homepage glass fly-in). */
+    if (isMenuOnlyCubePage) {
+      captureHomeSideEntryMenuFrom();
+      return;
+    }
+
     if (isSubpageCubeVisible()) {
       captureGalleryMenuFrom();
       return;
     }
 
-    /* Tiles/case/sand-hero: fly cube in from corner like homepage — never particle-pass blob */
-    if (isSandHeroPage || isGallerySubpage || isPortfolioTilesPage || isCasePage) {
+    /* Sand-hero / gallery: fly cube in from corner like homepage — never particle-pass blob */
+    if (isSandHeroPage || isGallerySubpage) {
       captureHomeSideEntryMenuFrom();
       return;
     }
@@ -2138,7 +2153,10 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
         applyPortfolioFilm(filmDrive.p, t);
       } else if (autoHero.p > 0.01 || portfolioFlight.phase === "auto-hero") {
         applyAutoHero(autoHero.enter, autoHero.exit, t);
-      } else if (isSandHeroPage && portfolioFlight.phase === "hidden") {
+      } else if (
+        (isSandHeroPage || isMenuOnlyCubePage) &&
+        portfolioFlight.phase === "hidden"
+      ) {
         syncCamera();
         root.position.set(0, 0, 0);
         root.rotation.set(0, 0, 0);
