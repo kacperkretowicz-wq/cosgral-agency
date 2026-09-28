@@ -223,12 +223,47 @@
       wrapChildren(section, ".portfolio-section__curtain");
     });
 
-    /* Realizacje: tilt only chapter media — leave titles / Zobacz więcej put */
-    document
-      .querySelectorAll("body.portfolio-page--tiles [data-portfolio-tile] > .portfolio-chapter__bg")
-      .forEach(function (bg) {
-        wrapChildren(bg);
+    /* Realizacje: gyro only on tiles + center word — never chapter titles / chrome */
+    function wrapTileCatalogTilts() {
+      document.querySelectorAll("body.portfolio-page--tiles [data-portfolio-tile]").forEach(function (chapter) {
+        var luxStage = chapter.querySelector(".chapter-lux__stage");
+        if (luxStage) wrapChildren(luxStage);
+
+        var montaz = chapter.querySelector(".chapter-montaz");
+        if (montaz) wrapChildren(montaz);
+
+        var show = chapter.querySelector(".chapter-show");
+        if (show) {
+          /* Word + tile stage only (meta/foot removed or left outside) */
+          var showWord = show.querySelector(":scope > .chapter-show__word");
+          var showStage = show.querySelector(":scope > .chapter-show__stage");
+          if (showStage && !showStage.closest(".home-tilt-face")) {
+            var host = document.createElement("div");
+            host.className = "chapter-show__tilt-host";
+            show.insertBefore(host, showStage);
+            if (showWord) host.appendChild(showWord);
+            host.appendChild(showStage);
+            wrapChildren(host);
+          }
+        }
+
+        /* Systems fan cards — tilt inner face; card keeps arc transform */
+        chapter.querySelectorAll(".sys-fan__card").forEach(function (card) {
+          wrapChildren(card);
+        });
       });
+    }
+    wrapTileCatalogTilts();
+    /* Fan cards mount async */
+    if (!window.__portfolioTileTiltWatch) {
+      window.__portfolioTileTiltWatch = true;
+      var tiltMo = new MutationObserver(function () {
+        wrapTileCatalogTilts();
+      });
+      document.querySelectorAll("body.portfolio-page--tiles [data-systems-fan-catalog]").forEach(function (node) {
+        tiltMo.observe(node, { childList: true, subtree: true });
+      });
+    }
 
     var tiltHosts = document.querySelectorAll(
       [
