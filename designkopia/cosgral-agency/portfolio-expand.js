@@ -992,7 +992,7 @@
 
     /* Half of previous ~1120px gallery → ~560px / 2-col */
     var galleryW = Math.min(560, window.innerWidth * 0.92);
-    var gap = 20;
+    var gap = 28;
     var colW = (galleryW - gap) / 2;
     var total = colW * 2 + gap;
     var startX = (window.innerWidth - total) / 2;

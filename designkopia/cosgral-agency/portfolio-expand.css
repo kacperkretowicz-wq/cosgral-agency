@@ -919,7 +919,7 @@ body.is-tile-expanded .portfolio-tile-expand:has([data-expand-mode="systems"]),
 .expand-gallery--video .reels-masonry {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(0.8rem, 2.2vw, 1.25rem);
+  gap: clamp(1.05rem, 2.8vw, 1.65rem);
   columns: unset;
   column-gap: unset;
 }
