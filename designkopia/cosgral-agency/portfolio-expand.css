@@ -26,6 +26,34 @@
 .portfolio-tile-expand.is-closing {
   opacity: 0;
 }
+/* Inside-catalog back — quiet corner, same action as empty-stage click */
+.portfolio-tile-expand__back {
+  position: absolute;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  left: max(0.85rem, env(safe-area-inset-left, 0px));
+  z-index: 580;
+  margin: 0;
+  padding: 0.35rem 0.15rem;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.25s ease, opacity 0.35s ease;
+}
+.portfolio-tile-expand__back:hover,
+.portfolio-tile-expand__back:focus-visible {
+  color: rgba(255, 255, 255, 0.92);
+  outline: none;
+}
+.portfolio-tile-expand__back[hidden] {
+  display: none !important;
+}
 body.is-tile-expanded .site-nav {
   pointer-events: none;
 }

@@ -223,6 +223,11 @@
       wrapChildren(section, ".portfolio-section__curtain");
     });
 
+    /* Realizacje tile catalogs — wrap each chapter for homepage-style gyro */
+    document.querySelectorAll("body.portfolio-page--tiles [data-portfolio-tile]").forEach(function (chapter) {
+      wrapChildren(chapter);
+    });
+
     var tiltHosts = document.querySelectorAll(
       [
         "#main > header",
@@ -255,6 +260,7 @@
       if (block.hasAttribute("data-portfolio-section")) return;
       /* GSAP pin-spacer + chapter title: wrapping breaks full-bleed pin bounds */
       if (block.classList.contains("pin-spacer") || (block.className && String(block.className).indexOf("pin-spacer") !== -1)) return;
+      /* Tile catalogs wrap via dedicated path above; skip legacy chapter hosts here */
       if (block.hasAttribute("data-portfolio-chapter") || block.classList.contains("portfolio-chapter")) return;
       if (block.classList.contains("about-scene") || block.classList.contains("about-scene-curtain")) return;
       if (block.querySelector(":scope > .home-scene__panel")) return;

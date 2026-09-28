@@ -1,12 +1,13 @@
 /**
  * Realizacje expand — tiles morph into the final layout (no disappear handoff).
- * Click empty chrome (not a tile/card) to reverse. No back button.
+ * Click empty chrome (not a tile/card) to reverse. „Wróć” mirrors empty click.
  */
 (function () {
   "use strict";
 
   var stage = document.querySelector("[data-tile-expand-stage]");
   var bodyEl = document.querySelector("[data-expand-body]");
+  var backBtn = document.querySelector("[data-expand-back]");
   var root = document.querySelector("[data-portfolio-tiles]");
   if (!stage || !bodyEl || !root) return;
   if (stage.parentElement !== document.body) {
@@ -249,7 +250,23 @@
     stage.hidden = !open;
     stage.setAttribute("aria-hidden", open ? "false" : "true");
     stage.classList.toggle("is-open", open);
+    if (backBtn) {
+      backBtn.hidden = !open;
+      backBtn.setAttribute("aria-hidden", open ? "false" : "true");
+    }
   }
+
+  function bindExpandBack() {
+    if (!backBtn || backBtn.dataset.bound === "1") return;
+    backBtn.dataset.bound = "1";
+    backBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      /* Same path as clicking empty stage chrome */
+      close();
+    });
+  }
+  bindExpandBack();
 
   function clearBody() {
     if (ghostClearTimer) {
@@ -282,7 +299,7 @@
       return !!el.closest("a.expand-web-visit, .expand-web-visit");
     }
     return !!el.closest(
-      "a, button, video, .expand-deck__card, .expand-web-panel, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__dot, .sys-fan__nav, .sys-fan__copy, .sys-fan__more, .sys-fan__article, .sys-fan__stage"
+      "a, button, video, .expand-deck__card, .expand-web-panel, .portfolio-case-card, .expand-feed__item, .reels-masonry__item, .graphics-masonry__item, .expand-hero-tile, .expand-cam__tile, .expand-fly, .sys-fan__card, .sys-fan__arrow, .sys-fan__dot, .sys-fan__nav, .sys-fan__copy, .sys-fan__more, .sys-fan__article, .sys-fan__stage, [data-expand-back], .portfolio-tile-expand__back"
     );
   }
 
@@ -1626,7 +1643,7 @@
       });
 
       var beltLayer = document.createElement("div");
-      beltLayer.className = "expand-belt is-level is-fan-return";
+      beltLayer.className = "expand-belt is-fan-return";
       document.body.appendChild(beltLayer);
       activeGhosts.push(beltLayer);
 

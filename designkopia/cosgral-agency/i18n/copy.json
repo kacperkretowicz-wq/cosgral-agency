@@ -1064,6 +1064,10 @@
       "pl": "← Wróć do portfolio",
       "en": "← Back to portfolio"
     },
+    "expand_back": {
+      "pl": "Wróć",
+      "en": "Back"
+    },
     "lightbox_reel": {
       "pl": "Podgląd rolki",
       "en": "Reel preview"

@@ -208,6 +208,30 @@ body.portfolio-page--tiles .portfolio-theme-stage {
   color: #f7f7f7;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  perspective: 1200px;
+}
+/* Gyro / pointer tilt wrapper inside tile chapters */
+body.portfolio-page--tiles .portfolio-chapter:has(> .home-tilt-layer) {
+  padding: 0;
+}
+body.portfolio-page--tiles .portfolio-chapter > .home-tilt-layer {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  z-index: 0;
+}
+body.portfolio-page--tiles .portfolio-chapter > .home-tilt-layer > .home-tilt-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  box-sizing: border-box;
+  padding:
+    clamp(5.5rem, 12vh, 7rem)
+    max(var(--gutter, 1.25rem), 4vw)
+    clamp(4.5rem, 12vh, 6.5rem);
+  transform-origin: 50vw 50vh;
 }
 
 .portfolio-chapters__pager {
