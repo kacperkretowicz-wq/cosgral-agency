@@ -623,9 +623,23 @@
 
   stage.addEventListener("click", function (e) {
     if (!expandedKey) return;
+    /* Anywhere that is not a tile/card/link closes back to the chapter */
     if (isInteractiveTarget(e.target)) return;
     close();
   });
+  /* Also allow clicking the dimmed page chrome / empty gallery chrome */
+  document.addEventListener(
+    "click",
+    function (e) {
+      if (!expandedKey || closing) return;
+      if (!stage.classList.contains("is-open")) return;
+      if (isInteractiveTarget(e.target)) return;
+      /* Ignore nav menu toggles */
+      if (e.target.closest && e.target.closest(".site-nav, .nav-overlay")) return;
+      close();
+    },
+    true
+  );
 
   window.addEventListener("keydown", function (e) {
     if (!expandedKey) return;

@@ -78,7 +78,7 @@
     },
   ];
 
-  /* Systemy — unique B&W tiles only (no repeats, no color / SVG case dupes) */
+  /* Systemy — unique B&W tiles only (no repeats) */
   var OS_MEDIA = [
     STILL + "systems/bw/ui-ai-agent-bw.jpg",
     STILL + "systems/bw/ui-forecast-bw.jpg",
@@ -88,17 +88,17 @@
     STILL + "systems/bw/ui-barcode-bw.jpg",
     STILL + "systems/bw/ui-chatbot-bw.jpg",
     STILL + "systems/bw/ui-price-monitor-bw.jpg",
-    STILL + "systems/bw/still-crm0-bw.jpg",
-    STILL + "systems/bw/still-crm1-bw.jpg",
-    STILL + "systems/bw/still-crm2-bw.jpg",
-    STILL + "systems/bw/still-crm3-bw.jpg",
+    STILL + "systems/bw/ui-kanban-bw.jpg",
+    STILL + "systems/bw/ui-calendar-bw.jpg",
+    STILL + "systems/bw/ui-network-bw.jpg",
+    STILL + "systems/bw/ui-kpi-board-bw.jpg",
+    STILL + "systems/bw/ui-form-builder-bw.jpg",
+    STILL + "systems/bw/ui-shelf-sync-bw.jpg",
+    STILL + "systems/bw/ui-logs-bw.jpg",
+    STILL + "systems/bw/ui-segments-bw.jpg",
     STILL + "systems/bw/still-auto0-bw.jpg",
-    STILL + "systems/bw/still-auto1-bw.jpg",
     STILL + "systems/bw/still-auto2-bw.jpg",
-    STILL + "systems/bw/still-auto3-bw.jpg",
-    STILL + "systems/bw/still-app0-bw.jpg",
     STILL + "systems/bw/still-app1-bw.jpg",
-    STILL + "systems/bw/still-app2-bw.jpg",
     STILL + "systems/bw/still-app3-bw.jpg",
   ];
 
