@@ -15,7 +15,7 @@
       tag: "CRM / sprzedaż terenowa",
       client: "TelForceOne S.A.",
       title: "CRM z mapą handlowców",
-      desc: "Jedno miejsce na dane klientów, planowanie wizyt i pracę przedstawicieli w terenie. Mapa tras, etykiety i raporty — bez Exceli i telefonów.",
+      desc: "Handlowcy jeździli z Excelami i notatkami w telefonie — nikt nie wiedział, kto u kogo był. CRM z mapą zbiera klientów, trasy i raporty dnia w jednym miejscu, więc planowanie wizyt zajmuje minuty zamiast godziny.",
       img: STILL + "ui-crm-map-bw.jpg",
     },
     {
@@ -24,7 +24,7 @@
       tag: "Narzędzie / identyfikacja",
       client: "TelForceOne S.A.",
       title: "Generator kodów Code 39",
-      desc: "Szybkie generowanie i podgląd etykiet Code 39 — gotowych do druku i skanowania w magazynie.",
+      desc: "Etykiety powstawały w kilku narzędziach i często wracały ze skanera jako błąd. Generator daje podgląd Code 39 i batch do druku — oznaczenie SKU w sekundach, bez poprawek na magazynie.",
       img: STILL + "ui-barcode-bw.jpg",
     },
     {
@@ -33,7 +33,7 @@
       tag: "Analityka / zapasy",
       client: "TelForceOne S.A.",
       title: "Stany i prognozowanie",
-      desc: "Widok zapasów, rotacji i prognoz popytu wspiera planowanie zakupów zanim braknie towaru na półce.",
+      desc: "Zakupy szły „na wyczucie”: braki na półce albo zamrożony towar. Panel łączy stany, rotację i prognozę z alertami — widać, co dokupić zanim sprzedaż stanie.",
       img: STILL + "ui-forecast-bw.jpg",
     },
     {
@@ -42,7 +42,7 @@
       tag: "Aplikacja",
       client: "Trove",
       title: "Panel sklepu i monitoring cen",
-      desc: "Stany magazynowe, porównanie cen z marketplace’ami i alerty przecen w jednym panelu operacyjnym.",
+      desc: "Trove ręcznie porównywało ceny na Allegro i własnym sklepie w arkuszach. Panel zbiera stany i ceny kanałów z alertami przecen — reakcja na spadek marży tego samego dnia, nie po tygodniu.",
       img: STILL + "ui-price-monitor-bw.jpg",
     },
     {
@@ -51,7 +51,7 @@
       tag: "CRM",
       client: "",
       title: "CRM leadów i dealów",
-      desc: "Leady → deale → pipeline, notatki, statusy i przypomnienia. Zespół widzi cały lejek bez przełączania narzędzi.",
+      desc: "Leady ginęły między skrzynką, czatem i karteczkami — follow-upy się spóźniały. CRM prowadzi od pierwszego kontaktu do deala: pipeline, notatki i przypomnienia w jednym lejku.",
       img: STILL + "ui-kanban-bw.jpg",
     },
     {
@@ -60,7 +60,7 @@
       tag: "Automatyzacja",
       client: "",
       title: "Chatbot AI dla klientów",
-      desc: "Asystent AI na Instagram, Facebook i WWW — odpowiada na FAQ, zbiera leady i przekazuje rozmowę do konsultanta.",
+      desc: "Po godzinach Instagram i Messenger zasypywały te same pytania, a zespół odpisywał rano z opóźnieniem. Bot zamyka FAQ 24/7, zbiera lead i oddaje rozmowę konsultantowi z kontekstem.",
       img: STILL + "ui-chatbot-bw.jpg",
     },
     {
@@ -69,7 +69,7 @@
       tag: "Automatyzacja",
       client: "Trove",
       title: "Zamówienie → faktura → paczka",
-      desc: "Workflow e-commerce: zamówienie → faktura → paczka → powiadomienie. Mniej ręcznej roboty, mniej błędów.",
+      desc: "Każde zamówienie Trove wymagało ręcznego klejenia faktury, statusu i maila do klienta. Workflow odpala cały łańcuch sam — mniej klikania, mniej pomyłek przy fulfillmentcie.",
       img: STILL + "ui-invoice-flow-bw.jpg",
     },
     {
@@ -78,7 +78,7 @@
       tag: "Automatyzacja",
       client: "",
       title: "Agent AI i integracje",
-      desc: "Łączy chat, mail, CRM i bazę w jednym przepływie — decyzje i handoff bez ręcznego klejenia narzędzi.",
+      desc: "Chat, mail i CRM żyły osobno — handoff to było kopiuj-wklej. Agent łączy kanały w jednym przepływie: klasyfikuje sprawę, uzupełnia kartę i przekazuje ją właściwej osobie.",
       img: STILL + "ui-ai-agent-bw.jpg",
     },
     {
@@ -87,7 +87,7 @@
       tag: "Aplikacja",
       client: "Trove",
       title: "Shelf Sync",
-      desc: "Podgląd półek i stanów w czasie zbliżonym do rzeczywistego — alerty, gdy produkt znika z widoku sprzedaży.",
+      desc: "Produkt znikał z półki sprzedażowej, zanim magazyn zdążył zareagować. Shelf Sync pilnuje widoczności stanów i alarmuje, gdy oferta wypada z rynku.",
       img: STILL + "ui-shelf-sync-bw.jpg",
     },
     {
@@ -96,7 +96,7 @@
       tag: "Analityka",
       client: "TelForceOne S.A.",
       title: "KPI board",
-      desc: "Kluczowe wskaźniki sprzedaży i operacji na jednym ekranie — szybki puls firmy bez budowania raportów od zera.",
+      desc: "Raporty tygodnia powstawały z kilku Exceli i zajmowały pół dnia. Board pokazuje sprzedaż i operacje na żywo — puls firmy bez budowania tabel od zera.",
       img: STILL + "ui-kpi-board-bw.jpg",
     },
     {
@@ -105,7 +105,7 @@
       tag: "Automatyzacja",
       client: "",
       title: "Graf workflow",
-      desc: "Wizualny przepływ procesów: triggery, warunki i akcje w czytelnej sieci — łatwiej utrzymywać i rozwijać automatyzacje.",
+      desc: "Automatyzacje siedziały w głowie jednej osoby albo w chaotycznych regułach. Graf pokazuje triggery, warunki i akcje — łatwiej utrzymać proces i dokładać kolejne kroki.",
       img: STILL + "ui-network-bw.jpg",
     },
   ];
@@ -137,6 +137,7 @@
     var wrap = document.createElement("div");
     wrap.className = "sys-fan__case";
     var intro = article.querySelector(".case-viz-intro");
+    var story = article.querySelector(".case-viz-close__copy");
     var rail = article.querySelector(".case-viz-rail");
     var aside = article.querySelector(".case-study__aside");
     if (intro) {
@@ -144,6 +145,13 @@
       var back = introClone.querySelector(".case-study__back");
       if (back && back.parentNode) back.parentNode.removeChild(back);
       wrap.appendChild(introClone);
+    }
+    /* Case narrative (problem → solution → result) before interactive viz tiles */
+    if (story) {
+      var storyWrap = document.createElement("div");
+      storyWrap.className = "sys-fan__case-story case-viz-close__copy";
+      storyWrap.innerHTML = story.innerHTML;
+      wrap.appendChild(storyWrap);
     }
     if (rail) wrap.appendChild(rail.cloneNode(true));
     if (aside) wrap.appendChild(aside.cloneNode(true));

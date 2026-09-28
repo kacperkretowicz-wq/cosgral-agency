@@ -85,7 +85,7 @@
     <div class="case-viz-intro__main">
       <p class="case-study__back"><a href="portfolio.html#systemy" data-i18n="portfolio.tf_back">← Wróć do realizacji</a></p>
       <h1 class="case-study__title" data-i18n="portfolio.case_trove_workflow_title">Zamówienie → faktura → status paczki</h1>
-      <p class="case-study__lede" data-i18n="portfolio.case_trove_workflow_lede">Automatyczny workflow e-commerce dla Trove: od zamówienia przez fakturę po status dostawy.</p>
+      <p class="case-study__lede" data-i18n="portfolio.case_trove_workflow_lede">Fulfillment nie powinien być listą ręcznych kliknięć po każdym checkoutcie. U Trove zamówienie samo odpala fakturę, paczkę i mail do klienta.</p>
     </div>
     <aside class="case-viz-intro__aside">
       <div class="case-study__meta">
@@ -280,8 +280,9 @@
 
   <div class="case-viz-close">
     <div class="case-viz-close__copy">
-        <p data-i18n="portfolio.case_trove_workflow_p1">Dla Trove zaprojektowaliśmy łańcuch automatyzacji wokół nowego zamówienia — bez ręcznego przepisywania.</p>
-        <p data-i18n="portfolio.case_trove_workflow_p2">Status paczki i powiadomienie klienta domykają pętlę od checkoutu do dostawy.</p>
+        <p data-i18n="portfolio.case_trove_workflow_p1">Problem: po każdym zamówieniu ktoś przepisywał dane do faktury, aktualizował status w drugim narzędziu i wysyłał wiadomość do klienta. Przy wzroście zamówień rosła też liczba pomyłek i opóźnień.</p>
+        <p data-i18n="portfolio.case_trove_workflow_p2">Rozwiązanie: automatyczny łańcuch od checkoutu — eksport pod fakturę, przekazanie do magazynu/API kuriera, track&trace i powiadomienie statusowe. Człowiek wkracza tylko przy wyjątkach.</p>
+        <p data-i18n="portfolio.case_trove_workflow_p3">Efekt: minuty ręcznej roboty przy zamówieniu spadają do obsługi wyjątków. Klient dostaje spójny status, a zespół nie klei tego samego procesu w trzech systemach.</p>
     </div>
     <aside class="case-study__aside">
       <p class="case-study__aside-label">Trove / <span data-i18n="portfolio.case_trove_workflow_tag">Automatyzacja</span></p>
@@ -351,7 +352,7 @@
   </div>
 </footer>
 
-<script src="i18n.js?v=20260919gyro"></script>
+<script src="i18n.js?v=20260928cases1"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
 <script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
