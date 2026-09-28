@@ -11,7 +11,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="cosgral-build" content="20260928pager1" />
+<meta name="cosgral-build" content="20260928expand2" />
 <script src="site-cache-bust.js?v=20260831e"></script>
 <title>Portfolio — cosgral.agency</title>
 <meta name="description" content="Realizacje — montaż wideo, kreacja graficzna, strony internetowe, systemy i automatyzacje." />
@@ -37,7 +37,9 @@
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="cosgral-subpages.css?v=20260927expand2" />
 <link rel="stylesheet" href="portfolio-theme-layers.css?v=20260927expand2" />
-<link rel="stylesheet" href="portfolio-tiles.css?v=20260928pager1" />
+<link rel="stylesheet" href="portfolio-tiles.css?v=20260928expand2" />
+<link rel="stylesheet" href="portfolio-expand.css?v=20260928expand2" />
+<link rel="stylesheet" href="telforce-cases.css?v=20260925viz2" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260925webdeck1" />
 <script>
@@ -178,7 +180,7 @@
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.montaz_title">Montaż wideo</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.montaz_lead">Reels i materiały reklamowe</p>
-        <a class="portfolio-chapter__more" href="portfolio-montaz.html" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+        <a class="portfolio-chapter__more" href="portfolio-montaz.html" data-tile-expand="video" data-no-transition data-i18n="portfolio.view_more">Zobacz więcej →</a>
       </div>
     </section>
 
@@ -205,7 +207,7 @@
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.grafiki_title">Grafiki</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.grafiki_tile_lead">Posty, stories i key visuale w rytmie pokazu slajdów.</p>
-        <a class="portfolio-chapter__more" href="portfolio-grafiki.html" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+        <a class="portfolio-chapter__more" href="portfolio-grafiki.html" data-tile-expand="graphics" data-no-transition data-i18n="portfolio.view_more">Zobacz więcej →</a>
       </div>
     </section>
 
@@ -230,18 +232,14 @@
     </div>
 
     <div class="portfolio-tile-expand" data-tile-expand-stage aria-hidden="true" hidden>
-      <div class="portfolio-tile-expand__layout">
-        <button type="button" class="portfolio-tile-expand__source" data-tile-expand-source aria-label="Wróć do kategorii">
-          <div class="portfolio-tile-expand__source-media" data-tile-expand-source-media></div>
-          <div class="portfolio-tile-expand__source-body">
-            <span class="portfolio-tile-expand__source-title" data-tile-expand-source-title></span>
-            <span class="portfolio-tile-expand__source-hint" data-i18n="portfolio.expand_back">Wróć</span>
-          </div>
+      <div class="portfolio-tile-expand__bar">
+        <button type="button" class="portfolio-tile-expand__close" data-tile-expand-close aria-label="Wróć do kategorii">
+          <span aria-hidden="true">←</span>
+          <span data-i18n="portfolio.expand_back">Wróć</span>
         </button>
-        <div class="portfolio-tile-expand__panel">
-          <div class="portfolio-tile-expand__track" data-tile-expand-track></div>
-        </div>
+        <p class="portfolio-tile-expand__title" data-expand-title></p>
       </div>
+      <div class="portfolio-tile-expand__body" data-expand-body></div>
     </div>
   </div>
 </main>
@@ -328,7 +326,9 @@
 <script src="portfolio-theme-layers.js?v=20260927menufix1"></script>
 <script src="portfolio-montaz-bg.js?v=20260927themebg1"></script>
 <script defer src="home-nav-menu.js?v=20260927menufix1"></script>
-<script src="portfolio-tiles.js?v=20260928pager1"></script>
+<script src="telforce-previews.js?v=20260928expand2"></script>
+<script src="portfolio-expand.js?v=20260928expand2"></script>
+<script src="portfolio-tiles.js?v=20260928expand2"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
 </body>

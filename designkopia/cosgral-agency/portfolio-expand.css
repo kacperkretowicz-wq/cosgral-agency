@@ -1,0 +1,352 @@
+/* Realizacje — in-place expand views (coverflow + galleries) */
+
+.portfolio-tile-expand {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  padding:
+    max(4.6rem, env(safe-area-inset-top, 0px))
+    var(--gutter, 1.25rem)
+    max(1rem, env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.portfolio-tile-expand.is-open {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+.portfolio-chapters.is-expanded .portfolio-chapter__copy,
+.portfolio-chapters.is-expanded .portfolio-chapter__bg .portfolio-tile__media {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.portfolio-tile-expand__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex: 0 0 auto;
+  margin-bottom: 0.65rem;
+  z-index: 2;
+}
+.portfolio-tile-expand__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.portfolio-tile-expand__close:hover,
+.portfolio-tile-expand__close:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+  outline: none;
+}
+.portfolio-tile-expand__title {
+  margin: 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand {
+  background: rgba(244, 244, 246, 0.72);
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand__close {
+  background: rgba(0, 0, 0, 0.06);
+  color: #111;
+}
+body.portfolio-page--tiles.is-tile-bg-light .portfolio-tile-expand__title {
+  color: #111;
+}
+
+.portfolio-tile-expand__body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+/* —— Web coverflow —— */
+.expand-deck {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 1400px;
+}
+.expand-deck__track {
+  position: relative;
+  width: min(92vw, 68rem);
+  height: min(62svh, 28rem);
+  transform-style: preserve-3d;
+}
+.expand-deck__card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(42vw, 22rem);
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #0c0c0e;
+  color: #fff;
+  cursor: pointer;
+  transform-origin: center center;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.45);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.expand-deck__card.is-front {
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 36px 90px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+.expand-deck__media {
+  position: absolute;
+  inset: 0;
+}
+.expand-deck__media video,
+.expand-deck__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.expand-deck__body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 1rem 1rem 0.95rem;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.82));
+  text-align: left;
+}
+.expand-deck__name {
+  margin: 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.expand-deck__lead {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+.expand-deck__arrows {
+  position: absolute;
+  left: 50%;
+  bottom: max(0.2rem, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.expand-deck__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+}
+.expand-deck__arrow:hover:not(:disabled),
+.expand-deck__arrow:focus-visible:not(:disabled) {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+.expand-deck__arrow:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+.expand-deck__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.expand-deck__dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.34);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.expand-deck__dot.is-active {
+  width: 1.25rem;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.expand-fly {
+  position: fixed;
+  z-index: 40;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0.65rem;
+  pointer-events: none;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  transition:
+    left 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.62s ease,
+    opacity 0.3s ease;
+}
+.expand-fly img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* —— Scroll galleries (systems / montaż / grafiki) —— */
+.expand-gallery {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.25rem 0 1.5rem;
+  scroll-behavior: smooth;
+}
+.expand-gallery::-webkit-scrollbar { width: 6px; }
+.expand-gallery::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+
+.expand-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.85rem, 2.2vw, 1.35rem);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 0.15rem 2rem;
+}
+.expand-gallery__grid .portfolio-case-card {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0) scale(0.94);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+.expand-gallery.is-ready .portfolio-case-card {
+  opacity: 1;
+  transform: none;
+}
+.expand-gallery.is-ready .portfolio-case-card:nth-child(1) { transition-delay: 0.05s; }
+.expand-gallery.is-ready .portfolio-case-card:nth-child(2) { transition-delay: 0.1s; }
+.expand-gallery.is-ready .portfolio-case-card:nth-child(3) { transition-delay: 0.15s; }
+.expand-gallery.is-ready .portfolio-case-card:nth-child(4) { transition-delay: 0.2s; }
+.expand-gallery.is-ready .portfolio-case-card:nth-child(5) { transition-delay: 0.25s; }
+.expand-gallery.is-ready .portfolio-case-card:nth-child(6) { transition-delay: 0.3s; }
+.expand-gallery.is-ready .portfolio-case-card:nth-child(7) { transition-delay: 0.35s; }
+
+.expand-gallery__group {
+  max-width: 1120px;
+  margin: 0 auto 2rem;
+  padding: 0 0.15rem;
+}
+.expand-gallery__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+.expand-gallery__heading {
+  margin: 0;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.95);
+}
+.expand-gallery__count {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+body.portfolio-page--tiles.is-tile-bg-light .expand-gallery__heading { color: #111; }
+body.portfolio-page--tiles.is-tile-bg-light .expand-gallery__count { color: rgba(0, 0, 0, 0.5); }
+
+.expand-gallery .reels-masonry,
+.expand-gallery .graphics-masonry {
+  columns: 2;
+  column-gap: clamp(0.65rem, 1.8vw, 1rem);
+}
+.expand-gallery .reels-masonry__item,
+.expand-gallery .graphics-masonry__item {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0) scale(0.96);
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.expand-gallery.is-ready .reels-masonry__item,
+.expand-gallery.is-ready .graphics-masonry__item {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .expand-gallery__grid {
+    grid-template-columns: 1fr;
+  }
+  .expand-deck__card {
+    width: min(78vw, 20rem);
+  }
+  .expand-deck__track {
+    height: min(52svh, 22rem);
+  }
+}
+
+html.reduce-motion .expand-fly,
+html.reduce-motion .expand-deck__card,
+html.reduce-motion .expand-gallery__grid .portfolio-case-card,
+html.reduce-motion .expand-gallery .reels-masonry__item,
+html.reduce-motion .expand-gallery .graphics-masonry__item {
+  transition: none !important;
+}

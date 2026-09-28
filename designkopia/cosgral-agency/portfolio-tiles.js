@@ -1,5 +1,5 @@
 /**
- * Realizacje — full-viewport horizontal chapters (pin-matched BGs) + dots + expand rail.
+ * Realizacje — full-viewport horizontal chapters + dots + in-place expand.
  */
 (function () {
   "use strict";
@@ -12,11 +12,6 @@
   var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-chapter-dot]"));
   var prevBtn = root.querySelector("[data-portfolio-chapter-prev]");
   var nextBtn = root.querySelector("[data-portfolio-chapter-next]");
-  var expandStage = root.querySelector("[data-tile-expand-stage]");
-  var expandSource = root.querySelector("[data-tile-expand-source]");
-  var expandSourceMedia = root.querySelector("[data-tile-expand-source-media]");
-  var expandSourceTitle = root.querySelector("[data-tile-expand-source-title]");
-  var expandTrack = root.querySelector("[data-tile-expand-track]");
   if (!scroller || !chapters.length) return;
 
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
@@ -27,84 +22,19 @@
   var showTimer = null;
   var pendingTheme = null;
   var expandedKey = null;
-  var caseVideoTimer = null;
   var wheelLock = 0;
   var scrollRaf = 0;
+  var loopsPaused = false;
+  var restartLux = null;
+  var restartOs = null;
+  var restartShow = null;
 
   var STILL = "portfolio-media/showcase/chapter-stills/";
   var ACC = STILL + "accents/";
   var GFX = "portfolio-media/graphics/juicy-events/";
   var REEL = "portfolio-media/reels/";
 
-  var CASE_SETS = {
-    web: [
-      {
-        href: "portfolio-strona-juicy-events.html",
-        title: "Juicy Events",
-        lead: "Agencja eventowa",
-        video: "portfolio-media/showcase/web/juicy-events.mp4",
-        poster: "portfolio-media/showcase/web/juicy-events-poster.jpg",
-      },
-      {
-        href: "portfolio-strona-trove.html",
-        title: "Trove Archive",
-        lead: "Ecommerce fashion",
-        video: "portfolio-media/showcase/web/trove-archive.mp4",
-        poster: "portfolio-media/showcase/web/trove-archive-poster.jpg",
-      },
-      {
-        href: "portfolio-strona-mj.html",
-        title: "MJ Social Media",
-        lead: "Content creator",
-        video: "portfolio-media/showcase/web/mj-social-media.mp4",
-        poster: "portfolio-media/showcase/web/mj-social-media-poster.jpg",
-      },
-    ],
-    systems: [
-      {
-        href: "portfolio-telforceone-crm.html",
-        title: "CRM z mapą handlowców",
-        lead: "TelForceOne S.A.",
-        img: "assets/cases/telforceone-crm.svg",
-      },
-      {
-        href: "portfolio-telforceone-code39.html",
-        title: "Generator Code 39",
-        lead: "TelForceOne S.A.",
-        img: "assets/cases/telforceone-code39.svg",
-      },
-      {
-        href: "portfolio-telforceone-forecast.html",
-        title: "Stany i prognozowanie",
-        lead: "TelForceOne S.A.",
-        img: "assets/cases/telforceone-forecast.svg",
-      },
-      {
-        href: "portfolio-trove-panel.html",
-        title: "Panel sklepu i monitoring cen",
-        lead: "Trove",
-        img: "assets/cases/shelfsync.svg",
-      },
-      {
-        href: "portfolio-crm-leady.html",
-        title: "CRM leadów i dealów",
-        lead: "Sprzedaż",
-        img: "assets/cases/northline-crm.svg",
-      },
-      {
-        href: "portfolio-chatbot-ai.html",
-        title: "Chatbot AI",
-        lead: "Automatyzacja",
-        img: "assets/cases/atelier-bloom.svg",
-      },
-      {
-        href: "portfolio-trove-workflow.html",
-        title: "Zamówienie → faktura → paczka",
-        lead: "Trove",
-        img: "assets/cases/parcel-co.svg",
-      },
-    ],
-  };
+  var EXPAND_KEYS = { web: 1, systems: 1, video: 1, graphics: 1 };
 
   var LUX_SETS = [
     {
@@ -378,26 +308,32 @@
       }, 380);
     }
 
-    luxTimer = window.setInterval(cycle, 2800);
+    restartLux = function () {
+      if (luxTimer || REDUCED || loopsPaused) return;
+      luxTimer = window.setInterval(cycle, 2800);
+    };
+    restartLux();
   }
 
   /* —— Systemy OS stack↔field —— */
   function initOs() {
     var stage = root.querySelector("[data-os-stage]");
     if (!stage) return;
-    var cards = [];
-    OS_MEDIA.forEach(function (src, i) {
-      var fig = document.createElement("figure");
-      fig.className = "chapter-os__card";
-      var img = document.createElement("img");
-      img.src = src;
-      img.alt = "";
-      img.decoding = "async";
-      img.loading = i < 6 ? "eager" : "lazy";
-      fig.appendChild(img);
-      stage.appendChild(fig);
-      cards.push(fig);
-    });
+    var cards = Array.prototype.slice.call(stage.querySelectorAll(".chapter-os__card"));
+    if (!cards.length) {
+      OS_MEDIA.forEach(function (src, i) {
+        var fig = document.createElement("figure");
+        fig.className = "chapter-os__card";
+        var img = document.createElement("img");
+        img.src = src;
+        img.alt = "";
+        img.decoding = "async";
+        img.loading = i < 6 ? "eager" : "lazy";
+        fig.appendChild(img);
+        stage.appendChild(fig);
+        cards.push(fig);
+      });
+    }
 
     function applyMode(mode) {
       stage.classList.toggle("is-stack", mode === "stack");
@@ -415,10 +351,14 @@
     applyMode("stack");
     if (REDUCED) return;
     var mode = "stack";
-    osTimer = window.setInterval(function () {
-      mode = mode === "stack" ? "field" : "stack";
-      applyMode(mode);
-    }, 2200);
+    restartOs = function () {
+      if (osTimer || REDUCED || loopsPaused) return;
+      osTimer = window.setInterval(function () {
+        mode = mode === "stack" ? "field" : "stack";
+        applyMode(mode);
+      }, 2200);
+    };
+    restartOs();
   }
 
   /* —— Grafiki Showcase 14 —— */
@@ -428,17 +368,19 @@
     var stage = show.querySelector("[data-show-stage]");
     var wordEl = show.querySelector("[data-show-word]");
     if (!stage) return;
-    var tiles = [];
-    for (var i = 0; i < 8; i++) {
-      var fig = document.createElement("figure");
-      fig.className = "chapter-show__tile";
-      var img = document.createElement("img");
-      img.alt = "";
-      img.decoding = "async";
-      img.loading = i < 4 ? "eager" : "lazy";
-      fig.appendChild(img);
-      stage.appendChild(fig);
-      tiles.push(fig);
+    var tiles = Array.prototype.slice.call(stage.querySelectorAll(".chapter-show__tile"));
+    if (!tiles.length) {
+      for (var i = 0; i < 8; i++) {
+        var fig = document.createElement("figure");
+        fig.className = "chapter-show__tile";
+        var img = document.createElement("img");
+        img.alt = "";
+        img.decoding = "async";
+        img.loading = i < 4 ? "eager" : "lazy";
+        fig.appendChild(img);
+        stage.appendChild(fig);
+        tiles.push(fig);
+      }
     }
 
     var layoutIdx = 0;
@@ -469,16 +411,20 @@
     paint();
     if (REDUCED) return;
 
-    showTimer = window.setInterval(function () {
-      show.classList.add("is-swap");
-      window.setTimeout(function () {
-        layoutIdx = (layoutIdx + 1) % SHOW_LAYOUTS.length;
-        wordIdx = (wordIdx + 1) % SHOW_WORDS.length;
-        poolCursor = (poolCursor + 3) % SHOW_POOL.length;
-        paint();
-        show.classList.remove("is-swap");
-      }, 280);
-    }, 2400);
+    restartShow = function () {
+      if (showTimer || REDUCED || loopsPaused) return;
+      showTimer = window.setInterval(function () {
+        show.classList.add("is-swap");
+        window.setTimeout(function () {
+          layoutIdx = (layoutIdx + 1) % SHOW_LAYOUTS.length;
+          wordIdx = (wordIdx + 1) % SHOW_WORDS.length;
+          poolCursor = (poolCursor + 3) % SHOW_POOL.length;
+          paint();
+          show.classList.remove("is-swap");
+        }, 280);
+      }, 2400);
+    };
+    restartShow();
   }
 
   function nearestIndex() {
@@ -526,162 +472,50 @@
     setActive(index, { force: true });
   }
 
-  function stopCaseVideos() {
-    if (caseVideoTimer) {
-      window.clearInterval(caseVideoTimer);
-      caseVideoTimer = null;
+  function pauseChapterLoops() {
+    if (loopsPaused) return;
+    loopsPaused = true;
+    if (luxTimer) {
+      window.clearInterval(luxTimer);
+      luxTimer = null;
     }
-    if (!expandTrack) return;
-    expandTrack.querySelectorAll("video").forEach(function (video) {
-      try {
-        video.pause();
-      } catch (e) {}
-    });
+    if (osTimer) {
+      window.clearInterval(osTimer);
+      osTimer = null;
+    }
+    if (showTimer) {
+      window.clearInterval(showTimer);
+      showTimer = null;
+    }
+    if (vizShowTimer) {
+      window.clearInterval(vizShowTimer);
+      vizShowTimer = null;
+    }
   }
 
-  function playVisibleCaseVideos() {
-    if (!expandTrack) return;
-    stopCaseVideos();
-    var cards = Array.prototype.slice.call(expandTrack.querySelectorAll("[data-case-card]"));
-    if (!cards.length) return;
-    function sync() {
-      var mid = expandTrack.getBoundingClientRect();
-      var center = mid.left + mid.width * 0.35;
-      var best = null;
-      var bestDist = Infinity;
-      cards.forEach(function (card) {
-        var r = card.getBoundingClientRect();
-        var c = r.left + r.width * 0.5;
-        var d = Math.abs(c - center);
-        if (d < bestDist) {
-          bestDist = d;
-          best = card;
-        }
-      });
-      cards.forEach(function (card) {
-        var video = card.querySelector("video");
-        if (!video) return;
-        if (card === best) {
-          var play = video.play();
-          if (play && play.catch) play.catch(function () {});
-        } else {
-          try {
-            video.pause();
-          } catch (e) {}
-        }
-      });
-    }
-    sync();
-    caseVideoTimer = window.setInterval(sync, 900);
-  }
-
-  function buildCaseCards(key) {
-    if (!expandTrack) return;
-    var items = CASE_SETS[key] || [];
-    expandTrack.innerHTML = "";
-    items.forEach(function (item) {
-      var a = document.createElement("a");
-      a.className = "portfolio-case-tile";
-      a.href = item.href;
-      a.setAttribute("data-case-card", "");
-      a.setAttribute("aria-label", item.title);
-
-      var media = document.createElement("div");
-      media.className = "portfolio-case-tile__media";
-      if (item.video) {
-        var video = document.createElement("video");
-        video.muted = true;
-        video.loop = true;
-        video.playsInline = true;
-        video.preload = "metadata";
-        if (item.poster) video.poster = item.poster;
-        video.src = item.video;
-        media.appendChild(video);
-      } else if (item.img) {
-        var img = document.createElement("img");
-        img.src = item.img;
-        img.alt = "";
-        img.loading = "lazy";
-        img.decoding = "async";
-        media.appendChild(img);
-      }
-      a.appendChild(media);
-
-      var body = document.createElement("div");
-      body.className = "portfolio-case-tile__body";
-      var title = document.createElement("h3");
-      title.className = "portfolio-case-tile__title";
-      title.textContent = item.title;
-      var lead = document.createElement("p");
-      lead.className = "portfolio-case-tile__lead";
-      lead.textContent = item.lead;
-      body.appendChild(title);
-      body.appendChild(lead);
-      a.appendChild(body);
-      expandTrack.appendChild(a);
-    });
-  }
-
-  function fillSourceFromChapter(chapter) {
-    if (!expandSourceMedia || !expandSourceTitle) return;
-    expandSourceMedia.innerHTML = "";
-    var media = chapter.querySelector(".portfolio-tile__media");
-    if (media) {
-      var clone = media.cloneNode(true);
-      clone.querySelectorAll("video").forEach(function (v) {
-        v.removeAttribute("data-card-video");
-        v.muted = true;
-        v.loop = true;
-        v.playsInline = true;
-        var p = v.play();
-        if (p && p.catch) p.catch(function () {});
-      });
-      expandSourceMedia.appendChild(clone);
-    }
-    var titleEl = chapter.querySelector(".portfolio-chapter__title");
-    expandSourceTitle.textContent = titleEl ? titleEl.textContent : "";
+  function resumeChapterLoops() {
+    if (!loopsPaused) return;
+    loopsPaused = false;
+    if (REDUCED) return;
+    if (restartLux) restartLux();
+    if (restartOs) restartOs();
+    if (restartShow) restartShow();
+    startVizShowLoop();
   }
 
   function openExpand(chapter) {
-    if (!expandStage || !expandTrack) return;
     var more = chapter.querySelector("[data-tile-expand]");
     var key = more && more.getAttribute("data-tile-expand");
-    if (!key || !CASE_SETS[key] || expandedKey === key) return;
-
+    if (!key || !EXPAND_KEYS[key]) return;
+    if (!window.__portfolioExpand) return;
     expandedKey = key;
     applyTheme(chapter.getAttribute("data-theme") || key);
-    fillSourceFromChapter(chapter);
-    buildCaseCards(key);
-
-    document.body.classList.add("is-tile-expanded");
-    root.classList.add("is-expanded");
-    expandStage.hidden = false;
-    expandStage.setAttribute("aria-hidden", "false");
-
-    window.requestAnimationFrame(function () {
-      expandStage.classList.add("is-open");
-      playVisibleCaseVideos();
-    });
+    pauseChapterLoops();
+    window.__portfolioExpand.open(key, chapter);
   }
 
   function closeExpand() {
-    if (!expandedKey || !expandStage) return;
-    expandedKey = null;
-    stopCaseVideos();
-    expandStage.classList.remove("is-open");
-    document.body.classList.remove("is-tile-expanded");
-    root.classList.remove("is-expanded");
-
-    window.setTimeout(
-      function () {
-        if (expandedKey) return;
-        expandStage.hidden = true;
-        expandStage.setAttribute("aria-hidden", "true");
-        if (expandTrack) expandTrack.innerHTML = "";
-        if (expandSourceMedia) expandSourceMedia.innerHTML = "";
-      },
-      REDUCED ? 0 : 420
-    );
+    if (window.__portfolioExpand) window.__portfolioExpand.close();
   }
 
   scroller.addEventListener(
@@ -719,7 +553,7 @@
       "click",
       function (e) {
         var key = link.getAttribute("data-tile-expand");
-        if (!key || !CASE_SETS[key]) return;
+        if (!key || !EXPAND_KEYS[key]) return;
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
         e.preventDefault();
         e.stopPropagation();
@@ -730,29 +564,17 @@
     );
   });
 
-  if (expandSource) {
-    expandSource.addEventListener("click", function () {
-      closeExpand();
-    });
-  }
-
-  if (expandTrack) {
-    expandTrack.addEventListener(
-      "scroll",
-      function () {
-        if (!expandedKey) return;
-        playVisibleCaseVideos();
-      },
-      { passive: true }
-    );
-  }
+  window.addEventListener("portfolio-expand-open", function (e) {
+    expandedKey = (e.detail && e.detail.key) || expandedKey;
+    pauseChapterLoops();
+  });
+  window.addEventListener("portfolio-expand-close", function () {
+    expandedKey = null;
+    resumeChapterLoops();
+  });
 
   window.addEventListener("keydown", function (e) {
-    if (expandedKey) {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        closeExpand();
-      }
+    if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
       return;
     }
     if (e.key === "ArrowRight" || e.key === "PageDown") {
@@ -773,12 +595,8 @@
   window.addEventListener(
     "wheel",
     function (e) {
-      if (expandedKey) {
-        if (!expandTrack) return;
-        if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-        if (Math.abs(e.deltaY) < 1.2) return;
-        e.preventDefault();
-        expandTrack.scrollBy({ left: e.deltaY, behavior: "auto" });
+      if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
+        /* gallery / deck handle their own scroll */
         return;
       }
       if (Math.abs(e.deltaY) < 1.2 && Math.abs(e.deltaX) < 1.2) return;
