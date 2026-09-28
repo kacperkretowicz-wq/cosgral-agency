@@ -151,6 +151,17 @@ body.is-tile-expanded.is-closing-reverse .expand-belt__card {
 .expand-belt.is-level .expand-belt__card {
   transform: rotate(0deg);
 }
+/* Close: ghosts reforming the catalog diagonal fan */
+.expand-belt.is-fan-return .expand-belt__card {
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.52);
+  will-change: left, top, width, height, transform, opacity;
+}
+.expand-belt.is-fan-return.is-fan-settled .expand-belt__card {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.expand-belt.is-fan-return.is-fan-settled .expand-belt__card.is-hero {
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.58);
+}
 
 /* —— Web coverflow (≈2× larger) —— */
 .expand-deck {
