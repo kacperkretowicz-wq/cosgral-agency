@@ -283,7 +283,8 @@ body.is-tile-expanded .site-nav {
 .expand-feed__media {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 16 / 11;
+  max-height: min(52vh, 28rem);
   border-radius: 14px;
   overflow: hidden;
   background: #111;
@@ -434,7 +435,7 @@ body.is-tile-expanded .site-nav {
 @media (max-width: 720px) {
   .expand-deck__card { width: min(92vw, 26rem); }
   .expand-feed__list { max-width: 100%; }
-  .expand-feed__media { aspect-ratio: 3 / 4; }
+  .expand-feed__media { aspect-ratio: 4 / 5; max-height: min(48vh, 22rem); }
 }
 
 html.reduce-motion .expand-cam__tile,
