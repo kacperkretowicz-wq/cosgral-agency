@@ -114,6 +114,12 @@ html.is-page-transitioning body {
   overflow: hidden;
 }
 
+/* Hard fail-safe: inactive curtain must never eat taps after aborted nav / bfcache */
+.page-transition:not(.is-active) {
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 html.is-page-enter::before {
   content: "";
   position: fixed;

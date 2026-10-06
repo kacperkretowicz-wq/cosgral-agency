@@ -630,6 +630,36 @@
     });
   });
 
-  window.cosgralNavMenu = { open: openNav, close: closeNav, isOpen: function () { return isOpen; } };
+  function resetMenuUI() {
+    menuTargetOpen = false;
+    bumpDriveToken();
+    stopStageSync();
+    servicesExpanded = false;
+    if (window.gsap) {
+      gsap.killTweensOf(links);
+      gsap.killTweensOf(menuChars());
+      gsap.killTweensOf(subLinks);
+      if (backdrop) gsap.killTweensOf(backdrop);
+    }
+    setOpenState(false);
+    document.body.classList.remove(
+      "is-cube-menu-front",
+      "is-cube-menu-passing",
+      "is-nav-services-expanded"
+    );
+  }
+
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted || isOpen || menuTargetOpen) {
+      resetMenuUI();
+    }
+  });
+
+  window.cosgralNavMenu = {
+    open: openNav,
+    close: closeNav,
+    isOpen: function () { return isOpen; },
+    reset: resetMenuUI,
+  };
   bindLinkHover();
 })();

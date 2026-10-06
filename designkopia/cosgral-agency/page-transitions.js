@@ -1,5 +1,7 @@
 /**
  * Global page transitions — curtain wipe + cube mark (all internal pages).
+ * Resets hard locks on bfcache / aborted navigation so mobile back/rapid taps
+ * cannot leave a click-blocking veil or overflow:hidden body.
  */
 (function () {
   "use strict";
@@ -19,7 +21,11 @@
   };
   var EXIT_MS = 360;
   var REVEAL_MS = 500;
+  var EXIT_ABORT_MS = EXIT_MS + 2200;
   var navigating = false;
+  var exitTimer = 0;
+  var exitWatchTimer = 0;
+  var revealTimer = 0;
 
   function siteRoot() {
     var path = window.location.pathname || "";
@@ -123,6 +129,32 @@
     document.documentElement.classList.toggle("is-page-transitioning", !!on);
   }
 
+  function clearTimers() {
+    if (exitTimer) {
+      window.clearTimeout(exitTimer);
+      exitTimer = 0;
+    }
+    if (exitWatchTimer) {
+      window.clearTimeout(exitWatchTimer);
+      exitWatchTimer = 0;
+    }
+    if (revealTimer) {
+      window.clearTimeout(revealTimer);
+      revealTimer = 0;
+    }
+  }
+
+  function resetTransitionUI() {
+    navigating = false;
+    clearTimers();
+    lockScroll(false);
+    document.documentElement.classList.remove("is-page-enter", "is-page-transitioning");
+    var overlay = document.getElementById("page-transition");
+    if (overlay) {
+      overlay.classList.remove("is-active", "is-covering", "is-revealing");
+    }
+  }
+
   function playExit() {
     var overlay = ensureOverlay();
     overlay.classList.add("is-active");
@@ -140,7 +172,8 @@
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         overlay.classList.add("is-revealing");
-        window.setTimeout(function () {
+        revealTimer = window.setTimeout(function () {
+          revealTimer = 0;
           overlay.classList.remove("is-active", "is-covering", "is-revealing");
           lockScroll(false);
           if (typeof done === "function") done();
@@ -259,10 +292,12 @@
   }
 
   function navigateTo(url) {
-    if (navigating || REDUCED) {
+    if (REDUCED) {
       window.location.href = url;
       return;
     }
+
+    if (navigating) return;
 
     navigating = true;
     sessionStorage.setItem(SESSION_KEY, "1");
@@ -280,16 +315,25 @@
     }
 
     playExit();
-    window.setTimeout(function () {
+    exitTimer = window.setTimeout(function () {
+      exitTimer = 0;
       window.location.href = url;
     }, EXIT_MS);
+
+    /* If back/cancel leaves us on this document, drop the blocking veil. */
+    exitWatchTimer = window.setTimeout(function () {
+      exitWatchTimer = 0;
+      if (!navigating) return;
+      if (document.visibilityState === "hidden") return;
+      resetTransitionUI();
+    }, EXIT_ABORT_MS);
   }
 
   function bindLinks() {
     document.addEventListener(
       "click",
       function (e) {
-        if (navigating || REDUCED) return;
+        if (REDUCED) return;
 
         var anchor = e.target.closest("a[href]");
         if (!anchor) return;
@@ -301,6 +345,7 @@
         if (serviceTheme) {
           e.preventDefault();
           e.stopPropagation();
+          if (navigating) return;
           navigateToService(serviceTheme);
           return;
         }
@@ -309,19 +354,43 @@
 
         e.preventDefault();
         e.stopPropagation();
+        if (navigating) return;
         navigateTo(anchor.href);
       },
       true
     );
   }
 
+  function bindLifecycle() {
+    window.addEventListener("pageshow", function (event) {
+      /* Cold load: leave enter/reveal alone. BFCache restore freezes mid-exit
+         overlays with pointer-events + overflow:hidden — clear them. */
+      if (event.persisted || navigating) {
+        resetTransitionUI();
+        clearEnterLock();
+      }
+    });
+
+    window.addEventListener("pagehide", function () {
+      /* Keep SESSION_KEY for the destination enter animation. Timers from a
+         frozen bfcache snapshot are meaningless once restored. */
+      clearTimers();
+    });
+  }
+
   window.cosgralPageTransition = {
     navigate: navigateTo,
     navigateService: navigateToService,
     shouldHandle: shouldHandleLink,
+    reset: resetTransitionUI,
   };
 
-  if (REDUCED) return;
+  if (REDUCED) {
+    bindLifecycle();
+    return;
+  }
+
+  bindLifecycle();
 
   if (document.body) {
     bindLinks();

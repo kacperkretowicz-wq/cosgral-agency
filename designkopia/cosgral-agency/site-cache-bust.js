@@ -19,6 +19,26 @@
   }
 
   window.addEventListener("pageshow", function (event) {
-    if (event.persisted) location.reload();
+    if (!event.persisted) return;
+    /* Drop interaction locks before reload — bfcache can revive mid-transition. */
+    try {
+      if (window.cosgralPageTransition && window.cosgralPageTransition.reset) {
+        window.cosgralPageTransition.reset();
+      }
+      if (window.cosgralServiceDive && window.cosgralServiceDive.reset) {
+        window.cosgralServiceDive.reset();
+      }
+      if (window.cosgralNavMenu && window.cosgralNavMenu.reset) {
+        window.cosgralNavMenu.reset();
+      }
+      document.documentElement.classList.remove(
+        "is-page-enter",
+        "is-page-transitioning",
+        "is-nav-menu-open",
+        "is-service-dive-enter"
+      );
+      document.body.classList.remove("is-nav-menu-open", "is-nav-services-expanded");
+    } catch (e) {}
+    location.reload();
   });
 })();
