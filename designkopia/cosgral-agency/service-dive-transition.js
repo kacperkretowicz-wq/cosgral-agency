@@ -1,5 +1,6 @@
 /**
  * Animacja nurkowania w kafelek usługi + ripple wody.
+ * Czyści pełnoekranowy overlay po bfcache / anulowanej nawigacji (mobile back).
  */
 (function () {
   "use strict";
@@ -10,6 +11,11 @@
   var DIVE_KEY = "cosgral-service-dive";
   var SESSION_KEY = "cosgral-page-transition";
   var diving = false;
+  var diveTimer = 0;
+  var sinkTimer = 0;
+  var abortTimer = 0;
+  var DIVE_NAV_MS = 640;
+  var DIVE_ABORT_MS = DIVE_NAV_MS + 2200;
 
   function themeFromHref(href) {
     return window.cosgralServiceThemes?.fromHref?.(href) || null;
@@ -17,6 +23,37 @@
 
   function themeData(id) {
     return window.cosgralServiceThemes?.themes?.[id] || null;
+  }
+
+  function clearDiveTimers() {
+    if (diveTimer) {
+      window.clearTimeout(diveTimer);
+      diveTimer = 0;
+    }
+    if (sinkTimer) {
+      window.clearTimeout(sinkTimer);
+      sinkTimer = 0;
+    }
+    if (abortTimer) {
+      window.clearTimeout(abortTimer);
+      abortTimer = 0;
+    }
+  }
+
+  function removeDiveOverlays() {
+    document.querySelectorAll(".service-dive, .service-dive-enter").forEach(function (el) {
+      el.remove();
+    });
+  }
+
+  function resetDiveUI() {
+    diving = false;
+    clearDiveTimers();
+    removeDiveOverlays();
+    document.documentElement.classList.remove("is-service-dive-enter");
+    if (document.body && document.body.classList.contains("service-page")) {
+      document.documentElement.classList.add("service-dive-ready");
+    }
   }
 
   function drawRipple(canvas, color, progress) {
@@ -66,6 +103,7 @@
     }
     resize();
     function frame(now) {
+      if (!canvas.isConnected) return;
       var p = Math.min(1, (now - start) / duration);
       drawRipple(canvas, color, p);
       if (p < 1) requestAnimationFrame(frame);
@@ -135,13 +173,22 @@
       runRipple(ripple, theme.ripple, 640);
     });
 
-    window.setTimeout(function () {
+    sinkTimer = window.setTimeout(function () {
+      sinkTimer = 0;
       overlay.classList.add("is-sinking");
     }, 480);
 
-    window.setTimeout(function () {
+    diveTimer = window.setTimeout(function () {
+      diveTimer = 0;
       window.location.href = href;
-    }, 640);
+    }, DIVE_NAV_MS);
+
+    abortTimer = window.setTimeout(function () {
+      abortTimer = 0;
+      if (!diving) return;
+      if (document.visibilityState === "hidden") return;
+      resetDiveUI();
+    }, DIVE_ABORT_MS);
   }
 
   function revealPage() {
@@ -175,9 +222,14 @@
     runRipple(ripple, theme.ripple, 520, function () {
       overlay.classList.add("is-revealing");
       window.setTimeout(function () {
-        overlay.remove();
+        if (overlay.parentNode) overlay.remove();
       }, 560);
     });
+
+    /* Safety: enter overlay must not linger if animation callbacks stall. */
+    window.setTimeout(function () {
+      if (overlay.parentNode) overlay.remove();
+    }, 1600);
 
     return true;
   }
@@ -207,10 +259,24 @@
     );
   }
 
+  function bindLifecycle() {
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted || diving) {
+        resetDiveUI();
+      }
+    });
+    window.addEventListener("pagehide", function () {
+      clearDiveTimers();
+    });
+  }
+
   window.cosgralServiceDive = {
     playEnter: playEnter,
     playDive: playDive,
+    reset: resetDiveUI,
   };
+
+  bindLifecycle();
 
   if (document.body) {
     bindHomeCards();

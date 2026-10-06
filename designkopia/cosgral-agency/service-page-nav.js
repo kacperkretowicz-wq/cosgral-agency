@@ -24,4 +24,8 @@
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && open) setOpen(false);
   });
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted || open) setOpen(false);
+  });
 })();
