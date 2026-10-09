@@ -12,22 +12,22 @@ var GLASS = {
   roughness: 0,
   transmission: 1,
   ior: 1.5,
-  thickness: 1,
+  thickness: 1.55,
   dispersion: 0.7,
-  attenuationColor: "#d5e0ea",
-  attenuationDistance: 2.4,
-  clearcoat: 1,
-  clearcoatRoughness: 0,
-  specularIntensity: 1,
+  attenuationColor: "#f7f9fc",
+  attenuationDistance: 14,
+  clearcoat: 0.35,
+  clearcoatRoughness: 0.12,
+    specularIntensity: 0.28,
   specularColor: "#ffffff",
-  envMapIntensity: 1.7,
+    envMapIntensity: 0.28,
   iridescence: 1,
   iridescenceIOR: 1.8,
   iridescenceThicknessRange: [350, 850],
   iridescenceNoise: 0.6,
   iridescenceEdgeBias: 0.65,
-  edgeGlow: -0.85,
-  farSideDim: 0.72,
+  edgeGlow: 0.16,
+  farSideDim: 0.9,
 };
 
 var ORANGE = new THREE.Color("#FF4A1C");
@@ -90,7 +90,7 @@ function createGlassMaterial(edgeUniform, farUniform) {
   var m = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color(GLASS.color),
     metalness: GLASS.metalness,
-    roughness: GLASS.roughness,
+    roughness: 0.035,
     transmission: GLASS.transmission,
     ior: GLASS.ior,
     thickness: GLASS.thickness,
@@ -141,7 +141,7 @@ function createGlassMaterial(edgeUniform, farUniform) {
 
 function buildEnv(renderer, pmrem) {
   var env = new THREE.Scene();
-  env.background = new THREE.Color(0.08, 0.08, 0.09);
+  env.background = new THREE.Color(0.965, 0.953, 0.925);
   var plane = new THREE.PlaneGeometry(1, 1);
   function add(pos, size, power, color) {
     var mat = new THREE.MeshBasicMaterial({ color: color || 0xffffff, side: THREE.DoubleSide });
@@ -152,17 +152,14 @@ function buildEnv(renderer, pmrem) {
     mesh.lookAt(0, 0, 0);
     env.add(mesh);
   }
-  add([0, 8, 0], [8, 8], 3.2);
-  add([-7, 2, 2], [0.7, 8], 5.5);
-  add([7, 1, -2], [0.7, 8], 5.2);
-  add([2, 3, 7], [5, 0.7], 4.2);
-  add([-3, 2, -7], [1, 6], 3.4);
-  add([5, 4, 5], [2.2, 2.2], 3.6, 0xff6a2b);
-  add([-5, 3, 4], [2.4, 3.2], 2.8, 0x1a2f86);
-  add([4, -3, -5], [3, 2], 2.2, 0xff4a1c);
+  add([0, 7, 1], [12, 8], 1.05);
+  add([0, 1.2, 8], [9, 4], 1.15);
+  add([-6, 1.4, 3], [3.4, 4.2], 1.55, 0xff5a28);
+  add([6, 0.6, 2.4], [3.6, 4.4], 1.35, 0x16307a);
+  add([-2, 4, -6], [5, 3], 0.9);
   var floor = new THREE.Mesh(
     new THREE.PlaneGeometry(30, 30),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color(0.16, 0.16, 0.17) })
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(0.95, 0.93, 0.9) })
   );
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -5;
@@ -197,53 +194,30 @@ function buildEnv(renderer, pmrem) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.15 : 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1;
   renderer.setClearColor(PAPER, 1);
 
   var scene = new THREE.Scene();
   scene.background = PAPER;
-  scene.backgroundIntensity = 1.25;
-  var camera = new THREE.PerspectiveCamera(mobile ? 38 : 32, 1, 0.08, 40);
-  camera.position.set(0, 0.15, mobile ? 7.4 : 6.35);
+  scene.backgroundIntensity = 1;
+  var camera = new THREE.PerspectiveCamera(mobile ? 32 : 28, 1, 0.08, 40);
+  camera.position.set(0.05, -0.05, mobile ? 8.6 : 9.2);
 
   var pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = buildEnv(renderer, pmrem);
-  scene.environmentIntensity = 1;
+  scene.environmentIntensity = 0.85;
 
-  var sheetUniforms = { uTime: { value: 0 }, uMix: { value: 0.35 } };
-  var sheet = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.4, 3.4),
-    new THREE.ShaderMaterial({
-      uniforms: sheetUniforms,
-      vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
-      fragmentShader: [
-        "varying vec2 vUv; uniform float uTime; uniform float uMix;",
-        "void main(){",
-        "  float n = sin(vUv.x * 9.0 + uTime * 0.45) * 0.5 + 0.5;",
-        "  float m = sin(vUv.y * 6.5 - uTime * 0.28 + vUv.x * 2.4) * 0.5 + 0.5;",
-        "  vec3 paper = vec3(0.953, 0.941, 0.918);",
-        "  vec3 orange = vec3(1.0, 0.290, 0.110);",
-        "  vec3 navy = vec3(0.075, 0.137, 0.369);",
-        "  float band = smoothstep(0.25, 0.82, n * 0.65 + m * 0.55);",
-        "  vec3 col = mix(paper, mix(navy, orange, n), band * (0.45 + uMix));",
-        "  gl_FragColor = vec4(col, 1.0);",
-        "}",
-      ].join("\n"),
-    })
-  );
-  sheet.position.set(0, 0, -1.15);
-  scene.add(sheet);
-
+  var lift = mobile ? 0.55 : 0.78;
   var orangeBlob = new THREE.Mesh(
-    new THREE.SphereGeometry(1.55, mobile ? 20 : 28, mobile ? 16 : 22),
+    new THREE.SphereGeometry(0.82, mobile ? 18 : 24, mobile ? 14 : 18),
     new THREE.MeshBasicMaterial({ color: ORANGE })
   );
   var navyBlob = new THREE.Mesh(
-    new THREE.SphereGeometry(1.85, mobile ? 20 : 28, mobile ? 16 : 22),
+    new THREE.SphereGeometry(0.9, mobile ? 18 : 24, mobile ? 14 : 18),
     new THREE.MeshBasicMaterial({ color: NAVY })
   );
-  orangeBlob.position.set(-2.15, -0.35, -1.25);
-  navyBlob.position.set(2.25, 0.45, -1.45);
+  orangeBlob.position.set(-0.42, lift + 0.02, -1.05);
+  navyBlob.position.set(0.48, lift + 0.06, -1.15);
   scene.add(orangeBlob, navyBlob);
 
   var cube = new THREE.Group();
@@ -284,7 +258,7 @@ function buildEnv(renderer, pmrem) {
         grainFlow[i * 3 + 2] = (Math.random() - 0.5) * 1.4;
         grains.setColorAt(i, i % 5 < 3 ? orangeC : navyC);
       }
-      scene.add(grains);
+      cube.add(grains);
     }
     if (!pointCount) return;
     var home = new Float32Array(pointCount * 3);
@@ -363,13 +337,19 @@ function buildEnv(renderer, pmrem) {
         ].join("\n"),
       })
     );
-    scene.add(points);
+    cube.add(points);
   }
 
   var quat = new THREE.Quaternion();
   var targetQ = new THREE.Quaternion();
   var euler = new THREE.Euler();
-  var pose = { rx: 0.5, ry: -0.62, rz: 0.06, sc: 1.05, x: 0, br: 0, hour: 0, spin: 0 };
+  var pose = { rx: 0.5, ry: -0.62, rz: 0.06, sc: 0.55, x: 0.28, y: 0.78, br: 0, hour: 0, spin: 0 };
+
+  function heroScale(fraction) {
+    var dist = Math.max(1, Math.abs(camera.position.z));
+    var visible = 2 * Math.tan((camera.fov * Math.PI) / 360) * dist;
+    return (fraction * visible) / 2.55;
+  }
   var scrollP = 0;
   var running = true;
   var frames = 0;
@@ -402,11 +382,12 @@ function buildEnv(renderer, pmrem) {
     ry = lerp(ry, 0.02, smooth(toG));
     ry += sand * 0.9 + services * 1.6 + time * (services > 0 && hour < 0.4 ? 0.15 : 0.05);
     var rz = lerp(0.08, 0, smooth(toG));
-    var sc = lerp(1.05, 1.2, smooth(intro));
-    sc = lerp(sc, 0.96, sand * 0.35);
-    sc = lerp(sc, mobile ? 0.78 : 0.86, smooth(services) * (1 - motto));
-    sc = lerp(sc, mobile ? 1.05 : 1.22, smooth(motto));
-    var x = lerp(0, mobile ? 0.15 : 0.85, smooth(services) * (1 - smooth(hour)));
+    var hero = heroScale(mobile ? 0.34 : 0.38);
+    var sc = lerp(hero * 0.94, hero, smooth(intro));
+    sc = lerp(sc, hero * 0.9, sand * 0.35);
+    sc = lerp(sc, hero * 0.82, smooth(services) * (1 - motto));
+    sc = lerp(sc, hero * 1.08, smooth(motto));
+    var x = lerp(mobile ? 0.02 : 0.28, mobile ? 0.12 : 0.7, smooth(services) * (1 - smooth(hour)));
     x = lerp(x, 0, smooth(motto));
 
     pose.rx = rx;
@@ -414,6 +395,7 @@ function buildEnv(renderer, pmrem) {
     pose.rz = rz;
     pose.sc = sc * (1 - sandWave * 0.18);
     pose.x = x;
+    pose.y = mobile ? 0.55 : 0.78;
     pose.br = Math.max(sandWave, smooth(hour) * 0.72) * (1 - smooth(motto) * 0.85);
     pose.hour = smooth(hour) * (1 - smooth(motto));
     pose.spin = services;
@@ -458,15 +440,12 @@ function buildEnv(renderer, pmrem) {
     cube.quaternion.copy(quat);
     cube.scale.setScalar(Math.max(0.05, pose.sc));
     cube.position.x += (pose.x - cube.position.x) * 0.08;
-    cube.position.y = Math.sin(time * 0.6) * 0.04;
+    cube.position.y = pose.y + Math.sin(time * 0.6) * 0.03;
 
-    sheet.scale.setScalar(lerp(1, 2.35, pose.br));
-    sheetUniforms.uTime.value = time;
-    sheetUniforms.uMix.value = 0.62 + pose.br * 0.7;
-    orangeBlob.position.x = lerp(-2.15, -1.15, pose.br);
-    orangeBlob.position.y = lerp(-0.35, -0.05, pose.br) + Math.sin(time * 0.4) * 0.08;
-    navyBlob.position.x = lerp(2.25, 1.2, pose.br);
-    navyBlob.position.y = lerp(0.45, 0.1, pose.br);
+    orangeBlob.position.x = lerp(-0.42, -0.22, pose.br);
+    orangeBlob.position.y = pose.y + lerp(0.02, 0.12, pose.br) + Math.sin(time * 0.4) * 0.05;
+    navyBlob.position.x = lerp(0.48, 0.28, pose.br);
+    navyBlob.position.y = pose.y + lerp(0.08, 0.02, pose.br);
 
     if (points) {
       points.material.uniforms.uBreak.value = pose.br;
