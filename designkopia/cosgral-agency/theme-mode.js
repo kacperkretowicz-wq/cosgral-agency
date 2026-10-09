@@ -14,7 +14,7 @@
     } catch (e) {}
 
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", "#050505");
+    if (meta) meta.setAttribute("content", "#F3F0EA");
 
     document.querySelectorAll("[data-theme-toggle], .theme-switch").forEach(function (el) {
       if (el.parentNode) el.parentNode.removeChild(el);

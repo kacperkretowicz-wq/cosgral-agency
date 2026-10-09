@@ -1,0 +1,234 @@
+/* COSGRAL editorial direction — paper, navy, orange, grain.
+   Loaded last so it restyles every page without touching copy or JSON-LD. */
+
+:root {
+  --paper: #f3f0ea;
+  --paper-2: #e7e2d8;
+  --ink: #14161c !important;
+  --muted: #5c6170 !important;
+  --bg: #f3f0ea !important;
+  --bg-card: #fbfaf7 !important;
+  --border: rgba(14, 26, 79, 0.14) !important;
+  --accent: #ff4a1c !important;
+  --navy: #0e1a4f;
+  --navy-2: #13235e;
+  --orange: #ff4a1c;
+  --orange-2: #ff6a2b;
+  --service-bg: #f3f0ea !important;
+  --service-accent: #13235e !important;
+  --service-highlight: #ff4a1c !important;
+  --font-display: "Cabinet Grotesk", "Satoshi", system-ui, sans-serif !important;
+  --font-body: "Satoshi", system-ui, sans-serif;
+  --cg-chat-bg: rgba(251, 250, 247, 0.96);
+  --cg-chat-ink: #14161c;
+  --cg-chat-muted: #5c6170;
+  --cg-chat-border: rgba(14, 26, 79, 0.14);
+  --cg-chat-fill: #0e1a4f;
+  --cg-chat-on-fill: #f3f0ea;
+  --cg-chat-bubble-agent: rgba(14, 26, 79, 0.06);
+}
+
+html, body {
+  background: var(--paper) !important;
+  color: #14161c;
+}
+body.subpage,
+body.home-page,
+body.service-page,
+body.portfolio-page,
+body.portfolio-page--tiles,
+body.portfolio-page--tiles[data-tile-theme],
+body.portfolio-page[data-tile-ground="home"] {
+  background: #f3f0ea !important;
+  color: #14161c !important;
+  --tile-page-bg: #f3f0ea !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+  background-size: 180px 180px;
+}
+body.subpage::after,
+body.service-page::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  right: -12vw;
+  top: 8vh;
+  width: 46vw;
+  height: 46vw;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 40% 40%, rgba(255, 74, 28, 0.42), transparent 62%),
+    radial-gradient(circle at 70% 80%, rgba(14, 26, 79, 0.28), transparent 60%);
+  filter: blur(2px);
+}
+
+/* Dark WebGL grounds yield to the paper field. Media inside chapters stays. */
+body.subpage .subpage-ambient,
+body.subpage .subpage-ambient__blur,
+body.subpage .subpage-ambient__shade,
+body.subpage .subpage-cube-portal,
+body.portfolio-page .portfolio-tile-bg,
+body.portfolio-page .portfolio-home-ambient,
+body.portfolio-page .home-ambient,
+body.portfolio-page .home-ambient__shade,
+body.portfolio-page .portfolio-theme-stage,
+body.portfolio-page .portfolio-sand-portal,
+body.home-page .home-ambient,
+body.home-page .home-ambient__shade,
+body.home-page .home-sand {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+h1, h2, h3 {
+  font-family: "Cabinet Grotesk", "Satoshi", sans-serif;
+}
+
+.section-label,
+.ed-kicker,
+.case-study__eyebrow,
+.footer-col__title {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
+body.subpage h1,
+body.subpage h2,
+body.subpage h3,
+body.subpage .portfolio-hero__title,
+body.service-page h1,
+body.service-page h2,
+body.service-page h3,
+body.service-page p,
+body.service-page li,
+body.about-page h1,
+body.about-page p,
+body.about-page figcaption {
+  color: #14161c;
+}
+body.service-page {
+  background: #f3f0ea !important;
+}
+
+.site-nav,
+.site-nav a,
+.site-nav button {
+  color: #f4f1ec !important;
+}
+.nav-overlay__backdrop {
+  background: rgba(243, 240, 234, 0.78) !important;
+}
+.nav-overlay__list a,
+.nav-overlay__char {
+  color: #0e1a4f !important;
+  font-family: "Cabinet Grotesk", "Satoshi", sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+}
+
+footer.site-footer {
+  background: #0e1a4f !important;
+  color: #f3f0ea !important;
+}
+footer.site-footer a,
+footer.site-footer p,
+footer.site-footer li,
+footer.site-footer span,
+footer.site-footer .footer-col__title,
+footer.site-footer .cosgral-footer-wordmark {
+  color: #f3f0ea !important;
+}
+.footer-bottom a { border-bottom: 1px solid rgba(243, 240, 234, 0.4); }
+
+.glass-btn,
+.btn--primary {
+  background: #ff4a1c !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 999px;
+}
+
+#cookie-banner {
+  background: rgba(251, 250, 247, 0.96) !important;
+  color: #14161c !important;
+  border: 1px solid rgba(14, 26, 79, 0.14) !important;
+  box-shadow: 0 18px 50px rgba(14, 26, 79, 0.12) !important;
+}
+.cookie-banner__text,
+.cookie-banner__text a { color: #2a2e3a !important; }
+#cookie-banner .cookie-banner__btn--accept,
+.cookie-banner__accept {
+  background: #ff4a1c !important;
+  color: #fff !important;
+}
+
+body.portfolio-page--tiles .portfolio-chapter,
+body.portfolio-page--tiles .portfolio-chapter__title,
+body.portfolio-page--tiles .portfolio-chapter__lead,
+body.portfolio-page--tiles .portfolio-chapter__more {
+  color: #14161c !important;
+}
+body.portfolio-page--tiles .portfolio-chapter {
+  background:
+    radial-gradient(circle at 88% 18%, rgba(255, 74, 28, 0.28), transparent 32%),
+    radial-gradient(circle at 8% 80%, rgba(14, 26, 79, 0.18), transparent 36%),
+    #f3f0ea !important;
+}
+body.portfolio-page--tiles .portfolio-chapter__copy {
+  background: rgba(243, 240, 234, 0.86);
+  padding: 0.85rem 1rem 0.95rem;
+  border-left: 2px solid #ff4a1c;
+  max-width: min(36rem, 92vw);
+}
+body.portfolio-page--tiles .portfolio-chapter__title {
+  font-family: "Cabinet Grotesk", "Satoshi", sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  text-transform: uppercase;
+}
+
+.case-study { background: transparent; }
+.case-study__eyebrow { color: #ff4a1c !important; }
+.case-study__title,
+.case-study__lede,
+.case-study__back a,
+.case-study__copy,
+.case-study__copy p,
+.case-study__aside,
+.case-study__aside-label,
+.case-study li {
+  color: #14161c !important;
+}
+.case-study__back a { border-bottom-color: rgba(14, 26, 79, 0.35) !important; }
+.case-study__film {
+  margin: 0 clamp(1.25rem, 4vw, 3rem);
+  width: auto;
+  border-radius: 1.1rem;
+  overflow: hidden;
+}
+.privacy-doc,
+.privacy-doc p,
+.privacy-doc h1,
+.privacy-doc h2,
+.privacy-doc li {
+  color: #14161c !important;
+}
+
+input, textarea, select {
+  color: #14161c;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { display: none; }
+}

@@ -410,6 +410,12 @@
       "click",
       function (e) {
         if (openPanel) return;
+        var indexCard = e.target.closest(".service-index .services-fan__card");
+        if (indexCard) {
+          e.preventDefault();
+          openFromCard(indexCard);
+          return;
+        }
         var card = e.target.closest(".services-fan__card.is-active");
         if (!card) return;
         /* Boczne strefy ekranu / kafelka = nawigacja — nie otwieraj panelu */
