@@ -41,14 +41,14 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var lenis = new Lenis({
-    /* Wolniejszy, gładszy krok kółka — dłuższy dwell w sekcji, bez ciężkiego lagu */
-    lerp: MOBILE ? 0.14 : 0.1,
-    duration: MOBILE ? 0.92 : 1.12,
+    /* Tunel szklany: wolniejszy, dłuższy krok — kamera ma czas przejechać przez modele */
+    lerp: MOBILE ? 0.09 : 0.055,
+    duration: MOBILE ? 1.2 : 1.55,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: true,
     smoothTouch: false,
-    touchMultiplier: 1.05,
-    wheelMultiplier: MOBILE ? 0.78 : 0.72,
+    touchMultiplier: 0.92,
+    wheelMultiplier: MOBILE ? 0.58 : 0.42,
   });
 
   window.cosgralSmoothScroll.lenis = lenis;

@@ -1,0 +1,43 @@
+/* Glass camera tunnel — fixed WebGL layer behind/around existing sections.
+   Does not change section layout, type, copy, or content colors. */
+
+html.is-glass-tunnel .home-cube-portal {
+  z-index: 8;
+}
+
+/* A glass shape crossing the lens paints in front of the section,
+   then drops back so the copy stays readable. */
+html.is-glass-tunnel.is-tunnel-pass .home-cube-portal {
+  z-index: 80;
+}
+
+html.is-glass-tunnel.is-sand-stream .home-cube-portal,
+html.is-glass-tunnel.is-shattering .home-cube-portal {
+  z-index: 8;
+}
+
+html.is-glass-tunnel.is-tunnel-pass.is-sand-stream .home-cube-portal,
+html.is-glass-tunnel.is-tunnel-pass.is-shattering .home-cube-portal {
+  z-index: 80;
+}
+
+/* The old hero cube needed a harsh brightness lift in the menu.
+   Transmission glass already carries its own light. */
+body.is-nav-menu-open.is-glass-tunnel .home-cube-portal {
+  filter: none;
+}
+
+html.is-glass-tunnel.reduce-motion .home-cube-portal {
+  z-index: 8;
+}
+
+/* Static fallback keeps the wordmark readable. Motion mode still reveals it
+   through the existing intro timeline. */
+html.reduce-motion body.home-page .home-hero__letter,
+html.reduce-motion body.home-page .home-hero__tagline,
+html.reduce-motion body.home-page .home-hero__scroll {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  filter: none;
+}
