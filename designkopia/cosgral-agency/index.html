@@ -38,17 +38,94 @@
   "logo": "https://cosgral.pl/icon-512.png",
   "email": "kontakt@cosgral.pl",
   "telephone": ["+48-533-790-518", "+48-571-798-397"],
+  "founder": [
+    { "@type": "Person", "name": "Jakub Gral", "jobTitle": "CEO & Founder" },
+    { "@type": "Person", "name": "Kacper Kosikowski", "jobTitle": "COO & Founder" }
+  ],
   "sameAs": [
     "https://www.facebook.com/people/cosgralagency/61591582027536/",
     "https://www.instagram.com/cosgral.agency",
     "https://www.linkedin.com/company/cosgral-agency"
   ],
-  "areaServed": "PL",
+  "areaServed": ["PL", "EU"],
   "description": "Agencja cyfrowa — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "COSGRAL",
+  "url": "https://cosgral.pl/",
+  "image": "https://cosgral.pl/og-cover.png",
+  "telephone": "+48-533-790-518",
+  "email": "kontakt@cosgral.pl",
+  "priceRange": "$$",
+  "areaServed": ["PL", "EU"],
+  "description": "Agencja cyfrowa oferująca tworzenie stron internetowych, aplikacji webowych, systemów CRM, automatyzacji, SEO/GEO oraz grafiki i montażu wideo.",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Usługi COSGRAL",
+    "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tworzenie stron internetowych", "url": "https://cosgral.pl/uslugi/tworzenie-stron-internetowych.html" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Projektowanie aplikacji webowych", "url": "https://cosgral.pl/uslugi/projektowanie-aplikacji.html" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "SEO i GEO — pozycjonowanie", "url": "https://cosgral.pl/uslugi/pozycjonowanie-seo-geo.html" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Automatyzacje procesów biznesowych", "url": "https://cosgral.pl/uslugi/wdrazanie-automatyzacji.html" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Systemy CRM", "url": "https://cosgral.pl/uslugi/systemy-crm.html" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Grafika i montaż wideo", "url": "https://cosgral.pl/uslugi/grafika-i-montaz-wideo.html" } }
+    ]
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "COSGRAL",
+  "url": "https://cosgral.pl/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": { "@type": "EntryPoint", "urlTemplate": "https://cosgral.pl/portfolio.html?q={search_term_string}" },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Ile kosztuje wdrożenie CRM lub nowej strony?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Koszt zależy od zakresu: landing page, strona firmowa, CRM lub automatyzacja mają inną skalę. Po krótkim audycie otrzymujesz wycenę i plan realizacji. Napisz do nas na kontakt@cosgral.pl."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Ile potrwa realizacja projektu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Landing page: ok. 2–3 tygodnie. Strona firmowa: ok. 4–6 tygodni. CRM lub automatyzacja: zwykle 3–8 tygodni — zależnie od integracji i złożoności."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Czy muszę znać się na technologii, żeby współpracować z COSGRAL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nie. Po stronie klienta wystarczą cele biznesowe i decyzje. Stronę techniczną prowadzimy my i komunikujemy ją jasno na każdym etapie projektu."
+      }
+    }
+  ]
 }
 </script>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" />
+<link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
+<script src="cookie-consent.js?v=20261001a"></script>
 <link rel="stylesheet" href="cosgral-home.css?v=20260928mob1" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
@@ -89,6 +166,7 @@
 <script src="cosgral-motion-pref.js?v=20260919a"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
   <link rel="stylesheet" href="site-chat.css?v=20260925fix2" />
+<link rel="stylesheet" href="section-motion.css?v=20261009sm3" />
 </head>
 <body class="home-page">
 
@@ -140,7 +218,7 @@
 <div class="nav-overlay" id="nav-overlay" data-lenis-prevent aria-hidden="true">
   <div class="nav-overlay__backdrop" data-nav-backdrop></div>
   <div class="nav-overlay__stage">
-    <nav class="nav-overlay__links" aria-label="Menu główne">
+    <nav class="nav-overlay__links" aria-label="Menu główne" data-i18n-aria-label="nav_overlay.main_menu">
       <ul class="nav-overlay__list">
         <li><a href="#top" data-nav-close data-i18n="nav.start">Start</a></li>
         <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
@@ -199,15 +277,15 @@
   </div>
 
   <div class="services-fan__stage" data-fan-stage data-enter="right">
-    <button type="button" class="services-fan__side-hit services-fan__side-hit--prev" data-fan-side="prev" aria-label="Poprzednia usługa"></button>
-    <button type="button" class="services-fan__side-hit services-fan__side-hit--next" data-fan-side="next" aria-label="Następna usługa"></button>
-    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--prev" data-fan-prev aria-label="Kliknij lewą stronę ekranu" aria-hidden="true" tabindex="-1">
+    <button type="button" class="services-fan__side-hit services-fan__side-hit--prev" data-fan-side="prev" aria-label="Poprzednia usługa" data-i18n-aria-label="services_fan.prev"></button>
+    <button type="button" class="services-fan__side-hit services-fan__side-hit--next" data-fan-side="next" aria-label="Następna usługa" data-i18n-aria-label="services_fan.next"></button>
+    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--prev" data-fan-prev aria-label="Kliknij lewą stronę ekranu" data-i18n-aria-label="services_fan.tap_prev" aria-hidden="true" tabindex="-1">
       <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
       <span class="services-fan__tap-pulse-icon" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
     </button>
-    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--next" data-fan-next aria-label="Kliknij prawą stronę ekranu" aria-hidden="true" tabindex="-1">
+    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--next" data-fan-next aria-label="Kliknij prawą stronę ekranu" data-i18n-aria-label="services_fan.tap_next" aria-hidden="true" tabindex="-1">
       <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
       <span class="services-fan__tap-pulse-icon" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -513,7 +591,7 @@
   </div>
   <div class="footer-bottom container" data-enter="bottom">
     <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
-    <a href="/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
+    <a href="privacy-policy.html" data-i18n="footer.privacy">Privacy Policy</a>
   </div>
 </footer>
 </section>
@@ -543,5 +621,6 @@
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
+<script src="section-motion.js?v=20261009sm3"></script>
 </body>
 </html>
