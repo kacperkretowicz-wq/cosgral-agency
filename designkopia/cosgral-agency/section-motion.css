@@ -1,0 +1,65 @@
+/* Section motion — transforms, clip-path, and transient fills only.
+   Settled pages match the unscripted layout (inline styles are cleared). */
+
+.sm-live {
+  will-change: transform, clip-path, filter;
+}
+
+.is-sm-collage {
+  overflow: hidden;
+}
+
+/* Portfolio web chapter: shots pass through a circle while they whip and settle. */
+.chapter-lux__shot {
+  clip-path: circle(140% at 50% 50%);
+  transition:
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s ease,
+    filter 0.8s ease,
+    clip-path 1.05s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.chapter-lux.is-exit-left .chapter-lux__shot,
+.chapter-lux.is-enter-right .chapter-lux__shot {
+  clip-path: circle(40% at 50% 50%);
+}
+.chapter-lux.is-enter-settle .chapter-lux__shot {
+  clip-path: circle(140% at 50% 50%);
+  transition:
+    transform 1.35s cubic-bezier(0.14, 1, 0.28, 1),
+    opacity 0.85s ease,
+    filter 0.85s ease,
+    clip-path 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Grafiki chapter already swaps tile positions; mask them as circles for the swap beat. */
+.chapter-show__tile {
+  clip-path: none;
+  transition:
+    transform 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s ease,
+    width 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    clip-path 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.chapter-show.is-swap .chapter-show__tile {
+  clip-path: circle(46% at 50% 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter-lux__shot,
+  .chapter-lux.is-exit-left .chapter-lux__shot,
+  .chapter-lux.is-enter-right .chapter-lux__shot,
+  .chapter-lux.is-enter-settle .chapter-lux__shot,
+  .chapter-show__tile,
+  .chapter-show.is-swap .chapter-show__tile {
+    clip-path: none !important;
+    transition: none !important;
+  }
+}
+
+html.reduce-motion .chapter-lux__shot,
+html.reduce-motion .chapter-show__tile,
+html.reduce-motion .sm-live {
+  clip-path: none !important;
+  transition: none !important;
+  animation: none !important;
+}
