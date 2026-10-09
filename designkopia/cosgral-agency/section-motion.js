@@ -67,6 +67,8 @@
       docTop: 0,
       booted: false,
       hold: false,
+      intro: false,
+      introLock: false,
     };
     jobs.push(job);
     return job;
@@ -100,6 +102,8 @@
     vh = window.innerHeight || 1;
     jobs.forEach(function (job) {
       job.docTop = docTop(job.el);
+      job.boxH = job.el.offsetHeight || vh;
+      job.boxW = job.el.offsetWidth || vw;
     });
   }
 
@@ -118,10 +122,16 @@
       var p = progress(job, scrollY);
       if (!job.booted) {
         job.booted = true;
-        job.hold = p > 0.14;
+        job.hold = p > 0.02;
+        if (job.hold && job.intro) {
+          job.hold = false;
+          job.introLock = true;
+          runIntro(job);
+        }
       }
+      if (job.introLock) return;
       if (job.hold) {
-        if (p < 0.04) job.hold = false;
+        if (p < 0.02) job.hold = false;
         else {
           job.fn(1, job, true);
           return;
@@ -138,25 +148,44 @@
   }
 
   function maxRadius() {
-    return Math.hypot(vw, vh) * 0.74;
+    return Math.hypot(vw, vh) * 0.76;
+  }
+
+  function runIntro(job) {
+    var t0 = performance.now();
+    var dur = mobile() ? 900 : 1500;
+    function step(now) {
+      var p = Math.min(1, (now - t0) / dur);
+      job.fn(p, job, false);
+      if (p < 1) {
+        window.requestAnimationFrame(step);
+        return;
+      }
+      job.introLock = false;
+      job.fn(1, job, false);
+    }
+    window.requestAnimationFrame(step);
   }
 
   /**
-   * Circle wipe on a stacked / entering section.
+   * Circle wipe. The disc is anchored in the top of the section box,
+   * which is the part entering the viewport, and grows until it covers the screen.
    * p=0 and p=1 leave the element untouched.
    */
   function paintIris(el, p, opts) {
     opts = opts || {};
     if (!el) return;
-    if (p <= 0.015 || p >= 0.985) {
+    if (p <= 0.012 || p >= 0.992) {
       release(el);
       return;
     }
-    var e = ease(p);
-    var startFrac = opts.startFrac != null ? opts.startFrac : mobile() ? 0.28 : 0.07;
-    var r = mix(maxRadius() * startFrac, maxRadius(), e);
-    var top = vh * mix(opts.startPct || 100, opts.endPct || 10, p) / 100;
-    var y = vh * 0.46 - top;
+    var gentle = !!opts.gentle;
+    var sectionTop = (vh * mix(opts.startPct || 100, opts.endPct || 0, p)) / 100;
+    var knee = gentle ? 0.28 : mobile() ? 0.34 : 0.46;
+    var grow = p < knee ? 0 : ease((p - knee) / (1 - knee));
+    var startR = vh * (gentle ? 0.34 : mobile() ? 0.3 : 0.26);
+    var r = mix(startR, maxRadius(), grow);
+    var y = vh * (gentle ? 0.5 : 0.64) - sectionTop;
     var x = vw * 0.5;
     var path = "circle(" + r.toFixed(1) + "px at " + x.toFixed(1) + "px " + y.toFixed(1) + "px)";
     live(el);
@@ -174,6 +203,8 @@
         release(el);
         return;
       }
+      opts.boxH = job.boxH || vh;
+      opts.boxW = job.boxW || vw;
       paintIris(el, p, opts);
     });
   }
@@ -191,7 +222,7 @@
     opts = opts || {};
     var list = Array.prototype.slice.call(nodes);
     var host = opts.host || trigger;
-    addJob(trigger, opts.start || 92, opts.end || (mobile() ? 46 : 22), function (p, job, held) {
+    var job = addJob(trigger, opts.start || 92, opts.end || (mobile() ? 46 : 22), function (p, job, held) {
       if (held || p <= 0.02 || p >= 0.985) {
         list.forEach(release);
         clearHost(host);
@@ -230,6 +261,7 @@
         el.style.zIndex = i % 2 === 0 ? "6" : "2";
       });
     });
+    if (job) job.intro = true;
   }
 
   function titleHold(title, trigger, opts) {
@@ -310,11 +342,11 @@
     var process = document.getElementById("proces");
     var contact = document.getElementById("kontakt");
 
-    iris(services, 100, mobile() ? 36 : 8);
-    iris(work, 100, mobile() ? 36 : 8);
-    iris(faq, 100, mobile() ? 40 : 12, { startFrac: mobile() ? 0.34 : 0.12 });
-    iris(process, 100, mobile() ? 40 : 12, { startFrac: mobile() ? 0.34 : 0.12 });
-    iris(contact, 100, mobile() ? 42 : 14, { startFrac: mobile() ? 0.36 : 0.14 });
+    iris(services, 100, mobile() ? 18 : 0);
+    iris(work, 100, mobile() ? 18 : 0);
+    iris(faq, 100, mobile() ? 22 : 0, { gentle: true });
+    iris(process, 100, mobile() ? 22 : 0, { gentle: true });
+    iris(contact, 100, mobile() ? 24 : 2, { gentle: true });
 
     if (services) {
       earlySettle(services.querySelector(".services-fan__head") || services.querySelector(".services-fan__title"), services);
@@ -350,7 +382,7 @@
   function wireAbout() {
     var team = document.getElementById("about-team");
     if (!team) return;
-    iris(team, 100, mobile() ? 40 : 14, { startFrac: mobile() ? 0.3 : 0.08 });
+    iris(team, 100, mobile() ? 20 : 0);
     var photos = team.querySelectorAll(".about-team__photo");
     addJob(team, 92, mobile() ? 52 : 34, function (p, job, held) {
       if (held || p <= 0.02 || p >= 0.985) {
@@ -394,9 +426,12 @@
           if (title) release(title);
           return;
         }
-        var e = ease(p);
-        var r = mix(maxRadius() * (mobile() ? 0.32 : 0.1), maxRadius(), e);
-        var path = "circle(" + r.toFixed(1) + "px at 50% 46%)";
+        var e = ease(Math.max(0, (p - 0.2) / 0.8));
+        var chapterLeft = ch.offsetLeft - left;
+        var cx = vw * 0.5 - chapterLeft;
+        var cy = vh * 0.5;
+        var r = mix(vh * (mobile() ? 0.36 : 0.28), maxRadius(), e);
+        var path = "circle(" + r.toFixed(1) + "px at " + cx.toFixed(1) + "px " + cy.toFixed(1) + "px)";
         live(ch);
         ch.style.clipPath = path;
         ch.style.webkitClipPath = path;
@@ -467,7 +502,7 @@
     var viz = document.querySelectorAll(".case-viz-tile");
     if (viz.length) {
       Array.prototype.forEach.call(viz, function (tile) {
-        iris(tile, 96, mobile() ? 62 : 58, { startFrac: mobile() ? 0.45 : 0.22, fill: true });
+        iris(tile, 98, mobile() ? 55 : 42, { gentle: true, fill: true });
       });
       var vizTitle = document.querySelector(".case-study__title");
       var rail = document.querySelector(".case-viz-rail");
@@ -520,7 +555,7 @@
       });
     }
     Array.prototype.forEach.call(blocks, function (block) {
-      iris(block, 96, mobile() ? 64 : 52, { startFrac: mobile() ? 0.5 : 0.38, fill: true });
+      iris(block, 98, mobile() ? 62 : 48, { gentle: true, fill: true });
       depthNodes(block.querySelectorAll("h2, li, p"), block, {
         y: mobile() ? 16 : 26,
         x: 0,
@@ -534,7 +569,7 @@
 
   function wireContactCta() {
     document.querySelectorAll(".portfolio-contact-cta").forEach(function (el) {
-      iris(el, 98, mobile() ? 70 : 60, { startFrac: 0.42, fill: false });
+      iris(el, 98, mobile() ? 68 : 55, { gentle: true, fill: false });
       depthNodes(el.querySelectorAll("h2, p, .glass-btn"), el, {
         y: 22,
         scale: 1,

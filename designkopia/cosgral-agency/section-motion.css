@@ -63,3 +63,30 @@ html.reduce-motion .sm-live {
   transition: none !important;
   animation: none !important;
 }
+
+/* Service panel (homepage ?service= and the fan) — copy settles after the shell opens. */
+@keyframes sm-panel-in {
+  from { transform: translate3d(0, 28px, 0); filter: blur(8px); }
+  to { transform: none; filter: none; }
+}
+.service-panel.is-content-ready .service-panel__title,
+.service-panel.is-content-ready .service-panel__copy,
+.service-panel.is-content-ready .service-panel__cta {
+  animation: sm-panel-in 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.service-panel.is-content-ready .service-panel__copy { animation-delay: 0.08s; }
+.service-panel.is-content-ready .service-panel__cta { animation-delay: 0.16s; }
+
+@media (max-width: 900px) {
+  @keyframes sm-panel-in {
+    from { transform: translate3d(0, 16px, 0); filter: none; }
+    to { transform: none; filter: none; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .service-panel.is-content-ready .service-panel__title,
+  .service-panel.is-content-ready .service-panel__copy,
+  .service-panel.is-content-ready .service-panel__cta {
+    animation: none !important;
+  }
+}
