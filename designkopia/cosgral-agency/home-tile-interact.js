@@ -214,6 +214,9 @@
     document.querySelectorAll(".home-scene > .home-scene__panel").forEach(function (panel) {
       if (panel.closest(".home-hero")) return;
       if (panel.closest("#kontakt") || panel.closest(".home-contact")) return;
+      /* Realizacje pins an inner stage. A tilt face (perspective / will-change)
+         would trap that fixed pin inside the section. */
+      if (panel.closest("#realizacje")) return;
       wrapChildren(panel);
     });
 
