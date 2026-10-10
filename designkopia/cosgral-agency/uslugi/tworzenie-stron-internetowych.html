@@ -11,6 +11,8 @@
 <title>Tworzenie stron internetowych — cosgral.agency</title>
 <meta name="description" content="Strony wizytówkowe, landing page pod kampanie i rozbudowane serwisy firmowe — nowoczesny stack, szybkość i design bez kompromisów." />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" />
+<link rel="stylesheet" href="../pins4.css?v=20261010p4b" />
 <link rel="stylesheet" href="../cosgral-subpages.css?v=20260924polish1" />
 <link rel="stylesheet" href="../service-page-nav.css?v=20260923fix3" />
 <link rel="stylesheet" href="../page-transitions.css?v=20260924polish1" />
@@ -40,7 +42,7 @@
 <script src="../cosgral-motion-pref.js?v=20260919a"></script>
   <link rel="stylesheet" href="../site-chat.css?v=20260922ui51" />
 </head>
-<body class="subpage service-page" data-service-theme="blue">
+<body class="subpage service-page p4-service" data-service-theme="blue">
 <a class="visually-hidden" href="#main">Przejdź do treści</a>
 
 <div class="service-page-video" aria-hidden="true">
@@ -67,7 +69,6 @@
         <li><a href="../index.html#top" data-nav-close>Start</a></li>
         <li><a href="../portfolio.html" data-nav-close>Realizacje</a></li>
         <li><a href="../index.html#uslugi" data-nav-close>Usługi</a></li>
-        <li><a href="../index.html#proces" data-nav-close>Proces</a></li>
         <li><a href="../index.html#faq" data-nav-close>FAQ</a></li>
         <li><a href="../index.html#kontakt" data-nav-close>Kontakt</a></li>
       </ul>
@@ -76,33 +77,45 @@
 </div>
 
 
-<main id="main">
-  <section class="service-hero container">
-    <p class="service-hero__num">01 — Usługa</p>
-    <h1 class="service-hero__title">Tworzenie stron internetowych</h1>
+<main id="main" class="p4-service">
+  <section class="p4-service-hero">
+    <div>
+      <p class="p4-kicker">Strony</p>
+      <h1>Wizytówki, landingi, serwisy z CMS.</h1>
+      <a class="glass-btn" href="../index.html#kontakt">Wyceń projekt</a>
+    </div>
+    <canvas data-p4-object="phone"></canvas>
   </section>
-
-  <section class="service-block container">
-    <h2 class="service-block__title">Co robimy</h2>
+  <section class="p4-facts">
+    <h2>Zakres</h2>
     <ul>
-      <li>Strony wizytówkowe i landing page pod konkretne kampanie</li>
-      <li>Rozbudowane serwisy firmowe z panelem CMS</li>
-      <li>Sklepy e-commerce (od prostych po zintegrowane z ERP/CRM)</li>
-      <li>Animacje i interakcje scroll-driven, gdy marka na to zasługuje</li>
-      <li>Optymalizacja SEO, szybkości ładowania i Core Web Vitals</li>
+      <li>Wizytówki i landingi pod kampanię</li>
+      <li>Serwisy firmowe z panelem CMS</li>
+      <li>Szybkość i czytelny indeks</li>
+      <li>Scroll i motion, gdy marka zasługuje</li>
     </ul>
+    <p>Dla firm, które wchodzą na rynek albo wyrosły ze starej strony.</p>
   </section>
-
-  <section class="service-block container">
-    <h2 class="service-block__title">Dla kogo i jaki efekt</h2>
-    <p>Dla firm, które chcą wyróżnić się wizualnie i technicznie — nie kolejnym szablonem, tylko stroną zbudowaną pod ich konkretny model biznesowy i grupę odbiorców. Pracujemy zarówno z markami wchodzącymi na rynek, jak i z firmami, które przechodzą rebranding albo po prostu wyrosły ze starej strony.</p>
-    <p>Efektem jest strona, która realnie konwertuje — ładuje się szybko, prowadzi użytkownika do działania i wygląda na tyle dobrze, że staje się argumentem sprzedażowym samym w sobie, nie tylko wizytówką w internecie.</p>
-  </section>
-
-  <section class="service-block container">
-    <a class="service-cta glass-btn" href="../index.html#kontakt">Zacznijmy od bezpłatnego audytu</a>
+  <section class="p4-work">
+    <h2>Strony, które stoją</h2>
+    <article>
+      <h3><a href="../portfolio-strona-trove.html">Trove Archive</a></h3>
+      <p>Sklep vintage luxury. Editorial na wierzchu, zakup pod spodem.</p>
+      <p><a href="https://trovearchive.com/" target="_blank" rel="noopener noreferrer">trovearchive.com</a></p>
+    </article>
+    <article>
+      <h3><a href="../portfolio-strona-juicy-events.html">Juicy Events</a></h3>
+      <p>Agencja eventowa w całej Polsce. Strona jak zaproszenie, nie katalog.</p>
+      <p><a href="https://juicyevents.pl/" target="_blank" rel="noopener noreferrer">juicyevents.pl</a></p>
+    </article>
+    <article>
+      <h3><a href="../portfolio-strona-mj.html">MJ Social Media</a></h3>
+      <p>Landing content creatora. Ruch z social mediów do rozmowy.</p>
+      <p><a href="https://mjsocialmedia.netlify.app/" target="_blank" rel="noopener noreferrer">mjsocialmedia.netlify.app</a></p>
+    </article>
   </section>
 </main>
+
 
 <footer class="site-footer">
   <div class="container">
@@ -117,7 +130,6 @@
           <li><a href="../portfolio.html#montaz">Montaż</a></li>
           <li><a href="../portfolio.html#grafiki">Grafiki</a></li>
           <li><a href="../index.html#uslugi">Usługi</a></li>
-          <li><a href="../index.html#proces">Proces</a></li>
           <li><a href="../index.html#faq">FAQ</a></li>
           <li><a href="../index.html#kontakt">Kontakt</a></li>
         </ul>
@@ -167,5 +179,7 @@
 <script defer src="../sections.js?v=20260812j"></script>
 <script defer src="../site-chat.js?v=20260924idle1"></script>
 <script defer src="../service-page-nav.js?v=20260923fix3"></script>
+<script src="../pins4-gyro.js?v=20261010p4"></script>
+<script type="module" src="../pins4-service.js?v=20261010p4"></script>
 </body>
 </html>

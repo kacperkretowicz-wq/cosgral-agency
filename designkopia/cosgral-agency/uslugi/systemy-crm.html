@@ -11,6 +11,8 @@
 <title>Systemy CRM — cosgral.agency</title>
 <meta name="description" content="Wdrożenie i konfiguracja CRM, migracja danych i automatyzacja lejka sprzedaży — porządek w relacjach z klientami zamiast rozproszonych arkuszy." />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" />
+<link rel="stylesheet" href="../pins4.css?v=20261010p4b" />
 <link rel="stylesheet" href="../cosgral-subpages.css?v=20260924polish1" />
 <link rel="stylesheet" href="../service-page-nav.css?v=20260923fix3" />
 <link rel="stylesheet" href="../page-transitions.css?v=20260924polish1" />
@@ -40,7 +42,7 @@
 <script src="../cosgral-motion-pref.js?v=20260919a"></script>
   <link rel="stylesheet" href="../site-chat.css?v=20260922ui51" />
 </head>
-<body class="subpage service-page" data-service-theme="crimson">
+<body class="subpage service-page p4-service" data-service-theme="crimson">
 <a class="visually-hidden" href="#main">Przejdź do treści</a>
 
 <div class="service-page-video" aria-hidden="true">
@@ -66,7 +68,6 @@
         <li><a href="../index.html#top" data-nav-close>Start</a></li>
         <li><a href="../portfolio.html" data-nav-close>Realizacje</a></li>
         <li><a href="../index.html#uslugi" data-nav-close>Usługi</a></li>
-        <li><a href="../index.html#proces" data-nav-close>Proces</a></li>
         <li><a href="../index.html#faq" data-nav-close>FAQ</a></li>
         <li><a href="../index.html#kontakt" data-nav-close>Kontakt</a></li>
       </ul>
@@ -75,33 +76,39 @@
 </div>
 
 
-<main id="main">
-  <section class="service-hero container">
-    <p class="service-hero__num">05 — Usługa</p>
-    <h1 class="service-hero__title">Systemy CRM</h1>
+<main id="main" class="p4-service">
+  <section class="p4-service-hero">
+    <div>
+      <p class="p4-kicker">CRM</p>
+      <h1>Jedno źródło prawdy.</h1>
+      <a class="glass-btn" href="../index.html#kontakt">Wyceń projekt</a>
+    </div>
+    <canvas data-p4-object="chart"></canvas>
   </section>
-
-  <section class="service-block container">
-    <h2 class="service-block__title">Co robimy</h2>
+  <section class="p4-facts">
+    <h2>Zakres</h2>
     <ul>
-      <li>Wdrożenie i konfiguracja CRM (HubSpot, Pipedrive, rozwiązania dedykowane)</li>
-      <li>Migracja danych z arkuszy i starych systemów</li>
-      <li>Automatyzacja lejka sprzedaży i follow-upów</li>
-      <li>Integracja CRM z formularzami, mailingiem i stroną</li>
-      <li>Szkolenie zespołu i wsparcie po wdrożeniu</li>
+      <li>HubSpot, Pipedrive albo CRM dedykowany</li>
+      <li>Migracja z arkuszy</li>
+      <li>Lejek i follow-upy</li>
+      <li>Podpięcie pod formularze, mail i stronę</li>
+      <li>Szkolenie po starcie</li>
     </ul>
+    <p>Relacje zostają w firmie, nie w głowie handlowca.</p>
   </section>
-
-  <section class="service-block container">
-    <h2 class="service-block__title">Dla kogo i jaki efekt</h2>
-    <p>Dla firm, w których informacje o klientach żyją w mailach, arkuszach i głowach handlowców — a każde odejście pracownika oznacza utratę części wiedzy o relacjach z klientami.</p>
-    <p>Efektem jest jedno, uporządkowane źródło prawdy o kliencie: widać, na jakim etapie jest każda rozmowa, nic nie umyka, a raportowanie sprzedaży przestaje być ręczną pracą pod koniec miesiąca.</p>
-  </section>
-
-  <section class="service-block container">
-    <a class="service-cta glass-btn" href="../index.html#kontakt">Zacznijmy od bezpłatnego audytu</a>
+  <section class="p4-work">
+    <h2>CRM, które powstały</h2>
+    <article>
+      <h3><a href="../portfolio-telforceone-crm.html">TelForceOne S.A.</a></h3>
+      <p>Baza klientów i mapa dla sprzedaży terenowej. Wizyta i rekord klienta w jednym przebiegu.</p>
+    </article>
+    <article>
+      <h3><a href="../portfolio.html#automatyzacje">Northline Studio</a></h3>
+      <p>Leady, deale, pipeline, notatki i przypomnienia dla zespołu B2B.</p>
+    </article>
   </section>
 </main>
+
 
 <footer class="site-footer">
   <div class="container">
@@ -116,7 +123,6 @@
           <li><a href="../portfolio.html#montaz">Montaż</a></li>
           <li><a href="../portfolio.html#grafiki">Grafiki</a></li>
           <li><a href="../index.html#uslugi">Usługi</a></li>
-          <li><a href="../index.html#proces">Proces</a></li>
           <li><a href="../index.html#faq">FAQ</a></li>
           <li><a href="../index.html#kontakt">Kontakt</a></li>
         </ul>
@@ -166,5 +172,7 @@
 <script defer src="../sections.js?v=20260812j"></script>
 <script defer src="../site-chat.js?v=20260924idle1"></script>
 <script defer src="../service-page-nav.js?v=20260923fix3"></script>
+<script src="../pins4-gyro.js?v=20261010p4"></script>
+<script type="module" src="../pins4-service.js?v=20261010p4"></script>
 </body>
 </html>

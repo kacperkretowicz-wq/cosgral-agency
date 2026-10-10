@@ -11,6 +11,8 @@
 <title>Projektowanie aplikacji — cosgral.agency</title>
 <meta name="description" content="Panele klienckie, narzędzia wewnętrzne i integracje z API — aplikacje webowe zaprojektowane pod realny proces pracy Twojego zespołu." />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" />
+<link rel="stylesheet" href="../pins4.css?v=20261010p4b" />
 <link rel="stylesheet" href="../cosgral-subpages.css?v=20260924polish1" />
 <link rel="stylesheet" href="../service-page-nav.css?v=20260923fix3" />
 <link rel="stylesheet" href="../page-transitions.css?v=20260924polish1" />
@@ -40,7 +42,7 @@
 <script src="../cosgral-motion-pref.js?v=20260919a"></script>
   <link rel="stylesheet" href="../site-chat.css?v=20260922ui51" />
 </head>
-<body class="subpage service-page" data-service-theme="purple">
+<body class="subpage service-page p4-service" data-service-theme="purple">
 <a class="visually-hidden" href="#main">Przejdź do treści</a>
 
 <div class="service-page-video" aria-hidden="true">
@@ -66,7 +68,6 @@
         <li><a href="../index.html#top" data-nav-close>Start</a></li>
         <li><a href="../portfolio.html" data-nav-close>Realizacje</a></li>
         <li><a href="../index.html#uslugi" data-nav-close>Usługi</a></li>
-        <li><a href="../index.html#proces" data-nav-close>Proces</a></li>
         <li><a href="../index.html#faq" data-nav-close>FAQ</a></li>
         <li><a href="../index.html#kontakt" data-nav-close>Kontakt</a></li>
       </ul>
@@ -75,33 +76,28 @@
 </div>
 
 
-<main id="main">
-  <section class="service-hero container">
-    <p class="service-hero__num">02 — Usługa</p>
-    <h1 class="service-hero__title">Projektowanie aplikacji</h1>
+<main id="main" class="p4-service">
+  <section class="p4-service-hero">
+    <div>
+      <p class="p4-kicker">Aplikacje</p>
+      <h1>Narzędzia pod realny proces.</h1>
+      <a class="glass-btn" href="../index.html#kontakt">Wyceń projekt</a>
+    </div>
+    <canvas data-p4-object="gear"></canvas>
   </section>
-
-  <section class="service-block container">
-    <h2 class="service-block__title">Co robimy</h2>
+  <section class="p4-facts">
+    <h2>Zakres</h2>
     <ul>
       <li>Panele klienckie i portale B2B</li>
-      <li>Narzędzia wewnętrzne usprawniające pracę zespołu</li>
-      <li>Integracje z zewnętrznymi API i systemami firmy</li>
-      <li>Progressive Web Apps (PWA) dostępne jak natywna aplikacja</li>
-      <li>Projektowanie UX pod konkretny proces, nie generyczny wzorzec</li>
+      <li>Narzędzia wewnętrzne</li>
+      <li>Integracje API</li>
+      <li>PWA w przeglądarce</li>
+      <li>UX pod konkretny proces</li>
     </ul>
-  </section>
-
-  <section class="service-block container">
-    <h2 class="service-block__title">Dla kogo i jaki efekt</h2>
-    <p>Dla firm, które wyrosły z arkuszy kalkulacyjnych i maili, a ich proces wymaga własnego narzędzia — nie kolejnej subskrypcji uniwersalnego SaaS-u, który i tak trzeba obchodzić wyjątkami.</p>
-    <p>Efektem jest aplikacja skrojona pod Twój realny przepływ pracy — zespół pracuje szybciej, mniej rzeczy robi się ręcznie, a dane nie giną między systemami.</p>
-  </section>
-
-  <section class="service-block container">
-    <a class="service-cta glass-btn" href="../index.html#kontakt">Zacznijmy od bezpłatnego audytu</a>
+    <p>Dla firm, które wyrosły z arkuszy i nie chcą uniwersalnego SaaS-u.</p>
   </section>
 </main>
+
 
 <footer class="site-footer">
   <div class="container">
@@ -116,7 +112,6 @@
           <li><a href="../portfolio.html#montaz">Montaż</a></li>
           <li><a href="../portfolio.html#grafiki">Grafiki</a></li>
           <li><a href="../index.html#uslugi">Usługi</a></li>
-          <li><a href="../index.html#proces">Proces</a></li>
           <li><a href="../index.html#faq">FAQ</a></li>
           <li><a href="../index.html#kontakt">Kontakt</a></li>
         </ul>
@@ -166,5 +161,7 @@
 <script defer src="../sections.js?v=20260812j"></script>
 <script defer src="../site-chat.js?v=20260924idle1"></script>
 <script defer src="../service-page-nav.js?v=20260923fix3"></script>
+<script src="../pins4-gyro.js?v=20261010p4"></script>
+<script type="module" src="../pins4-service.js?v=20261010p4"></script>
 </body>
 </html>

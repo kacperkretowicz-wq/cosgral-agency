@@ -470,6 +470,7 @@
   }
 
   (async function () {
+    if (document.body && document.body.classList.contains("pins4")) return;
     var main = document.querySelector("main.home-film");
     if (!main || !window.gsap) {
       if (main) {

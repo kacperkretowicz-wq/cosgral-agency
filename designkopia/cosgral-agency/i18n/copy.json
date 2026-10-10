@@ -219,20 +219,20 @@
       "en": "Frequently asked questions"
     },
     "q1": {
-      "pl": "Ile kosztuje wdrożenie CRM lub nowej strony?",
-      "en": "How much does a CRM or new website cost?"
+      "pl": "Od czego zaczynamy?",
+      "en": "Where do we start?"
     },
     "a1": {
-      "pl": "Koszt zależy od zakresu: landing page, strona firmowa, CRM lub automatyzacja mają inną skalę. Po krótkim audycie otrzymujesz wycenę i plan realizacji.",
-      "en": "Cost depends on scope: a landing page, company website, CRM or automation differ in scale. After a short audit you receive a quote and delivery plan."
+      "pl": "Od rozmowy o marce, procesie i tym, co zespół ma prowadzić dalej. Najpierw smak i zakres, potem budowa.",
+      "en": "With a conversation about the brand, the process and what the team will run afterwards. Taste and scope first, then the build."
     },
     "q2": {
-      "pl": "Ile potrwa realizacja?",
-      "en": "How long will it take?"
+      "pl": "Co zostaje po starcie?",
+      "en": "What stays after launch?"
     },
     "a2": {
-      "pl": "Landing page: ok. 2–3 tygodnie. Strona firmowa: ok. 4–6 tygodni. CRM lub automatyzacja: zwykle 3–8 tygodni — zależnie od integracji i złożoności.",
-      "en": "Landing page: about 2–3 weeks. Company website: about 4–6 weeks. CRM or automation: usually 3–8 weeks — depending on integrations and complexity."
+      "pl": "Strona, system albo montaż, który da się prowadzić. Szkolenie i dokumentacja idą razem z oddaniem.",
+      "en": "A site, a system or an edit the team can run. Training and documentation ship with the handover."
     },
     "q3": {
       "pl": "Czy muszę znać się na technologii?",
@@ -285,16 +285,16 @@
       "en": "Thank you for reaching out"
     },
     "success_body": {
-      "pl": "Otrzymaliśmy Twoją wiadomość. Wrócimy do Ciebie w ciągu jednego dnia roboczego — zwykle szybciej.",
-      "en": "We've received your message. We'll get back to you within one business day — usually sooner."
+      "pl": "Otrzymaliśmy Twoją wiadomość. Wrócimy z odpowiedzią.",
+      "en": "We've received your message. We'll reply."
     },
     "error_send": {
       "pl": "Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na kontakt@cosgral.pl.",
       "en": "We couldn't send your message. Please try again or email kontakt@cosgral.pl."
     },
     "mailto_subject": {
-      "pl": "Bezpłatny audyt",
-      "en": "Free audit"
+      "pl": "Zapytanie o projekt",
+      "en": "Project inquiry"
     },
     "mailto_inquiry": {
       "pl": "zapytanie",
@@ -349,12 +349,12 @@
   },
   "contact": {
     "call_title": {
-      "pl": "Kontakt",
-      "en": "Contact"
+      "pl": "Wyceń projekt",
+      "en": "Scope the project"
     },
     "call_lead": {
-      "pl": "Zadzwoń lub napisz — odpowiadamy zwykle w ciągu jednego dnia roboczego.",
-      "en": "Call or write us — we usually reply within one business day."
+      "pl": "Zadzwoń lub napisz — wracamy z odpowiedzią.",
+      "en": "Call or write — we'll come back with a reply."
     },
     "social_label": {
       "pl": "Social media",
@@ -917,8 +917,8 @@
       "en": "AI chatbot for customer messages"
     },
     "auto3_desc": {
-      "pl": "Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź dostępna 24/7.",
-      "en": "An AI assistant answering Instagram, Facebook and website messages — FAQ, opening hours, preliminary quotes and handoff to a consultant. First reply available 24/7."
+      "pl": "Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępna rozmowa oraz przekazanie do konsultanta.",
+      "en": "An AI assistant answering Instagram, Facebook and website messages — FAQ, opening hours, a first conversation and handoff to a consultant."
     },
     "auto4_tag": {
       "pl": "Automatyzacja",

@@ -250,6 +250,7 @@
         if (block.matches("article, .case-study")) return;
       }
       if (block.classList.contains("home-scene")) return;
+      if (block.classList.contains("p4-act") || block.closest(".p4-act")) return;
       if (block.hasAttribute("data-portfolio-section")) return;
       /* GSAP pin-spacer + chapter title: wrapping breaks full-bleed pin bounds */
       if (block.classList.contains("pin-spacer") || (block.className && String(block.className).indexOf("pin-spacer") !== -1)) return;

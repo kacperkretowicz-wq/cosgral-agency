@@ -3,7 +3,7 @@
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 
-var EDGE_RADIUS_RATIO = 0.2;
+var EDGE_RADIUS_RATIO = 0.055;
 var EDGE_SEGMENTS = 5;
 var EDGE_OUTLINE_ANGLE = 72;
 
@@ -125,17 +125,49 @@ function setWireOpacity(wire, value) {
   if (wire) wire.material.opacity = value;
 }
 
+export function createGlassMaterial(mobile) {
+  return new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 0,
+    roughness: 0.07,
+    transmission: mobile ? 0.78 : 0.9,
+    thickness: mobile ? 0.85 : 1.25,
+    ior: 1.5,
+    iridescence: mobile ? 0.7 : 1,
+    iridescenceIOR: 1.28,
+    iridescenceThicknessRange: new THREE.Vector2(120, 420),
+    clearcoat: 1,
+    clearcoatRoughness: 0.06,
+    envMapIntensity: 1.25,
+    transparent: true,
+    opacity: 1,
+    side: THREE.FrontSide,
+  });
+}
+
+export function attachGlassEnv(renderer, scene) {
+  if (!renderer || !scene || scene.environment) return;
+  var pmrem = new THREE.PMREMGenerator(renderer);
+  var envScene = new THREE.Scene();
+  var hemi = new THREE.HemisphereLight(0xf4f7ff, 0x142038, 0.7);
+  envScene.add(hemi);
+  var key = new THREE.DirectionalLight(0xffffff, 2.4);
+  key.position.set(3, 6, 4);
+  envScene.add(key);
+  var plasma = new THREE.PointLight(0xd24bff, 20, 14);
+  plasma.position.set(-4, 1.2, 2);
+  envScene.add(plasma);
+  var navy = new THREE.PointLight(0x3a6dff, 18, 14);
+  navy.position.set(4, -0.6, 2);
+  envScene.add(navy);
+  scene.environment = pmrem.fromScene(envScene, 0.04).texture;
+  pmrem.dispose();
+}
+
 export function createIntactCubeParts(half) {
   var boxGeo = createRoundedBoxGeometry(half);
-  var shellMat = new THREE.MeshBasicMaterial({
-    color: 0x080808,
-    transparent: true,
-    opacity: 0.45,
-    depthWrite: true,
-    polygonOffset: true,
-    polygonOffsetFactor: 1,
-    polygonOffsetUnits: 1,
-  });
+  var mobile = window.matchMedia("(max-width: 900px)").matches;
+  var shellMat = createGlassMaterial(mobile);
   var shell = new THREE.Mesh(boxGeo, shellMat);
   shell.renderOrder = 0;
 
