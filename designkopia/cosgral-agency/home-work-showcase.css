@@ -97,12 +97,33 @@ html.is-free-scroll #realizacje.home-work.is-work-showcase {
   min-height: 0;
 }
 
+#realizacje.is-work-showcase .home-work__card,
+#realizacje.is-work-showcase .home-work__head,
+#realizacje.is-work-showcase .home-work__lead,
+#realizacje.is-work-showcase .home-work__footer,
+#realizacje.is-work-showcase .home-work__still {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 #realizacje.is-work-showcase .home-work__card {
   height: 100%;
   min-height: 0;
   transform: none !important;
   transform-style: flat;
   transition: none;
+  background: #141414;
+}
+
+/* Video frames often fail to composite under a scaled board.
+   The still is the visible picture; the video stays in the DOM. */
+#realizacje.is-work-showcase .home-work__card-media video {
+  opacity: 0 !important;
+}
+
+#realizacje.is-work-showcase .home-work__still {
+  opacity: 1;
+  z-index: 0;
 }
 
 #realizacje.is-work-showcase .home-work__footer {

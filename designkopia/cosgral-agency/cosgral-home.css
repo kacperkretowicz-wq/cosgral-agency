@@ -1579,6 +1579,8 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 }
 .home-work__card-media video,
 .home-work__card-media img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;

@@ -33,6 +33,20 @@
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
 
+  function titleWords(title) {
+    if (!title) return "Wybrane realizacje";
+    var words = title.querySelectorAll(".reveal-word");
+    if (words.length) {
+      return Array.prototype.map
+        .call(words, function (word) {
+          return word.textContent.trim();
+        })
+        .filter(Boolean)
+        .join(" ");
+    }
+    return title.textContent.replace(/\s+/g, " ").trim() || "Wybrane realizacje";
+  }
+
   function unwrapTilt(panel) {
     var layer = panel.querySelector(":scope > .home-tilt-layer");
     if (!layer) return;
@@ -101,7 +115,15 @@
     if (cover) cover.kill();
     gsap.set(panel, { clearProps: "transform,filter,opacity,visibility" });
     gsap.killTweensOf(cards);
-    if (footer) gsap.killTweensOf(footer);
+    gsap.set(cards, { clearProps: "opacity,visibility,transform,filter,x,y" });
+    if (head) {
+      gsap.killTweensOf(head);
+      gsap.set(head, { clearProps: "opacity,visibility,transform,filter,x,y" });
+    }
+    if (footer) {
+      gsap.killTweensOf(footer);
+      gsap.set(footer, { clearProps: "opacity,visibility,transform,filter,x,y" });
+    }
 
     var camTitle = pin.querySelector(".home-work__cam-title");
     if (!camTitle) {
@@ -109,7 +131,7 @@
       camTitle.className = "home-work__cam-title";
       camTitle.setAttribute("aria-hidden", "true");
       var camText = document.createElement("span");
-      camText.textContent = title ? title.textContent.replace(/\s+/g, " ").trim() : "Wybrane realizacje";
+      camText.textContent = titleWords(title);
       var camSup = document.createElement("sup");
       camSup.textContent = "(04)";
       camTitle.appendChild(camText);
@@ -151,20 +173,46 @@
       };
     }
 
+    /* Whole tile stays visible: about 86% of the pin width, centered
+       in the safe area, so neighbours remain around it. */
     function frameTile(rect) {
       var ch = chrome();
-      var availW = Math.max(40, pinW - ch.side * 2);
-      var availH = Math.max(40, pinH - ch.top - ch.bottom);
-      var sFit = Math.min(availW / rect.w, availH / rect.h);
-      var sCover = Math.max(availW / rect.w, availH / rect.h);
-      var s = Math.max(sFit, sCover * 0.82);
+      var availW = pinW * 0.86;
+      var availH = Math.max(40, (pinH - ch.top - ch.bottom) * 0.78);
+      var s = Math.min(availW / rect.w, availH / rect.h);
+      if (!isFinite(s) || s <= 0) s = 1;
       var cx = rect.x + rect.w / 2;
       var cy = rect.y + rect.h / 2;
       return {
         s: s,
         tx: pinW / 2 - cx * s,
-        ty: ch.top + availH / 2 - cy * s,
+        ty: ch.top + (pinH - ch.top - ch.bottom) / 2 - cy * s,
       };
+    }
+
+    function applyPose(pose) {
+      gsap.set(board, {
+        x: pose.tx,
+        y: pose.ty,
+        scale: pose.s,
+        transformOrigin: "0 0",
+        force3D: true,
+      });
+    }
+
+    /* Read the card back and nudge the translation so its center lands
+       in the pin, even if the pin is fixed or the origin was off. */
+    function settlePose(focus, pose) {
+      applyPose(pose);
+      var card = cards[focus];
+      if (!card) return pose;
+      var pr = pin.getBoundingClientRect();
+      var cr = card.getBoundingClientRect();
+      var ch = chrome();
+      var availH = pinH - ch.top - ch.bottom;
+      pose.tx += pr.left + pinW / 2 - (cr.left + cr.width / 2);
+      pose.ty += pr.top + ch.top + availH / 2 - (cr.top + cr.height / 2);
+      return pose;
     }
 
     function measure() {
@@ -183,6 +231,10 @@
       });
       overviewPose = frameOverview();
       tilePoses = tileRects.map(frameTile);
+      tilePoses.forEach(function (pose, i) {
+        settlePose(i, pose);
+      });
+      gsap.set(board, { clearProps: "transform" });
       render(currentP);
     }
 
@@ -214,13 +266,7 @@
       var tx = lerp(pa.tx, pb.tx, e);
       var ty = lerp(pa.ty, pb.ty, e);
 
-      gsap.set(board, {
-        x: tx,
-        y: ty,
-        scale: s,
-        transformOrigin: "0 0",
-        force3D: true,
-      });
+      applyPose({ s: s, tx: tx, ty: ty });
 
       var sharp = [0, 0, 0, 0];
       if (seg.a.focus >= 0) sharp[seg.a.focus] += 1 - e;
