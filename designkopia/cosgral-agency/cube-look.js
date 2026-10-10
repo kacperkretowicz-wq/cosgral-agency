@@ -13,7 +13,7 @@ export function heroCubeLook(mobile) {
     heroScaleMul: mobile ? 0.39 * MOBILE_HERO_CUBE : 0.78,
     peakScaleMul: mobile ? 0.58 * MOBILE_HERO_CUBE : 1.16,
     edgeOp: mobile ? 0.18 : 0.24,
-    shellOp: mobile ? 0.5 : 0.45,
+    shellOp: 1,
     surfaceCount: mobile ? 1200 : 2800,
     surfaceSizeMul: mobile ? 0.48 : 1,
     surfaceAlphaMul: mobile ? 0.42 : 1,
@@ -58,6 +58,7 @@ export function createCubeShimmerMaterial(THREE, opts) {
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    toneMapped: false,
     uniforms: {
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
@@ -72,8 +73,12 @@ export function createCubeShimmerMaterial(THREE, opts) {
 export function applyHeroCubeMaterials(shell, edges, fade, look) {
   var dim = fade == null ? 1 : fade;
   if (shell && shell.material) {
-    if (shell.material.color) shell.material.color.setHex(0x080808);
-    shell.material.opacity = look.shellOp * dim;
+    if (shell.material.transmission > 0) {
+      shell.material.opacity = dim;
+    } else {
+      if (shell.material.color) shell.material.color.setHex(0x080808);
+      shell.material.opacity = look.shellOp * dim;
+    }
   }
   if (edges && edges.material) {
     edges.material.opacity = look.edgeOp * dim;

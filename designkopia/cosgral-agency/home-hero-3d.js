@@ -3,11 +3,11 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260919mob";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261010glass";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
-(function () {
+(async function () {
   "use strict";
 
   var canvas = document.getElementById("hero-3d");
@@ -383,6 +383,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var menuAnchorGroup = new THREE.Group();
   root.add(menuAnchorGroup);
 
+  await whenCubeReady();
+  installGlassScene(renderer, scene, camera);
+
   function randomOnCube(h) {
     var face = Math.floor(Math.random() * 6);
     var a = (Math.random() - 0.5) * 2 * h;
@@ -401,7 +404,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
-    var sp = randomOnCube(HALF);
+    var sp = randomCubeSurface(HALF);
     sPos[si * 3] = sp[0];
     sPos[si * 3 + 1] = sp[1];
     sPos[si * 3 + 2] = sp[2];
@@ -418,7 +421,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var wire = cubeParts.wire;
   var edges = cubeParts.edges;
   var setWireOpacity = cubeParts.setWireOpacity;
-  cubeGroup.add(shell, edges, new THREE.Points(sGeo, sMat));
+  var surfacePoints = new THREE.Points(sGeo, sMat);
+  surfacePoints.visible = false;
+  cubeGroup.add(shell, edges, surfacePoints);
 
   // ——— Shatter shards (deferred on mobile to avoid blocking first paint) ———
   var shards = null;
@@ -455,35 +460,10 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     var sz;
     var depth01;
     if (hash(i, 1) < 0.78) {
-      var face = Math.floor(hash(i, 2) * 6);
-      var a = (hash(i, 3) * 2 - 1) * HALF;
-      var b = (hash(i, 4) * 2 - 1) * HALF;
-      var inset = hash(i, 5) * 0.04 * HALF;
-      if (face === 0) {
-        sx = HALF - inset;
-        sy = a;
-        sz = b;
-      } else if (face === 1) {
-        sx = -HALF + inset;
-        sy = a;
-        sz = b;
-      } else if (face === 2) {
-        sx = a;
-        sy = HALF - inset;
-        sz = b;
-      } else if (face === 3) {
-        sx = a;
-        sy = -HALF + inset;
-        sz = b;
-      } else if (face === 4) {
-        sx = a;
-        sy = b;
-        sz = HALF - inset;
-      } else {
-        sx = a;
-        sy = b;
-        sz = -HALF + inset;
-      }
+      var sp0 = sampleCubeSurface(i, HALF);
+      sx = sp0[0];
+      sy = sp0[1];
+      sz = sp0[2];
       depth01 = 1;
     } else {
       var r = Math.pow(hash(i, 2), 0.42);
@@ -530,6 +510,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     depthWrite: true,
     depthTest: true,
     blending: THREE.NormalBlending,
+    toneMapped: false,
     side: THREE.FrontSide,
     uniforms: {
       uTime: { value: 0 },

@@ -4,7 +4,7 @@
  * Framed with padding so rotated cube never clips the canvas.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261010glass";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {
@@ -25,7 +25,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     if (tries < 40) window.setTimeout(findCanvas, 50);
   }
 
-  function boot() {
+  async function boot() {
     var MOBILE = window.matchMedia("(max-width: 900px)").matches;
     var look = heroCubeLook(MOBILE);
     var HALF = look.half;
@@ -52,6 +52,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     root.scale.setScalar(CUBE_SCALE);
     scene.add(root);
 
+    await whenCubeReady();
+    installGlassScene(renderer, scene, camera);
+
     var parts = createIntactCubeParts(HALF);
     parts.shell.material.opacity = SHELL_OP;
     parts.shell.material.depthWrite = true;
@@ -77,7 +80,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     var sPos = new Float32Array(SURFACE * 3);
     var sSize = new Float32Array(SURFACE);
     for (var si = 0; si < SURFACE; si++) {
-      var sp = randomOnCube(HALF);
+      var sp = randomCubeSurface(HALF);
       sPos[si * 3] = sp[0];
       sPos[si * 3 + 1] = sp[1];
       sPos[si * 3 + 2] = sp[2];
@@ -89,7 +92,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
 
     var sMat = createCubeShimmerMaterial(THREE, { alphaMul: 1 });
 
-    root.add(parts.shell, parts.edges, new THREE.Points(sGeo, sMat));
+    var surfacePoints = new THREE.Points(sGeo, sMat);
+    surfacePoints.visible = false;
+    root.add(parts.shell, parts.edges, surfacePoints);
 
     var spin = 0.35;
     var leanX = 0;

@@ -2,11 +2,11 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261010glass";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from "./cube-look.js?v=20260926cube1";
 
-(function () {
+(async function () {
   "use strict";
 
   var canvas = document.getElementById("subpage-cube");
@@ -1990,13 +1990,16 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   var menuAnchorGroup = new THREE.Group();
   root.add(menuAnchorGroup);
 
+  await whenCubeReady();
+  installGlassScene(renderer, scene, camera);
+
   var SURFACE = look.surfaceCount;
   var SURFACE_SIZE_MUL = look.surfaceSizeMul;
   var SURFACE_ALPHA_MUL = look.surfaceAlphaMul;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
-    var sp = randomOnCube(HALF);
+    var sp = randomCubeSurface(HALF);
     sPos[si * 3] = sp[0];
     sPos[si * 3 + 1] = sp[1];
     sPos[si * 3 + 2] = sp[2];
@@ -2014,7 +2017,9 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   var wire = cubeParts.wire;
   var edges = cubeParts.edges;
   var setWireOpacity = cubeParts.setWireOpacity;
-  cubeGroup.add(shell, edges, new THREE.Points(sGeo, sMat));
+  var surfacePoints = new THREE.Points(sGeo, sMat);
+  surfacePoints.visible = false;
+  cubeGroup.add(shell, edges, surfacePoints);
 
   function resize() {
     var w = canvas.clientWidth;
