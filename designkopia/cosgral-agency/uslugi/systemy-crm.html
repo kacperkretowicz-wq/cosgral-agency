@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" data-i18n-meta="service_crm.meta">
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" href="../favicon.ico" sizes="any" />
@@ -7,13 +7,25 @@
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="manifest" href="../site.webmanifest" />
+<script>location.replace("../index.html?service=crimson");</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Systemy CRM — cosgral.agency</title>
 <meta name="description" content="Wdrożenie i konfiguracja CRM, migracja danych i automatyzacja lejka sprzedaży — porządek w relacjach z klientami zamiast rozproszonych arkuszy." />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pl_PL" />
+<meta property="og:site_name" content="COSGRAL" />
+<meta property="og:url" content="https://cosgral.pl/uslugi/systemy-crm.html" />
+<meta property="og:title" content="Systemy CRM dla firm — COSGRAL" />
+<meta property="og:description" content="Projektowanie i wdrażanie systemów CRM dopasowanych do procesów sprzedażowych klienta." />
+<meta property="og:image" content="https://cosgral.pl/og-cover.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://cosgral.pl/og-cover.png" />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="../cosgral-subpages.css?v=20260924polish1" />
-<link rel="stylesheet" href="../service-page-nav.css?v=20260923fix3" />
-<link rel="stylesheet" href="../page-transitions.css?v=20260924polish1" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" />
+<link rel="stylesheet" href="../cookie-consent.css?v=20261001a" />
+<script src="../cookie-consent.js?v=20261001a"></script>
+<link rel="stylesheet" href="../cosgral-subpages.css?v=20260928mob1" />
+<link rel="stylesheet" href="../page-transitions.css?v=20260810h" />
 <link rel="stylesheet" href="../service-dive-transition.css?v=20260810k" />
 <script>
   (function () {
@@ -36,9 +48,25 @@
 </script>
 <script src="../service-themes.js?v=20260810l"></script>
 <script src="../service-dive-transition.js?v=20260810k"></script>
-<script src="../page-transitions.js?v=20260924hash1"></script>
-<script src="../cosgral-motion-pref.js?v=20260919a"></script>
-  <link rel="stylesheet" href="../site-chat.css?v=20260922ui51" />
+<script src="../page-transitions.js?v=20260925fix21"></script>
+<script src="cosgral-motion-pref.js?v=20260919a"></script>
+  <link rel="stylesheet" href="../site-chat.css?v=20260924fix1" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "serviceType": "SoftwareDevelopment",
+  "name": "Systemy CRM",
+  "description": "Projektowanie i wdrażanie systemów CRM dopasowanych do procesów sprzedażowych i operacyjnych klienta.",
+  "url": "https://cosgral.pl/uslugi/systemy-crm.html",
+  "provider": {
+        "@type": "Organization",
+        "name": "COSGRAL",
+        "url": "https://cosgral.pl/"
+      },
+  "areaServed": ["PL", "EU"]
+}
+</script>
 </head>
 <body class="subpage service-page" data-service-theme="crimson">
 <a class="visually-hidden" href="#main">Przejdź do treści</a>
@@ -53,22 +81,23 @@
   <a href="../index.html#top" class="site-nav__logo" aria-label="COSGRAL — strona główna">
     <img src="../images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
   </a>
-  <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
+  <div class="lang-switch" role="group" aria-label="Język"><button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button><button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button></div>
+<button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
     <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-    <span>Menu</span>
+    <span data-i18n="nav.menu">Menu</span>
   </button>
 </nav>
 <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
   <div class="nav-overlay__backdrop" data-nav-close></div>
   <div class="nav-overlay__stage">
-    <nav class="nav-overlay__links" aria-label="Menu główne">
+    <nav class="nav-overlay__links" aria-label="Menu główne" data-i18n-aria-label="nav_overlay.main_menu">
       <ul class="nav-overlay__list">
-        <li><a href="../index.html#top" data-nav-close>Start</a></li>
-        <li><a href="../portfolio.html" data-nav-close>Realizacje</a></li>
-        <li><a href="../index.html#uslugi" data-nav-close>Usługi</a></li>
-        <li><a href="../index.html#proces" data-nav-close>Proces</a></li>
-        <li><a href="../index.html#faq" data-nav-close>FAQ</a></li>
-        <li><a href="../index.html#kontakt" data-nav-close>Kontakt</a></li>
+        <li><a href="../index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
+        <li><a href="../portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="../index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
+        <li><a href="../index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
+        <li><a href="../index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="../index.html#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
       </ul>
     </nav>
   </div>
@@ -77,12 +106,12 @@
 
 <main id="main">
   <section class="service-hero container">
-    <p class="service-hero__num">05 — Usługa</p>
-    <h1 class="service-hero__title">Systemy CRM</h1>
+    <p class="service-hero__num" data-i18n="service_num_05">005 — Usługa</p>
+    <h1 class="service-hero__title"><span data-i18n="service_crm.title">Systemy CRM</span></h1>
   </section>
 
   <section class="service-block container">
-    <h2 class="service-block__title">Co robimy</h2>
+    <h2 class="service-block__title"><span data-i18n="service_crm.s1_title">Co robimy</span></h2>
     <ul>
       <li>Wdrożenie i konfiguracja CRM (HubSpot, Pipedrive, rozwiązania dedykowane)</li>
       <li>Migracja danych z arkuszy i starych systemów</li>
@@ -93,50 +122,50 @@
   </section>
 
   <section class="service-block container">
-    <h2 class="service-block__title">Dla kogo i jaki efekt</h2>
-    <p>Dla firm, w których informacje o klientach żyją w mailach, arkuszach i głowach handlowców — a każde odejście pracownika oznacza utratę części wiedzy o relacjach z klientami.</p>
-    <p>Efektem jest jedno, uporządkowane źródło prawdy o kliencie: widać, na jakim etapie jest każda rozmowa, nic nie umyka, a raportowanie sprzedaży przestaje być ręczną pracą pod koniec miesiąca.</p>
+    <h2 class="service-block__title"><span data-i18n="service_crm.s2_title">Dla kogo i jaki efekt</span></h2>
+    <p data-i18n="service_crm.s2_p1">Dla firm, w których informacje o klientach żyją w mailach, arkuszach i głowach handlowców — a każde odejście pracownika oznacza utratę części wiedzy o relacjach z klientami.</p>
+    <p data-i18n="service_crm.s2_p2">Efektem jest jedno, uporządkowane źródło prawdy o kliencie: widać, na jakim etapie jest każda rozmowa, nic nie umyka, a raportowanie sprzedaży przestaje być ręczną pracą pod koniec miesiąca.</p>
   </section>
 
   <section class="service-block container">
-    <a class="service-cta glass-btn" href="../index.html#kontakt">Zacznijmy od bezpłatnego audytu</a>
+    <a class="service-cta glass-btn" href="../index.html#kontakt"><span data-i18n="service_crm.cta">Zacznijmy od bezpłatnego audytu</span></a>
   </section>
 </main>
 
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <div class="footer-cta"><p class="cosgral-footer-wordmark">cosgral agency</p></div>
+      <div class="footer-cta"><p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p></div>
       <div class="footer-col">
-        <p class="footer-col__title">Sekcje</p>
+        <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
         <ul>
-          <li><a href="../index.html#top">Start</a></li>
-          <li><a href="../portfolio.html">Realizacje</a></li>
-          <li><a href="../portfolio.html#strony">Strony</a></li>
-          <li><a href="../portfolio.html#montaz">Montaż</a></li>
-          <li><a href="../portfolio.html#grafiki">Grafiki</a></li>
-          <li><a href="../index.html#uslugi">Usługi</a></li>
-          <li><a href="../index.html#proces">Proces</a></li>
-          <li><a href="../index.html#faq">FAQ</a></li>
-          <li><a href="../index.html#kontakt">Kontakt</a></li>
+          <li><a href="../index.html#top" data-i18n="footer.link_start">Start</a></li>
+          <li><a href="../portfolio.html" data-i18n="footer.link_work">Realizacje</a></li>
+          <li><a href="../portfolio.html#strony" data-i18n="footer.link_websites">Strony</a></li>
+          <li><a href="../portfolio.html#montaz" data-i18n="footer.link_montaz">Montaż</a></li>
+          <li><a href="../portfolio.html#grafiki" data-i18n="footer.link_grafiki">Grafiki</a></li>
+          <li><a href="../index.html#uslugi" data-i18n="footer.services">Usługi</a></li>
+          <li><a href="../index.html#proces" data-i18n="footer.link_process">Proces</a></li>
+          <li><a href="../index.html#faq" data-i18n="footer.link_faq">FAQ</a></li>
+          <li><a href="../index.html#kontakt" data-i18n="footer.link_contact">Kontakt</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <p class="footer-col__title">Usługi</p>
+        <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
         <ul>
-          <li><a href="tworzenie-stron-internetowych.html">Strony internetowe</a></li>
-          <li><a href="projektowanie-aplikacji.html">Aplikacje</a></li>
-          <li><a href="pozycjonowanie-seo-geo.html">Pozycjonowanie SEO/GEO</a></li>
-          <li><a href="wdrazanie-automatyzacji.html">Automatyzacje</a></li>
-          <li><a href="systemy-crm.html">Systemy CRM</a></li>
-          <li><a href="grafika-i-montaz-wideo.html">Grafika i wideo</a></li>
+          <li><a href="tworzenie-stron-internetowych.html" data-i18n="footer.svc_web">Strony internetowe</a></li>
+          <li><a href="projektowanie-aplikacji.html" data-i18n="footer.svc_app">Aplikacje</a></li>
+          <li><a href="pozycjonowanie-seo-geo.html" data-i18n="footer.svc_seo">Pozycjonowanie SEO/GEO</a></li>
+          <li><a href="wdrazanie-automatyzacji.html" data-i18n="footer.svc_auto">Automatyzacje</a></li>
+          <li><a href="systemy-crm.html" data-i18n="footer.svc_crm">Systemy CRM</a></li>
+          <li><a href="grafika-i-montaz-wideo.html" data-i18n="footer.svc_video">Grafika i wideo</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <p class="footer-col__title">Kontakt</p>
+        <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
         <ul>
           <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
-          <li><a href="../index.html#kontakt">Bezpłatny audyt →</a></li>
+          <li><a href="../index.html#kontakt" data-i18n="footer.audit">Bezpłatny audyt →</a></li>
         </ul>
       </div>
       <div class="footer-col footer-col--social">
@@ -155,16 +184,21 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 cosgral agency</span>
-      <a href="../privacy-policy.html">Polityka prywatności</a>
+      <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
+      <a href="../privacy-policy.html" data-i18n="footer.privacy">Polityka prywatności</a>
     </div>
   </div>
 </footer>
 
 <script defer src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
+<script defer src="../home-cursor-field.js?v=20260928mob1"></script>
+<script defer src="../home-cursor.js?v=20260916a"></script>
+<script defer src="../home-tile-interact.js?v=20260920ui9"></script>
 <script defer src="../service-page-bg.js?v=20260810l"></script>
 <script defer src="../sections.js?v=20260812j"></script>
-<script defer src="../site-chat.js?v=20260924idle1"></script>
-<script defer src="../service-page-nav.js?v=20260923fix3"></script>
+<script defer src="../site-chat.js?v=20260926chat7"></script>
+<script type="module" src="../site-chat-cube.js?v=20260926cube1"></script>
+<script src="../i18n.js?v=20260920ui10"></script>
+<script defer src="../home-nav-menu.js?v=20260925fix2"></script>
 </body>
 </html>

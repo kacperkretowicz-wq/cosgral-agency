@@ -3,17 +3,11 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import {
-  createIntactCubeParts,
-  createShardGeometry,
-  whenCubeReady,
-  installGlassScene,
-  sampleCubeSurface,
-  randomCubeSurface,
-} from "./cube-shape.js?v=20261010clear";
+import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260919mob";
 import { createFxaaPass } from "./three-fxaa-pass.js";
+import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
-(async function () {
+(function () {
   "use strict";
 
   var canvas = document.getElementById("hero-3d");
@@ -25,15 +19,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     MOBILE || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   if (REDUCED) return;
 
-  var HALF = 1.35;
-  var CUBE_SCALE = 0.5;
-  /* Mobile hero cube — 1.6× previous size */
-  var MOBILE_HERO_CUBE = 1.6;
-  var HERO_SCALE_MUL = MOBILE ? 0.39 * MOBILE_HERO_CUBE : 0.78;
-  var PEAK_SCALE_MUL = MOBILE ? 0.58 * MOBILE_HERO_CUBE : 1.16;
-  var EDGE_OP = MOBILE ? 0.18 : 0.24;
-  var SHELL_OP = 1;
-  var SHARDS = LOW_PERF ? 280 : 1000;
+  var look = heroCubeLook(MOBILE);
+  var HALF = look.half;
+  var CUBE_SCALE = look.cubeScale;
+  var HERO_SCALE_MUL = look.heroScaleMul;
+  var PEAK_SCALE_MUL = look.peakScaleMul;
+  var EDGE_OP = look.edgeOp;
+  var SHELL_OP = look.shellOp;
+  var SHARDS = LOW_PERF ? 280 : 1600;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
   var streamAmt = 0;
@@ -274,12 +267,12 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     group.rotation.setFromQuaternion(group.quaternion, "XYZ");
   }
 
-  var _quadArcResult = { x: 0, y: 0 };
   function quadArc(t, sx, sy, cx, cy, ex, ey) {
     var u = 1 - t;
-    _quadArcResult.x = u * u * sx + 2 * u * t * cx + t * t * ex;
-    _quadArcResult.y = u * u * sy + 2 * u * t * cy + t * t * ey;
-    return _quadArcResult;
+    return {
+      x: u * u * sx + 2 * u * t * cx + t * t * ex,
+      y: u * u * sy + 2 * u * t * cy + t * t * ey,
+    };
   }
 
   function startIntro() {
@@ -364,7 +357,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.25));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.5));
   renderer.setClearColor(0x000000, 0);
 
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
@@ -402,18 +395,13 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     return [a, b, -h];
   }
 
-  await whenCubeReady();
-  installGlassScene(renderer, scene, camera);
-
-  var SURFACE = MOBILE ? 1200 : 2800;
-  /* Na mobile cubeGroup.scale jest ~2× mniejszy, a gl_PointSize nie skaluje się
-     z obiektem — te same sprite'y dają jaśniejszy glow. Dopasowujemy do desktopu. */
-  var SURFACE_SIZE_MUL = MOBILE ? 0.48 : 1;
-  var SURFACE_ALPHA_MUL = MOBILE ? 0.42 : 1;
+  var SURFACE = look.surfaceCount;
+  var SURFACE_SIZE_MUL = look.surfaceSizeMul;
+  var SURFACE_ALPHA_MUL = look.surfaceAlphaMul;
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
-    var sp = randomCubeSurface(HALF);
+    var sp = randomOnCube(HALF);
     sPos[si * 3] = sp[0];
     sPos[si * 3 + 1] = sp[1];
     sPos[si * 3 + 2] = sp[2];
@@ -423,56 +411,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
   sGeo.setAttribute("size", new THREE.BufferAttribute(sSize, 1));
 
-  var sMat = new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    toneMapped: false,
-    uniforms: {
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0, 0) },
-      uFade: { value: 1 },
-      uAlphaMul: { value: SURFACE_ALPHA_MUL },
-    },
-    vertexShader: `
-      attribute float size;
-      uniform float uTime;
-      uniform vec2 uMouse;
-      uniform float uFade;
-      uniform float uAlphaMul;
-      varying float vAlpha;
-      void main() {
-        vec3 pos = position;
-        float pulse = sin(uTime * 0.55 + pos.y * 4.0 + pos.x * 3.0) * 0.012;
-        pos += normalize(pos + 0.0001) * pulse;
-        float dist = length(pos.xy - uMouse * 1.4);
-        float ripple = sin(dist * 9.0 - uTime * 2.8) * smoothstep(2.6, 0.0, dist) * 0.07;
-        pos.xy += normalize(pos.xy + 0.0001) * ripple;
-        vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-        gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);
-        gl_Position = projectionMatrix * mv;
-        vAlpha = (0.16 + smoothstep(2.8, 0.0, dist) * 0.25) * uFade * uAlphaMul;
-      }
-    `,
-    fragmentShader: `
-      varying float vAlpha;
-      void main() {
-        float d = length(gl_PointCoord - 0.5);
-        if (d > 0.5) discard;
-        float glow = 1.0 - smoothstep(0.0, 0.5, d);
-        gl_FragColor = vec4(0.7, 0.7, 0.72, vAlpha * glow * 0.5);
-      }
-    `,
-  });
+  var sMat = createCubeShimmerMaterial(THREE, { alphaMul: SURFACE_ALPHA_MUL });
 
   var cubeParts = createIntactCubeParts(HALF);
   var shell = cubeParts.shell;
   var wire = cubeParts.wire;
   var edges = cubeParts.edges;
   var setWireOpacity = cubeParts.setWireOpacity;
-  var surfacePoints = new THREE.Points(sGeo, sMat);
-  surfacePoints.visible = false;
-  cubeGroup.add(shell, edges, surfacePoints);
+  cubeGroup.add(shell, edges, new THREE.Points(sGeo, sMat));
 
   // ——— Shatter shards (deferred on mobile to avoid blocking first paint) ———
   var shards = null;
@@ -509,10 +455,35 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     var sz;
     var depth01;
     if (hash(i, 1) < 0.78) {
-      var sp0 = sampleCubeSurface(i, HALF);
-      sx = sp0[0];
-      sy = sp0[1];
-      sz = sp0[2];
+      var face = Math.floor(hash(i, 2) * 6);
+      var a = (hash(i, 3) * 2 - 1) * HALF;
+      var b = (hash(i, 4) * 2 - 1) * HALF;
+      var inset = hash(i, 5) * 0.04 * HALF;
+      if (face === 0) {
+        sx = HALF - inset;
+        sy = a;
+        sz = b;
+      } else if (face === 1) {
+        sx = -HALF + inset;
+        sy = a;
+        sz = b;
+      } else if (face === 2) {
+        sx = a;
+        sy = HALF - inset;
+        sz = b;
+      } else if (face === 3) {
+        sx = a;
+        sy = -HALF + inset;
+        sz = b;
+      } else if (face === 4) {
+        sx = a;
+        sy = b;
+        sz = HALF - inset;
+      } else {
+        sx = a;
+        sy = b;
+        sz = -HALF + inset;
+      }
       depth01 = 1;
     } else {
       var r = Math.pow(hash(i, 2), 0.42);
@@ -559,7 +530,6 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     depthWrite: true,
     depthTest: true,
     blending: THREE.NormalBlending,
-    toneMapped: false,
     side: THREE.FrontSide,
     uniforms: {
       uTime: { value: 0 },
@@ -732,14 +702,16 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   // nie schodzi z ekranu — obserwujemy sekcje, w których sześcian jest naprawdę
   // potrzebny, żeby nie renderować sceny przez całą długość strony.
   var zoneVisible = true;
-  var cardsZoneVisible = typeof IntersectionObserver !== "function";
   var lastPortalOp = null;
   var lastPortalVis = null;
   var offZoneTick = 0;
-  // Poza hero i przejściem scena pozostaje animowana, ale nie wymaga 60 FPS.
-  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [3, 4, 5] : [2, 3, 4];
-  // Miękkie cząstki zachowują czytelność przy mniejszej rozdzielczości.
-  var DPR_CAP_BY_TIER = LOW_PERF ? [1.0, 1.0, 1] : [1.25, 1.1, 1];
+  // Poza strefą sześcianu na ekranie zostaje wolno dryfujące pole piasku.
+  // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
+  // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
+  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
+  // Miękkie, addytywne cząstki nie zyskują na DPR 2 — cap 1.5 tnie fill-rate
+  // o ~44% na ekranach hi-DPI bez widocznej różnicy.
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [1.5, 1.25, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;
@@ -776,13 +748,6 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       io.observe(z);
     });
   })();
-  (function watchCardsZone() {
-    var services = document.getElementById("uslugi");
-    if (!services || typeof IntersectionObserver !== "function") return;
-    new IntersectionObserver(function (entries) {
-      cardsZoneVisible = entries[0].isIntersecting;
-    }, { rootMargin: "20% 0px" }).observe(services);
-  })();
 
   function restoreRendererDpr() {
     introDprDone = true;
@@ -806,16 +771,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   }
 
   var cardNodes = null;
-  var cardSampleDirty = true;
-  function markCardsDirty() {
-    cardSampleDirty = true;
-  }
   window.addEventListener("resize", function () {
     cardNodes = null;
-    cardSampleDirty = true;
-  }, { passive: true });
-  window.addEventListener("scroll", markCardsDirty, { passive: true });
-  window.addEventListener("cosgral:services-fan-step", markCardsDirty, { passive: true });
+  });
 
   function sampleCards() {
     if (!shardMat) return;
@@ -1289,11 +1247,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       shardMat.uniforms.uCubeMat.value.copy(cubeGroup.matrixWorld);
     }
 
-    if (cardsZoneVisible && (displayStream > 0.15 || sandLocked)) {
-      if (cardSampleDirty) {
-        cardSampleDirty = false;
-        sampleCards();
-      }
+    if (displayStream > 0.15 || sandLocked) {
+      // Każde sampleCards() to wymuszony reflow (getBoundingClientRect na kartach),
+      // więc próbkujemy co 3. klatkę niezależnie od klasy urządzenia.
+      if (cardSampleTick++ % 3 === 0) sampleCards();
     }
 
     // Portal stays visible for sand ribbon after cube exits.
@@ -1311,12 +1268,11 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
         : tilesOp > 0.45
           ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
           : 1;
-    var inFooter = document.documentElement.classList.contains("is-footer-covered");
-    var needsScene = !inFooter && (portalOp > 0.05 || sandOn || menuBlend > 0.001);
+    var needsScene = portalOp > 0.05 || sandOn || menuBlend > 0.001;
 
     if (canvas.parentElement) {
-      var op = inFooter ? "0" : String(portalOp);
-      var vis = (!inFooter && portalOp > 0.05) ? "visible" : "hidden";
+      var op = String(portalOp);
+      var vis = portalOp > 0.05 ? "visible" : "hidden";
       // Zapisy stylu unieważniają styl całego poddrzewa — piszemy tylko przy zmianie.
       if (op !== lastPortalOp) {
         canvas.parentElement.style.opacity = op;
@@ -1329,6 +1285,11 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     }
 
     if (!needsScene) return;
+
+    // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
+    // Poza nią częstotliwość ustala sterownik jakości (na tier 0 też co klatkę).
+    var fullRate = zoneVisible || menuBlend > 0.001;
+    if (!fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);

@@ -55,6 +55,22 @@
     "about": {
       "pl": "O nas",
       "en": "About"
+    },
+    "music": {
+      "pl": "Muzyka",
+      "en": "Music"
+    },
+    "music_play": {
+      "pl": "Włącz muzykę",
+      "en": "Play music"
+    },
+    "music_pause": {
+      "pl": "Wycisz muzykę",
+      "en": "Pause music"
+    },
+    "music_next": {
+      "pl": "Następny utwór",
+      "en": "Next track"
     }
   },
   "preloader": {
@@ -345,6 +361,70 @@
     "link_crm": {
       "pl": "CRM",
       "en": "CRM"
+    },
+    "link_start": {
+      "pl": "Start",
+      "en": "Start"
+    },
+    "link_work": {
+      "pl": "Realizacje",
+      "en": "Work"
+    },
+    "link_montaz": {
+      "pl": "Montaż",
+      "en": "Editing"
+    },
+    "link_grafiki": {
+      "pl": "Grafiki",
+      "en": "Graphics"
+    },
+    "link_process": {
+      "pl": "Proces",
+      "en": "Process"
+    },
+    "link_faq": {
+      "pl": "FAQ",
+      "en": "FAQ"
+    },
+    "link_contact": {
+      "pl": "Kontakt",
+      "en": "Contact"
+    },
+    "link_about": {
+      "pl": "O nas",
+      "en": "About"
+    },
+    "link_portfolio": {
+      "pl": "Portfolio",
+      "en": "Portfolio"
+    },
+    "svc_web": {
+      "pl": "Strony internetowe",
+      "en": "Websites"
+    },
+    "svc_app": {
+      "pl": "Aplikacje",
+      "en": "Applications"
+    },
+    "svc_seo": {
+      "pl": "Pozycjonowanie SEO/GEO",
+      "en": "SEO/GEO Positioning"
+    },
+    "svc_auto": {
+      "pl": "Automatyzacje",
+      "en": "Automations"
+    },
+    "svc_crm": {
+      "pl": "Systemy CRM",
+      "en": "CRM Systems"
+    },
+    "svc_video": {
+      "pl": "Grafika i wideo",
+      "en": "Graphics & Video"
+    },
+    "link_audit": {
+      "pl": "Bezpłatny audyt →",
+      "en": "Free audit →"
     }
   },
   "contact": {
@@ -423,6 +503,316 @@
     "cta": {
       "pl": "Porozmawiajmy o projekcie",
       "en": "Let's talk about your project"
+    },
+    "intro_label": {
+      "pl": "Kim jesteśmy",
+      "en": "Who we are"
+    },
+    "team_label": {
+      "pl": "Zespół",
+      "en": "Team"
+    }
+  },
+  "service_num_01": {
+    "pl": "01 — Usługa",
+    "en": "01 — Service"
+  },
+  "service_num_02": {
+    "pl": "02 — Usługa",
+    "en": "02 — Service"
+  },
+  "service_num_03": {
+    "pl": "03 — Usługa",
+    "en": "03 — Service"
+  },
+  "service_num_04": {
+    "pl": "04 — Usługa",
+    "en": "04 — Service"
+  },
+  "service_num_05": {
+    "pl": "05 — Usługa",
+    "en": "05 — Service"
+  },
+  "service_num_06": {
+    "pl": "06 — Usługa",
+    "en": "06 — Service"
+  },
+  "service_web": {
+    "meta": {
+      "title": {
+        "pl": "Tworzenie stron internetowych — COSGRAL",
+        "en": "Website Development — COSGRAL"
+      },
+      "description": {
+        "pl": "Strony wizytówkowe, landing page pod kampanie i rozbudowane serwisy firmowe — nowoczesny stack, szybkość i design bez kompromisów.",
+        "en": "Business card sites, campaign landing pages and complex company websites — modern stack, speed and uncompromising design."
+      }
+    },
+    "title": {
+      "pl": "Tworzenie stron internetowych",
+      "en": "Website Development"
+    },
+    "s1_title": {
+      "pl": "Co robimy",
+      "en": "What we do"
+    },
+    "s1_items": {
+      "pl": "",
+      "en": ""
+    },
+    "s2_title": {
+      "pl": "Dla kogo i jaki efekt",
+      "en": "Who is it for and what's the outcome"
+    },
+    "s2_p1": {
+      "pl": "Dla firm, które chcą wyróżnić się wizualnie i technicznie — nie kolejnym szablonem, tylko stroną zbudowaną pod ich konkretny model biznesowy i grupę odbiorców.",
+      "en": "For businesses that want to stand out visually and technically — not with another template, but a site built around their specific business model and audience."
+    },
+    "s2_p2": {
+      "pl": "Efektem jest strona, która realnie konwertuje — ładuje się szybko, prowadzi użytkownika do działania i wygląda na tyle dobrze, że staje się argumentem sprzedażowym samym w sobie.",
+      "en": "The result is a site that actually converts — loads fast, guides the user to act, and looks good enough to become a sales argument in itself."
+    },
+    "cta": {
+      "pl": "Zacznijmy od bezpłatnego audytu",
+      "en": "Start with a free audit"
+    }
+  },
+  "service_app": {
+    "meta": {
+      "title": {
+        "pl": "Projektowanie aplikacji — COSGRAL",
+        "en": "Application Design — COSGRAL"
+      },
+      "description": {
+        "pl": "Panele klienckie, narzędzia wewnętrzne i integracje z API — aplikacje webowe zaprojektowane pod realny proces pracy Twojego zespołu.",
+        "en": "Client panels, internal tools and API integrations — web applications designed around your team's real workflow."
+      }
+    },
+    "title": {
+      "pl": "Projektowanie aplikacji",
+      "en": "Application Design"
+    },
+    "s1_title": {
+      "pl": "Co robimy",
+      "en": "What we do"
+    },
+    "s1_items": {
+      "pl": "",
+      "en": ""
+    },
+    "s2_title": {
+      "pl": "Dla kogo i jaki efekt",
+      "en": "Who is it for and what's the outcome"
+    },
+    "s2_p1": {
+      "pl": "Dla firm, które wyrosły z arkuszy kalkulacyjnych i maili, a ich proces wymaga własnego narzędzia — nie kolejnej subskrypcji uniwersalnego SaaS-u, który i tak trzeba obchodzić wyjątkami.",
+      "en": "For businesses that have outgrown spreadsheets and emails, and whose process requires a custom tool — not another generic SaaS subscription."
+    },
+    "s2_p2": {
+      "pl": "Efektem jest aplikacja skrojona pod Twój realny przepływ pracy — zespół pracuje szybciej, mniej rzeczy robi się ręcznie, a dane nie giną między systemami.",
+      "en": "The result is an app tailored to your actual workflow — the team works faster, fewer things are done manually, and data no longer gets lost between systems."
+    },
+    "cta": {
+      "pl": "Zacznijmy od bezpłatnego audytu",
+      "en": "Start with a free audit"
+    }
+  },
+  "service_seo": {
+    "meta": {
+      "title": {
+        "pl": "Pozycjonowanie SEO i GEO — COSGRAL",
+        "en": "SEO & GEO Optimisation — COSGRAL"
+      },
+      "description": {
+        "pl": "Pozycjonowanie SEO i optymalizacja GEO dla widoczności w Google, Gemini, ChatGPT, Perplexity i Claude.",
+        "en": "SEO positioning and GEO optimisation for visibility in Google, Gemini, ChatGPT, Perplexity and Claude."
+      }
+    },
+    "title": {
+      "pl": "Pozycjonowanie SEO i GEO",
+      "en": "SEO & GEO Optimisation"
+    },
+    "s1_title": {
+      "pl": "Co robimy",
+      "en": "What we do"
+    },
+    "s1_items": {
+      "pl": "",
+      "en": ""
+    },
+    "s2_title": {
+      "pl": "Dla kogo i jaki efekt",
+      "en": "Who is it for and what's the outcome"
+    },
+    "s2_p1": {
+      "pl": "Dla firm, które chcą stabilnego dopływu klientów z wyszukiwarki zamiast płacenia za każde kliknięcie. Coraz więcej decyzji zakupowych zaczyna się dziś nie w Google, a w rozmowie z AI — dlatego pracujemy na obu frontach jednocześnie: klasyczne SEO i GEO.",
+      "en": "For businesses that want a steady flow of clients from search instead of paying for every click. More and more purchase decisions now start not in Google, but in a conversation with AI — that's why we work on both fronts simultaneously: classic SEO and GEO."
+    },
+    "s2_p2": {
+      "pl": "Efektem jest rosnąca widoczność na zapytania, które faktycznie przynoszą pieniądze — mierzona pozycjami, ruchem organicznym i leadami, nie ogólnikami. Zaczynamy od audytu, który pokazuje, gdzie strona traci widoczność i co naprawić najpierw.",
+      "en": "The result is growing visibility for queries that actually bring revenue — measured by rankings, organic traffic and leads, not generalisations. We start with an audit that shows where the site is losing visibility and what to fix first."
+    },
+    "cta": {
+      "pl": "Zacznijmy od bezpłatnego audytu",
+      "en": "Start with a free audit"
+    }
+  },
+  "service_auto": {
+    "meta": {
+      "title": {
+        "pl": "Wdrażanie automatyzacji — COSGRAL",
+        "en": "Business Automation — COSGRAL"
+      },
+      "description": {
+        "pl": "Automatyzacje procesów biznesowych — Make, Zapier, n8n, integracje API i niestandardowe workflow dla firm.",
+        "en": "Business process automation — Make, Zapier, n8n, API integrations and custom workflows for businesses."
+      }
+    },
+    "title": {
+      "pl": "Wdrażanie automatyzacji",
+      "en": "Business Automation"
+    },
+    "s1_title": {
+      "pl": "Co robimy",
+      "en": "What we do"
+    },
+    "s1_items": {
+      "pl": "",
+      "en": ""
+    },
+    "s2_title": {
+      "pl": "Dla kogo i jaki efekt",
+      "en": "Who is it for and what's the outcome"
+    },
+    "s2_p1": {
+      "pl": "Efektem jest odzyskany czas zespołu i mniej błędów wynikających z ręcznej, powtarzalnej pracy. Zaczynamy od audytu, który pokazuje, co faktycznie opłaca się zautomatyzować — nie automatyzujemy dla samej automatyzacji.",
+      "en": "For businesses where the same tasks — data entry, sending quotes, reminders, reports — repeat daily and eat up time that should go into growing the business."
+    },
+    "s2_p2": {
+      "pl": "Efektem jest odzyskany czas zespołu i mniej błędów wynikających z ręcznej, powtarzalnej pracy. Zaczynamy od audytu, który pokazuje, co faktycznie opłaca się zautomatyzować — nie automatyzujemy dla samej automatyzacji.",
+      "en": "The result is reclaimed team time and fewer errors from manual, repetitive work. We start with an audit that identifies what's actually worth automating."
+    },
+    "cta": {
+      "pl": "Zacznijmy od bezpłatnego audytu",
+      "en": "Start with a free audit"
+    }
+  },
+  "service_crm": {
+    "meta": {
+      "title": {
+        "pl": "Systemy CRM — COSGRAL",
+        "en": "CRM Systems — COSGRAL"
+      },
+      "description": {
+        "pl": "Projektowanie i wdrażanie systemów CRM dopasowanych do procesów sprzedażowych i operacyjnych klienta.",
+        "en": "Design and implementation of CRM systems tailored to the client's sales and operational processes."
+      }
+    },
+    "title": {
+      "pl": "Systemy CRM",
+      "en": "CRM Systems"
+    },
+    "s1_title": {
+      "pl": "Co robimy",
+      "en": "What we do"
+    },
+    "s1_items": {
+      "pl": "",
+      "en": ""
+    },
+    "s2_title": {
+      "pl": "Dla kogo i jaki efekt",
+      "en": "Who is it for and what's the outcome"
+    },
+    "s2_p1": {
+      "pl": "Dla firm, w których informacje o klientach żyją w mailach, arkuszach i głowach handlowców — a każde odejście pracownika oznacza utratę części wiedzy o relacjach z klientami.",
+      "en": "For businesses where client information lives in emails, spreadsheets and salespeople's heads — where every employee departure means losing some relationship knowledge."
+    },
+    "s2_p2": {
+      "pl": "Efektem jest jedno, uporządkowane źródło prawdy o kliencie: widać, na jakim etapie jest każda rozmowa, nic nie umyka, a raportowanie sprzedaży przestaje być ręczną pracą pod koniec miesiąca.",
+      "en": "The result is one organised source of truth about each client: you can see where every conversation stands, nothing slips through, and sales reporting stops being manual end-of-month work."
+    },
+    "cta": {
+      "pl": "Zacznijmy od bezpłatnego audytu",
+      "en": "Start with a free audit"
+    }
+  },
+  "service_video": {
+    "meta": {
+      "title": {
+        "pl": "Grafika i montaż wideo — COSGRAL",
+        "en": "Graphic Design & Video Editing — COSGRAL"
+      },
+      "description": {
+        "pl": "Kreacja graficzna i montaż wideo — reels, spoty reklamowe, materiały brandingowe i content na social media.",
+        "en": "Graphic design and video editing — reels, advertising spots, brand materials and social media content."
+      }
+    },
+    "title": {
+      "pl": "Grafika i montaż wideo",
+      "en": "Graphic Design & Video"
+    },
+    "s1_title": {
+      "pl": "Co robimy",
+      "en": "What we do"
+    },
+    "s1_items": {
+      "pl": "",
+      "en": ""
+    },
+    "s2_title": {
+      "pl": "Dla kogo i jaki efekt",
+      "en": "Who is it for and what's the outcome"
+    },
+    "s2_p1": {
+      "pl": "Dla marek, którym zależy na spójności — żeby strona, social media i materiały wideo wyglądały, jakby robiło je jedno studio z jedną wizją, a nie kilku freelancerów bez kontaktu ze sobą.",
+      "en": "For brands that care about consistency — so that the website, social media and video materials all look like they were made by one studio with one vision."
+    },
+    "s2_p2": {
+      "pl": "Efektem jest oprawa wizualna, która buduje rozpoznawalność marki niezależnie od nośnika — od posta na Instagramie po wideo produktowe na stronie głównej.",
+      "en": "The result is a visual identity that builds brand recognition regardless of medium — from an Instagram post to a product video on the homepage."
+    },
+    "cta": {
+      "pl": "Zacznijmy od bezpłatnego audytu",
+      "en": "Start with a free audit"
+    },
+    "s3_title": {
+      "pl": "Zobacz realizacje",
+      "en": "See our work"
+    },
+    "s3_montaz": {
+      "pl": "Montaż wideo →",
+      "en": "Video editing →"
+    },
+    "s3_grafiki": {
+      "pl": "Grafiki i social →",
+      "en": "Graphics & social →"
+    },
+    "s3_montaz_full": {
+      "pl": "Pełna galeria montażu →",
+      "en": "Full editing gallery →"
+    },
+    "s3_grafiki_full": {
+      "pl": "Pełna galeria grafik →",
+      "en": "Full graphics gallery →"
+    }
+  },
+  "cookie": {
+    "banner_text": {
+      "pl": "Używamy plików cookies — niezbędnych do działania strony oraz, za Twoją zgodą, analitycznych i marketingowych.",
+      "en": "We use cookies — essential for the site to work and, with your consent, analytics and marketing cookies."
+    },
+    "accept": {
+      "pl": "Zaakceptuj wszystkie",
+      "en": "Accept all"
+    },
+    "reject": {
+      "pl": "Tylko niezbędne",
+      "en": "Only necessary"
+    },
+    "policy_link": {
+      "pl": "Polityka prywatności",
+      "en": "Privacy policy"
     }
   },
   "privacy": {
@@ -432,8 +822,8 @@
         "en": "Privacy Policy — cosgral.agency"
       },
       "description": {
-        "pl": "Polityka prywatności i informacje o przetwarzaniu danych kontaktowych w cosgral.agency.",
-        "en": "Privacy policy and information about contact data processing at cosgral.agency."
+        "pl": "Polityka prywatności COSGRAL — informacje o przetwarzaniu danych osobowych, plikach cookies oraz prawach użytkownika zgodnie z RODO.",
+        "en": "COSGRAL Privacy Policy — information on personal data processing, cookies and user rights under GDPR."
       }
     },
     "title": {
@@ -441,52 +831,100 @@
       "en": "Privacy Policy"
     },
     "updated": {
-      "pl": "Ostatnia aktualizacja: sierpień 2026",
-      "en": "Last updated: August 2026"
+      "pl": "Ostatnia aktualizacja: wrzesień 2026",
+      "en": "Last updated: September 2026"
     },
     "intro": {
-      "pl": "Poniżej opisujemy, jakie dane kontaktowe zbieramy i w jakim celu je przetwarzamy.",
-      "en": "Below we describe what contact data we collect and why we process it."
+      "pl": "Zależy nam na Twojej prywatności. Poniżej znajdziesz pełne informacje o tym, jakie dane zbieramy, w jakim celu i na jakiej podstawie — zgodnie z art. 13 RODO.",
+      "en": "Your privacy matters to us. Below you will find complete information about what data we collect, for what purpose and on what legal basis — in accordance with GDPR Art. 13."
     },
     "s1_title": {
-      "pl": "Administrator",
-      "en": "Controller"
+      "pl": "Administrator danych",
+      "en": "Data Controller"
     },
     "s1_body": {
-      "pl": "Administratorem danych jest cosgral.agency (kontakt: kontakt@cosgral.pl).",
-      "en": "The data controller is cosgral.agency (contact: kontakt@cosgral.pl)."
+      "pl": "Administratorem Twoich danych osobowych jest Jakub Gral i Kacper Kosikowski prowadzący agencję cyfrową COSGRAL (marka nieposiadająca rejestracji jako podmiot gospodarczy). Kontakt w sprawach danych: kontakt@cosgral.pl.",
+      "en": "The data controllers are Jakub Gral and Kacper Kosikowski operating the digital agency COSGRAL (a brand not registered as a legal business entity). For data-related matters contact: kontakt@cosgral.pl."
     },
     "s2_title": {
       "pl": "Jakie dane zbieramy",
-      "en": "What we collect"
+      "en": "What data we collect"
     },
     "s2_body": {
-      "pl": "Przez formularz kontaktowy lub e-mail możemy otrzymać imię, adres e-mail, nazwę firmy oraz treść wiadomości. Telefony podane na stronie służą wyłącznie do kontaktu biznesowego.",
-      "en": "Via the contact form or email we may receive your name, email address, company name and message content. Phone numbers listed on the site are for business contact only."
+      "pl": "Za pośrednictwem formularza kontaktowego lub e-maila możemy otrzymać: imię i nazwisko, adres e-mail, nazwę firmy oraz treść wiadomości. Numery telefonów podane na stronie służą wyłącznie do kontaktu biznesowego.",
+      "en": "Through the contact form or email we may receive: your name, email address, company name and message content. Phone numbers listed on the site are for business contact only."
     },
     "s3_title": {
-      "pl": "Cel i podstawa",
-      "en": "Purpose & basis"
+      "pl": "Cel i podstawa prawna",
+      "en": "Purpose and legal basis"
     },
     "s3_body": {
-      "pl": "Dane przetwarzamy, aby odpowiedzieć na zapytanie i prowadzić rozmowę o współpracy (art. 6 ust. 1 lit. b lub f RODO — wykonanie działań przed umową / prawnie uzasadniony interes).",
-      "en": "We process data to reply to your inquiry and discuss a potential collaboration (GDPR Art. 6(1)(b) or (f) — pre-contract steps / legitimate interest)."
+      "pl": "Dane przetwarzamy w celu odpowiedzi na zapytanie i prowadzenia rozmów o współpracy (art. 6 ust. 1 lit. b RODO — działania przed zawarciem umowy) lub na podstawie prawnie uzasadnionego interesu (art. 6 ust. 1 lit. f RODO).",
+      "en": "We process data to reply to enquiries and discuss potential collaboration (GDPR Art. 6(1)(b) — pre-contract steps) or on the basis of legitimate interest (GDPR Art. 6(1)(f))."
     },
     "s4_title": {
-      "pl": "Jak długo przechowujemy",
-      "en": "Retention"
+      "pl": "Rozliczenia i faktury",
+      "en": "Billing and invoicing"
     },
     "s4_body": {
-      "pl": "Korespondencję trzymamy tak długo, jak jest potrzebna do obsługi zapytania i ewentualnej współpracy, a potem usuwamy lub archiwizujemy zgodnie z obowiązującymi przepisami.",
-      "en": "We keep correspondence only as long as needed to handle the inquiry and any collaboration, then delete or archive it as required by law."
+      "pl": "Usługi COSGRAL mogą być rozliczane za pośrednictwem platformy Useme, systemu płatności Stripe lub przez podmiot trzeci (osoba fizyczna prowadząca działalność gospodarczą powiązana z agencją). Dane niezbędne do wystawienia faktury przetwarzamy wyłącznie w celu realizacji umowy i obowiązków rachunkowych (art. 6 ust. 1 lit. c RODO).",
+      "en": "COSGRAL services may be invoiced through the Useme platform, the Stripe payment system, or by a third party (a natural person running a sole proprietorship associated with the agency). Data required for invoicing is processed solely to fulfil the contract and accounting obligations (GDPR Art. 6(1)(c))."
     },
     "s5_title": {
+      "pl": "Pliki cookies",
+      "en": "Cookies"
+    },
+    "s5_body": {
+      "pl": "Strona używa plików cookies. Cookies niezbędne zapewniają podstawowe działanie strony (np. zapamiętanie preferencji językowych i motywu) — podstawą jest nasz uzasadniony interes. Cookies analityczne i marketingowe stosujemy wyłącznie po uzyskaniu Twojej zgody (art. 6 ust. 1 lit. a RODO). Zgodę możesz wycofać w każdej chwili, usuwając dane z localStorage przeglądarki lub klikając ponownie baner cookies.",
+      "en": "This site uses cookies. Necessary cookies enable basic site functionality (e.g. remembering language and theme preferences) — the legal basis is our legitimate interest. Analytics and marketing cookies are used only after your consent (GDPR Art. 6(1)(a)). You can withdraw consent at any time by clearing your browser's localStorage or clicking the cookie banner again."
+    },
+    "s5_table_title": {
+      "pl": "Kategorie cookies",
+      "en": "Cookie categories"
+    },
+    "s5_cat1": {
+      "pl": "Niezbędne — preferencje językowe, motyw, sesja. Czas: trwale w localStorage.",
+      "en": "Necessary — language preference, theme, session. Duration: persisted in localStorage."
+    },
+    "s5_cat2": {
+      "pl": "Analityczne — statystyki odwiedzin (tylko za zgodą). Czas: do 13 miesięcy.",
+      "en": "Analytics — visit statistics (only with consent). Duration: up to 13 months."
+    },
+    "s5_cat3": {
+      "pl": "Marketingowe — remarketing i kampanie (tylko za zgodą). Czas: do 90 dni.",
+      "en": "Marketing — remarketing and campaigns (only with consent). Duration: up to 90 days."
+    },
+    "s6_title": {
+      "pl": "Jak długo przechowujemy dane",
+      "en": "Data retention"
+    },
+    "s6_body": {
+      "pl": "Korespondencję i dane kontaktowe przechowujemy przez czas niezbędny do obsługi zapytania i ewentualnej współpracy, jednak nie dłużej niż 3 lata od ostatniego kontaktu. Dane fakturowe przechowujemy przez 5 lat zgodnie z przepisami rachunkowymi.",
+      "en": "We retain correspondence and contact data for as long as necessary to handle the enquiry and any collaboration, but no longer than 3 years from the last contact. Invoice data is retained for 5 years in accordance with accounting regulations."
+    },
+    "s7_title": {
+      "pl": "Odbiorcy danych",
+      "en": "Data recipients"
+    },
+    "s7_body": {
+      "pl": "Twoje dane mogą być przekazywane dostawcom usług technicznych (hosting Seohost, poczta e-mail, narzędzia projektowe) oraz platformom rozliczeniowym (Useme, Stripe) wyłącznie w zakresie niezbędnym do świadczenia usług. Nie sprzedajemy danych osobom trzecim.",
+      "en": "Your data may be shared with technical service providers (Seohost hosting, email, project tools) and billing platforms (Useme, Stripe) only to the extent necessary for service delivery. We do not sell personal data to third parties."
+    },
+    "s8_title": {
       "pl": "Twoje prawa",
       "en": "Your rights"
     },
-    "s5_body": {
-      "pl": "Masz prawo dostępu, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu oraz skargi do Prezesa UODO. W sprawach danych napisz na kontakt@cosgral.pl.",
-      "en": "You have the right to access, rectify, erase, restrict processing, object, and lodge a complaint with the supervisory authority. For data requests email kontakt@cosgral.pl."
+    "s8_body": {
+      "pl": "Na podstawie RODO przysługują Ci prawa: dostępu do danych, sprostowania, usunięcia (\"prawo do bycia zapomnianym\"), ograniczenia przetwarzania, przenoszenia danych oraz sprzeciwu wobec przetwarzania. Masz też prawo do złożenia skargi do Prezesa Urzędu Ochrony Danych Osobowych (UODO), ul. Stawki 2, 00-193 Warszawa. W sprawach danych pisz na: kontakt@cosgral.pl.",
+      "en": "Under GDPR you have the right to: access your data, rectify it, erase it (\"right to be forgotten\"), restrict processing, data portability, and object to processing. You also have the right to lodge a complaint with the supervisory authority (in Poland: UODO, ul. Stawki 2, 00-193 Warsaw). For data requests email: kontakt@cosgral.pl."
+    },
+    "s9_title": {
+      "pl": "Zmiany polityki",
+      "en": "Policy changes"
+    },
+    "s9_body": {
+      "pl": "Zastrzegamy prawo do aktualizacji niniejszej polityki. O istotnych zmianach poinformujemy poprzez zmianę daty aktualizacji na tej stronie.",
+      "en": "We reserve the right to update this policy. We will notify of significant changes by updating the revision date on this page."
     }
   },
   "common": {
@@ -581,6 +1019,46 @@
         "pl": "Galeria grafik COSGRAL — Juicy Events, Far East, BTS i więcej.",
         "en": "COSGRAL graphics gallery — Juicy Events, Far East, BTS and more."
       }
+    },
+    "automation_systems_meta": {
+      "title": {
+        "pl": "Systemy i automatyzacje — Portfolio COSGRAL",
+        "en": "Systems & automation — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Aplikacje, CRM i automatyzacje COSGRAL — TelForceOne, Trove, chatboty AI.",
+        "en": "COSGRAL apps, CRM and automations — TelForceOne, Trove, AI chatbots."
+      }
+    },
+    "web_pages_meta": {
+      "title": {
+        "pl": "Strony internetowe — Portfolio COSGRAL",
+        "en": "Websites — COSGRAL portfolio"
+      },
+      "description": {
+        "pl": "Wybrane strony internetowe COSGRAL — Juicy Events, Trove Archive, MJ Social Media.",
+        "en": "Selected COSGRAL websites — Juicy Events, Trove Archive, MJ Social Media."
+      }
+    },
+    "tile_open": {
+      "pl": "Zobacz realizacje",
+      "en": "See the work"
+    },
+    "tiles_hint": {
+      "pl": "Przesuń w bok między kategoriami",
+      "en": "Swipe sideways between categories"
+    },
+    "automation_tile_lead": {
+      "pl": "CRM, aplikacje i workflow, które odciążają zespół.",
+      "en": "CRM, apps and workflows that take work off your team."
+    },
+    "grafiki_tile_lead": {
+      "pl": "Posty, stories i key visuale w rytmie pokazu slajdów.",
+      "en": "Posts, stories and key visuals as a slide show."
+    },
+    "web_page_lead": {
+      "pl": "Od landing page po sklepy — wybrane wdrożenia stron, które oddają markę i konwertują.",
+      "en": "From landing pages to stores — selected website deliveries that carry the brand and convert."
     },
     "hero_title": {
       "pl": "Realizacje",
@@ -703,8 +1181,8 @@
       "en": "Websites"
     },
     "web_lead": {
-      "pl": "Od landing page po serwisy firmowe i sklepy — projekt i wdrożenie pod cele biznesowe.",
-      "en": "From landing pages to company sites and stores — design and delivery aligned to business goals."
+      "pl": "eCommerce, landing page, strony jako część systemu dla działalności",
+      "en": "eCommerce, landing pages, sites as part of a business system"
     },
     "web_service": {
       "pl": "Usługa: strony internetowe →",
@@ -829,8 +1307,8 @@
       "en": "Video editing"
     },
     "montaz_lead": {
-      "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
-      "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
+      "pl": "Reels i materiały reklamowe",
+      "en": "Reels and advertising films"
     },
     "montaz_service": {
       "pl": "Usługa: montaż i wideo →",
@@ -845,8 +1323,52 @@
       "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
     },
     "grafiki_title": {
+      "pl": "GRAFIKI",
+      "en": "VISUALS"
+    },
+    "brands_word": {
       "pl": "Grafiki",
-      "en": "Graphics"
+      "en": "Visuals"
+    },
+    "montaz_word": {
+      "pl": "Montaż",
+      "en": "Edit"
+    },
+    "lux_meta_a": {
+      "pl": "COSGRAL",
+      "en": "COSGRAL"
+    },
+    "lux_meta_b": {
+      "pl": "DIGITAL",
+      "en": "DIGITAL"
+    },
+    "lux_meta_c": {
+      "pl": "STUDIO",
+      "en": "STUDIO"
+    },
+    "lux_foot": {
+      "pl": "WEB",
+      "en": "WEB"
+    },
+    "show_meta": {
+      "pl": "Jitter Template",
+      "en": "Jitter Template"
+    },
+    "show_formats": {
+      "pl": "Output formats(5)",
+      "en": "Output formats(5)"
+    },
+    "brands_label_side": {
+      "pl": "Wybrane realizacje",
+      "en": "Selected work"
+    },
+    "brands_label_foot": {
+      "pl": "Posty · stories · key visual",
+      "en": "Posts · stories · key visuals"
+    },
+    "see_more_graphics": {
+      "pl": "Zobacz więcej →",
+      "en": "See more →"
     },
     "grafiki_lead": {
       "pl": "Kreacje do social mediów i kampanii: posty, stories i key visuale.",
@@ -859,6 +1381,18 @@
     "grafiki_service": {
       "pl": "Usługa: grafika i wideo →",
       "en": "Service: design & video →"
+    },
+    "see_more_systems": {
+      "pl": "Zobacz więcej",
+      "en": "See more"
+    },
+    "automation_cover_aria": {
+      "pl": "Systemy i automatyzacje — zobacz więcej",
+      "en": "Systems and automation — see more"
+    },
+    "automation_page_lead": {
+      "pl": "Aplikacje, CRM i automatyzacje, które wdrożyliśmy — od TelForceOne po Trove i chatboty AI.",
+      "en": "Apps, CRM and automations we shipped — from TelForceOne to Trove and AI chatbots."
     },
     "automation_title": {
       "pl": "Systemy i automatyzacje",
@@ -877,64 +1411,64 @@
       "en": "Application"
     },
     "auto1_client": {
-      "pl": "ShelfSync",
-      "en": "ShelfSync"
+      "pl": "Trove",
+      "en": "Trove"
     },
     "auto1_title": {
       "pl": "Panel sklepu i monitoring cen",
       "en": "Store panel & price monitoring"
     },
     "auto1_desc": {
-      "pl": "Aplikacja dla wielokanałowego sprzedawcy fashion: stany magazynowe, porównanie cen z marketplace’ami i alerty przecen. Mniej ręcznej kontroli — szybsza reakcja na zmiany cen.",
-      "en": "An app for a multi-channel fashion seller: stock levels, marketplace price checks and markdown alerts. Less manual control — faster response to price changes."
+      "pl": "Trove ręcznie porównywało ceny na Allegro i własnym sklepie w arkuszach. Panel zbiera stany i ceny kanałów z alertami przecen — reakcja na spadek marży tego samego dnia, nie po tygodniu.",
+      "en": "Trove compared Allegro and own-shop prices in spreadsheets. The panel unifies stock and channel prices with markdown alerts — same-day reaction when margin slips, not a week later."
     },
     "auto2_tag": {
       "pl": "CRM",
       "en": "CRM"
     },
     "auto2_client": {
-      "pl": "Northline Studio",
-      "en": "Northline Studio"
+      "pl": "",
+      "en": ""
     },
     "auto2_title": {
       "pl": "CRM leadów, dealów i operacji sprzedażowych",
       "en": "CRM for leads, deals and sales operations"
     },
     "auto2_desc": {
-      "pl": "CRM dla zespołu B2B: leady → deale → pipeline, notatki, statusy i przypomnienia w jednym miejscu. Pełna historia kontaktu bez utraty leadów między handlowcami.",
-      "en": "A B2B team CRM: leads → deals → pipeline, notes, statuses and reminders in one place. Full contact history without leads getting lost between salespeople."
+      "pl": "Leady ginęły między skrzynką, czatem i karteczkami — follow-upy się spóźniały. CRM prowadzi od pierwszego kontaktu do deala: pipeline, notatki i przypomnienia w jednym lejku.",
+      "en": "Leads died between inbox, chat and sticky notes — follow-ups slipped. The CRM runs first contact to deal: pipeline, notes and reminders in one funnel."
     },
     "auto3_tag": {
       "pl": "Automatyzacja",
       "en": "Automation"
     },
     "auto3_client": {
-      "pl": "Atelier Bloom",
-      "en": "Atelier Bloom"
+      "pl": "",
+      "en": ""
     },
     "auto3_title": {
       "pl": "Chatbot AI do wiadomości klientów",
       "en": "AI chatbot for customer messages"
     },
     "auto3_desc": {
-      "pl": "Asystent AI odpowiadający na wiadomości z Instagram, Facebook i WWW — FAQ, godziny otwarcia, wstępne wyceny oraz przekazanie rozmowy do konsultanta. Pierwsza odpowiedź dostępna 24/7.",
-      "en": "An AI assistant answering Instagram, Facebook and website messages — FAQ, opening hours, preliminary quotes and handoff to a consultant. First reply available 24/7."
+      "pl": "Po godzinach Instagram i Messenger zasypywały te same pytania, a zespół odpisywał rano z opóźnieniem. Bot zamyka FAQ 24/7, zbiera lead i oddaje rozmowę konsultantowi z kontekstem.",
+      "en": "After hours, Instagram and Messenger repeated the same questions; the team replied late in the morning. The bot closes FAQ 24/7, captures the lead and hands the thread to a consultant with context."
     },
     "auto4_tag": {
       "pl": "Automatyzacja",
       "en": "Automation"
     },
     "auto4_client": {
-      "pl": "Parcel & Co.",
-      "en": "Parcel & Co."
+      "pl": "Trove",
+      "en": "Trove"
     },
     "auto4_title": {
       "pl": "Zamówienie → faktura → status paczki",
       "en": "Order → invoice → parcel status"
     },
     "auto4_desc": {
-      "pl": "Workflow e-commerce: nowe zamówienie uruchamia eksport pod fakturę, aktualizację statusu paczki i powiadomienie klienta (e-mail/Slack). Mniej ręcznej pracy przy obsłudze zamówień.",
-      "en": "An e-commerce workflow: a new order triggers invoice-ready export, parcel status updates and a customer notification (email/Slack). Less manual work in order operations."
+      "pl": "Każde zamówienie Trove wymagało ręcznego klejenia faktury, statusu i maila do klienta. Workflow odpala cały łańcuch sam — mniej klikania, mniej pomyłek przy fulfillmentcie.",
+      "en": "Every Trove order meant manually gluing invoice, status and customer email. The workflow runs the full chain — less clicking, fewer fulfilment mistakes."
     },
     "view_all": {
       "pl": "Zobacz wszystko →",
@@ -951,6 +1485,10 @@
     "back_portfolio": {
       "pl": "← Wróć do portfolio",
       "en": "← Back to portfolio"
+    },
+    "expand_back": {
+      "pl": "Wróć",
+      "en": "Back"
     },
     "lightbox_reel": {
       "pl": "Podgląd rolki",
@@ -1014,41 +1552,41 @@
     },
     "tf_crm_title": {
       "pl": "CRM z mapą dla handlowców",
-      "en": "CRM with a map for sales representatives"
+      "en": "CRM with a map for field sales"
     },
     "tf_crm_tag": {
       "pl": "CRM / sprzedaż terenowa",
       "en": "CRM / field sales"
     },
     "tf_crm_lede": {
-      "pl": "Baza danych klientów i zintegrowana mapa dla przedstawicieli handlowych.",
-      "en": "A customer database and integrated map for field sales representatives."
+      "pl": "Gdy trasa dnia powstaje w Excelu, a notatka z wizyty w telefonie — sprzedaż terenowa traci czas i kontekst. CRM z mapą zbiera to w jednym panelu.",
+      "en": "When the day’s route lives in Excel and the visit note lives in a phone, field sales lose time and context. A CRM with a map puts it in one panel."
     },
     "tf_crm_description": {
-      "pl": "Aplikacja CRM dla TelForceOne S.A. z bazą danych i mapą wspierającą pracę przedstawicieli handlowych.",
-      "en": "A CRM app for TelForceOne S.A. with a database and a map supporting field sales representatives."
+      "pl": "Handlowcy TelForceOne planowali wizyty w arkuszach i raportowali mailami. CRM z mapą trzyma klientów, trasy i log wizyt razem — plan dnia w minutach, pełna historia w terenie.",
+      "en": "TelForceOne reps planned visits in spreadsheets and reported by email. A CRM with a map keeps customers, routes and visit logs together — a day’s plan in minutes, full history in the field."
     },
     "tf_crm_meta": {
       "title": {
         "pl": "CRM z mapą dla handlowców — TelForceOne S.A. | COSGRAL",
-        "en": "CRM with a map for sales representatives — TelForceOne S.A. | COSGRAL"
+        "en": "CRM with a map for field sales — TelForceOne S.A. | COSGRAL"
       },
       "description": {
-        "pl": "Aplikacja CRM dla TelForceOne S.A. z bazą danych i mapą wspierającą pracę przedstawicieli handlowych.",
-        "en": "A CRM app for TelForceOne S.A. with a database and a map supporting field sales representatives."
+        "pl": "Handlowcy TelForceOne planowali wizyty w arkuszach i raportowali mailami. CRM z mapą trzyma klientów, trasy i log wizyt razem — plan dnia w minutach, pełna historia w terenie.",
+        "en": "TelForceOne reps planned visits in spreadsheets and reported by email. A CRM with a map keeps customers, routes and visit logs together — a day’s plan in minutes, full history in the field."
       }
     },
     "tf_crm_p1": {
-      "pl": "Dla TelForceOne S.A. powstała aplikacja CRM dla zespołu przedstawicieli handlowych. Łączy bazę danych klientów z widokiem mapy, dzięki czemu informacje potrzebne do pracy w terenie są dostępne w jednym miejscu.",
-      "en": "We built a CRM app for TelForceOne S.A.’s sales representatives. It combines a customer database with a map view, keeping the information needed in the field in one place."
+      "pl": "Problem: przedstawiciele jeździli z listami w Excelu i notatkami w telefonie. Szef sprzedaży nie widział na żywo, kto u kogo był, trasy dublowały się albo omijały ważnych klientów, a raport dnia ginął w skrzynce.",
+      "en": "Problem: reps worked from Excel lists and phone notes. Sales leadership couldn’t see who visited whom, routes overlapped or skipped key accounts, and the day report vanished in inboxes."
     },
     "tf_crm_p2": {
-      "pl": "Mapa nadaje danym kontekst przestrzenny: pomaga zorientować się, gdzie znajdują się klienci i planować kolejne wizyty. Widok klienta oraz praca na trasie tworzą spójny proces dla handlowca.",
-      "en": "The map gives customer data a spatial context: it helps the team see where customers are and plan upcoming visits. Customer records and route work form a coherent workflow."
+      "pl": "Rozwiązanie: aplikacja CRM z bazą klientów, mapą pinów, planem trasy i logiem wizyty. Handlowiec check-inuje się u klienta, dopisuje temat i follow-up — wszystko wpada od razu do karty, bez drugiej aplikacji.",
+      "en": "Solution: a CRM with customer records, map pins, a route plan and a visit log. The rep checks in, adds the topic and follow-up — it lands on the account instantly, without a second app."
     },
     "tf_crm_p3": {
-      "pl": "Projekt pokazuje, jak narzędzie sprzedażowe można zbudować wokół codziennego sposobu pracy zespołu, zamiast wymagać przełączania się między oddzielną bazą kontaktów i mapą.",
-      "en": "The project shows how a sales tool can follow the team’s daily work instead of making them switch between a separate contact database and map."
+      "pl": "Efekt: planowanie trasy skraca się z godzinnego układania w arkuszu do krótkiego przeglądu mapy. Zespół ma jedną historię kontaktu, mniej pustych wyjazdów i raport dnia bez ręcznego przepisywania.",
+      "en": "Result: route planning shrinks from an hour in a spreadsheet to a short map review. The team shares one contact history, fewer wasted trips, and a day report without retyping."
     },
     "tf_code39_title": {
       "pl": "Generator kodów kreskowych Code 39",
@@ -1059,12 +1597,12 @@
       "en": "Tool / identification"
     },
     "tf_code39_lede": {
-      "pl": "Aplikacja do generowania kodów kreskowych Code 39.",
-      "en": "An app for generating Code 39 barcodes."
+      "pl": "Oznaczanie SKU nie powinno zajmować pół zmiany magazynu. Generator Code 39 robi etykietę z podglądem i idzie prosto na drukarkę.",
+      "en": "Labeling SKUs shouldn’t eat half a warehouse shift. The Code 39 generator builds a label with a live preview and sends it straight to print."
     },
     "tf_code39_description": {
-      "pl": "Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.",
-      "en": "An app for TelForceOne S.A. generating barcodes in the Code 39 standard."
+      "pl": "TelForceOne generowało etykiety w kilku programach — wolno i z błędami skanowania. Jedna aplikacja: wartość → podgląd Code 39 → druk, także w batchu.",
+      "en": "TelForceOne built labels in several tools — slowly, with scan errors. One app: value → Code 39 preview → print, including batches."
     },
     "tf_code39_meta": {
       "title": {
@@ -1072,21 +1610,21 @@
         "en": "Code 39 barcode generator — TelForceOne S.A. | COSGRAL"
       },
       "description": {
-        "pl": "Aplikacja dla TelForceOne S.A. do generowania kodów kreskowych w standardzie Code 39.",
-        "en": "An app for TelForceOne S.A. generating barcodes in the Code 39 standard."
+        "pl": "TelForceOne generowało etykiety w kilku programach — wolno i z błędami skanowania. Jedna aplikacja: wartość → podgląd Code 39 → druk, także w batchu.",
+        "en": "TelForceOne built labels in several tools — slowly, with scan errors. One app: value → Code 39 preview → print, including batches."
       }
     },
     "tf_code39_p1": {
-      "pl": "Drugim narzędziem dla TelForceOne S.A. jest aplikacja do generowania kodów kreskowych w standardzie Code 39. Ułatwia przygotowanie oznaczeń potrzebnych do identyfikacji produktów i materiałów.",
-      "en": "The second tool for TelForceOne S.A. generates barcodes in the Code 39 standard. It helps prepare labels used to identify products and materials."
+      "pl": "Problem: magazyn i produkcja oznaczały towary w rozproszonych narzędziach. Błędny kod wracał od skanera, a przygotowanie paczki etykiet na nową dostawę zajmowało nieproporcjonalnie dużo czasu.",
+      "en": "Problem: warehouse and production labeled goods across scattered tools. Bad codes bounced at the scanner, and preparing a batch for a new delivery took far too long."
     },
     "tf_code39_p2": {
-      "pl": "Interfejs skupia się na krótkim zadaniu: wprowadzeniu wartości, obejrzeniu wyniku i przygotowaniu kodu do wykorzystania. Poglądowa wizualizacja powyżej pokazuje tę prostą ścieżkę.",
-      "en": "The interface focuses on a short task: entering a value, reviewing the result and preparing the code for use. The illustrative visual above shows this simple flow."
+      "pl": "Rozwiązanie: lekka aplikacja Code 39 z podglądem na żywo, kontrolą parametrów etykiety i kolejką do druku. Operator wpisuje wartość, widzi paski i wysyła batch bez przełączania programów.",
+      "en": "Solution: a light Code 39 app with live preview, label checks and a print queue. The operator enters a value, sees the bars and sends a batch without switching tools."
     },
     "tf_code39_p3": {
-      "pl": "Projekt należy do tej samej rodziny narzędzi operacyjnych: pomaga przełożyć powtarzalny proces na czytelną aplikację dostępną dla zespołu.",
-      "en": "It belongs to the same family of operational tools: turning a repetitive process into a clear app for the team."
+      "pl": "Efekt: pojedyncza etykieta w sekundach zamiast minut, mniej poprawek przy skanowaniu i powtarzalny proces oznaczania SKU dla całego zespołu — nie tylko dla „osoby od kodów”.",
+      "en": "Result: a single label in seconds instead of minutes, fewer scan rework loops, and a repeatable SKU labeling process for the whole team — not just the “barcode person”."
     },
     "tf_forecast_title": {
       "pl": "Kontrola stanów i prognozowanie",
@@ -1097,12 +1635,12 @@
       "en": "Analytics / inventory"
     },
     "tf_forecast_lede": {
-      "pl": "Aplikacja do kontroli stanów i prognozowania zapotrzebowania.",
-      "en": "An app for monitoring stock and forecasting demand."
+      "pl": "Brak na półce boli sprzedaż, a nadmiar zamraża gotówkę. Panel stanów i prognoz pokazuje, co dokupić zanim będzie za późno.",
+      "en": "Stockouts hurt sales; overstock freezes cash. The inventory and forecast panel shows what to reorder before it’s too late."
     },
     "tf_forecast_description": {
-      "pl": "Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania.",
-      "en": "An app for TelForceOne S.A. supporting inventory control and demand forecasting."
+      "pl": "TelForceOne planowało zakupy z opóźnionych raportów. Aplikacja łączy stany, rotację i prognozę z alertami — decyzja zakupowa na danych, nie na wyczuciu.",
+      "en": "TelForceOne planned purchases from delayed reports. The app joins stock, velocity and forecast with alerts — buy decisions on data, not gut feel."
     },
     "tf_forecast_meta": {
       "title": {
@@ -1110,21 +1648,1015 @@
         "en": "Inventory control and forecasting — TelForceOne S.A. | COSGRAL"
       },
       "description": {
-        "pl": "Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania.",
-        "en": "An app for TelForceOne S.A. supporting inventory control and demand forecasting."
+        "pl": "TelForceOne planowało zakupy z opóźnionych raportów. Aplikacja łączy stany, rotację i prognozę z alertami — decyzja zakupowa na danych, nie na wyczuciu.",
+        "en": "TelForceOne planned purchases from delayed reports. The app joins stock, velocity and forecast with alerts — buy decisions on data, not gut feel."
       }
     },
     "tf_forecast_p1": {
-      "pl": "Trzecia aplikacja dla TelForceOne S.A. skupia się na kontroli stanów i prognozowaniu. Łączy bieżący widok zapasów z perspektywą przyszłego zapotrzebowania.",
-      "en": "The third app for TelForceOne S.A. focuses on inventory control and forecasting. It combines a current view of stock with a view of future demand."
+      "pl": "Problem: decyzje zakupowe opierały się na spóźnionych arkuszach. Albo towaru brakowało w kluczowym momencie, albo magazyn trzymał nadwyżkę „na wszelki wypadek” — bez wspólnego widoku ryzyka.",
+      "en": "Problem: purchasing ran on stale spreadsheets. Either a key SKU ran out at the wrong time, or the warehouse held “just in case” overstock — with no shared view of risk."
     },
     "tf_forecast_p2": {
-      "pl": "Takie zestawienie pomaga zespołowi wychwycić ryzyko braków oraz planować kolejne decyzje zakupowe na podstawie danych. Wizualizacja powyżej pokazuje ideę połączenia stanów, trendu i prognozy.",
-      "en": "This combination helps the team spot shortage risk and plan purchasing decisions using data. The visual above illustrates stock, trend and forecast together."
+      "pl": "Rozwiązanie: panel z bieżącym stanem, historią sprzedaży, prognozą na kolejne tygodnie i feedem alertów poniżej minimum. Od sygnału braku do draftu zamówienia zakupowego jest jedna ścieżka.",
+      "en": "Solution: a panel with live stock, sales history, a multi-week forecast and alerts below minimum. From shortage signal to a purchase-order draft is one path."
     },
     "tf_forecast_p3": {
-      "pl": "W projekcie ważna jest czytelność: najpierw stan, potem zmiana w czasie i sygnał wymagający uwagi. Dzięki temu panel wspiera szybkie decyzje operacyjne.",
-      "en": "Clarity matters here: first the current state, then change over time, then the signal requiring attention. The panel supports quick operational decisions."
+      "pl": "Efekt: cotygodniowe planowanie zakupów zajmuje wyraźnie mniej czasu, braki widać wcześniej, a zespół rozmawia o tych samych liczbach zamiast o trzech wersjach Excela.",
+      "en": "Result: weekly purchasing planning takes clearly less time, shortages show up earlier, and the team debates the same numbers instead of three Excel versions."
+    },
+    "case_trove_panel_tag": {
+      "pl": "Aplikacja",
+      "en": "Application"
+    },
+    "case_trove_panel_title": {
+      "pl": "Panel sklepu i monitoring cen",
+      "en": "Store panel & price monitoring"
+    },
+    "case_trove_panel_lede": {
+      "pl": "Gdy ceny na Allegro zmieniają się szybciej niż arkusz w biurze, marża ucieka po cichu. Panel Trove pilnuje stanów i cen w jednym widoku.",
+      "en": "When Allegro prices move faster than the office spreadsheet, margin slips away quietly. Trove’s panel watches stock and prices in one view."
+    },
+    "case_trove_panel_meta": {
+      "title": {
+        "pl": "Panel sklepu i monitoring cen — Trove | COSGRAL",
+        "en": "Store panel & price monitoring — Trove | COSGRAL"
+      },
+      "description": {
+        "pl": "Gdy ceny na Allegro zmieniają się szybciej niż arkusz w biurze, marża ucieka po cichu. Panel Trove pilnuje stanów i cen w jednym widoku.",
+        "en": "When Allegro prices move faster than the office spreadsheet, margin slips away quietly. Trove’s panel watches stock and prices in one view."
+      }
+    },
+    "case_trove_panel_p1": {
+      "pl": "Problem: zespół Trove porównywał stany i ceny marketplace’ów ręcznie. Przecena konkurencji albo własna oferta poza rynkiem wychodziła z opóźnieniem — często dopiero gdy spadła sprzedaż.",
+      "en": "Problem: Trove’s team compared marketplace stock and prices by hand. A competitor markdown or an off-market listing showed up late — often only after sales dipped."
+    },
+    "case_trove_panel_p2": {
+      "pl": "Rozwiązanie: panel operacyjny ze stanami, porównaniem cen (własny sklep / Allegro / konkurencja) i alertami przecen. Zdarzenia w feedzie mówią, kiedy trzeba skorygować ofertę.",
+      "en": "Solution: an ops panel with stock, price comparison (own shop / Allegro / competitors) and markdown alerts. The event feed says when a listing needs a fix."
+    },
+    "case_trove_panel_p3": {
+      "pl": "Efekt: kontrola cen i dostępności zajmuje minuty dziennie zamiast godzin w Excelu. Reakcja na spadek marży dzieje się tego samego dnia — bez kolejnego arkusza „do pilnowania”.",
+      "en": "Result: price and availability checks take minutes a day instead of hours in Excel. Margin dips get a same-day response — without another “watch this” spreadsheet."
+    },
+    "case_trove_panel_client": {
+      "pl": "Trove",
+      "en": "Trove"
+    },
+    "case_crm_leady_tag": {
+      "pl": "CRM",
+      "en": "CRM"
+    },
+    "case_crm_leady_title": {
+      "pl": "CRM leadów, dealów i operacji sprzedażowych",
+      "en": "CRM for leads, deals and sales ops"
+    },
+    "case_crm_leady_lede": {
+      "pl": "Lead bez właściciela i follow-upu to stracona sprzedaż. CRM trzyma lejek, historię kontaktu i przypomnienia w jednym procesie.",
+      "en": "A lead without an owner and a follow-up is lost revenue. The CRM keeps the funnel, contact history and reminders in one process."
+    },
+    "case_crm_leady_meta": {
+      "title": {
+        "pl": "CRM leadów, dealów i operacji sprzedażowych | COSGRAL",
+        "en": "CRM for leads, deals and sales ops | COSGRAL"
+      },
+      "description": {
+        "pl": "Lead bez właściciela i follow-upu to stracona sprzedaż. CRM trzyma lejek, historię kontaktu i przypomnienia w jednym procesie.",
+        "en": "A lead without an owner and a follow-up is lost revenue. The CRM keeps the funnel, contact history and reminders in one process."
+      }
+    },
+    "case_crm_leady_p1": {
+      "pl": "Problem: zespół B2B łapał zapytania z formularza, maila i poleceń — a potem gubił je między skrzynkami. Nikt nie wiedział, który deal stoi, kto miał oddzwonić i co ustalono tydzień temu.",
+      "en": "Problem: a B2B team caught inquiries from forms, email and referrals — then lost them between inboxes. No one knew which deal was stuck, who should call back, or what was agreed last week."
+    },
+    "case_crm_leady_p2": {
+      "pl": "Rozwiązanie: CRM od leada do zamkniętego deala — kolejka, kwalifikacja, kanban pipeline, alerty bez follow-upu i oś historii kontaktu. Każda rozmowa i mail siedzą przy karcie, nie w prywatnej skrzynce.",
+      "en": "Solution: CRM from lead to closed deal — intake, qualification, kanban pipeline, no-follow-up alerts and a contact timeline. Every call and email lives on the account, not in a private inbox."
+    },
+    "case_crm_leady_p3": {
+      "pl": "Efekt: mniej zimnych leadów, szybsza pierwsza reakcja i sprzedaż, którą da się przekazać koledze bez briefingu „z głowy”. Pipeline widać na co dzień, nie dopiero na statusie miesięcznym.",
+      "en": "Result: fewer cold leads, faster first response, and deals you can hand off without a “from memory” briefing. The pipeline is visible daily — not only at the monthly status meeting."
+    },
+    "case_chatbot_ai_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "case_chatbot_ai_title": {
+      "pl": "Chatbot AI do wiadomości klientów",
+      "en": "AI chatbot for customer messages"
+    },
+    "case_chatbot_ai_lede": {
+      "pl": "Klienci piszą wieczorem te same pytania — zespół odpisywał rano. Bot zamyka FAQ od razu i oddaje trudniejsze sprawy człowiekowi z kontekstem.",
+      "en": "Customers ask the same questions at night — the team replied in the morning. The bot closes FAQ instantly and hands harder cases to a human with context."
+    },
+    "case_chatbot_ai_meta": {
+      "title": {
+        "pl": "Chatbot AI do wiadomości klientów | COSGRAL",
+        "en": "AI chatbot for customer messages | COSGRAL"
+      },
+      "description": {
+        "pl": "Klienci piszą wieczorem te same pytania — zespół odpisywał rano. Bot zamyka FAQ od razu i oddaje trudniejsze sprawy człowiekowi z kontekstem.",
+        "en": "Customers ask the same questions at night — the team replied in the morning. The bot closes FAQ instantly and hands harder cases to a human with context."
+      }
+    },
+    "case_chatbot_ai_p1": {
+      "pl": "Problem: Instagram, Facebook i formularz WWW zasypywały skrzynkę powtarzalnymi pytaniami o godziny, ofertę i wycenę. Po godzinach nikt nie odpowiadał, a rano kolejka rosła szybciej niż zespół zdążył odpisać.",
+      "en": "Problem: Instagram, Facebook and the website form flooded the inbox with repeat questions about hours, offer and pricing. After hours nobody answered, and by morning the queue grew faster than the team could reply."
+    },
+    "case_chatbot_ai_p2": {
+      "pl": "Rozwiązanie: chatbot AI w jednym inboxie na social i WWW. Klasyfikuje sprawę, odpowiada na FAQ, zbiera zakres i budżet, a gdy pewność spada — przekazuje rozmowę konsultantowi z pełnym wątkiem.",
+      "en": "Solution: an AI chatbot in one inbox for social and web. It classifies the case, answers FAQ, collects scope and budget, and when confidence drops — hands the thread to a consultant with full context."
+    },
+    "case_chatbot_ai_p3": {
+      "pl": "Efekt: pierwsza odpowiedź 24/7, mniej kopiowania tych samych replyi i leady, które nie stygną do rana. Konsultant wchodzi tylko tam, gdzie naprawdę potrzeba człowieka — z gotowym briefem rozmowy.",
+      "en": "Result: a first reply 24/7, less copy-pasting the same answers, and leads that don’t go cold overnight. Consultants only join where a human is needed — with a ready conversation brief."
+    },
+    "case_trove_workflow_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "case_trove_workflow_title": {
+      "pl": "Zamówienie → faktura → status paczki",
+      "en": "Order → invoice → parcel status"
+    },
+    "case_trove_workflow_lede": {
+      "pl": "Fulfillment nie powinien być listą ręcznych kliknięć po każdym checkoutcie. U Trove zamówienie samo odpala fakturę, paczkę i mail do klienta.",
+      "en": "Fulfilment shouldn’t be a checklist of manual clicks after every checkout. At Trove, an order triggers invoice, parcel and the customer email by itself."
+    },
+    "case_trove_workflow_meta": {
+      "title": {
+        "pl": "Zamówienie → faktura → status paczki — Trove | COSGRAL",
+        "en": "Order → invoice → parcel status — Trove | COSGRAL"
+      },
+      "description": {
+        "pl": "Fulfillment nie powinien być listą ręcznych kliknięć po każdym checkoutcie. U Trove zamówienie samo odpala fakturę, paczkę i mail do klienta.",
+        "en": "Fulfilment shouldn’t be a checklist of manual clicks after every checkout. At Trove, an order triggers invoice, parcel and the customer email by itself."
+      }
+    },
+    "case_trove_workflow_p1": {
+      "pl": "Problem: po każdym zamówieniu ktoś przepisywał dane do faktury, aktualizował status w drugim narzędziu i wysyłał wiadomość do klienta. Przy wzroście zamówień rosła też liczba pomyłek i opóźnień.",
+      "en": "Problem: after every order someone retyped data into an invoice, updated status in a second tool and emailed the customer. As order volume grew, so did mistakes and delays."
+    },
+    "case_trove_workflow_p2": {
+      "pl": "Rozwiązanie: automatyczny łańcuch od checkoutu — eksport pod fakturę, przekazanie do magazynu/API kuriera, track&trace i powiadomienie statusowe. Człowiek wkracza tylko przy wyjątkach.",
+      "en": "Solution: an automated chain from checkout — invoice export, handoff to warehouse/courier API, track & trace and status notification. People step in only for exceptions."
+    },
+    "case_trove_workflow_p3": {
+      "pl": "Efekt: minuty ręcznej roboty przy zamówieniu spadają do obsługi wyjątków. Klient dostaje spójny status, a zespół nie klei tego samego procesu w trzech systemach.",
+      "en": "Result: minutes of manual work per order shrink to exception handling. Customers get a coherent status, and the team stops gluing the same process across three systems."
+    },
+    "case_trove_workflow_client": {
+      "pl": "Trove",
+      "en": "Trove"
+    },
+    "tf_crm_s1": {
+      "pl": "Mapa klientów",
+      "en": "Client map"
+    },
+    "tf_crm_s2": {
+      "pl": "Baza handlowców",
+      "en": "Sales database"
+    },
+    "tf_crm_s3": {
+      "pl": "Praca w terenie",
+      "en": "Field work"
+    },
+    "tf_code_s1": {
+      "pl": "Code 39",
+      "en": "Code 39"
+    },
+    "tf_code_s2": {
+      "pl": "Generator etykiet",
+      "en": "Label generator"
+    },
+    "tf_code_s3": {
+      "pl": "Szybki wydruk",
+      "en": "Fast print"
+    },
+    "tf_forecast_s1": {
+      "pl": "Stany magazynowe",
+      "en": "Stock levels"
+    },
+    "tf_forecast_s2": {
+      "pl": "Prognoza popytu",
+      "en": "Demand forecast"
+    },
+    "tf_forecast_s3": {
+      "pl": "Alerty braków",
+      "en": "Shortage alerts"
+    },
+    "case_trove_panel_s1": {
+      "pl": "Stany magazynowe",
+      "en": "Stock levels"
+    },
+    "case_trove_panel_s2": {
+      "pl": "Ceny marketplace",
+      "en": "Marketplace prices"
+    },
+    "case_trove_panel_s3": {
+      "pl": "Alerty przecen",
+      "en": "Markdown alerts"
+    },
+    "case_crm_leady_s1": {
+      "pl": "Leady → deale",
+      "en": "Leads → deals"
+    },
+    "case_crm_leady_s2": {
+      "pl": "Pipeline sprzedaży",
+      "en": "Sales pipeline"
+    },
+    "case_crm_leady_s3": {
+      "pl": "Historia kontaktu",
+      "en": "Contact history"
+    },
+    "case_chatbot_ai_s1": {
+      "pl": "Social + WWW",
+      "en": "Social + web"
+    },
+    "case_chatbot_ai_s2": {
+      "pl": "FAQ i wyceny",
+      "en": "FAQ & quotes"
+    },
+    "case_chatbot_ai_s3": {
+      "pl": "Handoff do człowieka",
+      "en": "Human handoff"
+    },
+    "case_trove_workflow_s1": {
+      "pl": "Nowe zamówienie",
+      "en": "New order"
+    },
+    "case_trove_workflow_s2": {
+      "pl": "Eksport faktury",
+      "en": "Invoice export"
+    },
+    "case_trove_workflow_s3": {
+      "pl": "Status paczki",
+      "en": "Parcel status"
+    },
+    "prev": {
+      "pl": "Poprzedni",
+      "en": "Previous"
+    },
+    "next": {
+      "pl": "Następny",
+      "en": "Next"
+    },
+    "prev_cat": {
+      "pl": "Poprzednia kategoria",
+      "en": "Previous category"
+    },
+    "next_cat": {
+      "pl": "Następna kategoria",
+      "en": "Next category"
+    },
+    "chapters_label": {
+      "pl": "Kategorie realizacji",
+      "en": "Portfolio categories"
+    },
+    "chapters_nav": {
+      "pl": "Nawigacja kategorii",
+      "en": "Category navigation"
+    },
+    "chapters_dots": {
+      "pl": "Kategorie",
+      "en": "Categories"
+    },
+    "contact_label": {
+      "pl": "Kontakt",
+      "en": "Contact"
+    },
+    "dot_strony": {
+      "pl": "Strony internetowe",
+      "en": "Websites"
+    },
+    "dot_systemy": {
+      "pl": "Systemy i automatyzacje",
+      "en": "Systems & automation"
+    },
+    "dot_montaz": {
+      "pl": "Montaż wideo",
+      "en": "Video editing"
+    },
+    "dot_grafiki": {
+      "pl": "Grafiki",
+      "en": "Graphics"
+    },
+    "systems_nav": {
+      "pl": "Nawigacja systemów",
+      "en": "Systems navigation"
+    },
+    "systems_dots": {
+      "pl": "Systemy",
+      "en": "Systems"
+    },
+    "systems_prev": {
+      "pl": "Poprzedni",
+      "en": "Previous"
+    },
+    "systems_next": {
+      "pl": "Następny",
+      "en": "Next"
+    },
+    "view_more_aria": {
+      "pl": "Zobacz więcej",
+      "en": "See more"
+    },
+    "tf_crm_aria": {
+      "pl": "TelForceOne S.A. — CRM z mapą dla przedstawicieli handlowych",
+      "en": "TelForceOne S.A. — Sales rep map CRM"
+    },
+    "tf_code39_aria": {
+      "pl": "TelForceOne S.A. — generator kodów kreskowych Code 39",
+      "en": "TelForceOne S.A. — Code 39 barcode generator"
+    },
+    "tf_forecast_aria": {
+      "pl": "TelForceOne S.A. — aplikacja stanów magazynowych i prognozowania",
+      "en": "TelForceOne S.A. — stock levels and forecasting app"
+    },
+    "auto1_aria": {
+      "pl": "Trove — panel sklepu i monitoring cen",
+      "en": "Trove — store panel and price monitoring"
+    },
+    "auto2_aria": {
+      "pl": "CRM leadów, dealów i operacji sprzedażowych",
+      "en": "Leads, deals and sales operations CRM"
+    },
+    "auto3_aria": {
+      "pl": "Chatbot AI do wiadomości klientów",
+      "en": "AI chatbot for customer messages"
+    },
+    "auto4_aria": {
+      "pl": "Trove — zamówienie, faktura, status paczki",
+      "en": "Trove — order, invoice, parcel status"
+    },
+    "juicy_aria": {
+      "pl": "Juicy Events — strona internetowa",
+      "en": "Juicy Events — website"
+    },
+    "trove_aria": {
+      "pl": "Trove Archive — strona internetowa",
+      "en": "Trove Archive — website"
+    },
+    "mj_aria": {
+      "pl": "MJ Social Media — strona internetowa",
+      "en": "MJ Social Media — website"
+    },
+    "loading": {
+      "pl": "Ładowanie opisu…",
+      "en": "Loading description…"
+    },
+    "case_fallback": {
+      "pl": "Nie udało się wczytać opisu.",
+      "en": "Could not load description."
+    },
+    "open_case_link": {
+      "pl": "Otwórz stronę realizacji →",
+      "en": "Open case study →"
+    }
+  },
+  "nav_overlay": {
+    "main_menu": {
+      "pl": "Menu główne",
+      "en": "Main menu"
+    }
+  },
+  "services_fan": {
+    "prev": {
+      "pl": "Poprzednia usługa",
+      "en": "Previous service"
+    },
+    "next": {
+      "pl": "Następna usługa",
+      "en": "Next service"
+    },
+    "tap_prev": {
+      "pl": "Kliknij lewą stronę ekranu",
+      "en": "Click the left side of the screen"
+    },
+    "tap_next": {
+      "pl": "Kliknij prawą stronę ekranu",
+      "en": "Click the right side of the screen"
+    }
+  },
+  "systems_cases": {
+    "tfo_crm_tag": {
+      "pl": "CRM / sprzedaż terenowa",
+      "en": "CRM / field sales"
+    },
+    "tfo_crm_title": {
+      "pl": "CRM z mapą handlowców",
+      "en": "Sales rep map CRM"
+    },
+    "tfo_crm_desc": {
+      "pl": "Handlowcy jeździli z Excelami i notatkami w telefonie — nikt nie wiedział, kto u kogo był. CRM z mapą zbiera klientów, trasy i raporty dnia w jednym miejscu, więc planowanie wizyt zajmuje minuty zamiast godziny.",
+      "en": "Sales reps drove around with Excel files and phone notes — no one knew who had visited whom. The map CRM gathers clients, routes and daily reports in one place, so trip planning takes minutes instead of hours."
+    },
+    "tfo_code39_tag": {
+      "pl": "Narzędzie / identyfikacja",
+      "en": "Tool / identification"
+    },
+    "tfo_code39_title": {
+      "pl": "Generator kodów Code 39",
+      "en": "Code 39 barcode generator"
+    },
+    "tfo_code39_desc": {
+      "pl": "Etykiety powstawały w kilku narzędziach i często wracały ze skanera jako błąd. Generator daje podgląd Code 39 i batch do druku — oznaczenie SKU w sekundach, bez poprawek na magazynie.",
+      "en": "Labels were created in multiple tools and often came back from the scanner as errors. The generator provides a Code 39 preview and batch print — SKU labelling in seconds, no warehouse corrections."
+    },
+    "tfo_forecast_tag": {
+      "pl": "Analityka / zapasy",
+      "en": "Analytics / inventory"
+    },
+    "tfo_forecast_title": {
+      "pl": "Stany i prognozowanie",
+      "en": "Stock levels & forecasting"
+    },
+    "tfo_forecast_desc": {
+      "pl": "Zakupy szły \"na wyczucie\": braki na półce albo zamrożony towar. Panel łączy stany, rotację i prognozę z alertami — widać, co dokupić zanim sprzedaż stanie.",
+      "en": "Purchases were made by gut feeling: empty shelves or frozen stock. The dashboard combines levels, turnover and forecast with alerts — see what to reorder before sales stop."
+    },
+    "trove_panel_tag": {
+      "pl": "Aplikacja",
+      "en": "Application"
+    },
+    "trove_panel_title": {
+      "pl": "Panel sklepu i monitoring cen",
+      "en": "Store panel & price monitoring"
+    },
+    "trove_panel_desc": {
+      "pl": "Trove ręcznie porównywało ceny na Allegro i własnym sklepie w arkuszach. Panel zbiera stany i ceny kanałów z alertami przecen — reakcja na spadek marży tego samego dnia, nie po tygodniu.",
+      "en": "Trove manually compared prices on Allegro and its own store using spreadsheets. The panel aggregates stock and channel prices with discount alerts — react to margin drops the same day, not after a week."
+    },
+    "crm_leady_tag": {
+      "pl": "CRM",
+      "en": "CRM"
+    },
+    "crm_leady_title": {
+      "pl": "CRM leadów i dealów",
+      "en": "Leads & deals CRM"
+    },
+    "crm_leady_desc": {
+      "pl": "Leady ginęły między skrzynką, czatem i karteczkami — follow-upy się spóźniały. CRM prowadzi od pierwszego kontaktu do deala: pipeline, notatki i przypomnienia w jednym lejku.",
+      "en": "Leads got lost between inbox, chat and sticky notes — follow-ups were late. The CRM guides from first contact to deal: pipeline, notes and reminders in one funnel."
+    },
+    "chatbot_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "chatbot_title": {
+      "pl": "Chatbot AI dla klientów",
+      "en": "AI chatbot for clients"
+    },
+    "chatbot_desc": {
+      "pl": "Po godzinach Instagram i Messenger zasypywały te same pytania, a zespół odpisywał rano z opóźnieniem. Bot zamyka FAQ 24/7, zbiera lead i oddaje rozmowę konsultantowi z kontekstem.",
+      "en": "After hours Instagram and Messenger were flooded with the same questions, and the team replied in the morning with delays. The bot handles FAQ 24/7, captures leads and hands off conversations to consultants with context."
+    },
+    "trove_flow_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "trove_flow_title": {
+      "pl": "Zamówienie → faktura → paczka",
+      "en": "Order → invoice → parcel"
+    },
+    "trove_flow_desc": {
+      "pl": "Każde zamówienie Trove wymagało ręcznego klejenia faktury, statusu i maila do klienta. Workflow odpala cały łańcuch sam — mniej klikania, mniej pomyłek przy fulfillmentcie.",
+      "en": "Every Trove order required manually stitching together an invoice, status and customer email. The workflow fires the whole chain automatically — less clicking, fewer fulfilment errors."
+    },
+    "ai_agent_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "ai_agent_title": {
+      "pl": "Agent AI i integracje",
+      "en": "AI agent & integrations"
+    },
+    "ai_agent_desc": {
+      "pl": "Chat, mail i CRM żyły osobno — handoff to było kopiuj-wklej. Agent łączy kanały w jednym przepływie: klasyfikuje sprawę, uzupełnia kartę i przekazuje ją właściwej osobie.",
+      "en": "Chat, email and CRM lived separately — handoff was copy-paste. The agent connects channels in one flow: classifies the issue, fills the card and routes it to the right person."
+    },
+    "shelf_tag": {
+      "pl": "Aplikacja",
+      "en": "Application"
+    },
+    "shelf_title": {
+      "pl": "Shelf Sync",
+      "en": "Shelf Sync"
+    },
+    "shelf_desc": {
+      "pl": "Produkt znikał z półki sprzedażowej, zanim magazyn zdążył zareagować. Shelf Sync pilnuje widoczności stanów i alarmuje, gdy oferta wypada z rynku.",
+      "en": "Products vanished from the sales shelf before the warehouse could react. Shelf Sync monitors stock visibility and alerts when a listing drops off the market."
+    },
+    "kpi_tag": {
+      "pl": "Analityka",
+      "en": "Analytics"
+    },
+    "kpi_title": {
+      "pl": "KPI board",
+      "en": "KPI board"
+    },
+    "kpi_desc": {
+      "pl": "Raporty tygodnia powstawały z kilku Exceli i zajmowały pół dnia. Board pokazuje sprzedaż i operacje na żywo — puls firmy bez budowania tabel od zera.",
+      "en": "Weekly reports were built from multiple Excel files and took half a day. The board shows sales and operations live — company pulse without building tables from scratch."
+    },
+    "network_tag": {
+      "pl": "Automatyzacja",
+      "en": "Automation"
+    },
+    "network_title": {
+      "pl": "Graf workflow",
+      "en": "Workflow graph"
+    },
+    "network_desc": {
+      "pl": "Automatyzacje siedziały w głowie jednej osoby albo w chaotycznych regułach. Graf pokazuje triggery, warunki i akcje — łatwiej utrzymać proces i dokładać kolejne kroki.",
+      "en": "Automations lived in one person's head or in chaotic rules. The graph shows triggers, conditions and actions — easier to maintain the process and add steps."
+    }
+  },
+  "tf_crm_demo": {
+    "h2_clients": {
+      "pl": "Baza klientów",
+      "en": "Client Database"
+    },
+    "h2_map": {
+      "pl": "Mapa klientów",
+      "en": "Client Map"
+    },
+    "p_map": {
+      "pl": "Piny na mapie — kliknij, by wybrać punkt trasy i zobaczyć kontekst lokalizacji.",
+      "en": "Pins on the map — click to select a route point and see location context."
+    },
+    "p_timeline": {
+      "pl": "Oś dnia handlowca: start → wizyty → powrót. Scrub pokazuje kolejność.",
+      "en": "Sales rep's day timeline: start → visits → return. Scrub shows order."
+    },
+    "span_drag": {
+      "pl": "Przeciągnij",
+      "en": "Drag"
+    },
+    "p_timeline_label": {
+      "pl": "Oś czasu · przeciągnij",
+      "en": "Timeline · drag"
+    },
+    "span_click_call": {
+      "pl": "Klik rozmowę",
+      "en": "Click a call"
+    },
+    "p_regions": {
+      "pl": "Obciążenie rejonów — hover pokazuje, gdzie trasa jest przeładowana.",
+      "en": "Region load — hover shows where the route is overloaded."
+    },
+    "p_orbit": {
+      "pl": "Orbit synchronizuje mapę, CRM i raport dnia.",
+      "en": "Orbit syncs the map, CRM and daily report."
+    },
+    "p_channels": {
+      "pl": "Kanały",
+      "en": "Channels"
+    },
+    "p_gauge": {
+      "pl": "Gauge gotowości trasy: ile pinów ma komplet danych przed wyjazdem.",
+      "en": "Route readiness gauge: how many pins have complete data before departure."
+    },
+    "span_slide": {
+      "pl": "Przesuń",
+      "en": "Slide"
+    },
+    "p_gauge_label": {
+      "pl": "Ready · przesuń",
+      "en": "Ready · slide"
+    },
+    "p_client_db": {
+      "pl": "Kartoteka handlowa w liczbach: aktywni klienci, wizyty tygodnia, otwarte tematy.",
+      "en": "Sales records by the numbers: active clients, weekly visits, open topics."
+    },
+    "hint_snapshot": {
+      "pl": "Snapshot",
+      "en": "Snapshot"
+    },
+    "hint_select_pin": {
+      "pl": "Wybierz pin",
+      "en": "Select pin"
+    },
+    "hint_hover_click": {
+      "pl": "Hover / klik",
+      "en": "Hover / click"
+    },
+    "hint_orbit": {
+      "pl": "Orbit",
+      "en": "Orbit"
+    },
+    "p_visit": {
+      "pl": "Notatka z terenu wpada od razu do karty klienta — bez osobnej aplikacji.",
+      "en": "A field note goes straight to the client record — no separate app."
+    },
+    "nav_db": {
+      "pl": "Baza",
+      "en": "Database"
+    },
+    "nav_map": {
+      "pl": "Mapa",
+      "en": "Map"
+    },
+    "nav_route": {
+      "pl": "Trasa",
+      "en": "Route"
+    },
+    "nav_visit": {
+      "pl": "Wizyta",
+      "en": "Visit"
+    },
+    "nav_territory": {
+      "pl": "Teren",
+      "en": "Territory"
+    },
+    "nav_sync": {
+      "pl": "Sync",
+      "en": "Sync"
+    },
+    "nav_brief": {
+      "pl": "Brief",
+      "en": "Brief"
+    },
+    "h2_route": {
+      "pl": "Plan trasy",
+      "en": "Route plan"
+    },
+    "h2_visit": {
+      "pl": "Log wizyty",
+      "en": "Visit log"
+    },
+    "h2_territory": {
+      "pl": "Terytorium",
+      "en": "Territory"
+    },
+    "h2_sync": {
+      "pl": "Sync teren ↔ biuro",
+      "en": "Field ↔ office sync"
+    },
+    "h2_brief": {
+      "pl": "Brief dnia",
+      "en": "Day brief"
+    },
+    "label_map_pin": {
+      "pl": "Mapa · wybierz pin",
+      "en": "Map · select pin"
+    },
+    "label_call_click": {
+      "pl": "Rozmowa · kliknij",
+      "en": "Call · click"
+    },
+    "label_states_hover": {
+      "pl": "Stany · hover / klik",
+      "en": "States · hover / click"
+    }
+  },
+  "tf_code39_demo": {
+    "h2_input": {
+      "pl": "Wartość wejściowa",
+      "en": "Input Value"
+    },
+    "p_input": {
+      "pl": "Wpisz kod — paski budują się na żywo w standardzie Code 39.",
+      "en": "Type a code — bars build live in the Code 39 standard."
+    },
+    "p_input_label": {
+      "pl": "Code 39 · wpisz wartość",
+      "en": "Code 39 · type value"
+    },
+    "p_steps": {
+      "pl": "Kroki od znaku alfanumerycznego do wzorca pasków.",
+      "en": "Steps from alphanumeric character to bar pattern."
+    },
+    "h2_preview": {
+      "pl": "Podgląd etykiety",
+      "en": "Label Preview"
+    },
+    "p_preview": {
+      "pl": "KPI etykiety: szerokość, wysokość, kontrast — szybki sanity-check przed drukiem.",
+      "en": "Label KPIs: width, height, contrast — quick sanity-check before printing."
+    },
+    "h2_batch": {
+      "pl": "Partia kodów",
+      "en": "Code Batch"
+    },
+    "p_batch": {
+      "pl": "Obciążenie generatora przy batchu — klik słupka pokazuje falę zadań.",
+      "en": "Generator load during batch — click a bar to show the task wave."
+    },
+    "p_batch_timeline": {
+      "pl": "Oś: generuj → kolejka → drukarka → potwierdzenie.",
+      "en": "Pipeline: generate → queue → printer → confirm."
+    },
+    "span_drag": {
+      "pl": "Przeciągnij",
+      "en": "Drag"
+    },
+    "p_batch_label": {
+      "pl": "Oś czasu · przeciągnij",
+      "en": "Timeline · drag"
+    },
+    "p_alerts": {
+      "pl": "Alerty gdy skaner nie czyta etykiety albo checksum nie zgadza się.",
+      "en": "Alerts when the scanner can't read the label or checksum mismatch."
+    },
+    "span_low_contrast": {
+      "pl": "Słaby kontrast",
+      "en": "Low contrast"
+    },
+    "span_reprint": {
+      "pl": "Ponów druk · LOTE 12",
+      "en": "Reprint · LOTE 12"
+    },
+    "h2_archive": {
+      "pl": "Archiwum oznaczeń",
+      "en": "Label Archive"
+    },
+    "span_slide": {
+      "pl": "Przesuń",
+      "en": "Slide"
+    },
+    "p_archive_label": {
+      "pl": "Covered · przesuń",
+      "en": "Covered · slide"
+    },
+    "hint_edit": {
+      "pl": "Edytuj pole",
+      "en": "Edit field"
+    },
+    "hint_click_step": {
+      "pl": "Kliknij krok",
+      "en": "Click step"
+    },
+    "hint_snapshot": {
+      "pl": "Snapshot",
+      "en": "Snapshot"
+    },
+    "hint_hover_click": {
+      "pl": "Hover / klik",
+      "en": "Hover / click"
+    },
+    "hint_pulse": {
+      "pl": "Pulse",
+      "en": "Pulse"
+    },
+    "p_coverage": {
+      "pl": "Gauge pokrycia: ile SKU ma aktywny, zweryfikowany Code 39.",
+      "en": "Coverage gauge: how many SKUs have an active, verified Code 39."
+    },
+    "nav_input": {
+      "pl": "Input",
+      "en": "Input"
+    },
+    "nav_encode": {
+      "pl": "Encode",
+      "en": "Encode"
+    },
+    "nav_preview": {
+      "pl": "Preview",
+      "en": "Preview"
+    },
+    "nav_batch": {
+      "pl": "Batch",
+      "en": "Batch"
+    },
+    "nav_print": {
+      "pl": "Print",
+      "en": "Print"
+    },
+    "nav_scan": {
+      "pl": "Scan",
+      "en": "Scan"
+    },
+    "nav_archive": {
+      "pl": "Archivum",
+      "en": "Archive"
+    },
+    "h2_encode": {
+      "pl": "Kodowanie",
+      "en": "Encoding"
+    },
+    "h2_print": {
+      "pl": "Szybki wydruk",
+      "en": "Quick print"
+    },
+    "h2_scan": {
+      "pl": "Weryfikacja skanem",
+      "en": "Scan verification"
+    },
+    "label_flow": {
+      "pl": "Flow · kliknij krok",
+      "en": "Flow · click step"
+    },
+    "label_states_hover": {
+      "pl": "Stany · hover / klik",
+      "en": "States · hover / click"
+    },
+    "btn_znak": {
+      "pl": "Znak",
+      "en": "Char"
+    },
+    "btn_checksum": {
+      "pl": "Checksum",
+      "en": "Checksum"
+    },
+    "btn_paski": {
+      "pl": "Paski",
+      "en": "Bars"
+    },
+    "btn_quiet": {
+      "pl": "Quiet",
+      "en": "Quiet zone"
+    }
+  },
+  "tf_forecast_demo": {
+    "h2_snapshot": {
+      "pl": "Snapshot stanów",
+      "en": "State Snapshot"
+    },
+    "p_snapshot": {
+      "pl": "Aktualne pokrycie magazynu: SKU poniżej minimum, wartość zapasu, rotacja.",
+      "en": "Current warehouse coverage: SKUs below minimum, inventory value, rotation."
+    },
+    "h2_trend": {
+      "pl": "Trend zużycia",
+      "en": "Consumption Trend"
+    },
+    "p_trend": {
+      "pl": "Przesuń sondę po wykresie, by odczytać punkt na historii sprzedaży.",
+      "en": "Drag the probe across the chart to read a point in sales history."
+    },
+    "span_drag_line": {
+      "pl": "Przesuń po linii",
+      "en": "Drag along line"
+    },
+    "p_trend_label": {
+      "pl": "Trend · przesuń sondę",
+      "en": "Trend · drag probe"
+    },
+    "p_forecast": {
+      "pl": "Słupki forecastu na kolejne tygodnie — klik losuje korektę scenariusza.",
+      "en": "Forecast bars for upcoming weeks — click to randomise scenario adjustment."
+    },
+    "h2_alerts": {
+      "pl": "Alerty braków",
+      "en": "Shortage Alerts"
+    },
+    "p_alerts": {
+      "pl": "Feed ryzyk: kiedy SKU spadnie poniżej bezpiecznego progu.",
+      "en": "Risk feed: when an SKU will drop below the safety threshold."
+    },
+    "span_avg": {
+      "pl": "średnie",
+      "en": "avg"
+    },
+    "h2_order": {
+      "pl": "Sugestia zamówienia",
+      "en": "Order Suggestion"
+    },
+    "p_order": {
+      "pl": "Kroki od sygnału braku do draftu PO.",
+      "en": "Steps from shortage signal to PO draft."
+    },
+    "btn_signal": {
+      "pl": "Sygnał",
+      "en": "Signal"
+    },
+    "btn_qty": {
+      "pl": "Ilość",
+      "en": "Quantity"
+    },
+    "p_orbit": {
+      "pl": "Orbit pokazuje powiązania: stan ↔ forecast ↔ zakup ↔ alert.",
+      "en": "Orbit shows connections: stock ↔ forecast ↔ purchase ↔ alert."
+    },
+    "p_channels": {
+      "pl": "Kanały",
+      "en": "Channels"
+    },
+    "p_gauge": {
+      "pl": "Gauge pewności prognozy — im wyżej, tym bezpieczniejsza decyzja zakupowa.",
+      "en": "Forecast confidence gauge — the higher, the safer the purchase decision."
+    },
+    "span_slide": {
+      "pl": "Przesuń",
+      "en": "Slide"
+    },
+    "p_gauge_label": {
+      "pl": "Confidence · przesuń",
+      "en": "Confidence · slide"
+    },
+    "hint_snapshot": {
+      "pl": "Snapshot",
+      "en": "Snapshot"
+    },
+    "hint_hover_click": {
+      "pl": "Hover / klik",
+      "en": "Hover / click"
+    },
+    "hint_pulse": {
+      "pl": "Pulse",
+      "en": "Pulse"
+    },
+    "hint_click_step": {
+      "pl": "Kliknij krok",
+      "en": "Click step"
+    },
+    "hint_orbit": {
+      "pl": "Orbit",
+      "en": "Orbit"
+    },
+    "nav_stock": {
+      "pl": "Stany",
+      "en": "Stock"
+    },
+    "nav_trend": {
+      "pl": "Trend",
+      "en": "Trend"
+    },
+    "nav_demand": {
+      "pl": "Popyt",
+      "en": "Demand"
+    },
+    "nav_short": {
+      "pl": "Braki",
+      "en": "Shortages"
+    },
+    "nav_reorder": {
+      "pl": "Reorder",
+      "en": "Reorder"
+    },
+    "nav_sku": {
+      "pl": "SKU",
+      "en": "SKU"
+    },
+    "nav_decide": {
+      "pl": "Decyzja",
+      "en": "Decision"
+    },
+    "h2_demand": {
+      "pl": "Prognoza popytu",
+      "en": "Demand forecast"
+    },
+    "h2_focus": {
+      "pl": "Focus SKU",
+      "en": "Focus SKU"
+    },
+    "h2_decide": {
+      "pl": "Panel decyzji",
+      "en": "Decision panel"
+    },
+    "label_states_hover": {
+      "pl": "Stany · hover / klik",
+      "en": "States · hover / click"
+    },
+    "label_flow": {
+      "pl": "Flow · kliknij krok",
+      "en": "Flow · click step"
+    },
+    "btn_dostawca": {
+      "pl": "Dostawca",
+      "en": "Supplier"
+    },
+    "btn_po": {
+      "pl": "PO",
+      "en": "PO"
+    }
+  },
+  "chatbot_ai_demo": {
+    "h2_inbox": {
+      "pl": "Wspólna skrzynka",
+      "en": "Shared inbox"
+    },
+    "h2_intent": {
+      "pl": "Wykrywanie intencji",
+      "en": "Intent detection"
+    },
+    "h2_faq": {
+      "pl": "Odpowiedź FAQ",
+      "en": "FAQ reply"
+    },
+    "h2_quote": {
+      "pl": "Asystent wyceny",
+      "en": "Quote assistant"
+    },
+    "h2_handoff": {
+      "pl": "Przekazanie człowiekowi",
+      "en": "Human handoff"
+    },
+    "h2_context": {
+      "pl": "Kontekst rozmowy",
+      "en": "Conversation context"
+    },
+    "h2_after_hours": {
+      "pl": "Po godzinach",
+      "en": "After hours"
+    },
+    "nav_quote": {
+      "pl": "Wycena",
+      "en": "Quote"
+    },
+    "nav_context": {
+      "pl": "Kontekst",
+      "en": "Context"
     }
   }
 }

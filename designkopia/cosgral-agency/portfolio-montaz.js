@@ -185,7 +185,7 @@
   }
 
   /* Stała prędkość w px/s — na mobile krótsza belka przy 52s wyglądała wolniej */
-  var DRIFT_PX_PER_SEC = 96;
+  var DRIFT_PX_PER_SEC = 48;
   var driftResizeBound = false;
 
   function syncDriftSpeed() {

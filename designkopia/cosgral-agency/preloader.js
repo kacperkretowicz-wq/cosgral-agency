@@ -19,16 +19,6 @@
   var cubeSlot = document.querySelector(".preloader__cube-slot");
   if (!shell) return;
 
-  // Returning visitors can use the navigation immediately.
-  try {
-    if (sessionStorage.getItem("cosgral-intro-seen")) {
-      shell.classList.add("is-done", "is-settled");
-      document.body.classList.add("is-ready");
-      return;
-    }
-    sessionStorage.setItem("cosgral-intro-seen", "1");
-  } catch (e) {}
-
   if (REDUCED) {
     shell.classList.add("is-done", "is-settled");
     document.body.classList.add("is-ready");
@@ -36,7 +26,7 @@
   }
 
   var start = performance.now();
-  var duration = MOBILE ? 650 : 900;
+  var duration = MOBILE ? 2400 : 3200;
   var flight = null;
   var logo = { x: 0, y: 0, rot: 0, scale: 1, opacity: 0 };
   var logoTarget = { x: 0, y: 0, rot: 0, scale: 1, opacity: 1 };
@@ -147,7 +137,7 @@
       setTimeout(function () {
         shell.classList.add("is-done");
         document.body.classList.add("is-ready");
-      }, MOBILE ? 160 : 200);
+      }, MOBILE ? 380 : 650);
     }
   }
 

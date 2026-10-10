@@ -38,15 +38,8 @@
   }
 
   function serviceHref(theme) {
-    var pages = {
-      blue: "tworzenie-stron-internetowych.html",
-      purple: "projektowanie-aplikacji.html",
-      gold: "pozycjonowanie-seo-geo.html",
-      orange: "wdrazanie-automatyzacji.html",
-      crimson: "systemy-crm.html",
-      green: "grafika-i-montaz-wideo.html",
-    };
-    return siteRoot() + "uslugi/" + pages[theme];
+    if (document.body.classList.contains("home-page")) return "?service=" + theme;
+    return siteRoot() + "index.html?service=" + theme;
   }
 
   function findServicesLink() {
@@ -265,17 +258,8 @@
   }
 
   function startStageSync() {
-    // The 3D cube may be offscreen or still loading. Keep navigation in a
-    // predictable place and let the cube animate behind it.
-    stopStageSync();
-    if (!stage) return;
-    stage.style.left = "50%";
-    stage.style.top = "50%";
-    stage.style.width = "min(84vw, 360px)";
-    stage.style.height = "auto";
-    stage.style.minHeight = "min(84vw, 360px)";
-    stage.style.setProperty("--menu-face-size", "min(84vw, 360px)");
-    stage.style.transform = "translate(-50%, -50%)";
+    if (syncRaf) window.cancelAnimationFrame(syncRaf);
+    syncStageToCube();
   }
 
   function stopStageSync() {
@@ -291,6 +275,7 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("is-nav-menu-open", open);
     document.documentElement.classList.toggle("is-nav-menu-open", open);
+    setScrollLock(open);
     if (open && backdrop && window.gsap) {
       gsap.set(backdrop, { opacity: 1 });
     }
@@ -305,6 +290,33 @@
         servicesLink.setAttribute("aria-expanded", "false");
       }
       if (servicesSublist) servicesSublist.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function setScrollLock(locked) {
+    document.documentElement.classList.toggle("is-scroll-locked", locked);
+    document.body.classList.toggle("is-scroll-locked", locked);
+    var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+    if (lenis) {
+      try {
+        if (locked) lenis.stop();
+        else lenis.start();
+      } catch (err) {}
+    }
+    if (locked) {
+      var y = window.scrollY || window.pageYOffset || 0;
+      document.documentElement.style.setProperty("--scroll-lock-y", "-" + y + "px");
+      document.body.dataset.scrollLockY = String(y);
+    } else if (document.body.dataset.scrollLockY) {
+      var restore = parseInt(document.body.dataset.scrollLockY, 10) || 0;
+      delete document.body.dataset.scrollLockY;
+      document.documentElement.style.removeProperty("--scroll-lock-y");
+      window.scrollTo(0, restore);
+      if (lenis && lenis.scrollTo) {
+        try {
+          lenis.scrollTo(restore, { immediate: true });
+        } catch (err2) {}
+      }
     }
   }
 
@@ -323,17 +335,67 @@
     return Math.max(0, fullDelay - blend * openDur);
   }
 
+  function showLinksImmediate() {
+    Array.prototype.forEach.call(links, function (a) {
+      a.style.opacity = "1";
+      a.style.clipPath = "inset(0 0% 0 0)";
+      a.style.pointerEvents = "auto";
+    });
+    Array.prototype.forEach.call(menuChars(), function (ch) {
+      ch.style.opacity = "1";
+      ch.style.transform = "none";
+      ch.style.filter = "none";
+    });
+  }
+
   function animateLinksForOpen() {
-    if (REDUCED || !window.gsap) return;
+    if (REDUCED || !window.gsap) {
+      showLinksImmediate();
+      return;
+    }
     var chars = menuChars();
+    var delay = linksDelayForBlend();
+
     gsap.killTweensOf(links);
     gsap.killTweensOf(chars);
-    gsap.set(chars, { opacity: 1, y: 0, clearProps: "filter,transform" });
-    gsap.set(links, { clipPath: "inset(0 0% 0 0)" });
-    gsap.fromTo(links, { opacity: 0, y: 8 }, {
-      opacity: 1, y: 0, duration: 0.2, stagger: 0.018,
-      ease: "power2.out", overwrite: true, clearProps: "transform",
-    });
+    gsap.set(links, { opacity: 0, clipPath: "inset(0 100% 0 0)" });
+    if (chars.length) {
+      gsap.set(chars, { opacity: 0, y: 12, filter: "blur(4px)" });
+    }
+
+    gsap.fromTo(
+      links,
+      { clipPath: "inset(0 100% 0 0)", opacity: 0 },
+      {
+        clipPath: "inset(0 0% 0 0)",
+        opacity: 1,
+        duration: 0.38,
+        stagger: 0.045,
+        ease: "power3.out",
+        delay: delay,
+        overwrite: true,
+      }
+    );
+
+    gsap.fromTo(
+      chars,
+      {
+        opacity: 0,
+        y: 12,
+        filter: "blur(4px)",
+      },
+      {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.32,
+        stagger: { each: 0.01, from: "start" },
+        ease: "power3.out",
+        delay: delay + 0.04,
+        overwrite: true,
+        clearProps: "filter,transform",
+      }
+    );
   }
 
   function bindLinkHover() {
@@ -502,7 +564,7 @@
       gsap.to(backdrop, { opacity: 0, duration: 0.26, ease: "power2.in", overwrite: true });
     }
 
-    invokeCubeClose();
+    var cubeTween = invokeCubeClose();
     var overlayDone = false;
 
     var finishOverlay = function () {
@@ -519,8 +581,14 @@
       if (onComplete) onComplete();
     };
 
-    // Never hold links or navigation hostage to the cube's multi-second tween.
-    window.setTimeout(finishAll, REDUCED ? 0 : 220);
+    var closeDur = window.cosgralCube?.getMenuCloseDuration?.() || 2.85;
+    var closeBlend = window.cosgralCube?.getMenuBlend?.() ?? (isOpen ? 1 : 0);
+    var closeMs = Math.max(80, closeDur * closeBlend * 1000 + 80);
+    if (cubeTween && cubeTween.eventCallback) {
+      cubeTween.eventCallback("onComplete", finishAll);
+    } else {
+      window.setTimeout(finishAll, REDUCED ? 0 : closeMs);
+    }
   }
 
   function openNav() {
@@ -613,7 +681,6 @@
 
   document.querySelectorAll("a.site-nav__logo").forEach(function (logo) {
     logo.addEventListener("click", function (e) {
-      if (!document.body.classList.contains("home-page")) return;
       e.preventDefault();
       if (isOpen) closeNav();
       if (window.cosgralSectionSnap?.jumpTo) {
@@ -621,7 +688,7 @@
         return;
       }
       if (window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(0, { duration: 0.8 });
+        window.cosgralSmoothScroll.scrollTo(0, { duration: 2.2 });
         return;
       }
       var top = document.getElementById("top");
