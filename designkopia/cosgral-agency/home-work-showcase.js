@@ -349,10 +349,13 @@
     }
 
     function applyRunway() {
+      /* Lock the wrapper once. The stage itself stays 100dvh so the
+         address bar can grow or shrink the visible frame without
+         changing the document height (that reflow is what shakes). */
       var vh = viewportPx();
       var distance = Math.round(vh * 3.2);
       section.style.setProperty("height", vh + distance + "px", "important");
-      pin.style.setProperty("height", vh + "px", "important");
+      pin.style.removeProperty("height");
     }
 
     function scrollYNow() {

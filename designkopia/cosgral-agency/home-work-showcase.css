@@ -454,6 +454,7 @@ html.is-free-scroll #realizacje.home-work.is-work-showcase {
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
   min-height: 0;
   width: 100%;
   overflow: hidden;
