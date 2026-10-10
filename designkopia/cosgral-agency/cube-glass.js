@@ -12,18 +12,18 @@ var spec = {
   roughness: 0,
   transmission: 1,
   ior: 1.5,
-  thickness: 1,
+  thickness: 1.5,
   dispersion: 0.4,
-  attenuationColor: "#f6f9ff",
-  attenuationDistance: 12,
-  clearcoat: 0.15,
+  attenuationColor: "#ffffff",
+  attenuationDistance: 1000,
+  clearcoat: 1,
   clearcoatRoughness: 0,
   specularIntensity: 1,
   specularColor: "#ffffff",
-  envMapIntensity: 1.8,
+  envMapIntensity: 3,
   edgeGlow: 0.2,
   side: "double",
-  exposure: 1,
+  exposure: 1.2,
   iridescence: 1,
   iridescenceIOR: 1.3,
   iridescenceThicknessRange: [100, 800],
@@ -39,7 +39,7 @@ function num(value, fallback) {
 
 export function whenGlassSpec() {
   if (!specPromise) {
-    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010irid", import.meta.url))
+    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010bright", import.meta.url))
       .then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.json();
@@ -66,14 +66,14 @@ export function createGlassMaterial() {
     roughness: num(spec.roughness, 0),
     transmission: num(spec.transmission, 1),
     ior: num(spec.ior, 1.5),
-    thickness: num(spec.thickness, 1),
-    attenuationColor: new THREE.Color(spec.attenuationColor || "#f6f9ff"),
-    attenuationDistance: num(spec.attenuationDistance, 12),
-    clearcoat: num(spec.clearcoat, 0.15),
+    thickness: num(spec.thickness, 1.5),
+    attenuationColor: new THREE.Color(spec.attenuationColor || "#ffffff"),
+    attenuationDistance: num(spec.attenuationDistance, 1000),
+    clearcoat: num(spec.clearcoat, 1),
     clearcoatRoughness: num(spec.clearcoatRoughness, 0),
     specularIntensity: num(spec.specularIntensity, 1),
     specularColor: new THREE.Color(spec.specularColor || "#ffffff"),
-    envMapIntensity: num(spec.envMapIntensity, 1.8),
+    envMapIntensity: num(spec.envMapIntensity, 3),
     iridescence: num(spec.iridescence, 1),
     iridescenceIOR: num(spec.iridescenceIOR, 1.3),
     iridescenceThicknessRange: [num(range[0], 100), num(range[1], 800)],
@@ -113,7 +113,7 @@ export function createGlassMaterial() {
       "material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );",
       [
         "material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );",
-        "material.iridescenceFresnel = clamp( mix( vec3( dot( material.iridescenceFresnel, vec3( 0.33333 ) ) ), material.iridescenceFresnel, 5.2 ), 0.0, 1.0 );",
+        "material.iridescenceFresnel = clamp( mix( vec3( dot( material.iridescenceFresnel, vec3( 0.33333 ) ) ), material.iridescenceFresnel, 1.85 ), 0.0, 1.0 );",
       ].join("\n")
     );
     var opaque = THREE.ShaderChunk.opaque_fragment.replace(
@@ -154,59 +154,44 @@ export function createGlassMaterial() {
   return mat;
 }
 
-function createDarkStudio() {
+function createBrightStudio() {
   var env = spec.env || {};
-  var power = num(env.power, 2.5);
-  var ambient = num(env.ambient, 0.02);
-  var floorLevel = num(env.floor, 0.06);
-  var sheen = num(env.sheen, 4);
+  var ambient = num(env.ambient, 0.16);
   var studio = new THREE.Scene();
   studio.add(
     new THREE.Mesh(
-      new THREE.BoxGeometry(16, 16, 16),
+      new THREE.BoxGeometry(18, 18, 18),
       new THREE.MeshBasicMaterial({
         color: new THREE.Color().setRGB(ambient, ambient, ambient, THREE.LinearSRGBColorSpace),
         side: THREE.BackSide,
       })
     )
   );
-  var floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(16, 16),
-    new THREE.MeshBasicMaterial({
-      color: new THREE.Color().setRGB(floorLevel, floorLevel, floorLevel, THREE.LinearSRGBColorSpace),
-    })
-  );
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -5.5;
-  studio.add(floor);
 
-  function addStrip(x, y, z, sx, sy, sz, intensity) {
+  function addSoftbox(x, y, z, sx, sy, hex, intensity) {
+    var tint = new THREE.Color(hex);
     var mesh = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshBasicMaterial({
-        color: new THREE.Color().setRGB(intensity, intensity, intensity, THREE.LinearSRGBColorSpace),
+        side: THREE.DoubleSide,
+        color: new THREE.Color().setRGB(
+          tint.r * intensity,
+          tint.g * intensity,
+          tint.b * intensity,
+          THREE.LinearSRGBColorSpace
+        ),
       })
     );
     mesh.position.set(x, y, z);
-    mesh.scale.set(sx, sy, sz);
+    mesh.lookAt(0, 0, 0);
+    mesh.scale.set(sx, sy, 0.18);
     studio.add(mesh);
   }
-  /* One narrow ring just off the view axis. Flat faces miss it; outer bevels catch a thin line. */
-  var hi = Math.max(sheen, power);
-  function lightRing(angleDeg, intensity, thick) {
-    var a = (angleDeg * Math.PI) / 180;
-    var dist = 7.2;
-    var z = -Math.cos(a) * dist;
-    var rad = Math.sin(a) * dist;
-    var count = 20;
-    for (var i = 0; i < count; i++) {
-      var t = (i / count) * Math.PI * 2;
-      addStrip(Math.cos(t) * rad, Math.sin(t) * rad, z, thick, thick, thick, intensity);
-    }
-  }
-  /* Bright enough for a sharp edge, low enough that the film tint is not clipped to white. */
-  lightRing(28, hi * 0.3, 0.28);
-  lightRing(52, hi * 0.045, 0.7);
+  /* Softboxes sit just behind the camera so front bevels catch them. Side rims are coloured, not sprites. */
+  addSoftbox(0.2, 2.8, 5.2, 4.4, 1.7, "#ffffff", 12);
+  addSoftbox(1.6, -2.4, 4.8, 3.4, 1.15, "#fff6ee", 9);
+  addSoftbox(-4.2, 0.6, 3.1, 1.15, 3.6, "#9dffc4", 11);
+  addSoftbox(4.2, -0.15, 3.2, 1.15, 3.6, "#ff9ec8", 11);
   return studio;
 }
 
@@ -271,8 +256,6 @@ var WAVE_FRAG = [
 ].join("\n");
 
 export function installGlassScene(renderer, scene, camera) {
-  renderer.toneMapping = THREE.NeutralToneMapping;
-  renderer.toneMappingExposure = num(spec.exposure, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   /* Alpha stays 0 so the page shows through. three.js would otherwise clear the
      transmission target to white whenever clear alpha is below 1. */
@@ -280,7 +263,10 @@ export function installGlassScene(renderer, scene, camera) {
 
   if (!scene.environment) {
     var pmrem = new THREE.PMREMGenerator(renderer);
-    var studio = createDarkStudio();
+    var studio = createBrightStudio();
+    /* Capture the softboxes as linear HDR. ACES on this pass would crush them before the glass samples them. */
+    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.toneMappingExposure = 1;
     scene.environment = pmrem.fromScene(studio, 0).texture;
     studio.traverse(function (obj) {
       if (obj.geometry) obj.geometry.dispose();
@@ -288,6 +274,8 @@ export function installGlassScene(renderer, scene, camera) {
     });
     pmrem.dispose();
   }
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = num(spec.exposure, 1.2);
 
   if (camera.parent == null) scene.add(camera);
 

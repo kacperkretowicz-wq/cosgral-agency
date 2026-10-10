@@ -3,7 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261010irid";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261010bright";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
@@ -976,8 +976,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     var idleRotZ =
       Math.sin(t * (mobileHeroIdle ? 0.1 : 0.022) * idleMul) * 0.02 +
       Math.cos(t * driftW * 0.67) * 0.018 * idleHoldSmooth;
-    var driftX = Math.sin(t * driftW) * 0.075 * idleHoldSmooth;
-    var driftY = Math.cos(t * driftW * 0.8) * 0.05 * idleHoldSmooth;
+    /* Phone framing matches the live cube. Drift would push that pose into the screen edge. */
+    var driftX = MOBILE ? 0 : Math.sin(t * driftW) * 0.075 * idleHoldSmooth;
+    var driftY = MOBILE ? 0 : Math.cos(t * driftW * 0.8) * 0.05 * idleHoldSmooth;
     scrollPosX += driftX;
     scrollPosY += driftY;
 
@@ -1277,6 +1278,8 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
         : tilesOp > 0.45
           ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
           : 1;
+    /* Live service panel is an empty navy sheet. The fixed cube canvas must not sit on top of it. */
+    if (document.body.classList.contains("is-service-panel-open")) portalOp = 0;
     var needsScene = portalOp > 0.05 || sandOn || menuBlend > 0.001;
 
     if (canvas.parentElement) {
