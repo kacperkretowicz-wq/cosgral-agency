@@ -13,7 +13,7 @@ var spec = {
   transmission: 1,
   ior: 1.5,
   thickness: 1.5,
-  dispersion: 0.4,
+  dispersion: 0.5,
   attenuationColor: "#ffffff",
   attenuationDistance: 1000,
   clearcoat: 1,
@@ -39,7 +39,7 @@ function num(value, fallback) {
 
 export function whenGlassSpec() {
   if (!specPromise) {
-    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010clear", import.meta.url))
+    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010view", import.meta.url))
       .then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.json();
@@ -102,9 +102,10 @@ export function createGlassMaterial() {
         [
           "float filmCos = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
           "float filmEdge = pow(1.0 - filmCos, 1.05);",
-          "float filmUp = clamp(nonPerturbedNormal.y, 0.0, 1.0);",
-          "float filmNoise = fract(sin(dot(vWorldPosition.xyz, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
-          "float filmCrawl = 0.5 + 0.5 * sin(uFilmTime * 1.15 + filmNoise * 6.28318 + (1.0 - filmCos) * 8.0);",
+          "vec3 filmN = normalize(nonPerturbedNormal);",
+          "float filmUp = clamp(filmN.y, 0.0, 1.0);",
+          "float filmNoise = fract(sin(dot(filmN, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
+          "float filmCrawl = 0.5 + 0.5 * sin(uFilmTime * 1.15 + filmNoise * 6.28318 + filmEdge * 8.0);",
           "float filmT = clamp(mix(filmNoise, filmCrawl, 0.7) + filmUp * filmEdge * 0.45, 0.0, 1.0);",
           "material.iridescenceThickness = mix(iridescenceThicknessMinimum, iridescenceThicknessMaximum, filmT);",
           "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, max(filmEdge, filmUp));",
@@ -119,7 +120,17 @@ export function createGlassMaterial() {
     );
     var opaque = THREE.ShaderChunk.opaque_fragment.replace(
       "gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-      "gl_FragColor = vec4( outgoingLight, opacity );"
+      [
+        "vec3 crystalN = normalize(normal);",
+        "float crystalCos = clamp(dot(crystalN, normalize(vViewPosition)), 0.0, 1.0);",
+        "float crystalRim = pow(1.0 - crystalCos, 1.45);",
+        "float crystalHue = atan(crystalN.y, crystalN.x);",
+        "vec3 crystalSplit = 0.55 + 0.45 * cos(vec3(0.0, 2.094395, 4.18879) + crystalHue * 2.5 + (1.0 - crystalCos) * 16.0);",
+        "vec3 crystalTint = mix(vec3(0.42, 1.0, 0.68), vec3(1.0, 0.46, 0.74), clamp(crystalN.x * 0.5 + 0.5, 0.0, 1.0));",
+        "vec3 crystalEdge = mix(crystalTint * crystalSplit, vec3(1.0), smoothstep(0.62, 0.96, crystalRim));",
+        "outgoingLight += crystalEdge * crystalRim * 0.72;",
+        "gl_FragColor = vec4( outgoingLight, opacity );",
+      ].join("\n")
     );
     /* Faces over a black page stay black at transmission 1. Mix a soft env refraction into those dark samples so the body reads as clear glass. */
     var transmission = THREE.ShaderChunk.transmission_fragment.replace(
@@ -130,7 +141,7 @@ export function createGlassMaterial() {
         "#ifdef ENVMAP_TYPE_CUBE_UV",
         "envRefract = textureCubeUV( envMap, refractDir, 0.22 ).rgb;",
         "#endif",
-        "vec3 envLift = min( envRefract, vec3( 0.72 ) );",
+        "vec3 envLift = min( envRefract, vec3( 0.46 ) );",
         "vec3 glassBody = max( transmitted.rgb, envLift );",
         "totalDiffuse = mix( totalDiffuse, glassBody, material.transmission );",
       ].join("\n")
@@ -145,7 +156,7 @@ export function createGlassMaterial() {
     }
   };
   mat.customProgramCacheKey = function () {
-    return "cosgral-glass-clear-" + biasLit;
+    return "cosgral-glass-view-" + biasLit;
   };
   mat.onBeforeRender = function () {
     filmTime.value = performance.now() * 0.001;
@@ -203,13 +214,32 @@ function createBrightStudio() {
     mesh.scale.set(sx, sy, 0.18);
     studio.add(mesh);
   }
-  /* Same studio on desktop and mobile. A back strip and a thin top strip light the upper bevels; side strips stay coloured. */
-  addSoftbox(0.2, 2.6, 5.4, 4.6, 1.5, "#ffffff", 14);
-  addSoftbox(0.0, 5.1, 1.2, 5.4, 0.48, "#f7fff9", 22);
-  addSoftbox(0.15, 2.8, -5.2, 4.8, 1.6, "#ffffff", 18);
-  addSoftbox(-4.8, 1.4, -0.6, 0.72, 3.4, "#b8ffd6", 16);
-  addSoftbox(4.8, 0.55, -0.4, 0.72, 3.4, "#ffb0d2", 16);
-  addSoftbox(1.4, -2.6, 4.6, 3.2, 1.05, "#fff4ea", 8);
+  /* View-locked tent. A ring around the camera axis hits bevels and grooves at every cube yaw.
+     Left of the view stays green, right stays pink, the top arc stays white. */
+  var i;
+  var a;
+  for (i = 0; i < 20; i++) {
+    a = (i / 20) * Math.PI * 2;
+    addSoftbox(
+      Math.cos(a) * 5.15,
+      Math.sin(a) * 5.15,
+      0.25,
+      0.42,
+      1.15,
+      a > Math.PI * 0.5 && a < Math.PI * 1.5 ? "#9dffc8" : "#ffb0d0",
+      Math.abs(Math.sin(a)) > 0.85 ? 15 : 12
+    );
+  }
+  for (i = 0; i < 14; i++) {
+    a = (i / 14) * Math.PI * 2;
+    addSoftbox(Math.cos(a) * 3.5, 4.55, Math.sin(a) * 3.5, 0.85, 0.36, "#f6fff9", 16);
+  }
+  for (i = 0; i < 10; i++) {
+    a = (i / 10) * Math.PI * 2;
+    addSoftbox(Math.cos(a) * 3.8, -3.15, Math.sin(a) * 3.8, 0.7, 0.32, "#fff4ea", 8);
+  }
+  addSoftbox(0.0, 0.35, 6.3, 4.8, 2.6, "#f4f7fb", 3.4);
+  addSoftbox(0.0, 0.8, -6.1, 4.6, 2.8, "#ffffff", 7);
   return studio;
 }
 
@@ -263,7 +293,7 @@ var WAVE_FRAG = [
   "  float r2 = ridge * ridge;",
   "  float r4 = r2 * r2;",
   "  float r14 = r4 * r4 * r4 * r2;",
-  "  col += hi * r14 * 0.32;",
+  "  col += hi * r14 * 0.62;",
   "  col += mid * mForce * 0.16;",
   "  col += hi * mForce * ridge * 0.12;",
   "  float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));",
@@ -319,7 +349,8 @@ export function installGlassScene(renderer, scene, camera) {
   camera.add(backdrop);
 
   var mouse = { x: 0, y: 0 };
-  backdrop.onBeforeRender = function (r) {
+  backdrop.onBeforeRender = function (r, sc, cam) {
+    if (sc && sc.environmentRotation && cam) sc.environmentRotation.copy(cam.rotation);
     var rt = r.getRenderTarget();
     var transmission = !!(rt && rt.samples > 0 && rt.texture && rt.texture.generateMipmaps);
     backdrop.material.colorWrite = transmission;

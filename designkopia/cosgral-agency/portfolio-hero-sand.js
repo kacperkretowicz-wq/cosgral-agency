@@ -2,7 +2,7 @@
  * Portfolio hero — kostka + rozpad w linię piasku (jak homepage) przy wejściu na stronę.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createShardGeometry, sampleCubeSurface, whenCubeReady } from "./cube-shape.js?v=20261010clear";
+import { createShardGeometry, sampleCubeSurface, whenCubeReady } from "./cube-shape.js?v=20261010view";
 
 (async function () {
   "use strict";
