@@ -168,11 +168,20 @@ function createDarkStudio() {
     mesh.scale.set(sx, sy, sz);
     studio.add(mesh);
   }
-  addStrip(0, 6.2, -1.5, 7.5, 0.03, 0.04, sheen);
-  addStrip(-6.2, 1.2, 0.4, 0.03, 4.2, 0.04, power);
-  addStrip(6.2, -0.4, -0.8, 0.03, 3.4, 0.04, power);
-  addStrip(0.6, 2.4, -6.2, 4.8, 0.03, 0.04, sheen * 0.55);
-  addStrip(-1.2, -0.6, 6.2, 3.2, 0.03, 0.04, power);
+  /* One narrow ring just off the view axis. Flat faces miss it; outer bevels catch a thin line. */
+  var hi = Math.max(sheen, power);
+  function lightRing(angleDeg, intensity, thick) {
+    var a = (angleDeg * Math.PI) / 180;
+    var dist = 7.2;
+    var z = -Math.cos(a) * dist;
+    var rad = Math.sin(a) * dist;
+    var count = 20;
+    for (var i = 0; i < count; i++) {
+      var t = (i / count) * Math.PI * 2;
+      addStrip(Math.cos(t) * rad, Math.sin(t) * rad, z, thick, thick, thick, intensity);
+    }
+  }
+  lightRing(28, hi * 0.55, 0.36);
   return studio;
 }
 
@@ -247,7 +256,7 @@ export function installGlassScene(renderer, scene, camera) {
   if (!scene.environment) {
     var pmrem = new THREE.PMREMGenerator(renderer);
     var studio = createDarkStudio();
-    scene.environment = pmrem.fromScene(studio, 0.02).texture;
+    scene.environment = pmrem.fromScene(studio, 0).texture;
     studio.traverse(function (obj) {
       if (obj.geometry) obj.geometry.dispose();
       if (obj.material) obj.material.dispose();
