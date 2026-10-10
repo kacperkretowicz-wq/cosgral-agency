@@ -2,7 +2,7 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import { createIntactCubeParts, attachGlassEnv } from "./cube-shape.js?v=20261010p4";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (function () {
@@ -17,7 +17,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var HALF = 1.35;
   var CUBE_SCALE = MOBILE ? 0.23 : 0.46;
   var EDGE_OP = MOBILE ? 0.12 : 0.16;
-  var SHELL_OP = MOBILE ? 0.58 : 0.55;
+  var SHELL_OP = 1;
   var WIRE_OP = 0.08;
   var isPortfolioPage = document.body.classList.contains("portfolio-page");
   var isCasePage = document.body.classList.contains("case-page");
@@ -1827,6 +1827,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
 
   var scene = new THREE.Scene();
+  attachGlassEnv(renderer, scene);
   var root = new THREE.Group();
   scene.add(root);
 

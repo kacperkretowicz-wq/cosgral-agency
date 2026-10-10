@@ -3,7 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260919mob";
+import { createIntactCubeParts, createShardGeometry, attachGlassEnv } from "./cube-shape.js?v=20261010p4";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (function () {
@@ -25,7 +25,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var HERO_SCALE_MUL = MOBILE ? 0.39 * MOBILE_HERO_CUBE : 0.78;
   var PEAK_SCALE_MUL = MOBILE ? 0.58 * MOBILE_HERO_CUBE : 1.16;
   var EDGE_OP = MOBILE ? 0.18 : 0.24;
-  var SHELL_OP = MOBILE ? 0.5 : 0.45;
+  var SHELL_OP = 1;
   var SHARDS = LOW_PERF ? 280 : 1000;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
@@ -359,6 +359,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.25));
   renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
 
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
 
@@ -368,6 +370,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   }
 
   var scene = new THREE.Scene();
+  attachGlassEnv(renderer, scene);
   var root = new THREE.Group();
   scene.add(root);
 
