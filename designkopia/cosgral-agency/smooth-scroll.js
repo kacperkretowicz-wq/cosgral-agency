@@ -72,14 +72,17 @@
     pinType: "fixed",
   });
   ScrollTrigger.defaults({ pinType: "fixed" });
+  /* Address-bar show/hide must not refresh pins or the sticky runway. */
+  if (ScrollTrigger.config) ScrollTrigger.config({ ignoreMobileResize: true });
 
   lenis.on("scroll", ScrollTrigger.update);
 
   gsap.ticker.add(function (time) {
     lenis.raf(time * 1000);
   });
-  /* Allow mild catch-up on mobile under GPU load; keep tight on desktop */
-  gsap.ticker.lagSmoothing(MOBILE ? 500 : 0);
+  /* Catch-up smoothing jumps the locked stage on touch. Keep the
+     ticker in lockstep with Lenis on every viewport. */
+  gsap.ticker.lagSmoothing(0);
 
   var SECTION_IDS = ["top", "rozpad", "uslugi", "realizacje", "faq", "proces", "kontakt"];
 

@@ -1,0 +1,488 @@
+/* WYBRANE REALIZACJE — one reference-style board.
+   Positions are offsets from the viewport center, in vw/vh,
+   matching the pinned overview in d.mp4. The camera scales this
+   board as a single layer. Reduced motion keeps the same layout
+   without the pin. */
+
+#realizacje.home-work.home-scene {
+  padding-block: 0 !important;
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  justify-content: flex-start;
+}
+
+/* Camera runway: the section is a tall wrapper and the stage sticks.
+   No ancestor between the sticky stage and the scrollport may be
+   overflow:hidden, transformed, filtered, or will-change:transform —
+   any of those traps sticky inside a box that scrolls away. JS locks
+   the pixel height to the viewport; 420vh is the fallback. */
+#realizacje.home-work.is-work-showcase {
+  display: block !important;
+  height: 420vh;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  position: relative !important;
+  top: auto !important;
+  margin-bottom: 0 !important;
+  justify-content: flex-start;
+  background: transparent !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  will-change: auto !important;
+  contain: none !important;
+}
+
+#realizacje .home-scene__panel {
+  position: relative !important;
+  flex: none !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  transform-style: flat !important;
+  will-change: auto !important;
+  contain: none !important;
+}
+
+#realizacje.is-work-showcase .home-scene__panel {
+  display: block !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+/* Full-width stage, tall enough for the plate, the type card under it,
+   and the Systemy square. Centered in the band above the fixed title. */
+#realizacje .home-work__stage {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  width: min(100%, 80vh);
+  aspect-ratio: 100 / 90;
+  transform: translate(-50%, -50%) !important;
+  overflow: visible;
+  container-type: inline-size;
+  background: transparent;
+}
+
+#realizacje .home-work__card,
+#realizacje .home-work__float,
+#realizacje .home-work__sq,
+#realizacje .home-work__footer {
+  position: absolute;
+  margin: 0;
+  transform: none !important;
+  text-decoration: none;
+  color: inherit;
+}
+
+#realizacje .home-work__card {
+  display: block;
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  min-height: 0 !important;
+  height: auto;
+  background: #141414;
+  z-index: 10;
+}
+
+#realizacje .home-work__media,
+#realizacje .home-work__sq {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+#realizacje .home-work__sq {
+  position: absolute;
+  display: block;
+}
+
+#realizacje .home-work__still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 1 !important;
+  filter: none;
+}
+
+/* Labels stay inside each item and appear only while that item is held,
+   so the overview matches the reference without text collisions. */
+#realizacje .home-work__card-tag,
+#realizacje .home-work__card-cta,
+#realizacje .home-work__sq .home-work__card-cta {
+  position: absolute;
+  z-index: 2;
+  left: 0.7em;
+  right: 0.7em;
+  line-height: 1.1;
+  opacity: 0;
+}
+
+#realizacje .home-work__card.is-focused .home-work__card-tag,
+#realizacje .home-work__card.is-focused .home-work__card-cta {
+  opacity: 1;
+}
+
+#realizacje .home-work__card-tag {
+  bottom: 1.7em;
+  font-family: var(--font-display);
+  font-size: clamp(0.55rem, 2vw, 0.95rem);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+#realizacje .home-work__card-cta {
+  bottom: 0.45em;
+  font-size: clamp(0.48rem, 1.7vw, 0.8rem);
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  width: max-content;
+  padding-bottom: 0.08em;
+}
+
+/* Center plate — about 70% of the stage */
+#realizacje .home-work__plate {
+  width: 70%;
+  aspect-ratio: 16 / 9.2;
+  left: 14%;
+  top: 12%;
+  z-index: 10;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+#realizacje .home-work__plate .home-work__card-tag,
+#realizacje .home-work__plate .home-work__card-cta {
+  left: auto;
+  right: 0.75em;
+  text-align: right;
+}
+
+#realizacje .home-work__stat {
+  left: 85%;
+  top: 30%;
+  z-index: 28;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 8.6cqi;
+  letter-spacing: -0.06em;
+  line-height: 0.85;
+  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+/* Upper-left square, overlapping the plate */
+#realizacje .home-work__sq {
+  width: 15%;
+  aspect-ratio: 1;
+  left: 1%;
+  top: 3%;
+  border-radius: 16px;
+  z-index: 30;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+#realizacje .home-work__sq .home-work__card-cta {
+  left: 0.4em;
+  bottom: 0.35em;
+  font-size: clamp(0.4rem, 1.3vw, 0.7rem);
+}
+
+/* Kicker pill above the plate — solid, so it reads on the black field */
+#realizacje .home-work__kicker {
+  left: 49%;
+  top: 0;
+  transform: translateX(-50%) !important;
+  z-index: 30;
+  margin: 0;
+  padding: 0.38em 0.85em;
+  border-radius: 999px;
+  background: #e6e6e6;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: clamp(0.72rem, 3.1cqi, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  white-space: nowrap;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+/* Type card — dark specimen, ~85% on screen, under the plate's left edge.
+   Padding is in px so percentages don't eat the card (they resolve
+   against the stage, not the card). */
+#realizacje .home-work__type {
+  width: 34%;
+  aspect-ratio: 1;
+  left: -5.1%;
+  top: 55%;
+  z-index: 24;
+  background: #111;
+  color: #f4f4f4;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 8px 8px 7px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  container-type: inline-size;
+}
+
+/* 15% of the card sits off the left edge, so the type starts
+   inset enough to stay on screen. Percentages here are of the card. */
+#realizacje .home-work__type-meta,
+#realizacje .home-work__type-kicker,
+#realizacje .home-work__type-title {
+  margin-left: 20%;
+}
+
+#realizacje .home-work__type-meta {
+  font-family: var(--font-body);
+  font-size: clamp(10px, 10.5cqi, 16px);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+#realizacje .home-work__type-kicker {
+  font-family: var(--font-display);
+  font-size: 52cqi;
+  line-height: 0.72;
+  letter-spacing: -0.07em;
+  color: #f7f7f7;
+  margin-top: 1px;
+}
+
+#realizacje .home-work__type-title {
+  margin-top: auto;
+  font-family: var(--font-display);
+  font-size: clamp(11px, 11cqi, 18px);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+}
+
+#realizacje .home-work__type .home-work__card-cta {
+  position: absolute;
+  left: 7%;
+  right: auto;
+  bottom: 6%;
+  margin: 0;
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.55);
+  font-size: clamp(9px, 10cqi, 14px);
+}
+
+#realizacje .home-work__type.is-focused .home-work__type-title {
+  opacity: 0;
+}
+
+/* Grafiki pill, right of the plate and just under its bottom edge */
+#realizacje .home-work__graf {
+  width: 32%;
+  height: 12%;
+  left: 66%;
+  top: 60%;
+  border-radius: 999px;
+  z-index: 22;
+  background: #8b97a1;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+#realizacje .home-work__graf .home-work__card-tag,
+#realizacje .home-work__graf .home-work__card-cta {
+  left: 1.1em;
+  right: 1.1em;
+  text-align: left;
+}
+
+#realizacje .home-work__graf .home-work__card-tag {
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-115%);
+  font-size: clamp(0.55rem, 1.6vw, 0.9rem);
+}
+
+#realizacje .home-work__graf .home-work__card-cta {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(10%);
+}
+
+/* Systemy photo — small square directly under the plate */
+#realizacje .home-work__sys {
+  width: 16%;
+  aspect-ratio: 1;
+  height: auto;
+  left: 41%;
+  top: 63%;
+  z-index: 18;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+#realizacje .home-work__sys .home-work__card-tag {
+  font-size: clamp(0.42rem, 1.15vw, 0.72rem);
+  bottom: 1.55em;
+}
+
+#realizacje .home-work__sys .home-work__card-cta {
+  font-size: clamp(0.4rem, 1.05vw, 0.68rem);
+}
+
+/* Three overlapping neutral circles, under the stat at the plate's right */
+#realizacje .home-work__swatches {
+  left: 84%;
+  top: 43%;
+  width: 17%;
+  height: 7.5%;
+  z-index: 26;
+  pointer-events: none;
+}
+
+#realizacje .home-work__swatches span {
+  position: absolute;
+  top: 0;
+  width: 42%;
+  height: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+#realizacje .home-work__swatches span:nth-child(1) {
+  left: 0;
+  background: #d9d3cb;
+  z-index: 3;
+}
+
+#realizacje .home-work__swatches span:nth-child(2) {
+  left: 28%;
+  background: #9c958c;
+  z-index: 2;
+}
+
+#realizacje .home-work__swatches span:nth-child(3) {
+  left: 56%;
+  background: #5e5954;
+  z-index: 1;
+}
+
+#realizacje .home-work__footer {
+  left: 50%;
+  top: 96%;
+  transform: translateX(-50%) !important;
+  z-index: 30;
+  color: #fff;
+  font-size: clamp(0.62rem, 1.8vw, 0.9rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  padding-bottom: 0.12em;
+  white-space: nowrap;
+  background: none;
+}
+
+#realizacje .home-work__title {
+  position: absolute;
+  left: 5vw;
+  right: auto;
+  bottom: 3.2vh;
+  z-index: 40;
+  margin: 0;
+  max-width: none;
+  width: max-content;
+  pointer-events: none;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.35rem, 8.4vw, 6.4rem);
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  text-transform: uppercase;
+  text-wrap: nowrap;
+}
+
+#realizacje .home-work__title sup {
+  font-size: 0.34em;
+  margin-left: 0.28em;
+  letter-spacing: 0;
+  font-weight: 500;
+  vertical-align: super;
+}
+
+/* Sticky stage. Depth-dwell must not add a second hold, and the
+   section stays in normal flow so the tall wrapper pushes FAQ down.
+   The stage is transparent so the site ambient (wavy field) shows
+   through the gaps between tiles. */
+html.is-free-scroll #realizacje.home-work.is-work-showcase {
+  position: relative !important;
+  top: auto !important;
+  margin-bottom: 0 !important;
+  overflow: visible !important;
+  min-height: 0 !important;
+  background: transparent !important;
+  transform: none !important;
+  filter: none !important;
+  will-change: auto !important;
+}
+
+#realizacje.is-work-showcase .home-work__pin {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  background: transparent;
+  transform: none;
+  filter: none;
+  z-index: 1;
+}
+
+#realizacje.is-work-showcase .home-work__board {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  display: block;
+  background: transparent;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+#realizacje.is-work-showcase .home-work__title {
+  position: absolute;
+}
+
+@media (min-width: 901px) {
+  #realizacje .home-work__stage {
+    top: 47%;
+  }
+}
