@@ -12,6 +12,22 @@
   justify-content: flex-start;
 }
 
+/* Once the camera is armed, the section has to grow with the pin
+   spacer. A locked 100dvh box (and overflow:hidden on the panel)
+   swallows that spacer, so the next section arrives immediately
+   while the scrub keeps running. On iOS, overflow:hidden also
+   turns position:fixed into a scrolling descendant. */
+#realizacje.home-work.is-work-showcase {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  position: relative !important;
+  top: auto !important;
+  margin-bottom: 0 !important;
+  justify-content: flex-start;
+}
+
 #realizacje .home-scene__panel {
   position: relative !important;
   flex: none !important;
@@ -29,6 +45,13 @@
   perspective: none !important;
   transform-style: flat !important;
   will-change: auto !important;
+  contain: none !important;
+}
+
+#realizacje.is-work-showcase .home-scene__panel {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
 }
 
 /* Full-width stage, tall enough for the plate, the type card under it,
@@ -400,27 +423,38 @@
   vertical-align: super;
 }
 
-/* Pin: the board scales, the title stays put */
+/* Pin: the board scales, the title stays put.
+   The spacer is the scroll runway. Sticky depth-dwell must not
+   add a second, shorter hold, and the section must stay in normal
+   flow so the spacer actually pushes FAQ down. */
 html.is-free-scroll #realizacje.home-work.is-work-showcase {
   position: relative !important;
   top: auto !important;
   margin-bottom: 0 !important;
   overflow: visible !important;
+  height: auto !important;
+  min-height: 0 !important;
   background: transparent;
 }
 
 #realizacje.is-work-showcase .pin-spacer {
+  display: block !important;
   flex: none !important;
+  width: 100% !important;
   max-height: none !important;
   overflow: visible !important;
+  position: relative !important;
 }
 
 #realizacje.is-work-showcase .home-work__pin {
   position: relative;
+  height: 100vh;
   height: 100dvh;
+  min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
   overflow: hidden;
+  background: var(--bg, #050505);
 }
 
 #realizacje.is-work-showcase .home-work__board {

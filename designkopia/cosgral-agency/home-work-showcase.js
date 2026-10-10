@@ -118,7 +118,9 @@
 
     var cover = ScrollTrigger.getById("scene-realizacje-cover");
     if (cover) cover.kill();
-    gsap.set(panel, { clearProps: "transform,filter,opacity,visibility" });
+    gsap.set(panel, { clearProps: "transform,filter,opacity,visibility,scale,x,y,xPercent,yPercent" });
+    panel.style.transform = "none";
+    panel.style.filter = "none";
     gsap.killTweensOf(cards);
     gsap.set(cards, { clearProps: "opacity,visibility,transform,filter,x,y" });
     if (head) {
@@ -333,6 +335,11 @@
       window.__workShowcaseHold = null;
     };
 
+    /* Transform pin, not position:fixed. iOS Safari promotes fixed
+       descendants of overflow/sticky/filter ancestors into the scrolling
+       layer, so the page moved while this scrub kept running. */
+    if (ScrollTrigger.config) ScrollTrigger.config({ ignoreMobileResize: true });
+
     ScrollTrigger.create({
       id: "work-showcase",
       trigger: pin,
@@ -342,8 +349,10 @@
       },
       pin: true,
       pinSpacing: true,
-      anticipatePin: 1,
-      scrub: isMobile() ? 0.32 : 0.5,
+      pinType: "transform",
+      pinReparent: false,
+      anticipatePin: 0,
+      scrub: true,
       invalidateOnRefresh: true,
       refreshPriority: 1,
       onRefresh: function (self) {
@@ -358,12 +367,25 @@
     });
 
     measure();
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(function () {
-        measure();
-        if (typeof window.__workShowcaseHold === "number") render(window.__workShowcaseHold);
-      });
+
+    /* Recalculate start/end after fonts and posters, but never while
+       the visitor has already scrolled — a refresh mid-gesture jumps
+       the pin. */
+    function refreshIfAtTop() {
+      var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      if (lenis && typeof lenis.scroll === "number") y = Math.max(y, lenis.scroll);
+      if (y > 80) return;
+      ScrollTrigger.refresh();
     }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(refreshIfAtTop);
+    }
+    section.querySelectorAll("img").forEach(function (img) {
+      if (!img.complete) img.addEventListener("load", refreshIfAtTop, { once: true });
+    });
+    window.addEventListener("load", refreshIfAtTop, { once: true });
   }
 
   if (window.ScrollTrigger && ScrollTrigger.getById("scene-realizacje")) boot();
