@@ -13,10 +13,10 @@ var spec = {
   transmission: 1,
   ior: 1.5,
   thickness: 1,
-  dispersion: 0.7,
+  dispersion: 0.4,
   attenuationColor: "#f6f9ff",
   attenuationDistance: 12,
-  clearcoat: 1,
+  clearcoat: 0.15,
   clearcoatRoughness: 0,
   specularIntensity: 1,
   specularColor: "#ffffff",
@@ -25,10 +25,10 @@ var spec = {
   side: "double",
   exposure: 1,
   iridescence: 1,
-  iridescenceIOR: 1.8,
-  iridescenceThicknessRange: [350, 850],
+  iridescenceIOR: 1.3,
+  iridescenceThicknessRange: [100, 800],
   iridescenceNoise: 0.6,
-  iridescenceEdgeBias: 0.65,
+  iridescenceEdgeBias: 0.2,
 };
 
 var specPromise = null;
@@ -39,7 +39,7 @@ function num(value, fallback) {
 
 export function whenGlassSpec() {
   if (!specPromise) {
-    specPromise = fetch(new URL("./assets/cube/web_glass.json", import.meta.url))
+    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010irid", import.meta.url))
       .then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.json();
@@ -57,8 +57,8 @@ export function whenGlassSpec() {
 }
 
 export function createGlassMaterial() {
-  var range = spec.iridescenceThicknessRange || [350, 850];
-  var edgeBias = Math.min(0.92, Math.max(0, num(spec.iridescenceEdgeBias, 0.65)));
+  var range = spec.iridescenceThicknessRange || [100, 800];
+  var edgeBias = Math.min(0.92, Math.max(0, num(spec.iridescenceEdgeBias, 0.2)));
   var edgeGlow = num(spec.edgeGlow, 0.2);
   var mat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color(spec.color || "#ffffff"),
@@ -69,14 +69,14 @@ export function createGlassMaterial() {
     thickness: num(spec.thickness, 1),
     attenuationColor: new THREE.Color(spec.attenuationColor || "#f6f9ff"),
     attenuationDistance: num(spec.attenuationDistance, 12),
-    clearcoat: num(spec.clearcoat, 1),
+    clearcoat: num(spec.clearcoat, 0.15),
     clearcoatRoughness: num(spec.clearcoatRoughness, 0),
     specularIntensity: num(spec.specularIntensity, 1),
     specularColor: new THREE.Color(spec.specularColor || "#ffffff"),
     envMapIntensity: num(spec.envMapIntensity, 1.8),
     iridescence: num(spec.iridescence, 1),
-    iridescenceIOR: num(spec.iridescenceIOR, 1.8),
-    iridescenceThicknessRange: [num(range[0], 350), num(range[1], 850)],
+    iridescenceIOR: num(spec.iridescenceIOR, 1.3),
+    iridescenceThicknessRange: [num(range[0], 100), num(range[1], 800)],
     side: THREE.DoubleSide,
     transparent: false,
     opacity: 1,
@@ -88,28 +88,51 @@ export function createGlassMaterial() {
     blendSrcAlpha: THREE.OneFactor,
     blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
   });
-  if ("dispersion" in mat) mat.dispersion = num(spec.dispersion, 0.7);
+  if ("dispersion" in mat) mat.dispersion = num(spec.dispersion, 0.4);
   /* edgeGlow is an emissive rim. It reads as a white halo, so it is not applied. */
   void edgeGlow;
 
   var biasLit = edgeBias.toFixed(4);
+  var filmTime = { value: 0 };
   mat.onBeforeCompile = function (shader) {
-    shader.fragmentShader = shader.fragmentShader
+    shader.uniforms.uFilmTime = filmTime;
+    var physical = THREE.ShaderChunk.lights_physical_fragment
       .replace(
         "material.iridescenceThickness = iridescenceThicknessMaximum;",
         [
-          "float cosT = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
-          "float edge = pow(1.0 - cosT, 1.35);",
-          "float n = fract(sin(dot(vWorldPosition.xyz, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
-          "float film = mix(iridescenceThicknessMinimum, iridescenceThicknessMaximum, mix(n, 1.0, edge));",
-          "material.iridescenceThickness = film;",
-          "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, edge);",
+          "float filmCos = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
+          "float filmEdge = pow(1.0 - filmCos, 1.2);",
+          "float filmNoise = fract(sin(dot(vWorldPosition.xyz, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
+          "float filmCrawl = 0.5 + 0.5 * sin(uFilmTime * 1.15 + filmNoise * 6.28318 + (1.0 - filmCos) * 8.0);",
+          "float filmT = clamp(mix(filmNoise, filmCrawl, 0.82), 0.0, 1.0);",
+          "material.iridescenceThickness = mix(iridescenceThicknessMinimum, iridescenceThicknessMaximum, filmT);",
+          "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, filmEdge);",
         ].join("\n")
-      )
-      .replace(
-        "gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-        "gl_FragColor = vec4( outgoingLight, opacity );"
       );
+    var lightsBegin = THREE.ShaderChunk.lights_fragment_begin.replace(
+      "material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );",
+      [
+        "material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );",
+        "material.iridescenceFresnel = clamp( mix( vec3( dot( material.iridescenceFresnel, vec3( 0.33333 ) ) ), material.iridescenceFresnel, 5.2 ), 0.0, 1.0 );",
+      ].join("\n")
+    );
+    var opaque = THREE.ShaderChunk.opaque_fragment.replace(
+      "gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+      "gl_FragColor = vec4( outgoingLight, opacity );"
+    );
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <lights_physical_fragment>", physical)
+      .replace("#include <lights_fragment_begin>", lightsBegin)
+      .replace("#include <opaque_fragment>", opaque);
+    if (shader.fragmentShader.indexOf("uniform float uFilmTime") === -1) {
+      shader.fragmentShader = "uniform float uFilmTime;\n" + shader.fragmentShader;
+    }
+  };
+  mat.customProgramCacheKey = function () {
+    return "cosgral-glass-soap-" + biasLit;
+  };
+  mat.onBeforeRender = function () {
+    filmTime.value = performance.now() * 0.001;
   };
   /* Transmission alpha would fringe the silhouette. Opacity still drives menu fades. */
   var opacityValue = 1;
@@ -181,7 +204,9 @@ function createDarkStudio() {
       addStrip(Math.cos(t) * rad, Math.sin(t) * rad, z, thick, thick, thick, intensity);
     }
   }
-  lightRing(28, hi * 0.55, 0.36);
+  /* Bright enough for a sharp edge, low enough that the film tint is not clipped to white. */
+  lightRing(28, hi * 0.3, 0.28);
+  lightRing(52, hi * 0.045, 0.7);
   return studio;
 }
 

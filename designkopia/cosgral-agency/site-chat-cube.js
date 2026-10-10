@@ -4,7 +4,7 @@
  * Framed with padding so rotated cube never clips the canvas.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261010glass";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261010irid";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {
@@ -107,7 +107,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     var running = true;
     var last = performance.now();
     var LOOK = MOBILE ? 0.48 : 0.58;
-    var IDLE_SPIN = MOBILE ? 0.2 : 0.26;
+    var IDLE_SPIN = (MOBILE ? 0.2 : 0.26) * 1.75;
+    var driftX = 0;
+    var driftY = 0;
     /* Mega-menu style dim when chat panel is open (~40% darker). */
     var OPEN_DIM = 0.58;
 
@@ -189,9 +191,19 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       leanY += (targetLeanY - leanY) * Math.min(1, follow * 12);
       if (!open) spin += dt * IDLE_SPIN;
 
-      root.rotation.x = leanX;
+      var driftW = (Math.PI * 2) / 8;
+      var nowS = now * 0.001;
+      var driftTargetX = open ? 0 : Math.sin(nowS * driftW) * 0.05;
+      var driftTargetY = open ? 0 : Math.cos(nowS * driftW * 0.8) * 0.035;
+      var driftFollow = Math.min(1, follow * 3);
+      driftX += (driftTargetX - driftX) * driftFollow;
+      driftY += (driftTargetY - driftY) * driftFollow;
+      root.position.x = driftX;
+      root.position.y = driftY;
+
+      root.rotation.x = leanX + (open ? 0 : Math.sin(nowS * driftW * 0.83) * 0.03);
       root.rotation.y = (open ? 0.22 : spin * 0.5) + leanY;
-      root.rotation.z = leanY * -0.12 + leanX * 0.04;
+      root.rotation.z = leanY * -0.12 + leanX * 0.04 + (open ? 0 : Math.cos(nowS * driftW * 0.67) * 0.02);
 
       var fadeTarget = open ? OPEN_DIM : 1;
       visualFade += (fadeTarget - visualFade) * Math.min(1, follow * 8);

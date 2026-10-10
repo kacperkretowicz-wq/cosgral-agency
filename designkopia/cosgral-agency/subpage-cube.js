@@ -2,7 +2,7 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261010glass";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261010irid";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from "./cube-look.js?v=20260926cube1";
 
@@ -176,7 +176,7 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
 
   function applyMobileIdleSpin(group) {
     _axisSpin.set(0.12, 1, 0.08).normalize();
-    _qFaceSpin.setFromAxisAngle(_axisSpin, 0.00135);
+    _qFaceSpin.setFromAxisAngle(_axisSpin, 0.00135 * 1.75);
     group.quaternion.multiply(_qFaceSpin);
     group.rotation.setFromQuaternion(group.quaternion, "XYZ");
   }
@@ -741,9 +741,9 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
     cubeGroup.position.set(x, y, z);
     var sc = heroSc * (0.82 + 0.18 * u) * (1 - out * 0.12);
     cubeGroup.scale.set(sc, sc, sc);
-    var idleRotX = look.restRot.x + Math.sin(time * 0.035) * 0.04;
-    var idleRotY = look.restRot.y + Math.cos(time * 0.028) * 0.05 + time * 0.09;
-    var idleRotZ = look.restRot.z + Math.sin(time * 0.022) * 0.02;
+    var idleRotX = look.restRot.x + Math.sin(time * 0.035 * 1.75) * 0.04;
+    var idleRotY = look.restRot.y + Math.cos(time * 0.028 * 1.75) * 0.05 + time * 0.09 * 1.75;
+    var idleRotZ = look.restRot.z + Math.sin(time * 0.022 * 1.75) * 0.02;
     var rx = 0.52 + (idleRotX - 0.52) * u + out * 0.22;
     var ry = -1.18 + (idleRotY + 1.18) * u + out * 0.85;
     var rz = 0.32 + (idleRotZ - 0.32) * u + out * 0.12;
