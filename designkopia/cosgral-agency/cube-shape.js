@@ -1,7 +1,12 @@
 /**
- * Shared rounded cube geometry for homepage + subpages.
+ * Shared cube geometry for homepage + subpages.
+ * The visible cube is the Blender glass mesh (cube_web.glb, meshopt).
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
+import { GLTFLoader, MeshoptDecoder } from "./vendor/cube-three-addons.js";
+import { createGlassMaterial, whenGlassSpec } from "./cube-look.js?v=20261010clear";
+
+export { installGlassScene } from "./cube-look.js?v=20261010clear";
 
 var EDGE_RADIUS_RATIO = 0.2;
 var EDGE_SEGMENTS = 5;
@@ -125,22 +130,178 @@ function setWireOpacity(wire, value) {
   if (wire) wire.material.opacity = value;
 }
 
-export function createIntactCubeParts(half) {
-  var boxGeo = createRoundedBoxGeometry(half);
-  var shellMat = new THREE.MeshBasicMaterial({
-    color: 0x080808,
-    transparent: true,
-    opacity: 0.45,
-    depthWrite: true,
-    polygonOffset: true,
-    polygonOffsetFactor: 1,
-    polygonOffsetUnits: 1,
-  });
-  var shell = new THREE.Mesh(boxGeo, shellMat);
-  shell.renderOrder = 0;
+var sourceGeo = null;
+var surface = null;
+var readyPromise = null;
 
+function hashUnit(i, salt) {
+  var x = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function buildSurface(geo) {
+  var pos = geo.attributes.position.array;
+  var index = geo.index ? geo.index.array : null;
+  var triCount = index ? index.length / 3 : pos.length / 9;
+  var areas = new Float32Array(triCount);
+  var total = 0;
+  var ax;
+  var ay;
+  var az;
+  var bx;
+  var by;
+  var bz;
+  var cx;
+  var cy;
+  var cz;
+  var abx;
+  var aby;
+  var abz;
+  var acx;
+  var acy;
+  var acz;
+  for (var t = 0; t < triCount; t++) {
+    var i0 = index ? index[t * 3] : t * 3;
+    var i1 = index ? index[t * 3 + 1] : t * 3 + 1;
+    var i2 = index ? index[t * 3 + 2] : t * 3 + 2;
+    ax = pos[i0 * 3];
+    ay = pos[i0 * 3 + 1];
+    az = pos[i0 * 3 + 2];
+    bx = pos[i1 * 3];
+    by = pos[i1 * 3 + 1];
+    bz = pos[i1 * 3 + 2];
+    cx = pos[i2 * 3];
+    cy = pos[i2 * 3 + 1];
+    cz = pos[i2 * 3 + 2];
+    abx = bx - ax;
+    aby = by - ay;
+    abz = bz - az;
+    acx = cx - ax;
+    acy = cy - ay;
+    acz = cz - az;
+    var crx = aby * acz - abz * acy;
+    var cry = abz * acx - abx * acz;
+    var crz = abx * acy - aby * acx;
+    total += 0.5 * Math.sqrt(crx * crx + cry * cry + crz * crz);
+    areas[t] = total;
+  }
+  surface = { pos: pos, index: index, areas: areas, total: Math.max(total, 1e-8) };
+}
+
+function pointOnSurface(uArea, u, v, half) {
+  if (!surface) {
+    var face = Math.floor(uArea * 6);
+    var a = (u - 0.5) * 2 * half;
+    var b = (v - 0.5) * 2 * half;
+    if (face === 0) return [half, a, b];
+    if (face === 1) return [-half, a, b];
+    if (face === 2) return [a, half, b];
+    if (face === 3) return [a, -half, b];
+    if (face === 4) return [a, b, half];
+    return [a, b, -half];
+  }
+  var target = uArea * surface.total;
+  var lo = 0;
+  var hi = surface.areas.length - 1;
+  while (lo < hi) {
+    var mid = (lo + hi) >> 1;
+    if (surface.areas[mid] < target) lo = mid + 1;
+    else hi = mid;
+  }
+  var t = lo;
+  var i0 = surface.index ? surface.index[t * 3] : t * 3;
+  var i1 = surface.index ? surface.index[t * 3 + 1] : t * 3 + 1;
+  var i2 = surface.index ? surface.index[t * 3 + 2] : t * 3 + 2;
+  var pos = surface.pos;
+  if (u + v > 1) {
+    u = 1 - u;
+    v = 1 - v;
+  }
+  var w = 1 - u - v;
+  return [
+    (pos[i0 * 3] * w + pos[i1 * 3] * u + pos[i2 * 3] * v) * half,
+    (pos[i0 * 3 + 1] * w + pos[i1 * 3 + 1] * u + pos[i2 * 3 + 1] * v) * half,
+    (pos[i0 * 3 + 2] * w + pos[i1 * 3 + 2] * u + pos[i2 * 3 + 2] * v) * half,
+  ];
+}
+
+/** Deterministic point on the glass mesh, in the same space as the cube shell. */
+export function sampleCubeSurface(index, half) {
+  return pointOnSurface(hashUnit(index, 21), hashUnit(index, 22), hashUnit(index, 23), half);
+}
+
+export function randomCubeSurface(half) {
+  return pointOnSurface(Math.random(), Math.random(), Math.random(), half);
+}
+
+function fitUnitCube(geo) {
+  geo.computeBoundingBox();
+  var box = geo.boundingBox;
+  var size = new THREE.Vector3();
+  var center = new THREE.Vector3();
+  box.getSize(size);
+  box.getCenter(center);
+  geo.translate(-center.x, -center.y, -center.z);
+  var maxDim = Math.max(size.x, size.y, size.z) || 1;
+  var fit = 2 / maxDim;
+  geo.scale(fit, fit, fit);
+  if (!geo.attributes.normal) geo.computeVertexNormals();
+  geo.computeBoundingBox();
+  geo.computeBoundingSphere();
+  return geo;
+}
+
+function fallbackUnitGeo() {
+  return fitUnitCube(new RoundedBoxGeometry(2, 2, 2, EDGE_SEGMENTS, 0.4));
+}
+
+export function whenCubeReady() {
+  if (!readyPromise) {
+    readyPromise = whenGlassSpec()
+      .then(function () {
+        var loader = new GLTFLoader();
+        loader.setMeshoptDecoder(MeshoptDecoder);
+        var url = new URL("./assets/cube/cube_web.glb", import.meta.url).href;
+        return loader.loadAsync(url);
+      })
+      .then(function (gltf) {
+        var mesh = null;
+        gltf.scene.traverse(function (obj) {
+          if (!mesh && obj.isMesh) mesh = obj;
+        });
+        if (!mesh) throw new Error("cube_web.glb has no mesh");
+        sourceGeo = fitUnitCube(mesh.geometry.clone());
+        buildSurface(sourceGeo);
+      })
+      .catch(function (err) {
+        console.warn("[cube-shape] cube_web.glb", err);
+        sourceGeo = fallbackUnitGeo();
+        buildSurface(sourceGeo);
+      });
+  }
+  return readyPromise;
+}
+
+export function createIntactCubeParts(half) {
+  var unit = sourceGeo || fallbackUnitGeo();
+  var boxGeo = unit.clone();
+  boxGeo.scale(half, half, half);
+  boxGeo.computeBoundingSphere();
+
+  var shell = new THREE.Mesh(boxGeo, createGlassMaterial());
+  shell.renderOrder = 0;
+  shell.castShadow = false;
+  shell.receiveShadow = false;
+
+  var edgeGeo = new THREE.EdgesGeometry(boxGeo, EDGE_OUTLINE_ANGLE);
+  if (!edgeGeo.attributes.position || edgeGeo.attributes.position.count > 1500) {
+    edgeGeo.dispose();
+    var cage = new THREE.BoxGeometry(half * 2, half * 2, half * 2);
+    edgeGeo = new THREE.EdgesGeometry(cage);
+    cage.dispose();
+  }
   var edges = new THREE.LineSegments(
-    new THREE.EdgesGeometry(boxGeo, EDGE_OUTLINE_ANGLE),
+    edgeGeo,
     new THREE.LineBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -149,6 +310,8 @@ export function createIntactCubeParts(half) {
     })
   );
   edges.renderOrder = 1;
+  /* White outline reads as a halo on clear glass. Callers still set opacity. */
+  edges.visible = false;
 
   return { boxGeo: boxGeo, shell: shell, wire: null, edges: edges, setWireOpacity: setWireOpacity };
 }

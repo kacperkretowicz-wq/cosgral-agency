@@ -4,7 +4,12 @@
  * Framed with padding so rotated cube never clips the canvas.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import {
+  createIntactCubeParts,
+  whenCubeReady,
+  installGlassScene,
+  randomCubeSurface,
+} from "./cube-shape.js?v=20261010clear";
 
 (function () {
   "use strict";
@@ -24,12 +29,12 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     if (tries < 40) window.setTimeout(findCanvas, 50);
   }
 
-  function boot() {
+  async function boot() {
     var MOBILE = window.matchMedia("(max-width: 900px)").matches;
     var HALF = 1.35;
     /* Same visual recipe as hero; framing only differs (camera / scale). */
     var CUBE_SCALE = MOBILE ? 0.72 : 0.76;
-    var SHELL_OP = 0.45;
+    var SHELL_OP = 1;
     var EDGE_OP = 0.24;
 
     var renderer = new THREE.WebGLRenderer({
@@ -49,6 +54,9 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     var root = new THREE.Group();
     root.scale.setScalar(CUBE_SCALE);
     scene.add(root);
+
+    await whenCubeReady();
+    installGlassScene(renderer, scene, camera);
 
     var parts = createIntactCubeParts(HALF);
     parts.shell.material.opacity = SHELL_OP;
@@ -75,7 +83,7 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     var sPos = new Float32Array(SURFACE * 3);
     var sSize = new Float32Array(SURFACE);
     for (var si = 0; si < SURFACE; si++) {
-      var sp = randomOnCube(HALF);
+      var sp = randomCubeSurface(HALF);
       sPos[si * 3] = sp[0];
       sPos[si * 3 + 1] = sp[1];
       sPos[si * 3 + 2] = sp[2];
@@ -91,6 +99,7 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
       depthWrite: false,
       depthTest: true,
       blending: THREE.AdditiveBlending,
+      toneMapped: false,
       uniforms: {
         uTime: { value: 0 },
         uMouse: { value: new THREE.Vector2(0, 0) },
@@ -128,7 +137,9 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
       ].join("\n"),
     });
 
-    root.add(parts.shell, parts.edges, new THREE.Points(sGeo, sMat));
+    var surfacePoints = new THREE.Points(sGeo, sMat);
+    surfacePoints.visible = false;
+    root.add(parts.shell, parts.edges, surfacePoints);
 
     var spin = 0.35;
     var leanX = 0;

@@ -2,9 +2,9 @@
  * Portfolio hero — kostka + rozpad w linię piasku (jak homepage) przy wejściu na stronę.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createShardGeometry } from "./cube-shape.js?v=20260918d";
+import { createShardGeometry, sampleCubeSurface, whenCubeReady } from "./cube-shape.js?v=20261010glass";
 
-(function () {
+(async function () {
   "use strict";
 
   if (
@@ -193,35 +193,10 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       var sz;
       var depth01;
       if (hash(gi, 1) < 0.78) {
-        var face = Math.floor(hash(gi, 2) * 6);
-        var a = (hash(gi, 3) * 2 - 1) * HALF;
-        var b = (hash(gi, 4) * 2 - 1) * HALF;
-        var inset = hash(gi, 5) * 0.04 * HALF;
-        if (face === 0) {
-          sx = HALF - inset;
-          sy = a;
-          sz = b;
-        } else if (face === 1) {
-          sx = -HALF + inset;
-          sy = a;
-          sz = b;
-        } else if (face === 2) {
-          sx = a;
-          sy = HALF - inset;
-          sz = b;
-        } else if (face === 3) {
-          sx = a;
-          sy = -HALF + inset;
-          sz = b;
-        } else if (face === 4) {
-          sx = a;
-          sy = b;
-          sz = HALF - inset;
-        } else {
-          sx = a;
-          sy = b;
-          sz = -HALF + inset;
-        }
+        var sp = sampleCubeSurface(gi, HALF);
+        sx = sp[0];
+        sy = sp[1];
+        sz = sp[2];
         depth01 = 1;
       } else {
         var r = Math.pow(hash(gi, 2), 0.42);
@@ -385,6 +360,8 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       baseAlpha: layerOpts.alpha,
     };
   }
+
+  await whenCubeReady();
 
   layers.push(
     buildLayer(backCanvas, Math.floor(COUNT * 0.52), {

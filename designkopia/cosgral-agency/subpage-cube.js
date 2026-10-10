@@ -2,10 +2,15 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import {
+  createIntactCubeParts,
+  whenCubeReady,
+  installGlassScene,
+  randomCubeSurface,
+} from "./cube-shape.js?v=20261010clear";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
-(function () {
+(async function () {
   "use strict";
 
   var canvas = document.getElementById("subpage-cube");
@@ -17,7 +22,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var HALF = 1.35;
   var CUBE_SCALE = MOBILE ? 0.23 : 0.46;
   var EDGE_OP = MOBILE ? 0.12 : 0.16;
-  var SHELL_OP = MOBILE ? 0.58 : 0.55;
+  var SHELL_OP = 1;
   var WIRE_OP = 0.08;
   var isPortfolioPage = document.body.classList.contains("portfolio-page");
   var isCasePage = document.body.classList.contains("case-page");
@@ -1833,6 +1838,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
   camera.position.z = 5.4;
 
+  await whenCubeReady();
+  installGlassScene(renderer, scene, camera);
+
   var cubeGroup = new THREE.Group();
   cubeGroup.scale.set(CUBE_SCALE, CUBE_SCALE, CUBE_SCALE);
   cubeGroup.rotation.set(0.22, -0.35, 0);
@@ -1850,7 +1858,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
-    var sp = randomOnCube(HALF);
+    var sp = randomCubeSurface(HALF);
     sPos[si * 3] = sp[0];
     sPos[si * 3 + 1] = sp[1];
     sPos[si * 3 + 2] = sp[2];
@@ -1865,6 +1873,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    toneMapped: false,
     uniforms: {
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
@@ -1907,7 +1916,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var wire = cubeParts.wire;
   var edges = cubeParts.edges;
   var setWireOpacity = cubeParts.setWireOpacity;
-  cubeGroup.add(shell, edges, new THREE.Points(sGeo, sMat));
+  var surfacePoints = new THREE.Points(sGeo, sMat);
+  surfacePoints.visible = false;
+  cubeGroup.add(shell, edges, surfacePoints);
 
   function resize() {
     var w = canvas.clientWidth;

@@ -3,10 +3,17 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry } from "./cube-shape.js?v=20260919mob";
+import {
+  createIntactCubeParts,
+  createShardGeometry,
+  whenCubeReady,
+  installGlassScene,
+  sampleCubeSurface,
+  randomCubeSurface,
+} from "./cube-shape.js?v=20261010clear";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
-(function () {
+(async function () {
   "use strict";
 
   var canvas = document.getElementById("hero-3d");
@@ -25,7 +32,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var HERO_SCALE_MUL = MOBILE ? 0.39 * MOBILE_HERO_CUBE : 0.78;
   var PEAK_SCALE_MUL = MOBILE ? 0.58 * MOBILE_HERO_CUBE : 1.16;
   var EDGE_OP = MOBILE ? 0.18 : 0.24;
-  var SHELL_OP = MOBILE ? 0.5 : 0.45;
+  var SHELL_OP = 1;
   var SHARDS = LOW_PERF ? 280 : 1000;
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var breakAmt = 0;
@@ -395,6 +402,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     return [a, b, -h];
   }
 
+  await whenCubeReady();
+  installGlassScene(renderer, scene, camera);
+
   var SURFACE = MOBILE ? 1200 : 2800;
   /* Na mobile cubeGroup.scale jest ~2× mniejszy, a gl_PointSize nie skaluje się
      z obiektem — te same sprite'y dają jaśniejszy glow. Dopasowujemy do desktopu. */
@@ -403,7 +413,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var sPos = new Float32Array(SURFACE * 3);
   var sSize = new Float32Array(SURFACE);
   for (var si = 0; si < SURFACE; si++) {
-    var sp = randomOnCube(HALF);
+    var sp = randomCubeSurface(HALF);
     sPos[si * 3] = sp[0];
     sPos[si * 3 + 1] = sp[1];
     sPos[si * 3 + 2] = sp[2];
@@ -417,6 +427,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    toneMapped: false,
     uniforms: {
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
@@ -459,7 +470,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var wire = cubeParts.wire;
   var edges = cubeParts.edges;
   var setWireOpacity = cubeParts.setWireOpacity;
-  cubeGroup.add(shell, edges, new THREE.Points(sGeo, sMat));
+  var surfacePoints = new THREE.Points(sGeo, sMat);
+  surfacePoints.visible = false;
+  cubeGroup.add(shell, edges, surfacePoints);
 
   // ——— Shatter shards (deferred on mobile to avoid blocking first paint) ———
   var shards = null;
@@ -496,35 +509,10 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     var sz;
     var depth01;
     if (hash(i, 1) < 0.78) {
-      var face = Math.floor(hash(i, 2) * 6);
-      var a = (hash(i, 3) * 2 - 1) * HALF;
-      var b = (hash(i, 4) * 2 - 1) * HALF;
-      var inset = hash(i, 5) * 0.04 * HALF;
-      if (face === 0) {
-        sx = HALF - inset;
-        sy = a;
-        sz = b;
-      } else if (face === 1) {
-        sx = -HALF + inset;
-        sy = a;
-        sz = b;
-      } else if (face === 2) {
-        sx = a;
-        sy = HALF - inset;
-        sz = b;
-      } else if (face === 3) {
-        sx = a;
-        sy = -HALF + inset;
-        sz = b;
-      } else if (face === 4) {
-        sx = a;
-        sy = b;
-        sz = HALF - inset;
-      } else {
-        sx = a;
-        sy = b;
-        sz = -HALF + inset;
-      }
+      var sp0 = sampleCubeSurface(i, HALF);
+      sx = sp0[0];
+      sy = sp0[1];
+      sz = sp0[2];
       depth01 = 1;
     } else {
       var r = Math.pow(hash(i, 2), 0.42);
@@ -571,6 +559,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     depthWrite: true,
     depthTest: true,
     blending: THREE.NormalBlending,
+    toneMapped: false,
     side: THREE.FrontSide,
     uniforms: {
       uTime: { value: 0 },
