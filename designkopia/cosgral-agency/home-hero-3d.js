@@ -3,7 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261010bright";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261010clear";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
@@ -1278,21 +1278,42 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
         : tilesOp > 0.45
           ? Math.max(0.15, 1 - smooth01(0.45, 0.85, tilesOp))
           : 1;
-    /* Live service panel is an empty navy sheet. The fixed cube canvas must not sit on top of it. */
-    if (document.body.classList.contains("is-service-panel-open")) portalOp = 0;
+    /* Live service panel is an empty navy sheet. Hide the cube even if a menu rule forces the portal visible. */
+    var serviceOpen =
+      document.body.classList.contains("is-service-panel-open") ||
+      document.documentElement.classList.contains("is-service-panel-open");
+    if (serviceOpen) {
+      portalOp = 0;
+      cubeGroup.visible = false;
+      if (shards) shards.visible = false;
+    }
     var needsScene = portalOp > 0.05 || sandOn || menuBlend > 0.001;
 
     if (canvas.parentElement) {
-      var op = String(portalOp);
-      var vis = portalOp > 0.05 ? "visible" : "hidden";
-      // Zapisy stylu unieważniają styl całego poddrzewa — piszemy tylko przy zmianie.
-      if (op !== lastPortalOp) {
-        canvas.parentElement.style.opacity = op;
-        lastPortalOp = op;
-      }
-      if (vis !== lastPortalVis) {
-        canvas.parentElement.style.visibility = vis;
-        lastPortalVis = vis;
+      var portalEl = canvas.parentElement;
+      if (serviceOpen) {
+        portalEl.style.setProperty("opacity", "0", "important");
+        portalEl.style.setProperty("visibility", "hidden", "important");
+        lastPortalOp = "0";
+        lastPortalVis = "hidden";
+      } else {
+        if (portalEl.style.getPropertyPriority("opacity") === "important") {
+          portalEl.style.removeProperty("opacity");
+          portalEl.style.removeProperty("visibility");
+          lastPortalOp = null;
+          lastPortalVis = null;
+        }
+        var op = String(portalOp);
+        var vis = portalOp > 0.05 ? "visible" : "hidden";
+        // Zapisy stylu unieważniają styl całego poddrzewa — piszemy tylko przy zmianie.
+        if (op !== lastPortalOp) {
+          portalEl.style.opacity = op;
+          lastPortalOp = op;
+        }
+        if (vis !== lastPortalVis) {
+          portalEl.style.visibility = vis;
+          lastPortalVis = vis;
+        }
       }
     }
 

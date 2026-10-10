@@ -39,7 +39,7 @@ function num(value, fallback) {
 
 export function whenGlassSpec() {
   if (!specPromise) {
-    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010bright", import.meta.url))
+    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010clear", import.meta.url))
       .then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.json();
@@ -101,12 +101,13 @@ export function createGlassMaterial() {
         "material.iridescenceThickness = iridescenceThicknessMaximum;",
         [
           "float filmCos = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
-          "float filmEdge = pow(1.0 - filmCos, 1.2);",
+          "float filmEdge = pow(1.0 - filmCos, 1.05);",
+          "float filmUp = clamp(nonPerturbedNormal.y, 0.0, 1.0);",
           "float filmNoise = fract(sin(dot(vWorldPosition.xyz, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
           "float filmCrawl = 0.5 + 0.5 * sin(uFilmTime * 1.15 + filmNoise * 6.28318 + (1.0 - filmCos) * 8.0);",
-          "float filmT = clamp(mix(filmNoise, filmCrawl, 0.82), 0.0, 1.0);",
+          "float filmT = clamp(mix(filmNoise, filmCrawl, 0.7) + filmUp * filmEdge * 0.45, 0.0, 1.0);",
           "material.iridescenceThickness = mix(iridescenceThicknessMinimum, iridescenceThicknessMaximum, filmT);",
-          "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, filmEdge);",
+          "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, max(filmEdge, filmUp));",
         ].join("\n")
       );
     var lightsBegin = THREE.ShaderChunk.lights_fragment_begin.replace(
@@ -120,16 +121,31 @@ export function createGlassMaterial() {
       "gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
       "gl_FragColor = vec4( outgoingLight, opacity );"
     );
+    /* Faces over a black page stay black at transmission 1. Mix a soft env refraction into those dark samples so the body reads as clear glass. */
+    var transmission = THREE.ShaderChunk.transmission_fragment.replace(
+      "totalDiffuse = mix( totalDiffuse, transmitted.rgb, material.transmission );",
+      [
+        "vec3 refractDir = refract( -v, normalize( n ), 1.0 / max( material.ior, 1.001 ) );",
+        "vec3 envRefract = vec3( 0.18 );",
+        "#ifdef ENVMAP_TYPE_CUBE_UV",
+        "envRefract = textureCubeUV( envMap, refractDir, 0.22 ).rgb;",
+        "#endif",
+        "vec3 envLift = min( envRefract, vec3( 0.72 ) );",
+        "vec3 glassBody = max( transmitted.rgb, envLift );",
+        "totalDiffuse = mix( totalDiffuse, glassBody, material.transmission );",
+      ].join("\n")
+    );
     shader.fragmentShader = shader.fragmentShader
       .replace("#include <lights_physical_fragment>", physical)
       .replace("#include <lights_fragment_begin>", lightsBegin)
+      .replace("#include <transmission_fragment>", transmission)
       .replace("#include <opaque_fragment>", opaque);
     if (shader.fragmentShader.indexOf("uniform float uFilmTime") === -1) {
       shader.fragmentShader = "uniform float uFilmTime;\n" + shader.fragmentShader;
     }
   };
   mat.customProgramCacheKey = function () {
-    return "cosgral-glass-soap-" + biasLit;
+    return "cosgral-glass-clear-" + biasLit;
   };
   mat.onBeforeRender = function () {
     filmTime.value = performance.now() * 0.001;
@@ -156,7 +172,7 @@ export function createGlassMaterial() {
 
 function createBrightStudio() {
   var env = spec.env || {};
-  var ambient = num(env.ambient, 0.16);
+  var ambient = num(env.ambient, 0.18);
   var studio = new THREE.Scene();
   studio.add(
     new THREE.Mesh(
@@ -187,11 +203,13 @@ function createBrightStudio() {
     mesh.scale.set(sx, sy, 0.18);
     studio.add(mesh);
   }
-  /* Softboxes sit just behind the camera so front bevels catch them. Side rims are coloured, not sprites. */
-  addSoftbox(0.2, 2.8, 5.2, 4.4, 1.7, "#ffffff", 12);
-  addSoftbox(1.6, -2.4, 4.8, 3.4, 1.15, "#fff6ee", 9);
-  addSoftbox(-4.2, 0.6, 3.1, 1.15, 3.6, "#9dffc4", 11);
-  addSoftbox(4.2, -0.15, 3.2, 1.15, 3.6, "#ff9ec8", 11);
+  /* Same studio on desktop and mobile. A back strip and a thin top strip light the upper bevels; side strips stay coloured. */
+  addSoftbox(0.2, 2.6, 5.4, 4.6, 1.5, "#ffffff", 14);
+  addSoftbox(0.0, 5.1, 1.2, 5.4, 0.48, "#f7fff9", 22);
+  addSoftbox(0.15, 2.8, -5.2, 4.8, 1.6, "#ffffff", 18);
+  addSoftbox(-4.8, 1.4, -0.6, 0.72, 3.4, "#b8ffd6", 16);
+  addSoftbox(4.8, 0.55, -0.4, 0.72, 3.4, "#ffb0d2", 16);
+  addSoftbox(1.4, -2.6, 4.6, 3.2, 1.05, "#fff4ea", 8);
   return studio;
 }
 
@@ -235,7 +253,7 @@ var WAVE_FRAG = [
   "  float s = 1.0 - abs(sin(w * 4.2 + t * 0.25));",
   "  float s2 = s * s;",
   "  float ridge = s2 * s2 * s2;",
-  "  vec3 base = vec3(0.055);",
+  "  vec3 base = vec3(0.14, 0.16, 0.2);",
   "  vec3 dim = vec3(0.24);",
   "  vec3 mid = vec3(0.58);",
   "  vec3 hi = vec3(1.0);",
@@ -250,7 +268,7 @@ var WAVE_FRAG = [
   "  col += hi * mForce * ridge * 0.12;",
   "  float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));",
   "  col *= 0.58 + vignette * 0.42;",
-  "  col = ((col - 0.5) * 1.04 + 0.5) * 0.78;",
+  "  col = ((col - 0.5) * 1.04 + 0.5) * 0.92;",
   "  gl_FragColor = vec4(col, 1.0);",
   "}",
 ].join("\n");
