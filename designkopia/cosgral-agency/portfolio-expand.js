@@ -1489,6 +1489,13 @@
   }
 
   function open(key, chapter) {
+    if (key === "systems") {
+      var catalogIris = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
+      if (catalogIris && catalogIris.playIris) {
+        catalogIris.playIris();
+        return;
+      }
+    }
     if (!key || expandedKey === key || closing) return;
     expandedKey = key;
     openChapter = chapter || null;
@@ -1990,6 +1997,12 @@
   );
 
   window.addEventListener("keydown", function (e) {
+    var irisCat = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
+    if (irisCat && irisCat.isIrisOpen && irisCat.isIrisOpen() && e.key === "Escape") {
+      e.preventDefault();
+      irisCat.closeIris();
+      return;
+    }
     if (!expandedKey) return;
     if (e.key === "Escape") {
       e.preventDefault();

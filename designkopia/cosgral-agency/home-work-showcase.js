@@ -1,8 +1,7 @@
 /**
- * Homepage #realizacje — pinned, scroll-scrubbed showcase.
- * Existing cards fly in from depth (blur → sharp, parallax), one fills
- * the frame, labels drift, the section title stays. The pin then releases
- * into the settled bento so the links work. Reduced motion keeps the grid.
+ * Homepage #realizacje — pinned showcase matching the reference depth scroll.
+ * Spec progress 0–1 is the dolly (two focal holds, peripheral blast, outro fade).
+ * The last stretch of the pin settles back into the bento so the links work.
  */
 (function () {
   "use strict";
@@ -30,13 +29,29 @@
     return a + (b - a) * t;
   }
 
-  function smooth(t) {
+  function easeInOut(t) {
     t = clamp(t, 0, 1);
-    return t * t * (3 - 2 * t);
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
 
   function smoothstep(e0, e1, x) {
-    return smooth((x - e0) / (e1 - e0));
+    var t = clamp((x - e0) / (e1 - e0), 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  function sample(keys, p) {
+    if (p <= keys[0][0]) return keys[0][1];
+    for (var i = 1; i < keys.length; i++) {
+      if (p <= keys[i][0]) {
+        var t0 = keys[i - 1][0];
+        var t1 = keys[i][0];
+        var v0 = keys[i - 1][1];
+        var v1 = keys[i][1];
+        if (v0 === v1 || t1 === t0) return v0;
+        return lerp(v0, v1, easeInOut((p - t0) / (t1 - t0)));
+      }
+    }
+    return keys[keys.length - 1][1];
   }
 
   function unwrapTilt(panel) {
@@ -63,14 +78,15 @@
       panel.appendChild(pin);
     }
 
+    var grid = pin.querySelector(".home-work__grid");
     var cards = Array.prototype.slice.call(pin.querySelectorAll(".home-work__card"));
-    if (cards.length < 2) return;
+    if (!grid || cards.length < 4) return;
 
     var title = pin.querySelector(".home-work__title");
     var lead = pin.querySelector(".home-work__lead");
     var footer = pin.querySelector(".home-work__footer");
+    var eyebrow = pin.querySelector(".section-label");
 
-    /* Enter tweens write x/y/filter on these nodes and would fight the scrub. */
     cards.forEach(function (card) {
       card.removeAttribute("data-enter");
     });
@@ -82,174 +98,214 @@
     gsap.killTweensOf(cards);
     if (footer) gsap.killTweensOf(footer);
 
+    if (title) {
+      gsap.killTweensOf(title.querySelectorAll(".reveal-word, .reveal-word > span"));
+      gsap.set(title.querySelectorAll(".reveal-word > span"), { clearProps: "all" });
+    }
+
+    cards.forEach(function (card) {
+      var video = card.querySelector("video");
+      if (!video) return;
+      if (video.poster) {
+        card.style.backgroundImage = "url('" + video.poster + "')";
+      }
+      video.style.opacity = video.readyState >= 2 ? "1" : "0";
+      video.addEventListener("loadeddata", function () {
+        video.style.opacity = "1";
+      });
+    });
+
+    if (title && !title.querySelector(".home-work__count")) {
+      var sup = document.createElement("sup");
+      sup.className = "home-work__count";
+      sup.textContent = "(04)";
+      title.appendChild(sup);
+    }
+
+    var flight = document.createElement("div");
+    flight.className = "home-work__flight";
+    pin.appendChild(flight);
+
+    var ctaText = "Zobacz realizacje";
+    var ctaNode = cards[0].querySelector(".home-work__card-cta");
+    if (ctaNode && ctaNode.textContent) ctaText = ctaNode.textContent.trim();
+    var kickerText = (eyebrow && eyebrow.textContent.trim()) || "Realizacje";
+
+    function makeFloat(cls, text) {
+      var el = document.createElement("div");
+      el.className = "home-work__float " + cls;
+      el.textContent = text;
+      flight.appendChild(el);
+      return el;
+    }
+    var pillA = makeFloat("home-work__float--pill", ctaText);
+    var pillB = makeFloat("home-work__float--pill", ctaText);
+    var kicker = makeFloat("home-work__float--kicker", kickerText);
+
+    var order = cards.slice();
+
     section.classList.add("is-work-showcase", "is-work-flying");
 
-    var mobileQuery = window.matchMedia("(max-width: 900px)");
-    var homes = [];
-    var pinW = 1;
-    var pinH = 1;
+    var ST = {
+      center: {
+        s: [[0, 1], [0.3, 1.5], [0.4, 1.5], [0.7, 1.6], [0.8, 1.6], [1, 1.7]],
+        b: [[0, 0], [0.3, 15], [0.4, 15], [0.7, 25], [0.8, 25], [1, 35]],
+        x: [[0, 0], [0.3, 15], [0.4, 15], [0.7, -15], [0.8, -15], [1, -25]],
+        y: [[0, 0], [1, 0]],
+        o: [[0, 1], [0.8, 1], [1, 0]],
+      },
+      focalA: {
+        s: [[0, 0.6], [0.3, 1.5], [0.4, 1.5], [0.7, 0.6], [1, 0.6]],
+        b: [[0, 4], [0.3, 0], [0.4, 0], [0.7, 15], [1, 18]],
+        x: [[0, -20], [0.3, -5], [0.4, -5], [0.7, -40], [1, -48]],
+        y: [[0, 12], [0.3, 0], [0.4, 0], [0.7, 5], [1, 8]],
+        o: [[0, 1], [0.7, 1], [0.86, 0], [1, 0]],
+      },
+      focalB: {
+        s: [[0, 0.6], [0.4, 0.8], [0.7, 1.8], [0.8, 1.8], [1, 0.8]],
+        b: [[0, 4], [0.4, 8], [0.7, 0], [0.8, 0], [1, 15]],
+        x: [[0, 22], [0.4, 35], [0.7, 5], [0.8, 5], [1, -20]],
+        y: [[0, 15], [0.4, 15], [0.7, 0], [0.8, 0], [1, 10]],
+        o: [[0, 1], [0.8, 1], [1, 0]],
+      },
+    };
 
-    /* Focus beats spread across the flight. Settle starts after the last fill. */
-    /* First beat starts late enough that progress 0 is still a depth field. */
-    var FOCUS = [0.28, 0.44, 0.58, 0.72];
-    var SPAN = 0.2;
-    var SCATTER = [
-      { x: 0.22, y: 0.62 },
-      { x: 0.78, y: 0.72 },
-      { x: 0.7, y: 0.48 },
-      { x: 0.32, y: 0.8 },
-    ];
-    var AFTER = [
-      { x: -0.02, y: 0.26 },
-      { x: 1.02, y: 0.3 },
-      { x: 0.08, y: 0.86 },
-      { x: 0.96, y: 0.66 },
-    ];
-    var DEPTH = [0.42, 0.86, 0.58, 0.24];
-
-    function isMobile() {
-      return mobileQuery.matches;
+    function sizeOf(vw, vhRatio) {
+      var w = (window.innerWidth || 480) * vw;
+      return { w: w, h: w * vhRatio };
     }
 
-    function measure() {
-      gsap.set(cards, { clearProps: "transform,filter,opacity,zIndex" });
-      cards.forEach(function (card) {
-        var body = card.querySelector(".home-work__card-body");
-        var cta = card.querySelector(".home-work__card-cta");
-        var tag = card.querySelector(".home-work__card-tag");
-        if (body) gsap.set(body, { clearProps: "transform" });
-        if (cta) gsap.set(cta, { clearProps: "transform" });
-        if (tag) gsap.set(tag, { clearProps: "transform" });
-      });
-      if (title) gsap.set(title, { clearProps: "transform" });
-      if (lead) gsap.set(lead, { clearProps: "transform" });
-
-      var pinRect = pin.getBoundingClientRect();
-      pinW = pin.clientWidth || window.innerWidth || 1;
-      pinH = pin.clientHeight || window.innerHeight || 1;
-      homes = cards.map(function (card) {
-        var r = card.getBoundingClientRect();
-        return {
-          cx: r.left + r.width / 2 - pinRect.left,
-          cy: r.top + r.height / 2 - pinRect.top,
-          w: Math.max(1, r.width),
-          h: Math.max(1, r.height),
-        };
+    function applyCard(card, spec, p, box, z) {
+      var s = sample(spec.s, p);
+      var b = sample(spec.b, p);
+      var x = sample(spec.x, p);
+      var y = sample(spec.y, p);
+      var o = sample(spec.o, p);
+      gsap.set(card, {
+        position: "absolute",
+        left: "50%",
+        top: "46%",
+        xPercent: -50,
+        yPercent: -50,
+        width: box.w,
+        height: box.h,
+        x: (x / 100) * (window.innerWidth || box.w),
+        y: (y / 100) * (window.innerHeight || box.h),
+        scale: s,
+        opacity: o,
+        filter: "blur(" + b.toFixed(2) + "px)",
+        zIndex: z,
+        borderRadius: "16px",
+        transformOrigin: "50% 50%",
+        force3D: true,
       });
     }
 
-    function poseFor(i, p) {
-      var home = homes[i];
-      var mobile = isMobile();
-      var maxBlur = mobile ? 6 : 15;
-      var depth = DEPTH[i] || 0.5;
-      var t = (p - FOCUS[Math.min(i, FOCUS.length - 1)]) / SPAN;
-      var focusW = Math.exp(-Math.pow(Math.max(0, Math.abs(t) - 0.12) / 0.72, 2));
-      var farScale = 0.22 + depth * 0.2;
-      var fillByBox = Math.max(
-        (pinW * (mobile ? 1.02 : 0.8)) / home.w,
-        (pinH * (mobile ? 0.58 : 0.72)) / home.h
-      );
-      var fillCap = Math.min(
-        mobile ? 3.3 : 2.35,
-        (pinW * (mobile ? 1.8 : 1.55)) / home.w
-      );
-      var fill = Math.min(Math.max(fillByBox, farScale + 0.45), fillCap);
-      var focus = { x: mobile ? 0.5 : 0.56, y: mobile ? 0.6 : 0.55 };
-      var scatter = SCATTER[i] || SCATTER[0];
-      var after = AFTER[i] || AFTER[0];
-      var par = 0.72 + depth * 0.5;
-      var px;
-      var py;
-      var scale;
-      if (t < 0) {
-        var u = Math.pow(smooth(clamp((t + 1.35) / 1.35, 0, 1)), 1 / par);
-        px = lerp(scatter.x * pinW, focus.x * pinW, u);
-        py = lerp(scatter.y * pinH, focus.y * pinH, u);
-        py += (1 - u) * pinH * (0.06 + (1 - depth) * 0.14);
-        px += (1 - u) * pinW * (i % 2 === 0 ? -0.05 : 0.07) * (1.15 - depth);
-        scale = lerp(farScale, fill, u);
-      } else {
-        var u2 = Math.pow(smooth(clamp(t / 1.25, 0, 1)), par);
-        px = lerp(focus.x * pinW, after.x * pinW, u2);
-        py = lerp(focus.y * pinH, after.y * pinH, u2);
-        scale = lerp(fill, 0.5 + depth * 0.22, u2);
-      }
-      var blur = maxBlur * (1 - focusW);
-      if (blur < 0.4) blur = 0;
-      var rot = (i % 2 === 0 ? -1 : 1) * (2.4 + i * 0.45) * (1 - focusW);
-      var opacity = clamp(0.42 + 0.58 * Math.max(focusW, t < -0.35 ? 0.72 : 0.5), 0, 1);
-      return {
-        x: px - home.cx,
-        y: py - home.cy,
-        scale: scale,
-        blur: blur,
-        rot: rot,
+    function applyFloat(el, xVw, yVh, blur, opacity, scale) {
+      gsap.set(el, {
+        position: "absolute",
+        left: "50%",
+        top: "46%",
+        xPercent: -50,
+        yPercent: -50,
+        x: (xVw / 100) * (window.innerWidth || 1),
+        y: (yVh / 100) * (window.innerHeight || 1),
+        scale: scale || 1,
         opacity: opacity,
-        z: Math.round(8 + focusW * 28 + depth * 2),
-      };
+        filter: "blur(" + blur.toFixed(2) + "px)",
+        force3D: true,
+      });
     }
 
-    function render(p) {
-      if (!homes.length || !homes[0] || homes[0].w < 2) return;
-      p = clamp(p, 0, 1);
-      var settle = smoothstep(0.78, 0.92, p);
-      var flightP = Math.min(p, 0.78);
-      var flying = p < 0.9;
+    function parkInFlight() {
+      cards.forEach(function (card) {
+        flight.appendChild(card);
+      });
+    }
+
+    function restoreGrid() {
+      order.forEach(function (card) {
+        grid.appendChild(card);
+      });
+      gsap.set(cards, { clearProps: "all" });
+      gsap.set([pillA, pillB, kicker], { opacity: 0 });
+    }
+
+    var parked = false;
+
+    function render(pinP) {
+      var hold = window.__workShowcaseHold;
+      var specP;
+      var settle;
+      if (typeof hold === "number") {
+        specP = clamp(hold, 0, 1);
+        settle = 0;
+      } else {
+        pinP = clamp(pinP, 0, 1);
+        specP = clamp(pinP / 0.86, 0, 1);
+        settle = smoothstep(0.86, 0.97, pinP);
+      }
+
+      var flying = settle < 0.98;
       section.classList.toggle("is-work-flying", flying);
       section.classList.toggle("is-work-settled", !flying);
       section.style.setProperty("--work-foot", settle.toFixed(3));
+      if (lead) lead.style.opacity = String(1 - Math.min(1, settle > 0 ? settle : specP < 0.08 ? 0 : 1));
+      if (eyebrow) eyebrow.style.opacity = lead ? lead.style.opacity : "0";
 
-      if (title) {
-        var ts = 1 + (isMobile() ? 0.16 : 0.22) * (1 - settle);
-        gsap.set(title, { scale: ts, transformOrigin: "0% 0%", force3D: true });
-      }
-      if (lead) {
-        gsap.set(lead, {
-          x: (1 - settle) * (isMobile() ? 8 : 18),
-          force3D: true,
-        });
-      }
-
-      if (!flying && settle > 0.999) {
-        gsap.set(cards, { clearProps: "transform,filter,opacity,zIndex" });
-        cards.forEach(function (card) {
-          var body = card.querySelector(".home-work__card-body");
-          var cta = card.querySelector(".home-work__card-cta");
-          var tag = card.querySelector(".home-work__card-tag");
-          if (body) gsap.set(body, { clearProps: "transform" });
-          if (cta) gsap.set(cta, { clearProps: "transform" });
-          if (tag) gsap.set(tag, { clearProps: "transform" });
-        });
-        if (title) gsap.set(title, { scale: 1, transformOrigin: "0% 0%" });
-        if (lead) gsap.set(lead, { clearProps: "transform" });
+      if (!flying) {
+        if (parked) {
+          restoreGrid();
+          parked = false;
+        }
         return;
       }
 
-      var mobile = isMobile();
-      cards.forEach(function (card, i) {
-        var pose = poseFor(i, flightP);
-        var k = 1 - settle;
-        gsap.set(card, {
-          x: pose.x * k,
-          y: pose.y * k,
-          scale: lerp(pose.scale, 1, settle),
-          rotation: pose.rot * k,
-          filter: "blur(" + (pose.blur * k).toFixed(2) + "px)",
-          opacity: lerp(pose.opacity, 1, settle),
-          zIndex: pose.z,
-          force3D: true,
-          transformOrigin: "50% 50%",
-        });
-        var drift = k * (mobile ? 12 : 28) * Math.sin(flightP * Math.PI * 2 + i * 1.15);
-        var body = card.querySelector(".home-work__card-body");
-        var cta = card.querySelector(".home-work__card-cta");
-        var tag = card.querySelector(".home-work__card-tag");
-        if (body) gsap.set(body, { x: drift * 0.35, y: drift * -0.12, force3D: true });
-        if (tag) gsap.set(tag, { x: drift * 0.55, force3D: true });
-        if (cta) gsap.set(cta, { x: drift * -0.7, y: drift * 0.08, force3D: true });
+      if (!parked) {
+        parkInFlight();
+        parked = true;
+      }
+
+      var vw = window.innerWidth || 480;
+      applyCard(cards[0], ST.center, specP, { w: vw * 0.55, h: vw * 0.32 }, 10);
+      applyCard(cards[1], ST.focalA, specP, { w: vw * 0.2, h: vw * 0.26 }, 20);
+      applyCard(cards[2], ST.focalB, specP, { w: vw * 0.22, h: vw * 0.28 }, 20);
+
+      /* Peripheral: systemy tile + pills. Gone by 20%. */
+      var blast = smoothstep(0, 0.2, specP);
+      var periOp = 1 - smoothstep(0.12, 0.2, specP);
+      var sysBox = { w: vw * 0.12, h: vw * 0.12 };
+      gsap.set(cards[3], {
+        position: "absolute",
+        left: "50%",
+        top: "46%",
+        xPercent: -50,
+        yPercent: -50,
+        width: sysBox.w,
+        height: sysBox.h,
+        x: ((-18 * (1 + blast * 1.5)) / 100) * vw,
+        y: ((-15 * (1 + blast * 1.5)) / 100) * (window.innerHeight || 1),
+        scale: 1,
+        opacity: periOp,
+        filter: "blur(" + (2 + blast * 8).toFixed(2) + "px)",
+        zIndex: 30,
+        borderRadius: "16px",
+        force3D: true,
       });
+      applyFloat(pillA, 8 * (1 + blast * 1.5), -20 * (1 + blast * 1.5), 2 + blast * 8, periOp, 1);
+      applyFloat(pillB, -6 * (1 + blast * 1.5), 22 * (1 + blast * 1.5), 2 + blast * 8, periOp, 1);
+
+      var kickIn = smoothstep(0.62, 0.78, specP) * (1 - smoothstep(0.9, 1, specP));
+      applyFloat(kicker, 30, -30, 8, kickIn, 1.4);
     }
+
+    window.__workShowcaseAt = function (specP) {
+      window.__workShowcaseHold = specP;
+      render(0);
+    };
+    window.__workShowcaseRelease = function () {
+      window.__workShowcaseHold = null;
+    };
 
     ScrollTrigger.create({
       id: "work-showcase",
@@ -257,24 +313,20 @@
       start: "top top",
       end: function () {
         var vh = window.innerHeight || 800;
-        return "+=" + Math.round(vh * (isMobile() ? 3.05 : 3.4));
+        return "+=" + Math.round(vh * 3);
       },
       pin: true,
       pinSpacing: true,
       anticipatePin: 1,
-      scrub: isMobile() ? 0.28 : 0.5,
+      scrub: window.matchMedia("(max-width: 900px)").matches ? 0.28 : 0.5,
       invalidateOnRefresh: true,
       refreshPriority: 1,
-      onRefresh: function (self) {
-        measure();
-        render(self ? self.progress : 0);
-      },
       onUpdate: function (self) {
+        if (typeof window.__workShowcaseHold === "number") return;
         render(self.progress);
       },
     });
 
-    measure();
     render(0);
     ScrollTrigger.refresh();
   }

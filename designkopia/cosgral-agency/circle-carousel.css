@@ -1,4 +1,4 @@
-/* Systems fan — circular arc carousel + iris open. Scoped to the fan and its expand. */
+/* Systems fan — 1:1 circle carousel (spec a). Dark base, light-grey nav, #141414 iris. */
 
 .portfolio-chapter[data-theme="systems"] {
   overflow: hidden;
@@ -8,273 +8,374 @@
 }
 .portfolio-chapter[data-theme="systems"] .portfolio-chapter__copy {
   z-index: 8;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
 }
-.portfolio-chapter[data-theme="systems"] .sys-fan__stage {
+.portfolio-chapter[data-theme="systems"] .portfolio-chapter__more {
+  pointer-events: auto;
+}
+
+body.portfolio-page--tiles .sys-fan__stage {
   pointer-events: auto;
   touch-action: none;
   overflow: visible;
+  height: 100% !important;
+  perspective: none !important;
 }
-
-.sys-fan__card {
-  width: min(34vw, 17.5rem);
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
+body.portfolio-page--tiles .sys-fan__arc {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
-.sys-fan__card.is-front {
-  border: 0;
-  box-shadow: none;
+body.portfolio-page--tiles .sys-fan__card {
+  width: 40vw !important;
+  height: 40vw !important;
+  aspect-ratio: auto !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #141414 !important;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.88) !important;
+  overflow: hidden !important;
+  transition: none !important;
 }
-.sys-fan__blobs {
+body.portfolio-page--tiles .sys-fan__card.is-front {
+  border: 0 !important;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.88) !important;
+}
+.sys-fan__disc {
   position: absolute;
   inset: 0;
-  display: block;
-  pointer-events: none;
-}
-.sys-fan__blob {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 100%;
-  height: 100%;
   border-radius: 50%;
   overflow: hidden;
-  background: #101010;
-  box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.48),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
-  will-change: transform, opacity;
 }
-.sys-fan__blob img {
+.sys-fan__disc img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: grayscale(1) contrast(1.06);
-  transform: none;
-}
-.sys-fan__blob--a {
-  z-index: 3;
-  transform:
-    translate3d(-50%, -50%, 0)
-    scaleX(calc(1 + var(--spread, 0) * 0.07))
-    scaleY(calc(1 - var(--spread, 0) * 0.05));
-}
-.sys-fan__blob--b,
-.sys-fan__blob--c {
-  opacity: var(--spread, 0);
-}
-.sys-fan__blob--b {
-  z-index: 2;
-  width: 64%;
-  height: 64%;
-  transform:
-    translate3d(-50%, -50%, 0)
-    translate3d(calc(var(--spread, 0) * 72%), calc(var(--spread, 0) * -48%), 0)
-    scale(calc(0.4 + var(--spread, 0) * 0.75));
-}
-.sys-fan__blob--c {
-  z-index: 1;
-  width: 46%;
-  height: 46%;
-  transform:
-    translate3d(-50%, -50%, 0)
-    translate3d(calc(var(--spread, 0) * -64%), calc(var(--spread, 0) * 54%), 0)
-    scale(calc(0.35 + var(--spread, 0) * 0.8));
-}
-.sys-fan__card.is-front .sys-fan__blob--a {
-  box-shadow:
-    0 28px 64px rgba(0, 0, 0, 0.58),
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  filter: grayscale(1) contrast(1.05);
+  pointer-events: none;
 }
 .sys-fan__cap {
-  left: 50%;
-  right: auto;
-  bottom: auto;
-  top: calc(100% + 0.55rem);
-  width: max-content;
-  max-width: 46vw;
-  padding: 0;
-  background: none;
-  transform: translateX(-50%);
-  text-align: center;
-  letter-spacing: 0.14em;
-  font-size: 0.56rem;
-  color: rgba(255, 255, 255, 0.72);
-  opacity: 0;
-}
-.sys-fan__card.is-front .sys-fan__cap {
-  opacity: 1;
-}
-.sys-fan__card.is-side .sys-fan__cap {
-  opacity: 0;
+  display: none !important;
 }
 
+/* Pill — 10vw × 3.5vw, radius 50px, dark glass */
 .sys-fan__pill {
   position: absolute;
-  left: 50%;
-  top: 58%;
-  z-index: 70;
-  transform: translate(-50%, 0);
+  z-index: 40;
+  left: 0;
+  top: 0;
+  width: 10vw;
+  height: 3.5vw;
   margin: 0;
-  padding: 0.38rem 0.9rem;
+  padding: 0 0.6vw;
   border: 0;
-  border-radius: 999px;
-  background: rgba(8, 8, 8, 0.9);
+  border-radius: 50px;
+  background: rgba(30, 30, 30, 0.7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: #fff;
-  font-family: var(--font-body, "Satoshi", sans-serif);
-  font-size: 0.72rem;
+  font-family: inherit;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.01em;
   line-height: 1;
-  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45vw;
+  transform: translate(-50%, -50%);
   pointer-events: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  transition: opacity 0.25s ease, transform 0.35s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s linear, transform 0.15s linear;
 }
-.sys-fan__pill:hover,
-.sys-fan__pill:focus-visible {
-  transform: translate(-50%, -1px);
-  outline: none;
-}
-.sys-fan__stage.is-dragging .sys-fan__pill,
-.sys-fan--detail .sys-fan__cap {
-  display: none;
-}
-.sys-fan--detail .sys-fan__pill,
-.sys-fan.is-article-open .sys-fan__pill {
+.sys-fan__pill.is-out {
   opacity: 0;
+  transform: translate(-50%, calc(-50% + 10px));
+}
+.sys-fan__pill.is-in {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.sys-fan__pill::before {
+  content: "";
+  width: 0.45vw;
+  height: 0.45vw;
+  min-width: 4px;
+  min-height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  flex: none;
+}
+.sys-fan.is-iris-open .sys-fan__pill,
+.sys-fan__stage.is-dragging .sys-fan__pill {
   pointer-events: none;
 }
 
-.sys-fan__dot,
-.sys-fan__dot.is-active {
-  width: 0.42rem;
-  height: 0.42rem;
-  border-radius: 50%;
-  transition: transform 0.35s ease, background 0.35s ease, opacity 0.35s ease;
+/* Bottom nav: 35vw × 17.5vw semicircle + dots on a larger arc */
+.sys-fan__nav {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 36;
+  width: auto !important;
+  height: 36vw;
+  transform: none !important;
+  display: block !important;
+  pointer-events: none;
+  background: none !important;
+  gap: 0 !important;
+}
+.sys-fan__goo-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.sys-fan__nav-goo {
+  position: absolute;
+  inset: 0;
+}
+.sys-fan__semi {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 40vw;
+  height: 20vw;
+  transform: translateX(-50%);
+  background: #cfcfcf;
+  border-radius: 40vw 40vw 0 0;
+}
+.sys-fan__ring {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sys-fan__dot {
+  position: absolute;
+  width: 10.2vw !important;
+  height: 10.2vw !important;
+  min-width: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #ececec !important;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  box-shadow: none !important;
 }
 .sys-fan__dot.is-active {
-  background: #fff;
-  transform: scale(1.4);
+  background: #fff !important;
+  z-index: 2;
 }
-.sys-fan__nav::before {
+.sys-fan__dot.is-active::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 0.45rem);
-  width: min(34vw, 168px);
-  height: 12px;
-  transform: translateX(-50%);
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  border-bottom: 0;
-  border-radius: 140px 140px 0 0;
+  top: 50%;
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: #141414;
+  transform: translate(-50%, -50%);
+}
+.sys-fan__arrow {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  border: 0 !important;
+  opacity: 0 !important;
+}
+
+.sys-fan.is-iris-open .sys-fan__card:not(.is-front) {
+  opacity: 0 !important;
+  transition: opacity 0.35s ease !important;
+}
+.sys-fan.is-iris-open .sys-fan__card.is-front {
+  opacity: 0 !important;
+}
+
+/* Iris overlay — circle bg scales to cover; photos keep their size */
+.sys-iris {
+  position: fixed;
+  inset: 0;
+  z-index: 700;
+  pointer-events: auto;
+}
+.sys-iris__disc {
+  position: fixed;
+  border-radius: 50%;
+  background: #141414;
+  transform: scale(1);
+  transform-origin: 50% 50%;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1;
+}
+.sys-iris.is-open .sys-iris__disc {
+  transform: scale(30);
+}
+.sys-iris.is-closing .sys-iris__disc {
+  transform: scale(1);
+  transition-duration: 0.85s;
+}
+.sys-iris__sat {
+  position: fixed;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  transition: left 0.9s cubic-bezier(0.16, 1, 0.3, 1), top 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sys-iris__sat img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.05);
+}
+.sys-iris__sat--a { width: 25.2vw; height: 25.2vw; }
+.sys-iris__sat--b { width: 19.2vw; height: 19.2vw; }
+.sys-iris__sat--c { width: 13.8vw; height: 13.8vw; }
+.sys-iris__copy,
+.sys-iris__hint {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.45s ease 0.55s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.55s;
+  z-index: 4;
+}
+.sys-iris.is-open .sys-iris__copy,
+.sys-iris.is-open .sys-iris__hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+.sys-iris.is-closing .sys-iris__copy,
+.sys-iris.is-closing .sys-iris__hint {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.sys-iris__hint {
+  position: fixed;
+  left: 6vw;
+  top: 16vh;
+  color: #888;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.sys-iris__dots {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+.sys-iris__dots i {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #888;
+}
+.sys-iris__copy {
+  position: fixed;
+  right: 7vw;
+  top: 42%;
+  width: min(34vw, 440px);
+  color: #fff;
+}
+.sys-iris__kicker {
+  margin: 0;
+  color: #888;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.sys-iris__h {
+  margin: 0.55rem 0 0.7rem;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #fff;
+}
+.sys-iris__p {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.45;
+  color: #aaa;
+}
+.sys-iris__more {
+  display: inline-block;
+  margin-top: 1.1rem;
+  color: #fff;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+}
+.sys-iris__nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36vw;
+  z-index: 5;
   pointer-events: none;
 }
-.sys-fan__nav.is-in-case::before {
-  display: none;
+.sys-iris__nav-goo {
+  position: absolute;
+  inset: 0;
+  filter: url(#sys-iris-goo);
 }
-.sys-fan__nav.is-in-case::after {
-  display: none;
+.sys-iris__semi {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 40vw;
+  height: 20vw;
+  transform: translateX(-50%);
+  background: #cfcfcf;
+  border-radius: 40vw 40vw 0 0;
 }
-
-/* Detail: circles regroup, copy sits beside them on wide screens */
-@media (min-width: 900px) {
-  .expand-systems .sys-fan__arc {
-    left: 34%;
-    top: 42%;
-  }
-  .expand-systems .sys-fan__copy,
-  .expand-systems .sys-fan--detail.is-settled .sys-fan__copy,
-  .expand-systems .sys-fan--detail.is-from-catalog .sys-fan__copy {
-    left: auto;
-    right: max(5vw, 2.5rem);
-    top: 24%;
-    width: min(26rem, 34vw);
-    text-align: left;
-    transform: none;
-  }
-  .expand-systems .sys-fan__copy .sys-fan__desc {
-    margin-left: 0;
-    margin-right: 0;
-  }
+.sys-iris__neck {
+  position: absolute;
+  left: 50%;
+  bottom: 22vw;
+  width: 10.2vw;
+  height: 10.2vw;
+  margin-left: -5.1vw;
+  border-radius: 50%;
+  background: #2a2a2a;
+  transform: translateY(0);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-@media (max-width: 760px) {
-  .sys-fan__card {
-    width: min(54vw, 13.6rem);
-  }
-  .sys-fan__pill {
-    font-size: 0.68rem;
-    padding: 0.42rem 0.85rem;
-  }
-  .expand-systems .sys-fan__copy,
-  .expand-systems .sys-fan--detail.is-settled .sys-fan__copy {
-    top: auto;
-    bottom: 16%;
-    width: min(22rem, 88vw);
-  }
-  .expand-systems .sys-fan__stage {
-    height: 56%;
-  }
-  .sys-fan__cap {
-    font-size: 0.5rem;
-    max-width: 40vw;
-  }
-  .expand-systems .sys-fan__arc {
-    top: 40%;
-  }
+.sys-iris__neck::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, -50%);
+}
+.sys-iris.is-open .sys-iris__neck {
+  transform: translateY(7.2vw);
 }
 
-/* Full-screen circle grow from the active tile */
-.portfolio-tile-expand.is-iris {
-  opacity: 1;
-  visibility: visible;
-  background: #070709;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  transition: none;
-}
-.portfolio-tile-expand.is-iris .portfolio-tile-expand__body {
-  opacity: 1;
-}
-.portfolio-tile-expand.is-iris:not(.is-iris-in) .sys-fan__copy,
-.portfolio-tile-expand.is-iris:not(.is-iris-in) .portfolio-tile-expand__back {
-  opacity: 0;
-}
-.portfolio-tile-expand.is-iris.is-iris-in .portfolio-tile-expand__back {
-  opacity: 1;
-  transition: opacity 0.45s ease 0.4s;
-}
-.portfolio-tile-expand.is-iris-out {
-  background: #070709;
-  transition: none;
-}
-.portfolio-tile-expand.is-iris-out .sys-fan__copy,
-.portfolio-tile-expand.is-iris-out .portfolio-tile-expand__back,
-.portfolio-tile-expand.is-iris-out .sys-fan__nav {
-  opacity: 0 !important;
-  transition: opacity 0.22s ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sys-fan__blob--b,
-  .sys-fan__blob--c {
-    display: none;
-  }
-  .portfolio-tile-expand.is-iris,
-  .portfolio-tile-expand.is-iris-out {
-    clip-path: none !important;
-    transition: opacity 0.25s ease;
-  }
-}
-html.reduce-motion .sys-fan__blob--b,
-html.reduce-motion .sys-fan__blob--c {
-  display: none;
-}
-html.reduce-motion .portfolio-tile-expand.is-iris,
-html.reduce-motion .portfolio-tile-expand.is-iris-out {
-  clip-path: none !important;
+html.reduce-motion .sys-iris__disc,
+html.reduce-motion .sys-iris__sat,
+html.reduce-motion .sys-iris__copy,
+html.reduce-motion .sys-iris__hint,
+html.reduce-motion .sys-iris__neck {
+  transition: none !important;
 }

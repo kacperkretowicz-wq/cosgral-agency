@@ -104,6 +104,93 @@ html.is-free-scroll #realizacje.home-work.is-work-showcase {
   transform-origin: 0% 0%;
 }
 
+#realizacje.is-work-showcase.is-work-flying .home-work__head {
+  position: absolute;
+  left: 4vw;
+  right: 4vw;
+  bottom: 2vh;
+  top: auto;
+  max-width: none;
+  z-index: 40;
+}
+
+#realizacje.is-work-showcase .reveal-word,
+#realizacje.is-work-showcase .reveal-word > span {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  visibility: visible !important;
+}
+
+#realizacje.is-work-showcase.is-work-flying .home-work__title {
+  font-size: 10vw;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  max-width: none;
+  color: #fff;
+}
+
+#realizacje.is-work-showcase .home-work__count {
+  font-size: 0.3em;
+  letter-spacing: 0;
+  margin-left: 0.35em;
+  font-weight: 500;
+  vertical-align: super;
+}
+
+#realizacje.is-work-showcase .home-work__flight {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#realizacje.is-work-showcase.is-work-settled .home-work__flight {
+  display: none;
+}
+
+#realizacje.is-work-showcase.is-work-flying .home-work__card {
+  border-radius: 16px !important;
+  overflow: hidden;
+  background: #c8c8c8 center/cover no-repeat;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+#realizacje.is-work-showcase.is-work-flying .home-work__card-media,
+#realizacje.is-work-showcase.is-work-flying .home-work__card-media::after {
+  background: transparent;
+}
+#realizacje.is-work-showcase.is-work-flying .home-work__card-media::after {
+  opacity: 0.15;
+}
+#realizacje.is-work-showcase.is-work-flying .home-work__card-media video {
+  background: transparent;
+}
+
+#realizacje.is-work-showcase .home-work__float {
+  position: absolute;
+  z-index: 30;
+  color: #fff;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+#realizacje.is-work-showcase .home-work__float--pill {
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+#realizacje.is-work-showcase .home-work__float--kicker {
+  font-size: 18vw;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
 #realizacje.is-work-showcase .home-work__lead {
   max-width: 28rem;
   margin-top: 0.65rem;
@@ -164,6 +251,11 @@ html.is-free-scroll #realizacje.home-work.is-work-showcase {
   #realizacje.is-work-showcase .home-work__title {
     font-size: clamp(1.85rem, 8.6vw, 2.55rem);
     max-width: 14ch;
+  }
+
+  #realizacje.is-work-showcase.is-work-flying .home-work__title {
+    font-size: 10vw;
+    max-width: none;
   }
 
   #realizacje.is-work-showcase .home-work__lead {
