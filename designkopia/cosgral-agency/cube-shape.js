@@ -3,7 +3,7 @@
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 
-var EDGE_RADIUS_RATIO = 0.2;
+var EDGE_RADIUS_RATIO = 0.055;
 var EDGE_SEGMENTS = 5;
 var EDGE_OUTLINE_ANGLE = 72;
 
@@ -125,17 +125,52 @@ function setWireOpacity(wire, value) {
   if (wire) wire.material.opacity = value;
 }
 
+/** Glass recipe mirrored in assets/web_glass.json. Equal extents — a cube, not a slab. */
+export function createGlassMaterial(mobile) {
+  var low = !!mobile;
+  return new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 0,
+    roughness: 0.07,
+    transmission: low ? 0.78 : 0.9,
+    thickness: low ? 0.85 : 1.25,
+    ior: 1.5,
+    iridescence: low ? 0.7 : 1,
+    iridescenceIOR: 1.28,
+    iridescenceThicknessRange: new THREE.Vector2(120, 420),
+    clearcoat: 1,
+    clearcoatRoughness: 0.06,
+    transparent: true,
+    opacity: 1,
+    envMapIntensity: 1.25,
+    side: THREE.FrontSide,
+  });
+}
+
+export function attachGlassEnv(renderer, scene) {
+  if (!renderer || !scene || scene.environment) return;
+  var env = new THREE.Scene();
+  function strip(w, h, x, y, z, ry, rx, color) {
+    var mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(w, h),
+      new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide })
+    );
+    mesh.position.set(x, y, z);
+    mesh.rotation.set(rx || 0, ry || 0, 0);
+    env.add(mesh);
+  }
+  strip(14, 2.2, 0, 6.2, 0, 0, Math.PI / 2, 0xffffff);
+  strip(2.4, 11, -6.5, 0.4, 1.2, Math.PI / 2.5, 0, 0xff6a3c);
+  strip(2.1, 9, 6.4, 0.2, -1.2, -Math.PI / 2.4, 0, 0x9eb0e8);
+  var pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(env, 0.05).texture;
+  pmrem.dispose();
+}
+
 export function createIntactCubeParts(half) {
   var boxGeo = createRoundedBoxGeometry(half);
-  var shellMat = new THREE.MeshBasicMaterial({
-    color: 0x080808,
-    transparent: true,
-    opacity: 0.45,
-    depthWrite: true,
-    polygonOffset: true,
-    polygonOffsetFactor: 1,
-    polygonOffsetUnits: 1,
-  });
+  var mobile = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches;
+  var shellMat = createGlassMaterial(mobile);
   var shell = new THREE.Mesh(boxGeo, shellMat);
   shell.renderOrder = 0;
 

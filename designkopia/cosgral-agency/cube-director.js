@@ -142,10 +142,12 @@ async function initCubeDirector() {
     color: 0xffffff,
     roughness: 0.05,
     metalness: 0,           // szkło nie jest metalem — metalness gasi transmisję/odbicia
-    transmission: 0.92,     // wysoka transmisja na czarnym tle = ciemne wnętrze szkła
-                            // (kierunek inspo: ciemny szklany klawisz, nie mleczna kostka)
-    thickness: 1.2,
+    transmission: 0.9,
+    thickness: 1.25,
     ior: 1.5,
+    iridescence: 1,
+    iridescenceIOR: 1.28,
+    iridescenceThicknessRange: new THREE.Vector2(120, 420),
     transparent: true,
     opacity: 1.0,
     clearcoat: 1.0,

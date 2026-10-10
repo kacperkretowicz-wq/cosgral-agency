@@ -214,6 +214,8 @@
     document.querySelectorAll(".home-scene > .home-scene__panel").forEach(function (panel) {
       if (panel.closest(".home-hero")) return;
       if (panel.closest("#kontakt") || panel.closest(".home-contact")) return;
+      /* Sticky chapters: a transformed tilt face traps position:sticky. */
+      if (panel.closest("#uslugi, #realizacje, #faq, #proces, .award-arc")) return;
       wrapChildren(panel);
     });
 
