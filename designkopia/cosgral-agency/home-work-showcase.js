@@ -289,6 +289,7 @@
           });
         }
         card.style.pointerEvents = zoom < 0.45 || sh > 0.62 ? "auto" : "none";
+        card.classList.toggle("is-focused", zoom > 0.35 && sh > 0.62);
       });
 
       [head, footer].forEach(function (el) {
