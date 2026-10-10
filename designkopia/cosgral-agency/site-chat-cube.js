@@ -9,7 +9,7 @@ import {
   whenCubeReady,
   installGlassScene,
   randomCubeSurface,
-} from "./cube-shape.js?v=20261010glass";
+} from "./cube-shape.js?v=20261010clear";
 
 (function () {
   "use strict";
@@ -137,7 +137,9 @@ import {
       ].join("\n"),
     });
 
-    root.add(parts.shell, parts.edges, new THREE.Points(sGeo, sMat));
+    var surfacePoints = new THREE.Points(sGeo, sMat);
+    surfacePoints.visible = false;
+    root.add(parts.shell, parts.edges, surfacePoints);
 
     var spin = 0.35;
     var leanX = 0;

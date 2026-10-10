@@ -4,9 +4,9 @@
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { GLTFLoader, MeshoptDecoder } from "./vendor/cube-three-addons.js";
-import { createGlassMaterial, whenGlassSpec } from "./cube-look.js?v=20261010glass";
+import { createGlassMaterial, whenGlassSpec } from "./cube-look.js?v=20261010clear";
 
-export { installGlassScene } from "./cube-look.js?v=20261010glass";
+export { installGlassScene } from "./cube-look.js?v=20261010clear";
 
 var EDGE_RADIUS_RATIO = 0.2;
 var EDGE_SEGMENTS = 5;
@@ -310,6 +310,8 @@ export function createIntactCubeParts(half) {
     })
   );
   edges.renderOrder = 1;
+  /* White outline reads as a halo on clear glass. Callers still set opacity. */
+  edges.visible = false;
 
   return { boxGeo: boxGeo, shell: shell, wire: null, edges: edges, setWireOpacity: setWireOpacity };
 }

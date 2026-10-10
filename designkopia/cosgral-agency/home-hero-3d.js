@@ -10,7 +10,7 @@ import {
   installGlassScene,
   sampleCubeSurface,
   randomCubeSurface,
-} from "./cube-shape.js?v=20261010glass";
+} from "./cube-shape.js?v=20261010clear";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 
 (async function () {
@@ -470,7 +470,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var wire = cubeParts.wire;
   var edges = cubeParts.edges;
   var setWireOpacity = cubeParts.setWireOpacity;
-  cubeGroup.add(shell, edges, new THREE.Points(sGeo, sMat));
+  var surfacePoints = new THREE.Points(sGeo, sMat);
+  surfacePoints.visible = false;
+  cubeGroup.add(shell, edges, surfacePoints);
 
   // ——— Shatter shards (deferred on mobile to avoid blocking first paint) ———
   var shards = null;

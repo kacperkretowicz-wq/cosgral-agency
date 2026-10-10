@@ -1,10 +1,10 @@
 /**
- * Glass look for the Cosgral cube: web_glass.json on MeshPhysicalMaterial,
- * RoomEnvironment PMREM, and a transmission backdrop so a transparent canvas
- * does not clear the transmission buffer to white.
+ * Glass look for the Cosgral cube: web_glass.json on MeshPhysicalMaterial.
+ * The env is a dark studio (narrow strips only) so faces stay clear and
+ * specular catches stay sharp. A transmission backdrop keeps the transmission
+ * buffer from clearing to white on a transparent canvas.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { RoomEnvironment } from "./vendor/cube-three-addons.js";
 
 var spec = {
   color: "#ffffff",
@@ -78,30 +78,102 @@ export function createGlassMaterial() {
     iridescenceIOR: num(spec.iridescenceIOR, 1.8),
     iridescenceThicknessRange: [num(range[0], 350), num(range[1], 850)],
     side: THREE.DoubleSide,
-    transparent: true,
+    transparent: false,
     opacity: 1,
     depthWrite: true,
+    premultipliedAlpha: true,
+    blending: THREE.CustomBlending,
+    blendSrc: THREE.OneFactor,
+    blendDst: THREE.OneMinusSrcAlphaFactor,
+    blendSrcAlpha: THREE.OneFactor,
+    blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
   });
   if ("dispersion" in mat) mat.dispersion = num(spec.dispersion, 0.7);
+  /* edgeGlow is an emissive rim. It reads as a white halo, so it is not applied. */
+  void edgeGlow;
 
   var biasLit = edgeBias.toFixed(4);
-  var glowLit = edgeGlow.toFixed(4);
   mat.onBeforeCompile = function (shader) {
-    shader.fragmentShader = shader.fragmentShader.replace(
-      "material.iridescenceThickness = iridescenceThicknessMaximum;",
-      [
-        "float cosT = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
-        "float edge = pow(1.0 - cosT, 1.35);",
-        "float n = fract(sin(dot(vWorldPosition.xyz, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
-        "float span = iridescenceThicknessMaximum - iridescenceThicknessMinimum;",
-        "float film = mix(iridescenceThicknessMinimum, iridescenceThicknessMaximum, mix(n, 1.0, edge));",
-        "material.iridescenceThickness = film;",
-        "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, edge);",
-        "totalEmissiveRadiance += vec3(" + glowLit + ") * edge;",
-      ].join("\n")
-    );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "material.iridescenceThickness = iridescenceThicknessMaximum;",
+        [
+          "float cosT = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
+          "float edge = pow(1.0 - cosT, 1.35);",
+          "float n = fract(sin(dot(vWorldPosition.xyz, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
+          "float film = mix(iridescenceThicknessMinimum, iridescenceThicknessMaximum, mix(n, 1.0, edge));",
+          "material.iridescenceThickness = film;",
+          "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, edge);",
+        ].join("\n")
+      )
+      .replace(
+        "gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
+        "gl_FragColor = vec4( outgoingLight, opacity );"
+      );
   };
+  /* Transmission alpha would fringe the silhouette. Opacity still drives menu fades. */
+  var opacityValue = 1;
+  Object.defineProperty(mat, "opacity", {
+    configurable: true,
+    enumerable: true,
+    get: function () {
+      return opacityValue;
+    },
+    set: function (next) {
+      opacityValue = next;
+      var fade = next < 0.999;
+      if (mat.transparent !== fade) {
+        mat.transparent = fade;
+        mat.needsUpdate = true;
+      }
+    },
+  });
   return mat;
+}
+
+function createDarkStudio() {
+  var env = spec.env || {};
+  var power = num(env.power, 2.5);
+  var ambient = num(env.ambient, 0.02);
+  var floorLevel = num(env.floor, 0.06);
+  var sheen = num(env.sheen, 4);
+  var studio = new THREE.Scene();
+  studio.add(
+    new THREE.Mesh(
+      new THREE.BoxGeometry(16, 16, 16),
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setRGB(ambient, ambient, ambient, THREE.LinearSRGBColorSpace),
+        side: THREE.BackSide,
+      })
+    )
+  );
+  var floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(16, 16),
+    new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setRGB(floorLevel, floorLevel, floorLevel, THREE.LinearSRGBColorSpace),
+    })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = -5.5;
+  studio.add(floor);
+
+  function addStrip(x, y, z, sx, sy, sz, intensity) {
+    var mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setRGB(intensity, intensity, intensity, THREE.LinearSRGBColorSpace),
+      })
+    );
+    mesh.position.set(x, y, z);
+    mesh.scale.set(sx, sy, sz);
+    studio.add(mesh);
+  }
+  addStrip(0, 6.2, -1.5, 7.5, 0.03, 0.04, sheen);
+  addStrip(-6.2, 1.2, 0.4, 0.03, 4.2, 0.04, power);
+  addStrip(6.2, -0.4, -0.8, 0.03, 3.4, 0.04, power);
+  addStrip(0.6, 2.4, -6.2, 4.8, 0.03, 0.04, sheen * 0.55);
+  addStrip(-1.2, -0.6, 6.2, 3.2, 0.03, 0.04, power);
+  return studio;
 }
 
 var WAVE_VERT = [
@@ -174,8 +246,12 @@ export function installGlassScene(renderer, scene, camera) {
 
   if (!scene.environment) {
     var pmrem = new THREE.PMREMGenerator(renderer);
-    var room = new RoomEnvironment();
-    scene.environment = pmrem.fromScene(room, 0.04).texture;
+    var studio = createDarkStudio();
+    scene.environment = pmrem.fromScene(studio, 0.02).texture;
+    studio.traverse(function (obj) {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) obj.material.dispose();
+    });
     pmrem.dispose();
   }
 
@@ -210,7 +286,8 @@ export function installGlassScene(renderer, scene, camera) {
     var vFov = (camera.fov * Math.PI) / 180;
     var height = 2 * Math.tan(vFov / 2) * dist;
     var width = height * Math.max(camera.aspect, 0.01);
-    backdrop.scale.set(width * 1.15, height * 1.15, 1);
+    backdrop.scale.set(width * 1.35, height * 1.35, 1);
+    backdrop.updateMatrixWorld(true);
     var ptr = window.cosgralPointer;
     if (ptr) {
       mouse.x += ((ptr.nx || 0) - mouse.x) * 0.08;
