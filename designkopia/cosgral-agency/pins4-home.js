@@ -83,14 +83,28 @@
     slit.style.transform = "scaleX(" + (0.04 + e * 1.35).toFixed(3) + ") scaleY(" + (0.08 + e * 0.92).toFixed(3) + ")";
   });
 
-  bind("realizacje", 4.2, function (p, section) {
+  var indexRows = document.querySelectorAll("#realizacje .p4-row");
+  bind("realizacje", Math.max(4.2, indexRows.length * 0.42), function (p, section) {
     var rows = section.querySelectorAll(".p4-row");
+    var list = section.querySelector(".p4-index__list");
     var n = rows.length;
+    if (!n) return;
     var focus = p * n;
+    var active = clamp(Math.floor(focus), 0, n - 1);
     for (var i = 0; i < n; i++) {
       var local = clamp(1 - Math.abs(focus - (i + 0.5)), 0, 1);
       var media = rows[i].querySelector(".p4-row__media");
-      if (media) media.style.height = (local * 46).toFixed(1) + "vh";
+      if (media) media.style.height = (local * 42).toFixed(1) + "vh";
+      var vid = rows[i].querySelector("video");
+      if (vid) {
+        if (i === active && vid.paused) {
+          var play = vid.play();
+          if (play && play.catch) play.catch(function () {});
+        } else if (i !== active && !vid.paused) vid.pause();
+      }
+    }
+    if (list && rows[active]) {
+      list.style.transform = "translate3d(0," + (-rows[active].offsetTop).toFixed(1) + "px,0)";
     }
   });
 
@@ -107,25 +121,77 @@
     }
   });
 
-  bind("act-mask", 2.2, function (p, section) {
+  var SHOWREEL = [
+    { client: "Wiktoria stylistka", src: "portfolio-media/reels/orlincy/001.mp4", poster: "portfolio-media/reels/orlincy/001-poster.jpg" },
+    { client: "Wiktoria stylistka", src: "portfolio-media/reels/orlincy/002.mp4", poster: "portfolio-media/reels/orlincy/002-poster.jpg" },
+    { client: "Wiktoria stylistka", src: "portfolio-media/reels/orlincy/003.mp4", poster: "portfolio-media/reels/orlincy/003-poster.jpg" },
+    { client: "Wiktoria stylistka", src: "portfolio-media/reels/orlincy/004.mp4", poster: "portfolio-media/reels/orlincy/004-poster.jpg" },
+    { client: "Wiktoria stylistka", src: "portfolio-media/reels/orlincy/005.mp4", poster: "portfolio-media/reels/orlincy/005-poster.jpg" },
+    { client: "Wiktoria stylistka", src: "portfolio-media/reels/orlincy/006.mp4", poster: "portfolio-media/reels/orlincy/006-poster.jpg" },
+    { client: "Trove Archive", src: "portfolio-media/reels/reklamy/001.mp4", poster: "portfolio-media/reels/reklamy/001-poster.jpg" },
+    { client: "Trove Archive", src: "portfolio-media/reels/reklamy/002.mp4", poster: "portfolio-media/reels/reklamy/002-poster.jpg" },
+    { client: "Trove Archive", src: "portfolio-media/reels/reklamy/003.mp4", poster: "portfolio-media/reels/reklamy/003-poster.jpg" },
+    { client: "Trove Archive", src: "portfolio-media/reels/reklamy/004.mp4", poster: "portfolio-media/reels/reklamy/004-poster.jpg" },
+    { client: "Trove Archive", src: "portfolio-media/reels/reklamy/005.mp4", poster: "portfolio-media/reels/reklamy/005-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/001.mp4", poster: "portfolio-media/reels/far-east/001-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/002.mp4", poster: "portfolio-media/reels/far-east/002-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/003.mp4", poster: "portfolio-media/reels/far-east/003-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/004.mp4", poster: "portfolio-media/reels/far-east/004-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/005.mp4", poster: "portfolio-media/reels/far-east/005-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/006.mp4", poster: "portfolio-media/reels/far-east/006-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/007.mp4", poster: "portfolio-media/reels/far-east/007-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/008.mp4", poster: "portfolio-media/reels/far-east/008-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/009.mp4", poster: "portfolio-media/reels/far-east/009-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/010.mp4", poster: "portfolio-media/reels/far-east/010-poster.jpg" },
+    { client: "Far East", src: "portfolio-media/reels/far-east/011.mp4", poster: "portfolio-media/reels/far-east/011-poster.jpg" },
+    { client: "BTS", src: "portfolio-media/reels/bts/001.mp4", poster: "portfolio-media/reels/bts/001-poster.jpg" },
+    { client: "BTS", src: "portfolio-media/reels/bts/002.mp4", poster: "portfolio-media/reels/bts/002-poster.jpg" },
+    { client: "Anna Jarosik", src: "portfolio-media/reels/anna-jarosik/001.mp4", poster: "portfolio-media/reels/anna-jarosik/001-poster.jpg" },
+    { client: "Anna Jarosik", src: "portfolio-media/reels/anna-jarosik/002.mp4", poster: "portfolio-media/reels/anna-jarosik/002-poster.jpg" },
+    { client: "Anna Jarosik", src: "portfolio-media/reels/anna-jarosik/003.mp4", poster: "portfolio-media/reels/anna-jarosik/003-poster.jpg" },
+    { client: "Anna Jarosik", src: "portfolio-media/reels/anna-jarosik/004.mp4", poster: "portfolio-media/reels/anna-jarosik/004-poster.jpg" },
+    { client: "Anna Jarosik", src: "portfolio-media/reels/anna-jarosik/005.mp4", poster: "portfolio-media/reels/anna-jarosik/005-poster.jpg" }
+  ];
+  var strip = document.querySelector(".p4-mask__strip");
+  if (strip) {
+    SHOWREEL.forEach(function (item) {
+      var img = document.createElement("img");
+      img.src = item.poster;
+      img.alt = "";
+      strip.appendChild(img);
+    });
+  }
+  var reelIdx = -1;
+  bind("act-mask", Math.max(2.8, SHOWREEL.length * 0.22), function (p, section) {
     var video = section.querySelector("video");
+    var label = section.querySelector(".p4-mask__client");
+    var rail = section.querySelector(".p4-mask__strip");
     if (!video) return;
-    var e = easeInOut(p);
+    var e = easeInOut(Math.min(1, p * 1.15));
     var r = 16 + e * 70;
     video.style.clipPath = "circle(" + r.toFixed(1) + "% at 50% 46%)";
-    if (e > 0.15 && video.paused) {
+    var idx = clamp(Math.floor(p * SHOWREEL.length), 0, SHOWREEL.length - 1);
+    if (idx !== reelIdx) {
+      reelIdx = idx;
+      video.poster = SHOWREEL[idx].poster;
+      video.src = SHOWREEL[idx].src;
+      if (label) label.textContent = SHOWREEL[idx].client;
+    }
+    if (video.paused) {
       var play = video.play();
       if (play && play.catch) play.catch(function () {});
     }
+    if (rail) rail.style.transform = "translate3d(0," + (-(p * Math.max(SHOWREEL.length - 1, 0) * 78)).toFixed(1) + "px,0)";
   });
 
-  bind("proces", 2.6, function (p, section) {
-    var bar = section.querySelector(".p4-highlight");
-    var steps = section.querySelectorAll(".p4-step");
-    if (!bar || !steps.length) return;
-    var idx = clamp(Math.floor(p * steps.length), 0, steps.length - 1);
-    var step = steps[idx];
-    bar.style.transform = "translate3d(0," + step.offsetTop + "px,0)";
+  var autoCases = document.querySelectorAll("#act-auto .p4-case");
+  bind("act-auto", Math.max(3.2, autoCases.length * 0.85), function (p, section) {
+    var cases = section.querySelectorAll(".p4-case");
+    var list = section.querySelector(".p4-auto__list");
+    if (!cases.length) return;
+    var idx = clamp(Math.floor(p * cases.length), 0, cases.length - 1);
+    for (var i = 0; i < cases.length; i++) cases[i].classList.toggle("is-on", i === idx);
+    if (list) list.style.transform = "translate3d(0," + (-cases[idx].offsetTop).toFixed(1) + "px,0)";
   });
 
   function pastHero() {
