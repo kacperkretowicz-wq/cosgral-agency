@@ -95,11 +95,16 @@
     }
 
     var cards = Array.prototype.slice.call(board.querySelectorAll(".home-work__card"));
+    cards.sort(function (a, b) {
+      return Number(a.getAttribute("data-cam") || 0) - Number(b.getAttribute("data-cam") || 0);
+    });
     if (cards.length < 4) return;
 
-    var title = board.querySelector(".home-work__title");
+    var title = board.querySelector(".home-work__title") || pin.querySelector(".home-work__title");
     var head = board.querySelector(".home-work__head");
     var footer = board.querySelector(".home-work__footer");
+    var floats = Array.prototype.slice.call(board.querySelectorAll(".home-work__float"));
+    if (title && title.parentElement !== pin) pin.appendChild(title);
 
     cards.forEach(function (card) {
       card.removeAttribute("data-enter");
@@ -125,18 +130,11 @@
       gsap.set(footer, { clearProps: "opacity,visibility,transform,filter,x,y" });
     }
 
-    var camTitle = pin.querySelector(".home-work__cam-title");
-    if (!camTitle) {
-      camTitle = document.createElement("div");
-      camTitle.className = "home-work__cam-title";
-      camTitle.setAttribute("aria-hidden", "true");
-      var camText = document.createElement("span");
-      camText.textContent = titleWords(title);
+    var camTitle = title;
+    if (camTitle && !camTitle.querySelector("sup")) {
       var camSup = document.createElement("sup");
       camSup.textContent = "(04)";
-      camTitle.appendChild(camText);
       camTitle.appendChild(camSup);
-      pin.appendChild(camTitle);
     }
 
     section.classList.add("is-work-showcase");
@@ -310,7 +308,19 @@
       });
       if (footer) footer.style.pointerEvents = zoom < 0.4 ? "auto" : "none";
 
-      if (camTitle) camTitle.style.opacity = String(clamp(zoom, 0, 1));
+      floats.forEach(function (el) {
+        var amount = zoom < 0.08 ? 0.4 : Math.max(0.4, zoom);
+        gsap.set(el, {
+          filter:
+            "blur(" +
+            (localCap * amount).toFixed(2) +
+            "px) brightness(" +
+            (1 - amount * 0.28).toFixed(3) +
+            ")",
+        });
+      });
+
+      if (camTitle) camTitle.style.opacity = "1";
       section.classList.toggle("is-work-zoomed", zoom > 0.35);
     }
 
@@ -350,7 +360,7 @@
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () {
         measure();
-        ScrollTrigger.refresh();
+        if (typeof window.__workShowcaseHold === "number") render(window.__workShowcaseHold);
       });
     }
   }

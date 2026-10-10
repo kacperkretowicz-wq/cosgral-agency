@@ -126,8 +126,8 @@
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" />
 <link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
 <script src="cookie-consent.js?v=20261001a"></script>
-<link rel="stylesheet" href="cosgral-home.css?v=20261010show7" />
-<link rel="stylesheet" href="home-work-showcase.css?v=20261010show7" />
+<link rel="stylesheet" href="cosgral-home.css?v=20261010show9" />
+<link rel="stylesheet" href="home-work-showcase.css?v=20261010show9" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
@@ -357,61 +357,59 @@
   </div>
 </section>
 
-<!-- 4. REALIZACJE -->
+<!-- 4. REALIZACJE — reference composition, one board for the camera -->
 <section id="realizacje" class="home-work home-scene">
   <div class="home-scene__panel">
-  <div class="container home-work__head">
-    <p class="section-label" data-enter="left" data-i18n="work.eyebrow">Realizacje</p>
-    <h2 class="home-work__title" data-reveal-words data-i18n="work.title">Wybrane realizacje</h2>
-    <p class="home-work__lead" data-enter="right" data-i18n="work.bentoLead">Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.</p>
-  </div>
+    <div class="home-work__stage">
+      <p class="home-work__kicker home-work__float">Nowa realizacja</p>
 
-  <div class="home-work__grid container">
-    <a class="home-work__card home-work__card--wide" href="portfolio.html#strony" data-tile-interact data-enter="bottom">
-      <div class="home-work__card-media" aria-hidden="true">
-        <img class="home-work__still" src="portfolio-media/showcase/web/trove-archive-poster.jpg" alt="" />
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/showcase/web/trove-archive-poster.jpg" src="portfolio-media/showcase/web/trove-archive.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
+      <a class="home-work__float home-work__sq" href="portfolio.html#strony">
+        <img class="home-work__still" src="portfolio-media/showcase/web/juicy-events-poster.jpg" alt="" />
+        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
+      </a>
+
+      <a class="home-work__card home-work__plate" data-cam="0" href="portfolio.html#strony">
+        <span class="home-work__media">
+          <img class="home-work__still" src="portfolio-media/showcase/web/trove-archive-poster.jpg" alt="" />
+        </span>
+        <span class="home-work__stat" aria-hidden="true">04</span>
         <span class="home-work__card-tag" data-i18n="bento.strony">Strony internetowe</span>
         <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#montaz" data-tile-interact data-enter="left">
-      <div class="home-work__card-media" aria-hidden="true">
-        <img class="home-work__still" src="portfolio-media/reels/orlincy/001-poster.jpg" alt="" />
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/001-poster.jpg" src="portfolio-media/reels/orlincy/001.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.montaz">Montaż wideo</span>
+      </a>
+
+      <a class="home-work__card home-work__type" data-cam="1" href="portfolio.html#montaz">
+        <span class="home-work__type-kicker">Aa</span>
+        <span class="home-work__type-title" data-i18n="bento.montaz">Montaż wideo</span>
+        <span class="home-work__type-spec" data-i18n="work.bentoLead">Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.</span>
         <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#grafiki" data-tile-interact data-enter="right">
-      <div class="home-work__card-media" aria-hidden="true">
-        <img class="home-work__still" src="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" alt="" />
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" src="portfolio-media/showcase/graphics/home-grafiki-social.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
+      </a>
+
+      <a class="home-work__card home-work__graf" data-cam="2" href="portfolio.html#grafiki">
+        <span class="home-work__media">
+          <img class="home-work__still" src="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" alt="" />
+        </span>
         <span class="home-work__card-tag" data-i18n="bento.grafiki">Grafiki &amp; social</span>
         <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#systemy" data-tile-interact data-enter="bottom">
-      <div class="home-work__card-media home-work__card-media--dim" aria-hidden="true">
-        <img class="home-work__still" src="assets/services/automatyzacje-poster.jpg" alt="" />
-        <video muted loop playsinline preload="metadata" poster="assets/services/automatyzacje-poster.jpg" src="assets/services/automatyzacje.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
+      </a>
+
+      <a class="home-work__card home-work__sys" data-cam="3" href="portfolio.html#systemy">
+        <span class="home-work__media">
+          <img class="home-work__still" src="assets/services/automatyzacje-poster.jpg" alt="" />
+        </span>
         <span class="home-work__card-tag" data-i18n="work.card_automation">Systemy i automatyzacje</span>
         <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-  </div>
+      </a>
 
-  <div class="container home-work__footer" data-enter="bottom">
-    <a class="home-work__link glass-btn" href="portfolio.html" data-i18n="work.fullPortfolio">Zobacz pełne portfolio</a>
-  </div>
+      <div class="home-work__swatches home-work__float" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+
+      <a class="home-work__link home-work__footer" href="portfolio.html" data-i18n="work.fullPortfolio">Zobacz pełne portfolio</a>
+
+      <h2 class="home-work__title">
+        <span data-i18n="work.title">Wybrane realizacje</span><sup>(04)</sup>
+      </h2>
+    </div>
   </div>
 </section>
 
@@ -622,7 +620,7 @@
 <script src="home-section-stepper.js?v=20260925end1"></script>
 <script src="home-director.js?v=20260920ui37"></script>
 <script src="home-tile-interact.js?v=20261010show1"></script>
-<script src="home-work-showcase.js?v=20261010show7"></script>
+<script src="home-work-showcase.js?v=20261010show9"></script>
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
