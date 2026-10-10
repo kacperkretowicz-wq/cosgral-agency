@@ -4,7 +4,7 @@
  * Framed with padding so rotated cube never clips the canvas.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import { createIntactCubeParts, attachGlassEnv } from "./cube-shape.js?v=20261010award1";
 
 (function () {
   "use strict";
@@ -29,7 +29,7 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     var HALF = 1.35;
     /* Same visual recipe as hero; framing only differs (camera / scale). */
     var CUBE_SCALE = MOBILE ? 0.72 : 0.76;
-    var SHELL_OP = 0.45;
+    var SHELL_OP = 1;
     var EDGE_OP = 0.24;
 
     var renderer = new THREE.WebGLRenderer({
@@ -43,6 +43,7 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     var scene = new THREE.Scene();
+    attachGlassEnv(renderer, scene);
     var camera = new THREE.PerspectiveCamera(26, 1, 0.1, 40);
     camera.position.set(0, 0.02, MOBILE ? 9.4 : 8.9);
 

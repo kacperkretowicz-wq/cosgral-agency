@@ -69,8 +69,8 @@
       "en": "Scroll"
     },
     "monopo_tagline": {
-      "pl": "Projektujemy i wdrażamy produkty cyfrowe dla firm",
-      "en": "We design and ship digital products for businesses"
+      "pl": "Produkty cyfrowe. Bez szumu.",
+      "en": "Digital products. No noise."
     }
   },
   "work": {
@@ -95,8 +95,8 @@
       "en": "Systems & automation"
     },
     "bentoLead": {
-      "pl": "Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.",
-      "en": "Video editing, digital products and creative — in one portfolio."
+      "pl": "Cztery kadry. Jeden kierunek.",
+      "en": "Four frames. One direction."
     },
     "caseStudy": {
       "pl": "Zobacz realizacje",
@@ -161,6 +161,22 @@
     "card6": {
       "pl": "Grafika i montaż wideo",
       "en": "Graphics & video editing"
+    },
+    "card1_line": {
+      "pl": "Strona, która niesie markę i zbiera zapytania.",
+      "en": "A site that carries the brand and collects inquiries."
+    },
+    "card2_line": {
+      "pl": "Narzędzia, z których zespół korzysta codziennie.",
+      "en": "Tools the team actually uses every day."
+    },
+    "card3_line": {
+      "pl": "CRM, automatyzacje i SEO w jednym obiegu.",
+      "en": "CRM, automation and SEO in one loop."
+    },
+    "card4_line": {
+      "pl": "Kadry, które wyglądają jak feed, a pracują jak sprzedaż.",
+      "en": "Frames that look like a feed and work like sales."
     }
   },
   "process": {
@@ -173,8 +189,8 @@
       "en": "How collaboration works"
     },
     "lead": {
-      "pl": "Od audytu po wdrożenie — jasny zakres, terminy i odpowiedzialności.",
-      "en": "From audit to launch — clear scope, timelines and ownership."
+      "pl": "Cztery kroki. Zero zgadywania.",
+      "en": "Four steps. No guesswork."
     },
     "step1_title": {
       "pl": "Audyt i analiza",

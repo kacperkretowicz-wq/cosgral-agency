@@ -1,0 +1,26 @@
+{
+  "name": "web_glass",
+  "geometry": "cube",
+  "note": "Unit cube. Equal scale on X Y Z. MeshPhysicalMaterial transmission + iridescence. cube_web.glb was not in the environment; this recipe drives the shared cube.",
+  "material": {
+    "type": "MeshPhysicalMaterial",
+    "color": "#ffffff",
+    "metalness": 0,
+    "roughness": 0.07,
+    "transmission": 0.9,
+    "thickness": 1.25,
+    "ior": 1.5,
+    "iridescence": 1,
+    "iridescenceIOR": 1.28,
+    "iridescenceThicknessRange": [120, 420],
+    "clearcoat": 1,
+    "clearcoatRoughness": 0.06,
+    "envMapIntensity": 1.25,
+    "opacity": 1
+  },
+  "mobile": {
+    "transmission": 0.78,
+    "thickness": 0.85,
+    "iridescence": 0.7
+  }
+}

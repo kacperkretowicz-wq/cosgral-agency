@@ -48,7 +48,9 @@
 }
 </script>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=clash-display@500,600,700&display=swap" />
 <link rel="stylesheet" href="cosgral-home.css?v=20260924fix4" />
+<link rel="stylesheet" href="award.css?v=20261010award1" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
 <script>
@@ -171,7 +173,7 @@
     <h1 class="home-hero__title" aria-label="COSGRAL">
       <span class="home-hero__letter">C</span><span class="home-hero__letter">O</span><span class="home-hero__letter">S</span><span class="home-hero__letter">G</span><span class="home-hero__letter">R</span><span class="home-hero__letter">A</span><span class="home-hero__letter">L</span>
     </h1>
-    <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">Projektujemy i wdrażamy produkty cyfrowe dla firm</p>
+    <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">Produkty cyfrowe. Bez szumu.</p>
   </div>
   <a href="#rozpad" class="home-hero__scroll">
     <span class="home-hero__scroll-line" aria-hidden="true"></span>
@@ -186,154 +188,79 @@
 </section>
 <div class="cube-runway" id="cube-runway" aria-hidden="true"></div>
 
-<!-- 3. USŁUGI -->
-<section id="uslugi" class="services-fan home-scene">
+<!-- 3. CO ROBIMY — horizontal split-wipe cards -->
+<section id="uslugi" class="award-cards services-fan home-scene">
   <div class="home-scene__panel">
-  <div class="container services-fan__head">
-    <p class="section-label" data-enter="left" data-i18n="services.eyebrow">Usługi</p>
-    <h2 class="services-fan__title" data-reveal-words data-i18n="services.title">Co robimy</h2>
-  </div>
-
-  <div class="services-fan__meta" data-enter="bottom">
-    <span class="services-fan__counter" data-fan-counter aria-live="polite">01 / 06</span>
-    <div class="services-fan__progress" aria-hidden="true"><span data-fan-progress></span></div>
-  </div>
-
-  <div class="services-fan__stage" data-fan-stage data-enter="right">
-    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--prev" data-fan-prev aria-label="Kliknij lewą stronę ekranu" aria-hidden="true" tabindex="-1">
-      <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
-      <span class="services-fan__tap-pulse-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
-    </button>
-    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--next" data-fan-next aria-label="Kliknij prawą stronę ekranu" aria-hidden="true" tabindex="-1">
-      <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
-      <span class="services-fan__tap-pulse-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
-    </button>
-    <div class="services-fan__hint" data-fan-hint>
-      <span class="services-fan__hint-gesture" aria-hidden="true">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14h16M16 10l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="14" r="2.5" stroke="currentColor" stroke-width="1.2"/></svg>
-      </span>
-      <span class="services-fan__hint-text" data-i18n="services.fan_hint">Przesuń w lewo lub prawo — touchpad, palec lub strzałki</span>
+    <div class="award-cards__pin">
+      <p class="award-kicker" data-i18n="services.title">Co robimy</p>
+      <div class="award-cards__stack">
+        <a class="award-card is-dark" href="uslugi/tworzenie-stron-internetowych.html">
+          <span class="award-card__index">01</span>
+          <span class="award-card__circle"><img src="portfolio-media/showcase/web/juicy-events-poster.jpg" alt="" width="640" height="640" /></span>
+          <span class="award-card__name" data-i18n="services.card1">Strony internetowe</span>
+          <span class="award-card__line" data-i18n="services.card1_line">Strona, która niesie markę i zbiera zapytania.</span>
+        </a>
+        <a class="award-card is-light" href="uslugi/projektowanie-aplikacji.html">
+          <span class="award-card__index">02</span>
+          <span class="award-card__circle"><img src="portfolio-media/showcase/web/mj-social-media-poster.jpg" alt="" width="640" height="640" /></span>
+          <span class="award-card__name" data-i18n="services.card2">Aplikacje</span>
+          <span class="award-card__line" data-i18n="services.card2_line">Narzędzia, z których zespół korzysta codziennie.</span>
+        </a>
+        <div class="award-card is-dark">
+          <span class="award-card__index">03</span>
+          <span class="award-card__circle"><img src="portfolio-media/graphics/far-east/001-poster.jpg" alt="" width="640" height="640" /></span>
+          <span class="award-card__name">Systemy</span>
+          <span class="award-card__line" data-i18n="services.card3_line">CRM, automatyzacje i SEO w jednym obiegu.</span>
+          <span class="award-card__more">
+            <a href="uslugi/systemy-crm.html" data-i18n="services.card5">CRM</a>
+            <a href="uslugi/wdrazanie-automatyzacji.html" data-i18n="services.card4">Automatyzacje</a>
+            <a href="uslugi/pozycjonowanie-seo-geo.html" data-i18n="services.card3">SEO &amp; GEO</a>
+          </span>
+        </div>
+        <a class="award-card is-light" href="uslugi/grafika-i-montaz-wideo.html">
+          <span class="award-card__index">04</span>
+          <span class="award-card__circle"><img src="portfolio-media/reels/orlincy/001-poster.jpg" alt="" width="640" height="640" /></span>
+          <span class="award-card__name" data-i18n="services.card6">Grafika i montaż</span>
+          <span class="award-card__line" data-i18n="services.card4_line">Kadry, które wyglądają jak feed, a pracują jak sprzedaż.</span>
+        </a>
+      </div>
+      <div class="award-dock" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </div>
-    <div class="services-fan__carousel" data-services-fan>
-      <a href="uslugi/tworzenie-stron-internetowych.html" class="services-fan__card" data-service-theme="blue" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/stock/hero-abstract.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">01</span>
-        <span class="services-fan__name" data-i18n="services.card1">Strony internetowe</span>
-      </a>
-      <a href="uslugi/projektowanie-aplikacji.html" class="services-fan__card" data-service-theme="purple" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/aplikacje.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">02</span>
-        <span class="services-fan__name" data-i18n="services.card2">Aplikacje</span>
-      </a>
-      <a href="uslugi/pozycjonowanie-seo-geo.html" class="services-fan__card" data-service-theme="gold" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/pozycjonowanie-seo.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">03</span>
-        <span class="services-fan__name" data-i18n="services.card3">Pozycjonowanie SEO &amp; GEO</span>
-      </a>
-      <a href="uslugi/wdrazanie-automatyzacji.html" class="services-fan__card" data-service-theme="orange" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/automatyzacje.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">04</span>
-        <span class="services-fan__name" data-i18n="services.card4">Automatyzacje</span>
-      </a>
-      <a href="uslugi/systemy-crm.html" class="services-fan__card" data-service-theme="crimson" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/crm.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">05</span>
-        <span class="services-fan__name" data-i18n="services.card5">Systemy CRM</span>
-      </a>
-      <a href="uslugi/grafika-i-montaz-wideo.html" class="services-fan__card" data-service-theme="green" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/grafika-montaz.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">06</span>
-        <span class="services-fan__name" data-i18n="services.card6">Grafika i montaż wideo</span>
-      </a>
-    </div>
-  </div>
   </div>
 </section>
 
-<!-- 4. REALIZACJE -->
-<section id="realizacje" class="home-work home-scene">
+<section class="award-arc award-arc--light" id="arc-to-work" aria-hidden="true">
+  <div class="award-arc__pin"><div class="award-arc__disc"></div></div>
+</section>
+
+<!-- 4. REALIZACJE — depth tiles on paper -->
+<section id="realizacje" class="award-work home-work home-scene">
   <div class="home-scene__panel">
-  <div class="container home-work__head">
-    <p class="section-label" data-enter="left" data-i18n="work.eyebrow">Realizacje</p>
-    <h2 class="home-work__title" data-reveal-words data-i18n="work.title">Wybrane realizacje</h2>
-    <p class="home-work__lead" data-enter="right" data-i18n="work.bentoLead">Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.</p>
-  </div>
-
-  <div class="home-work__grid container" data-enter="bottom">
-    <a class="home-work__card home-work__card--wide" href="portfolio.html#strony" data-tile-interact>
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" src="portfolio-media/showcase/web/trove-archive.mp4"></video>
+    <div class="award-work__pin">
+      <div class="award-work__board">
+        <a class="award-tile award-tile--plate" href="portfolio.html#strony">
+          <img src="portfolio-media/showcase/web/trove-archive-poster.jpg" alt="" width="960" height="600" />
+        </a>
+        <a class="award-tile award-tile--reel" href="portfolio.html#montaz">
+          <img src="portfolio-media/reels/orlincy/002-poster.jpg" alt="" width="480" height="480" />
+        </a>
+        <a class="award-tile award-tile--type" href="portfolio.html#grafiki">
+          <span class="award-tile__meta">Inter / Space Mono</span>
+          <span class="award-tile__aa">Aa</span>
+          <span class="award-tile__label" data-i18n="bento.grafiki">Grafiki &amp; social</span>
+        </a>
+        <a class="award-tile award-tile--sys" href="portfolio.html#automatyzacje">
+          <img src="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" alt="" width="480" height="480" />
+        </a>
       </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.strony">Strony internetowe</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#montaz" data-tile-interact>
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/001-poster.jpg" src="portfolio-media/reels/orlincy/001.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.montaz">Montaż wideo</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#grafiki" data-tile-interact>
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" src="portfolio-media/showcase/graphics/home-grafiki-social.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.grafiki">Grafiki &amp; social</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#automatyzacje" data-tile-interact>
-      <div class="home-work__card-media home-work__card-media--dim" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" src="assets/services/automatyzacje.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="work.card_automation">Systemy i automatyzacje</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-  </div>
-
-  <div class="container home-work__footer" data-enter="bottom">
-    <a class="home-work__link glass-btn" href="portfolio.html" data-i18n="work.fullPortfolio">Zobacz pełne portfolio</a>
-  </div>
+      <h2 class="award-work__title"><span data-i18n="work.title">Wybrane realizacje</span> <sup>09</sup></h2>
+      <a class="award-work__link" href="portfolio.html" data-i18n="work.fullPortfolio">Zobacz pełne portfolio</a>
+    </div>
   </div>
 </section>
 
 <!-- 5. FAQ -->
-<section id="faq" class="home-faq home-scene">
+<section id="faq" class="home-faq home-scene award-faq">
   <div class="home-scene__panel">
   <h2 class="home-faq__title" data-reveal-words data-i18n="faq.title">Najczęstsze pytania</h2>
   <div class="faq-item" data-open="false" data-enter="left">
@@ -361,7 +288,11 @@
 </section>
 
 <!-- 6. WORKFLOW -->
-<section id="proces" class="home-process home-scene">
+<section class="award-arc award-arc--dark" id="arc-to-process" aria-hidden="true">
+  <div class="award-arc__pin"><div class="award-arc__disc"></div></div>
+</section>
+
+<section id="proces" class="home-process home-scene award-process">
   <div class="home-scene__panel">
   <div class="container">
     <p class="section-label" data-enter="top" data-i18n="process.eyebrow">Jak pracujemy</p>
@@ -527,11 +458,11 @@
 <script>gsap.registerPlugin(ScrollTrigger);</script>
 <script src="i18n.js?v=20260919gyro"></script>
 <script src="preloader.js?v=20260923test2"></script>
-<script src="smooth-scroll.js?v=20260924polish1"></script>
+<script src="smooth-scroll.js?v=20261010award1"></script>
 <script src="cosgral-perf.js?v=20260924recover1"></script>
 <script src="home-cursor-field.js?v=20260920ui7"></script>
 <script src="home-ambient-bg.js?v=20260924fix4"></script>
-<script type="module" src="home-hero-3d.js?v=20260924fix4"></script>
+<script type="module" src="home-hero-3d.js?v=20261010award1"></script>
 <script src="home-cursor.js?v=20260917ad"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
 <script src="home-thump.js?v=20260731ae"></script>
@@ -540,9 +471,11 @@
 <script src="home-scroll-rail.js?v=20260924fix4"></script>
 <script src="home-section-stepper.js?v=20260924fix4"></script>
 <script src="home-director.js?v=20260920ui37"></script>
-<script src="home-tile-interact.js?v=20260920ui9"></script>
+<script src="home-tile-interact.js?v=20261010award2"></script>
 <script defer src="home-nav-menu.js?v=20260924polish1"></script>
+<script src="award-home.js?v=20261010award2"></script>
+<script src="award-gyro.js?v=20261010award1"></script>
 <script defer src="site-chat.js?v=20260924idle1"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
+<script type="module" src="site-chat-cube.js?v=20261010award1"></script>
 </body>
 </html>
