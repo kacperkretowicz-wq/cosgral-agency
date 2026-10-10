@@ -262,6 +262,7 @@
 
   var irisRaf = 0;
   var irisGen = 0;
+  var irisToken = 0;
   function irisCover(x, y) {
     var w = window.innerWidth || 1;
     var h = window.innerHeight || 1;
@@ -294,6 +295,7 @@
   }
   function animateIris(from, to, origin, ms, done) {
     if (irisRaf) cancelAnimationFrame(irisRaf);
+    var token = ++irisToken;
     if (prefersReduced() || ms <= 0) {
       setIris(to, origin);
       if (done) done();
@@ -301,6 +303,7 @@
     }
     var t0 = performance.now();
     function tick(now) {
+      if (token !== irisToken) return;
       var p = Math.min(1, (now - t0) / ms);
       var e = 1 - Math.pow(1 - p, 3);
       setIris(from + (to - from) * e, origin);
@@ -322,13 +325,16 @@
     requestAnimationFrame(function () {
       if (gen !== irisGen) return;
       stage.classList.add("is-iris-in");
-      animateIris(Math.max(8, origin.r0 * 0.55), irisCover(origin.x, origin.y), origin, 880, function () {
+      function settleOpenIris() {
         if (gen !== irisGen) return;
+        if (!stage.classList.contains("is-iris") || stage.classList.contains("is-iris-out")) return;
         var catalog = window.CosgralSystemsFan && window.CosgralSystemsFan.getCatalog();
         if (catalog && catalog.root) catalog.root.classList.add("is-under-detail");
         stage.style.clipPath = "";
         stage.classList.remove("is-iris");
-      });
+      }
+      animateIris(Math.max(8, origin.r0 * 0.55), irisCover(origin.x, origin.y), origin, 880, settleOpenIris);
+      window.setTimeout(settleOpenIris, 1100);
     });
   }
 

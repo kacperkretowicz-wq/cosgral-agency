@@ -295,11 +295,11 @@
       pill.textContent = pillLabel();
       pill.addEventListener("pointerdown", function (e) {
         e.stopPropagation();
+        didDrag = false;
       });
       pill.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        if (didDrag) return;
         if (mode === "catalog") {
           var link = document.querySelector('[data-tile-expand="systems"]');
           if (link) link.click();
@@ -438,11 +438,11 @@
     function clusterSlot(k, w, h, mobile) {
       var table = mobile
         ? {
-            "0": { x: 0, y: -h * 0.04, s: 0.92 },
-            "1": { x: w * 0.2, y: h * 0.1, s: 0.46 },
-            "-1": { x: -w * 0.22, y: h * 0.08, s: 0.5 },
-            "2": { x: w * 0.1, y: -h * 0.2, s: 0.3 },
-            "-2": { x: -w * 0.12, y: -h * 0.18, s: 0.28 },
+            "0": { x: -w * 0.02, y: -h * 0.1, s: 0.78 },
+            "1": { x: w * 0.18, y: h * 0.02, s: 0.42 },
+            "-1": { x: -w * 0.2, y: h * 0.04, s: 0.46 },
+            "2": { x: w * 0.08, y: -h * 0.22, s: 0.28 },
+            "-2": { x: -w * 0.1, y: -h * 0.2, s: 0.26 },
           }
         : {
             "0": { x: -w * 0.1, y: -h * 0.02, s: 0.86 },
@@ -473,8 +473,8 @@
       if (arc.style.getPropertyValue("--spread") !== spread.toFixed(3)) {
         arc.style.setProperty("--spread", spread.toFixed(3));
       }
-      var step = w * (mobile ? 0.42 : 0.3);
-      var arcDrop = mobile ? 16 : 26;
+      var step = Math.min(w * (mobile ? 0.36 : 0.24), mobile ? 148 : 250);
+      var arcDrop = mobile ? 18 : 22;
 
       cards.forEach(function (card, i) {
         var raw = i - index;
@@ -516,7 +516,7 @@
         } else {
           x = raw * step;
           y = ad * ad * arcDrop;
-          s = Math.max(0.3, 1.04 - ad * 0.4);
+          s = Math.max(0.32, 1.08 - ad * 0.42);
           o = ad > 2.15 ? Math.max(0, 1 - (ad - 2.15) / 0.55) : 1;
         }
         card.style.transform =
@@ -534,6 +534,13 @@
         card.classList.toggle("is-front", i === nearest);
         card.classList.toggle("is-side", ad > 0.55);
       });
+
+      if (pill && mode === "catalog") {
+        var cardW = Math.min(w * (mobile ? 0.54 : 0.34), mobile ? 218 : 280);
+        var arcTop = h * 0.46;
+        var half = (cardW * 1.08) / 2;
+        pill.style.top = (arcTop + half * 0.22).toFixed(1) + "px";
+      }
 
       dotButtons.forEach(function (dot, i) {
         var on = i === nearest;

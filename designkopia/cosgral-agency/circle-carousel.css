@@ -115,7 +115,7 @@
 .sys-fan__pill {
   position: absolute;
   left: 50%;
-  top: 66%;
+  top: 58%;
   z-index: 70;
   transform: translate(-50%, 0);
   margin: 0;
@@ -140,6 +140,9 @@
   outline: none;
 }
 .sys-fan__stage.is-dragging .sys-fan__pill,
+.sys-fan--detail .sys-fan__cap {
+  display: none;
+}
 .sys-fan--detail .sys-fan__pill,
 .sys-fan.is-article-open .sys-fan__pill {
   opacity: 0;
@@ -157,18 +160,21 @@
   background: #fff;
   transform: scale(1.4);
 }
-.sys-fan__nav::after {
+.sys-fan__nav::before {
   content: "";
   position: absolute;
   left: 50%;
-  top: calc(100% + 0.05rem);
-  width: min(42vw, 220px);
-  height: 11px;
+  bottom: calc(100% + 0.45rem);
+  width: min(34vw, 168px);
+  height: 12px;
   transform: translateX(-50%);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  border-top: 0;
-  border-radius: 0 0 140px 140px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-bottom: 0;
+  border-radius: 140px 140px 0 0;
   pointer-events: none;
+}
+.sys-fan__nav.is-in-case::before {
+  display: none;
 }
 .sys-fan__nav.is-in-case::after {
   display: none;
@@ -201,9 +207,17 @@
     width: min(54vw, 13.6rem);
   }
   .sys-fan__pill {
-    top: 62%;
     font-size: 0.68rem;
     padding: 0.42rem 0.85rem;
+  }
+  .expand-systems .sys-fan__copy,
+  .expand-systems .sys-fan--detail.is-settled .sys-fan__copy {
+    top: auto;
+    bottom: 16%;
+    width: min(22rem, 88vw);
+  }
+  .expand-systems .sys-fan__stage {
+    height: 56%;
   }
   .sys-fan__cap {
     font-size: 0.5rem;
