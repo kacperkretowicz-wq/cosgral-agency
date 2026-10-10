@@ -1,0 +1,36 @@
+{
+  "_comment": "Glass look for three.js r170 MeshPhysicalMaterial on cosgral.pl (#050505 bg). Single source of truth: phone viewer (main.js) + cube_web*.glb (export_web.py). side=double renders the far grooves through the glass (dimmed by farSideDim); env = PMREM studio (strip power, sheen panels); edgeGlow = emissive boost on bevel/rounded faces; toneMapping Neutral keeps #050505 exact. Soap-bubble sheen: iridescence* = KHR_materials_iridescence (in the GLB); iridescenceNoise (swirl frequency, film thickness varies min..max over the surface) and iridescenceEdgeBias (weaker face-on, full at grazing/edges) are viewer shader tweaks - a plain GLTFLoader uses the max thickness everywhere.",
+  "color": "#ffffff",
+  "metalness": 0.0,
+  "roughness": 0.0,
+  "transmission": 1.0,
+  "ior": 1.5,
+  "thickness": 1.0,
+  "dispersion": 0.7,
+  "attenuationColor": "#f6f9ff",
+  "attenuationDistance": 12.0,
+  "clearcoat": 1.0,
+  "clearcoatRoughness": 0.0,
+  "specularIntensity": 1.0,
+  "specularColor": "#ffffff",
+  "envMapIntensity": 1.8,
+  "edgeGlow": 0.2,
+  "farSideDim": 0.7,
+  "side": "double",
+  "env": {
+    "power": 2.5,
+    "ambient": 0.02,
+    "floor": 0.06,
+    "sheen": 4.0
+  },
+  "toneMapping": "NeutralToneMapping",
+  "exposure": 1.0,
+  "iridescence": 1.0,
+  "iridescenceIOR": 1.8,
+  "iridescenceThicknessRange": [
+    350,
+    850
+  ],
+  "iridescenceNoise": 0.6,
+  "iridescenceEdgeBias": 0.65
+}
