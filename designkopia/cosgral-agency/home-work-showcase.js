@@ -1,9 +1,10 @@
 /**
  * Homepage #realizacje — one static bento, scrolled as a camera.
  * The board (title, intro, four tiles, portfolio link) stays put.
- * Scroll pins the section and applies a single scale+translate so the
- * view zooms from the full overview into each tile, holds, then zooms
- * back out. Reduced motion leaves the authored grid.
+ * A tall section holds a sticky stage (no ScrollTrigger pin). Scroll
+ * progress drives one scale+translate so the view zooms from the
+ * overview into each tile, holds, then zooms back out. Reduced motion
+ * leaves the authored grid.
  */
 (function () {
   "use strict";
@@ -335,23 +336,43 @@
       window.__workShowcaseHold = null;
     };
 
-    /* Transform pin, not position:fixed. iOS Safari promotes fixed
-       descendants of overflow/sticky/filter ancestors into the scrolling
-       layer, so the page moved while this scrub kept running. */
+    /* Sticky stage inside a tall section. A transform pin rewrites
+       translateY one frame behind native/Lenis scroll and shakes the
+       whole page on iPhone. Progress comes from the section's own
+       scroll span — no pin, no pinSpacing. */
     if (ScrollTrigger.config) ScrollTrigger.config({ ignoreMobileResize: true });
+
+    var runwayWidth = window.innerWidth || 0;
+
+    function viewportPx() {
+      return Math.round(window.innerHeight || document.documentElement.clientHeight || 800);
+    }
+
+    function applyRunway() {
+      var vh = viewportPx();
+      var distance = Math.round(vh * 3.2);
+      section.style.setProperty("height", vh + distance + "px", "important");
+      pin.style.setProperty("height", vh + "px", "important");
+    }
+
+    function scrollYNow() {
+      var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      if (lenis && typeof lenis.scroll === "number") y = Math.max(y, lenis.scroll);
+      return y;
+    }
+
+    applyRunway();
+
+    var prev = ScrollTrigger.getById("work-showcase");
+    if (prev) prev.kill();
 
     ScrollTrigger.create({
       id: "work-showcase",
-      trigger: pin,
+      trigger: section,
       start: "top top",
-      end: function () {
-        return "+=" + Math.round((window.innerHeight || 800) * 3.2);
-      },
-      pin: true,
-      pinSpacing: true,
-      pinType: "transform",
-      pinReparent: false,
-      anticipatePin: 0,
+      end: "bottom bottom",
+      pin: false,
       scrub: true,
       invalidateOnRefresh: true,
       refreshPriority: 1,
@@ -368,16 +389,22 @@
 
     measure();
 
-    /* Recalculate start/end after fonts and posters, but never while
-       the visitor has already scrolled — a refresh mid-gesture jumps
-       the pin. */
+    /* Recalculate after fonts and posters, but never while the visitor
+       has already scrolled — a refresh mid-gesture jumps the page.
+       Ignore height-only resizes (iOS address bar); they must not
+       rebuild the runway. */
     function refreshIfAtTop() {
-      var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
-      var y = window.scrollY || document.documentElement.scrollTop || 0;
-      if (lenis && typeof lenis.scroll === "number") y = Math.max(y, lenis.scroll);
-      if (y > 80) return;
+      if (scrollYNow() > 80) return;
+      applyRunway();
       ScrollTrigger.refresh();
     }
+
+    window.addEventListener("resize", function () {
+      var w = window.innerWidth || 0;
+      if (Math.abs(w - runwayWidth) < 48) return;
+      runwayWidth = w;
+      refreshIfAtTop();
+    });
 
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(refreshIfAtTop);
