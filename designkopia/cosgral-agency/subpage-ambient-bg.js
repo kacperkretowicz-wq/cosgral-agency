@@ -265,7 +265,7 @@
 
   function boot() {
     var gl =
-      canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" }) ||
+      canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power", preserveDrawingBuffer: true }) ||
       canvas.getContext("experimental-webgl");
 
     if (!gl) {

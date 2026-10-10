@@ -1,8 +1,11 @@
 /**
- * Glass look for the Cosgral cube: web_glass.json on MeshPhysicalMaterial.
- * The env is a dark studio (narrow strips only) so faces stay clear and
- * specular catches stay sharp. A transmission backdrop keeps the transmission
- * buffer from clearing to white on a transparent canvas.
+ * Glass look for the Cosgral cube.
+ * MeshPhysicalMaterial transmission is not used: on a transparent canvas,
+ * especially iOS WebKit, the transmission buffer clears white and the cube
+ * becomes an opaque milky block. This is a fresnel glass shader instead.
+ * The body stays a low alpha so the page shows through. Reflections come
+ * from a camera-locked studio. Refraction is a normal-offset sample of the
+ * ambient canvas.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 
@@ -39,7 +42,7 @@ function num(value, fallback) {
 
 export function whenGlassSpec() {
   if (!specPromise) {
-    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010view", import.meta.url))
+    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261010alpha", import.meta.url))
       .then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.json();
@@ -57,123 +60,115 @@ export function whenGlassSpec() {
 }
 
 export function createGlassMaterial() {
-  var range = spec.iridescenceThicknessRange || [100, 800];
-  var edgeBias = Math.min(0.92, Math.max(0, num(spec.iridescenceEdgeBias, 0.2)));
-  var edgeGlow = num(spec.edgeGlow, 0.2);
-  var mat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(spec.color || "#ffffff"),
-    metalness: num(spec.metalness, 0),
-    roughness: num(spec.roughness, 0),
-    transmission: num(spec.transmission, 1),
-    ior: num(spec.ior, 1.5),
-    thickness: num(spec.thickness, 1.5),
-    attenuationColor: new THREE.Color(spec.attenuationColor || "#ffffff"),
-    attenuationDistance: num(spec.attenuationDistance, 1000),
-    clearcoat: num(spec.clearcoat, 1),
-    clearcoatRoughness: num(spec.clearcoatRoughness, 0),
-    specularIntensity: num(spec.specularIntensity, 1),
-    specularColor: new THREE.Color(spec.specularColor || "#ffffff"),
-    envMapIntensity: num(spec.envMapIntensity, 3),
-    iridescence: num(spec.iridescence, 1),
-    iridescenceIOR: num(spec.iridescenceIOR, 1.3),
-    iridescenceThicknessRange: [num(range[0], 100), num(range[1], 800)],
+  var fade = { value: 1 };
+  var filmTime = { value: 0 };
+  var resolution = { value: new THREE.Vector2(1, 1) };
+  var viewRect = { value: new THREE.Vector4(0, 0, 1, 1) };
+  var bgEnable = { value: 0 };
+  var blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1);
+  blank.needsUpdate = true;
+  blank.colorSpace = THREE.LinearSRGBColorSpace;
+  var bgHolder = { value: blank };
+  var mat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color(0x000000),
+    metalness: 0,
+    roughness: 0.16,
+    envMapIntensity: 2.4,
     side: THREE.DoubleSide,
-    transparent: false,
+    transparent: true,
     opacity: 1,
     depthWrite: true,
+    toneMapped: false,
     premultipliedAlpha: true,
+    forceSinglePass: true,
     blending: THREE.CustomBlending,
     blendSrc: THREE.OneFactor,
     blendDst: THREE.OneMinusSrcAlphaFactor,
     blendSrcAlpha: THREE.OneFactor,
     blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
   });
-  if ("dispersion" in mat) mat.dispersion = num(spec.dispersion, 0.4);
-  /* edgeGlow is an emissive rim. It reads as a white halo, so it is not applied. */
-  void edgeGlow;
 
-  var biasLit = edgeBias.toFixed(4);
-  var filmTime = { value: 0 };
   mat.onBeforeCompile = function (shader) {
     shader.uniforms.uFilmTime = filmTime;
-    var physical = THREE.ShaderChunk.lights_physical_fragment
-      .replace(
-        "material.iridescenceThickness = iridescenceThicknessMaximum;",
-        [
-          "float filmCos = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
-          "float filmEdge = pow(1.0 - filmCos, 1.05);",
-          "vec3 filmN = normalize(nonPerturbedNormal);",
-          "float filmUp = clamp(filmN.y, 0.0, 1.0);",
-          "float filmNoise = fract(sin(dot(filmN, vec3(127.1, 311.7, 74.7))) * 43758.5453);",
-          "float filmCrawl = 0.5 + 0.5 * sin(uFilmTime * 1.15 + filmNoise * 6.28318 + filmEdge * 8.0);",
-          "float filmT = clamp(mix(filmNoise, filmCrawl, 0.7) + filmUp * filmEdge * 0.45, 0.0, 1.0);",
-          "material.iridescenceThickness = mix(iridescenceThicknessMinimum, iridescenceThicknessMaximum, filmT);",
-          "material.iridescence *= mix(1.0 - " + biasLit + ", 1.0, max(filmEdge, filmUp));",
-        ].join("\n")
-      );
-    var lightsBegin = THREE.ShaderChunk.lights_fragment_begin.replace(
-      "material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );",
-      [
-        "material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );",
-        "material.iridescenceFresnel = clamp( mix( vec3( dot( material.iridescenceFresnel, vec3( 0.33333 ) ) ), material.iridescenceFresnel, 1.85 ), 0.0, 1.0 );",
-      ].join("\n")
-    );
-    var opaque = THREE.ShaderChunk.opaque_fragment.replace(
-      "gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
-      [
-        "vec3 crystalN = normalize(normal);",
-        "float crystalCos = clamp(dot(crystalN, normalize(vViewPosition)), 0.0, 1.0);",
-        "float crystalRim = pow(1.0 - crystalCos, 1.45);",
-        "float crystalHue = atan(crystalN.y, crystalN.x);",
-        "vec3 crystalSplit = 0.55 + 0.45 * cos(vec3(0.0, 2.094395, 4.18879) + crystalHue * 2.5 + (1.0 - crystalCos) * 16.0);",
-        "vec3 crystalTint = mix(vec3(0.42, 1.0, 0.68), vec3(1.0, 0.46, 0.74), clamp(crystalN.x * 0.5 + 0.5, 0.0, 1.0));",
-        "vec3 crystalEdge = mix(crystalTint * crystalSplit, vec3(1.0), smoothstep(0.62, 0.96, crystalRim));",
-        "outgoingLight += crystalEdge * crystalRim * 0.72;",
-        "gl_FragColor = vec4( outgoingLight, opacity );",
-      ].join("\n")
-    );
-    /* Faces over a black page stay black at transmission 1. Mix a soft env refraction into those dark samples so the body reads as clear glass. */
-    var transmission = THREE.ShaderChunk.transmission_fragment.replace(
-      "totalDiffuse = mix( totalDiffuse, transmitted.rgb, material.transmission );",
-      [
-        "vec3 refractDir = refract( -v, normalize( n ), 1.0 / max( material.ior, 1.001 ) );",
-        "vec3 envRefract = vec3( 0.18 );",
-        "#ifdef ENVMAP_TYPE_CUBE_UV",
-        "envRefract = textureCubeUV( envMap, refractDir, 0.22 ).rgb;",
-        "#endif",
-        "vec3 envLift = min( envRefract, vec3( 0.46 ) );",
-        "vec3 glassBody = max( transmitted.rgb, envLift );",
-        "totalDiffuse = mix( totalDiffuse, glassBody, material.transmission );",
-      ].join("\n")
-    );
+    shader.uniforms.uFade = fade;
+    shader.uniforms.uResolution = resolution;
+    shader.uniforms.uView = viewRect;
+    shader.uniforms.uBgMap = bgHolder;
+    shader.uniforms.uBgEnable = bgEnable;
+    shader.fragmentShader =
+      "uniform float uFilmTime;\nuniform float uFade;\nuniform vec2 uResolution;\nuniform vec4 uView;\nuniform sampler2D uBgMap;\nuniform float uBgEnable;\n" +
+      shader.fragmentShader;
+    var opaque = [
+      "vec3 glassN = normalize(normal);",
+      "float glassNd = clamp(dot(glassN, normalize(vViewPosition)), 0.0, 1.0);",
+      "float glassRim = pow(1.0 - glassNd, 1.45);",
+      "float glassHue = atan(glassN.y, glassN.x);",
+      "vec3 glassSplit = 0.55 + 0.45 * cos(vec3(0.0, 2.094395, 4.18879) + glassHue * 2.7 + glassRim * 14.0 + uFilmTime * 1.15);",
+      "vec3 glassTint = mix(vec3(0.2, 0.9, 0.5), vec3(0.95, 0.32, 0.6), clamp(glassN.x * 0.5 + 0.5, 0.0, 1.0));",
+      "vec3 glassSpec = outgoingLight * mix(0.0, 0.42, smoothstep(0.15, 0.95, glassRim));",
+      "vec3 glassLin = glassSpec + glassTint * glassSplit * glassRim * 0.95;",
+      "float glassAlpha = mix(0.10, 0.68, glassRim) * uFade;",
+      "gl_FragColor = vec4(glassLin, glassAlpha);",
+    ].join("\n");
+    var refract = [
+      "vec3 refrN = normalize(normal);",
+      "float refrRim = pow(1.0 - clamp(dot(refrN, normalize(vViewPosition)), 0.0, 1.0), 1.45);",
+      "if (uBgEnable > 0.5) {",
+      "  vec2 screenUv = uView.xy + (gl_FragCoord.xy / max(uResolution, vec2(1.0))) * uView.zw;",
+      "  vec2 bend = refrN.xy * 0.045;",
+      "  vec3 refr;",
+      "  refr.r = texture2D(uBgMap, screenUv + bend * 1.55).r;",
+      "  refr.g = texture2D(uBgMap, screenUv + bend).g;",
+      "  refr.b = texture2D(uBgMap, screenUv + bend * 0.55).b;",
+      "  gl_FragColor.rgb += refr * mix(0.18, 0.85, refrRim);",
+      "}",
+    ].join("\n");
     shader.fragmentShader = shader.fragmentShader
-      .replace("#include <lights_physical_fragment>", physical)
-      .replace("#include <lights_fragment_begin>", lightsBegin)
-      .replace("#include <transmission_fragment>", transmission)
-      .replace("#include <opaque_fragment>", opaque);
-    if (shader.fragmentShader.indexOf("uniform float uFilmTime") === -1) {
-      shader.fragmentShader = "uniform float uFilmTime;\n" + shader.fragmentShader;
-    }
+      .replace("#include <opaque_fragment>", opaque)
+      .replace("#include <tonemapping_fragment>", "")
+      .replace("#include <colorspace_fragment>", THREE.ShaderChunk.colorspace_fragment + "\n" + refract);
   };
   mat.customProgramCacheKey = function () {
-    return "cosgral-glass-view-" + biasLit;
+    return "cosgral-glass-alpha-v1";
   };
-  mat.onBeforeRender = function () {
+  mat.onBeforeRender = function (renderer, scene, camera) {
     filmTime.value = performance.now() * 0.001;
+    if (scene && scene.environmentRotation && camera) scene.environmentRotation.copy(camera.rotation);
+    if (renderer && renderer.getDrawingBufferSize) renderer.getDrawingBufferSize(resolution.value);
+    var el = renderer && renderer.domElement;
+    if (el && el.getBoundingClientRect) {
+      var rect = el.getBoundingClientRect();
+      var vw = window.innerWidth || 1;
+      var vh = window.innerHeight || 1;
+      viewRect.value.set(rect.left / vw, 1 - rect.bottom / vh, rect.width / vw, rect.height / vh);
+    }
+    var canvas = document.getElementById("home-ambient") || document.getElementById("subpage-ambient");
+    if (canvas && canvas.width > 2) {
+      if (!bgHolder.value || bgHolder.value.image !== canvas) {
+        var tex = new THREE.CanvasTexture(canvas);
+        tex.colorSpace = THREE.LinearSRGBColorSpace;
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.generateMipmaps = false;
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        bgHolder.value = tex;
+      }
+      bgHolder.value.needsUpdate = true;
+      bgEnable.value = 1;
+    }
   };
-  /* Transmission alpha would fringe the silhouette. Opacity still drives menu fades. */
-  var opacityValue = 1;
+  /* Callers fade the cube through opacity. The shader stays transparent so the body never becomes an opaque fill. */
   Object.defineProperty(mat, "opacity", {
     configurable: true,
     enumerable: true,
     get: function () {
-      return opacityValue;
+      return fade.value;
     },
     set: function (next) {
-      opacityValue = next;
-      var fade = next < 0.999;
-      if (mat.transparent !== fade) {
-        mat.transparent = fade;
+      fade.value = next;
+      if (!mat.transparent) {
+        mat.transparent = true;
         mat.needsUpdate = true;
       }
     },
@@ -183,7 +178,7 @@ export function createGlassMaterial() {
 
 function createBrightStudio() {
   var env = spec.env || {};
-  var ambient = num(env.ambient, 0.18);
+  var ambient = num(env.ambient, 0.05);
   var studio = new THREE.Scene();
   studio.add(
     new THREE.Mesh(
@@ -238,81 +233,18 @@ function createBrightStudio() {
     a = (i / 10) * Math.PI * 2;
     addSoftbox(Math.cos(a) * 3.8, -3.15, Math.sin(a) * 3.8, 0.7, 0.32, "#fff4ea", 8);
   }
-  addSoftbox(0.0, 0.35, 6.3, 4.8, 2.6, "#f4f7fb", 3.4);
-  addSoftbox(0.0, 0.8, -6.1, 4.6, 2.8, "#ffffff", 7);
+  addSoftbox(0.0, 0.15, 6.4, 2.4, 1.6, "#141820", 1.1);
+  addSoftbox(0.0, 0.4, -6.2, 3.2, 2.2, "#d8dbe2", 4.5);
   return studio;
 }
 
-var WAVE_VERT = [
-  "varying vec2 vUv;",
-  "void main() {",
-  "  vUv = uv;",
-  "  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
-  "}",
-].join("\n");
-
-/* Same glowing-line field as home-ambient-bg.js, drawn only into the transmission pass. */
-var WAVE_FRAG = [
-  "precision mediump float;",
-  "uniform float uTime;",
-  "uniform vec2 uMouse;",
-  "varying vec2 vUv;",
-  "float wave(vec2 p, float t) {",
-  "  float w = 0.0;",
-  "  p.x += sin(p.y * 1.4 + t * 0.7) * 0.18;",
-  "  w += sin(p.x * 1.8 + p.y * 1.1 + t * 0.5);",
-  "  p.x += sin(p.y * 1.75 + t * 0.7) * 0.18;",
-  "  w += sin(p.x * 2.5 + p.y * 1.1 + t * 0.58) * 0.58;",
-  "  p.x += sin(p.y * 2.1 + t * 0.7) * 0.18;",
-  "  w += sin(p.x * 3.2 + p.y * 1.1 + t * 0.66) * 0.3364;",
-  "  p.x += sin(p.y * 2.45 + t * 0.7) * 0.18;",
-  "  w += sin(p.x * 3.9 + p.y * 1.1 + t * 0.74) * 0.1951;",
-  "  return w * 0.5 + 0.5;",
-  "}",
-  "void main() {",
-  "  vec2 uv = vUv;",
-  "  vec2 m = uMouse * 0.5 + 0.5;",
-  "  vec2 toM = uv - m;",
-  "  float mDist = length(toM);",
-  "  float mForce = smoothstep(0.62, 0.0, mDist);",
-  "  vec2 p = uv * vec2(2.8, 2.0);",
-  "  p += normalize(toM + 0.0001) * mForce * 0.17 * sin(uTime * 1.7 + mDist * 13.0);",
-  "  p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;",
-  "  float t = uTime * 0.14;",
-  "  float w = wave(p, t);",
-  "  float s = 1.0 - abs(sin(w * 4.2 + t * 0.25));",
-  "  float s2 = s * s;",
-  "  float ridge = s2 * s2 * s2;",
-  "  vec3 base = vec3(0.14, 0.16, 0.2);",
-  "  vec3 dim = vec3(0.24);",
-  "  vec3 mid = vec3(0.58);",
-  "  vec3 hi = vec3(1.0);",
-  "  vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);",
-  "  ribbon = mix(ribbon, hi, ridge * 0.52);",
-  "  vec3 col = mix(base, ribbon, smoothstep(0.08, 0.88, ridge) * 0.58);",
-  "  float r2 = ridge * ridge;",
-  "  float r4 = r2 * r2;",
-  "  float r14 = r4 * r4 * r4 * r2;",
-  "  col += hi * r14 * 0.62;",
-  "  col += mid * mForce * 0.16;",
-  "  col += hi * mForce * ridge * 0.12;",
-  "  float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));",
-  "  col *= 0.58 + vignette * 0.42;",
-  "  col = ((col - 0.5) * 1.04 + 0.5) * 0.92;",
-  "  gl_FragColor = vec4(col, 1.0);",
-  "}",
-].join("\n");
-
-export function installGlassScene(renderer, scene, camera) {
+export function installGlassScene(renderer, scene) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  /* Alpha stays 0 so the page shows through. three.js would otherwise clear the
-     transmission target to white whenever clear alpha is below 1. */
-  renderer.setClearColor(0x050505, 0);
+  renderer.setClearColor(0x000000, 0);
 
   if (!scene.environment) {
     var pmrem = new THREE.PMREMGenerator(renderer);
     var studio = createBrightStudio();
-    /* Capture the softboxes as linear HDR. ACES on this pass would crush them before the glass samples them. */
     renderer.toneMapping = THREE.NoToneMapping;
     renderer.toneMappingExposure = 1;
     scene.environment = pmrem.fromScene(studio, 0).texture;
@@ -324,49 +256,4 @@ export function installGlassScene(renderer, scene, camera) {
   }
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = num(spec.exposure, 1.2);
-
-  if (camera.parent == null) scene.add(camera);
-
-  var dist = 2.5;
-  var backdrop = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
-    new THREE.ShaderMaterial({
-      depthTest: false,
-      depthWrite: false,
-      toneMapped: false,
-      uniforms: {
-        uTime: { value: 0 },
-        uMouse: { value: new THREE.Vector2() },
-      },
-      vertexShader: WAVE_VERT,
-      fragmentShader: WAVE_FRAG,
-    })
-  );
-  backdrop.frustumCulled = false;
-  backdrop.renderOrder = -1000;
-  backdrop.position.z = -dist;
-  backdrop.material.colorWrite = false;
-  camera.add(backdrop);
-
-  var mouse = { x: 0, y: 0 };
-  backdrop.onBeforeRender = function (r, sc, cam) {
-    if (sc && sc.environmentRotation && cam) sc.environmentRotation.copy(cam.rotation);
-    var rt = r.getRenderTarget();
-    var transmission = !!(rt && rt.samples > 0 && rt.texture && rt.texture.generateMipmaps);
-    backdrop.material.colorWrite = transmission;
-    var vFov = (camera.fov * Math.PI) / 180;
-    var height = 2 * Math.tan(vFov / 2) * dist;
-    var width = height * Math.max(camera.aspect, 0.01);
-    backdrop.scale.set(width * 1.35, height * 1.35, 1);
-    backdrop.updateMatrixWorld(true);
-    var ptr = window.cosgralPointer;
-    if (ptr) {
-      mouse.x += ((ptr.nx || 0) - mouse.x) * 0.08;
-      mouse.y += ((ptr.ny || 0) - mouse.y) * 0.08;
-    }
-    backdrop.material.uniforms.uTime.value = performance.now() * 0.001;
-    backdrop.material.uniforms.uMouse.value.set(mouse.x, mouse.y);
-  };
-
-  return backdrop;
 }
