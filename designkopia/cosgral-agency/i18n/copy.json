@@ -5,8 +5,8 @@
       "en": "COSGRAL — digital agency | websites, apps, CRM, automation"
     },
     "description": {
-      "pl": "COSGRAL — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo. Budujemy produkty cyfrowe i systemy dla firm.",
-      "en": "COSGRAL — websites, apps, CRM, automation, SEO/GEO, graphics and video editing. We build digital products and systems for businesses."
+      "pl": "Strony, aplikacje, CRM, automatyzacje, SEO i obraz. Produkty cyfrowe. Bez szumu.",
+      "en": "Websites, apps, CRM, automation, SEO and image. Digital products. No noise."
     }
   },
   "theme": {
@@ -185,8 +185,8 @@
       "en": "How we work"
     },
     "title": {
-      "pl": "Proces współpracy",
-      "en": "How collaboration works"
+      "pl": "Proces",
+      "en": "Process"
     },
     "lead": {
       "pl": "Cztery kroki. Zero zgadywania.",
@@ -197,32 +197,32 @@
       "en": "Audit & analysis"
     },
     "step1_body": {
-      "pl": "Analizujemy cele biznesowe, procesy i ograniczenia, aby dobrać zakres, który realnie wspiera sprzedaż i operacje.",
-      "en": "We analyze business goals, processes and constraints to define a scope that actually supports sales and operations."
+      "pl": "Cele, procesy, ograniczenia. Zakres, który wspiera sprzedaż i operacje.",
+      "en": "Goals, processes, constraints. A scope that supports sales and operations."
     },
     "step2_title": {
       "pl": "Strategia i architektura",
       "en": "Strategy & architecture"
     },
     "step2_body": {
-      "pl": "Ustalamy architekturę rozwiązania, integracje i plan wdrożenia — zanim zacznie się produkcja.",
-      "en": "We define solution architecture, integrations and an implementation plan — before production starts."
+      "pl": "Architektura, integracje, plan. Zanim ruszy produkcja.",
+      "en": "Architecture, integrations, a plan. Before production starts."
     },
     "step3_title": {
       "pl": "Wdrożenie i rozwój",
       "en": "Implementation & development"
     },
     "step3_body": {
-      "pl": "Budujemy, integrujemy i testujemy iteracyjnie, z regularnymi przeglądami postępu i jakości.",
-      "en": "We build, integrate and test iteratively, with regular progress and quality reviews."
+      "pl": "Budowa, integracje, testy. Regularny przegląd.",
+      "en": "Build, integrate, test. A regular review."
     },
     "step4_title": {
       "pl": "Optymalizacja i wsparcie",
       "en": "Optimization & support"
     },
     "step4_body": {
-      "pl": "Szkolimy zespół, przekazujemy dokumentację i zapewniamy wsparcie po wdrożeniu.",
-      "en": "We train your team, hand over documentation and provide post-launch support."
+      "pl": "Szkolenie, dokumentacja, wsparcie po starcie.",
+      "en": "Training, documentation, support after launch."
     }
   },
   "faq": {
@@ -231,32 +231,32 @@
       "en": "FAQ"
     },
     "title": {
-      "pl": "Najczęstsze pytania",
-      "en": "Frequently asked questions"
+      "pl": "Pytania",
+      "en": "Questions"
     },
     "q1": {
-      "pl": "Ile kosztuje wdrożenie CRM lub nowej strony?",
-      "en": "How much does a CRM or new website cost?"
+      "pl": "Ile to kosztuje?",
+      "en": "What does it cost?"
     },
     "a1": {
-      "pl": "Koszt zależy od zakresu: landing page, strona firmowa, CRM lub automatyzacja mają inną skalę. Po krótkim audycie otrzymujesz wycenę i plan realizacji.",
-      "en": "Cost depends on scope: a landing page, company website, CRM or automation differ in scale. After a short audit you receive a quote and delivery plan."
+      "pl": "Landing, strona, CRM i automatyzacja to inna skala. Po audycie dostajesz wycenę i plan.",
+      "en": "A landing page, site, CRM and automation are different scales. After an audit you get a quote and a plan."
     },
     "q2": {
-      "pl": "Ile potrwa realizacja?",
-      "en": "How long will it take?"
+      "pl": "Ile to trwa?",
+      "en": "How long?"
     },
     "a2": {
-      "pl": "Landing page: ok. 2–3 tygodnie. Strona firmowa: ok. 4–6 tygodni. CRM lub automatyzacja: zwykle 3–8 tygodni — zależnie od integracji i złożoności.",
-      "en": "Landing page: about 2–3 weeks. Company website: about 4–6 weeks. CRM or automation: usually 3–8 weeks — depending on integrations and complexity."
+      "pl": "Landing: 2–3 tygodnie. Strona firmowa: 4–6. CRM lub automatyzacja: zwykle 3–8 — zależnie od integracji.",
+      "en": "Landing page: 2–3 weeks. Company site: 4–6. CRM or automation: usually 3–8, depending on integrations."
     },
     "q3": {
-      "pl": "Czy muszę znać się na technologii?",
-      "en": "Do I need to be tech-savvy?"
+      "pl": "Muszę znać technologię?",
+      "en": "Do I need to know the tech?"
     },
     "a3": {
-      "pl": "Nie. Po stronie klienta wystarczą cele biznesowe i decyzje. Stronę techniczną prowadzimy my i komunikujemy ją jasno.",
-      "en": "No. On your side, business goals and decisions are enough. We handle the technical side and communicate it clearly."
+      "pl": "Nie. Od Ciebie cele i decyzje. Technikę bierzemy na siebie.",
+      "en": "No. You bring goals and decisions. We take the technical side."
     }
   },
   "form": {
@@ -281,8 +281,8 @@
       "en": "Send"
     },
     "placeholder_message": {
-      "pl": "Opisz krótko projekt, cele i termin — wrócimy z propozycją kolejnych kroków.",
-      "en": "Briefly describe the project, goals and timeline — we'll reply with next steps."
+      "pl": "Projekt, cel, termin.",
+      "en": "Project, goal, timing."
     },
     "placeholder_email": {
       "pl": "jan@firma.pl",
@@ -297,12 +297,12 @@
       "en": "We opened your mail app — send the message."
     },
     "success_title": {
-      "pl": "Dziękujemy za kontakt",
-      "en": "Thank you for reaching out"
+      "pl": "Dziękujemy.",
+      "en": "Thank you."
     },
     "success_body": {
-      "pl": "Otrzymaliśmy Twoją wiadomość. Wrócimy do Ciebie w ciągu jednego dnia roboczego — zwykle szybciej.",
-      "en": "We've received your message. We'll get back to you within one business day — usually sooner."
+      "pl": "Wracamy w jeden dzień roboczy. Zwykle szybciej.",
+      "en": "We reply within one business day. Usually sooner."
     },
     "error_send": {
       "pl": "Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na kontakt@cosgral.pl.",
@@ -369,8 +369,8 @@
       "en": "Contact"
     },
     "call_lead": {
-      "pl": "Zadzwoń lub napisz — odpowiadamy zwykle w ciągu jednego dnia roboczego.",
-      "en": "Call or write us — we usually reply within one business day."
+      "pl": "Jeden dzień roboczy. Zwykle szybciej.",
+      "en": "One business day. Usually sooner."
     },
     "social_label": {
       "pl": "Social media",
@@ -392,33 +392,33 @@
         "en": "About us — cosgral.agency"
       },
       "description": {
-        "pl": "Poznaj zespół COSGRAL — Jakub Gral (CEO & Founder) i Kacper Kosikowski (COO & Founder). Programiści łączący frontend, design, aplikacje i systemy.",
-        "en": "Meet the COSGRAL team — Jakub Gral (CEO & Founder) and Kacper Kosikowski (COO & Founder). Engineers combining frontend, design, apps and systems."
+        "pl": "Jakub Gral, CEO. Kacper Kosikowski, COO. Strony, design, aplikacje, systemy.",
+        "en": "Jakub Gral, CEO. Kacper Kosikowski, COO. Sites, design, apps, systems."
       }
     },
     "title": {
-      "pl": "Kim jesteśmy",
-      "en": "Who we are"
+      "pl": "Dwie osoby. Cały zakres.",
+      "en": "Two people. The full scope."
     },
     "lead": {
-      "pl": "Jesteśmy dwuosobowym zespołem programistów łączącym inżynierię oprogramowania z designem i kreacją. Budujemy strony, aplikacje, CRM i automatyzacje — od architektury po wdrożenie i utrzymanie.",
-      "en": "We are a two-person team of engineers combining software development with design and creative. We build websites, apps, CRM and automation — from architecture through launch and ongoing support."
+      "pl": "Strony, aplikacje, CRM i automatyzacje. Od architektury po wdrożenie.",
+      "en": "Sites, apps, CRM and automation. From architecture through launch."
     },
     "role_jakub": {
       "pl": "CEO & Founder",
       "en": "CEO & Founder"
     },
     "focus_jakub": {
-      "pl": "Frontend, design i automatyzacje",
-      "en": "Frontend, design & automation"
+      "pl": "Frontend, design, wideo, automatyzacje",
+      "en": "Frontend, design, video, automation"
     },
     "bio_jakub": {
-      "pl": "Współzałożyciel COSGRAL. Programista i projektant — odpowiada za frontend, design, kreację, montaż wideo, grafikę oraz budowę aplikacji i automatyzacji dla firm.",
-      "en": "Co-founder of COSGRAL. Software engineer and designer — leads frontend, design, creative, video editing, graphics, plus building apps and automation for companies."
+      "pl": "CEO. Frontend, design, wideo, grafika, aplikacje i automatyzacje.",
+      "en": "CEO. Frontend, design, video, graphics, apps and automation."
     },
     "bio_jakub_2": {
-      "pl": "Wcześniej jako kierownik działu w firmie IT — dostarczającej oprogramowanie oraz serwis i helpdesk urządzeń — zautomatyzował łańcuch dostaw i na bieżąco rozwijał systemy CRM oraz intranet firmowy.",
-      "en": "Previously a department manager at an IT firm delivering software as well as device service and helpdesk — where he automated the supply chain and continuously improved CRM systems and the company intranet."
+      "pl": "Wcześniej kierownik działu IT. Zautomatyzował łańcuch dostaw. Rozwijał CRM i intranet.",
+      "en": "Former IT department lead. Automated the supply chain. Built CRM and the intranet."
     },
     "role_kacper": {
       "pl": "COO & Founder",
@@ -429,16 +429,16 @@
       "en": "Applications & systems"
     },
     "bio_kacper": {
-      "pl": "Współzałożyciel COSGRAL. Programista specjalizujący się w aplikacjach i systemach.",
-      "en": "Co-founder of COSGRAL. Software engineer focused on applications and systems."
+      "pl": "COO. Aplikacje i systemy.",
+      "en": "COO. Apps and systems."
     },
     "bio_kacper_2": {
-      "pl": "Pracuje w korporacji zajmującej się rozwojem produktów cyfrowych; w COSGRAL projektuje i wdraża rozwiązania systemowe oraz aplikacje dopasowane do procesów klienta.",
-      "en": "He works at a corporation developing digital products; at COSGRAL he designs and ships system solutions and applications tailored to client workflows."
+      "pl": "Na co dzień w korporacji produktów cyfrowych. W COSGRAL składa systemy pod proces klienta.",
+      "en": "Day to day at a digital-product company. At COSGRAL he builds systems around the client's process."
     },
     "cta": {
-      "pl": "Porozmawiajmy o projekcie",
-      "en": "Let's talk about your project"
+      "pl": "Porozmawiajmy",
+      "en": "Let's talk"
     }
   },
   "privacy": {
@@ -603,8 +603,8 @@
       "en": "Selected work"
     },
     "hero_lead": {
-      "pl": "Wybrane projekty stron, wideo, grafiki oraz systemów i automatyzacji.",
-      "en": "Selected website, video, graphics, systems and automation projects."
+      "pl": "Strony. Wideo. Grafika. Systemy.",
+      "en": "Sites. Video. Graphics. Systems."
     },
     "selected_title": {
       "pl": "Wybrane realizacje",
@@ -635,92 +635,92 @@
       "en": "AI for business"
     },
     "ai_claim": {
-      "pl": "Od informacji o firmie do przygotowanej szansy sprzedażowej.",
-      "en": "From company information to a prepared sales opportunity."
+      "pl": "Od danych firmy do gotowej szansy.",
+      "en": "From company data to a ready opportunity."
     },
     "ai_lead": {
-      "pl": "Projektujemy agentów AI i automatyzacje, które wspierają sprzedaż B2B: research, kwalifikacja, CRM i przygotowanie handlowca — z jasnymi regułami użycia danych.",
-      "en": "We design AI agents and automation that support B2B sales: research, qualification, CRM and salesperson prep — with clear rules for data use."
+      "pl": "Agenci AI do sprzedaży B2B: research, kwalifikacja, CRM, brief. Jasne reguły danych.",
+      "en": "AI agents for B2B sales: research, qualification, CRM, a brief. Clear data rules."
     },
     "ai_b1_title": {
       "pl": "Firmy dopasowane do profilu klienta",
       "en": "Companies that match your customer profile"
     },
     "ai_b1_desc": {
-      "pl": "Definiujemy branże, skalę, lokalizację i sygnały popytu. Agent przygotowuje kandydatów z uzgodnionych źródeł i uzasadnia dopasowanie.",
-      "en": "We define industries, scale, location and demand signals. The agent prepares candidates from agreed sources and explains the match."
+      "pl": "Branża, skala, lokalizacja, sygnały popytu. Kandydaci z uzgodnionych źródeł i powód dopasowania.",
+      "en": "Industry, scale, location, demand signals. Candidates from agreed sources, with the reason they match."
     },
     "ai_b2_title": {
       "pl": "Porządek w kontaktach i CRM",
       "en": "Organised contacts and CRM"
     },
     "ai_b2_desc": {
-      "pl": "Łączy rekordy tej samej firmy, wykrywa duplikaty, uzupełnia dozwolone pola ze źródłem i datą — bez chaosu w bazie.",
-      "en": "It merges records for the same company, detects duplicates and fills permitted fields with source and date — without database chaos."
+      "pl": "Łączy rekordy, łapie duplikaty, uzupełnia pola ze źródłem i datą.",
+      "en": "Merges records, catches duplicates, fills fields with source and date."
     },
     "ai_b3_title": {
       "pl": "Priorytety i brief dla handlowca",
       "en": "Priorities and a brief for sales"
     },
     "ai_b3_desc": {
-      "pl": "Porównuje firmy z Waszymi kryteriami, układa kolejkę follow-up i tworzy brief: fakty, historia, otwarte wątki, pytania.",
-      "en": "It compares companies with your criteria, builds a follow-up queue and creates a brief: facts, history, open topics, questions."
+      "pl": "Kryteria, kolejka follow-up, brief: fakty, historia, otwarte wątki, pytania.",
+      "en": "Criteria, a follow-up queue, a brief: facts, history, open threads, questions."
     },
     "ai_b4_title": {
       "pl": "Szkice wiadomości i kolejne kroki",
       "en": "Draft messages and next steps"
     },
     "ai_b4_desc": {
-      "pl": "Na bazie oferty i historii kontaktu przygotowuje draft wiadomości, podsumowanie spotkania lub zadanie. Wysyłka zostaje osobnym, zatwierdzonym etapem.",
-      "en": "Using your offer and contact history it prepares a message draft, meeting summary or task. Sending stays a separate, approved stage."
+      "pl": "Szkic wiadomości, podsumowanie spotkania albo zadanie. Wysyłka zostaje osobnym, zatwierdzonym krokiem.",
+      "en": "A message draft, meeting summary or task. Sending stays a separate, approved step."
     },
     "ai_day_title": {
       "pl": "Dzień pracy zespołu sprzedaży",
       "en": "A working day in the sales team"
     },
     "ai_day_desc": {
-      "pl": "Ustalamy rynki i kryteria. Agent przygotowuje listę, sprawdza CRM i oznacza firmy już w rozmowie. Handlowiec dostaje profil, powody dopasowania i proponowany kolejny krok — akceptuje, dodaje kontekst i decyduje o kontakcie.",
-      "en": "We define markets and criteria. The agent prepares a list, checks the CRM and flags companies already in conversation. The salesperson gets a profile, match reasons and a suggested next step — they approve, add context and decide how to contact."
+      "pl": "Rynki i kryteria. Lista, CRM, firmy już w rozmowie. Handlowiec dostaje profil i kolejny krok — i decyduje.",
+      "en": "Markets and criteria. A list, the CRM, companies already in conversation. Sales gets a profile and a next step — and decides."
     },
     "ai_faq1_q": {
       "pl": "Czy agent musi od razu wysyłać wiadomości?",
       "en": "Does the agent have to send messages immediately?"
     },
     "ai_faq1_a": {
-      "pl": "Nie. Możemy zacząć od researchu, kwalifikacji i draftów. Kontakt zostaje po stronie handlowca. Automatyczna wysyłka to osobny, uzgodniony etap.",
-      "en": "No. We can start with research, qualification and drafts. Contact stays with the salesperson. Automatic sending is a separate, agreed stage."
+      "pl": "Nie musi. Start: research, kwalifikacja, drafty. Kontakt zostaje u handlowca.",
+      "en": "It doesn't have to. Start with research, qualification, drafts. Contact stays with sales."
     },
     "ai_faq2_q": {
       "pl": "Czy zadziała z naszą istniejącą bazą?",
       "en": "Can it work with our existing database?"
     },
     "ai_faq2_a": {
-      "pl": "Tak. Często zaczynamy od czyszczenia rekordów, braków i szans bez kolejnego kroku. Testujemy próbkę i reguły dopasowania przed większymi zmianami.",
-      "en": "Yes. We often start by cleaning records, filling gaps and highlighting opportunities without a next step. We test a sample and matching rules before larger changes."
+      "pl": "Tak. Często od czyszczenia rekordów. Najpierw próbka i reguły.",
+      "en": "Yes. Often by cleaning records first. A sample and the rules come before a wider change."
     },
     "ai_faq3_q": {
       "pl": "Jak mierzymy, czy działa?",
       "en": "How do we measure whether it works?"
     },
     "ai_faq3_a": {
-      "pl": "Ustalamy baseline: czas przygotowania, akceptacja kandydatów, kompletność rekordów. Wyniki sprzedaży zależą też od oferty i rynku — nie przypisujemy ich automatycznie agentowi.",
-      "en": "We set a baseline: prep time, acceptance rate and record completeness. Sales results also depend on the offer and market — we do not automatically attribute them to the agent."
+      "pl": "Baseline: czas przygotowania, akceptacja kandydatów, kompletność rekordów. Sprzedaż zależy też od oferty i rynku.",
+      "en": "Baseline: prep time, candidate acceptance, record completeness. Sales also depends on the offer and the market."
     },
     "ai_cta": {
       "pl": "Porozmawiajmy o agencie AI",
       "en": "Talk to us about an AI agent"
     },
     "cta_lead": {
-      "pl": "Masz podobny projekt? Napisz — przygotujemy zakres, plan i wycenę.",
-      "en": "Have a similar project? Write us — we will prepare scope, plan and quote."
+      "pl": "Podobny projekt? Zakres, plan, wycena.",
+      "en": "A similar project? Scope, plan, quote."
     },
     "web_title": {
       "pl": "Strony internetowe",
       "en": "Websites"
     },
     "web_lead": {
-      "pl": "Od landing page po serwisy firmowe i sklepy — projekt i wdrożenie pod cele biznesowe.",
-      "en": "From landing pages to company sites and stores — design and delivery aligned to business goals."
+      "pl": "Landing, serwis, sklep. Pod cel, nie pod szablon.",
+      "en": "Landing page, company site, store. Built for the goal, not a template."
     },
     "web_service": {
       "pl": "Usługa: strony internetowe →",
@@ -789,64 +789,64 @@
       "en": "Visit website"
     },
     "web_deck_hint": {
-      "pl": "Przesuń trackpadem między projektami",
-      "en": "Swipe the trackpad between projects"
+      "pl": "Przesuń między projektami.",
+      "en": "Swipe between projects."
     },
     "juicy_p1": {
-      "pl": "Juicy Events to agencja eventowa działająca w całej Polsce — od kameralnych wydarzeń prywatnych po duże produkcje biznesowe i artystyczne. Klient potrzebował strony, która nie wygląda jak katalog usług, tylko jak zaproszenie na event: odważnej, soczystej i wiarygodnej jednocześnie.",
-      "en": "Juicy Events is an event agency working across Poland — from intimate private gatherings to large business and artistic productions. The client needed a site that would not read like a service catalog, but like an invitation to an event: bold, juicy and trustworthy at the same time."
+      "pl": "Agencja eventowa na całą Polskę. Od kameralnych eventów po duże produkcje biznesowe i artystyczne.",
+      "en": "An event agency across Poland. From private gatherings to large business and artistic productions."
     },
     "juicy_p2": {
-      "pl": "Zależało nam na tym, żeby pierwsza sekunda mówiła, kim są. Silny rytm typografii, duża przestrzeń na obraz i jasna hierarchia miały oddać festiwalowy charakter marki, nie gubiąc przy tym powagi organizatora, któremu powierza się budżet i gości. Strona miała działać tak samo dobrze na telefonie — stamtąd przychodzi większość zapytań z Instagrama i Facebooka.",
-      "en": "We wanted the first second to say who they are. A strong typographic rhythm, generous space for image and a clear hierarchy had to carry the brand’s festival energy without losing the seriousness of an organizer trusted with budget and guests. The site also had to work just as well on a phone — that is where most Instagram and Facebook inquiries arrive."
+      "pl": "Strona jak zaproszenie, nie katalog. Mocna typografia, dużo obrazu. Telefon pierwszy — stamtąd idą zapytania z Instagrama i Facebooka.",
+      "en": "A site like an invitation, not a catalog. Strong type, room for image. Phone first — that's where Instagram and Facebook inquiries arrive."
     },
     "juicy_p3": {
-      "pl": "Strategia była prosta: jeden mocny przekaz o zasięgu ogólnopolskim, krótki opis tego, co Juicy robi, i natychmiastowa ścieżka do kontaktu. Zamiast rozbudowanego bloga czy wielopoziomowego menu zbudowaliśmy serwis, który w kilku ekranach pokazuje charakter, skalę i sposób współpracy. Każdy blok prowadzi do rozmowy — nie do kolejnej podstrony, na której gubi się energia.",
-      "en": "The strategy was simple: one strong nationwide message, a short account of what Juicy does, and an immediate path to contact. Instead of a long blog or a nested menu we built a site that shows character, scale and the way of working in a few screens. Every block leads to a conversation — not to another page where the energy leaks away."
+      "pl": "Jeden przekaz o zasięgu, krótki opis, droga do kontaktu. Bez bloga i zagnieżdżonego menu.",
+      "en": "One nationwide line, a short description, a path to contact. No blog, no nested menu."
     },
     "juicy_p4": {
-      "pl": "Klient oczekiwał wdrożenia, które da się pokazać w pitchu i w stories, a jednocześnie będzie narzędziem sprzedażowym: szybkim, czytelnym i gotowym na zapytania z całej Polski. Taką stronę oddaliśmy — z nagraniem powyżej widać rytm scrolla, układ treści i to, jak marka wchodzi na ekran.",
-      "en": "The client expected a delivery they could show in a pitch and in stories, and that would still work as a sales tool: fast, readable and ready for inquiries from all over Poland. That is the site we shipped — the recording above shows the scroll rhythm, the content layout and how the brand enters the screen."
+      "pl": "Do pitchu, do stories i do zapytań z całej Polski. Nagranie pokazuje rytm.",
+      "en": "For the pitch, for stories, and for inquiries from across Poland. The recording shows the rhythm."
     },
     "mj_p1": {
-      "pl": "MJ Social Media to marka osobista content creatora. Celem było zebranie ruchu z Instagrama i TikToka na jednej stronie, która w kilkanaście sekund tłumaczy ofertę i prowadzi do zapytania — bez rozpraszaczy i bez poczucia, że weszło się na szablon freelance’era.",
-      "en": "MJ Social Media is a content creator’s personal brand. The goal was to gather Instagram and TikTok traffic on one page that explains the offer in a few seconds and leads to an inquiry — without distractions and without the feeling of a generic freelancer template."
+      "pl": "Marka osobista twórcy. Ruch z Instagrama i TikToka na jedną stronę.",
+      "en": "A creator's personal brand. Instagram and TikTok traffic on one page."
     },
     "mj_p2": {
-      "pl": "Zależało nam na krótkim, prawie instagramowym scrollu: twarz marki na starcie, jasny zakres usług, wybrane realizacje i jeden główny przycisk. Typografia i tempo miały być blisko treści, które MJ publikuje na co dzień, żeby przejście z rolki na stronę nie psuło wizerunku.",
-      "en": "We wanted a short, almost Instagram-like scroll: the face of the brand at the start, a clear service range, selected work and one primary button. Typography and pacing had to sit close to the content MJ publishes every day, so the jump from a reel to the site would not break the image."
+      "pl": "Oferta w kilkanaście sekund. Twarz, zakres, realizacje, jeden przycisk. Bez szablonu freelancera.",
+      "en": "The offer in a few seconds. Face, scope, work, one button. Not a freelancer template."
     },
     "mj_p3": {
-      "pl": "Strategia konwersji była jednokierunkowa. Każda sekcja powtarza tę samą obietnicę — współpraca, nie tylko „zobacz portfolio” — i spycha do kontaktu. Zrezygnowaliśmy z rozbudowanego bloga i zbędnych podstron, żeby osoba z social mediów nie zgubiła się po drodze.",
-      "en": "The conversion strategy was one-way. Every section repeats the same promise — collaboration, not just “see the portfolio” — and pushes toward contact. We dropped a long blog and extra subpages so someone arriving from social would not get lost on the way."
+      "pl": "Każda sekcja prowadzi do współpracy. Bez bloga i zbędnych podstron.",
+      "en": "Every section leads to a collaboration. No blog, no extra pages."
     },
     "mj_p4": {
-      "pl": "Klient oczekiwał strony, która wygląda jak rozszerzenie jego kanałów i od razu zbiera leady. Wdrożenie oddaje ten brief: lądowanie z social, szybki odczyt oferty i prosta ścieżka do rozmowy.",
-      "en": "The client expected a site that feels like an extension of their channels and collects leads immediately. The delivery matches that brief: a landing from social, a fast read of the offer and a simple path to a conversation."
+      "pl": "Rozszerzenie kanałów, które od razu zbiera leady.",
+      "en": "An extension of the channels that collects leads immediately."
     },
     "trove_p1": {
-      "pl": "Trove Archive to sklep z odzieżą vintage luxury. Klient chciał e-commerce, który wygląda jak archiwum i lookbook, a nie jak typowy marketplace — i jednocześnie pozwala kupić rzecz w kilku krokach, bez tarcia.",
-      "en": "Trove Archive is a vintage luxury clothing store. The client wanted e-commerce that looks like an archive and a lookbook, not a typical marketplace — and still lets someone buy a piece in a few steps, without friction."
+      "pl": "Sklep vintage luxury. Archiwum i lookbook, nie marketplace.",
+      "en": "A vintage luxury store. An archive and a lookbook, not a marketplace."
     },
     "trove_p2": {
-      "pl": "Zależało nam na fotografii jako głównym języku strony. Duże kadry, spokojna typografia i dużo powietrza miały budować poczucie rzadkości i selekcji. Katalog, koszyk i checkout musiały zostać czytelne, żeby wizerunek premium nie utrudniał zakupu.",
-      "en": "We wanted photography to be the main language of the site. Large frames, calm typography and plenty of air had to build a sense of rarity and selection. Catalog, cart and checkout still had to stay readable, so the premium image would not get in the way of buying."
+      "pl": "Duże kadry, spokojna typografia, dużo powietrza. Katalog, koszyk i checkout zostają czytelne.",
+      "en": "Large frames, calm type, plenty of air. Catalog, cart and checkout stay readable."
     },
     "trove_p3": {
-      "pl": "Strategia była dwutorowa: najpierw emocja i zaufanie do selekcji, potem maksymalnie krótka ścieżka zakupowa. Segregacja kolekcji, karty produktów i podsumowanie koszyka prowadzą liniowo do płatności — bez zbędnych pop-upów i bez rozbijania rytmu oglądania ubrań.",
-      "en": "The strategy ran on two tracks: first emotion and trust in the selection, then the shortest possible purchase path. Collection grouping, product cards and the cart summary lead linearly to payment — without extra pop-ups and without breaking the rhythm of looking at clothes."
+      "pl": "Najpierw selekcja, potem krótka ścieżka zakupu. Bez pop-upów.",
+      "en": "Selection first, then a short path to checkout. No pop-ups."
     },
     "trove_p4": {
-      "pl": "Klient oczekiwał sklepu, który uniesie wizerunek vintage luxury i nie zgubi konwersji. Takie wdrożenie oddaliśmy: editorial na wierzchu, e-commerce pod spodem. Nagranie pokazuje, jak katalog i proces zakupowy układają się w jeden rytm.",
-      "en": "The client expected a store that could carry a vintage luxury image without losing conversion. That is the delivery: editorial on the surface, e-commerce underneath. The recording shows how the catalog and the purchase flow sit in one rhythm."
+      "pl": "Editorial na wierzchu. E-commerce pod spodem. Nagranie pokazuje jeden rytm.",
+      "en": "Editorial on the surface. E-commerce underneath. The recording shows one rhythm."
     },
     "montaz_title": {
       "pl": "Montaż wideo",
       "en": "Video editing"
     },
     "montaz_lead": {
-      "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
-      "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
+      "pl": "Reels, reklamy, BTS. Od surowca do publikacji.",
+      "en": "Reels, ads, BTS. From raw footage to publish-ready."
     },
     "montaz_service": {
       "pl": "Usługa: montaż i wideo →",
@@ -857,20 +857,20 @@
       "en": "Video editing"
     },
     "montaz_page_lead": {
-      "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
-      "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
+      "pl": "Reels, reklamy, BTS. Od surowca do publikacji.",
+      "en": "Reels, ads, BTS. From raw footage to publish-ready."
     },
     "grafiki_title": {
       "pl": "Grafiki",
       "en": "Graphics"
     },
     "grafiki_lead": {
-      "pl": "Kreacje do social mediów i kampanii: posty, stories i key visuale.",
-      "en": "Creative for social and campaigns: posts, stories and key visuals."
+      "pl": "Posty, stories, key visuale.",
+      "en": "Posts, stories, key visuals."
     },
     "grafiki_page_lead": {
-      "pl": "Wybrane realizacje graficzne dla marek i wydarzeń — m.in. Juicy Events, Far East i BTS.",
-      "en": "Selected graphic work for brands and events — including Juicy Events, Far East and BTS."
+      "pl": "Juicy Events, Far East, BTS.",
+      "en": "Juicy Events, Far East, BTS."
     },
     "grafiki_service": {
       "pl": "Usługa: grafika i wideo →",
@@ -881,8 +881,8 @@
       "en": "Systems & automation"
     },
     "automation_lead": {
-      "pl": "Aplikacje, CRM i procesy automatyczne, które porządkują sprzedaż, operacje i komunikację z klientem.",
-      "en": "Apps, CRM and automated processes that organize sales, operations and customer communication."
+      "pl": "Aplikacje, CRM, procesy. Sprzedaż i operacje w jednym miejscu.",
+      "en": "Apps, CRM, processes. Sales and operations in one place."
     },
     "automation_service": {
       "pl": "Usługa: automatyzacje →",
@@ -1041,8 +1041,8 @@
       "en": "A customer database and integrated map for field sales representatives."
     },
     "tf_crm_description": {
-      "pl": "Aplikacja CRM dla TelForceOne S.A. z bazą danych i mapą wspierającą pracę przedstawicieli handlowych.",
-      "en": "A CRM app for TelForceOne S.A. with a database and a map supporting field sales representatives."
+      "pl": "Baza klientów i mapa wizyt. Zasięg i kolejność spotkań w jednym miejscu.",
+      "en": "A customer database and a visit map. Coverage and meeting order in one place."
     },
     "tf_crm_meta": {
       "title": {
@@ -1055,16 +1055,16 @@
       }
     },
     "tf_crm_p1": {
-      "pl": "Dla TelForceOne S.A. powstała aplikacja CRM dla zespołu przedstawicieli handlowych. Łączy bazę danych klientów z widokiem mapy, dzięki czemu informacje potrzebne do pracy w terenie są dostępne w jednym miejscu.",
-      "en": "We built a CRM app for TelForceOne S.A.’s sales representatives. It combines a customer database with a map view, keeping the information needed in the field in one place."
+      "pl": "CRM dla TelForceOne S.A. Baza klientów i mapa. Dane do pracy w terenie są w jednym miejscu.",
+      "en": "A CRM for TelForceOne S.A. Customer database and a map. Field data lives in one place."
     },
     "tf_crm_p2": {
-      "pl": "Mapa nadaje danym kontekst przestrzenny: pomaga zorientować się, gdzie znajdują się klienci i planować kolejne wizyty. Widok klienta oraz praca na trasie tworzą spójny proces dla handlowca.",
-      "en": "The map gives customer data a spatial context: it helps the team see where customers are and plan upcoming visits. Customer records and route work form a coherent workflow."
+      "pl": "Mapa pokazuje, gdzie są klienci, i układa kolejne wizyty. Rekord i trasa to jeden proces.",
+      "en": "The map shows where customers are and lines up the next visits. The record and the route are one process."
     },
     "tf_crm_p3": {
-      "pl": "Projekt pokazuje, jak narzędzie sprzedażowe można zbudować wokół codziennego sposobu pracy zespołu, zamiast wymagać przełączania się między oddzielną bazą kontaktów i mapą.",
-      "en": "The project shows how a sales tool can follow the team’s daily work instead of making them switch between a separate contact database and map."
+      "pl": "Narzędzie idzie za dniem handlowca. Bez przeskakiwania między bazą a mapą.",
+      "en": "The tool follows the sales day. No jumping between a database and a map."
     },
     "tf_code39_title": {
       "pl": "Generator kodów kreskowych Code 39",
@@ -1093,16 +1093,16 @@
       }
     },
     "tf_code39_p1": {
-      "pl": "Drugim narzędziem dla TelForceOne S.A. jest aplikacja do generowania kodów kreskowych w standardzie Code 39. Ułatwia przygotowanie oznaczeń potrzebnych do identyfikacji produktów i materiałów.",
-      "en": "The second tool for TelForceOne S.A. generates barcodes in the Code 39 standard. It helps prepare labels used to identify products and materials."
+      "pl": "Generator Code 39 dla TelForceOne S.A. Oznaczenia produktów i materiałów.",
+      "en": "A Code 39 generator for TelForceOne S.A. Labels for products and materials."
     },
     "tf_code39_p2": {
-      "pl": "Interfejs skupia się na krótkim zadaniu: wprowadzeniu wartości, obejrzeniu wyniku i przygotowaniu kodu do wykorzystania. Poglądowa wizualizacja powyżej pokazuje tę prostą ścieżkę.",
-      "en": "The interface focuses on a short task: entering a value, reviewing the result and preparing the code for use. The illustrative visual above shows this simple flow."
+      "pl": "Wartość, podgląd, kod. Krótka ścieżka.",
+      "en": "A value, a preview, a code. A short path."
     },
     "tf_code39_p3": {
-      "pl": "Projekt należy do tej samej rodziny narzędzi operacyjnych: pomaga przełożyć powtarzalny proces na czytelną aplikację dostępną dla zespołu.",
-      "en": "It belongs to the same family of operational tools: turning a repetitive process into a clear app for the team."
+      "pl": "Powtarzalny proces jako czytelna aplikacja dla zespołu.",
+      "en": "A repetitive process, as a clear app for the team."
     },
     "tf_forecast_title": {
       "pl": "Kontrola stanów i prognozowanie",
@@ -1117,8 +1117,8 @@
       "en": "An app for monitoring stock and forecasting demand."
     },
     "tf_forecast_description": {
-      "pl": "Aplikacja dla TelForceOne S.A. wspierająca kontrolę stanów magazynowych i prognozowanie zapotrzebowania.",
-      "en": "An app for TelForceOne S.A. supporting inventory control and demand forecasting."
+      "pl": "Stany i prognoza popytu. Widać ryzyko braków, zanim zabraknie towaru.",
+      "en": "Stock and a demand forecast. Shortage risk shows up before the shelf is empty."
     },
     "tf_forecast_meta": {
       "title": {
@@ -1131,16 +1131,28 @@
       }
     },
     "tf_forecast_p1": {
-      "pl": "Trzecia aplikacja dla TelForceOne S.A. skupia się na kontroli stanów i prognozowaniu. Łączy bieżący widok zapasów z perspektywą przyszłego zapotrzebowania.",
-      "en": "The third app for TelForceOne S.A. focuses on inventory control and forecasting. It combines a current view of stock with a view of future demand."
+      "pl": "Kontrola stanów i prognoza dla TelForceOne S.A. Bieżący zapas i przyszłe zapotrzebowanie.",
+      "en": "Inventory control and a forecast for TelForceOne S.A. Current stock and future demand."
     },
     "tf_forecast_p2": {
-      "pl": "Takie zestawienie pomaga zespołowi wychwycić ryzyko braków oraz planować kolejne decyzje zakupowe na podstawie danych. Wizualizacja powyżej pokazuje ideę połączenia stanów, trendu i prognozy.",
-      "en": "This combination helps the team spot shortage risk and plan purchasing decisions using data. The visual above illustrates stock, trend and forecast together."
+      "pl": "Widać ryzyko braków. Zakupy opierają się na danych, nie na przeczuciu.",
+      "en": "Shortage risk is visible. Purchasing follows the data, not a hunch."
     },
     "tf_forecast_p3": {
-      "pl": "W projekcie ważna jest czytelność: najpierw stan, potem zmiana w czasie i sygnał wymagający uwagi. Dzięki temu panel wspiera szybkie decyzje operacyjne.",
-      "en": "Clarity matters here: first the current state, then change over time, then the signal requiring attention. The panel supports quick operational decisions."
+      "pl": "Najpierw stan. Potem trend. Potem sygnał. Szybka decyzja operacyjna.",
+      "en": "Stock first. Then the trend. Then the signal. A fast operational decision."
+    },
+    "tf_code_tag": {
+      "pl": "Narzędzie / identyfikacja",
+      "en": "Tool / identification"
+    },
+    "tf_code_title": {
+      "pl": "Generator kodów Code 39",
+      "en": "Code 39 barcode generator"
+    },
+    "tf_code_description": {
+      "pl": "Kody Code 39 do oznaczania produktów i materiałów.",
+      "en": "Code 39 barcodes for labeling products and materials."
     }
   }
 }

@@ -535,3 +535,149 @@ body:not(.home-page) h1 {
   .home-hero__content::before,
   .home-hero__content::after { filter: blur(28px); }
 }
+
+/* ——— Subpage type, grade, reveal, tilt ——— */
+body:not(.home-page) h1,
+body:not(.home-page) h2,
+body:not(.home-page) h3,
+body:not(.home-page) .portfolio-hero__title,
+body:not(.home-page) .case-study__title,
+body:not(.home-page) .about-team__name {
+  font-family: var(--award-display);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+body:not(.home-page) p,
+body:not(.home-page) li,
+body:not(.home-page) a,
+body:not(.home-page) button,
+body:not(.home-page) label,
+body:not(.home-page) input,
+body:not(.home-page) textarea {
+  font-family: var(--award-body);
+}
+
+body:not(.home-page)::before {
+  transform: translate3d(
+    calc(var(--tilt-x) * -16px),
+    calc(var(--page-p, 0) * -10vh + var(--tilt-y) * -8px),
+    0
+  );
+}
+body:not(.home-page)::after {
+  transform: translate3d(
+    calc(var(--tilt-x) * 14px),
+    calc(var(--page-p, 0) * 8vh + var(--tilt-y) * 10px),
+    0
+  );
+}
+
+.award-grade {
+  filter: contrast(1.08) saturate(0.86);
+}
+.award-parallax {
+  transform: translate3d(calc(var(--tilt-x) * 8px), calc(var(--tilt-y) * 6px), 0);
+}
+html.award-motion .award-reveal {
+  transition: opacity 0.7s ease, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+html.award-motion .award-reveal:not(.is-in) {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+html.reduce-motion .award-reveal,
+html.reduce-motion .award-parallax {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.award-page {
+  padding: clamp(6.5rem, 18vh, 11rem) 0 clamp(4rem, 12vh, 8rem);
+}
+.award-chapter,
+.award-facts,
+.award-close {
+  padding-left: clamp(1.25rem, 6vw, 5rem);
+  padding-right: clamp(1.25rem, 6vw, 5rem);
+}
+.award-kicker {
+  margin: 0 0 1.1rem;
+  font-family: var(--award-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--award-orange);
+}
+.award-page h1 {
+  max-width: 16ch;
+  margin: 0;
+}
+.award-lead,
+.award-note {
+  max-width: 34ch;
+  margin: 1.35rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: rgba(243, 240, 232, 0.76);
+}
+.award-frame {
+  margin: clamp(3.5rem, 12vh, 8rem) clamp(1.25rem, 8vw, 7rem);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.award-frame img,
+.award-frame video {
+  display: block;
+  width: 100%;
+  height: min(72vh, 760px);
+  object-fit: cover;
+  background: #111;
+}
+.award-frame img[src*=".svg"] {
+  object-fit: contain;
+  height: auto;
+  max-height: 72vh;
+  background: var(--award-paper);
+  padding: clamp(1rem, 3vw, 2rem);
+}
+.award-facts { max-width: 46rem; }
+.award-facts h2 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+.award-facts ul {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+.award-facts li {
+  padding: 0.95rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 1.02rem;
+  line-height: 1.35;
+}
+.award-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.4rem;
+  margin-top: 1.6rem;
+}
+.award-links a {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--award-orange);
+  padding-bottom: 0.15rem;
+}
+.award-page .service-cta {
+  display: inline-flex;
+  margin-top: 2.2rem;
+  padding: 0.95rem 1.45rem;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
