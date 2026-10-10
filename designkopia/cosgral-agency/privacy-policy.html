@@ -1,141 +1,111 @@
 <!DOCTYPE html>
-<html lang="pl" data-i18n-meta="privacy.meta">
+<html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<link rel="icon" href="favicon.ico" sizes="any" />
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
-<link rel="manifest" href="site.webmanifest" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Polityka prywatności — cosgral.agency</title>
-<meta name="description" content="Polityka prywatności i informacje o przetwarzaniu danych kontaktowych w cosgral.agency." />
-<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260924polish1" />
-<link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
-<link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
-<script>
-  (function () {
-    if (sessionStorage.getItem("cosgral-page-transition")) {
-      document.documentElement.classList.add("is-page-enter");
-    }
-  })();
-</script>
-<script src="page-transitions.js?v=20260924hash1"></script>
-<script src="cosgral-motion-pref.js?v=20260919a"></script>
-<script src="theme-mode.js?v=20260920ui34"></script>
-  <link rel="stylesheet" href="site-chat.css?v=20260922ui51" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Polityka prywatności — COSGRAL</title>
+  <link rel="icon" href="favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="fresh.css" />
+  
 </head>
-<body class="subpage privacy-page">
-<a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
-
-<canvas id="subpage-ambient" class="subpage-ambient" aria-hidden="true"></canvas>
-<div class="subpage-ambient__blur" aria-hidden="true"></div>
-<div class="subpage-ambient__shade" aria-hidden="true"></div>
-<div class="subpage-cube-portal" aria-hidden="true">
-  <canvas id="subpage-cube" class="subpage-cube__canvas"></canvas>
-</div>
-<div class="portfolio-sand-portal portfolio-sand-portal--back" aria-hidden="true">
-  <canvas id="portfolio-sand-back" class="portfolio-sand__canvas"></canvas>
-</div>
-<div class="portfolio-sand-portal portfolio-sand-portal--front" aria-hidden="true">
-  <canvas id="portfolio-sand-front" class="portfolio-sand__canvas"></canvas>
-</div>
-
-<nav class="site-nav" id="site-nav">
-  <a href="index.html#top" class="site-nav__logo" data-i18n-aria-label="common.logo_aria" aria-label="COSGRAL — strona główna">
-    <img src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" class="site-nav__logo-img" width="48" height="48" />
-  </a>
-  <div class="site-nav__actions">
-    <div class="lang-switch" role="group" data-i18n-aria-label="common.lang" aria-label="Język">
-      <button type="button" data-i18n-lang-btn="pl" aria-pressed="true">PL</button>
-      <button type="button" data-i18n-lang-btn="en" aria-pressed="false">EN</button>
+<body data-page="sub" data-base="" data-object="shards" data-accent="navy">
+  <a class="skip" href="#main">Przejdź do treści</a>
+  <div class="grain" aria-hidden="true"></div>
+  <canvas class="stage" data-stage aria-hidden="true"></canvas>
+  <div class="cursor" data-cursor aria-hidden="true"></div>
+  <div class="leave" aria-hidden="true"><i></i><i></i></div>
+  <header class="nav">
+    <a class="nav__logo" href="index.html">COSGRAL</a>
+    <div class="nav__right">
+      <button type="button" data-lang>EN</button>
+      <button type="button" data-menu aria-expanded="false">Menu</button>
     </div>
-    <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-overlay">
-      <span class="site-nav__toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
-      <span data-i18n="nav.menu">Menu</span>
-    </button>
-  </div>
-</nav>
-<div class="nav-overlay" id="nav-overlay" aria-hidden="true">
-  <div class="nav-overlay__backdrop" data-nav-close></div>
-  <div class="nav-overlay__stage">
-    <nav class="nav-overlay__links" aria-label="Menu główne">
-      <ul class="nav-overlay__list">
-        <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
-        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
-        <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
-        <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
-        <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
-        <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
-        <li><a href="index.html#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
-
-<main id="main">
-  <article class="privacy-content">
-    <h1 data-i18n="privacy.title">Polityka prywatności</h1>
-    <p class="privacy-content__updated" data-i18n="privacy.updated">Ostatnia aktualizacja: sierpień 2026</p>
-    <p class="privacy-content__intro" data-i18n="privacy.intro">Dbamy o Twoje dane. Poniżej krótko opisujemy, co zbieramy i po co — bez zbędnego żargonu.</p>
-
-    <h2 data-i18n="privacy.s1_title">Administrator</h2>
-    <p data-i18n="privacy.s1_body">Administratorem danych jest cosgral.agency (kontakt: kontakt@cosgral.pl).</p>
-
-    <h2 data-i18n="privacy.s2_title">Jakie dane zbieramy</h2>
-    <p data-i18n="privacy.s2_body">Przez formularz kontaktowy lub e-mail możemy otrzymać imię, adres e-mail, nazwę firmy oraz treść wiadomości. Telefony podane na stronie służą wyłącznie do kontaktu biznesowego.</p>
-
-    <h2 data-i18n="privacy.s3_title">Cel i podstawa</h2>
-    <p data-i18n="privacy.s3_body">Dane przetwarzamy, aby odpowiedzieć na zapytanie i prowadzić rozmowę o współpracy (art. 6 ust. 1 lit. b lub f RODO — wykonanie działań przed umową / prawnie uzasadniony interes).</p>
-
-    <h2 data-i18n="privacy.s4_title">Jak długo przechowujemy</h2>
-    <p data-i18n="privacy.s4_body">Korespondencję trzymamy tak długo, jak jest potrzebna do obsługi zapytania i ewentualnej współpracy, a potem usuwamy lub archiwizujemy zgodnie z obowiązującymi przepisami.</p>
-
-    <h2 data-i18n="privacy.s5_title">Twoje prawa</h2>
-    <p data-i18n="privacy.s5_body">Masz prawo dostępu, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu oraz skargi do Prezesa UODO. W sprawach danych napisz na kontakt@cosgral.pl.</p>
-  </article>
-</main>
-
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-cta"><p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p></div>
-      <div class="footer-col">
-        <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
-        <ul>
-          <li><a href="index.html#top" data-i18n="nav.start">Start</a></li>
-          <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
-          <li><a href="index.html#uslugi" data-i18n="nav.services">Usługi</a></li>
-          <li><a href="o-nas.html" data-i18n="nav.about">O nas</a></li>
-          <li><a href="index.html#kontakt" data-i18n="nav.contact">Kontakt</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
-        <ul>
-          <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
-          <li><a href="tel:+48533790518" data-i18n="contact.phone_kuba">Kuba · +48 533 790 518</a></li>
-          <li><a href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a></li>
-        </ul>
+  </header>
+  <nav class="menu" aria-label="Menu">
+    <button class="menu__close meta" type="button" data-menu-close>Zamknij</button>
+    <div class="menu__links">
+      <a href="index.html" data-preview="portfolio-media/showcase/web/juicy-events-poster.jpg">Start</a>
+      <a href="index.html#uslugi" data-services="1" data-preview="portfolio-media/clients/far-east/cover.jpg">Usługi</a>
+      <a href="portfolio.html" data-preview="portfolio-media/showcase/web/trove-archive-poster.jpg">Realizacje</a>
+      <a href="o-nas.html" data-preview="images/cosgral-agency/team/jakub-gral.png">O nas</a>
+      <a href="kontakt.html" data-preview="images/cosgral-agency/team/kacper-kosikowski.jpg">Kontakt</a>
+      <button type="button" data-sound>Dźwięk</button>
+    </div>
+    <div class="menu__side">
+      <img class="menu__preview" data-menu-preview alt="" />
+      <div class="menu__services" data-menu-services>
+        <a href="uslugi/tworzenie-stron-internetowych.html">Strony</a>
+        <a href="uslugi/sklepy.html">Sklepy</a>
+        <a href="uslugi/projektowanie-aplikacji.html">Aplikacje</a>
+        <a href="uslugi/portale-b2b.html">Portale B2B</a>
+        <a href="uslugi/seo.html">SEO</a>
+        <a href="uslugi/geo.html">GEO</a>
+        <a href="uslugi/wdrazanie-automatyzacji.html">Automatyzacje</a>
+        <a href="uslugi/systemy-crm.html">CRM</a>
+        <a href="uslugi/chatboty.html">Chatboty</a>
+        <a href="uslugi/grafika.html">Grafika</a>
+        <a href="uslugi/montaz-wideo.html">Montaż</a>
+        <a href="uslugi/motion.html">Motion</a>
+        <a href="uslugi/social.html">Social</a>
+        <a href="uslugi/interakcje.html">Interakcje</a>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
-      <a href="privacy-policy.html" data-i18n="footer.privacy">Polityka prywatności</a>
+  </nav>
+  <button class="gyro" type="button" data-gyro>Włącz pochylenie</button>
+  <main id="main">
+  
+    <section class="page-hero" data-subhero>
+      <div>
+        <p class="meta">Dokument</p>
+        <h1 class="display">Prywatność</h1>
+        <p class="lede">Ostatnia aktualizacja: sierpień 2026</p>
+      </div>
+      <div class="slot"></div>
+    </section>
+    <section class="page-main">
+      <div class="split"><h2>Administrator</h2><p>Administratorem danych jest cosgral.agency (kontakt: kontakt@cosgral.pl).</p></div>
+      <div class="split"><h2>Jakie dane zbieramy</h2><p>Przez formularz lub e-mail możemy otrzymać imię, adres e-mail, nazwę firmy oraz treść wiadomości. Telefony na stronie służą do kontaktu biznesowego.</p></div>
+      <div class="split"><h2>Cel i podstawa</h2><p>Dane przetwarzamy, aby odpowiedzieć na zapytanie i prowadzić rozmowę o współpracy (art. 6 ust. 1 lit. b lub f RODO).</p></div>
+      <div class="split"><h2>Jak długo przechowujemy</h2><p>Korespondencję trzymamy tak długo, jak jest potrzebna do obsługi zapytania i ewentualnej współpracy, a potem usuwamy lub archiwizujemy zgodnie z przepisami.</p></div>
+      <div class="split"><h2>Twoje prawa</h2><p>Masz prawo dostępu, sprostowania, usunięcia, ograniczenia, sprzeciwu oraz skargi do Prezesa UODO. Napisz na kontakt@cosgral.pl.</p></div>
+    </section>
+    
+  </main>
+  <footer class="site-foot" data-chat-stop>
+    <div class="foot-grid">
+      <div><p class="meta">COSGRAL</p><p>Agencja cyfrowa.</p></div>
+      <div>
+        <p><a href="tel:+48533790518">Jakub · +48 533 790 518</a></p>
+        <p><a href="tel:+48571798397">Kacper · +48 571 798 397</a></p>
+        <p><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></p>
+      </div>
+      <div>
+        <p><a href="portfolio.html">Portfolio</a></p>
+        <p><a href="kontakt.html">Kontakt</a></p>
+        <p><a href="privacy-policy.html">Polityka prywatności</a></p>
+      </div>
     </div>
+    <p class="display">COSGRAL</p>
+  </footer>
+  <div class="cg-chat-root" data-cg-chat>
+    <div class="cg-chat-panel" role="dialog" aria-label="Czat z Cosgral">
+      <div class="cg-chat-head"><strong>COSGRAL</strong><i class="cg-chat-status"></i></div>
+      <div class="cg-chat-msgs"><div class="cg-chat-empty"><p>Napisz do nas. Odpiszemy.</p></div></div>
+      <form class="cg-chat-form">
+        <input type="text" maxlength="2000" autocomplete="off" aria-label="Wiadomość" placeholder="Twoja wiadomość" />
+        <button type="submit">Wyślij</button>
+      </form>
+    </div>
+    <button class="cg-chat-launcher" type="button" aria-expanded="false" aria-label="Otwórz czat"><span class="cg-chat-label">Live czat</span><span class="cg-chat-badge" hidden>0</span></button>
   </div>
-</footer>
-
-<script src="i18n.js?v=20260920ui10"></script>
-<script src="home-cursor-field.js?v=20260920ui7"></script>
-<script src="home-cursor.js?v=20260920ui10"></script>
-<script src="home-tile-interact.js?v=20260920ui9"></script>
-<script src="subpage-ambient-bg.js?v=20260924polish1"></script>
-<script type="module" src="subpage-cube.js?v=20260924polish1"></script>
-<script type="module" src="portfolio-hero-sand.js?v=20260924scrollidle1"></script>
-<script defer src="home-nav-menu.js?v=20260924polish1"></script>
-<script defer src="site-chat.js?v=20260924idle1"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
+  <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.170.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.170.0/examples/jsm/"}}</script>
+  <script type="module" src="fresh-app.js"></script>
 </body>
 </html>
