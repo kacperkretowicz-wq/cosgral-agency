@@ -1,0 +1,266 @@
+/* Systems fan — circular arc carousel + iris open. Scoped to the fan and its expand. */
+
+.portfolio-chapter[data-theme="systems"] {
+  overflow: hidden;
+}
+.portfolio-chapter[data-theme="systems"] .portfolio-chapter__bg {
+  z-index: 7;
+}
+.portfolio-chapter[data-theme="systems"] .portfolio-chapter__copy {
+  z-index: 8;
+}
+.portfolio-chapter[data-theme="systems"] .sys-fan__stage {
+  pointer-events: auto;
+  touch-action: none;
+  overflow: visible;
+}
+
+.sys-fan__card {
+  width: min(34vw, 17.5rem);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+.sys-fan__card.is-front {
+  border: 0;
+  box-shadow: none;
+}
+.sys-fan__blobs {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+.sys-fan__blob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #101010;
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  will-change: transform, opacity;
+}
+.sys-fan__blob img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.06);
+  transform: none;
+}
+.sys-fan__blob--a {
+  z-index: 3;
+  transform:
+    translate3d(-50%, -50%, 0)
+    scaleX(calc(1 + var(--spread, 0) * 0.07))
+    scaleY(calc(1 - var(--spread, 0) * 0.05));
+}
+.sys-fan__blob--b,
+.sys-fan__blob--c {
+  opacity: var(--spread, 0);
+}
+.sys-fan__blob--b {
+  z-index: 2;
+  width: 64%;
+  height: 64%;
+  transform:
+    translate3d(-50%, -50%, 0)
+    translate3d(calc(var(--spread, 0) * 72%), calc(var(--spread, 0) * -48%), 0)
+    scale(calc(0.4 + var(--spread, 0) * 0.75));
+}
+.sys-fan__blob--c {
+  z-index: 1;
+  width: 46%;
+  height: 46%;
+  transform:
+    translate3d(-50%, -50%, 0)
+    translate3d(calc(var(--spread, 0) * -64%), calc(var(--spread, 0) * 54%), 0)
+    scale(calc(0.35 + var(--spread, 0) * 0.8));
+}
+.sys-fan__card.is-front .sys-fan__blob--a {
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+.sys-fan__cap {
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  top: calc(100% + 0.55rem);
+  width: max-content;
+  max-width: 46vw;
+  padding: 0;
+  background: none;
+  transform: translateX(-50%);
+  text-align: center;
+  letter-spacing: 0.14em;
+  font-size: 0.56rem;
+  color: rgba(255, 255, 255, 0.72);
+  opacity: 0;
+}
+.sys-fan__card.is-front .sys-fan__cap {
+  opacity: 1;
+}
+.sys-fan__card.is-side .sys-fan__cap {
+  opacity: 0;
+}
+
+.sys-fan__pill {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  z-index: 70;
+  transform: translate(-50%, 0);
+  margin: 0;
+  padding: 0.38rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(8, 8, 8, 0.9);
+  color: #fff;
+  font-family: var(--font-body, "Satoshi", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transition: opacity 0.25s ease, transform 0.35s ease;
+}
+.sys-fan__pill:hover,
+.sys-fan__pill:focus-visible {
+  transform: translate(-50%, -1px);
+  outline: none;
+}
+.sys-fan__stage.is-dragging .sys-fan__pill,
+.sys-fan--detail .sys-fan__pill,
+.sys-fan.is-article-open .sys-fan__pill {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sys-fan__dot,
+.sys-fan__dot.is-active {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  transition: transform 0.35s ease, background 0.35s ease, opacity 0.35s ease;
+}
+.sys-fan__dot.is-active {
+  background: #fff;
+  transform: scale(1.4);
+}
+.sys-fan__nav::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.05rem);
+  width: min(42vw, 220px);
+  height: 11px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-top: 0;
+  border-radius: 0 0 140px 140px;
+  pointer-events: none;
+}
+.sys-fan__nav.is-in-case::after {
+  display: none;
+}
+
+/* Detail: circles regroup, copy sits beside them on wide screens */
+@media (min-width: 900px) {
+  .expand-systems .sys-fan__arc {
+    left: 34%;
+    top: 42%;
+  }
+  .expand-systems .sys-fan__copy,
+  .expand-systems .sys-fan--detail.is-settled .sys-fan__copy,
+  .expand-systems .sys-fan--detail.is-from-catalog .sys-fan__copy {
+    left: auto;
+    right: max(5vw, 2.5rem);
+    top: 24%;
+    width: min(26rem, 34vw);
+    text-align: left;
+    transform: none;
+  }
+  .expand-systems .sys-fan__copy .sys-fan__desc {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .sys-fan__card {
+    width: min(54vw, 13.6rem);
+  }
+  .sys-fan__pill {
+    top: 62%;
+    font-size: 0.68rem;
+    padding: 0.42rem 0.85rem;
+  }
+  .sys-fan__cap {
+    font-size: 0.5rem;
+    max-width: 40vw;
+  }
+  .expand-systems .sys-fan__arc {
+    top: 40%;
+  }
+}
+
+/* Full-screen circle grow from the active tile */
+.portfolio-tile-expand.is-iris {
+  opacity: 1;
+  visibility: visible;
+  background: #070709;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: none;
+}
+.portfolio-tile-expand.is-iris .portfolio-tile-expand__body {
+  opacity: 1;
+}
+.portfolio-tile-expand.is-iris:not(.is-iris-in) .sys-fan__copy,
+.portfolio-tile-expand.is-iris:not(.is-iris-in) .portfolio-tile-expand__back {
+  opacity: 0;
+}
+.portfolio-tile-expand.is-iris.is-iris-in .portfolio-tile-expand__back {
+  opacity: 1;
+  transition: opacity 0.45s ease 0.4s;
+}
+.portfolio-tile-expand.is-iris-out {
+  background: #070709;
+  transition: none;
+}
+.portfolio-tile-expand.is-iris-out .sys-fan__copy,
+.portfolio-tile-expand.is-iris-out .portfolio-tile-expand__back,
+.portfolio-tile-expand.is-iris-out .sys-fan__nav {
+  opacity: 0 !important;
+  transition: opacity 0.22s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sys-fan__blob--b,
+  .sys-fan__blob--c {
+    display: none;
+  }
+  .portfolio-tile-expand.is-iris,
+  .portfolio-tile-expand.is-iris-out {
+    clip-path: none !important;
+    transition: opacity 0.25s ease;
+  }
+}
+html.reduce-motion .sys-fan__blob--b,
+html.reduce-motion .sys-fan__blob--c {
+  display: none;
+}
+html.reduce-motion .portfolio-tile-expand.is-iris,
+html.reduce-motion .portfolio-tile-expand.is-iris-out {
+  clip-path: none !important;
+}

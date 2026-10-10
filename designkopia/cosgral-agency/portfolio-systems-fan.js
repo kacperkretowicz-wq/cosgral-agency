@@ -208,6 +208,7 @@
       '<div class="sys-fan__head" data-sys-fan-head>' +
       '<div class="sys-fan__stage" data-sys-fan-stage>' +
       '<div class="sys-fan__arc" data-sys-fan-arc></div>' +
+      '<button type="button" class="sys-fan__pill" data-sys-fan-pill></button>' +
       "</div>" +
       (mode === "detail"
         ? '<div class="sys-fan__copy" data-sys-fan-copy aria-live="polite"></div>'
@@ -258,12 +259,20 @@
       fig.className = "sys-fan__card";
       fig.setAttribute("data-sys-fan-card", String(i));
       fig.setAttribute("data-case-id", item.id);
-      var img = document.createElement("img");
-      img.src = item.img;
-      img.alt = item.title;
-      img.decoding = "async";
-      img.draggable = false;
-      fig.appendChild(img);
+      var blobs = document.createElement("span");
+      blobs.className = "sys-fan__blobs";
+      ["a", "b", "c"].forEach(function (name, bi) {
+        var blob = document.createElement("span");
+        blob.className = "sys-fan__blob sys-fan__blob--" + name;
+        var img = document.createElement("img");
+        img.src = item.img;
+        img.alt = bi === 0 ? item.title : "";
+        img.decoding = "async";
+        img.draggable = false;
+        blob.appendChild(img);
+        blobs.appendChild(blob);
+      });
+      fig.appendChild(blobs);
       var cap = document.createElement("figcaption");
       cap.className = "sys-fan__cap";
       cap.textContent = item.tag;
@@ -274,6 +283,34 @@
       });
       arc.appendChild(fig);
       cards.push(fig);
+    });
+
+    var pill = root.querySelector("[data-sys-fan-pill]");
+    function pillLabel() {
+      var t =
+        window.cosgralI18n && window.cosgralI18n.t && window.cosgralI18n.t("portfolio.view_more");
+      return String(t || "Zobacz więcej").replace(/\s*→\s*$/, "");
+    }
+    if (pill) {
+      pill.textContent = pillLabel();
+      pill.addEventListener("pointerdown", function (e) {
+        e.stopPropagation();
+      });
+      pill.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (didDrag) return;
+        if (mode === "catalog") {
+          var link = document.querySelector('[data-tile-expand="systems"]');
+          if (link) link.click();
+          return;
+        }
+        var item = CASES[clampIndex(Math.round(index), n)];
+        if (item) expandArticle(item);
+      });
+    }
+    window.addEventListener("cosgral:langchange", function () {
+      if (pill) pill.textContent = pillLabel();
     });
 
     function getScrollParent() {
@@ -389,44 +426,113 @@
       });
     }
 
+    var metrics = { w: 1, h: 1, mobile: false };
+    function readMetrics() {
+      metrics.w = stage.clientWidth || window.innerWidth || 1;
+      metrics.h = stage.clientHeight || window.innerHeight * 0.55 || 1;
+      metrics.mobile = (window.innerWidth || metrics.w) < 760;
+    }
+    readMetrics();
+    window.addEventListener("resize", readMetrics, { passive: true });
+
+    function clusterSlot(k, w, h, mobile) {
+      var table = mobile
+        ? {
+            "0": { x: 0, y: -h * 0.04, s: 0.92 },
+            "1": { x: w * 0.2, y: h * 0.1, s: 0.46 },
+            "-1": { x: -w * 0.22, y: h * 0.08, s: 0.5 },
+            "2": { x: w * 0.1, y: -h * 0.2, s: 0.3 },
+            "-2": { x: -w * 0.12, y: -h * 0.18, s: 0.28 },
+          }
+        : {
+            "0": { x: -w * 0.1, y: -h * 0.02, s: 0.86 },
+            "1": { x: w * 0.04, y: h * 0.16, s: 0.42 },
+            "-1": { x: -w * 0.26, y: h * 0.1, s: 0.5 },
+            "2": { x: -w * 0.02, y: -h * 0.22, s: 0.3 },
+            "-2": { x: -w * 0.24, y: -h * 0.18, s: 0.28 },
+          };
+      return table[String(k)] || null;
+    }
+
+    function lerpSlot(a, b, t) {
+      return {
+        x: a.x + (b.x - a.x) * t,
+        y: a.y + (b.y - a.y) * t,
+        s: a.s + (b.s - a.s) * t,
+      };
+    }
+
     function layout() {
       if (destroyed) return;
       var nearest = clampIndex(Math.round(index), n);
-      /* Same geometry in catalog + detail — click only pulls the camera back */
-      var span = 172;
-      var step = span / Math.max(8, n - 1);
-      var radiusX = 78;
-      var radiusY = 12;
-      var baseScale = 1;
+      var w = metrics.w;
+      var h = metrics.h;
+      var mobile = metrics.mobile;
+      var frac = Math.abs(index - Math.round(index));
+      var spread = reduced ? 0 : Math.sin(Math.min(1, frac) * Math.PI);
+      if (arc.style.getPropertyValue("--spread") !== spread.toFixed(3)) {
+        arc.style.setProperty("--spread", spread.toFixed(3));
+      }
+      var step = w * (mobile ? 0.42 : 0.3);
+      var arcDrop = mobile ? 16 : 26;
 
       cards.forEach(function (card, i) {
         var raw = i - index;
         if (raw > n / 2) raw -= n;
         if (raw < -n / 2) raw += n;
-        var angDeg = raw * step;
-        var ang = (angDeg * Math.PI) / 180;
-        var x = Math.sin(ang) * radiusX;
-        var y = (1 - Math.cos(ang)) * radiusY;
-        var depth = Math.cos(ang);
-        var s = baseScale * (0.58 + 0.42 * depth);
-        var o = Math.max(0, 0.18 + 0.82 * Math.pow(Math.max(0, depth), 1.05));
-        var rot = angDeg * 0.92;
+        var ad = Math.abs(raw);
+        var x;
+        var y;
+        var s;
+        var o;
+        if (mode === "detail") {
+          var a = Math.floor(raw);
+          var t = raw - a;
+          var eased = t * t * (3 - 2 * t);
+          var sa = clusterSlot(a, w, h, mobile);
+          var sb = clusterSlot(a + 1, w, h, mobile);
+          if (!sa && !sb) {
+            x = raw * step;
+            y = 0;
+            s = 0.2;
+            o = 0;
+          } else if (!sa) {
+            x = sb.x;
+            y = sb.y;
+            s = sb.s * eased;
+            o = eased;
+          } else if (!sb) {
+            x = sa.x;
+            y = sa.y;
+            s = sa.s * (1 - eased);
+            o = 1 - eased;
+          } else {
+            var mix = lerpSlot(sa, sb, eased);
+            x = mix.x;
+            y = mix.y;
+            s = mix.s;
+            o = ad > 2.35 ? Math.max(0, 1 - (ad - 2.35) / 0.45) : 1;
+          }
+        } else {
+          x = raw * step;
+          y = ad * ad * arcDrop;
+          s = Math.max(0.3, 1.04 - ad * 0.4);
+          o = ad > 2.15 ? Math.max(0, 1 - (ad - 2.15) / 0.55) : 1;
+        }
         card.style.transform =
           "translate3d(calc(-50% + " +
-          x.toFixed(3) +
-          "vw), calc(-50% + " +
-          y.toFixed(3) +
-          "vh), 0) rotate(" +
-          rot.toFixed(2) +
-          "deg) scale(" +
+          x.toFixed(2) +
+          "px), calc(-50% + " +
+          y.toFixed(2) +
+          "px), 0) scale(" +
           s.toFixed(3) +
           ")";
         card.style.opacity = String(Math.max(0, Math.min(1, o)));
         card.style.visibility = o < 0.04 ? "hidden" : "visible";
         card.style.pointerEvents = o < 0.12 ? "none" : "auto";
-        card.style.zIndex = String(Math.round(20 + depth * 30));
+        card.style.zIndex = String(Math.round(48 - ad * 12));
         card.classList.toggle("is-front", i === nearest);
-        card.classList.toggle("is-side", Math.abs(raw) > 0.55);
+        card.classList.toggle("is-side", ad > 0.55);
       });
 
       dotButtons.forEach(function (dot, i) {
@@ -534,13 +640,11 @@
 
     function startAuto() {
       stopAuto();
-      if (!autoplay || destroyed) return;
+      if (!autoplay || destroyed || reduced) return;
       autoTimer = window.setInterval(function () {
-        if (dragging || destroyed) return;
-        index += 0.014;
-        if (index >= n) index -= n;
-        layout();
-      }, 40);
+        if (dragging || destroyed || document.hidden) return;
+        nudge(1);
+      }, 6400);
     }
 
     function stopAuto() {
@@ -555,6 +659,8 @@
       dragging = true;
       didDrag = false;
       vel = 0;
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
       lastX = e.clientX != null ? e.clientX : e.touches && e.touches[0].clientX;
       stopAuto();
       stage.classList.add("is-dragging");
@@ -567,8 +673,9 @@
       var dx = x - lastX;
       lastX = x;
       if (Math.abs(dx) > 2) didDrag = true;
-      vel = dx * 0.006;
-      index -= dx * 0.006;
+      var pxPer = Math.max(88, (metrics.w || window.innerWidth || 360) * (metrics.mobile ? 0.34 : 0.22));
+      vel = dx / pxPer;
+      index -= dx / pxPer;
       while (index < 0) index += n;
       while (index >= n) index -= n;
       layout();
@@ -646,6 +753,11 @@
     root.addEventListener("wheel", onWheel, { passive: false });
 
     layout();
+    requestAnimationFrame(function () {
+      if (destroyed) return;
+      readMetrics();
+      layout();
+    });
     if (autoplay) startAuto();
 
     var api = {
@@ -669,6 +781,7 @@
         destroyed = true;
         stopAuto();
         if (raf) cancelAnimationFrame(raf);
+        window.removeEventListener("resize", readMetrics);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
