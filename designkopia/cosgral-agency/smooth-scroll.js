@@ -73,6 +73,9 @@
   });
   ScrollTrigger.defaults({ pinType: "fixed" });
 
+  /* iOS toolbar show/hide fires resize: don't re-measure every trigger on it
+     (that refresh is what made pins jump mid-swipe). */
+  if (ScrollTrigger.config) ScrollTrigger.config({ ignoreMobileResize: true });
   lenis.on("scroll", ScrollTrigger.update);
 
   gsap.ticker.add(function (time) {

@@ -3640,3 +3640,16 @@ html.reduce-motion body.home-page .site-nav {
     filter: brightness(0.34) saturate(0.7);
   }
 }
+
+/* iOS: dvh changes every time Safari's toolbar collapses/expands, which
+   re-laid out every sticky scene mid-scroll (pins shaking, content jumping).
+   Use the stable small viewport for content panels so nothing is cut under
+   the toolbar and nothing re-flows while scrolling. */
+@supports (height: 1svh) {
+  @media (hover: none) and (pointer: coarse) {
+    main.home-film > .home-scene { min-height: 100svh; }
+    .home-hero { height: 100svh; }
+    .home-hero .home-scene__panel { min-height: 100svh; }
+    html.is-free-scroll .cube-runway { height: 50svh; }
+  }
+}
