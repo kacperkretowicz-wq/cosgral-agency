@@ -3,8 +3,8 @@
  * Materials + surface shimmer match home-hero-3d.js (same look on mobile & desktop).
  * Framed with padding so rotated cube never clips the canvas.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011phys";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011line";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011line";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {

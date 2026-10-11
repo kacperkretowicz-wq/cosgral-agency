@@ -2,8 +2,8 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011phys";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011line";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011line";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
@@ -135,15 +135,10 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var _screenRay = new THREE.Vector3();
   var mobileHeroSpinReady = false;
   var mobileDriftSpinReady = false;
-  /* Desktop hero had no continuous yaw (mobile spins ~0.081 rad/s). 1.75× that rate. */
-  var IDLE_YAW_RATE = 0.081 * 1.75;
-  var idleSpinAngle = 0;
-  var idleHoldSmooth = 0;
-  var lastMotionT = 0;
 
   function applyMobileIdleSpin(group) {
     _axisSpin.set(0.12, 1, 0.08).normalize();
-    _qFaceSpin.setFromAxisAngle(_axisSpin, 0.00135 * 1.75);
+    _qFaceSpin.setFromAxisAngle(_axisSpin, 0.00135);
     group.quaternion.multiply(_qFaceSpin);
     group.rotation.setFromQuaternion(group.quaternion, "XYZ");
   }
@@ -954,33 +949,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       !introActive &&
       !introLanding;
 
-    var dtMotion = Math.min(0.08, Math.max(0, t - lastMotionT));
-    lastMotionT = t;
-    var idleHoldTarget =
-      introDone && !introActive && !introLanding && menuBlend < 0.001
-        ? 1 - smooth01(0, 0.12, motion)
-        : 0;
-    idleHoldSmooth += (idleHoldTarget - idleHoldSmooth) * Math.min(1, dtMotion * 2.4);
-    if (!MOBILE && idleHoldSmooth > 0.35) idleSpinAngle += dtMotion * IDLE_YAW_RATE;
-
-    var idleMul = 1.75;
-    var driftW = (Math.PI * 2) / 8;
-    var idleRotX =
-      0.22 +
-      Math.sin(t * (mobileHeroIdle ? 0.16 : 0.035) * idleMul) * 0.04 +
-      Math.sin(t * driftW * 0.83) * 0.028 * idleHoldSmooth;
-    var idleRotY =
-      -0.35 +
-      Math.cos(t * (mobileHeroIdle ? 0.13 : 0.028) * idleMul) * 0.05 +
-      idleSpinAngle;
-    var idleRotZ =
-      Math.sin(t * (mobileHeroIdle ? 0.1 : 0.022) * idleMul) * 0.02 +
-      Math.cos(t * driftW * 0.67) * 0.018 * idleHoldSmooth;
-    /* Phone framing matches the live cube. Drift would push that pose into the screen edge. */
-    var driftX = MOBILE ? 0 : Math.sin(t * driftW) * 0.075 * idleHoldSmooth;
-    var driftY = MOBILE ? 0 : Math.cos(t * driftW * 0.8) * 0.05 * idleHoldSmooth;
-    scrollPosX += driftX;
-    scrollPosY += driftY;
+    var idleRotX = 0.22 + Math.sin(t * (mobileHeroIdle ? 0.16 : 0.035)) * 0.04;
+    var idleRotY = -0.35 + Math.cos(t * (mobileHeroIdle ? 0.13 : 0.028)) * 0.05;
+    var idleRotZ = Math.sin(t * (mobileHeroIdle ? 0.1 : 0.022)) * 0.02;
 
     var spin = 0.016 + approach * 0.01 + depart * 0.005;
     var scrollRotX =
@@ -1015,8 +986,8 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
 
     if (!scrollHandoff && leavingHero && motion >= 0.01 && motion < 0.04) {
       scrollHandoff = {
-        px: heroX + driftX,
-        py: heroY + driftY,
+        px: heroX,
+        py: heroY,
         pz: heroZ,
         rx: idleRotX + heroLook.x,
         ry: idleRotY + heroLook.y,

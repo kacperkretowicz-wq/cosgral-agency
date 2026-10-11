@@ -2,7 +2,7 @@
  * Portfolio WebGL — systems: glassmorphism field that follows the cursor.
  * Canvas is shown only for systems; other themes use dedicated media layers / home ambient.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011line";
 
 (function () {
   "use strict";

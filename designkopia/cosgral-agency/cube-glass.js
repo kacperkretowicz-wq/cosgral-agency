@@ -1,10 +1,10 @@
 /**
  * Grooved cube as real-time MeshPhysicalMaterial glass.
- * The page line field is drawn inside this same scene, so the built-in
- * transmission pass refracts those lines instead of an empty clear.
+ * The page line field is sampled inside this same scene. The plate is drawn
+ * only in the transmission pre-pass; #home-ambient stays the visible background.
  * The studio HDR is reflections only. No custom refraction shader.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011line";
 import { RGBELoader } from "./vendor/RGBELoader.js";
 import { RectAreaLightUniformsLib } from "./vendor/RectAreaLightUniformsLib.js";
 
@@ -12,7 +12,7 @@ var specPromise = null;
 
 export function whenGlassSpec() {
   if (!specPromise) {
-    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261011phys", import.meta.url))
+    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261011line", import.meta.url))
       .then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.json();
@@ -25,7 +25,7 @@ export function whenGlassSpec() {
   return specPromise;
 }
 
-/* Same field as home-ambient-bg.js, so the in-scene plate matches the page. */
+/* Exact home-ambient-bg.js field (dark + light). No precision line: three prepends one. */
 var WAVE_FRAG = [
   "uniform vec2 uRes;",
   "uniform float uTime;",
@@ -52,21 +52,37 @@ var WAVE_FRAG = [
   "  p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;",
   "  float t = uTime * 0.14;",
   "  float w = wave(p, t);",
-  "  float ridge = pow(1.0 - abs(sin(w * 3.4 + t * 0.25)), 2.4);",
-  "  vec3 base = mix(vec3(0.055), vec3(0.94, 0.94, 0.96), uLight);",
-  "  vec3 dim = mix(vec3(0.24), vec3(0.82, 0.83, 0.87), uLight);",
-  "  vec3 mid = mix(vec3(0.58), vec3(0.62, 0.64, 0.7), uLight);",
-  "  vec3 hi = mix(vec3(1.0), vec3(0.35, 0.37, 0.42), uLight);",
-  "  vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);",
-  "  ribbon = mix(ribbon, hi, ridge * mix(0.52, 0.45, uLight));",
-  "  vec3 col = base;",
-  "  col = mix(col, ribbon, smoothstep(0.04, 0.72, ridge) * mix(0.85, 0.62, uLight));",
-  "  col += hi * pow(ridge, 3.0) * mix(0.72, 0.28, uLight);",
-  "  col += mid * mForce * mix(0.16, 0.12, uLight);",
-  "  col += hi * mForce * ridge * mix(0.12, 0.0, uLight);",
-  "  float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));",
-  "  col *= mix(0.58 + vignette * 0.42, 0.92 + vignette * 0.08, uLight);",
-  "  col = mix(((col - 0.5) * 1.04 + 0.5) * 0.78, col, uLight);",
+  "  float ridge = pow(1.0 - abs(sin(w * 4.2 + t * 0.25)), 6.0);",
+  "  vec3 col;",
+  "  if (uLight > 0.5) {",
+  "    vec3 base = vec3(0.94, 0.94, 0.96);",
+  "    vec3 dim = vec3(0.82, 0.83, 0.87);",
+  "    vec3 mid = vec3(0.62, 0.64, 0.7);",
+  "    vec3 hi = vec3(0.35, 0.37, 0.42);",
+  "    vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);",
+  "    ribbon = mix(ribbon, hi, ridge * 0.45);",
+  "    col = base;",
+  "    col = mix(col, ribbon, smoothstep(0.08, 0.88, ridge) * 0.5);",
+  "    col = mix(col, hi, pow(ridge, 14.0) * 0.18);",
+  "    col = mix(col, mid, mForce * 0.12);",
+  "    float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));",
+  "    col *= 0.92 + vignette * 0.08;",
+  "  } else {",
+  "    vec3 base = vec3(0.055, 0.055, 0.055);",
+  "    vec3 dim = vec3(0.24, 0.24, 0.24);",
+  "    vec3 mid = vec3(0.58, 0.58, 0.58);",
+  "    vec3 hi = vec3(1.0, 1.0, 1.0);",
+  "    vec3 ribbon = mix(dim, mid, sin(uv.x * 2.2 + t * 0.15) * 0.5 + 0.5);",
+  "    ribbon = mix(ribbon, hi, ridge * 0.52);",
+  "    col = base;",
+  "    col = mix(col, ribbon, smoothstep(0.08, 0.88, ridge) * 0.58);",
+  "    col += hi * pow(ridge, 14.0) * 0.32;",
+  "    col += mid * mForce * 0.16;",
+  "    col += hi * mForce * ridge * 0.12;",
+  "    float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));",
+  "    col *= 0.58 + vignette * 0.42;",
+  "    col = ((col - 0.5) * 1.04 + 0.5) * 0.78;",
+  "  }",
   "  gl_FragColor = vec4(col, 1.0);",
   "}",
 ].join("\n");
@@ -120,10 +136,12 @@ function createLinePlate() {
   var material = new THREE.ShaderMaterial({
     uniforms: uniforms,
     transparent: false,
-    depthWrite: true,
-    depthTest: true,
+    depthWrite: false,
+    depthTest: false,
+    colorWrite: false,
     toneMapped: false,
     fog: false,
+    side: THREE.DoubleSide,
     vertexShader: "void main(){ gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
     fragmentShader: WAVE_FRAG,
   });
@@ -132,6 +150,14 @@ function createLinePlate() {
   mesh.renderOrder = -2;
   mesh.name = "cosgral-line-plate";
   mesh.userData.uniforms = uniforms;
+  /* Three's transmission pre-pass is the only render that sets toneMapping to 0.
+     The page keeps #home-ambient; this plate exists only so transmission can sample it. */
+  mesh.onBeforeRender = function (renderer) {
+    var sample = renderer.toneMapping === THREE.NoToneMapping;
+    material.colorWrite = sample;
+    material.depthWrite = sample;
+    material.depthTest = sample;
+  };
   return mesh;
 }
 
@@ -167,7 +193,9 @@ function addStudioLights(scene) {
 }
 
 export function installGlassScene(renderer, scene, camera) {
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  /* The page line canvas is raw WebGL (no sRGB encode). Encoding the glass
+     output lifts those same darks into a milky slab on WebKit. */
+  renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
   renderer.setClearColor(0x000000, 0);
