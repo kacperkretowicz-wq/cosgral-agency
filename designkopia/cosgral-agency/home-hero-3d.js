@@ -876,6 +876,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       { passive: true }
     );
   }
+  var servicesElCache = null;
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
@@ -1140,6 +1141,12 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     root.rotation.set(0, 0, 0);
 
     var cubeVisible = depart < 0.93;
+    /* Phones: the scrubbed motion lags a fast flick, so also gate on where the
+       services scene really is — once its heading is up, the cube is gone. */
+    if (MOBILE && cubeVisible && menuBlend < 0.001) {
+      var svcEl = servicesElCache || (servicesElCache = document.getElementById("uslugi"));
+      if (svcEl && svcEl.getBoundingClientRect().top < (window.innerHeight || 800) * 0.3) cubeVisible = false;
+    }
 
     var tilesOp = readUslugiPanelOpacity();
 

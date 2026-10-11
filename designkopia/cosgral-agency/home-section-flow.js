@@ -396,8 +396,32 @@
     /* Recess z live rect następnej — pełny zakres scrolla, bo sticky psuje
        start/end ST i zostawiał lukę (Kontakt na ostrym Procesie). */
     if (fadeOut && next) {
+      var nextPanel = next.querySelector(".home-scene__panel") || next;
+      var lastClip = "";
+      /* Same iris language as the realizacje boards (spec-a circle mask,
+         cubic-bezier(.25,1,.5,1)-like ease): the incoming scene opens from a
+         circle rising at the bottom centre while the outgoing one recedes. */
+      function irisFor(amt) {
+        if (REDUCED) return "";
+        if (amt <= 0.001) return "circle(0px at 50% 50%)";
+        if (amt >= 0.985) return "";
+        var vw = window.innerWidth || 1;
+        var vh = window.innerHeight || 1;
+        var t = amt < 0.5 ? 4 * amt * amt * amt : 1 - Math.pow(-2 * amt + 2, 3) / 2;
+        /* centre of the screen, expressed in the sliding panel's own box */
+        var top = nextPanel.getBoundingClientRect().top;
+        var cy = vh * 0.5 - top;
+        var r = t * Math.hypot(vw, vh) * 0.62;
+        return "circle(" + r.toFixed(1) + "px at 50% " + cy.toFixed(1) + "px)";
+      }
       function syncCover() {
         var amt = coverAmount();
+        var clip = irisFor(amt);
+        if (clip !== lastClip || (amt > 0.001 && amt < 0.985)) {
+          nextPanel.style.clipPath = clip;
+          nextPanel.style.webkitClipPath = clip;
+          lastClip = clip;
+        }
         applyPose(amt);
         if (opts.onUpdate) opts.onUpdate({ progress: amt });
       }
