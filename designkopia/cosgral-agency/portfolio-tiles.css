@@ -129,7 +129,7 @@ body.portfolio-page--tiles.subpage::after {
   opacity: 0.04;
 }
 
-body.portfolio-page--tiles .site-nav {
+body.portfolio-page--tiles:not(.is-nav-menu-open) .site-nav {
   z-index: 40;
 }
 

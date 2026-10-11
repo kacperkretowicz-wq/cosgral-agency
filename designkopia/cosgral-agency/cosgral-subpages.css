@@ -442,6 +442,7 @@ body.is-auto-cube-hero.portfolio-page main {
   width: 100%;
   height: 100%;
   display: block;
+  pointer-events: none;
 }
 .portfolio-sand-portal {
   position: fixed;
@@ -593,8 +594,12 @@ body.is-nav-menu-open .subpage-cube-portal {
   z-index: 518 !important;
   opacity: 1 !important;
   visibility: visible !important;
+  pointer-events: none !important;
   /* Subpage materials blow out at homepage 2.76 — glass cube, not white slab */
   filter: brightness(1.55) saturate(1.08);
+}
+body.is-nav-menu-open .subpage-cube__canvas {
+  pointer-events: none !important;
 }
 body.is-nav-menu-open.is-cube-menu-front .subpage-cube-portal {
   z-index: 518 !important;
@@ -632,6 +637,7 @@ body.is-nav-menu-open.is-gallery-menu-particles .portfolio-sand-portal--front {
   z-index: 516 !important;
 }
 body.is-nav-menu-open .nav-overlay {
+  z-index: 520 !important;
   background: transparent;
 }
 body.is-nav-menu-open .nav-overlay__backdrop {
@@ -639,8 +645,9 @@ body.is-nav-menu-open .nav-overlay__backdrop {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
-body.is-nav-menu-open .site-nav {
-  z-index: 530;
+body.is-nav-menu-open .site-nav,
+body.portfolio-page--tiles.is-nav-menu-open .site-nav {
+  z-index: 530 !important;
 }
 
 /* Mega menu — lock page scroll on subpages */

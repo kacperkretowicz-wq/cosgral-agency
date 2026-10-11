@@ -4,7 +4,7 @@
  * Framed with padding so rotated cube never clips the canvas.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011scroll";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011menu";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {
@@ -65,7 +65,13 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     parts.shell.material.transmission = 0;
     parts.shell.material.thickness = 0;
     parts.shell.material.depthWrite = false;
+    parts.shell.material.depthTest = true;
     parts.shell.material.opacity = 0.998;
+    parts.shell.material.transparent = true;
+    /* Shared glass material is premultiplied (One, OneMinusSrcAlpha). On a
+       straight-alpha canvas that paints the whole face as a dark square. */
+    parts.shell.material.premultipliedAlpha = false;
+    parts.shell.material.blending = THREE.NormalBlending;
     if (parts.shell.material.userData.uChatClear) parts.shell.material.userData.uChatClear.value = 1;
     parts.edges.material.opacity = EDGE_OP;
     parts.edges.material.depthTest = true;

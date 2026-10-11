@@ -2,7 +2,7 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011scroll";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011menu";
 import { createFxaaPass } from "./three-fxaa-pass.js?v=20261011scroll";
 import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from "./cube-look.js?v=20260926cube1";
 
@@ -18,6 +18,9 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   var look = heroCubeLook(MOBILE);
   var HALF = look.half;
   var CUBE_SCALE = MOBILE ? 0.23 : 0.46;
+  /* Homepage megamenu cube (home-hero-3d.js). Subpage idle scale is smaller;
+     the open menu must land on this same world size or the cube covers the links. */
+  var MENU_OPEN_SCALE = look.cubeScale * (MOBILE ? 0.82 : 0.78 * 1.14);
   var EDGE_OP = look.edgeOp;
   var SHELL_OP = look.shellOp;
   var WIRE_OP = 0.08;
@@ -1139,7 +1142,7 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
         x: MOBILE ? 0.3 : 0.4,
         y: MOBILE ? 0.54 : 0.7,
         z: 0.36,
-        sc: CUBE_SCALE * (MOBILE ? 0.82 : 0.78 * 1.14),
+        sc: MENU_OPEN_SCALE,
       };
     }
     return {
@@ -1269,7 +1272,7 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
     cubeGroup.updateMatrixWorld(true);
     menuFrom.driftMatrix = cubeGroup.matrixWorld.clone();
 
-    var menuOpenScale = CUBE_SCALE * (MOBILE ? 1.62 : 0.78 * 1.14);
+    var menuOpenScale = MENU_OPEN_SCALE;
     menuFrom.target = {
       x: MOBILE ? 0.3 : 0.4,
       y: MOBILE ? 0.54 : 0.7,
@@ -1526,7 +1529,7 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
     var heroX = MOBILE ? 0.3 : 0.4;
     var heroY = MOBILE ? 0.54 : 0.7;
     var heroZ = 0.36;
-    var menuScale = CUBE_SCALE * (MOBILE ? 1.62 : 0.78 * 1.14);
+    var menuScale = MENU_OPEN_SCALE;
     var useSoftFly = menuFrom.bgExit || menuFrom.galleryMenu;
     var startX = menuFrom.px;
     var startY = menuFrom.py;
@@ -2093,15 +2096,17 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
             if (menuFrom.keepDriftVisible) {
               applyGalleryDriftFreeze(driftFade);
               applySideEntryPose(arrive, menuSandTarget);
+              /* Full face align at rest. A 0.14 slerp was reset every frame by the
+                 flight spin, so the cube stayed tumbled over the links. */
               if (!menuTween.closing && activeBlend > 0.72) {
-                applyMenuFaceOrientation(((activeBlend - 0.72) / 0.28) * 0.14, false, menuSandTarget);
+                applyMenuFaceOrientation((activeBlend - 0.72) / 0.28, false, menuSandTarget);
               }
             } else {
               root.position.set(0, 0, 0);
               root.rotation.set(0, 0, 0);
               applySideEntryPose(arrive, cubeGroup);
               if (!menuTween.closing && activeBlend > 0.72) {
-                applyMenuFaceOrientation(((activeBlend - 0.72) / 0.28) * 0.14);
+                applyMenuFaceOrientation((activeBlend - 0.72) / 0.28);
               }
               var cubeDim = 1 - activeBlend * 0.4;
               if (!menuTween.closing && arrive < 0.12) {

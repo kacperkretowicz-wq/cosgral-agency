@@ -3,7 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
-import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011scroll";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011menu";
 import { createFxaaPass } from "./three-fxaa-pass.js?v=20261011scroll";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
