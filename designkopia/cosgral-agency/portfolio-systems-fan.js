@@ -352,6 +352,8 @@
       dot.setAttribute("data-sys-fan-dot", String(i));
       dot.setAttribute("role", "tab");
       dot.setAttribute("aria-label", item.title);
+      /* Thumbnail of the system in each small circle (spec: thumb arc). */
+      if (item.img) dot.style.setProperty("--sys-thumb", 'url("' + item.img + '")');
       if (i === index) dot.setAttribute("aria-current", "true");
       dot.addEventListener("click", function (e) {
         e.stopPropagation();

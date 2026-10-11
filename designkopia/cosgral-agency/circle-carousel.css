@@ -469,3 +469,23 @@ html.reduce-motion .sys-iris__hint,
 html.reduce-motion .sys-iris__neck {
   transition: none !important;
 }
+
+/* Thumb circles: show the system still, softened onto the cream arc. */
+#realizacje .sys-fan--circle .sys-fan__dot::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: var(--sys-thumb) center / cover no-repeat;
+  filter: grayscale(1) contrast(1.05);
+  opacity: 0.55;
+  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), inset 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+#realizacje .sys-fan--circle .sys-fan__dot:hover::before { opacity: 0.85; }
+#realizacje .sys-fan--circle .sys-fan__dot.is-active::before { opacity: 1; inset: 6%; }
+#realizacje .sys-fan--circle .sys-fan__dot.is-active::after {
+  z-index: 1;
+  width: 14%;
+  height: 14%;
+  box-shadow: 0 0 0 3px #f7f3ec;
+}
