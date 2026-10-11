@@ -964,7 +964,8 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     var centerY = mouse.y * 0.018;
 
     var approach = smooth01(0, 0.34, motion);
-    var depart = smooth01(0.32, 0.93, motion);
+    /* Phones: leave sooner so a fast flick never parks the cube over the first service card. */
+    var depart = MOBILE ? smooth01(0.26, 0.7, motion) : smooth01(0.32, 0.93, motion);
     var heroReady = document.body.classList.contains("is-ready");
     var inHero = motion < 0.01 && menuBlend < 0.001;
 
