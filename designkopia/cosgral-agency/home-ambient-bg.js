@@ -63,6 +63,7 @@
       "uniform vec2 uRes;",
       "uniform float uTime;",
       "uniform vec2 uMouse;",
+      "uniform float uPaper;",
       "float wave(vec2 p, float t) {",
       "  float w = 0.0; float amp = 1.0;",
       "  for (int i = 0; i < 4; i++) {",
@@ -99,7 +100,14 @@
       "  float vignette = smoothstep(1.15, 0.3, length(uv - 0.5));",
       "  col *= 0.58 + vignette * 0.42;",
       "  col = ((col - 0.5) * 1.04 + 0.5) * 0.78;",
-      "  gl_FragColor = vec4(col, 1.0);",
+      "  vec3 paperBase = vec3(0.9255, 0.9255, 0.9176);",
+      "  vec3 graphite = vec3(0.45, 0.45, 0.43);",
+      "  vec3 inkLine = vec3(0.29, 0.29, 0.28);",
+      "  vec3 lightCol = paperBase;",
+      "  lightCol = mix(lightCol, graphite, smoothstep(0.08, 0.88, ridge) * 0.7);",
+      "  lightCol = mix(lightCol, inkLine, pow(ridge, 10.0) * 0.78);",
+      "  lightCol = mix(lightCol, inkLine, mForce * 0.05);",
+      "  gl_FragColor = vec4(mix(col, lightCol, clamp(uPaper, 0.0, 1.0)), 1.0);",
       "}",
     ].join("\n");
   }
@@ -155,6 +163,8 @@
     var uRes = gl.getUniformLocation(program, "uRes");
     var uTime = gl.getUniformLocation(program, "uTime");
     var uMouse = gl.getUniformLocation(program, "uMouse");
+    var uPaper = gl.getUniformLocation(program, "uPaper");
+    var lastPaper = -1;
 
     var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
     var running = false;
@@ -190,8 +200,10 @@
       if (!running) return;
       var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
       var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
+      var paper = window.__cosgralPaper || 0;
+      var paperMoved = uPaper && Math.abs(paper - lastPaper) > 0.0006;
       frameSkip += 1;
-      if (skipN > 1 && frameSkip % skipN !== 0) {
+      if (skipN > 1 && frameSkip % skipN !== 0 && !paperMoved) {
         requestAnimationFrame(frame);
         return;
       }
@@ -208,6 +220,10 @@
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
+      if (uPaper) {
+        gl.uniform1f(uPaper, paper);
+        lastPaper = paper;
+      }
       window.__cosgralAmbient = { t: (now - start) / 1000, x: mouse.x, y: mouse.y };
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       requestAnimationFrame(frame);
@@ -225,6 +241,7 @@
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.uniform1f(uTime, 0);
     gl.uniform2f(uMouse, 0, 0);
+    if (uPaper) gl.uniform1f(uPaper, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     play();
 

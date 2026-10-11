@@ -113,13 +113,13 @@ body.home-page::after {
       rgba(255, 255, 255, 0.004) 58%,
       transparent 66%
     );
-  opacity: 0.55;
+  opacity: calc(0.55 * (1 - var(--paper, 0) * 0.82));
   transform: translate3d(50vw, 50vh, 0);
   will-change: transform;
 }
 @media (max-width: 900px) {
   .home-ambient__blur {
-    opacity: 0.4;
+    opacity: calc(0.4 * (1 - var(--paper, 0) * 0.82));
   }
 }
 .home-ambient__shade {
@@ -128,6 +128,7 @@ body.home-page::after {
   z-index: 0;
   pointer-events: none;
   background: rgba(3, 3, 3, 0.28);
+  opacity: calc(1 - var(--paper, 0));
 }
 .home-sand {
   position: fixed;
@@ -3155,126 +3156,82 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
   }
 }
 
-/* Dawn hill — scroll track between Usługi and Realizacje.
-   The canvas is fixed to the visual viewport; the track only supplies
-   scroll distance. z-index 25 sits above services (20) and under work (30)
-   inside main's stacking context. */
-.dawn-hill {
-  position: relative;
-  z-index: 25;
-  height: 150dvh;
+/* Quiet scroll distance for the line-field lightening. No shape, no plate. */
+.paper-bridge,
+.paper-return {
+  height: 72vh;
   pointer-events: none;
 }
-@media (max-width: 900px) {
-  .dawn-hill { height: 128dvh; }
+html.reduce-motion .paper-bridge,
+html.reduce-motion .paper-return {
+  display: none;
 }
-.dawn-hill__sticky {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  height: 100svh;
-  pointer-events: none;
-}
-.dawn-hill__canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  display: block;
-  pointer-events: none;
-  visibility: hidden;
-}
-html.reduce-motion .dawn-hill { display: none; }
 
-html.is-dawn-active .home-ambient {
-  opacity: calc(1 - var(--dawn-cover, 0));
-}
-html.is-dawn-active .home-ambient__blur {
-  opacity: calc(0.55 * (1 - var(--dawn-cover, 0)));
-}
-@media (max-width: 900px) {
-  html.is-dawn-active .home-ambient__blur {
-    opacity: calc(0.4 * (1 - var(--dawn-cover, 0)));
+@supports (color: color-mix(in srgb, black, white)) {
+  #uslugi .section-label,
+  #uslugi .services-fan__title,
+  #realizacje .section-label,
+  #realizacje .home-work__title {
+    color: color-mix(in srgb, #1c1c1b calc(var(--paper, 0) * 100%), var(--ink));
   }
-}
-html.is-dawn-active .home-ambient__shade {
-  opacity: calc(1 - var(--dawn-cover, 0));
-}
-
-html.is-dawn-active #realizacje {
-  background-color: rgba(255, 255, 255, var(--dawn-cover, 0));
-}
-html.is-dawn-light #realizacje {
-  color: #161616;
-}
-html.is-dawn-light #realizacje .section-label,
-html.is-dawn-light #realizacje .home-work__title {
-  color: #121212;
-}
-html.is-dawn-light #realizacje .home-work__lead {
-  color: #4e4e4e;
-}
-html.is-dawn-light #realizacje .home-work__card,
-html.is-dawn-light #realizacje .home-work__card-tag {
-  color: #fff;
-}
-html.is-dawn-light #realizacje .home-work__card {
-  border-color: rgba(0, 0, 0, 0.1);
-}
-html.is-dawn-light #realizacje .home-work__card-cta {
-  color: #141416;
-  background: #fff;
-  border-bottom-color: transparent;
-  padding: 0.2rem 0.48rem;
-}
-html.is-dawn-light #realizacje .glass-btn {
-  color: #141416;
-  border-bottom-color: rgba(20, 20, 20, 0.45);
-}
-html.is-dawn-light #realizacje .glass-btn:hover,
-html.is-dawn-light #realizacje .glass-btn:focus-visible {
-  border-color: #141416;
-}
-
-html.is-dawn-light .home-scroll-rail__track {
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.05) 0%,
-    rgba(0, 0, 0, 0.28) 12%,
-    rgba(0, 0, 0, 0.28) 88%,
-    rgba(0, 0, 0, 0.05) 100%
-  );
-}
-html.is-dawn-light .home-scroll-rail__fill {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.88));
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
-}
-html.is-dawn-light .home-scroll-rail__title {
-  color: rgba(18, 18, 18, 0.58);
-}
-html.is-dawn-light .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:hover,
-html.is-dawn-light .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:focus-visible,
-html.is-dawn-light .home-scroll-rail__item.is-title-revealed.is-current .home-scroll-rail__title {
-  color: rgba(10, 10, 10, 0.92);
-}
-html.is-dawn-light .home-scroll-rail__dot {
-  border-color: rgba(0, 0, 0, 0.38);
-  background: rgba(255, 255, 255, 0.92);
-}
-html.is-dawn-light .home-scroll-rail__dot.is-active {
-  border-color: rgba(0, 0, 0, 0.72);
-  background: rgba(0, 0, 0, 0.16);
-}
-html.is-dawn-light .home-scroll-rail__dot.is-passed {
-  border-color: rgba(0, 0, 0, 0.48);
-  background: rgba(0, 0, 0, 0.12);
-}
-html.is-dawn-light .home-scroll-rail__dot.is-hold {
-  border-color: rgba(0, 0, 0, 0.92);
-  background: rgba(18, 18, 18, 0.9);
-  box-shadow:
-    0 0 0 4px rgba(0, 0, 0, 0.06),
-    0 0 14px rgba(0, 0, 0, 0.18);
+  #uslugi .services-fan__counter,
+  #realizacje .home-work__lead {
+    color: color-mix(in srgb, #5c5c5a calc(var(--paper, 0) * 100%), var(--muted));
+  }
+  #realizacje .glass-btn {
+    color: color-mix(in srgb, #1c1c1b calc(var(--paper, 0) * 100%), var(--ink));
+    border-bottom-color: color-mix(
+      in srgb,
+      rgba(28, 28, 27, 0.45) calc(var(--paper, 0) * 100%),
+      rgba(255, 255, 255, 0.45)
+    );
+  }
+  #realizacje .glass-btn:hover,
+  #realizacje .glass-btn:focus-visible {
+    border-color: color-mix(in srgb, #1c1c1b calc(var(--paper, 0) * 100%), #fff);
+  }
+  #realizacje .home-work__card,
+  #realizacje .home-work__card-tag,
+  #realizacje .home-work__card-cta {
+    color: #fff;
+  }
+  body.home-page .cg-chat-launcher {
+    color: color-mix(in srgb, #1a1a1a calc(var(--paper, 0) * 100%), var(--cg-chat-ink, #f5f5f5));
+  }
+  .home-scroll-rail__track {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, rgba(0, 0, 0, 0.06) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.04)) 0%,
+      color-mix(in srgb, rgba(0, 0, 0, 0.22) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14)) 12%,
+      color-mix(in srgb, rgba(0, 0, 0, 0.22) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14)) 88%,
+      color-mix(in srgb, rgba(0, 0, 0, 0.06) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.04)) 100%
+    );
+  }
+  .home-scroll-rail__fill {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, rgba(0, 0, 0, 0.35) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.35)),
+      color-mix(in srgb, rgba(0, 0, 0, 0.82) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.85))
+    );
+  }
+  .home-scroll-rail__title {
+    color: color-mix(in srgb, rgba(22, 22, 22, 0.62) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.52));
+  }
+  .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:hover,
+  .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:focus-visible,
+  .home-scroll-rail__item.is-title-revealed.is-current .home-scroll-rail__title {
+    color: color-mix(in srgb, rgba(12, 12, 12, 0.92) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.88));
+  }
+  .home-scroll-rail__dot {
+    border-color: color-mix(in srgb, rgba(0, 0, 0, 0.38) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.28));
+    background: color-mix(in srgb, rgba(255, 255, 255, 0.92) calc(var(--paper, 0) * 100%), rgba(8, 8, 8, 0.65));
+  }
+  .home-scroll-rail__dot.is-active {
+    border-color: color-mix(in srgb, rgba(0, 0, 0, 0.7) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.55));
+    background: color-mix(in srgb, rgba(0, 0, 0, 0.16) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.22));
+  }
+  .home-scroll-rail__dot.is-passed {
+    border-color: color-mix(in srgb, rgba(0, 0, 0, 0.45) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.42));
+    background: color-mix(in srgb, rgba(0, 0, 0, 0.12) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14));
+  }
 }
