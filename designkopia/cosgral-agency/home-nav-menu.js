@@ -705,7 +705,8 @@
    Scroll up brings it back. An open mega menu always keeps it on screen. */
 (function () {
   "use strict";
-  if (!document.body || !document.body.classList.contains("home-page")) return;
+  /* All pages (O nas too): text used to slide under a bar that never hid. */
+  if (!document.body) return;
   var nav = document.getElementById("site-nav");
   if (!nav) return;
 
