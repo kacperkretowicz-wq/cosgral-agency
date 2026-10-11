@@ -358,6 +358,7 @@
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
+      window.__cosgralAmbient = { t: (now - start) / 1000, x: mouse.x, y: mouse.y };
       gl.uniform3fv(uBase, colors.base);
       gl.uniform3fv(uAccent, colors.accent);
       gl.uniform3fv(uHighlight, colors.highlight);
