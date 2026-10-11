@@ -2,9 +2,9 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011viewer";
-import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011viewer";
-import { createFxaaPass } from "./three-fxaa-pass.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011scroll";
+import { createFxaaPass } from "./three-fxaa-pass.js?v=20261011scroll";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (async function () {
@@ -363,6 +363,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
 
   function renderScene() {
+    /* Transmission's pre-pass temporarily clears with alpha 1. Put it back
+       before the presented frame so a failed restore cannot leave an opaque veil. */
+    renderer.setClearAlpha(0);
     if (fxaa) fxaa.render(scene, camera);
     else renderer.render(scene, camera);
   }

@@ -2,11 +2,11 @@
  * Shared cube geometry for homepage + subpages.
  * The visible cube is the Blender glass mesh (cube_web.glb, meshopt).
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011viewer";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
 import { GLTFLoader, MeshoptDecoder } from "./vendor/cube-three-addons.js";
-import { createGlassMaterial, whenGlassSpec } from "./cube-glass.js?v=20261011viewer";
+import { createGlassMaterial, whenGlassSpec } from "./cube-glass.js?v=20261011scroll";
 
-export { installGlassScene } from "./cube-glass.js?v=20261011viewer";
+export { installGlassScene } from "./cube-glass.js?v=20261011scroll";
 
 var EDGE_RADIUS_RATIO = 0.2;
 var EDGE_SEGMENTS = 5;

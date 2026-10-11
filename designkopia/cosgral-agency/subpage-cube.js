@@ -1,9 +1,9 @@
 /**
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011viewer";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011viewer";
-import { createFxaaPass } from "./three-fxaa-pass.js";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011scroll";
+import { createFxaaPass } from "./three-fxaa-pass.js?v=20261011scroll";
 import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from "./cube-look.js?v=20260926cube1";
 
 (async function () {

@@ -65,7 +65,7 @@ import {
   VectorKeyframeTrack,
   SRGBColorSpace,
   InstancedBufferAttribute as InstancedBufferAttribute2
-} from "./three-0.170.0.module.min.js?v=20261011viewer";
+} from "./three-0.170.0.module.min.js?v=20261011scroll";
 
 // node_modules/three/examples/jsm/utils/BufferGeometryUtils.js
 import {
@@ -79,7 +79,7 @@ import {
   TriangleStripDrawMode,
   TrianglesDrawMode,
   Vector3
-} from "./three-0.170.0.module.min.js?v=20261011viewer";
+} from "./three-0.170.0.module.min.js?v=20261011scroll";
 function toTrianglesDrawMode(geometry, drawMode) {
   if (drawMode === TrianglesDrawMode) {
     console.warn("THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.");
@@ -2628,7 +2628,7 @@ import {
   MeshStandardMaterial as MeshStandardMaterial2,
   PointLight as PointLight2,
   Scene
-} from "./three-0.170.0.module.min.js?v=20261011viewer";
+} from "./three-0.170.0.module.min.js?v=20261011scroll";
 var RoomEnvironment = class extends Scene {
   constructor() {
     super();

@@ -3,7 +3,7 @@
  * grooved cube. The page line field is sampled only in the transmission
  * pre-pass; #home-ambient stays the visible background.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011viewer";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
 
 var spec = {
   color: "#ffffff",
@@ -40,7 +40,7 @@ function num(value, fallback) {
 
 export function whenGlassSpec() {
   if (!specPromise) {
-    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261011viewer", import.meta.url))
+    specPromise = fetch(new URL("./assets/cube/web_glass.json?v=20261011scroll", import.meta.url))
       .then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.json();
@@ -99,7 +99,9 @@ export function createGlassMaterial() {
   var noise = Math.max(0.05, num(spec.iridescenceNoise, 0.6)).toFixed(4);
   var farDim = Math.min(1, Math.max(0, num(spec.farSideDim, 0.7))).toFixed(4);
   var uBackGlass = { value: 0 };
+  var uChatClear = { value: 0 };
   mat.userData.uBackGlass = uBackGlass;
+  mat.userData.uChatClear = uChatClear;
   /* r170 resolves #include after onBeforeCompile, so the patch has to sit on the include. */
   var film = [
     "float cosT = clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0);",
@@ -114,6 +116,7 @@ export function createGlassMaterial() {
   ].join("\n");
   mat.onBeforeCompile = function (shader) {
     shader.uniforms.uBackGlass = uBackGlass;
+    shader.uniforms.uChatClear = uChatClear;
     var frag = shader.fragmentShader;
     if (frag.indexOf("#include <lights_physical_fragment>") < 0 || frag.indexOf("#include <opaque_fragment>") < 0) {
       console.warn("[cube-look] glass shader patch missed");
@@ -138,15 +141,19 @@ export function createGlassMaterial() {
         "if (uBackGlass > 0.5) {",
         "  float fres = pow(1.0 - clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0), 2.2);",
         "  gl_FragColor = vec4(outgoingLight * fres, fres);",
+        "} else if (uChatClear > 0.5) {",
+        "  float face = pow(1.0 - clamp(dot(normalize(nonPerturbedNormal), normalize(vViewPosition)), 0.0, 1.0), 1.35);",
+        "  float a = clamp(0.22 + face * 0.78 + bevel, 0.0, 1.0);",
+        "  gl_FragColor = vec4(vec3(0.72, 0.78, 0.86) * (0.35 + face) + grooveTint * bevel * 1.6, a);",
         "} else {",
         "  gl_FragColor = vec4(outgoingLight, opacity);",
         "}",
       ].join("\n")
     );
-    shader.fragmentShader = "uniform float uBackGlass;\n" + frag;
+    shader.fragmentShader = "uniform float uBackGlass;\nuniform float uChatClear;\n" + frag;
   };
   mat.customProgramCacheKey = function () {
-    return "cosgral-viewer-glass-" + biasLit + "-" + noise + "-" + farDim + "-" + glowLit;
+    return "cosgral-viewer-glass-" + biasLit + "-" + noise + "-" + farDim + "-" + glowLit + (uChatClear.value > 0.5 ? "-chat" : "");
   };
   /* DoubleSide transmission draws the far wall into the buffer it also samples.
      SwiftShader drops that draw (feedback loop). Render the far wall as a fresnel
@@ -336,7 +343,11 @@ function createLinePlate() {
   /* Transmission pre-pass is the only render that sets toneMapping to 0.
      The vendored transmission target uses samples 0, so a samples>0 test never fires. */
   mesh.onBeforeRender = function (renderer) {
-    var sample = renderer.toneMapping === THREE.NoToneMapping;
+    var rt = renderer.getRenderTarget();
+    /* Only the transmission pre-pass (toneMapping 0, offscreen RT). Never the
+       canvas or the FXAA present target — those would paint a fullscreen plate
+       over the page. */
+    var sample = renderer.toneMapping === THREE.NoToneMapping && !!rt && !rt.__cosgralPresent;
     material.colorWrite = sample;
     material.depthWrite = sample;
     material.depthTest = sample;
@@ -355,13 +366,15 @@ function placePlate(plate, camera, width, height) {
   plate.scale.set(planeW * 1.08, planeH * 1.08, 1);
 }
 
-export function installGlassScene(renderer, scene, camera) {
+export function installGlassScene(renderer, scene, camera, options) {
+  options = options || {};
   var toneName = spec.toneMapping || "NeutralToneMapping";
   renderer.toneMapping = THREE[toneName] || THREE.NeutralToneMapping;
   renderer.toneMappingExposure = num(spec.exposure, 1.2);
   /* Page lines are raw WebGL. sRGB output lifts that same dark into a milky fill on WebKit. */
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
-  renderer.setClearColor(0x050505, 0);
+  scene.background = null;
+  renderer.setClearColor(options.clearColor != null ? options.clearColor : 0x050505, options.clearAlpha != null ? options.clearAlpha : 0);
 
   if (!scene.environment) {
     var pmrem = new THREE.PMREMGenerator(renderer);
@@ -374,6 +387,10 @@ export function installGlassScene(renderer, scene, camera) {
     });
     pmrem.dispose();
   }
+
+  /* Chat FAB: no fullscreen plate. Transmission would sample the black clear
+     and read as a dark square, so that canvas skips transmission too. */
+  if (options.plate === false) return;
 
   var plate = createLinePlate();
   scene.add(plate);

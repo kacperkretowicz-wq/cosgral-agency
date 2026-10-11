@@ -1,4 +1,4 @@
-import { UniformsLib } from "./three-0.170.0.module.min.js?v=20261011viewer";
+import { UniformsLib } from "./three-0.170.0.module.min.js?v=20261011scroll";
 import { RectAreaLightTexturesLib } from './RectAreaLightTexturesLib.js';
 
 class RectAreaLightUniformsLib {

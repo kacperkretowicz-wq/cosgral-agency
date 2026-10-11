@@ -25,7 +25,9 @@ export function createFxaaPass(THREE, renderer) {
     stencilBuffer: false,
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
+    format: THREE.RGBAFormat,
   });
+  target.__cosgralPresent = true;
 
   var material = new THREE.ShaderMaterial({
     uniforms: {

@@ -3,8 +3,8 @@
  * Materials + surface shimmer match home-hero-3d.js (same look on mobile & desktop).
  * Framed with padding so rotated cube never clips the canvas.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011viewer";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011viewer";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011scroll";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {
@@ -42,6 +42,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       premultipliedAlpha: false,
     });
     renderer.setClearColor(0x000000, 0);
+    renderer.setClearAlpha(0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     var scene = new THREE.Scene();
@@ -53,11 +54,19 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     scene.add(root);
 
     await whenCubeReady();
-    installGlassScene(renderer, scene, camera);
+    installGlassScene(renderer, scene, camera, { plate: false, clearColor: 0x000000, clearAlpha: 0 });
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.setClearColor(0x000000, 0);
+    renderer.setClearAlpha(0);
 
     var parts = createIntactCubeParts(HALF);
-    parts.shell.material.opacity = SHELL_OP;
-    parts.shell.material.depthWrite = true;
+    /* No scene plate, so transmission would refract the cleared black and
+       read as a dark square. Draw the same physical glass with alpha instead. */
+    parts.shell.material.transmission = 0;
+    parts.shell.material.thickness = 0;
+    parts.shell.material.depthWrite = false;
+    parts.shell.material.opacity = 0.998;
+    if (parts.shell.material.userData.uChatClear) parts.shell.material.userData.uChatClear.value = 1;
     parts.edges.material.opacity = EDGE_OP;
     parts.edges.material.depthTest = true;
     parts.edges.material.depthWrite = false;
@@ -210,8 +219,12 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       sMat.uniforms.uTime.value = spin;
       sMat.uniforms.uMouse.value.set(mouseX, mouseY);
       sMat.uniforms.uFade.value = visualFade;
-      parts.shell.material.opacity = SHELL_OP * visualFade;
+      parts.shell.material.transmission = 0;
+      parts.shell.material.opacity = 0.998 * visualFade;
+      if (parts.shell.material.userData.uChatClear) parts.shell.material.userData.uChatClear.value = 1;
       parts.edges.material.opacity = EDGE_OP * visualFade;
+      renderer.setClearColor(0x000000, 0);
+      renderer.setClearAlpha(0);
       renderer.render(scene, camera);
     }
 

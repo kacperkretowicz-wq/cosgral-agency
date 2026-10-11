@@ -347,9 +347,15 @@ html.is-sand-stream .home-scene-curtain {
 }
 html.is-sand-stream .home-cube-portal,
 html.is-shattering .home-cube-portal {
-  z-index: 4;
+  /* Stay in the same stacking context as main (z-index 1, earlier in the DOM).
+     Raising this fixed WebGL layer above main hides every section once the
+     canvas has any opaque pixels. */
   opacity: 1;
   visibility: visible;
+}
+.home-cube-portal,
+.home-cube-portal .home-hero__canvas {
+  background: transparent;
 }
 /* Nie ustawiaj position:relative — psuje GSAP pin (Lenis + transform). */
 #uslugi.is-visible.home-scene {
