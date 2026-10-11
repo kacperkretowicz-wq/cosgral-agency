@@ -3253,7 +3253,7 @@ html.reduce-motion .paper-return {
   body.home-page:not(.is-nav-menu-open) .lang-switch button[aria-pressed="true"] {
     opacity: 1;
   }
-  body.home-page .cg-chat-label {
-    color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(245, 245, 245, 0.72));
+  html:has(body.home-page) .cg-chat-label {
+    color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), #f5f5f5);
   }
 }

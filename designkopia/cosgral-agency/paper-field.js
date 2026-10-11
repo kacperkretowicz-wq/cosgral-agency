@@ -12,7 +12,9 @@
   var uslugi = document.getElementById("uslugi");
   var work = document.getElementById("realizacje");
   var faq = document.getElementById("faq");
-  if (!uslugi || !work || !faq) return;
+  var bridge = document.getElementById("paper-bridge");
+  var back = document.getElementById("paper-return");
+  if (!uslugi || !work || !faq || !bridge || !back) return;
 
   var root = document.documentElement;
   var shown = 0;
@@ -29,22 +31,20 @@
     return 0.5 - 0.5 * Math.cos(Math.PI * t);
   }
 
-  function docTop(el) {
-    var y = 0;
-    var n = el;
-    while (n) {
-      y += n.offsetTop || 0;
-      n = n.offsetParent;
-    }
-    return y;
+  function flowTop(el) {
+    return el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset || 0);
   }
 
   function goal() {
     var y = window.scrollY || window.pageYOffset || 0;
-    var enter0 = docTop(uslugi) + uslugi.offsetHeight * 0.5;
-    var enter1 = docTop(work);
-    var exit0 = docTop(work) + work.offsetHeight * 0.5;
-    var exit1 = docTop(faq);
+    var bridgeTop = flowTop(bridge);
+    var returnTop = flowTop(back);
+    var uTop = bridgeTop - (parseFloat(getComputedStyle(uslugi).marginBottom) || 0) - uslugi.offsetHeight;
+    var wTop = returnTop - (parseFloat(getComputedStyle(work).marginBottom) || 0) - work.offsetHeight;
+    var enter0 = uTop + uslugi.offsetHeight * 0.5;
+    var enter1 = bridgeTop + bridge.offsetHeight;
+    var exit0 = wTop + work.offsetHeight * 0.5;
+    var exit1 = returnTop + back.offsetHeight;
     var enter = sineInOut((y - enter0) / Math.max(enter1 - enter0, 1));
     var exit = sineInOut((y - exit0) / Math.max(exit1 - exit0, 1));
     return clamp01(enter) * (1 - clamp01(exit));
@@ -73,13 +73,19 @@
     tintChat(paper);
   }
 
-  function tick() {
+  function tick(time, deltaTime) {
     var next = goal();
     if (!primed) {
       shown = next;
       primed = true;
     } else {
-      shown += (next - shown) * LERP;
+      var dt = 0.0167;
+      if (typeof deltaTime === "number" && deltaTime > 0) {
+        dt = deltaTime > 5 ? deltaTime / 1000 : deltaTime;
+      }
+      if (dt > 0.05) dt = 0.05;
+      var k = 1 - Math.pow(1 - LERP, dt / 0.01667);
+      shown += (next - shown) * k;
       if (Math.abs(next - shown) < 0.0004) shown = next;
     }
     publish(shown);
