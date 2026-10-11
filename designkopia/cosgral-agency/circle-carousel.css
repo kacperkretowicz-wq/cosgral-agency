@@ -1,5 +1,4 @@
-/* Homepage systems slide — circular arc on the cream field.
-   Full-screen iris keeps the dark expand from the circle carousel. */
+/* Systems circle carousel — spec-a mechanics on the cream field. */
 
 #realizacje .portfolio-chapter[data-theme="systems"] .portfolio-chapter__hit {
   display: none;
@@ -13,87 +12,72 @@
   height: 100%;
   perspective: none;
   overflow: visible;
-  pointer-events: none;
+  pointer-events: auto;
+  touch-action: none;
 }
 #realizacje .sys-fan--circle .sys-fan__arc {
+  position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
 }
+
+/* Big circles — 40vw, thin ring, full media fill */
 #realizacje .sys-fan--circle .sys-fan__card,
 #realizacje .sys-fan--circle .sys-fan__card.is-front {
-  width: min(40vw, 22rem);
-  height: min(40vw, 22rem);
+  width: 40vw;
+  height: 40vw;
+  max-width: min(40vw, 28rem);
+  max-height: min(40vw, 28rem);
   aspect-ratio: auto;
-  border: 0;
+  border: 0 !important;
   border-radius: 50%;
-  background: #f7f3ec;
-  box-shadow: 0 0 0 1.5px #1c2b4a;
+  background: #efebe4;
+  box-shadow: 0 0 0 1.5px rgba(17, 17, 17, 0.88) !important;
   overflow: hidden;
   transition: none;
   pointer-events: auto;
-  touch-action: pan-y;
+  touch-action: none;
 }
 #realizacje .sys-fan--circle .sys-fan__disc {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 14% 12% 16%;
-  background: #f7f3ec;
-  container-type: inline-size;
+  background: #efebe4;
 }
-#realizacje .sys-fan--circle .sys-illu {
-  width: 62%;
-  flex: 0 0 auto;
-}
-#realizacje .sys-fan--circle .sys-illu svg,
-#realizacje .sys-fan--circle .sys-illu__photo,
+#realizacje .sys-fan--circle .sys-illu,
 #realizacje .sys-fan--circle .sys-illu__placeholder {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-  object-fit: cover;
+  height: 100%;
   display: block;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 32% 28%, #fbf8f3 0%, #f3ece2 46%, #e7dfd3 100%);
+    radial-gradient(circle at 34% 30%, #faf6f0 0%, #efe8dc 42%, #e2d8ca 100%);
 }
-#realizacje .sys-fan--circle .sys-illu__name {
-  display: block;
-  width: 100%;
-  color: #1c2b4a;
-  font-weight: 560;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  text-align: center;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
-  font-size: clamp(11px, 10cqi, 16px);
-}
+#realizacje .sys-fan--circle .sys-illu__name,
 #realizacje .sys-fan--circle .sys-fan__cap {
   display: none;
 }
 
+/* Pill — hidden on cream field; tap the circle instead */
 #realizacje .sys-fan--circle .sys-fan__pill {
   position: absolute;
   z-index: 40;
   left: 0;
   top: 0;
-  width: max(7.2rem, 10vw);
-  height: 2.15rem;
+  width: 10vw;
+  min-width: 6.5rem;
+  height: 3.5vw;
+  min-height: 2rem;
   margin: 0;
-  padding: 0 0.85rem;
+  padding: 0 0.7rem;
   border: 0;
-  border-radius: 999px;
-  background: rgba(28, 43, 74, 0.92);
+  border-radius: 50px;
+  background: rgba(17, 17, 17, 0.78);
   color: #f7f3ec;
   font: 500 0.82rem/1 inherit;
   letter-spacing: 0.01em;
@@ -105,6 +89,8 @@
   pointer-events: auto;
   cursor: pointer;
   white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
 }
 #realizacje .sys-fan--circle .sys-fan__pill::before {
   content: "";
@@ -116,32 +102,35 @@
 }
 #realizacje .sys-fan--circle .sys-fan__pill.is-out {
   opacity: 0;
-  transform: translate(-50%, calc(-50% + 8px));
+  transform: translate(-50%, calc(-50% + 10px));
   transition: opacity 0.15s linear, transform 0.15s linear;
 }
 #realizacje .sys-fan--circle .sys-fan__pill.is-in {
-  opacity: 1;
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-}
-#realizacje .sys-fan--circle.is-iris-open .sys-fan__pill,
-#realizacje .sys-fan--circle .sys-fan__stage.is-dragging .sys-fan__pill {
-  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
 }
 
+/* Bottom nav: light-grey semicircle + thumbnail arc */
 #realizacje .sys-fan--circle .sys-fan__nav,
 #realizacje .sys-fan--circle.sys-fan--catalog .sys-fan__nav {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 3.25rem !important;
+  bottom: 0 !important;
   z-index: 6;
   width: auto;
-  height: min(30vw, 16rem);
+  height: 36vw;
+  max-height: 16.5rem;
   transform: none;
   display: block;
   pointer-events: none;
   background: none;
   gap: 0;
+}
+#realizacje .sys-fan--circle .sys-fan__goo-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
 }
 #realizacje .sys-fan--circle .sys-fan__nav-goo {
   position: absolute;
@@ -151,11 +140,13 @@
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: min(36vw, 22rem);
-  height: min(16vw, 9.5rem);
+  width: 40vw;
+  max-width: 22rem;
+  height: 20vw;
+  max-height: 11rem;
   transform: translateX(-50%);
-  background: #d9d2c6;
-  border-radius: 20rem 20rem 0 0;
+  background: #cfc8bc;
+  border-radius: 40vw 40vw 0 0;
 }
 #realizacje .sys-fan--circle .sys-fan__ring {
   position: absolute;
@@ -164,19 +155,21 @@
 }
 #realizacje .sys-fan--circle .sys-fan__dot {
   position: absolute;
-  width: min(9vw, 3.6rem);
-  height: min(9vw, 3.6rem);
+  width: 10.2vw;
+  height: 10.2vw;
+  max-width: 3.6rem;
+  max-height: 3.6rem;
   min-width: 0;
   padding: 0;
   border: 0;
   border-radius: 50%;
   background: #f4efe6;
-  box-shadow: 0 0 0 1px rgba(28, 43, 74, 0.18);
+  box-shadow: 0 0 0 1px rgba(17, 17, 17, 0.08);
   transform: translate(-50%, -50%);
   pointer-events: auto;
 }
 #realizacje .sys-fan--circle .sys-fan__dot.is-active {
-  background: #f7f3ec;
+  background: #faf7f1;
   z-index: 2;
 }
 #realizacje .sys-fan--circle .sys-fan__dot.is-active::after {
@@ -187,36 +180,23 @@
   width: 22%;
   height: 22%;
   border-radius: 50%;
-  background: #1c2b4a;
+  background: #141414;
   transform: translate(-50%, -50%);
 }
+
+/* Fan arrows stay in the DOM for keyboard/API; the chapter pager owns visible arrows */
 #realizacje .sys-fan--circle .sys-fan__arrow {
   position: absolute;
-  z-index: 6;
-  width: 2.2rem;
-  height: 2.2rem;
-  margin: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
   padding: 0;
-  overflow: visible;
-  clip: auto;
-  opacity: 1;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
   border: 0;
-  border-radius: 50%;
-  color: #1c2b4a;
-  background: #f7f3ec;
-  box-shadow: 0 0 0 1px rgba(28, 43, 74, 0.16);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-  bottom: 0.35rem;
+  opacity: 0;
 }
-#realizacje .sys-fan--circle .sys-fan__arrow[data-sys-fan-prev] {
-  left: max(0.4rem, 2vw);
-}
-#realizacje .sys-fan--circle .sys-fan__arrow[data-sys-fan-next] {
-  right: max(0.4rem, 2vw);
-}
+
 #realizacje .sys-fan--circle.is-iris-open .sys-fan__card {
   opacity: 0 !important;
 }
@@ -225,6 +205,7 @@
   z-index: 8;
 }
 
+/* Iris overlay — dark expand, cream sats */
 .sys-iris {
   position: fixed;
   inset: 0;
@@ -235,7 +216,7 @@
 .sys-iris__disc {
   position: fixed;
   border-radius: 50%;
-  background: #14181f;
+  background: #141414;
   transform: scale(1);
   transform-origin: 50% 50%;
   transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
@@ -255,25 +236,24 @@
   border-radius: 50%;
   overflow: hidden;
   z-index: 3;
-  background: #f7f3ec;
+  background: #efebe4;
   box-shadow: 0 0 0 1.5px rgba(247, 243, 236, 0.7);
   transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12%;
+  display: block;
   transition: left 0.9s cubic-bezier(0.16, 1, 0.3, 1), top 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.sys-iris__sat svg,
+.sys-iris__sat .sys-illu__placeholder,
 .sys-iris__sat .sys-illu__photo,
-.sys-iris__sat .sys-illu__placeholder {
+.sys-iris__sat svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
   display: block;
   background:
-    radial-gradient(circle at 32% 28%, #fbf8f3 0%, #f3ece2 48%, #e4d9cb 100%);
+    radial-gradient(circle at 34% 30%, #faf6f0 0%, #efe8dc 48%, #e2d8ca 100%);
 }
 .sys-iris__sat--b { width: min(13vw, 6.5rem); height: min(13vw, 6.5rem); }
 .sys-iris__sat--c { width: min(10vw, 5rem); height: min(10vw, 5rem); }
@@ -339,27 +319,28 @@
 @media (max-width: 760px) {
   #realizacje .sys-fan--circle .sys-fan__card,
   #realizacje .sys-fan--circle .sys-fan__card.is-front {
-    width: min(62vw, 16.5rem);
-    height: min(62vw, 16.5rem);
-  }
-  #realizacje .sys-fan--circle .sys-fan__disc {
-    padding: 16% 11% 14%;
-    gap: 0.2rem;
-  }
-  #realizacje .sys-fan--circle .sys-illu {
-    width: 48%;
+    width: 62vw;
+    height: 62vw;
+    max-width: 16.5rem;
+    max-height: 16.5rem;
   }
   #realizacje .sys-fan--circle .sys-fan__nav,
   #realizacje .sys-fan--circle.sys-fan--catalog .sys-fan__nav {
-    height: 38vw;
+    height: 48vw;
+    max-height: 14rem;
+    bottom: 3.4rem !important;
   }
   #realizacje .sys-fan--circle .sys-fan__semi {
-    width: 52vw;
-    height: 22vw;
+    width: 58vw;
+    max-width: none;
+    height: 29vw;
+    max-height: none;
   }
   #realizacje .sys-fan--circle .sys-fan__dot {
-    width: 13vw;
-    height: 13vw;
+    width: 12vw;
+    height: 12vw;
+    max-width: none;
+    max-height: none;
   }
   .sys-iris__copy {
     left: 1.15rem;
@@ -386,5 +367,5 @@
 html.reduce-motion .sys-iris__disc,
 html.reduce-motion .sys-iris__sat,
 html.reduce-motion .sys-iris__copy {
-  transition: none !important;
+  transition: none;
 }

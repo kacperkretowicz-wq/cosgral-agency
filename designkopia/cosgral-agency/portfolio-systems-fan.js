@@ -381,12 +381,9 @@
         var art = document.createElement("span");
         art.className = "sys-illu";
         art.appendChild(placeholderMedia());
-        var name = document.createElement("span");
-        name.className = "sys-illu__name";
-        name.textContent = item.title;
         disc.appendChild(art);
-        disc.appendChild(name);
         fig.appendChild(disc);
+        fig.setAttribute("aria-label", item.title || "");
       } else {
         var img = document.createElement("img");
         img.src = systemPhoto(item.id);
@@ -597,50 +594,99 @@
       return raw;
     }
 
+    /* Spec-a ease: cubic-bezier(0.25, 1, 0.5, 1) via Newton. */
+    function swipeEase(t) {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      var u = t;
+      var k;
+      for (k = 0; k < 5; k++) {
+        var x =
+          3 * (1 - u) * (1 - u) * u * 0.25 +
+          3 * (1 - u) * u * u * 0.5 +
+          u * u * u;
+        var dx =
+          3 * (1 - u) * (1 - u) * 0.25 +
+          6 * (1 - u) * u * (0.5 - 0.25) +
+          3 * u * u * (1 - 0.5);
+        if (Math.abs(dx) < 1e-5) break;
+        u -= (x - t) / dx;
+        if (u < 0) u = 0;
+        if (u > 1) u = 1;
+      }
+      return 3 * u - 3 * u * u + u * u * u;
+    }
+
+    function circlePose(raw) {
+      var w = stage.clientWidth || window.innerWidth || 480;
+      var h = stage.clientHeight || window.innerHeight || 600;
+      var mobile = w < 760;
+      var ad = Math.abs(raw);
+      var x = w * (0.5 + raw * (mobile ? 0.58 : 0.5));
+      var y = ad < 1
+        ? h * (0.4075 + (0.515 - 0.4075) * ad)
+        : h * 0.515;
+      var o = ad > 1.05 ? Math.max(0, 1 - (ad - 1.05) / 0.4) : 1;
+      return { x: x, y: y, o: o, ad: ad };
+    }
+
+    var pillTimer = 0;
+    function pillOut() {
+      if (!pill) return;
+      pill.classList.remove("is-in");
+      pill.classList.add("is-out");
+    }
+    function pillIn() {
+      if (!pill || root.classList.contains("is-iris-open")) return;
+      pill.classList.remove("is-out");
+      pill.classList.add("is-in");
+    }
+
     function layoutCircle() {
       if (destroyed) return;
       var casesNow = getCases();
       var nearest = clampIndex(Math.round(index), n);
       var w = stage.clientWidth || window.innerWidth || 1;
       var h = stage.clientHeight || window.innerHeight || 1;
-      var mobile = (window.innerWidth || w) < 760;
+      var mobile = w < 760;
       cards.forEach(function (card, i) {
-        var raw = wrapRaw(i);
-        var ad = Math.abs(raw);
-        var x = w * (0.5 + raw * (mobile ? 0.62 : 0.5));
-        var y = ad < 1 ? h * (0.36 + 0.1 * ad) : h * 0.46;
-        var o = ad > 1.05 ? Math.max(0, 1 - (ad - 1.05) / 0.35) : 1;
-        card.style.left = x + "px";
-        card.style.top = y + "px";
+        var pose = circlePose(wrapRaw(i));
+        card.style.left = pose.x + "px";
+        card.style.top = pose.y + "px";
         card.style.transform = "translate(-50%, -50%)";
-        card.style.opacity = String(Math.max(0, Math.min(1, o)));
-        card.style.visibility = o < 0.04 ? "hidden" : "visible";
-        card.style.pointerEvents = o < 0.12 ? "none" : "auto";
-        card.style.zIndex = String(Math.round(40 - ad * 8));
+        card.style.opacity = String(Math.max(0, Math.min(1, pose.o)));
+        card.style.visibility = pose.o < 0.04 ? "hidden" : "visible";
+        card.style.pointerEvents = pose.o < 0.12 ? "none" : "auto";
+        card.style.zIndex = String(Math.round(30 - pose.ad * 8));
         card.classList.toggle("is-front", i === nearest);
-        card.classList.toggle("is-side", ad > 0.55);
+        card.classList.toggle("is-side", pose.ad > 0.55);
       });
       if (pill && !root.classList.contains("is-iris-open")) {
-        pill.style.left = w * 0.5 + "px";
-        pill.style.top = h * 0.36 + Math.min(w, h) * (mobile ? 0.16 : 0.11) + "px";
+        var slot = circlePose(0);
+        pill.style.left = slot.x + "px";
+        pill.style.top = slot.y + w * 0.045 + "px";
       }
       if (navEl && dotsEl) {
         var navW = navEl.clientWidth || w;
         var navH = navEl.clientHeight || h * 0.3;
+        var semiEl = root.querySelector(".sys-fan__semi");
+        var semiH = (semiEl && semiEl.offsetHeight) || navH * 0.55;
+        /* Sit the thumbnails on the semicircle rim (spec-a composition). */
         var arcCx = navW * 0.5;
-        var arcCy = navH * 0.98;
-        var arcR = Math.min(navW * (mobile ? 0.34 : 0.22), navH * 0.92);
+        var arcCy = navH;
+        var arcR = Math.min(navW * (mobile ? 0.32 : 0.22), semiH * (mobile ? 1.18 : 1.05));
+        var stepAng = mobile ? 34 : 42;
         dotButtons.forEach(function (dot, i) {
           var raw = wrapRaw(i);
-          var ang = raw * (mobile ? 32 : 38) * (Math.PI / 180);
+          var ang = raw * stepAng * (Math.PI / 180);
           var x = arcCx + Math.sin(ang) * arcR;
           var y = arcCy - Math.cos(ang) * arcR;
-          var show = Math.abs(raw) < 2.15 && y > navH * 0.08;
+          var on = i === nearest;
+          var show = Math.abs(raw) < 2.25 && y > navH * 0.06;
           dot.style.left = x + "px";
           dot.style.top = y + "px";
           dot.style.opacity = show ? "1" : "0";
           dot.style.pointerEvents = show ? "auto" : "none";
-          var on = i === nearest;
           dot.classList.toggle("is-active", on);
           if (on) dot.setAttribute("aria-current", "true");
           else dot.removeAttribute("aria-current");
@@ -936,24 +982,37 @@
       if (!animate || reduced) {
         index = clampIndex(Math.round(to), n);
         layout();
+        if (circle) pillIn();
         return;
       }
       var delta = to - from;
       while (delta > n / 2) delta -= n;
       while (delta < -n / 2) delta += n;
+      if (Math.abs(delta) < 0.001) {
+        index = clampIndex(Math.round(from), n);
+        layout();
+        if (circle) pillIn();
+        return;
+      }
       to = from + delta;
+      if (circle) {
+        pillOut();
+        if (pillTimer) window.clearTimeout(pillTimer);
+      }
       var t0 = performance.now();
-      var dur = 1040;
+      var dur = circle ? 800 : 1040;
       if (raf) cancelAnimationFrame(raf);
       function tick(now) {
         var p = Math.min(1, (now - t0) / dur);
-        var e = 1 - Math.pow(1 - p, 3);
+        var e = circle ? swipeEase(p) : 1 - Math.pow(1 - p, 3);
         index = from + (to - from) * e;
         layout();
         if (p < 1) raf = requestAnimationFrame(tick);
         else {
           index = clampIndex(Math.round(to), n);
           layout();
+          raf = 0;
+          if (circle) pillTimer = window.setTimeout(pillIn, 0);
         }
       }
       raf = requestAnimationFrame(tick);
@@ -1003,7 +1062,9 @@
       dragging = true;
       didDrag = false;
       vel = 0;
+      dragOrigin = index;
       lastX = x;
+      if (circle) pillOut();
       stopAuto();
       stage.classList.add("is-dragging");
       document.body.classList.add("is-sys-fan-dragging");
@@ -1024,6 +1085,7 @@
         vel = 0;
         dragOrigin = index;
         lastX = originX;
+        if (circle) pillOut();
         stopAuto();
         stage.classList.add("is-dragging");
         document.body.classList.add("is-sys-fan-dragging");
@@ -1034,8 +1096,12 @@
       var dx = x - lastX;
       lastX = x;
       if (Math.abs(dx) > 2) didDrag = true;
-      vel = dx * 0.006;
-      index -= dx * 0.006;
+      var w = stage.clientWidth || window.innerWidth || 360;
+      var pxPer = circle
+        ? Math.max(88, w * (w < 760 ? 0.34 : 0.22))
+        : 1 / 0.006;
+      vel = dx / pxPer;
+      index -= dx / pxPer;
       while (index < 0) index += n;
       while (index >= n) index -= n;
       layout();
@@ -1116,6 +1182,11 @@
     layout();
     if (circle) {
       window.addEventListener("resize", layout);
+      requestAnimationFrame(function () {
+        if (destroyed) return;
+        layout();
+        pillIn();
+      });
     }
     if (autoplay) startAuto();
 
@@ -1156,8 +1227,10 @@
           });
         }
         cards.forEach(function (card, di) {
+          if (!currentCases[di]) return;
           var nm = card.querySelector(".sys-illu__name");
-          if (nm && currentCases[di]) nm.textContent = currentCases[di].title;
+          if (nm) nm.textContent = currentCases[di].title;
+          if (circle) card.setAttribute("aria-label", currentCases[di].title || "");
         });
         if (pill) pill.textContent = pillLabel();
         if (irisEl && irisOpen) {
