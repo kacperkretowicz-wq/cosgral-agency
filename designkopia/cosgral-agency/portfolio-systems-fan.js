@@ -41,6 +41,151 @@
     return lang === "en" ? CASES_EN : CASES_PL;
   }
 
+  /* Rewrites of the copy that opens with each system. Facts only — no new clients, figures or results. */
+  var STORY = {
+    "tfo-crm": {
+      pl: [
+        "Dla TelForceOne S.A. zbudowaliśmy aplikację CRM dla przedstawicieli w terenie. Handlowcy jeździli z listami w Excelu i notatkami w telefonie: szef sprzedaży nie widział na żywo, kto u kogo był, trasy się dublowały albo omijały ważnych klientów, a raport dnia ginął w skrzynce.",
+        "Aplikacja łączy bazę klientów, mapę pinów, plan trasy i log wizyty. Handlowiec check-inuje się u klienta, dopisuje temat i follow-up, a wpis od razu trafia na kartę — bez drugiej aplikacji. Planowanie trasy schodzi z godzinnego układania arkusza do przeglądu mapy, a zespół ma jedną historię kontaktu i raport dnia bez ręcznego przepisywania."
+      ],
+      en: [
+        "For TelForceOne S.A. we built a CRM for field reps. They worked from Excel lists and phone notes: sales leadership could not see who had visited whom, routes overlapped or skipped key accounts, and the day report disappeared in inboxes.",
+        "The app keeps customer records, map pins, a route plan and a visit log together. A rep checks in, adds the topic and a follow-up, and it lands on the account at once, without a second app. Route planning drops from an hour in a spreadsheet to a short look at the map, and the team shares one contact history plus a day report that no longer has to be retyped."
+      ]
+    },
+    "tfo-code39": {
+      pl: [
+        "Dla magazynu i produkcji TelForceOne S.A. zbudowaliśmy lekką aplikację kodów Code 39. Towary oznaczano w rozproszonych narzędziach: błędny kod wracał ze skanera, a przygotowanie paczki etykiet na nową dostawę zajmowało nieproporcjonalnie dużo czasu.",
+        "Operator wpisuje wartość, widzi podgląd pasków na żywo, kontroluje parametry etykiety i wysyła kolejkę do druku bez przełączania programów. Pojedyncza etykieta powstaje w sekundach, a oznaczanie SKU jest tym samym procesem dla całego zespołu."
+      ],
+      en: [
+        "For TelForceOne S.A. warehouse and production we built a light Code 39 app. Goods were labeled across scattered tools: a bad code bounced at the scanner, and preparing a label batch for a new delivery took far too long.",
+        "The operator enters a value, sees a live preview of the bars, checks the label and sends a print queue without switching programs. A single label takes seconds, and SKU labeling is the same process for the whole team."
+      ]
+    },
+    "tfo-forecast": {
+      pl: [
+        "Dla zakupów TelForceOne S.A. zbudowaliśmy panel stanów i prognoz. Decyzje opierały się na spóźnionych arkuszach: towaru brakowało w kluczowym momencie albo magazyn trzymał nadwyżkę „na wszelki wypadek”, bez wspólnego widoku ryzyka.",
+        "Panel pokazuje bieżący stan, historię sprzedaży, prognozę na kolejne tygodnie i alerty poniżej minimum. Od sygnału braku do draftu zamówienia zakupowego jest jedna ścieżka, cotygodniowe planowanie zajmuje mniej czasu, a zespół rozmawia o tych samych liczbach."
+      ],
+      en: [
+        "For TelForceOne S.A. purchasing we built an inventory and forecast panel. Decisions ran on stale spreadsheets: a key item ran out at the wrong moment, or the warehouse held “just in case” overstock, with no shared view of risk.",
+        "The panel shows live stock, sales history, a forecast for the coming weeks and alerts below minimum. There is one path from a shortage signal to a purchase-order draft, weekly planning takes less time, and the team talks about the same numbers."
+      ]
+    },
+    "trove-panel": {
+      pl: [
+        "Dla zespołu Trove zbudowaliśmy panel operacyjny sklepu. Stany i ceny marketplace’ów porównywano ręcznie, więc przecena konkurencji albo własna oferta poza rynkiem wychodziła z opóźnieniem — często dopiero gdy spadła sprzedaż.",
+        "Panel zbiera stany oraz porównanie cen własnego sklepu, Allegro i konkurencji, razem z alertami przecen. Feed zdarzeń mówi, kiedy skorygować ofertę. Kontrola cen i dostępności zajmuje minuty dziennie, a na spadek marży da się zareagować tego samego dnia."
+      ],
+      en: [
+        "For Trove’s team we built a store operations panel. Marketplace stock and prices were compared by hand, so a competitor markdown or their own off-market listing showed up late — often only after sales dipped.",
+        "The panel gathers stock and a price comparison across their own shop, Allegro and competitors, with markdown alerts. The event feed says when a listing needs a correction. Price and availability checks take minutes a day, and a margin drop can be met the same day."
+      ]
+    },
+    "crm-leady": {
+      pl: [
+        "Zbudowaliśmy CRM od leada do zamkniętego deala dla zespołu B2B. Zapytania z formularza, maila i poleceń ginęły między skrzynkami: nikt nie wiedział, który deal stoi, kto miał oddzwonić i co ustalono tydzień temu.",
+        "System prowadzi kolejkę, kwalifikację, kanban pipeline, alerty braku follow-upu i oś historii kontaktu. Rozmowy i maile siedzą przy karcie, nie w prywatnej skrzynce. Pierwsza reakcja jest szybsza, a lejek widać na co dzień, nie dopiero na statusie miesięcznym."
+      ],
+      en: [
+        "We built a CRM from lead to closed deal for a B2B team. Inquiries from forms, email and referrals were lost between inboxes: no one knew which deal was stuck, who should call back, or what was agreed a week ago.",
+        "The system runs intake, qualification, a kanban pipeline, alerts when a follow-up is missing, and a contact timeline. Calls and emails sit on the card, not in a private inbox. The first response is faster, and the funnel is visible every day rather than only at the monthly status."
+      ]
+    },
+    "chatbot": {
+      pl: [
+        "Zbudowaliśmy chatbota AI w jednym inboxie na social i stronę. Instagram, Facebook i formularz WWW zasypywały skrzynkę pytaniami o godziny, ofertę i wycenę. Po godzinach nikt nie odpowiadał, a rano kolejka rosła szybciej, niż zespół zdążył odpisać.",
+        "Bot klasyfikuje sprawę, odpowiada na FAQ, zbiera zakres i budżet, a gdy pewność spada — przekazuje rozmowę konsultantowi z pełnym wątkiem. Pierwsza odpowiedź jest dostępna całą dobę, a człowiek wchodzi tam, gdzie jest potrzebny, z gotowym briefem."
+      ],
+      en: [
+        "We built an AI chatbot in one inbox for social and the website. Instagram, Facebook and the site form flooded the inbox with questions about hours, the offer and pricing. After hours nobody answered, and by morning the queue grew faster than the team could reply.",
+        "The bot classifies the case, answers FAQ, collects scope and budget, and when confidence drops it hands the thread to a consultant with the full conversation. A first reply is available around the clock, and a person steps in only where one is needed, with a ready brief."
+      ]
+    },
+    "trove-flow": {
+      pl: [
+        "Dla Trove zbudowaliśmy automatyczny łańcuch od zamówienia do faktury i statusu paczki. Po każdym zamówieniu ktoś przepisywał dane do faktury, aktualizował status w drugim narzędziu i wysyłał wiadomość do klienta. Przy wzroście zamówień rosła też liczba pomyłek i opóźnień.",
+        "Od checkoutu system sam przygotowuje eksport pod fakturę, przekazuje zamówienie do magazynu lub API kuriera, prowadzi track & trace i wysyła powiadomienie statusowe. Człowiek wkracza tylko przy wyjątkach, a klient dostaje spójny status."
+      ],
+      en: [
+        "For Trove we built an automatic chain from order to invoice and parcel status. After every order someone retyped the data into an invoice, updated a status in a second tool and sent the customer a message. As orders grew, so did mistakes and delays.",
+        "From checkout the system prepares the invoice export, passes the order to the warehouse or the courier API, follows track and trace and sends a status notice. A person steps in only for exceptions, and the customer gets one consistent status."
+      ]
+    },
+    "ai-agent": {
+      pl: [
+        "Zbudowaliśmy agenta AI, który spina kanały w jednym przepływie. Chat, mail i CRM żyły osobno, a przekazanie sprawy było kopiowaniem między nimi.",
+        "Agent klasyfikuje sprawę, uzupełnia kartę i przekazuje ją właściwej osobie."
+      ],
+      en: [
+        "We built an AI agent that joins the channels in one flow. Chat, email and the CRM lived apart, and handing a case over meant copying between them.",
+        "The agent classifies the case, fills in the card and passes it to the right person."
+      ]
+    },
+    "shelf": {
+      pl: [
+        "Dla Trove zbudowaliśmy Shelf Sync. Produkt znikał z półki sprzedażowej, zanim magazyn zdążył zareagować.",
+        "Narzędzie pilnuje widoczności stanów i alarmuje, gdy oferta wypada z rynku."
+      ],
+      en: [
+        "For Trove we built Shelf Sync. A product disappeared from the sales shelf before the warehouse could react.",
+        "The tool watches how visible the stock is and alerts when a listing drops off the market."
+      ]
+    },
+    "kpi": {
+      pl: [
+        "Dla TelForceOne S.A. zbudowaliśmy board KPI. Raporty tygodnia powstawały z kilku Exceli i zajmowały pół dnia.",
+        "Board pokazuje sprzedaż i operacje na żywo, bez budowania tabel od zera."
+      ],
+      en: [
+        "For TelForceOne S.A. we built a KPI board. Weekly reports were assembled from several Excel files and took half a day.",
+        "The board shows sales and operations live, without building the tables from scratch."
+      ]
+    },
+    "network": {
+      pl: [
+        "Zbudowaliśmy graf workflow. Automatyzacje siedziały w głowie jednej osoby albo w chaotycznych regułach.",
+        "Graf pokazuje triggery, warunki i akcje, więc proces da się utrzymać i dokładać do niego kolejne kroki."
+      ],
+      en: [
+        "We built a workflow graph. Automations lived in one person’s head or in chaotic rules.",
+        "The graph shows triggers, conditions and actions, so the process can be maintained and extended with further steps."
+      ]
+    }
+  };
+
+  function storyLang() {
+    var lang = (window.cosgralI18n && window.cosgralI18n.getLang && window.cosgralI18n.getLang()) || "pl";
+    return lang === "en" ? "en" : "pl";
+  }
+
+  function storyOf(item) {
+    var pack = item && STORY[item.id];
+    if (!pack) return [item && item.desc ? item.desc : ""];
+    return pack[storyLang()] || pack.pl;
+  }
+
+  function illuSvg(body) {
+    return '<svg viewBox="0 0 120 78" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + body + "</svg>";
+  }
+
+  var INK = "#1c2b4a";
+  var HEAT = "#e07a2f";
+  var ILLU = {
+    "tfo-crm": illuSvg('<rect x="10" y="8" width="100" height="62" rx="8" stroke="' + INK + '" stroke-width="1.6"/><path d="M20 54c10-14 18-6 26-16 8 12 16 4 24-8 8 10 12 16 16 24H20z" fill="' + INK + '" opacity=".1"/><circle cx="48" cy="34" r="3.4" fill="' + HEAT + '"/><circle cx="72" cy="26" r="2.8" fill="' + INK + '"/><circle cx="86" cy="42" r="2.8" fill="' + INK + '"/><path d="M48 34 L72 26 L86 42" stroke="' + INK + '" stroke-width="1.4"/>'),
+    "tfo-code39": illuSvg('<rect x="16" y="14" width="88" height="50" rx="6" stroke="' + INK + '" stroke-width="1.6"/><path d="M26 24v30M32 24v30M36 24v30M44 24v30M48 24v30M56 24v30M64 24v30M70 24v30M78 24v30M86 24v30M92 24v30" stroke="' + INK + '" stroke-width="2"/><rect x="48" y="40" width="18" height="4" rx="1" fill="' + HEAT + '"/>'),
+    "tfo-forecast": illuSvg('<rect x="14" y="12" width="92" height="54" rx="8" stroke="' + INK + '" stroke-width="1.6"/><path d="M24 50l16-10 14 6 18-16 16 8" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/><circle cx="88" cy="38" r="3.2" fill="' + HEAT + '"/><path d="M24 54h72" stroke="' + INK + '" stroke-width="1.2" opacity=".4"/>'),
+    "trove-panel": illuSvg('<rect x="14" y="16" width="40" height="46" rx="6" stroke="' + INK + '" stroke-width="1.6"/><rect x="62" y="16" width="44" height="20" rx="6" stroke="' + INK + '" stroke-width="1.6"/><rect x="62" y="42" width="44" height="20" rx="6" stroke="' + INK + '" stroke-width="1.6"/><path d="M22 48h24M70 26h28M70 52h20" stroke="' + INK + '" stroke-width="1.4" opacity=".55"/><circle cx="78" cy="26" r="2.4" fill="' + HEAT + '"/>'),
+    "crm-leady": illuSvg('<rect x="12" y="16" width="28" height="46" rx="6" stroke="' + INK + '" stroke-width="1.6"/><rect x="46" y="16" width="28" height="46" rx="6" stroke="' + INK + '" stroke-width="1.6"/><rect x="80" y="16" width="28" height="46" rx="6" stroke="' + INK + '" stroke-width="1.6"/><rect x="18" y="24" width="16" height="8" rx="2" fill="' + INK + '" opacity=".15"/><rect x="52" y="24" width="16" height="8" rx="2" fill="' + HEAT + '"/><rect x="86" y="24" width="16" height="8" rx="2" fill="' + INK + '" opacity=".15"/>'),
+    "chatbot": illuSvg('<rect x="18" y="12" width="70" height="40" rx="10" stroke="' + INK + '" stroke-width="1.6"/><path d="M32 52l8 12 10-12" stroke="' + INK + '" stroke-width="1.6" stroke-linejoin="round"/><circle cx="38" cy="32" r="2.4" fill="' + INK + '"/><circle cx="50" cy="32" r="2.4" fill="' + INK + '"/><circle cx="62" cy="32" r="2.4" fill="' + HEAT + '"/><rect x="78" y="36" width="26" height="22" rx="8" stroke="' + INK + '" stroke-width="1.4"/>'),
+    "trove-flow": illuSvg('<rect x="8" y="26" width="28" height="26" rx="6" stroke="' + INK + '" stroke-width="1.6"/><rect x="46" y="26" width="28" height="26" rx="6" stroke="' + INK + '" stroke-width="1.6"/><rect x="84" y="26" width="28" height="26" rx="6" stroke="' + INK + '" stroke-width="1.6"/><path d="M36 39h10M74 39h10" stroke="' + HEAT + '" stroke-width="1.6"/><path d="M18 34h8M54 34h8M96 36h10" stroke="' + INK + '" stroke-width="1.3" opacity=".5"/>'),
+    "ai-agent": illuSvg('<circle cx="60" cy="38" r="10" stroke="' + INK + '" stroke-width="1.6"/><circle cx="60" cy="38" r="3" fill="' + HEAT + '"/><circle cx="26" cy="22" r="6" stroke="' + INK + '" stroke-width="1.4"/><circle cx="96" cy="24" r="6" stroke="' + INK + '" stroke-width="1.4"/><circle cx="28" cy="58" r="6" stroke="' + INK + '" stroke-width="1.4"/><circle cx="94" cy="56" r="6" stroke="' + INK + '" stroke-width="1.4"/><path d="M32 26 L50 34M90 28 L70 34M34 54 L50 44M88 52 L70 44" stroke="' + INK + '" stroke-width="1.3"/>'),
+    "shelf": illuSvg('<path d="M22 18h76M22 38h76M22 58h76" stroke="' + INK + '" stroke-width="1.6"/><rect x="30" y="22" width="14" height="16" rx="2" stroke="' + INK + '" stroke-width="1.4"/><rect x="50" y="24" width="14" height="14" rx="2" stroke="' + INK + '" stroke-width="1.4"/><rect x="70" y="42" width="14" height="16" rx="2" fill="' + HEAT + '" opacity=".9"/><rect x="36" y="44" width="16" height="14" rx="2" stroke="' + INK + '" stroke-width="1.4"/>'),
+    "kpi": illuSvg('<rect x="14" y="12" width="92" height="54" rx="8" stroke="' + INK + '" stroke-width="1.6"/><rect x="24" y="36" width="12" height="20" rx="2" fill="' + INK + '" opacity=".2"/><rect x="42" y="28" width="12" height="28" rx="2" fill="' + INK + '" opacity=".45"/><rect x="60" y="22" width="12" height="34" rx="2" fill="' + HEAT + '"/><rect x="78" y="32" width="12" height="24" rx="2" fill="' + INK + '" opacity=".3"/>'),
+    "network": illuSvg('<circle cx="28" cy="40" r="8" stroke="' + INK + '" stroke-width="1.6"/><circle cx="64" cy="22" r="8" stroke="' + INK + '" stroke-width="1.6"/><circle cx="66" cy="56" r="8" stroke="' + INK + '" stroke-width="1.6"/><circle cx="98" cy="38" r="8" fill="' + HEAT + '"/><path d="M36 36 L56 24M36 44 L58 52M72 26 L90 36M74 52 L90 42" stroke="' + INK + '" stroke-width="1.4"/>')
+  };
+
   var CASES = getCases();
 
   var instances = [];
@@ -123,6 +268,7 @@
     var allowDrag = opts.drag !== false;
     var allowWheel = opts.wheel !== false;
     var dragAxis = opts.dragAxis === "x" ? "x" : "free";
+    var circle = !!opts.circle;
     var pendingDrag = null;
     var destroyed = false;
     var dragging = false;
@@ -142,10 +288,12 @@
     root.classList.add("sys-fan");
     root.classList.toggle("sys-fan--catalog", mode === "catalog");
     root.classList.toggle("sys-fan--detail", mode === "detail");
+    root.classList.toggle("sys-fan--circle", circle);
     root.innerHTML =
       '<div class="sys-fan__head" data-sys-fan-head>' +
       '<div class="sys-fan__stage" data-sys-fan-stage>' +
       '<div class="sys-fan__arc" data-sys-fan-arc></div>' +
+      (circle ? '<button type="button" class="sys-fan__pill is-in" data-sys-fan-pill></button>' : "") +
       "</div>" +
       (mode === "detail"
         ? '<div class="sys-fan__copy" data-sys-fan-copy aria-live="polite"></div>'
@@ -155,10 +303,14 @@
         ? '<div class="sys-fan__article" data-sys-fan-article hidden></div>'
         : "") +
       '<div class="sys-fan__nav" data-sys-fan-nav>' +
+      (circle
+        ? '<svg class="sys-fan__goo-svg" aria-hidden="true"><filter id="sys-fan-goo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo"/><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></svg>' +
+          '<div class="sys-fan__nav-goo"><div class="sys-fan__semi" aria-hidden="true"></div><div class="sys-fan__ring" data-sys-fan-dots role="tablist" data-i18n-aria-label="portfolio.systems_dots"></div></div>'
+        : "") +
       '<button type="button" class="sys-fan__arrow" data-sys-fan-prev data-i18n-aria-label="portfolio.systems_prev">' +
       '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M10.2 2.6L5.4 8l4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       "</button>" +
-      '<div class="sys-fan__dots" data-sys-fan-dots role="tablist" data-i18n-aria-label="portfolio.systems_dots"></div>' +
+      (circle ? "" : '<div class="sys-fan__dots" data-sys-fan-dots role="tablist" data-i18n-aria-label="portfolio.systems_dots"></div>') +
       '<button type="button" class="sys-fan__arrow" data-sys-fan-next data-i18n-aria-label="portfolio.systems_next">' +
       '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M5.8 2.6L10.6 8l-4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       "</button>" +
@@ -170,6 +322,9 @@
     articleEl = root.querySelector("[data-sys-fan-article]");
     var navEl = root.querySelector("[data-sys-fan-nav]");
     var dotsEl = root.querySelector("[data-sys-fan-dots]");
+    var pill = root.querySelector("[data-sys-fan-pill]");
+    var irisEl = null;
+    var irisOpen = false;
     var cards = [];
     var dotButtons = [];
 
@@ -196,18 +351,36 @@
       fig.className = "sys-fan__card";
       fig.setAttribute("data-sys-fan-card", String(i));
       fig.setAttribute("data-case-id", item.id);
-      var img = document.createElement("img");
-      img.src = item.img;
-      img.alt = item.title;
-      img.decoding = "async";
-      img.draggable = false;
-      fig.appendChild(img);
-      var cap = document.createElement("figcaption");
-      cap.className = "sys-fan__cap";
-      cap.textContent = item.tag;
-      fig.appendChild(cap);
+      if (circle) {
+        var disc = document.createElement("span");
+        disc.className = "sys-fan__disc";
+        var art = document.createElement("span");
+        art.className = "sys-illu";
+        art.innerHTML = ILLU[item.id] || ILLU.network;
+        var name = document.createElement("span");
+        name.className = "sys-illu__name";
+        name.textContent = item.title;
+        disc.appendChild(art);
+        disc.appendChild(name);
+        fig.appendChild(disc);
+      } else {
+        var img = document.createElement("img");
+        img.src = item.img;
+        img.alt = item.title;
+        img.decoding = "async";
+        img.draggable = false;
+        fig.appendChild(img);
+        var cap = document.createElement("figcaption");
+        cap.className = "sys-fan__cap";
+        cap.textContent = item.tag;
+        fig.appendChild(cap);
+      }
       fig.addEventListener("click", function () {
         if (Math.abs(vel) > 0.08 || didDrag) return;
+        if (circle && i === clampIndex(Math.round(index), n)) {
+          playIris();
+          return;
+        }
         setIndex(i, true);
       });
       arc.appendChild(fig);
@@ -339,6 +512,240 @@
       });
     }
 
+    function pillLabel() {
+      var t = window.cosgralI18n && window.cosgralI18n.t && window.cosgralI18n.t("portfolio.view_more");
+      return String(t || (storyLang() === "en" ? "See more" : "Zobacz więcej")).replace(/\s*→\s*$/, "");
+    }
+    if (pill) {
+      pill.textContent = pillLabel();
+      pill.addEventListener("pointerdown", function (e) {
+        e.stopPropagation();
+        didDrag = false;
+      });
+      pill.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        playIris();
+      });
+    }
+
+    function wrapRaw(i) {
+      var raw = i - index;
+      if (raw > n / 2) raw -= n;
+      if (raw < -n / 2) raw += n;
+      return raw;
+    }
+
+    function layoutCircle() {
+      if (destroyed) return;
+      var casesNow = getCases();
+      var nearest = clampIndex(Math.round(index), n);
+      var w = stage.clientWidth || window.innerWidth || 1;
+      var h = stage.clientHeight || window.innerHeight || 1;
+      var mobile = (window.innerWidth || w) < 760;
+      cards.forEach(function (card, i) {
+        var raw = wrapRaw(i);
+        var ad = Math.abs(raw);
+        var x = w * (0.5 + raw * (mobile ? 0.62 : 0.5));
+        var y = ad < 1 ? h * (0.36 + 0.1 * ad) : h * 0.46;
+        var o = ad > 1.05 ? Math.max(0, 1 - (ad - 1.05) / 0.35) : 1;
+        card.style.left = x + "px";
+        card.style.top = y + "px";
+        card.style.transform = "translate(-50%, -50%)";
+        card.style.opacity = String(Math.max(0, Math.min(1, o)));
+        card.style.visibility = o < 0.04 ? "hidden" : "visible";
+        card.style.pointerEvents = o < 0.12 ? "none" : "auto";
+        card.style.zIndex = String(Math.round(40 - ad * 8));
+        card.classList.toggle("is-front", i === nearest);
+        card.classList.toggle("is-side", ad > 0.55);
+      });
+      if (pill && !root.classList.contains("is-iris-open")) {
+        pill.style.left = w * 0.5 + "px";
+        pill.style.top = h * 0.36 + Math.min(w, h) * (mobile ? 0.16 : 0.11) + "px";
+      }
+      if (navEl && dotsEl) {
+        var navW = navEl.clientWidth || w;
+        var navH = navEl.clientHeight || h * 0.3;
+        var arcCx = navW * 0.5;
+        var arcCy = navH * 0.98;
+        var arcR = Math.min(navW * (mobile ? 0.34 : 0.22), navH * 0.92);
+        dotButtons.forEach(function (dot, i) {
+          var raw = wrapRaw(i);
+          var ang = raw * (mobile ? 32 : 38) * (Math.PI / 180);
+          var x = arcCx + Math.sin(ang) * arcR;
+          var y = arcCy - Math.cos(ang) * arcR;
+          var show = Math.abs(raw) < 2.15 && y > navH * 0.08;
+          dot.style.left = x + "px";
+          dot.style.top = y + "px";
+          dot.style.opacity = show ? "1" : "0";
+          dot.style.pointerEvents = show ? "auto" : "none";
+          var on = i === nearest;
+          dot.classList.toggle("is-active", on);
+          if (on) dot.setAttribute("aria-current", "true");
+          else dot.removeAttribute("aria-current");
+        });
+      }
+      if (typeof opts.onChange === "function") opts.onChange(nearest, casesNow[nearest]);
+    }
+
+    function fillIris(el, item) {
+      var paras = storyOf(item);
+      el.querySelector(".sys-iris__kicker").textContent = item.client || item.tag || "";
+      el.querySelector(".sys-iris__h").textContent = item.title || "";
+      var body = el.querySelector(".sys-iris__body");
+      body.innerHTML = "";
+      paras.forEach(function (text) {
+        var p = document.createElement("p");
+        p.className = "sys-iris__p";
+        p.textContent = text;
+        body.appendChild(p);
+      });
+    }
+
+    function buildIris(item, prev, next, rect) {
+      var el = document.createElement("div");
+      el.className = "sys-iris";
+      el.innerHTML =
+        '<div class="sys-iris__disc"></div>' +
+        '<div class="sys-iris__sat sys-iris__sat--a"></div>' +
+        '<div class="sys-iris__sat sys-iris__sat--b"></div>' +
+        '<div class="sys-iris__sat sys-iris__sat--c"></div>' +
+        '<div class="sys-iris__copy"><p class="sys-iris__kicker"></p><h3 class="sys-iris__h"></h3><div class="sys-iris__body"></div></div>' +
+        '<button type="button" class="sys-iris__close" aria-label="Zamknij">×</button>';
+      var sats = el.querySelectorAll(".sys-iris__sat");
+      var trio = [item, prev, next];
+      for (var s = 0; s < sats.length; s++) {
+        sats[s].innerHTML = ILLU[trio[s].id] || ILLU.network;
+      }
+      fillIris(el, item);
+      var disc = el.querySelector(".sys-iris__disc");
+      disc.style.left = rect.left + "px";
+      disc.style.top = rect.top + "px";
+      disc.style.width = rect.width + "px";
+      disc.style.height = rect.height + "px";
+      return el;
+    }
+
+    function placeSats(el, cx, cy, open) {
+      var vw = window.innerWidth || 1;
+      var vh = window.innerHeight || 1;
+      var targets = open
+        ? [
+            { x: vw * 0.34, y: vh * 0.42 },
+            { x: vw * 0.22, y: vh * 0.24 },
+            { x: vw * 0.48, y: vh * 0.22 },
+          ]
+        : [
+            { x: cx, y: cy },
+            { x: cx, y: cy },
+            { x: cx, y: cy },
+          ];
+      if (vw < 760 && open) {
+        targets = [
+          { x: vw * 0.28, y: vh * 0.22 },
+          { x: vw * 0.62, y: vh * 0.16 },
+          { x: vw * 0.72, y: vh * 0.32 },
+        ];
+      }
+      var sats = el.querySelectorAll(".sys-iris__sat");
+      for (var s = 0; s < sats.length; s++) {
+        sats[s].style.left = targets[s].x + "px";
+        sats[s].style.top = targets[s].y + "px";
+      }
+    }
+
+    function playIris() {
+      if (destroyed || !circle || irisOpen) return;
+      stopAuto();
+      var casesNow = getCases();
+      var i = clampIndex(Math.round(index), casesNow.length);
+      var item = casesNow[i];
+      var prev = casesNow[(i - 1 + casesNow.length) % casesNow.length];
+      var next = casesNow[(i + 1) % casesNow.length];
+      var rect = cards[i].getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      if (pill) {
+        pill.classList.remove("is-in");
+        pill.classList.add("is-out");
+      }
+      root.classList.add("is-iris-open");
+      var el = buildIris(item, prev, next, rect);
+      placeSats(el, cx, cy, false);
+      el.querySelectorAll(".sys-iris__sat").forEach(function (sat) {
+        sat.style.transition = "none";
+      });
+      document.body.appendChild(el);
+      irisEl = el;
+      irisOpen = true;
+      el.addEventListener("click", function (e) {
+        if (e.target.closest && e.target.closest(".sys-iris__copy")) return;
+        closeIris();
+      });
+      var closeBtn = el.querySelector(".sys-iris__close");
+      if (closeBtn) {
+        closeBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeIris();
+        });
+      }
+      if (reduced) {
+        el.classList.add("is-open");
+        placeSats(el, cx, cy, true);
+        return;
+      }
+      requestAnimationFrame(function () {
+        if (!irisEl) return;
+        el.querySelectorAll(".sys-iris__sat").forEach(function (sat) {
+          sat.style.transition = "";
+        });
+        requestAnimationFrame(function () {
+          if (!irisEl) return;
+          placeSats(el, cx, cy, true);
+          el.classList.add("is-open");
+        });
+      });
+    }
+
+    function closeIris(done) {
+      if (!irisEl) {
+        irisOpen = false;
+        if (done) done();
+        return;
+      }
+      var el = irisEl;
+      var disc = el.querySelector(".sys-iris__disc");
+      var cx = (parseFloat(disc.style.left) || 0) + (parseFloat(disc.style.width) || 0) / 2;
+      var cy = (parseFloat(disc.style.top) || 0) + (parseFloat(disc.style.height) || 0) / 2;
+      el.classList.remove("is-open");
+      el.classList.add("is-closing");
+      placeSats(el, cx, cy, false);
+      root.classList.remove("is-iris-open");
+      window.setTimeout(function () {
+        if (el.parentNode) el.parentNode.removeChild(el);
+        if (irisEl === el) {
+          irisEl = null;
+          irisOpen = false;
+        }
+        if (pill) {
+          pill.classList.remove("is-out");
+          pill.classList.add("is-in");
+        }
+        if (autoplay) startAuto();
+        if (done) done();
+      }, reduced ? 0 : 880);
+    }
+
+    function onIrisKey(e) {
+      if (!irisOpen) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeIris();
+      }
+    }
+    if (circle) window.addEventListener("keydown", onIrisKey);
+
     function enhanceInjectedCase(rootEl) {
       if (!rootEl) return;
       rootEl.querySelectorAll(".case-viz-tile").forEach(function (tile) {
@@ -350,6 +757,10 @@
 
     function layout() {
       if (destroyed) return;
+      if (circle) {
+        layoutCircle();
+        return;
+      }
       var nearest = clampIndex(Math.round(index), n);
       /* Same geometry in catalog + detail — click only pulls the camera back */
       var span = 172;
@@ -496,6 +907,13 @@
     function startAuto() {
       stopAuto();
       if (!autoplay || destroyed) return;
+      if (circle) {
+        autoTimer = window.setInterval(function () {
+          if (dragging || destroyed || irisOpen || document.hidden) return;
+          nudge(1);
+        }, 6400);
+        return;
+      }
       autoTimer = window.setInterval(function () {
         if (dragging || destroyed) return;
         index += 0.014;
@@ -633,6 +1051,9 @@
     if (allowWheel) root.addEventListener("wheel", onWheel, { passive: false });
 
     layout();
+    if (circle) {
+      window.addEventListener("resize", layout);
+    }
     if (autoplay) startAuto();
 
     var api = {
@@ -671,6 +1092,15 @@
             dot.setAttribute("aria-label", currentCases[di] ? currentCases[di].title : "");
           });
         }
+        cards.forEach(function (card, di) {
+          var nm = card.querySelector(".sys-illu__name");
+          if (nm && currentCases[di]) nm.textContent = currentCases[di].title;
+        });
+        if (pill) pill.textContent = pillLabel();
+        if (irisEl && irisOpen) {
+          var openItem = currentCases[clampIndex(Math.round(index), currentCases.length)];
+          if (openItem) fillIris(irisEl, openItem);
+        }
         /* Repaint current card copy */
         var idx = clampIndex(Math.round(index), n);
         paintCopy(idx);
@@ -679,6 +1109,11 @@
         destroyed = true;
         stopAuto();
         if (raf) cancelAnimationFrame(raf);
+        if (circle) {
+          window.removeEventListener("keydown", onIrisKey);
+          window.removeEventListener("resize", layout);
+        }
+        if (irisEl && irisEl.parentNode) irisEl.parentNode.removeChild(irisEl);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);

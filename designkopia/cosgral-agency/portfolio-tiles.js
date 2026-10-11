@@ -335,10 +335,11 @@
     systemsFan = window.CosgralSystemsFan.create(mount, {
       mode: "catalog",
       autoplay: !REDUCED,
-      /* Homepage: card drag and dots stay; vertical wheel stays with the page. */
+      /* Homepage: circle carousel; vertical wheel stays with the page. */
       drag: true,
       dragAxis: HOME ? "x" : "free",
       wheel: !HOME,
+      circle: HOME,
     });
     restartOs = function () {
       if (systemsFan && !loopsPaused) systemsFan.resume();
@@ -501,18 +502,90 @@
     };
   }
 
-  function applyFromScroll() {
-    if (!HOME || !track) return;
+  /* Same ease and duration as the portfolio chapter slide (easeOutQuart, ~1.1s).
+     Scroll progress picks the slide; the track eases one slide at a time. */
+  var CINE_MS = 1100;
+  var cine = { visual: 0, from: 0, to: 0, t0: 0, running: false, raf: 0 };
+
+  function easeOutQuart(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+
+  function desiredIndex() {
     measurePin();
-    if (!pinCache) return;
+    if (!pinCache) return 0;
     var y = window.scrollY || window.pageYOffset || 0;
     var p = (y - pinCache.top) / pinCache.travel;
     if (p < 0) p = 0;
     else if (p > 1) p = 1;
     var max = Math.max(1, chapters.length - 1);
-    var x = p * max * pinCache.width;
+    return Math.round(p * max);
+  }
+
+  function paintCine() {
+    measurePin();
+    if (!pinCache || !track) return;
+    var x = cine.visual * pinCache.width;
     track.style.transform = "translate3d(" + (-x).toFixed(2) + "px,0,0)";
-    setActive(Math.round(p * max));
+    setActive(Math.max(0, Math.min(chapters.length - 1, Math.round(cine.visual))));
+  }
+
+  function toward(desired) {
+    var max = Math.max(0, chapters.length - 1);
+    if (Math.abs(desired - cine.visual) < 0.02) return desired;
+    var dir = desired > cine.visual ? 1 : -1;
+    var next = dir > 0 ? Math.ceil(cine.visual - 1e-4) : Math.floor(cine.visual + 1e-4);
+    if (Math.abs(next - cine.visual) < 0.02) next = cine.visual + dir;
+    if (next < 0) next = 0;
+    if (next > max) next = max;
+    return next;
+  }
+
+  function cineStep() {
+    var desired = desiredIndex();
+    var max = Math.max(0, chapters.length - 1);
+    if (REDUCED) {
+      cine.visual = desired;
+      cine.running = false;
+      paintCine();
+      cine.raf = 0;
+      return;
+    }
+    if (!cine.running) {
+      if (Math.abs(cine.visual - desired) < 0.02) {
+        cine.visual = desired;
+        paintCine();
+        cine.raf = 0;
+        return;
+      }
+      cine.from = cine.visual;
+      cine.to = toward(desired);
+      cine.t0 = performance.now();
+      cine.running = true;
+    } else if ((desired - cine.to) * (cine.to - cine.from) < -0.001) {
+      cine.from = cine.visual;
+      cine.to = toward(desired);
+      cine.t0 = performance.now();
+    }
+    var t = Math.min(1, (performance.now() - cine.t0) / CINE_MS);
+    cine.visual = cine.from + (cine.to - cine.from) * easeOutQuart(t);
+    if (t >= 1) {
+      cine.visual = cine.to;
+      cine.running = false;
+      if (cine.visual < 0) cine.visual = 0;
+      if (cine.visual > max) cine.visual = max;
+    }
+    paintCine();
+    if (cine.running || Math.abs(cine.visual - desiredIndex()) > 0.02) {
+      cine.raf = requestAnimationFrame(cineStep);
+    } else {
+      cine.raf = 0;
+    }
+  }
+
+  function applyFromScroll() {
+    if (!HOME || !track) return;
+    if (!cine.raf) cine.raf = requestAnimationFrame(cineStep);
   }
 
   function pageToIndex(index) {
@@ -525,7 +598,7 @@
     var from = activeIndex < 0 ? 0 : activeIndex;
     var steps = Math.max(1, Math.abs(index - from));
     if (lenis && lenis.scrollTo) {
-      lenis.scrollTo(y, { duration: Math.max(0.45, Math.min(1.7, steps * 0.48)), force: true });
+      lenis.scrollTo(y, { duration: Math.max(1.05, Math.min(4.6, steps * 1.1)), force: true });
     } else {
       window.scrollTo({ top: y, behavior: "smooth" });
     }
