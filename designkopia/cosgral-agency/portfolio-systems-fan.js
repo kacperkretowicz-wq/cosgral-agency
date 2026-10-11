@@ -641,7 +641,12 @@
       if (destroyed) return;
       var casesNow = getCases();
       var nearest = clampIndex(Math.round(index), n);
-      var stageRect = stage.getBoundingClientRect();
+      /* Measure relative to the fan root, not the viewport: the chapter can sit
+         off-screen (horizontal realizacje rail) when layout runs, which used
+         to bake huge negative offsets into the cards. */
+      var rootRect0 = root.getBoundingClientRect();
+      var stageRect0 = stage.getBoundingClientRect();
+      var stageRect = { left: stageRect0.left - rootRect0.left, top: stageRect0.top - rootRect0.top };
       var vw = window.innerWidth || 1;
       var vh = window.innerHeight || 1;
       var mobile = vw < 760;
@@ -662,10 +667,17 @@
       if (pill && !root.classList.contains("is-iris-open")) {
         var slot = circlePose(0);
         pill.style.left = slot.x - stageRect.left + "px";
-        pill.style.top = slot.y - stageRect.top + vw * 0.045 + "px";
+        /* Sit the pill in the upper half of the front disc: the thumb arc
+           covers the lower half, which used to hide "Zobacz więcej". */
+        pill.style.top = slot.y - stageRect.top - (mobile ? vw * 0.2 : vw * 0.135) + "px";
       }
       if (navEl && dotsEl) {
-        var navRect = navEl.getBoundingClientRect();
+        var navRect0 = navEl.getBoundingClientRect();
+        var navRect = {
+          left: navRect0.left - rootRect0.left,
+          top: navRect0.top - rootRect0.top,
+          bottom: navRect0.bottom - rootRect0.top,
+        };
         var arcCx = vw * 0.5;
         var arcCy = mobile ? navRect.bottom - 4 : vh * 0.989;
         var arcR = vw * (mobile ? 0.34 : 0.2925);
@@ -1196,6 +1208,33 @@
       });
     }
     if (autoplay) startAuto();
+
+    /* While the systems circle fills the screen, park the live-chat cube:
+       it sat right on the thumb semicircle. Also re-layout on entry so the
+       arc is measured in its final on-screen position. */
+    if (circle && "IntersectionObserver" in window) {
+      var boardIO = new IntersectionObserver(
+        function (entries) {
+          var e0 = entries[entries.length - 1];
+          var on = e0.isIntersecting && e0.intersectionRatio > 0.55;
+          document.documentElement.classList.toggle("is-systems-board", on);
+          if (on && !destroyed) layout();
+        },
+        { threshold: [0, 0.55, 0.8, 1] }
+      );
+      boardIO.observe(root);
+      window.addEventListener("keydown", function (e) {
+        if (destroyed || root.classList.contains("is-iris-open")) return;
+        if (!document.documentElement.classList.contains("is-systems-board")) return;
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        var t = e.target;
+        if (t && t.closest && t.closest("input, textarea, select, [contenteditable]")) return;
+        e.preventDefault();
+        stopAuto();
+        nudge(e.key === "ArrowRight" ? 1 : -1);
+        if (autoplay) startAuto();
+      });
+    }
 
     var api = {
       root: root,
