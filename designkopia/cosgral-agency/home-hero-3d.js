@@ -2,8 +2,8 @@
  * Hero cube + cinematic shatter → diagonal sand stream (single Three.js system).
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011line";
-import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011line";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011viewer";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011viewer";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
