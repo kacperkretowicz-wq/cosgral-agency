@@ -122,6 +122,8 @@
     var autoplay = mode === "catalog" && !reduced && opts.autoplay !== false;
     var allowDrag = opts.drag !== false;
     var allowWheel = opts.wheel !== false;
+    var dragAxis = opts.dragAxis === "x" ? "x" : "free";
+    var pendingDrag = null;
     var destroyed = false;
     var dragging = false;
     var didDrag = false;
@@ -511,15 +513,38 @@
 
     function onPointerDown(e) {
       if (e.button != null && e.button !== 0) return;
+      var x = e.clientX != null ? e.clientX : 0;
+      var y = e.clientY != null ? e.clientY : 0;
+      if (dragAxis === "x") {
+        pendingDrag = { x: x, y: y, id: e.pointerId };
+        return;
+      }
       dragging = true;
       didDrag = false;
       vel = 0;
-      lastX = e.clientX != null ? e.clientX : e.touches && e.touches[0].clientX;
+      lastX = x;
       stopAuto();
       stage.classList.add("is-dragging");
       document.body.classList.add("is-sys-fan-dragging");
     }
     function onPointerMove(e) {
+      if (pendingDrag && !dragging) {
+        if (e.pointerId != null && pendingDrag.id != null && e.pointerId !== pendingDrag.id) return;
+        var px = e.clientX != null ? e.clientX : pendingDrag.x;
+        var py = e.clientY != null ? e.clientY : pendingDrag.y;
+        var adx = px - pendingDrag.x;
+        var ady = py - pendingDrag.y;
+        if (Math.abs(adx) < 8 && Math.abs(ady) < 8) return;
+        pendingDrag = null;
+        if (Math.abs(ady) >= Math.abs(adx)) return;
+        dragging = true;
+        didDrag = false;
+        vel = 0;
+        lastX = px;
+        stopAuto();
+        stage.classList.add("is-dragging");
+        document.body.classList.add("is-sys-fan-dragging");
+      }
       if (!dragging) return;
       var x = e.clientX != null ? e.clientX : e.touches && e.touches[0].clientX;
       if (x == null) return;
@@ -534,6 +559,7 @@
       if (e.cancelable) e.preventDefault();
     }
     function onPointerUp() {
+      pendingDrag = null;
       if (!dragging) return;
       dragging = false;
       stage.classList.remove("is-dragging");

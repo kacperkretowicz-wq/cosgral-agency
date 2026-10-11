@@ -3372,10 +3372,57 @@ html.reduce-motion .paper-return {
 #realizacje .sys-fan__card {
   border-color: rgba(17, 17, 17, 0.14);
   box-shadow: 0 18px 36px rgba(40, 32, 22, 0.22);
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+#realizacje .portfolio-chapter--grid {
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  text-align: left;
+  gap: clamp(0.85rem, 2dvh, 1.35rem);
+  padding:
+    clamp(4.75rem, 10dvh, 6.25rem)
+    clamp(1.25rem, 4.5vw, 3.25rem)
+    clamp(3.5rem, 8dvh, 4.75rem);
+  color: #1c1c1b;
+}
+#realizacje .portfolio-chapter--grid .home-work__head,
+#realizacje .portfolio-chapter--grid .home-work__footer {
+  flex: 0 0 auto;
+}
+#realizacje .portfolio-chapter--grid .home-work__title,
+#realizacje .portfolio-chapter--grid .section-label {
+  color: #1c1c1b;
+  text-shadow: none;
+}
+#realizacje .portfolio-chapter--grid .home-work__lead {
+  color: #4a4a47;
+  text-shadow: none;
+}
+#realizacje .portfolio-chapter--grid .home-work__grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+#realizacje .portfolio-chapter--grid .glass-btn,
+#realizacje .portfolio-chapter--grid .home-work__link {
+  color: #111;
+  border-bottom-color: rgba(17, 17, 17, 0.45);
+}
+#realizacje .portfolio-chapter--grid .glass-btn:hover,
+#realizacje .portfolio-chapter--grid .glass-btn:focus-visible {
+  border-color: #111;
 }
 #realizacje .sys-fan__card.is-front {
   border-color: rgba(17, 17, 17, 0.32);
   box-shadow: 0 28px 52px rgba(40, 32, 22, 0.28);
+}
+/* Keep the systems dots above the centered chat cube. */
+@media (min-width: 901px) {
+  #realizacje .sys-fan--catalog .sys-fan__nav {
+    bottom: 9rem;
+  }
 }
 #realizacje .portfolio-chapters__dot,
 #realizacje .sys-fan__dot {
@@ -3510,5 +3557,13 @@ html.reduce-motion #realizacje .reels-tiles__belt {
     width: 100%;
     padding-right: 0;
     padding-inline: 0;
+  }
+  #realizacje .portfolio-chapter--grid {
+    justify-content: flex-start;
+    padding: clamp(4.5rem, 11dvh, 5.5rem) 0.8rem clamp(3.2rem, 9dvh, 4.1rem);
+    gap: 0.65rem;
+  }
+  #realizacje .portfolio-chapter--grid .home-work__grid {
+    grid-template-rows: auto;
   }
 }

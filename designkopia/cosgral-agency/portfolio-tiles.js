@@ -311,8 +311,9 @@
     systemsFan = window.CosgralSystemsFan.create(mount, {
       mode: "catalog",
       autoplay: !REDUCED,
-      /* Homepage: fan autoplay stays; drag/wheel must not steal page scroll. */
-      drag: !HOME,
+      /* Homepage: card drag and dots stay; vertical wheel stays with the page. */
+      drag: true,
+      dragAxis: HOME ? "x" : "free",
       wheel: !HOME,
     });
     restartOs = function () {
@@ -676,6 +677,11 @@
       "touchstart",
       function (e) {
         if (!e.touches || e.touches.length !== 1) return;
+        var fromFan = e.target && e.target.closest && e.target.closest(".sys-fan__card, .sys-fan__nav, .sys-fan__arrow, .sys-fan__dot");
+        if (fromFan) {
+          gesture = null;
+          return;
+        }
         gesture = {
           x: e.touches[0].clientX,
           y: e.touches[0].clientY,

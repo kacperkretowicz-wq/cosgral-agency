@@ -127,7 +127,8 @@
 <link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
 <script src="cookie-consent.js?v=20261001a"></script>
 <link rel="stylesheet" href="portfolio-tiles.css?v=20260928montaz1" />
-<link rel="stylesheet" href="cosgral-home.css?v=20261011slides" />
+<link rel="stylesheet" href="portfolio-expand.css?v=20261011visit" />
+<link rel="stylesheet" href="cosgral-home.css?v=20261011grid" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
@@ -362,10 +363,57 @@
 <!-- 4. REALIZACJE -->
 <section id="realizacje" class="home-work home-scene">
   <div class="home-scene__panel">
-  <h2 class="home-work__title home-work__title--sr" data-i18n="work.title">Wybrane realizacje</h2>
   <div class="portfolio-chapters" data-portfolio-tiles data-home-chapters aria-label="Kategorie realizacji" data-i18n-aria-label="portfolio.chapters_label">
     <div class="portfolio-chapters__scroller" data-chapters-scroller>
-    <section class="portfolio-chapter is-active" data-portfolio-tile data-theme="web" id="strony">
+    <section class="portfolio-chapter portfolio-chapter--grid is-active" data-portfolio-tile data-theme="grid" id="wybrane" aria-label="Wybrane realizacje">
+      <div class="home-work__head">
+        <p class="section-label" data-enter="left" data-i18n="work.eyebrow">Realizacje</p>
+        <h2 class="home-work__title" data-reveal-words data-i18n="work.title">Wybrane realizacje</h2>
+        <p class="home-work__lead" data-enter="right" data-i18n="work.bentoLead">Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.</p>
+      </div>
+      <div class="home-work__grid">
+        <a class="home-work__card home-work__card--wide" href="portfolio.html#strony" data-tile-interact data-enter="bottom">
+          <div class="home-work__card-media" aria-hidden="true">
+            <video muted loop playsinline preload="metadata" src="portfolio-media/showcase/web/trove-archive.mp4"></video>
+          </div>
+          <div class="home-work__card-body">
+            <span class="home-work__card-tag" data-i18n="bento.strony">Strony internetowe</span>
+            <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
+          </div>
+        </a>
+        <a class="home-work__card" href="portfolio.html#montaz" data-tile-interact data-enter="left">
+          <div class="home-work__card-media" aria-hidden="true">
+            <video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/001-poster.jpg" src="portfolio-media/reels/orlincy/001.mp4"></video>
+          </div>
+          <div class="home-work__card-body">
+            <span class="home-work__card-tag" data-i18n="bento.montaz">Montaż wideo</span>
+            <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
+          </div>
+        </a>
+        <a class="home-work__card" href="portfolio.html#grafiki" data-tile-interact data-enter="right">
+          <div class="home-work__card-media" aria-hidden="true">
+            <video muted loop playsinline preload="metadata" poster="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" src="portfolio-media/showcase/graphics/home-grafiki-social.mp4"></video>
+          </div>
+          <div class="home-work__card-body">
+            <span class="home-work__card-tag" data-i18n="bento.grafiki">Grafiki &amp; social</span>
+            <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
+          </div>
+        </a>
+        <a class="home-work__card" href="portfolio.html#systemy" data-tile-interact data-enter="bottom">
+          <div class="home-work__card-media home-work__card-media--dim" aria-hidden="true">
+            <video muted loop playsinline preload="metadata" src="assets/services/automatyzacje.mp4"></video>
+          </div>
+          <div class="home-work__card-body">
+            <span class="home-work__card-tag" data-i18n="work.card_automation">Systemy i automatyzacje</span>
+            <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
+          </div>
+        </a>
+      </div>
+      <div class="home-work__footer" data-enter="bottom">
+        <a class="home-work__link glass-btn" href="portfolio.html" data-i18n="work.fullPortfolio">Zobacz pełne portfolio</a>
+      </div>
+    </section>
+    <section class="portfolio-chapter" data-portfolio-tile data-theme="web" id="strony">
       <div class="portfolio-chapter__bg" aria-hidden="true">
         <div class="portfolio-tile__media">
           <div class="chapter-lux" data-chapter-lux>
@@ -391,10 +439,11 @@
           </div>
         </div>
       </div>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.web_title">Strony internetowe</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.web_lead">eCommerce, landing page, strony jako część systemu dla działalności</p>
-        <a class="portfolio-chapter__more" href="portfolio.html#strony" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+        <a class="portfolio-chapter__more" href="portfolio.html#strony" data-tile-expand="web" data-no-transition data-i18n="portfolio.view_more">Zobacz więcej →</a>
       </div>
     </section>
 
@@ -406,10 +455,11 @@
           </div>
         </div>
       </div>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.automation_tile_lead">CRM, aplikacje i workflow, które odciążają zespół.</p>
-        <a class="portfolio-chapter__more" href="portfolio.html#automatyzacje" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+        <a class="portfolio-chapter__more" href="portfolio.html#systemy" data-tile-expand="systems" data-no-transition data-i18n="portfolio.view_more">Zobacz więcej →</a>
       </div>
     </section>
 
@@ -422,10 +472,11 @@
           </div>
         </div>
       </div>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.montaz_title">Montaż wideo</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.montaz_lead">Reels i materiały reklamowe</p>
-        <a class="portfolio-chapter__more" href="portfolio.html#montaz" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+        <a class="portfolio-chapter__more" href="portfolio.html#montaz" data-tile-expand="video" data-no-transition data-i18n="portfolio.view_more">Zobacz więcej →</a>
       </div>
     </section>
 
@@ -438,10 +489,11 @@
           </div>
         </div>
       </div>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.grafiki_title">Grafiki</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.grafiki_tile_lead">Posty, stories i key visuale w rytmie pokazu slajdów.</p>
-        <a class="portfolio-chapter__more" href="portfolio.html#grafiki" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+        <a class="portfolio-chapter__more" href="portfolio.html#grafiki" data-tile-expand="graphics" data-no-transition data-i18n="portfolio.view_more">Zobacz więcej →</a>
       </div>
     </section>
     </div>
@@ -452,7 +504,8 @@
         </svg>
       </button>
       <div class="portfolio-chapters__dots" role="tablist" aria-label="Kategorie" data-i18n-aria-label="portfolio.chapters_dots">
-        <button type="button" class="portfolio-chapters__dot is-active" data-portfolio-chapter-dot aria-label="Strony internetowe" data-i18n-aria-label="portfolio.dot_strony" aria-current="true"></button>
+        <button type="button" class="portfolio-chapters__dot is-active" data-portfolio-chapter-dot aria-label="Wybrane realizacje" aria-current="true"></button>
+        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Strony internetowe" data-i18n-aria-label="portfolio.dot_strony"></button>
         <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Systemy i automatyzacje" data-i18n-aria-label="portfolio.dot_systemy"></button>
         <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Montaż wideo" data-i18n-aria-label="portfolio.dot_montaz"></button>
         <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Grafiki" data-i18n-aria-label="portfolio.dot_grafiki"></button>
@@ -466,6 +519,11 @@
   </div>
   </div>
 </section>
+
+<div class="portfolio-tile-expand" data-tile-expand-stage aria-hidden="true" hidden>
+  <button type="button" class="portfolio-tile-expand__back" data-expand-back data-i18n="portfolio.expand_back" hidden>Wróć</button>
+  <div class="portfolio-tile-expand__body" data-expand-body></div>
+</div>
 
 <div class="paper-return" id="paper-return" aria-hidden="true"></div>
 
@@ -677,9 +735,11 @@
 <script src="home-section-stepper.js?v=20260925end1"></script>
 <script src="home-director.js?v=20260920ui37"></script>
 <script src="home-tile-interact.js?v=20261011slides"></script>
-<script src="portfolio-systems-fan.js?v=20261011slides"></script>
+<script src="portfolio-systems-fan.js?v=20261011five"></script>
 <script src="portfolio-montaz.js?v=20260928overlay2"></script>
-<script src="portfolio-tiles.js?v=20261011slides2"></script>
+<script src="telforce-previews.js?v=20260928overlay2"></script>
+<script src="portfolio-expand.js?v=20261011five"></script>
+<script src="portfolio-tiles.js?v=20261011five"></script>
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20261011menu"></script>

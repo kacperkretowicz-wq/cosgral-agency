@@ -421,26 +421,39 @@ body.is-tile-expanded.is-closing-reverse .expand-belt__card {
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.9rem;
 }
-/* Visit CTA under the parked site tile (left of description) */
-.expand-web-visit {
+/* Visit CTA under the parked site tile (left of description).
+   Higher specificity than .glass-btn, which is position:relative on the homepage. */
+a.expand-web-visit.glass-btn {
   position: absolute;
   z-index: 9;
   left: calc(50% - min(28vw, 12rem));
   top: calc(50% + min(46vw, 28rem) * 0.2875 + 0.85rem);
+  bottom: auto;
   transform: translate3d(-50%, 0.4rem, 0);
   display: inline-flex;
   justify-content: flex-start;
   min-width: 0;
+  color: #fff;
+  background: none;
+  border-bottom-color: rgba(255, 255, 255, 0.45);
   opacity: 0;
   pointer-events: none;
   transition:
     opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.expand-web-visit.is-ready {
+a.expand-web-visit.glass-btn.is-ready {
   opacity: 1;
   pointer-events: auto;
   transform: translate3d(-50%, 0, 0);
+}
+a.expand-web-visit.glass-btn:hover,
+a.expand-web-visit.glass-btn:focus-visible,
+a.expand-web-visit.glass-btn:active {
+  color: #fff;
+  border-color: #fff;
+  transform: translate3d(-50%, 0, 0);
+  filter: none;
 }
 @media (max-width: 820px) {
   .expand-deck.is-case-detail .expand-deck__card.is-detail-hero {
@@ -460,13 +473,16 @@ body.is-tile-expanded.is-closing-reverse .expand-belt__card {
   .expand-deck.is-case-detail .expand-deck__card.is-detail-hero {
     transform: translate3d(-50%, calc(-50% - 12vh), 0) rotateY(0deg) scale(0.78) !important;
   }
-  .expand-web-visit {
+  a.expand-web-visit.glass-btn {
     left: 50%;
     top: auto;
     bottom: max(7.5rem, calc(38svh + 1.25rem));
     transform: translate3d(-50%, 0.35rem, 0);
   }
-  .expand-web-visit.is-ready {
+  a.expand-web-visit.glass-btn.is-ready,
+  a.expand-web-visit.glass-btn:hover,
+  a.expand-web-visit.glass-btn:focus-visible,
+  a.expand-web-visit.glass-btn:active {
     transform: translate3d(-50%, 0, 0);
   }
 }
