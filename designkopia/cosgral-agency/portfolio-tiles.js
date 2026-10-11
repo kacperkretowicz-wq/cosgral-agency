@@ -424,6 +424,36 @@
     }
   }
 
+  var pinY = null;
+  var pinTimer = 0;
+  function holdPage() {
+    if (pinY == null) return;
+    var now = window.scrollY || window.pageYOffset || 0;
+    if (Math.abs(now - pinY) < 2) return;
+    if (window.lenis && window.lenis.scrollTo) window.lenis.scrollTo(pinY, { immediate: true });
+    else window.scrollTo(0, pinY);
+  }
+  function beginPin() {
+    if (!HOME) return;
+    if (pinTimer) {
+      window.clearTimeout(pinTimer);
+      pinTimer = 0;
+    }
+    if (pinY == null) pinY = window.scrollY || window.pageYOffset || 0;
+  }
+  function endPinSoon() {
+    if (!HOME) return;
+    if (pinTimer) window.clearTimeout(pinTimer);
+    pinTimer = window.setTimeout(function () {
+      pinTimer = 0;
+      holdPage();
+      pinY = null;
+    }, 120);
+  }
+  if (HOME) {
+    window.addEventListener("scroll", holdPage, true);
+  }
+
   function scrollToIndex(index, behavior) {
     index = Math.max(0, Math.min(chapters.length - 1, index));
     var chapter = chapters[index];
@@ -434,13 +464,16 @@
       scrollAnim = 0;
     }
     setActive(index, { force: true });
-    if (behavior === "auto" || REDUCED) {
-      scroller.scrollLeft = left;
-      return;
-    }
     var from = scroller.scrollLeft;
     var dist = left - from;
     if (Math.abs(dist) < 2) return;
+    beginPin();
+    if (behavior === "auto" || REDUCED) {
+      scroller.scrollLeft = left;
+      holdPage();
+      endPinSoon();
+      return;
+    }
     var prevBehavior = scroller.style.scrollBehavior;
     scroller.style.scrollBehavior = "auto";
     var t0 = performance.now();
@@ -449,11 +482,13 @@
       var p = Math.min(1, (now - t0) / dur);
       var e = 1 - Math.pow(1 - p, 4);
       scroller.scrollLeft = from + dist * e;
+      holdPage();
       if (p < 1) {
         scrollAnim = requestAnimationFrame(tick);
       } else {
         scrollAnim = 0;
         scroller.style.scrollBehavior = prevBehavior;
+        endPinSoon();
       }
     }
     scrollAnim = requestAnimationFrame(tick);
@@ -659,11 +694,15 @@
         if (!gesture.axis) {
           if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
           gesture.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-          if (gesture.axis === "x") scroller.classList.add("is-axis-x");
+          if (gesture.axis === "x") {
+            scroller.classList.add("is-axis-x");
+            beginPin();
+          }
         }
         if (gesture.axis !== "x") return;
         if (e.cancelable) e.preventDefault();
         scroller.scrollLeft = gesture.left - dx;
+        holdPage();
       },
       { passive: false }
     );

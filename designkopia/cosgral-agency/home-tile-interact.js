@@ -214,6 +214,8 @@
     document.querySelectorAll(".home-scene > .home-scene__panel").forEach(function (panel) {
       if (panel.closest(".home-hero")) return;
       if (panel.closest("#kontakt") || panel.closest(".home-contact")) return;
+      /* Realizacje chapters scroll sideways; a transformed parent jumps the page. */
+      if (panel.closest("#realizacje")) return;
       wrapChildren(panel);
     });
 
