@@ -140,7 +140,7 @@
   var WEB_CASES_PL = [
     {
       id: "juicy",
-      href: "portfolio-strona-juicy-events.html",
+      href: "#strony",
       title: "Juicy Events",
       lead: "Agencja eventowa",
       video: "portfolio-media/showcase/web/juicy-events.mp4",
@@ -149,7 +149,7 @@
     },
     {
       id: "trove",
-      href: "portfolio-strona-trove.html",
+      href: "#strony",
       title: "Trove Archive",
       lead: "eCommerce fashion",
       video: "portfolio-media/showcase/web/trove-archive.mp4",
@@ -158,7 +158,7 @@
     },
     {
       id: "mj",
-      href: "portfolio-strona-mj.html",
+      href: "#strony",
       title: "MJ Social Media",
       lead: "Content creator",
       video: "portfolio-media/showcase/web/mj-social-media.mp4",
@@ -169,7 +169,7 @@
   var WEB_CASES_EN = [
     {
       id: "juicy",
-      href: "portfolio-strona-juicy-events.html",
+      href: "#strony",
       title: "Juicy Events",
       lead: "Event agency",
       video: "portfolio-media/showcase/web/juicy-events.mp4",
@@ -178,7 +178,7 @@
     },
     {
       id: "trove",
-      href: "portfolio-strona-trove.html",
+      href: "#strony",
       title: "Trove Archive",
       lead: "eCommerce fashion",
       video: "portfolio-media/showcase/web/trove-archive.mp4",
@@ -187,7 +187,7 @@
     },
     {
       id: "mj",
-      href: "portfolio-strona-mj.html",
+      href: "#strony",
       title: "MJ Social Media",
       lead: "Content creator",
       video: "portfolio-media/showcase/web/mj-social-media.mp4",
@@ -195,6 +195,31 @@
       match: /mj/i,
     },
   ];
+  var WEB_COPY = {
+    juicy: {
+      visit: "https://juicyevents.pl/",
+      keys: ["portfolio.juicy_p1", "portfolio.juicy_p2", "portfolio.juicy_p3", "portfolio.juicy_p4"],
+    },
+    trove: {
+      visit: "https://trovearchive.com/",
+      keys: ["portfolio.trove_p1", "portfolio.trove_p2", "portfolio.trove_p3", "portfolio.trove_p4"],
+    },
+    mj: {
+      visit: "https://mjsocialmedia.netlify.app/",
+      keys: ["portfolio.mj_p1", "portfolio.mj_p2", "portfolio.mj_p3", "portfolio.mj_p4"],
+    },
+  };
+  function attachWebCopy(list) {
+    list.forEach(function (item) {
+      var extra = WEB_COPY[item.id];
+      if (!extra) return;
+      item.visit = extra.visit;
+      item.copyKeys = extra.keys;
+      item.href = "#strony";
+    });
+  }
+  attachWebCopy(WEB_CASES_PL);
+  attachWebCopy(WEB_CASES_EN);
   function getWebCases() {
     var lang = (window.cosgralI18n && window.cosgralI18n.getLang && window.cosgralI18n.getLang()) || "pl";
     return lang === "en" ? WEB_CASES_EN : WEB_CASES_PL;
@@ -203,7 +228,7 @@
 
   var SYSTEM_CASES = [
     {
-      href: "portfolio-telforceone-crm.html",
+      href: "#automatyzacje",
       tag: "CRM / sprzedaż terenowa",
       client: "TelForceOne S.A.",
       title: "CRM z bazą danych i mapą handlowców",
@@ -213,7 +238,7 @@
       cls: "portfolio-case-card--telforce",
     },
     {
-      href: "portfolio-telforceone-code39.html",
+      href: "#automatyzacje",
       tag: "Narzędzie / identyfikacja",
       client: "TelForceOne S.A.",
       title: "Generator kodów kreskowych Code 39",
@@ -223,7 +248,7 @@
       cls: "portfolio-case-card--telforce",
     },
     {
-      href: "portfolio-telforceone-forecast.html",
+      href: "#automatyzacje",
       tag: "Analityka / zapasy",
       client: "TelForceOne S.A.",
       title: "Kontrola stanów i prognozowanie",
@@ -233,7 +258,7 @@
       cls: "portfolio-case-card--telforce",
     },
     {
-      href: "portfolio-trove-panel.html",
+      href: "#automatyzacje",
       tag: "Aplikacja",
       client: "Trove",
       title: "Panel sklepu i monitoring cen",
@@ -243,7 +268,7 @@
       cls: "portfolio-case-card--app",
     },
     {
-      href: "portfolio-crm-leady.html",
+      href: "#automatyzacje",
       tag: "CRM",
       client: "",
       title: "CRM leadów, dealów i operacji sprzedażowych",
@@ -253,7 +278,7 @@
       cls: "portfolio-case-card--crm",
     },
     {
-      href: "portfolio-chatbot-ai.html",
+      href: "#automatyzacje",
       tag: "Automatyzacja",
       client: "",
       title: "Chatbot AI do wiadomości klientów",
@@ -263,7 +288,7 @@
       cls: "portfolio-case-card--bot",
     },
     {
-      href: "portfolio-trove-workflow.html",
+      href: "#automatyzacje",
       tag: "Automatyzacja",
       client: "Trove",
       title: "Zamówienie → faktura → paczka",
@@ -507,6 +532,27 @@
     layoutDeck();
   }
 
+  function localWebCase(item) {
+    var i18n = window.cosgralI18n;
+    var t = i18n && i18n.t ? function (k) { return i18n.t(k); } : function () { return ""; };
+    var lang = (i18n && i18n.getLang && i18n.getLang()) || "pl";
+    var copy = (item.copyKeys || []).map(function (k) {
+      var v = t(k);
+      return v && v !== k ? v : "";
+    }).filter(Boolean);
+    var visitLabel = t("portfolio.visit_site");
+    if (!visitLabel || visitLabel === "portfolio.visit_site") {
+      visitLabel = lang === "en" ? "Visit website" : "Odwiedź stronę";
+    }
+    return {
+      title: item.title,
+      lead: item.lead,
+      visitHref: item.visit || "",
+      visitLabel: visitLabel,
+      copy: copy,
+    };
+  }
+
   function openWebCaseDetail(item, card) {
     if (!item || webDetailOpen) return;
     webDetailOpen = true;
@@ -526,10 +572,9 @@
       panel.classList.add("is-ready");
     });
 
-    fetchPageHtml(item.href)
-      .then(function (html) {
+    Promise.resolve(localWebCase(item))
+      .then(function (data) {
         if (!webDetailOpen || expandedKey !== "web") return;
-        var data = parseWebCasePage(html, item);
         panel.innerHTML = "";
         var eye = document.createElement("p");
         eye.className = "expand-web-panel__eyebrow";

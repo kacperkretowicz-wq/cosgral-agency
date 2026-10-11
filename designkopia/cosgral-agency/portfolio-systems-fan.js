@@ -9,31 +9,31 @@
   var STILL = "portfolio-media/showcase/chapter-stills/systems/bw/";
 
   var CASES_PL = [
-    { id: "tfo-crm",      href: "portfolio-telforceone-crm.html",     tag: "CRM / sprzedaż terenowa",  client: "TelForceOne S.A.", title: "CRM z mapą handlowców",          desc: "Handlowcy jeździli z Excelami i notatkami w telefonie — nikt nie wiedział, kto u kogo był. CRM z mapą zbiera klientów, trasy i raporty dnia w jednym miejscu, więc planowanie wizyt zajmuje minuty zamiast godziny.", img: STILL + "ui-crm-map-bw.jpg" },
-    { id: "tfo-code39",   href: "portfolio-telforceone-code39.html",   tag: "Narzędzie / identyfikacja", client: "TelForceOne S.A.", title: "Generator kodów Code 39",        desc: "Etykiety powstawały w kilku narzędziach i często wracały ze skanera jako błąd. Generator daje podgląd Code 39 i batch do druku — oznaczenie SKU w sekundach, bez poprawek na magazynie.", img: STILL + "ui-barcode-bw.jpg" },
-    { id: "tfo-forecast", href: "portfolio-telforceone-forecast.html", tag: "Analityka / zapasy",        client: "TelForceOne S.A.", title: "Stany i prognozowanie",          desc: "Zakupy szły \u201ena wyczucie\u201f: braki na półce albo zamrożony towar. Panel łączy stany, rotację i prognozę z alertami — widać, co dokupić zanim sprzedaż stanie.", img: STILL + "ui-forecast-bw.jpg" },
-    { id: "trove-panel",  href: "portfolio-trove-panel.html",          tag: "Aplikacja",                 client: "Trove",            title: "Panel sklepu i monitoring cen",  desc: "Trove ręcznie porównywało ceny na Allegro i własnym sklepie w arkuszach. Panel zbiera stany i ceny kanałów z alertami przecen — reakcja na spadek marży tego samego dnia, nie po tygodniu.", img: STILL + "ui-price-monitor-bw.jpg" },
-    { id: "crm-leady",    href: "portfolio-crm-leady.html",            tag: "CRM",                       client: "",                 title: "CRM leadów i dealów",            desc: "Leady ginęły między skrzynką, czatem i karteczkami — follow-upy się spóźniały. CRM prowadzi od pierwszego kontaktu do deala: pipeline, notatki i przypomnienia w jednym lejku.", img: STILL + "ui-kanban-bw.jpg" },
-    { id: "chatbot",      href: "portfolio-chatbot-ai.html",           tag: "Automatyzacja",             client: "",                 title: "Chatbot AI dla klientów",        desc: "Po godzinach Instagram i Messenger zasypywały te same pytania, a zespół odpisywał rano z opóźnieniem. Bot zamyka FAQ 24/7, zbiera lead i oddaje rozmowę konsultantowi z kontekstem.", img: STILL + "ui-chatbot-bw.jpg" },
-    { id: "trove-flow",   href: "portfolio-trove-workflow.html",       tag: "Automatyzacja",             client: "Trove",            title: "Zamówienie \u2192 faktura \u2192 paczka", desc: "Każde zamówienie Trove wymagało ręcznego klejenia faktury, statusu i maila do klienta. Workflow odpala cały łańcuch sam — mniej klikania, mniej pomyłek przy fulfillmentcie.", img: STILL + "ui-invoice-flow-bw.jpg" },
-    { id: "ai-agent",     href: "portfolio-chatbot-ai.html",           tag: "Automatyzacja",             client: "",                 title: "Agent AI i integracje",          desc: "Chat, mail i CRM żyły osobno — handoff to było kopiuj-wklej. Agent łączy kanały w jednym przepływie: klasyfikuje sprawę, uzupełnia kartę i przekazuje ją właściwej osobie.", img: STILL + "ui-ai-agent-bw.jpg" },
-    { id: "shelf",        href: "portfolio-trove-panel.html",          tag: "Aplikacja",                 client: "Trove",            title: "Shelf Sync",                     desc: "Produkt znikał z półki sprzedażowej, zanim magazyn zdążył zareagować. Shelf Sync pilnuje widoczności stanów i alarmuje, gdy oferta wypada z rynku.", img: STILL + "ui-shelf-sync-bw.jpg" },
-    { id: "kpi",          href: "portfolio-telforceone-forecast.html", tag: "Analityka",                 client: "TelForceOne S.A.", title: "KPI board",                      desc: "Raporty tygodnia powstawały z kilku Exceli i zajmowały pół dnia. Board pokazuje sprzedaż i operacje na żywo — puls firmy bez budowania tabel od zera.", img: STILL + "ui-kpi-board-bw.jpg" },
-    { id: "network",      href: "portfolio-trove-workflow.html",       tag: "Automatyzacja",             client: "",                 title: "Graf workflow",                  desc: "Automatyzacje siedziały w głowie jednej osoby albo w chaotycznych regułach. Graf pokazuje triggery, warunki i akcje — łatwiej utrzymać proces i dokładać kolejne kroki.", img: STILL + "ui-network-bw.jpg" },
+    { id: "tfo-crm",      href: "#automatyzacje",     tag: "CRM / sprzedaż terenowa",  client: "TelForceOne S.A.", title: "CRM z mapą handlowców",          desc: "Handlowcy jeździli z Excelami i notatkami w telefonie — nikt nie wiedział, kto u kogo był. CRM z mapą zbiera klientów, trasy i raporty dnia w jednym miejscu, więc planowanie wizyt zajmuje minuty zamiast godziny.", img: STILL + "ui-crm-map-bw.jpg" },
+    { id: "tfo-code39",   href: "#automatyzacje",   tag: "Narzędzie / identyfikacja", client: "TelForceOne S.A.", title: "Generator kodów Code 39",        desc: "Etykiety powstawały w kilku narzędziach i często wracały ze skanera jako błąd. Generator daje podgląd Code 39 i batch do druku — oznaczenie SKU w sekundach, bez poprawek na magazynie.", img: STILL + "ui-barcode-bw.jpg" },
+    { id: "tfo-forecast", href: "#automatyzacje", tag: "Analityka / zapasy",        client: "TelForceOne S.A.", title: "Stany i prognozowanie",          desc: "Zakupy szły \u201ena wyczucie\u201f: braki na półce albo zamrożony towar. Panel łączy stany, rotację i prognozę z alertami — widać, co dokupić zanim sprzedaż stanie.", img: STILL + "ui-forecast-bw.jpg" },
+    { id: "trove-panel",  href: "#automatyzacje",          tag: "Aplikacja",                 client: "Trove",            title: "Panel sklepu i monitoring cen",  desc: "Trove ręcznie porównywało ceny na Allegro i własnym sklepie w arkuszach. Panel zbiera stany i ceny kanałów z alertami przecen — reakcja na spadek marży tego samego dnia, nie po tygodniu.", img: STILL + "ui-price-monitor-bw.jpg" },
+    { id: "crm-leady",    href: "#automatyzacje",            tag: "CRM",                       client: "",                 title: "CRM leadów i dealów",            desc: "Leady ginęły między skrzynką, czatem i karteczkami — follow-upy się spóźniały. CRM prowadzi od pierwszego kontaktu do deala: pipeline, notatki i przypomnienia w jednym lejku.", img: STILL + "ui-kanban-bw.jpg" },
+    { id: "chatbot",      href: "#automatyzacje",           tag: "Automatyzacja",             client: "",                 title: "Chatbot AI dla klientów",        desc: "Po godzinach Instagram i Messenger zasypywały te same pytania, a zespół odpisywał rano z opóźnieniem. Bot zamyka FAQ 24/7, zbiera lead i oddaje rozmowę konsultantowi z kontekstem.", img: STILL + "ui-chatbot-bw.jpg" },
+    { id: "trove-flow",   href: "#automatyzacje",       tag: "Automatyzacja",             client: "Trove",            title: "Zamówienie \u2192 faktura \u2192 paczka", desc: "Każde zamówienie Trove wymagało ręcznego klejenia faktury, statusu i maila do klienta. Workflow odpala cały łańcuch sam — mniej klikania, mniej pomyłek przy fulfillmentcie.", img: STILL + "ui-invoice-flow-bw.jpg" },
+    { id: "ai-agent",     href: "#automatyzacje",           tag: "Automatyzacja",             client: "",                 title: "Agent AI i integracje",          desc: "Chat, mail i CRM żyły osobno — handoff to było kopiuj-wklej. Agent łączy kanały w jednym przepływie: klasyfikuje sprawę, uzupełnia kartę i przekazuje ją właściwej osobie.", img: STILL + "ui-ai-agent-bw.jpg" },
+    { id: "shelf",        href: "#automatyzacje",          tag: "Aplikacja",                 client: "Trove",            title: "Shelf Sync",                     desc: "Produkt znikał z półki sprzedażowej, zanim magazyn zdążył zareagować. Shelf Sync pilnuje widoczności stanów i alarmuje, gdy oferta wypada z rynku.", img: STILL + "ui-shelf-sync-bw.jpg" },
+    { id: "kpi",          href: "#automatyzacje", tag: "Analityka",                 client: "TelForceOne S.A.", title: "KPI board",                      desc: "Raporty tygodnia powstawały z kilku Exceli i zajmowały pół dnia. Board pokazuje sprzedaż i operacje na żywo — puls firmy bez budowania tabel od zera.", img: STILL + "ui-kpi-board-bw.jpg" },
+    { id: "network",      href: "#automatyzacje",       tag: "Automatyzacja",             client: "",                 title: "Graf workflow",                  desc: "Automatyzacje siedziały w głowie jednej osoby albo w chaotycznych regułach. Graf pokazuje triggery, warunki i akcje — łatwiej utrzymać proces i dokładać kolejne kroki.", img: STILL + "ui-network-bw.jpg" },
   ];
 
   var CASES_EN = [
-    { id: "tfo-crm",      href: "portfolio-telforceone-crm.html",     tag: "CRM / field sales",        client: "TelForceOne S.A.", title: "Sales rep map CRM",              desc: "Sales reps drove around with Excel files and phone notes — no one knew who had visited whom. The map CRM gathers clients, routes and daily reports in one place, so trip planning takes minutes instead of hours.", img: STILL + "ui-crm-map-bw.jpg" },
-    { id: "tfo-code39",   href: "portfolio-telforceone-code39.html",   tag: "Tool / identification",    client: "TelForceOne S.A.", title: "Code 39 barcode generator",      desc: "Labels were created in multiple tools and often came back from the scanner as errors. The generator provides a Code 39 preview and batch print — SKU labelling in seconds, no warehouse corrections.", img: STILL + "ui-barcode-bw.jpg" },
-    { id: "tfo-forecast", href: "portfolio-telforceone-forecast.html", tag: "Analytics / inventory",    client: "TelForceOne S.A.", title: "Stock levels & forecasting",     desc: "Purchases were made by gut feeling: empty shelves or frozen stock. The dashboard combines levels, turnover and forecast with alerts — see what to reorder before sales stop.", img: STILL + "ui-forecast-bw.jpg" },
-    { id: "trove-panel",  href: "portfolio-trove-panel.html",          tag: "Application",              client: "Trove",            title: "Store panel & price monitoring", desc: "Trove manually compared prices on Allegro and its own store using spreadsheets. The panel aggregates stock and channel prices with discount alerts — react to margin drops the same day, not after a week.", img: STILL + "ui-price-monitor-bw.jpg" },
-    { id: "crm-leady",    href: "portfolio-crm-leady.html",            tag: "CRM",                      client: "",                 title: "Leads & deals CRM",              desc: "Leads got lost between inbox, chat and sticky notes — follow-ups were late. The CRM guides from first contact to deal: pipeline, notes and reminders in one funnel.", img: STILL + "ui-kanban-bw.jpg" },
-    { id: "chatbot",      href: "portfolio-chatbot-ai.html",           tag: "Automation",               client: "",                 title: "AI chatbot for clients",         desc: "After hours Instagram and Messenger were flooded with the same questions, and the team replied in the morning with delays. The bot handles FAQ 24/7, captures leads and hands off conversations to consultants with context.", img: STILL + "ui-chatbot-bw.jpg" },
-    { id: "trove-flow",   href: "portfolio-trove-workflow.html",       tag: "Automation",               client: "Trove",            title: "Order \u2192 invoice \u2192 parcel", desc: "Every Trove order required manually stitching together an invoice, status and customer email. The workflow fires the whole chain automatically — less clicking, fewer fulfilment errors.", img: STILL + "ui-invoice-flow-bw.jpg" },
-    { id: "ai-agent",     href: "portfolio-chatbot-ai.html",           tag: "Automation",               client: "",                 title: "AI agent & integrations",        desc: "Chat, email and CRM lived separately — handoff was copy-paste. The agent connects channels in one flow: classifies the issue, fills the card and routes it to the right person.", img: STILL + "ui-ai-agent-bw.jpg" },
-    { id: "shelf",        href: "portfolio-trove-panel.html",          tag: "Application",              client: "Trove",            title: "Shelf Sync",                     desc: "Products vanished from the sales shelf before the warehouse could react. Shelf Sync monitors stock visibility and alerts when a listing drops off the market.", img: STILL + "ui-shelf-sync-bw.jpg" },
-    { id: "kpi",          href: "portfolio-telforceone-forecast.html", tag: "Analytics",                client: "TelForceOne S.A.", title: "KPI board",                      desc: "Weekly reports were built from multiple Excel files and took half a day. The board shows sales and operations live — company pulse without building tables from scratch.", img: STILL + "ui-kpi-board-bw.jpg" },
-    { id: "network",      href: "portfolio-trove-workflow.html",       tag: "Automation",               client: "",                 title: "Workflow graph",                 desc: "Automations lived in one person's head or in chaotic rules. The graph shows triggers, conditions and actions — easier to maintain the process and add steps.", img: STILL + "ui-network-bw.jpg" },
+    { id: "tfo-crm",      href: "#automatyzacje",     tag: "CRM / field sales",        client: "TelForceOne S.A.", title: "Sales rep map CRM",              desc: "Sales reps drove around with Excel files and phone notes — no one knew who had visited whom. The map CRM gathers clients, routes and daily reports in one place, so trip planning takes minutes instead of hours.", img: STILL + "ui-crm-map-bw.jpg" },
+    { id: "tfo-code39",   href: "#automatyzacje",   tag: "Tool / identification",    client: "TelForceOne S.A.", title: "Code 39 barcode generator",      desc: "Labels were created in multiple tools and often came back from the scanner as errors. The generator provides a Code 39 preview and batch print — SKU labelling in seconds, no warehouse corrections.", img: STILL + "ui-barcode-bw.jpg" },
+    { id: "tfo-forecast", href: "#automatyzacje", tag: "Analytics / inventory",    client: "TelForceOne S.A.", title: "Stock levels & forecasting",     desc: "Purchases were made by gut feeling: empty shelves or frozen stock. The dashboard combines levels, turnover and forecast with alerts — see what to reorder before sales stop.", img: STILL + "ui-forecast-bw.jpg" },
+    { id: "trove-panel",  href: "#automatyzacje",          tag: "Application",              client: "Trove",            title: "Store panel & price monitoring", desc: "Trove manually compared prices on Allegro and its own store using spreadsheets. The panel aggregates stock and channel prices with discount alerts — react to margin drops the same day, not after a week.", img: STILL + "ui-price-monitor-bw.jpg" },
+    { id: "crm-leady",    href: "#automatyzacje",            tag: "CRM",                      client: "",                 title: "Leads & deals CRM",              desc: "Leads got lost between inbox, chat and sticky notes — follow-ups were late. The CRM guides from first contact to deal: pipeline, notes and reminders in one funnel.", img: STILL + "ui-kanban-bw.jpg" },
+    { id: "chatbot",      href: "#automatyzacje",           tag: "Automation",               client: "",                 title: "AI chatbot for clients",         desc: "After hours Instagram and Messenger were flooded with the same questions, and the team replied in the morning with delays. The bot handles FAQ 24/7, captures leads and hands off conversations to consultants with context.", img: STILL + "ui-chatbot-bw.jpg" },
+    { id: "trove-flow",   href: "#automatyzacje",       tag: "Automation",               client: "Trove",            title: "Order \u2192 invoice \u2192 parcel", desc: "Every Trove order required manually stitching together an invoice, status and customer email. The workflow fires the whole chain automatically — less clicking, fewer fulfilment errors.", img: STILL + "ui-invoice-flow-bw.jpg" },
+    { id: "ai-agent",     href: "#automatyzacje",           tag: "Automation",               client: "",                 title: "AI agent & integrations",        desc: "Chat, email and CRM lived separately — handoff was copy-paste. The agent connects channels in one flow: classifies the issue, fills the card and routes it to the right person.", img: STILL + "ui-ai-agent-bw.jpg" },
+    { id: "shelf",        href: "#automatyzacje",          tag: "Application",              client: "Trove",            title: "Shelf Sync",                     desc: "Products vanished from the sales shelf before the warehouse could react. Shelf Sync monitors stock visibility and alerts when a listing drops off the market.", img: STILL + "ui-shelf-sync-bw.jpg" },
+    { id: "kpi",          href: "#automatyzacje", tag: "Analytics",                client: "TelForceOne S.A.", title: "KPI board",                      desc: "Weekly reports were built from multiple Excel files and took half a day. The board shows sales and operations live — company pulse without building tables from scratch.", img: STILL + "ui-kpi-board-bw.jpg" },
+    { id: "network",      href: "#automatyzacje",       tag: "Automation",               client: "",                 title: "Workflow graph",                 desc: "Automations lived in one person's head or in chaotic rules. The graph shows triggers, conditions and actions — easier to maintain the process and add steps.", img: STILL + "ui-network-bw.jpg" },
   ];
 
   function getCases() {
@@ -164,6 +164,22 @@
     var pack = item && STORY[item.id];
     if (!pack) return [item && item.desc ? item.desc : ""];
     return pack[storyLang()] || pack.pl;
+  }
+
+  function systemPhoto(id) {
+    return "assets/systems/" + id + ".webp";
+  }
+
+  function mountSystemPhoto(parent, id) {
+    var img = document.createElement("img");
+    img.className = "sys-illu__photo";
+    img.alt = "";
+    img.decoding = "async";
+    img.loading = "lazy";
+    img.draggable = false;
+    img.src = systemPhoto(id);
+    parent.appendChild(img);
+    return img;
   }
 
   function illuSvg(body) {
@@ -356,7 +372,7 @@
         disc.className = "sys-fan__disc";
         var art = document.createElement("span");
         art.className = "sys-illu";
-        art.innerHTML = ILLU[item.id] || ILLU.network;
+        mountSystemPhoto(art, item.id);
         var name = document.createElement("span");
         name.className = "sys-illu__name";
         name.textContent = item.title;
@@ -365,7 +381,7 @@
         fig.appendChild(disc);
       } else {
         var img = document.createElement("img");
-        img.src = item.img;
+        img.src = systemPhoto(item.id);
         img.alt = item.title;
         img.decoding = "async";
         img.draggable = false;
@@ -432,8 +448,45 @@
       }, reduced ? 0 : 1000);
     }
 
+    function paintStoryArticle(item) {
+      var paras = storyOf(item);
+      articleEl.classList.remove("is-loading");
+      articleEl.hidden = false;
+      articleEl.innerHTML = "";
+      var body = document.createElement("article");
+      body.className = "case-study case-study--inline";
+      var h = document.createElement("h2");
+      h.className = "case-study__title";
+      h.textContent = item.title || "";
+      body.appendChild(h);
+      if (item.client) {
+        var client = document.createElement("p");
+        client.className = "case-study__lede";
+        client.textContent = item.client;
+        body.appendChild(client);
+      }
+      var copy = document.createElement("div");
+      copy.className = "case-study__copy";
+      paras.forEach(function (text) {
+        var p = document.createElement("p");
+        p.textContent = text;
+        copy.appendChild(p);
+      });
+      body.appendChild(copy);
+      articleEl.appendChild(body);
+      articleOpen = true;
+      articleLoading = false;
+      root.classList.add("is-article-open");
+      articleEl.classList.add("is-open");
+      articleEl.style.maxHeight = "none";
+    }
+
     function expandArticle(item) {
       if (!articleEl || articleLoading) return;
+      if (!item || !item.href || item.href.charAt(0) === "#") {
+        paintStoryArticle(item || {});
+        return;
+      }
       articleLoading = true;
       articleEl.hidden = false;
       articleEl.classList.add("is-loading");
@@ -615,7 +668,7 @@
       var sats = el.querySelectorAll(".sys-iris__sat");
       var trio = [item, prev, next];
       for (var s = 0; s < sats.length; s++) {
-        sats[s].innerHTML = ILLU[trio[s].id] || ILLU.network;
+        if (trio[s]) mountSystemPhoto(sats[s], trio[s].id);
       }
       fillIris(el, item);
       var disc = el.querySelector(".sys-iris__disc");

@@ -173,8 +173,8 @@
     var running = false;
     var start = performance.now();
     var frameSkip = 0;
-    var SCALE_BY_TIER = MOBILE ? [0.75, 0.6, 0.5] : [0.66, 0.5, 0.4];
-    var SKIP_BY_TIER = MOBILE ? [2, 3, 4] : [1, 2, 3];
+    var SCALE_BY_TIER = MOBILE ? [0.5, 0.42, 0.34] : [0.66, 0.5, 0.4];
+    var SKIP_BY_TIER = MOBILE ? [3, 4, 6] : [1, 2, 3];
     var dprCap = SCALE_BY_TIER[0];
     var tierSkip = SKIP_BY_TIER[0];
 
@@ -199,17 +199,28 @@
       });
     }
 
+    var scrollPauseUntil = 0;
+    if (MOBILE) {
+      window.addEventListener(
+        "scroll",
+        function () {
+          scrollPauseUntil = performance.now() + 160;
+        },
+        { passive: true }
+      );
+    }
+
     function frame(now) {
       if (!running) return;
+      requestAnimationFrame(frame);
+      if (document.hidden) return;
+      if (MOBILE && now < scrollPauseUntil) return;
       var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
-      var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
+      var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 5 : 3) : MOBILE ? 3 : 1);
       var paper = window.__cosgralPaper || 0;
       var paperMoved = uPaper && Math.abs(paper - lastPaper) > 0.0006;
       frameSkip += 1;
-      if (skipN > 1 && frameSkip % skipN !== 0 && !paperMoved) {
-        requestAnimationFrame(frame);
-        return;
-      }
+      if (skipN > 1 && frameSkip % skipN !== 0 && !paperMoved) return;
       var ptr = window.cosgralPointer;
       if (ptr) {
         mouse.tx = ptr.nx;
@@ -229,7 +240,6 @@
       }
       window.__cosgralAmbient = { t: (now - start) / 1000, x: mouse.x, y: mouse.y };
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      requestAnimationFrame(frame);
     }
 
     function play() {

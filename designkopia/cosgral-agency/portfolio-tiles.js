@@ -489,8 +489,8 @@
     window.addEventListener("scroll", holdPage, true);
   }
 
-  function measurePin() {
-    if (!HOME) return;
+  function measurePin(force) {
+    if (!HOME || (pinCache && !force)) return;
     var pin = document.getElementById("realizacje");
     if (!pin) return;
     var y = window.scrollY || window.pageYOffset || 0;
@@ -500,6 +500,12 @@
       travel: Math.max(1, pin.offsetHeight - vh),
       width: scroller.clientWidth || window.innerWidth || 1,
     };
+  }
+  if (HOME) {
+    window.addEventListener("resize", function () {
+      pinCache = null;
+      measurePin();
+    });
   }
 
   /* Same ease and duration as the portfolio chapter slide (easeOutQuart, ~1.1s).
@@ -927,11 +933,11 @@
       window.cosgralSmoothScroll.ready.then(bindLenis);
     }
     window.addEventListener("load", function () {
-      measurePin();
+      measurePin(true);
       applyFromScroll();
     });
     window.setTimeout(function () {
-      measurePin();
+      measurePin(true);
       applyFromScroll();
     }, 400);
   } else {
@@ -946,5 +952,28 @@
       var next = indexForHash(location.hash);
       if (next >= 0) scrollToIndex(next);
     });
+  } else {
+    window.addEventListener("hashchange", function () {
+      var next = indexForHash(location.hash);
+      if (next >= 0) pageToIndex(next);
+    });
+    document.addEventListener(
+      "click",
+      function (e) {
+        var a = e.target && e.target.closest && e.target.closest("a[href]");
+        if (!a || a.hasAttribute("data-tile-expand")) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === "_blank") return;
+        var href = a.getAttribute("href") || "";
+        var hashAt = href.indexOf("#");
+        if (hashAt < 0) return;
+        var idx = indexForHash(href.slice(hashAt));
+        if (idx < 0) return;
+        var path = href.slice(0, hashAt);
+        if (path && path !== location.pathname && !/(^|\/)index\.html$/.test(path)) return;
+        e.preventDefault();
+        pageToIndex(idx);
+      },
+      true
+    );
   }
 })();

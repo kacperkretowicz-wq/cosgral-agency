@@ -1119,3 +1119,11 @@ html.reduce-motion .expand-gallery .graphics-masonry__item {
   transition: none !important;
   animation: none !important;
 }
+@media (max-width: 900px) {
+  .portfolio-tile-expand,
+  .portfolio-tile-expand__stage,
+  body.is-tile-expanded .portfolio-tile-expand {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

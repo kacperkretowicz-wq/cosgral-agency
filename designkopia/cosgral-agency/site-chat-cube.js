@@ -36,7 +36,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
 
     var renderer = new THREE.WebGLRenderer({
       canvas: canvas,
-      antialias: true,
+      antialias: !MOBILE,
       alpha: true,
       powerPreference: "low-power",
       premultipliedAlpha: false,
@@ -132,7 +132,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       var rect = canvas.getBoundingClientRect();
       var w = Math.max(1, Math.round(rect.width));
       var h = Math.max(1, Math.round(rect.height));
-      var dpr = Math.min(window.devicePixelRatio || 1, 2.25);
+      var dpr = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2);
       renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
       camera.aspect = w / Math.max(h, 1);
@@ -175,6 +175,27 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       mouseY = clamp(-(py - cy) / Math.max(rect.height * 0.55, 1), -1.2, 1.2);
     }
 
+    var chatOnScreen = true;
+    var chatFrame = 0;
+    var scrollPauseUntil = 0;
+    if (MOBILE) {
+      window.addEventListener(
+        "scroll",
+        function () {
+          scrollPauseUntil = performance.now() + 160;
+        },
+        { passive: true }
+      );
+    }
+    if (typeof IntersectionObserver === "function") {
+      new IntersectionObserver(function (entries) {
+        chatOnScreen = false;
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting) chatOnScreen = true;
+        }
+      }).observe(canvas);
+    }
+
     function frame(now) {
       if (!running) return;
       requestAnimationFrame(frame);
@@ -185,11 +206,11 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       var open = launcher && launcher.getAttribute("aria-expanded") === "true";
       var chatRoot = document.querySelector(".cg-chat-root");
       var scrollHidden = chatRoot && !chatRoot.classList.contains("is-chat-visible");
-      var hidden =
-        document.hidden ||
-        scrollHidden ||
-        (canvas.offsetParent === null && getComputedStyle(canvas).visibility === "hidden");
+      var hidden = document.hidden || scrollHidden || !chatOnScreen;
       if (hidden) return;
+      if (MOBILE && !open && now < scrollPauseUntil) return;
+      /* Closed FAB on a phone: half rate. The cube is small and still reads as motion. */
+      if (MOBILE && !open && (chatFrame++ & 1)) return;
 
       if (open) {
         /* Face front + dim — same language as mega-menu cube settle. */

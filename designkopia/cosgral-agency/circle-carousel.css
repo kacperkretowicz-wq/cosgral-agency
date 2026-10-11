@@ -53,10 +53,15 @@
   width: 62%;
   flex: 0 0 auto;
 }
-#realizacje .sys-fan--circle .sys-illu svg {
+#realizacje .sys-fan--circle .sys-illu svg,
+#realizacje .sys-fan--circle .sys-illu__photo {
   width: 100%;
   height: auto;
+  aspect-ratio: 120 / 78;
+  object-fit: cover;
   display: block;
+  border-radius: 10px;
+  background: #f7f3ec;
 }
 #realizacje .sys-fan--circle .sys-illu__name {
   display: block;
@@ -241,9 +246,13 @@
   padding: 12%;
   transition: left 0.9s cubic-bezier(0.16, 1, 0.3, 1), top 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.sys-iris__sat svg {
+.sys-iris__sat svg,
+.sys-iris__sat .sys-illu__photo {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
 }
 .sys-iris__sat--b { width: min(13vw, 6.5rem); height: min(13vw, 6.5rem); }
 .sys-iris__sat--c { width: min(10vw, 5rem); height: min(10vw, 5rem); }

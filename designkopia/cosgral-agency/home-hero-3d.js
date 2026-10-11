@@ -353,11 +353,12 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var USE_FXAA = !LOW_PERF;
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: LOW_PERF,
+    antialias: false,
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 2 : 1.5));
+  /* Mobile stays at 1.5 even when LOW_PERF used to allow 2. Desktop tier caps can go lower. */
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
 
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
@@ -692,10 +693,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   // Poza strefą sześcianu na ekranie zostaje wolno dryfujące pole piasku.
   // Na tier 0 renderujemy je co klatkę (zero różnicy wobec oryginału);
   // dopiero gdy sterownik jakości zgłosi gubione klatki, schodzimy niżej.
-  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
-  // Miękkie, addytywne cząstki nie zyskują na DPR 2 — cap 1.5 tnie fill-rate
-  // o ~44% na ekranach hi-DPI bez widocznej różnicy.
-  var DPR_CAP_BY_TIER = LOW_PERF ? [2, 1.5, 1.25] : [1.5, 1.25, 1];
+  var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [3, 4, 6] : [1, 2, 3];
+  // Mobile never exceeds DPR 1.5. Off-screen the hero paints at most every third frame.
+  var DPR_CAP_BY_TIER = LOW_PERF ? [1.5, 1.25, 1] : [1.5, 1.25, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;
@@ -823,16 +823,29 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var uslugiSection = null;
   var uslugiPanel = null;
   var uslugiLooked = false;
-  function readUslugiPanelOpacity() {
+  var uslugiLayoutTop = null;
+  function cacheUslugiLayout() {
     if (!uslugiLooked) {
       uslugiLooked = true;
       uslugiSection = document.getElementById("uslugi");
       uslugiPanel = uslugiSection && uslugiSection.querySelector(".home-scene__panel");
     }
+    if (!uslugiSection) return;
+    var top = 0;
+    var node = uslugiSection;
+    while (node) {
+      top += node.offsetTop || 0;
+      node = node.offsetParent;
+    }
+    uslugiLayoutTop = top;
+  }
+  window.addEventListener("resize", cacheUslugiLayout);
+  function readUslugiPanelOpacity() {
+    if (uslugiLayoutTop == null) cacheUslugiLayout();
     if (!uslugiPanel) return 0;
-    /* Panel ma często opacity:1 z GSAP nawet gdy Usługi są daleko pod foldem —
-       to fałszywie gasiło portal sześcianu do 0.15 już w hero. */
-    var top = uslugiSection.getBoundingClientRect().top;
+    /* Layout top, not a per-frame rect: sticky visual position is not needed
+       once the section has entered, and reading it every frame thrashes layout. */
+    var top = uslugiLayoutTop - (window.scrollY || window.pageYOffset || 0);
     var vh = window.innerHeight || 1;
     if (top > vh * 0.92) return 0;
     if (uslugiSection.classList.contains("is-in-view")) return 1;
@@ -852,9 +865,29 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     return 1 - Math.pow(Math.max(0, 1 - menuBlend), 0.68);
   }
 
+  var offZoneGated = false;
+  var scrollPauseUntil = 0;
+  if (LOW_PERF) {
+    window.addEventListener(
+      "scroll",
+      function () {
+        scrollPauseUntil = performance.now() + 160;
+      },
+      { passive: true }
+    );
+  }
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
+    /* While the page is moving, keep the last hero frame. The draw is the stall. */
+    if (LOW_PERF && menuTween.blend < 0.001 && performance.now() < scrollPauseUntil) return;
+    /* Off-screen mobile: skip the whole tick, not only the WebGL draw. */
+    if (LOW_PERF && !zoneVisible && menuTween.blend < 0.001) {
+      offZoneGated = true;
+      if (++offZoneTick % outOfZoneEvery !== 0) return;
+    } else {
+      offZoneGated = false;
+    }
     var t = clock.getElapsedTime();
     syncPointer();
     mouse.x += (mouse.tx - mouse.x) * 0.06;
@@ -1296,7 +1329,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
     // Poza nią częstotliwość ustala sterownik jakości (na tier 0 też co klatkę).
     var fullRate = zoneVisible || menuBlend > 0.001;
-    if (!fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
+    if (!offZoneGated && !fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);

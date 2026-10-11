@@ -3624,3 +3624,15 @@ html.reduce-motion #realizacje .reels-tiles__belt {
 html.reduce-motion body.home-page .site-nav {
   transition: none;
 }
+@media (max-width: 900px) {
+  .nav-overlay__backdrop,
+  body.is-nav-menu-open::before,
+  .nav-overlay.is-services-expanded .nav-overlay__backdrop {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  body.is-nav-menu-open.is-nav-services-expanded .home-cube-portal,
+  body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
+    filter: brightness(0.34) saturate(0.7);
+  }
+}

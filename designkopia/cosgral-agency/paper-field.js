@@ -20,6 +20,7 @@
   var shown = 0;
   var primed = false;
   var lastFilter = null;
+  var lastPaperStr = "";
   var LERP = 0.1;
 
   function clamp01(v) {
@@ -31,26 +32,49 @@
     return 0.5 - 0.5 * Math.cos(Math.PI * t);
   }
 
-  function flowTop(el) {
-    return el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset || 0);
+  var geo = null;
+  function flowTop(el, y) {
+    return el.getBoundingClientRect().top + y;
   }
 
-  function goal() {
+  function measure() {
     var y = window.scrollY || window.pageYOffset || 0;
-    var bridgeTop = flowTop(bridge);
-    var returnTop = flowTop(back);
-    var uTop = bridgeTop - (parseFloat(getComputedStyle(uslugi).marginBottom) || 0) - uslugi.offsetHeight;
-    var wTop = returnTop - (parseFloat(getComputedStyle(work).marginBottom) || 0) - work.offsetHeight;
+    var vh = window.innerHeight || 1;
+    var bridgeTop = flowTop(bridge, y);
+    var returnTop = flowTop(back, y);
+    var uMb = parseFloat(getComputedStyle(uslugi).marginBottom) || 0;
+    var wMb = parseFloat(getComputedStyle(work).marginBottom) || 0;
+    var uTop = bridgeTop - uMb - uslugi.offsetHeight;
+    var wTop = returnTop - wMb - work.offsetHeight;
     var enter0 = uTop + uslugi.offsetHeight * 0.5;
     var enter1 = bridgeTop + bridge.offsetHeight;
     var exit0 = wTop + work.offsetHeight * 0.5;
     if (work.classList.contains("home-work-pin")) {
-      exit0 = flowTop(work) + work.offsetHeight - (window.innerHeight || 1);
+      exit0 = flowTop(work, y) + work.offsetHeight - vh;
     }
     var exit1 = returnTop + back.offsetHeight;
-    var enter = sineInOut((y - enter0) / Math.max(enter1 - enter0, 1));
-    var exit = sineInOut((y - exit0) / Math.max(exit1 - exit0, 1));
+    geo = { enter0: enter0, enter1: enter1, exit0: exit0, exit1: exit1 };
+  }
+
+  function goal() {
+    if (!geo) measure();
+    var y = window.scrollY || window.pageYOffset || 0;
+    var enter = sineInOut((y - geo.enter0) / Math.max(geo.enter1 - geo.enter0, 1));
+    var exit = sineInOut((y - geo.exit0) / Math.max(geo.exit1 - geo.exit0, 1));
     return clamp01(enter) * (1 - clamp01(exit));
+  }
+
+  measure();
+  window.addEventListener("resize", measure, { passive: true });
+  window.addEventListener("load", measure);
+  if (window.ResizeObserver) {
+    var geoObs = new ResizeObserver(function () {
+      measure();
+    });
+    geoObs.observe(work);
+    geoObs.observe(uslugi);
+    geoObs.observe(bridge);
+    geoObs.observe(back);
   }
 
   function tintChat(paper) {
@@ -70,7 +94,11 @@
   }
 
   function publish(paper) {
-    root.style.setProperty("--paper", paper.toFixed(4));
+    var rounded = paper.toFixed(3);
+    if (rounded !== lastPaperStr) {
+      lastPaperStr = rounded;
+      root.style.setProperty("--paper", paper.toFixed(4));
+    }
     window.__cosgralPaper = paper;
     root.classList.remove("is-paper-ink");
     tintChat(paper);
