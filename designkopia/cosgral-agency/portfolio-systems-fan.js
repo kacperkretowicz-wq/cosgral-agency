@@ -120,6 +120,8 @@
     var index = typeof opts.index === "number" ? clampIndex(opts.index, currentCases.length) : 0;
     var painted = -1;
     var autoplay = mode === "catalog" && !reduced && opts.autoplay !== false;
+    var allowDrag = opts.drag !== false;
+    var allowWheel = opts.wheel !== false;
     var destroyed = false;
     var dragging = false;
     var didDrag = false;
@@ -562,10 +564,12 @@
       nudge(1);
     });
 
-    stage.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("pointermove", onPointerMove, { passive: false });
-    window.addEventListener("pointerup", onPointerUp);
-    window.addEventListener("pointercancel", onPointerUp);
+    if (allowDrag) {
+      stage.addEventListener("pointerdown", onPointerDown);
+      window.addEventListener("pointermove", onPointerMove, { passive: false });
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+    }
 
     function onWheel(e) {
       if (destroyed) return;
@@ -600,7 +604,7 @@
       fanWheelLock = now;
       nudge(delta > 0 ? 1 : -1);
     }
-    root.addEventListener("wheel", onWheel, { passive: false });
+    if (allowWheel) root.addEventListener("wheel", onWheel, { passive: false });
 
     layout();
     if (autoplay) startAuto();

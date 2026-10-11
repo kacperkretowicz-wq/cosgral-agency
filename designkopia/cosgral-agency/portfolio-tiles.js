@@ -6,6 +6,8 @@
 
   var root = document.querySelector("[data-portfolio-tiles]");
   if (!root) return;
+  /* Homepage embed: same chapters, no page lock, no vertical-scroll hijack. */
+  var HOME = root.hasAttribute("data-home-chapters");
 
   var scroller = root.querySelector("[data-chapters-scroller]");
   var chapters = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
@@ -200,6 +202,10 @@
   function applyTheme(theme) {
     theme = theme || "web";
     pendingTheme = theme;
+    if (HOME) {
+      root.setAttribute("data-tile-theme", theme);
+      return;
+    }
     /* Keep chapter key for copy/logic, but force homepage dark ground always */
     document.body.setAttribute("data-tile-theme", theme);
     document.body.setAttribute("data-tile-ground", "home");
@@ -305,6 +311,9 @@
     systemsFan = window.CosgralSystemsFan.create(mount, {
       mode: "catalog",
       autoplay: !REDUCED,
+      /* Homepage: fan autoplay stays; drag/wheel must not steal page scroll. */
+      drag: !HOME,
+      wheel: !HOME,
     });
     restartOs = function () {
       if (systemsFan && !loopsPaused) systemsFan.resume();
@@ -572,44 +581,119 @@
     resumeChapterLoops();
   });
 
-  window.addEventListener("keydown", function (e) {
-    if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
-      return;
+  function indexForHash(hash) {
+    var raw = String(hash || "").replace(/^#/, "").split("&")[0].split("?")[0];
+    if (raw === "systemy") raw = "automatyzacje";
+    if (!raw) return -1;
+    for (var i = 0; i < chapters.length; i++) {
+      if (chapters[i].id === raw) return i;
     }
-    if (e.key === "ArrowRight" || e.key === "PageDown") {
-      e.preventDefault();
-      scrollToIndex(activeIndex + 1);
-    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
-      e.preventDefault();
-      scrollToIndex(activeIndex - 1);
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      scrollToIndex(0);
-    } else if (e.key === "End") {
-      e.preventDefault();
-      scrollToIndex(chapters.length - 1);
-    }
-  });
+    return -1;
+  }
 
-  window.addEventListener(
-    "wheel",
-    function (e) {
+  if (!HOME) {
+    window.addEventListener("keydown", function (e) {
       if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
-        /* gallery / deck / fan handle their own scroll */
         return;
       }
-      if (e.target && e.target.closest && e.target.closest(".sys-fan")) return;
-      if (Math.abs(e.deltaY) < 1.2 && Math.abs(e.deltaX) < 1.2) return;
-      var delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-      if (Math.abs(delta) < 8) return;
-      e.preventDefault();
-      var now = Date.now();
-      if (now - wheelLock < 960) return;
-      wheelLock = now;
-      scrollToIndex(activeIndex + (delta > 0 ? 1 : -1));
-    },
-    { passive: false }
-  );
+      if (e.key === "ArrowRight" || e.key === "PageDown") {
+        e.preventDefault();
+        scrollToIndex(activeIndex + 1);
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        scrollToIndex(activeIndex - 1);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        scrollToIndex(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        scrollToIndex(chapters.length - 1);
+      }
+    });
+
+    window.addEventListener(
+      "wheel",
+      function (e) {
+        if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
+          /* gallery / deck / fan handle their own scroll */
+          return;
+        }
+        if (e.target && e.target.closest && e.target.closest(".sys-fan")) return;
+        if (Math.abs(e.deltaY) < 1.2 && Math.abs(e.deltaX) < 1.2) return;
+        var delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+        if (Math.abs(delta) < 8) return;
+        e.preventDefault();
+        var now = Date.now();
+        if (now - wheelLock < 960) return;
+        wheelLock = now;
+        scrollToIndex(activeIndex + (delta > 0 ? 1 : -1));
+      },
+      { passive: false }
+    );
+  } else {
+    /* Horizontal gesture changes slides. Vertical movement stays with the page. */
+    var gesture = null;
+    var wheelSnap = 0;
+    function releaseAxis() {
+      scroller.classList.remove("is-axis-x");
+    }
+    scroller.addEventListener(
+      "touchstart",
+      function (e) {
+        if (!e.touches || e.touches.length !== 1) return;
+        gesture = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+          axis: "",
+          left: scroller.scrollLeft,
+        };
+      },
+      { passive: true }
+    );
+    scroller.addEventListener(
+      "touchmove",
+      function (e) {
+        if (!gesture || !e.touches || e.touches.length !== 1) return;
+        var dx = e.touches[0].clientX - gesture.x;
+        var dy = e.touches[0].clientY - gesture.y;
+        if (!gesture.axis) {
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+          gesture.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+          if (gesture.axis === "x") scroller.classList.add("is-axis-x");
+        }
+        if (gesture.axis !== "x") return;
+        if (e.cancelable) e.preventDefault();
+        scroller.scrollLeft = gesture.left - dx;
+      },
+      { passive: false }
+    );
+    function endGesture() {
+      if (gesture && gesture.axis === "x") {
+        scrollToIndex(nearestIndex());
+        window.setTimeout(releaseAxis, 1150);
+      }
+      gesture = null;
+    }
+    scroller.addEventListener("touchend", endGesture, { passive: true });
+    scroller.addEventListener("touchcancel", endGesture, { passive: true });
+    scroller.addEventListener(
+      "wheel",
+      function (e) {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        scroller.classList.add("is-axis-x");
+        scroller.scrollLeft += e.deltaX;
+        if (wheelSnap) window.clearTimeout(wheelSnap);
+        wheelSnap = window.setTimeout(function () {
+          wheelSnap = 0;
+          scrollToIndex(nearestIndex());
+          window.setTimeout(releaseAxis, 1150);
+        }, 90);
+      },
+      { passive: false, capture: true }
+    );
+  }
 
   window.addEventListener("resize", function () {
     scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
@@ -619,14 +703,22 @@
     if (pendingTheme) applyTheme(pendingTheme);
   });
 
-  document.body.classList.add("portfolio-page--tiles");
+  if (!HOME) document.body.classList.add("portfolio-page--tiles");
   initLux();
   initOs();
   initShow();
   startVizShowLoop();
-  scrollToIndex(0, "auto");
+  var startAt = HOME ? 0 : indexForHash(location.hash);
+  if (startAt < 0) startAt = 0;
+  scrollToIndex(startAt, "auto");
   window.setTimeout(function () {
-    scrollToIndex(0, "auto");
+    scrollToIndex(activeIndex < 0 ? startAt : activeIndex, "auto");
     if (pendingTheme) applyTheme(pendingTheme);
   }, 80);
+  if (!HOME) {
+    window.addEventListener("hashchange", function () {
+      var next = indexForHash(location.hash);
+      if (next >= 0) scrollToIndex(next);
+    });
+  }
 })();

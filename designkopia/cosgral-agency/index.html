@@ -126,7 +126,8 @@
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" />
 <link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
 <script src="cookie-consent.js?v=20261001a"></script>
-<link rel="stylesheet" href="cosgral-home.css?v=20261011flow" />
+<link rel="stylesheet" href="portfolio-tiles.css?v=20260928montaz1" />
+<link rel="stylesheet" href="cosgral-home.css?v=20261011slides" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
@@ -361,53 +362,107 @@
 <!-- 4. REALIZACJE -->
 <section id="realizacje" class="home-work home-scene">
   <div class="home-scene__panel">
-  <div class="container home-work__head">
-    <p class="section-label" data-enter="left" data-i18n="work.eyebrow">Realizacje</p>
-    <h2 class="home-work__title" data-reveal-words data-i18n="work.title">Wybrane realizacje</h2>
-    <p class="home-work__lead" data-enter="right" data-i18n="work.bentoLead">Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.</p>
-  </div>
+  <h2 class="home-work__title home-work__title--sr" data-i18n="work.title">Wybrane realizacje</h2>
+  <div class="portfolio-chapters" data-portfolio-tiles data-home-chapters aria-label="Kategorie realizacji" data-i18n-aria-label="portfolio.chapters_label">
+    <div class="portfolio-chapters__scroller" data-chapters-scroller>
+    <section class="portfolio-chapter is-active" data-portfolio-tile data-theme="web" id="strony">
+      <div class="portfolio-chapter__bg" aria-hidden="true">
+        <div class="portfolio-tile__media">
+          <div class="chapter-lux" data-chapter-lux>
+            <div class="chapter-lux__meta">
+              <span data-i18n="portfolio.lux_meta_a">COSGRAL</span>
+              <span data-i18n="portfolio.lux_meta_b">DIGITAL</span>
+              <span data-i18n="portfolio.lux_meta_c">STUDIO</span>
+            </div>
+            <div class="chapter-lux__stage" data-lux-stage>
+              <div class="chapter-lux__word-3d">
+                <p class="chapter-lux__word" data-lux-word>
+                  <span class="chapter-lux__word-line">New</span>
+                  <span class="chapter-lux__word-line">Sites</span>
+                </p>
+              </div>
+              <figure class="chapter-lux__shot" data-lux-shot="0"><img alt="" decoding="async" /></figure>
+              <figure class="chapter-lux__shot" data-lux-shot="1"><img alt="" decoding="async" /></figure>
+              <figure class="chapter-lux__shot" data-lux-shot="2"><img alt="" decoding="async" /></figure>
+              <figure class="chapter-lux__shot" data-lux-shot="3"><img alt="" decoding="async" /></figure>
+              <figure class="chapter-lux__shot" data-lux-shot="4"><img alt="" decoding="async" /></figure>
+            </div>
+            <span class="chapter-lux__foot" data-i18n="portfolio.lux_foot">WEB</span>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-chapter__copy">
+        <h2 class="portfolio-chapter__title" data-i18n="portfolio.web_title">Strony internetowe</h2>
+        <p class="portfolio-chapter__lead" data-i18n="portfolio.web_lead">eCommerce, landing page, strony jako część systemu dla działalności</p>
+        <a class="portfolio-chapter__more" href="portfolio.html#strony" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+      </div>
+    </section>
 
-  <div class="home-work__grid container">
-    <a class="home-work__card home-work__card--wide" href="portfolio.html#strony" data-tile-interact data-enter="bottom">
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" src="portfolio-media/showcase/web/trove-archive.mp4"></video>
+    <section class="portfolio-chapter" data-portfolio-tile data-theme="systems" id="automatyzacje">
+      <div class="portfolio-chapter__bg" aria-hidden="true">
+        <div class="portfolio-tile__media">
+          <div class="chapter-os" data-chapter-os>
+            <div class="sys-fan sys-fan--catalog" data-systems-fan-catalog aria-hidden="true"></div>
+          </div>
+        </div>
       </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.strony">Strony internetowe</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
+      <div class="portfolio-chapter__copy">
+        <h2 class="portfolio-chapter__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
+        <p class="portfolio-chapter__lead" data-i18n="portfolio.automation_tile_lead">CRM, aplikacje i workflow, które odciążają zespół.</p>
+        <a class="portfolio-chapter__more" href="portfolio.html#automatyzacje" data-i18n="portfolio.view_more">Zobacz więcej →</a>
       </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#montaz" data-tile-interact data-enter="left">
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/001-poster.jpg" src="portfolio-media/reels/orlincy/001.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.montaz">Montaż wideo</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#grafiki" data-tile-interact data-enter="right">
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" src="portfolio-media/showcase/graphics/home-grafiki-social.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.grafiki">Grafiki &amp; social</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#systemy" data-tile-interact data-enter="bottom">
-      <div class="home-work__card-media home-work__card-media--dim" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" src="assets/services/automatyzacje.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="work.card_automation">Systemy i automatyzacje</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-  </div>
+    </section>
 
-  <div class="container home-work__footer" data-enter="bottom">
-    <a class="home-work__link glass-btn" href="portfolio.html" data-i18n="work.fullPortfolio">Zobacz pełne portfolio</a>
+    <section class="portfolio-chapter" data-portfolio-tile data-theme="video" id="montaz">
+      <div class="portfolio-chapter__bg" aria-hidden="true">
+        <div class="portfolio-tile__media">
+          <div class="chapter-montaz" data-chapter-montaz>
+            <p class="portfolio-tile__viz-word" data-i18n="portfolio.montaz_word">Montaż</p>
+            <div id="reels-tiles" class="reels-tiles chapter-montaz__belt" data-chapter-reels></div>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-chapter__copy">
+        <h2 class="portfolio-chapter__title" data-i18n="portfolio.montaz_title">Montaż wideo</h2>
+        <p class="portfolio-chapter__lead" data-i18n="portfolio.montaz_lead">Reels i materiały reklamowe</p>
+        <a class="portfolio-chapter__more" href="portfolio.html#montaz" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+      </div>
+    </section>
+
+    <section class="portfolio-chapter" data-portfolio-tile data-theme="graphics" id="grafiki">
+      <div class="portfolio-chapter__bg" aria-hidden="true">
+        <div class="portfolio-tile__media">
+          <div class="chapter-show" data-chapter-show>
+            <p class="chapter-show__word" data-show-word>Grafiki</p>
+            <div class="chapter-show__stage" data-show-stage></div>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio-chapter__copy">
+        <h2 class="portfolio-chapter__title" data-i18n="portfolio.grafiki_title">Grafiki</h2>
+        <p class="portfolio-chapter__lead" data-i18n="portfolio.grafiki_tile_lead">Posty, stories i key visuale w rytmie pokazu slajdów.</p>
+        <a class="portfolio-chapter__more" href="portfolio.html#grafiki" data-i18n="portfolio.view_more">Zobacz więcej →</a>
+      </div>
+    </section>
+    </div>
+    <div class="portfolio-chapters__pager" aria-label="Nawigacja kategorii" data-i18n-aria-label="portfolio.chapters_nav">
+      <button type="button" class="portfolio-chapters__arrow" data-portfolio-chapter-prev aria-label="Poprzednia kategoria" data-i18n-aria-label="portfolio.prev_cat" disabled>
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+          <path d="M10.2 2.6L5.4 8l4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="portfolio-chapters__dots" role="tablist" aria-label="Kategorie" data-i18n-aria-label="portfolio.chapters_dots">
+        <button type="button" class="portfolio-chapters__dot is-active" data-portfolio-chapter-dot aria-label="Strony internetowe" data-i18n-aria-label="portfolio.dot_strony" aria-current="true"></button>
+        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Systemy i automatyzacje" data-i18n-aria-label="portfolio.dot_systemy"></button>
+        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Montaż wideo" data-i18n-aria-label="portfolio.dot_montaz"></button>
+        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Grafiki" data-i18n-aria-label="portfolio.dot_grafiki"></button>
+      </div>
+      <button type="button" class="portfolio-chapters__arrow" data-portfolio-chapter-next aria-label="Następna kategoria" data-i18n-aria-label="portfolio.next_cat">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+          <path d="M5.8 2.6L10.6 8l-4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
   </div>
   </div>
 </section>
@@ -622,6 +677,9 @@
 <script src="home-section-stepper.js?v=20260925end1"></script>
 <script src="home-director.js?v=20260920ui37"></script>
 <script src="home-tile-interact.js?v=20260925cases2"></script>
+<script src="portfolio-systems-fan.js?v=20261011slides"></script>
+<script src="portfolio-montaz.js?v=20260928overlay2"></script>
+<script src="portfolio-tiles.js?v=20261011slides"></script>
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20261011menu"></script>

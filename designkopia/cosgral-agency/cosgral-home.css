@@ -267,7 +267,9 @@ html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) 
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-tile-interact],
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-faq-toggle],
 html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [href],
-html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [role="button"] {
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [role="button"],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .portfolio-chapters,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .portfolio-chapters__scroller {
   pointer-events: auto !important;
 }
 html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone .home-scene__panel,
@@ -3255,5 +3257,258 @@ html.reduce-motion .paper-return {
   }
   html:has(body.home-page) .cg-chat-label {
     color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), #f5f5f5);
+  }
+}
+
+/* Homepage realizacje — portfolio chapters on the light field.
+   Vertical page scroll stays free; horizontal swipe only moves slides. */
+.home-work__title--sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+#realizacje.home-work.home-scene {
+  padding: 0;
+  justify-content: stretch;
+  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
+}
+#realizacje .home-scene__panel {
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+#realizacje .home-scene__panel > .home-tilt-layer,
+#realizacje .home-scene__panel > .home-tilt-layer > .home-tilt-face {
+  height: 100%;
+  min-height: 0;
+}
+#realizacje .portfolio-chapters {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  background: transparent;
+}
+#realizacje .portfolio-chapters__scroller {
+  touch-action: pan-y;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+}
+#realizacje .portfolio-chapters__scroller.is-axis-x {
+  scroll-snap-type: none;
+}
+#realizacje .portfolio-chapter {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  color: #111;
+  background: transparent;
+}
+#realizacje .portfolio-chapter__bg,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media,
+#realizacje .chapter-lux,
+#realizacje .chapter-os,
+#realizacje .chapter-montaz,
+#realizacje .chapter-show {
+  background: transparent;
+}
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-show {
+  filter: none;
+}
+#realizacje .portfolio-chapter__title,
+#realizacje .portfolio-chapter__lead,
+#realizacje .portfolio-chapter__more,
+#realizacje .chapter-lux,
+#realizacje .chapter-lux__word,
+#realizacje .chapter-lux__meta,
+#realizacje .chapter-lux__foot,
+#realizacje .chapter-show,
+#realizacje .chapter-show__word,
+#realizacje .portfolio-tile__viz-word {
+  color: #111;
+  text-shadow: 0 10px 24px rgba(50, 42, 32, 0.16);
+}
+#realizacje .portfolio-chapter__lead {
+  color: rgba(17, 17, 17, 0.78);
+}
+#realizacje .portfolio-chapter__more {
+  border-bottom-color: rgba(17, 17, 17, 0.45);
+}
+#realizacje .portfolio-chapter.is-active .portfolio-chapter__more:hover,
+#realizacje .portfolio-chapter.is-active .portfolio-chapter__more:focus-visible {
+  border-color: #111;
+}
+#realizacje .chapter-lux__shot,
+#realizacje .chapter-show__tile {
+  box-shadow: 0 16px 36px rgba(40, 32, 22, 0.22);
+}
+#realizacje .sys-fan {
+  touch-action: pan-y;
+  pointer-events: none;
+}
+#realizacje .sys-fan__nav,
+#realizacje .sys-fan__arrow,
+#realizacje .sys-fan__dot {
+  pointer-events: auto;
+}
+#realizacje .sys-fan__card {
+  border-color: rgba(17, 17, 17, 0.14);
+  box-shadow: 0 18px 36px rgba(40, 32, 22, 0.22);
+}
+#realizacje .sys-fan__card.is-front {
+  border-color: rgba(17, 17, 17, 0.32);
+  box-shadow: 0 28px 52px rgba(40, 32, 22, 0.28);
+}
+#realizacje .portfolio-chapters__dot,
+#realizacje .sys-fan__dot {
+  background: rgba(17, 17, 17, 0.28);
+  box-shadow: none;
+}
+#realizacje .portfolio-chapters__dot.is-active,
+#realizacje .sys-fan__dot.is-active {
+  background: #111;
+}
+#realizacje .portfolio-chapters__arrow,
+#realizacje .sys-fan__arrow {
+  color: rgba(17, 17, 17, 0.55);
+}
+#realizacje .portfolio-chapters__arrow:hover:not(:disabled),
+#realizacje .portfolio-chapters__arrow:focus-visible:not(:disabled),
+#realizacje .sys-fan__arrow:hover,
+#realizacje .sys-fan__arrow:focus-visible {
+  color: #111;
+  background: rgba(17, 17, 17, 0.08);
+}
+#realizacje .chapter-montaz__belt.reels-tiles {
+  position: absolute;
+  inset: -18% -10%;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0;
+  transform: rotate(-16deg);
+  transform-origin: center center;
+}
+#realizacje .reels-tiles__stage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+#realizacje .reels-tiles__belt {
+  display: flex;
+  width: max-content;
+  height: min(58vh, 28rem);
+  align-items: center;
+  will-change: transform;
+  animation: home-reels-drift 52s linear infinite;
+  animation-play-state: paused;
+}
+#realizacje .reels-tiles.is-ready .reels-tiles__belt {
+  animation-play-state: running;
+}
+@keyframes home-reels-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+#realizacje .reels-tiles__track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: clamp(0.9rem, 2.2vw, 1.75rem);
+  padding: 0 clamp(1rem, 3vw, 2rem);
+}
+#realizacje .reels-tiles__card {
+  position: relative;
+  flex: 0 0 auto;
+  align-self: center;
+  width: auto;
+  height: 86%;
+  max-height: 100%;
+  aspect-ratio: 9 / 16;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #141414;
+  pointer-events: none;
+  box-shadow: 0 16px 34px rgba(40, 32, 22, 0.28);
+  transform: translateY(calc(var(--lane, 0) * 10px)) scale(var(--tile-scale, 1));
+  filter: blur(var(--tile-blur, 0)) grayscale(1);
+  opacity: var(--tile-opacity, 1);
+  z-index: var(--tile-z, 2);
+}
+#realizacje .reels-tiles__card--xs { height: 64%; }
+#realizacje .reels-tiles__card--sm { height: 74%; }
+#realizacje .reels-tiles__card--md { height: 84%; }
+#realizacje .reels-tiles__card--lg { height: 92%; }
+#realizacje .reels-tiles__card--xl { height: 100%; }
+#realizacje .reels-tiles__card--far {
+  --tile-scale: 0.58;
+  --tile-opacity: 0.55;
+  --tile-z: 1;
+}
+#realizacje .reels-tiles__card--mid {
+  --tile-scale: 0.8;
+  --tile-opacity: 0.8;
+  --tile-z: 2;
+}
+#realizacje .reels-tiles__card--near {
+  --tile-scale: 1;
+  --tile-opacity: 1;
+  --tile-z: 4;
+}
+#realizacje .reels-tiles__card.is-in-focus {
+  filter: none;
+  opacity: 1;
+  z-index: 5;
+  box-shadow: 0 22px 44px rgba(40, 32, 22, 0.34);
+  transform: translateY(calc(var(--lane, 0) * 10px)) scale(calc(var(--tile-scale, 1) * 1.06));
+}
+#realizacje .reels-tiles__card video,
+#realizacje .reels-tiles__card .reels-tiles__poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #141414;
+}
+html.reduce-motion #realizacje .reels-tiles__belt {
+  animation: none;
+}
+@media (max-width: 900px) {
+  #realizacje.home-work.home-scene {
+    padding: 0;
+    justify-content: stretch;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+  }
+  #realizacje .home-scene__panel,
+  #realizacje .container {
+    width: 100%;
+    padding-right: 0;
+    padding-inline: 0;
   }
 }
