@@ -126,7 +126,7 @@
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" />
 <link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
 <script src="cookie-consent.js?v=20261001a"></script>
-<link rel="stylesheet" href="cosgral-home.css?v=20261011scroll" />
+<link rel="stylesheet" href="cosgral-home.css?v=20261011dawn" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
 <link rel="stylesheet" href="service-panel.css?v=20260816at" />
@@ -355,6 +355,13 @@
   </div>
   </div>
 </section>
+
+<!-- Przejście dark → white: wypukłe wzgórze, scrub 1:1 ze scrollem -->
+<div class="dawn-hill" id="dawn-hill" aria-hidden="true">
+  <div class="dawn-hill__sticky">
+    <canvas id="dawn-hill-canvas" class="dawn-hill__canvas"></canvas>
+  </div>
+</div>
 
 <!-- 4. REALIZACJE -->
 <section id="realizacje" class="home-work home-scene">
@@ -607,6 +614,7 @@
 <script src="cosgral-perf.js?v=20260901a"></script>
 <script src="home-cursor-field.js?v=20260928mob1"></script>
 <script src="home-ambient-bg.js?v=20261011scroll"></script>
+<script src="dawn-hill.js?v=20261011dawn"></script>
 <script type="module" src="home-hero-3d.js?v=20261011menu"></script>
 <script src="home-cursor.js?v=20260917ad"></script>
 <script src="home-sand-stream.js?v=20260731s"></script>
