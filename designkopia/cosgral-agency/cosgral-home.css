@@ -29,6 +29,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { background: var(--bg); }
+/* Phones: bleeding carousels/rails widened the layout viewport (390 -> 448 on
+   iPhone), which zoomed the page out and pushed the fixed cube canvas off to the
+   right. Clip horizontal overflow at the root so fixed layers match the screen. */
+html:has(body.home-page) { overflow-x: clip; }
 body.home-page {
   background: transparent;
   color: var(--ink);

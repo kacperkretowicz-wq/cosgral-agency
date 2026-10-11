@@ -958,8 +958,8 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     var heroZ = 0.36;
     var heroScale = CUBE_SCALE * HERO_SCALE_MUL;
     var peakScale = CUBE_SCALE * PEAK_SCALE_MUL;
-    var cornerX = MOBILE ? 4.35 : 5.55;
-    var cornerY = MOBILE ? 3.05 : 3.85;
+    var cornerX = MOBILE ? 5.6 : 6.1; /* exit fully past the corner; it used to park over the services heading */
+    var cornerY = MOBILE ? 4.3 : 4.3;
     var centerX = mouse.x * 0.028;
     var centerY = mouse.y * 0.018;
 
