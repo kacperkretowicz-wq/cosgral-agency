@@ -323,7 +323,10 @@
       }
       var u = easeInOut((p - holdEnd) / Math.max(1 - holdEnd, 0.001));
       /* Pod koniec przyspiesz zanik — w połowie jeszcze widać, przy cover=1 już nie */
-      var fade = u * u;
+      /* Clear the receding scene by ~65% of the cover so the incoming one
+         never double-exposes over it (same cinematic recess, no ghosting). */
+      var fq = Math.min(1, u / 0.65);
+      var fade = fq * fq * (3 - 2 * fq);
       /* opacity (nie autoAlpha) — klikalne w trakcie blur / transition */
       gsap.set(panel, {
         opacity: 1 - (1 - exitAlpha) * fade,
