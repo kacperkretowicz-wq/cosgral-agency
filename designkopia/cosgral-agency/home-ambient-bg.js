@@ -104,13 +104,13 @@
       "  vec3 bare = base + hi * pow(ridge, 14.0) * 0.32;",
       "  bare *= 0.58 + vignette * 0.42;",
       "  bare = ((bare - 0.5) * 1.04 + 0.5) * 0.78;",
-      "  float bloomKeep = 1.0 - smoothstep(0.0, 0.42, paper);",
+      "  float bloomKeep = 1.0 - smoothstep(0.0, 0.35, paper);",
       "  vec3 darkShown = mix(bare, col, bloomKeep);",
       "  vec3 paperBase = vec3(0.937, 0.922, 0.894);",
-      "  float hair = smoothstep(0.78, 1.0, ridge);",
-      "  hair = hair * hair;",
-      "  vec3 lightCol = mix(paperBase, vec3(0.604, 0.604, 0.604), hair * 0.40);",
-      "  gl_FragColor = vec4(mix(darkShown, lightCol, paper), 1.0);",
+      "  float glow = smoothstep(0.5, 0.94, ridge);",
+      "  float stroke = min(0.40, glow * glow * 0.40) * smoothstep(0.12, 0.48, paper);",
+      "  vec3 field = mix(darkShown, paperBase, paper);",
+      "  gl_FragColor = vec4(mix(field, vec3(0.604, 0.604, 0.604), stroke), 1.0);",
       "}",
     ].join("\n");
   }

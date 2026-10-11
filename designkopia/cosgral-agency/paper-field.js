@@ -54,8 +54,8 @@
     root.style.setProperty("--paper", paper.toFixed(4));
     window.__cosgralPaper = paper;
     var ink = root.classList.contains("is-paper-ink");
-    if (!ink && paper > 0.58) root.classList.add("is-paper-ink");
-    else if (ink && paper < 0.46) root.classList.remove("is-paper-ink");
+    if (!ink && paper > 0.48) root.classList.add("is-paper-ink");
+    else if (ink && paper < 0.36) root.classList.remove("is-paper-ink");
     tintChat(paper);
   }
 
