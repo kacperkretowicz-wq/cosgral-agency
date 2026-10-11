@@ -3235,3 +3235,52 @@ html.reduce-motion .paper-return {
     background: color-mix(in srgb, rgba(0, 0, 0, 0.12) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14));
   }
 }
+
+/* Solid ink once the field is light. Difference blend cannot hit #111. */
+html.is-paper-ink:not(.is-nav-menu-open) .site-nav {
+  mix-blend-mode: normal;
+  color: #111;
+}
+html.is-paper-ink:not(.is-nav-menu-open) .site-nav__logo-img {
+  filter: brightness(0);
+}
+html.is-paper-ink:not(.is-nav-menu-open) .lang-switch button {
+  color: #111;
+  opacity: 0.72;
+}
+html.is-paper-ink:not(.is-nav-menu-open) .lang-switch button[aria-pressed="true"] {
+  opacity: 1;
+}
+html.is-paper-ink:not(.is-nav-menu-open) .site-nav__toggle {
+  color: #111;
+  background: transparent;
+}
+html.is-paper-ink:not(.is-nav-menu-open) .site-nav__toggle-bars span {
+  background: #111;
+}
+html.is-paper-ink .home-scroll-rail__dot {
+  border-color: #111;
+  background: transparent;
+  box-shadow: none;
+}
+html.is-paper-ink .home-scroll-rail__dot.is-active,
+html.is-paper-ink .home-scroll-rail__dot.is-hold {
+  border-color: #111;
+  background: #111;
+  box-shadow: none;
+  animation: none;
+}
+html.is-paper-ink .home-scroll-rail__dot.is-passed {
+  border-color: rgba(17, 17, 17, 0.55);
+  background: rgba(17, 17, 17, 0.35);
+}
+html.is-paper-ink .home-scroll-rail__title,
+html.is-paper-ink .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title,
+html.is-paper-ink .home-scroll-rail__item.is-title-revealed.is-current .home-scroll-rail__title,
+html.is-paper-ink .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:hover,
+html.is-paper-ink .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:focus-visible {
+  color: #111;
+}
+html.is-paper-ink .cg-chat-label {
+  color: #111;
+}

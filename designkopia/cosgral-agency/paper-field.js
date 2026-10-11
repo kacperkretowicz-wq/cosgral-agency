@@ -1,7 +1,8 @@
 /**
  * Scroll-scrubbed lightening of the line field for Wybrane realizacje.
- * 72vh ease-in-out into off-white, hold, then the same ease back to dark
- * before FAQ. No lerp on top of scroll.
+ * Holds dark for the first quarter of each 72vh track, smoothsteps across
+ * the middle half, then holds off-white. Same curve back to dark before FAQ.
+ * No lerp on top of scroll.
  */
 (function () {
   "use strict";
@@ -20,8 +21,11 @@
     return v < 0 ? 0 : v > 1 ? 1 : v;
   }
 
-  function easeInOut(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  function centralSmoothstep(t) {
+    var u = (t - 0.25) / 0.5;
+    if (u <= 0) return 0;
+    if (u >= 1) return 1;
+    return u * u * (3 - 2 * u);
   }
 
   function tintChat(paper) {
@@ -44,11 +48,14 @@
     var b = bridge.getBoundingClientRect();
     var r = back.getBoundingClientRect();
     var vh = window.innerHeight || 1;
-    var enter = easeInOut(clamp01((vh - b.top) / Math.max(b.height, 1)));
-    var exit = easeInOut(clamp01((vh - r.top) / Math.max(r.height, 1)));
+    var enter = centralSmoothstep(clamp01((vh - b.top) / Math.max(b.height, 1)));
+    var exit = centralSmoothstep(clamp01((vh - r.top) / Math.max(r.height, 1)));
     var paper = enter * (1 - exit);
     root.style.setProperty("--paper", paper.toFixed(4));
     window.__cosgralPaper = paper;
+    var ink = root.classList.contains("is-paper-ink");
+    if (!ink && paper > 0.58) root.classList.add("is-paper-ink");
+    else if (ink && paper < 0.46) root.classList.remove("is-paper-ink");
     tintChat(paper);
   }
 
