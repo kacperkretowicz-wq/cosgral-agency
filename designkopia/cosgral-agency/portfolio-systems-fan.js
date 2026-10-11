@@ -681,8 +681,23 @@
           bottom: navRect0.bottom - rootRect0.top,
         };
         var arcCx = vw * 0.5;
-        var arcCy = mobile ? navRect.bottom - 4 : vh * 0.989;
         var arcR = vw * (mobile ? 0.34 : 0.2925);
+        /* Hang the thumb arc just below the front disc so the selected thumb
+           never sits on top of the big circle (was overlapping ~40%). */
+        var frontCard = cards[nearest] || cards[0];
+        var cardR = frontCard ? frontCard.offsetHeight / 2 : vw * 0.2;
+        var dotR = dotButtons[0] ? dotButtons[0].offsetWidth / 2 : vw * 0.05;
+        var frontPose = circlePose(0);
+        var arcTop = frontPose.y + cardR + dotR + (mobile ? 10 : 14);
+        arcTop = Math.min(arcTop, vh - dotR - 6);
+        var arcCy = arcTop + arcR;
+        var semiEl = root.querySelector(".sys-fan__semi");
+        if (semiEl) {
+          var semiH = Math.max(40, vh - (arcTop + dotR * 1.7));
+          semiEl.style.height = semiH + "px";
+          semiEl.style.width = semiH * 2 + "px";
+          semiEl.style.borderRadius = semiH + "px " + semiH + "px 0 0";
+        }
         var stepAng = mobile ? 36 : 47.5;
         dotButtons.forEach(function (dot, i) {
           var raw = wrapRaw(i);
@@ -691,7 +706,7 @@
           var y = arcCy - Math.cos(ang) * arcR;
           var on = i === nearest;
           var show = Math.abs(raw) < 2.35 && y < vh + 4;
-          if (mobile) show = show && y > navRect.top + 2;
+          // arc is anchored to the front disc now; no nav-box clipping
           dot.style.left = x - navRect.left + "px";
           dot.style.top = y - navRect.top + "px";
           dot.style.opacity = show ? "1" : "0";
