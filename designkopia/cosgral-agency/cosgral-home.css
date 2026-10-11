@@ -3271,7 +3271,7 @@ html.reduce-motion .paper-return {
 }
 
 /* Homepage realizacje — portfolio chapters on the light field.
-   Vertical page scroll stays free; horizontal swipe only moves slides. */
+   The section is a tall pin; a sticky viewport maps vertical scroll across five slides. */
 .home-work__title--sr {
   position: absolute;
   width: 1px;
@@ -3285,10 +3285,30 @@ html.reduce-motion .paper-return {
 }
 #realizacje.home-work.home-scene {
   padding: 0;
-  justify-content: stretch;
+  justify-content: flex-start;
+  display: block;
+  height: 500dvh;
+  min-height: 500dvh;
+  max-height: none;
+  overflow: visible;
+  overflow-anchor: none;
+}
+#realizacje .home-work-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   height: 100dvh;
-  min-height: 100dvh;
   max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow-anchor: none;
+}
+html.is-free-scroll main.home-film > #realizacje.home-depth {
+  position: relative !important;
+  top: auto !important;
+  margin-bottom: 0 !important;
+  overflow: visible !important;
 }
 #realizacje .home-scene__panel {
   width: 100%;
@@ -3311,9 +3331,28 @@ html.reduce-motion .paper-return {
   background: transparent;
 }
 #realizacje .portfolio-chapters__scroller {
+  display: block;
+  overflow: hidden;
+  scroll-snap-type: none;
   touch-action: pan-y;
   overscroll-behavior-x: contain;
   overscroll-behavior-y: auto;
+}
+#realizacje .portfolio-chapters__track {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: 100%;
+  width: 100%;
+  will-change: transform;
+}
+#realizacje .portfolio-chapter:not(.portfolio-chapter--grid) .portfolio-chapter__copy,
+#realizacje .chapter-lux__foot {
+  display: none !important;
+}
+#realizacje .chapter-lux__word {
+  font-size: clamp(1.45rem, 4.4vw, 2.8rem);
+  letter-spacing: -0.045em;
 }
 #realizacje .portfolio-chapters__scroller.is-axis-x {
   scroll-snap-type: none;
@@ -3557,10 +3596,11 @@ html.reduce-motion #realizacje .reels-tiles__belt {
 @media (max-width: 900px) {
   #realizacje.home-work.home-scene {
     padding: 0;
-    justify-content: stretch;
-    height: 100dvh;
-    min-height: 100dvh;
-    max-height: 100dvh;
+    justify-content: flex-start;
+    height: 500dvh;
+    min-height: 500dvh;
+    max-height: none;
+    overflow: visible;
   }
   #realizacje .home-scene__panel,
   #realizacje .container {

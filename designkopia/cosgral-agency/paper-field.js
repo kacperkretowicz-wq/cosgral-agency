@@ -1,7 +1,7 @@
 /**
  * Line-field lightening, scrubbed with the scroll.
  * Sine in-out from the middle of Co robimy to the top of Wybrane realizacje,
- * then the same curve from the middle of that section to the top of FAQ.
+ * then the same curve from the end of that section (after the pinned slides) to the top of FAQ.
  * A light per-frame lerp (same tick as Lenis) keeps the blend from stepping.
  */
 (function () {
@@ -44,6 +44,9 @@
     var enter0 = uTop + uslugi.offsetHeight * 0.5;
     var enter1 = bridgeTop + bridge.offsetHeight;
     var exit0 = wTop + work.offsetHeight * 0.5;
+    if (work.classList.contains("home-work-pin")) {
+      exit0 = flowTop(work) + work.offsetHeight - (window.innerHeight || 1);
+    }
     var exit1 = returnTop + back.offsetHeight;
     var enter = sineInOut((y - enter0) / Math.max(enter1 - enter0, 1));
     var exit = sineInOut((y - exit0) / Math.max(exit1 - exit0, 1));

@@ -10,6 +10,7 @@
   var HOME = root.hasAttribute("data-home-chapters");
 
   var scroller = root.querySelector("[data-chapters-scroller]");
+  var track = root.querySelector("[data-chapters-track]");
   var chapters = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-tile]"));
   var dots = Array.prototype.slice.call(root.querySelectorAll("[data-portfolio-chapter-dot]"));
   var prevBtn = root.querySelector("[data-portfolio-chapter-prev]");
@@ -28,6 +29,7 @@
   var scrollRaf = 0;
   var scrollAnim = 0;
   var loopsPaused = false;
+  var pinCache = null;
   var restartLux = null;
   var restartOs = null;
   var restartShow = null;
@@ -105,11 +107,17 @@
     STILL + "systems/bw/still-app3-bw.jpg",
   ];
 
-  var SHOW_WORDS = [
-    { pl: "Grafiki", en: "Visuals" },
-    { pl: "Showcase", en: "Showcase" },
-    { pl: "Cosgral", en: "Cosgral" },
-  ];
+  var SHOW_WORDS = HOME
+    ? [
+        { pl: "Grafiki", en: "Graphics" },
+        { pl: "Stories", en: "Stories" },
+        { pl: "Karuzele", en: "Carousels" },
+      ]
+    : [
+        { pl: "Grafiki", en: "Visuals" },
+        { pl: "Showcase", en: "Showcase" },
+        { pl: "Cosgral", en: "Cosgral" },
+      ];
 
   var SHOW_POOL = [
     GFX + "001.jpg",
@@ -196,7 +204,19 @@
   }
 
   function lang() {
+    if (window.cosgralI18n && window.cosgralI18n.getLang) {
+      var stored = window.cosgralI18n.getLang();
+      if (stored) return stored === "en" ? "en" : "pl";
+    }
     return (document.documentElement.lang || "pl").toLowerCase().indexOf("en") === 0 ? "en" : "pl";
+  }
+
+  function homeLuxLines() {
+    if (lang() === "en") return [{ pl: "Websites", en: "Websites" }];
+    return [
+      { pl: "Strony", en: "Strony" },
+      { pl: "internetowe", en: "internetowe" },
+    ];
   }
 
   function applyTheme(theme) {
@@ -253,9 +273,10 @@
     }
 
     function paint(set) {
-      if (wordEl && set.lines) {
+      var lines = HOME ? homeLuxLines() : set.lines;
+      if (wordEl && lines) {
         var loc = lang();
-        wordEl.innerHTML = set.lines
+        wordEl.innerHTML = lines
           .map(function (line) {
             var t = line[loc] || line.pl;
             return '<span class="chapter-lux__word-line">' + t + "</span>";
@@ -301,6 +322,9 @@
       luxTimer = window.setInterval(cycle, 5600);
     };
     restartLux();
+    window.addEventListener("cosgral:langchange", function () {
+      paint(LUX_SETS[idx]);
+    });
   }
 
   /* —— Systemy: shared fan (wachlarz) — catalog auto-rotates —— */
@@ -385,6 +409,9 @@
       }, 4800);
     };
     restartShow();
+    window.addEventListener("cosgral:langchange", function () {
+      paint();
+    });
   }
 
   function nearestIndex() {
@@ -461,7 +488,54 @@
     window.addEventListener("scroll", holdPage, true);
   }
 
+  function measurePin() {
+    if (!HOME) return;
+    var pin = document.getElementById("realizacje");
+    if (!pin) return;
+    var y = window.scrollY || window.pageYOffset || 0;
+    var vh = window.innerHeight || 1;
+    pinCache = {
+      top: pin.getBoundingClientRect().top + y,
+      travel: Math.max(1, pin.offsetHeight - vh),
+      width: scroller.clientWidth || window.innerWidth || 1,
+    };
+  }
+
+  function applyFromScroll() {
+    if (!HOME || !track) return;
+    measurePin();
+    if (!pinCache) return;
+    var y = window.scrollY || window.pageYOffset || 0;
+    var p = (y - pinCache.top) / pinCache.travel;
+    if (p < 0) p = 0;
+    else if (p > 1) p = 1;
+    var max = Math.max(1, chapters.length - 1);
+    var x = p * max * pinCache.width;
+    track.style.transform = "translate3d(" + (-x).toFixed(2) + "px,0,0)";
+    setActive(Math.round(p * max));
+  }
+
+  function pageToIndex(index) {
+    index = Math.max(0, Math.min(chapters.length - 1, index));
+    measurePin();
+    if (!pinCache) return;
+    var max = Math.max(1, chapters.length - 1);
+    var y = pinCache.top + (index / max) * pinCache.travel;
+    var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+    var from = activeIndex < 0 ? 0 : activeIndex;
+    var steps = Math.max(1, Math.abs(index - from));
+    if (lenis && lenis.scrollTo) {
+      lenis.scrollTo(y, { duration: Math.max(0.45, Math.min(1.7, steps * 0.48)), force: true });
+    } else {
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  }
+
   function scrollToIndex(index, behavior) {
+    if (HOME) {
+      pageToIndex(index);
+      return;
+    }
     index = Math.max(0, Math.min(chapters.length - 1, index));
     var chapter = chapters[index];
     if (!chapter) return;
@@ -552,7 +626,7 @@
   scroller.addEventListener(
     "scroll",
     function () {
-      if (expandedKey) return;
+      if (HOME || expandedKey) return;
       if (scrollRaf) return;
       scrollRaf = window.requestAnimationFrame(function () {
         scrollRaf = 0;
@@ -691,6 +765,7 @@
         gesture = {
           x: e.touches[0].clientX,
           y: e.touches[0].clientY,
+          lastX: e.touches[0].clientX,
           axis: "",
           left: scroller.scrollLeft,
         };
@@ -708,20 +783,20 @@
           gesture.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
           if (gesture.axis === "x") {
             scroller.classList.add("is-axis-x");
-            beginPin();
           }
         }
+        gesture.lastX = e.touches[0].clientX;
         if (gesture.axis !== "x") return;
         if (e.cancelable) e.preventDefault();
-        scroller.scrollLeft = gesture.left - dx;
-        holdPage();
       },
       { passive: false }
     );
     function endGesture() {
       if (gesture && gesture.axis === "x") {
-        scrollToIndex(nearestIndex());
-        window.setTimeout(releaseAxis, 1150);
+        var dx = (gesture.lastX == null ? gesture.x : gesture.lastX) - gesture.x;
+        var dir = dx < -36 ? 1 : dx > 36 ? -1 : 0;
+        if (dir) pageToIndex((activeIndex < 0 ? 0 : activeIndex) + dir);
+        window.setTimeout(releaseAxis, 400);
       }
       gesture = null;
     }
@@ -733,22 +808,23 @@
         if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
         e.preventDefault();
         e.stopPropagation();
-        scroller.classList.add("is-axis-x");
-        beginPin();
-        scroller.scrollLeft += e.deltaX;
-        holdPage();
-        if (wheelSnap) window.clearTimeout(wheelSnap);
+        if (wheelSnap) return;
         wheelSnap = window.setTimeout(function () {
           wheelSnap = 0;
-          scrollToIndex(nearestIndex());
-          window.setTimeout(releaseAxis, 1150);
-        }, 90);
+        }, 700);
+        pageToIndex((activeIndex < 0 ? 0 : activeIndex) + (e.deltaX > 0 ? 1 : -1));
+        window.setTimeout(releaseAxis, 400);
       },
       { passive: false, capture: true }
     );
   }
 
   window.addEventListener("resize", function () {
+    if (HOME) {
+      measurePin();
+      applyFromScroll();
+      return;
+    }
     scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
   });
 
@@ -763,11 +839,35 @@
   startVizShowLoop();
   var startAt = HOME ? 0 : indexForHash(location.hash);
   if (startAt < 0) startAt = 0;
-  scrollToIndex(startAt, "auto");
-  window.setTimeout(function () {
-    scrollToIndex(activeIndex < 0 ? startAt : activeIndex, "auto");
-    if (pendingTheme) applyTheme(pendingTheme);
-  }, 80);
+  if (HOME) {
+    measurePin();
+    applyFromScroll();
+    window.addEventListener("scroll", applyFromScroll, { passive: true });
+    var lenisBound = false;
+    var bindLenis = function (lenis) {
+      if (lenisBound || !lenis || !lenis.on) return;
+      lenisBound = true;
+      lenis.on("scroll", applyFromScroll);
+    };
+    bindLenis(window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis);
+    if (window.cosgralSmoothScroll && window.cosgralSmoothScroll.ready) {
+      window.cosgralSmoothScroll.ready.then(bindLenis);
+    }
+    window.addEventListener("load", function () {
+      measurePin();
+      applyFromScroll();
+    });
+    window.setTimeout(function () {
+      measurePin();
+      applyFromScroll();
+    }, 400);
+  } else {
+    scrollToIndex(startAt, "auto");
+    window.setTimeout(function () {
+      scrollToIndex(activeIndex < 0 ? startAt : activeIndex, "auto");
+      if (pendingTheme) applyTheme(pendingTheme);
+    }, 80);
+  }
   if (!HOME) {
     window.addEventListener("hashchange", function () {
       var next = indexForHash(location.hash);
