@@ -2,7 +2,7 @@
  * Subpage cube — scroll drift + menu fly-in (jak homepage, side entry).
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011clear";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011phys";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from "./cube-look.js?v=20260926cube1";
 
@@ -1965,7 +1965,7 @@ import { heroCubeLook, createCubeShimmerMaterial, applyHeroCubeMaterials } from 
   // miękkie cząstki nie zyskują na wyższym DPR, a fill-rate spada o ~44%.
   var USE_FXAA = !MOBILE;
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: MOBILE, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, MOBILE ? 2 : 1.5));
   renderer.setClearColor(0x000000, 0);
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
 

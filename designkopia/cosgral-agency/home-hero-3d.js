@@ -3,7 +3,7 @@
  * Soft additive particles, scroll-scrubbed, cursor liquid forces.
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011clear";
+import { createIntactCubeParts, createShardGeometry, whenCubeReady, installGlassScene, sampleCubeSurface, randomCubeSurface } from "./cube-shape.js?v=20261011phys";
 import { createFxaaPass } from "./three-fxaa-pass.js";
 import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
@@ -358,11 +358,11 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var USE_FXAA = !LOW_PERF;
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: false,
+    antialias: LOW_PERF,
     alpha: true,
     powerPreference: LOW_PERF ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 1.0 : 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_PERF ? 2 : 1.5));
   renderer.setClearColor(0x000000, 0);
 
   var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
@@ -697,7 +697,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
   var OFF_ZONE_EVERY_BY_TIER = LOW_PERF ? [2, 3, 4] : [1, 2, 3];
   // Miękkie, addytywne cząstki nie zyskują na DPR 2 — cap 1.5 tnie fill-rate
   // o ~44% na ekranach hi-DPI bez widocznej różnicy.
-  var DPR_CAP_BY_TIER = LOW_PERF ? [1.25, 1.1, 1] : [1.5, 1.25, 1];
+  var DPR_CAP_BY_TIER = LOW_PERF ? [2, 1.5, 1.25] : [1.5, 1.25, 1];
   var outOfZoneEvery = OFF_ZONE_EVERY_BY_TIER[0];
   var dprCap = DPR_CAP_BY_TIER[0];
   var introDprDone = false;
@@ -1326,6 +1326,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);
+    if (window.__cosgralHoldRot) {
+      cubeGroup.rotation.set(window.__cosgralHoldRot.x, window.__cosgralHoldRot.y, window.__cosgralHoldRot.z);
+    }
     renderScene();
   }
 
