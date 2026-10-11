@@ -442,8 +442,12 @@
       dot.classList.toggle("is-active", i === index);
       dot.setAttribute("aria-current", i === index ? "true" : "false");
     });
-    if (prevBtn) prevBtn.disabled = index <= 0;
-    if (nextBtn) nextBtn.disabled = index >= chapters.length - 1;
+    if (!HOME) {
+      if (prevBtn) prevBtn.disabled = index <= 0;
+      if (nextBtn) nextBtn.disabled = index >= chapters.length - 1;
+    } else {
+      syncStepArrows();
+    }
     var chapter = chapters[index];
     applyTheme(chapter.getAttribute("data-theme") || "web");
     /* Montaż belt must scroll while the chapter is active (IO can miss horizontal slides) */
@@ -509,9 +513,49 @@
   }
 
   /* Same ease and duration as the portfolio chapter slide (easeOutQuart, ~1.1s).
-     Scroll progress picks the slide; the track eases one slide at a time. */
+     Scroll progress picks a step; the track eases one step at a time.
+     Homepage steps: 0 wybrane, 1 strony, 2–12 the eleven systems, 13 montaż, 14 grafiki. */
+  var SYS_N = 11;
   var CINE_MS = 1100;
   var cine = { visual: 0, from: 0, to: 0, t0: 0, running: false, raf: 0 };
+  var chEase = null;
+  var jumpStep = null;
+  var jumpBest = null;
+
+  function stepMax() {
+    if (!HOME) return Math.max(0, chapters.length - 1);
+    return Math.max(0, chapters.length - 1 + (SYS_N - 1));
+  }
+
+  function chapterAt(step) {
+    if (!HOME) return step;
+    if (step <= 2) return step;
+    if (step <= 12) return 2;
+    return step - 10;
+  }
+
+  function systemAt(step) {
+    if (step <= 2) return 0;
+    if (step >= 12) return SYS_N - 1;
+    return step - 2;
+  }
+
+  function chapterToStep(index) {
+    if (!HOME) return index;
+    if (index <= 2) return index;
+    return index + (SYS_N - 1);
+  }
+
+  function syncStepArrows() {
+    if (!HOME) return;
+    var step = Math.round(cine.visual);
+    if (prevBtn) prevBtn.disabled = step <= 0;
+    if (nextBtn) nextBtn.disabled = step >= stepMax();
+  }
+
+  function storyOpen() {
+    return window.CosgralSystemsEditorial && window.CosgralSystemsEditorial.isOpen && window.CosgralSystemsEditorial.isOpen();
+  }
 
   function easeOutQuart(t) {
     return 1 - Math.pow(1 - t, 4);
@@ -524,20 +568,24 @@
     var p = (y - pinCache.top) / pinCache.travel;
     if (p < 0) p = 0;
     else if (p > 1) p = 1;
-    var max = Math.max(1, chapters.length - 1);
-    return Math.round(p * max);
+    return Math.round(p * stepMax());
   }
 
   function paintCine() {
     measurePin();
     if (!pinCache || !track) return;
-    var x = cine.visual * pinCache.width;
+    var chapter = chEase ? chEase.now : chapterAt(cine.visual);
+    var x = chapter * pinCache.width;
     track.style.transform = "translate3d(" + (-x).toFixed(2) + "px,0,0)";
-    setActive(Math.max(0, Math.min(chapters.length - 1, Math.round(cine.visual))));
+    setActive(Math.max(0, Math.min(chapters.length - 1, Math.round(chapter))));
+    syncStepArrows();
+    if (HOME && window.CosgralSystemsEditorial && window.CosgralSystemsEditorial.paint) {
+      window.CosgralSystemsEditorial.paint(systemAt(cine.visual));
+    }
   }
 
   function toward(desired) {
-    var max = Math.max(0, chapters.length - 1);
+    var max = stepMax();
     if (Math.abs(desired - cine.visual) < 0.02) return desired;
     var dir = desired > cine.visual ? 1 : -1;
     var next = dir > 0 ? Math.ceil(cine.visual - 1e-4) : Math.floor(cine.visual + 1e-4);
@@ -549,7 +597,29 @@
 
   function cineStep() {
     var desired = desiredIndex();
-    var max = Math.max(0, chapters.length - 1);
+    var max = stepMax();
+    if (chEase) {
+      var et = Math.min(1, (performance.now() - chEase.t0) / CINE_MS);
+      chEase.now = chEase.from + (chEase.to - chEase.from) * easeOutQuart(et);
+      if (et >= 1) chEase = null;
+    }
+    if (jumpStep != null) {
+      var gap = Math.abs(desired - jumpStep);
+      if (jumpBest == null || gap < jumpBest) jumpBest = gap;
+      if (gap < 0.6) {
+        jumpStep = null;
+        jumpBest = null;
+      } else if (jumpBest != null && gap > jumpBest + 1.25) {
+        jumpStep = null;
+        jumpBest = null;
+        chEase = null;
+      }
+    }
+    if (jumpStep != null || chEase) {
+      paintCine();
+      cine.raf = requestAnimationFrame(cineStep);
+      return;
+    }
     if (REDUCED) {
       cine.visual = desired;
       cine.running = false;
@@ -590,24 +660,41 @@
   }
 
   function applyFromScroll() {
-    if (!HOME || !track) return;
+    if (!HOME || !track || storyOpen()) return;
     if (!cine.raf) cine.raf = requestAnimationFrame(cineStep);
   }
 
-  function pageToIndex(index) {
-    index = Math.max(0, Math.min(chapters.length - 1, index));
+  function pageToStep(step) {
+    if (storyOpen() && window.CosgralSystemsEditorial.close) window.CosgralSystemsEditorial.close();
+    step = Math.max(0, Math.min(stepMax(), step));
     measurePin();
     if (!pinCache) return;
-    var max = Math.max(1, chapters.length - 1);
-    var y = pinCache.top + (index / max) * pinCache.travel;
+    var max = Math.max(1, stepMax());
+    var y = pinCache.top + (step / max) * pinCache.travel;
     var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
-    var from = activeIndex < 0 ? 0 : activeIndex;
-    var steps = Math.max(1, Math.abs(index - from));
+    var from = Math.round(cine.visual);
+    var steps = Math.max(1, Math.abs(step - from));
+    if (steps > 1) {
+      var fromCh = chEase ? chEase.now : chapterAt(cine.visual);
+      var toCh = chapterAt(step);
+      jumpStep = step;
+      jumpBest = null;
+      cine.visual = step;
+      cine.running = false;
+      cine.from = step;
+      cine.to = step;
+      chEase = Math.abs(toCh - fromCh) > 0.02 ? { from: fromCh, to: toCh, now: fromCh, t0: performance.now() } : null;
+      if (!cine.raf) cine.raf = requestAnimationFrame(cineStep);
+    }
     if (lenis && lenis.scrollTo) {
       lenis.scrollTo(y, { duration: Math.max(1.05, Math.min(4.6, steps * 1.1)), force: true });
     } else {
       window.scrollTo({ top: y, behavior: "smooth" });
     }
+  }
+
+  function pageToIndex(index) {
+    pageToStep(chapterToStep(index));
   }
 
   function scrollToIndex(index, behavior) {
@@ -723,12 +810,14 @@
 
   if (prevBtn) {
     prevBtn.addEventListener("click", function () {
-      scrollToIndex(activeIndex - 1);
+      if (HOME) pageToStep(Math.round(cine.visual) - 1);
+      else scrollToIndex(activeIndex - 1);
     });
   }
   if (nextBtn) {
     nextBtn.addEventListener("click", function () {
-      scrollToIndex(activeIndex + 1);
+      if (HOME) pageToStep(Math.round(cine.visual) + 1);
+      else scrollToIndex(activeIndex + 1);
     });
   }
 
@@ -874,7 +963,7 @@
       if (gesture && gesture.axis === "x") {
         var dx = (gesture.lastX == null ? gesture.x : gesture.lastX) - gesture.x;
         var dir = dx < -36 ? 1 : dx > 36 ? -1 : 0;
-        if (dir) pageToIndex((activeIndex < 0 ? 0 : activeIndex) + dir);
+        if (dir && !storyOpen()) pageToStep(Math.round(cine.visual) + dir);
         window.setTimeout(releaseAxis, 400);
       }
       gesture = null;
@@ -884,14 +973,14 @@
     scroller.addEventListener(
       "wheel",
       function (e) {
-        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || storyOpen()) return;
         e.preventDefault();
         e.stopPropagation();
         if (wheelSnap) return;
         wheelSnap = window.setTimeout(function () {
           wheelSnap = 0;
         }, 700);
-        pageToIndex((activeIndex < 0 ? 0 : activeIndex) + (e.deltaX > 0 ? 1 : -1));
+        pageToStep(Math.round(cine.visual) + (e.deltaX > 0 ? 1 : -1));
         window.setTimeout(releaseAxis, 400);
       },
       { passive: false, capture: true }
@@ -913,7 +1002,7 @@
 
   if (!HOME) document.body.classList.add("portfolio-page--tiles");
   initLux();
-  initOs();
+  if (!HOME) initOs();
   initShow();
   startVizShowLoop();
   var startAt = HOME ? 0 : indexForHash(location.hash);
@@ -971,6 +1060,7 @@
         var path = href.slice(0, hashAt);
         if (path && path !== location.pathname && !/(^|\/)index\.html$/.test(path)) return;
         e.preventDefault();
+        e.stopPropagation();
         pageToIndex(idx);
       },
       true

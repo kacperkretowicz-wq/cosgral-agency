@@ -1184,6 +1184,8 @@
   window.CosgralSystemsFan = {
     cases: CASES,
     create: createFan,
+    getCases: getCases,
+    storyOf: storyOf,
     getCatalog: function () {
       for (var i = 0; i < instances.length; i++) {
         if (instances[i].mode === "catalog") return instances[i];

@@ -3271,7 +3271,7 @@ html.reduce-motion .paper-return {
 }
 
 /* Homepage realizacje — portfolio chapters on the light field.
-   The section is a tall pin; a sticky viewport maps vertical scroll across five slides. */
+   The section is a tall pin. Vertical travel covers the grid, strony, eleven systems, montaż and grafiki. */
 .home-work__title--sr {
   position: absolute;
   width: 1px;
@@ -3287,8 +3287,8 @@ html.reduce-motion .paper-return {
   padding: 0;
   justify-content: flex-start;
   display: block;
-  height: 500dvh;
-  min-height: 500dvh;
+  height: 1500dvh;
+  min-height: 1500dvh;
   max-height: none;
   overflow: visible;
   overflow-anchor: none;
@@ -3597,8 +3597,8 @@ html.reduce-motion #realizacje .reels-tiles__belt {
   #realizacje.home-work.home-scene {
     padding: 0;
     justify-content: flex-start;
-    height: 500dvh;
-    min-height: 500dvh;
+    height: 1500dvh;
+    min-height: 1500dvh;
     max-height: none;
     overflow: visible;
   }
