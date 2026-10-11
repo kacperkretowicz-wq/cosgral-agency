@@ -4,9 +4,9 @@
  */
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { GLTFLoader, MeshoptDecoder } from "./vendor/cube-three-addons.js";
-import { createGlassMaterial, whenGlassSpec } from "./cube-glass.js?v=20261011optic";
+import { createGlassMaterial, whenGlassSpec } from "./cube-glass.js?v=20261011clear";
 
-export { installGlassScene } from "./cube-glass.js?v=20261011optic";
+export { installGlassScene } from "./cube-glass.js?v=20261011clear";
 
 var EDGE_RADIUS_RATIO = 0.2;
 var EDGE_SEGMENTS = 5;
