@@ -291,6 +291,7 @@
     var didDrag = false;
     var lastX = 0;
     var vel = 0;
+    var dragOrigin = 0;
     var raf = 0;
     var autoTimer = 0;
     var copyEl = null;
@@ -344,6 +345,13 @@
     var cards = [];
     var dotButtons = [];
 
+    function placeholderMedia() {
+      var ph = document.createElement("span");
+      ph.className = "sys-illu__placeholder";
+      ph.setAttribute("aria-hidden", "true");
+      return ph;
+    }
+
     currentCases.forEach(function (item, i) {
       var dot = document.createElement("button");
       dot.type = "button";
@@ -372,7 +380,7 @@
         disc.className = "sys-fan__disc";
         var art = document.createElement("span");
         art.className = "sys-illu";
-        mountSystemPhoto(art, item.id);
+        art.appendChild(placeholderMedia());
         var name = document.createElement("span");
         name.className = "sys-illu__name";
         name.textContent = item.title;
@@ -668,7 +676,7 @@
       var sats = el.querySelectorAll(".sys-iris__sat");
       var trio = [item, prev, next];
       for (var s = 0; s < sats.length; s++) {
-        if (trio[s]) mountSystemPhoto(sats[s], trio[s].id);
+        if (trio[s]) sats[s].appendChild(placeholderMedia());
       }
       fillIris(el, item);
       var disc = el.querySelector(".sys-iris__disc");
@@ -988,6 +996,8 @@
       var y = e.clientY != null ? e.clientY : 0;
       if (dragAxis === "x") {
         pendingDrag = { x: x, y: y, id: e.pointerId };
+        didDrag = false;
+        vel = 0;
         return;
       }
       dragging = true;
@@ -1006,12 +1016,14 @@
         var adx = px - pendingDrag.x;
         var ady = py - pendingDrag.y;
         if (Math.abs(adx) < 8 && Math.abs(ady) < 8) return;
+        var originX = pendingDrag.x;
         pendingDrag = null;
         if (Math.abs(ady) >= Math.abs(adx)) return;
         dragging = true;
-        didDrag = false;
+        didDrag = true;
         vel = 0;
-        lastX = px;
+        dragOrigin = index;
+        lastX = originX;
         stopAuto();
         stage.classList.add("is-dragging");
         document.body.classList.add("is-sys-fan-dragging");
@@ -1034,7 +1046,14 @@
       if (!dragging) return;
       dragging = false;
       stage.classList.remove("is-dragging");
-      setIndex(index - vel * 8, true);
+      if (dragAxis === "x") {
+        var stepped = Math.round(dragOrigin);
+        var travel = index - dragOrigin;
+        if (Math.abs(travel) > 0.12) stepped += travel > 0 ? 1 : -1;
+        setIndex(stepped, true);
+      } else {
+        setIndex(index - vel * 8, true);
+      }
       if (autoplay) startAuto();
       if (didDrag) {
         var swallow = function (ev) {
@@ -1069,19 +1088,10 @@
     }
 
     function onWheel(e) {
-      if (destroyed) return;
-      /* Rozwinięty opis — wolny natywny scroll, nie przełączaj systemów */
-      if (
-        mode === "detail" &&
-        articleOpen &&
-        e.target &&
-        e.target.closest &&
-        e.target.closest("[data-sys-fan-article]")
-      ) {
-        return;
-      }
-      if (mode === "catalog" && !root.matches(":hover")) return;
+      if (destroyed || irisOpen) return;
+      /* Homepage circle: vertical wheel stays with the five-board pin. */
       var dominantX = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.15;
+      if (dragAxis === "x" && !dominantX) return;
       /* Detail + article open: vertical outside stage scrolls the case slowly */
       if (
         mode === "detail" &&
