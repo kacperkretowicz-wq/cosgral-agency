@@ -2490,8 +2490,8 @@ html.reduce-motion .reveal-word > span {
   animation: scroll-rail-hold-pulse 1.8s ease-in-out infinite;
 }
 @keyframes scroll-rail-hold-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06), 0 0 10px rgba(255, 255, 255, 0.2); }
-  50% { box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.1), 0 0 18px rgba(255, 255, 255, 0.42); }
+  0%, 100% { box-shadow: 0 0 0 4px var(--rail-ring, rgba(255, 255, 255, 0.06)), 0 0 10px var(--rail-glow, rgba(255, 255, 255, 0.2)); }
+  50% { box-shadow: 0 0 0 7px var(--rail-ring, rgba(255, 255, 255, 0.1)), 0 0 18px var(--rail-glow, rgba(255, 255, 255, 0.42)); }
 }
 html.reduce-motion .home-scroll-rail { display: none; }
 
@@ -3159,7 +3159,7 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
 /* Quiet scroll distance for the line-field lightening. No shape, no plate. */
 .paper-bridge,
 .paper-return {
-  height: 72vh;
+  height: 44vh;
   pointer-events: none;
 }
 html.reduce-motion .paper-bridge,
@@ -3223,64 +3223,37 @@ html.reduce-motion .paper-return {
     color: color-mix(in srgb, rgba(12, 12, 12, 0.92) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.88));
   }
   .home-scroll-rail__dot {
-    border-color: color-mix(in srgb, rgba(0, 0, 0, 0.38) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.28));
-    background: color-mix(in srgb, rgba(255, 255, 255, 0.92) calc(var(--paper, 0) * 100%), rgba(8, 8, 8, 0.65));
+    --rail-ring: color-mix(in srgb, rgba(17, 17, 17, 0.08) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.06));
+    --rail-glow: color-mix(in srgb, rgba(17, 17, 17, 0.22) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.2));
+    border-color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.28));
+    background: color-mix(in srgb, transparent calc(var(--paper, 0) * 100%), rgba(8, 8, 8, 0.65));
   }
   .home-scroll-rail__dot.is-active {
-    border-color: color-mix(in srgb, rgba(0, 0, 0, 0.7) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.55));
-    background: color-mix(in srgb, rgba(0, 0, 0, 0.16) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.22));
+    border-color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.55));
+    background: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.22));
+  }
+  .home-scroll-rail__dot.is-hold {
+    border-color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.95));
+    background: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.92));
   }
   .home-scroll-rail__dot.is-passed {
-    border-color: color-mix(in srgb, rgba(0, 0, 0, 0.45) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.42));
-    background: color-mix(in srgb, rgba(0, 0, 0, 0.12) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14));
+    border-color: color-mix(in srgb, rgba(17, 17, 17, 0.55) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.42));
+    background: color-mix(in srgb, rgba(17, 17, 17, 0.35) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14));
   }
-}
-
-/* Solid ink once the field is light. Difference blend cannot hit #111. */
-html.is-paper-ink:not(.is-nav-menu-open) .site-nav {
-  mix-blend-mode: normal;
-  color: #111;
-}
-html.is-paper-ink:not(.is-nav-menu-open) .site-nav__logo-img {
-  filter: brightness(0);
-}
-html.is-paper-ink:not(.is-nav-menu-open) .lang-switch button {
-  color: #111;
-  opacity: 0.72;
-}
-html.is-paper-ink:not(.is-nav-menu-open) .lang-switch button[aria-pressed="true"] {
-  opacity: 1;
-}
-html.is-paper-ink:not(.is-nav-menu-open) .site-nav__toggle {
-  color: #111;
-  background: transparent;
-}
-html.is-paper-ink:not(.is-nav-menu-open) .site-nav__toggle-bars span {
-  background: #111;
-}
-html.is-paper-ink .home-scroll-rail__dot {
-  border-color: #111;
-  background: transparent;
-  box-shadow: none;
-}
-html.is-paper-ink .home-scroll-rail__dot.is-active,
-html.is-paper-ink .home-scroll-rail__dot.is-hold {
-  border-color: #111;
-  background: #111;
-  box-shadow: none;
-  animation: none;
-}
-html.is-paper-ink .home-scroll-rail__dot.is-passed {
-  border-color: rgba(17, 17, 17, 0.55);
-  background: rgba(17, 17, 17, 0.35);
-}
-html.is-paper-ink .home-scroll-rail__title,
-html.is-paper-ink .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title,
-html.is-paper-ink .home-scroll-rail__item.is-title-revealed.is-current .home-scroll-rail__title,
-html.is-paper-ink .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:hover,
-html.is-paper-ink .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:focus-visible {
-  color: #111;
-}
-html.is-paper-ink .cg-chat-label {
-  color: #111;
+  body.home-page:not(.is-nav-menu-open) .site-nav {
+    mix-blend-mode: normal;
+    color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), #f5f5f5);
+  }
+  body.home-page:not(.is-nav-menu-open) .site-nav__logo-img {
+    filter: brightness(calc(1 - var(--paper, 0)));
+  }
+  body.home-page:not(.is-nav-menu-open) .lang-switch button {
+    opacity: calc(0.45 + var(--paper, 0) * 0.27);
+  }
+  body.home-page:not(.is-nav-menu-open) .lang-switch button[aria-pressed="true"] {
+    opacity: 1;
+  }
+  body.home-page .cg-chat-label {
+    color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(245, 245, 245, 0.72));
+  }
 }

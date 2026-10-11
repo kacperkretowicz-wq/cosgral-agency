@@ -1,31 +1,53 @@
 /**
- * Scroll-scrubbed lightening of the line field for Wybrane realizacje.
- * Holds dark for the first quarter of each 72vh track, smoothsteps across
- * the middle half, then holds off-white. Same curve back to dark before FAQ.
- * No lerp on top of scroll.
+ * Line-field lightening, scrubbed with the scroll.
+ * Sine in-out from the middle of Co robimy to the top of Wybrane realizacje,
+ * then the same curve from the middle of that section to the top of FAQ.
+ * A light per-frame lerp (same tick as Lenis) keeps the blend from stepping.
  */
 (function () {
   "use strict";
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
-  var bridge = document.getElementById("paper-bridge");
-  var back = document.getElementById("paper-return");
-  if (!bridge || !back) return;
+  var uslugi = document.getElementById("uslugi");
+  var work = document.getElementById("realizacje");
+  var faq = document.getElementById("faq");
+  if (!uslugi || !work || !faq) return;
 
   var root = document.documentElement;
-  var scheduled = false;
+  var shown = 0;
+  var primed = false;
   var lastFilter = null;
+  var LERP = 0.1;
 
   function clamp01(v) {
     return v < 0 ? 0 : v > 1 ? 1 : v;
   }
 
-  function centralSmoothstep(t) {
-    var u = (t - 0.25) / 0.5;
-    if (u <= 0) return 0;
-    if (u >= 1) return 1;
-    return u * u * (3 - 2 * u);
+  function sineInOut(t) {
+    t = clamp01(t);
+    return 0.5 - 0.5 * Math.cos(Math.PI * t);
+  }
+
+  function docTop(el) {
+    var y = 0;
+    var n = el;
+    while (n) {
+      y += n.offsetTop || 0;
+      n = n.offsetParent;
+    }
+    return y;
+  }
+
+  function goal() {
+    var y = window.scrollY || window.pageYOffset || 0;
+    var enter0 = docTop(uslugi) + uslugi.offsetHeight * 0.5;
+    var enter1 = docTop(work);
+    var exit0 = docTop(work) + work.offsetHeight * 0.5;
+    var exit1 = docTop(faq);
+    var enter = sineInOut((y - enter0) / Math.max(enter1 - enter0, 1));
+    var exit = sineInOut((y - exit0) / Math.max(exit1 - exit0, 1));
+    return clamp01(enter) * (1 - clamp01(exit));
   }
 
   function tintChat(paper) {
@@ -44,48 +66,31 @@
     canvas.style.filter = next;
   }
 
-  function apply() {
-    var b = bridge.getBoundingClientRect();
-    var r = back.getBoundingClientRect();
-    var vh = window.innerHeight || 1;
-    var enter = centralSmoothstep(clamp01((vh - b.top) / Math.max(b.height, 1)));
-    var exit = centralSmoothstep(clamp01((vh - r.top) / Math.max(r.height, 1)));
-    var paper = enter * (1 - exit);
+  function publish(paper) {
     root.style.setProperty("--paper", paper.toFixed(4));
     window.__cosgralPaper = paper;
-    var ink = root.classList.contains("is-paper-ink");
-    if (!ink && paper > 0.48) root.classList.add("is-paper-ink");
-    else if (ink && paper < 0.36) root.classList.remove("is-paper-ink");
+    root.classList.remove("is-paper-ink");
     tintChat(paper);
   }
 
-  function requestDraw() {
-    if (scheduled) return;
-    scheduled = true;
-    requestAnimationFrame(function () {
-      scheduled = false;
-      apply();
-    });
-  }
-
-  window.addEventListener("scroll", requestDraw, { passive: true });
-  window.addEventListener("resize", requestDraw);
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", requestDraw);
-    window.visualViewport.addEventListener("scroll", requestDraw);
-  }
-
-  function bindLenis(tries) {
-    var api = window.cosgralSmoothScroll;
-    var lenis = api && api.lenis;
-    if (lenis && typeof lenis.on === "function") {
-      lenis.on("scroll", requestDraw);
-      return;
+  function tick() {
+    var next = goal();
+    if (!primed) {
+      shown = next;
+      primed = true;
+    } else {
+      shown += (next - shown) * LERP;
+      if (Math.abs(next - shown) < 0.0004) shown = next;
     }
-    if (tries > 40) return;
-    setTimeout(function () { bindLenis(tries + 1); }, 150);
+    publish(shown);
   }
-  bindLenis(0);
 
-  apply();
+  if (window.gsap && gsap.ticker) {
+    gsap.ticker.add(tick);
+  } else {
+    (function frame() {
+      tick();
+      requestAnimationFrame(frame);
+    })();
+  }
 })();
