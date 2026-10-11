@@ -87,13 +87,14 @@
     "  float x = (gl_FragCoord.x - vw * 0.5) / vh;",
     "  float halfW = vw * 0.5 / vh;",
     "  float aspect = vw / max(vh, 1.0);",
-    "  float k = aspect < 0.85 ? 1.12 : 1.38;",
-    "  float R = k * halfW;",
-    "  float edgeDrop = R - sqrt(max(R * R - halfW * halfW, 0.0001));",
-    "  float crest = mix(-0.06, 1.04 + edgeDrop, clamp(uLift, 0.0, 1.0));",
+    "  float drop = aspect < 0.85 ? 0.2 : 0.26;",
+    "  float R = (halfW * halfW + drop * drop) / (2.0 * drop);",
+    "  float crest = mix(-0.12, 1.06 + drop, clamp(uLift, 0.0, 1.0));",
     "  float cy = crest - R;",
-    "  float d = length(vec2(x, y - cy)) - R;",
-    "  float dPx = d * vh / max(uDpr, 1.0);",
+    "  float under = R * R - x * x;",
+    "  float arc = cy + sqrt(max(under, 0.0));",
+    "  float distVh = under < 0.0 ? 1.0 : (y - arc);",
+    "  float dPx = distVh * vh / max(uDpr, 1.0);",
     "  vec3 white = vec3(1.0);",
     "  vec3 yellow = vec3(1.0, 0.84, 0.2);",
     "  vec3 orange = vec3(1.0, 0.4, 0.04);",
@@ -217,25 +218,35 @@
       canvas.height = Math.max(1, Math.round(h));
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var halfW = canvas.width * 0.5;
-    var aspect = canvas.width / Math.max(canvas.height, 1);
-    var k = aspect < 0.85 ? 1.12 : 1.38;
-    var R = k * halfW;
-    var edgeDrop = R - Math.sqrt(Math.max(R * R - halfW * halfW, 0.0001));
-    var crest = -0.06 * canvas.height + lift * (1.04 * canvas.height + edgeDrop);
-    var cy = canvas.height - (crest - R);
-    var cx = canvas.width * 0.5;
-    var grd = ctx.createRadialGradient(cx, cy, Math.max(0, R - 2), cx, cy, R + 52);
-    grd.addColorStop(0, "#ffffff");
-    grd.addColorStop(Math.max(0, R / (R + 52) - 0.01), "#fff6e0");
-    grd.addColorStop(R / (R + 52), "#ffd12e");
-    grd.addColorStop((R + 14) / (R + 52), "#ff6a0d");
-    grd.addColorStop((R + 32) / (R + 52), "rgba(140,8,4,0.85)");
-    grd.addColorStop(1, "rgba(90,4,2,0)");
-    ctx.fillStyle = grd;
+    w = canvas.width;
+    h = canvas.height;
+    var aspect = w / Math.max(h, 1);
+    var halfW = w * 0.5;
+    var drop = (aspect < 0.85 ? 0.2 : 0.26) * h;
+    var R = (halfW * halfW + drop * drop) / (2 * drop);
+    var crest = -0.12 * h + lift * (1.06 * h + drop);
+    var cyTop = h - (crest - R);
     ctx.beginPath();
-    ctx.arc(cx, cy, R + 52, 0, Math.PI * 2);
+    ctx.moveTo(0, h);
+    for (var i = 0; i <= w; i += 4) {
+      var x = i - halfW;
+      var under = R * R - x * x;
+      var arc = under > 0 ? cyTop - Math.sqrt(under) : 0;
+      ctx.lineTo(i, arc);
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = "#fff";
     ctx.fill();
+    ctx.lineWidth = 70;
+    ctx.strokeStyle = "#ff4a08";
+    ctx.stroke();
+    ctx.lineWidth = 28;
+    ctx.strokeStyle = "#ffb01a";
+    ctx.stroke();
+    ctx.lineWidth = 12;
+    ctx.strokeStyle = "#fff4c4";
+    ctx.stroke();
   }
 
   var useGL = initGL();
