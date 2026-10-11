@@ -64,7 +64,7 @@ body.home-page::after {
   inset: 0;
   z-index: 9998;
   pointer-events: none;
-  opacity: 0.07;
+  opacity: calc(0.07 * (1 - var(--paper, 0)));
   mix-blend-mode: overlay;
   background-image: url("images/cosgral-agency/approved/charcoal-grain.jpg");
   background-size: 280px;
