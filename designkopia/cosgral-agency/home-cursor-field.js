@@ -110,9 +110,33 @@
     }, 420);
   }
 
+  function heroInView() {
+    var hero = document.getElementById("top");
+    if (!hero || !document.body.classList.contains("home-page")) return false;
+    var r = hero.getBoundingClientRect();
+    var vh = window.innerHeight || 1;
+    if (r.bottom <= 8 || r.top >= vh - 8) return false;
+    var visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+    return visible >= Math.min(vh, Math.max(r.height, 1)) * 0.42;
+  }
+
+  function syncGyroGate() {
+    if (!MOBILE || !needsIosPermission || orient.active || orient.permission === "denied") {
+      if (gateEl) gateEl.classList.add("is-away");
+      return;
+    }
+    if (!heroInView()) {
+      if (gateEl) gateEl.classList.add("is-away");
+      return;
+    }
+    showGate();
+    if (gateEl) gateEl.classList.remove("is-away");
+  }
+
   function showGate() {
     if (!MOBILE || gateEl || orient.active) return;
     if (orient.permission === "denied") return;
+    if (!heroInView()) return;
     gateEl = document.createElement("button");
     gateEl.type = "button";
     gateEl.className = "gyro-enable";
@@ -266,30 +290,18 @@
     if (remembered) {
       // Po wcześniejszym TURN ON 3D — od razu nasłuchuj na każdej podstronie.
       enableOrientation();
-      window.setTimeout(function () {
-        if (!orient.active && needsIosPermission) showGate();
-      }, 2200);
-      return;
-    }
-
-    if (needsIosPermission) {
-      var reveal = function () {
-        if (!orient.active) showGate();
-      };
-      if (document.body.classList.contains("is-ready")) reveal();
-      else {
-        window.addEventListener(
-          "load",
-          function () {
-            window.setTimeout(reveal, 700);
-          },
-          { once: true }
-        );
-        window.setTimeout(reveal, 4200);
-      }
-    } else {
+    } else if (!needsIosPermission) {
       requestOrientationAccess(false);
     }
+
+    /* Przycisk tylko na hero. Poza nim znika; na podstronach nie ma hero. */
+    window.addEventListener("scroll", syncGyroGate, { passive: true });
+    window.addEventListener("resize", syncGyroGate);
+    if (document.body.classList.contains("is-ready")) syncGyroGate();
+    window.addEventListener("load", function () {
+      window.setTimeout(syncGyroGate, 700);
+    });
+    window.setTimeout(syncGyroGate, remembered ? 2200 : 400);
   }
 
   armMobileGyro();

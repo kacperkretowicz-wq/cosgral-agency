@@ -619,6 +619,11 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.1rem var(--gutter);
   mix-blend-mode: difference;
+  transition: translate 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+body.home-page.is-nav-hidden:not(.is-nav-menu-open) .site-nav {
+  translate: 0 -110%;
+  pointer-events: none;
 }
 .site-nav__logo {
   display: inline-flex;
@@ -2496,6 +2501,9 @@ html.reduce-motion .reveal-word > span {
   50% { box-shadow: 0 0 0 7px var(--rail-ring, rgba(255, 255, 255, 0.1)), 0 0 18px var(--rail-glow, rgba(255, 255, 255, 0.42)); }
 }
 html.reduce-motion .home-scroll-rail { display: none; }
+@media (max-width: 768px) {
+  .home-scroll-rail { display: none !important; }
+}
 
 .home-scroll-rail__arrows {
   display: none !important;
@@ -3141,14 +3149,16 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
   text-transform: none;
   cursor: pointer;
   box-shadow: none;
-  transition: opacity 0.35s var(--ease, ease), border-color 0.45s ease;
+  opacity: 1;
+  transition: opacity 0.45s var(--ease, ease), border-color 0.45s ease;
 }
 .gyro-enable:hover,
 .gyro-enable:focus-visible {
   border-color: #fff;
   outline: none;
 }
-.gyro-enable.is-done {
+.gyro-enable.is-done,
+.gyro-enable.is-away {
   opacity: 0;
   pointer-events: none;
 }
@@ -3566,4 +3576,11 @@ html.reduce-motion #realizacje .reels-tiles__belt {
   #realizacje .portfolio-chapter--grid .home-work__grid {
     grid-template-rows: auto;
   }
+}
+@media (max-width: 768px) {
+  :root { --rail-safe: 0px; }
+  .home-scroll-rail { display: none !important; }
+}
+html.reduce-motion body.home-page .site-nav {
+  transition: none;
 }

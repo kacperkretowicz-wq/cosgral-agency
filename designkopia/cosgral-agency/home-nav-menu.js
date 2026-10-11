@@ -700,3 +700,62 @@
   window.cosgralNavMenu = { open: openNav, close: closeNav, isOpen: function () { return isOpen; } };
   bindLinkHover();
 })();
+
+/* Homepage: hide the bar on scroll down and on a sideways carousel swipe.
+   Scroll up brings it back. An open mega menu always keeps it on screen. */
+(function () {
+  "use strict";
+  if (!document.body || !document.body.classList.contains("home-page")) return;
+  var nav = document.getElementById("site-nav");
+  if (!nav) return;
+
+  var lastY = window.scrollY || window.pageYOffset || 0;
+  var acc = 0;
+
+  function menuOpen() {
+    return document.body.classList.contains("is-nav-menu-open");
+  }
+  function show() {
+    acc = 0;
+    document.body.classList.remove("is-nav-hidden");
+  }
+  function hide() {
+    if (menuOpen()) {
+      show();
+      return;
+    }
+    document.body.classList.add("is-nav-hidden");
+  }
+  function onScroll() {
+    var y = window.scrollY || window.pageYOffset || 0;
+    var dy = y - lastY;
+    lastY = y;
+    if (menuOpen() || y < 48) {
+      show();
+      return;
+    }
+    if (Math.abs(dy) < 1) return;
+    acc = dy > 0 ? (acc > 0 ? acc + dy : dy) : (acc < 0 ? acc + dy : dy);
+    if (acc > 28) hide();
+    else if (acc < -28) show();
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  var scroller = document.querySelector("[data-home-chapters] [data-chapters-scroller]");
+  if (scroller) {
+    var lastLeft = scroller.scrollLeft || 0;
+    scroller.addEventListener(
+      "scroll",
+      function () {
+        var left = scroller.scrollLeft || 0;
+        if (Math.abs(left - lastLeft) > 8) hide();
+        lastLeft = left;
+      },
+      { passive: true }
+    );
+  }
+
+  new MutationObserver(function () {
+    if (menuOpen()) show();
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+})();

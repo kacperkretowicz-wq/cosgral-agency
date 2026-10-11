@@ -427,12 +427,18 @@
 
   var pinY = null;
   var pinTimer = 0;
+  var pinLock = false;
   function holdPage() {
-    if (pinY == null) return;
+    if (pinY == null || pinLock) return;
     var now = window.scrollY || window.pageYOffset || 0;
     if (Math.abs(now - pinY) < 2) return;
-    if (window.lenis && window.lenis.scrollTo) window.lenis.scrollTo(pinY, { immediate: true });
+    pinLock = true;
+    var lenis = (window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis) || window.lenis;
+    if (lenis && lenis.scrollTo) lenis.scrollTo(pinY, { immediate: true });
     else window.scrollTo(0, pinY);
+    window.requestAnimationFrame(function () {
+      pinLock = false;
+    });
   }
   function beginPin() {
     if (!HOME) return;
@@ -728,7 +734,9 @@
         e.preventDefault();
         e.stopPropagation();
         scroller.classList.add("is-axis-x");
+        beginPin();
         scroller.scrollLeft += e.deltaX;
+        holdPage();
         if (wheelSnap) window.clearTimeout(wheelSnap);
         wheelSnap = window.setTimeout(function () {
           wheelSnap = 0;
