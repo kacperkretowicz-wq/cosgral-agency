@@ -3659,3 +3659,13 @@ main.home-film > .home-scene > .home-scene__panel > * {
   opacity: var(--iris-fade, 1);
   translate: 0 var(--iris-rise, 0px);
 }
+
+#cg-iris-rim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  will-change: opacity, background;
+}

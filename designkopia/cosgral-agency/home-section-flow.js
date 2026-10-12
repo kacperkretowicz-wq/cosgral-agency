@@ -398,27 +398,83 @@
     if (fadeOut && next) {
       var nextPanel = next.querySelector(".home-scene__panel") || next;
       var lastClip = "";
+      /* Sections with their own opaque fill (Kontakt) must be masked as a
+         whole, or their background slides in as a flat straight-edged wipe. */
+      var clipTarget = nextPanel;
+      var clipTargetResolved = false;
+      function resolveClipTarget() {
+        if (clipTargetResolved) return;
+        clipTargetResolved = true;
+        var bg = window.getComputedStyle(next).backgroundColor || "";
+        var m = bg.match(/rgba?\(([^)]+)\)/);
+        var alpha = m ? (m[1].split(",")[3] === undefined ? 1 : parseFloat(m[1].split(",")[3])) : 0;
+        if (alpha > 0.5) {
+          clipTarget = next;
+          nextPanel.style.clipPath = "";
+          nextPanel.style.webkitClipPath = "";
+        }
+      }
       var lastFade = "";
       /* Same iris language as the realizacje boards (spec-a circle mask,
          cubic-bezier(.25,1,.5,1)-like ease): the incoming scene opens from a
          circle rising at the bottom centre while the outgoing one recedes. */
-      function irisFor(amt) {
-        if (REDUCED) return "";
-        if (amt <= 0.001) return "circle(0px at 50% 50%)";
-        if (amt >= 0.985) return "";
+      /* Rising-dome iris: circle anchored at the bottom-centre of the screen,
+         radius kept inside the incoming scene's leading edge so the reveal is
+         always a clean arc (no straight wipe), then blooming to full frame. */
+      function irisRadius(amt) {
         var vw = window.innerWidth || 1;
         var vh = window.innerHeight || 1;
-        /* open the circle over the first 72% of the cover, then let it rest */
-        var a = Math.min(1, amt / 0.72);
-        var t = a < 0.5 ? 4 * a * a * a : 1 - Math.pow(-2 * a + 2, 3) / 2;
-        /* centre of the screen, expressed in the sliding panel's own box */
-        var top = nextPanel.getBoundingClientRect().top;
-        var cy = vh * 0.5 - top;
-        var r = t * Math.hypot(vw, vh) * 0.62;
-        return "circle(" + r.toFixed(1) + "px at 50% " + cy.toFixed(1) + "px)";
+        var full = Math.hypot(vw * 0.5, vh) + 24;
+        var dome = vh * amt * 0.985;
+        var k = Math.max(0, Math.min(1, (amt - 0.62) / 0.38));
+        k = k * k * (3 - 2 * k);
+        return dome + (full - dome) * k;
+      }
+      function irisFor(amt) {
+        if (REDUCED) return "";
+        if (amt <= 0.001) return "circle(0px at 50% 100%)";
+        if (amt >= 0.985) return "";
+        var vh = window.innerHeight || 1;
+        var top = clipTarget.getBoundingClientRect().top;
+        var cy = vh - top;
+        return "circle(" + irisRadius(amt).toFixed(1) + "px at 50% " + cy.toFixed(1) + "px)";
+      }
+      /* Glow rim riding the iris edge (pins4 #03/#04): navy beam between
+         sections, orange plasma into Kontakt. One accent per viewport. */
+      var rimColor = next.id === "kontakt" ? "255, 106, 40" : "58, 123, 213";
+      function irisRim() {
+        var el = document.getElementById("cg-iris-rim");
+        if (!el) {
+          el = document.createElement("div");
+          el.id = "cg-iris-rim";
+          el.setAttribute("aria-hidden", "true");
+          document.body.appendChild(el);
+        }
+        return el;
+      }
+      function syncRim(amt) {
+        if (REDUCED) return;
+        var el = irisRim();
+        var live = amt > 0.02 && amt < 0.9;
+        if (!live) {
+          if (el.__owner === scene.id || !el.__owner) {
+            el.style.opacity = "0";
+            el.__owner = null;
+          }
+          return;
+        }
+        el.__owner = scene.id;
+        var a = Math.min(1, amt / 0.85);
+        var r = irisRadius(amt);
+        var glow = Math.sin(Math.PI * a);
+        el.style.background =
+          "radial-gradient(circle at 50% 100%, transparent " + Math.max(0, r - 2).toFixed(0) + "px, rgba(" + rimColor + ", 0.55) " + r.toFixed(0) + "px, rgba(" + rimColor + ", 0.16) " + (r + 34).toFixed(0) + "px, transparent " + (r + 120).toFixed(0) + "px)";
+        el.style.opacity = (glow * 0.9).toFixed(3);
       }
       function syncCover() {
         var amt = coverAmount();
+        syncRim(amt);
+        if (amt > 0.001) resolveClipTarget();
         var clip = irisFor(amt);
         /* Content follows the mask: headings fade/rise in only once the
            circle has opened past them, so the edge never slices a title. */
@@ -431,8 +487,8 @@
           lastFade = cfs;
         }
         if (clip !== lastClip || (amt > 0.001 && amt < 0.985)) {
-          nextPanel.style.clipPath = clip;
-          nextPanel.style.webkitClipPath = clip;
+          clipTarget.style.clipPath = clip;
+          clipTarget.style.webkitClipPath = clip;
           lastClip = clip;
         }
         applyPose(amt);
@@ -702,7 +758,7 @@
       priority: 2,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 10,
       hideWhenGone: true,
       onEnter: function () {
         /* Nie lockuj cinema wcześnie — shatter-beat prowadzi do Usługi top */
@@ -757,7 +813,7 @@
       priority: 3,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 10,
       hideWhenGone: true,
       onEnter: function () {
         lockSandStream();
@@ -774,7 +830,7 @@
       priority: 4,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 10,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
@@ -788,7 +844,7 @@
       priority: 5,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 10 : 18,
+      exitBlur: MOBILE ? 0 : 10,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
