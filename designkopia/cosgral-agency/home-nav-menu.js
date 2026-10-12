@@ -717,7 +717,11 @@
   }
   function show() {
     acc = 0;
-    document.body.classList.remove("is-nav-hidden");
+    /* Only touch the class when it is set: remove() on an absent class still
+       queues a class mutation, which re-fired the observer below forever. */
+    if (document.body.classList.contains("is-nav-hidden")) {
+      document.body.classList.remove("is-nav-hidden");
+    }
   }
   function hide() {
     if (menuOpen()) {
