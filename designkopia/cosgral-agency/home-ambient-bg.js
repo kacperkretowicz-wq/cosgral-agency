@@ -228,6 +228,10 @@
       if (document.hidden) return;
       var mustDraw = forceDraw;
       forceDraw = false;
+      /* Never hold a stale frame while the paper (cream) blend is moving:
+         on phones the scroll pause froze an old, darker frame between boards. */
+      var paperNow = window.__cosgralPaper || 0;
+      if (uPaper && Math.abs(paperNow - lastPaper) > 0.01) mustDraw = true;
       if (!mustDraw && MOBILE && now < scrollPauseUntil) return;
       var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
       var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 5 : 3) : MOBILE ? 3 : 1);
