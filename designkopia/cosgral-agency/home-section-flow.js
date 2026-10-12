@@ -410,8 +410,8 @@
         var alpha = m ? (m[1].split(",")[3] === undefined ? 1 : parseFloat(m[1].split(",")[3])) : 0;
         if (alpha > 0.5) {
           clipTarget = next;
-          nextPanel.style.clipPath = "";
-          nextPanel.style.webkitClipPath = "";
+          nextPanel.style.maskImage = "";
+          nextPanel.style.webkitMaskImage = "";
         }
       }
       var lastFade = "";
@@ -432,12 +432,15 @@
       }
       function irisFor(amt) {
         if (REDUCED) return "";
-        if (amt <= 0.001) return "circle(0px at 50% 100%)";
+        if (amt <= 0.001) return "radial-gradient(circle 0px at 50% 100%, #000 0, transparent 0)";
         if (amt >= 0.985) return "";
         var vh = window.innerHeight || 1;
         var top = clipTarget.getBoundingClientRect().top;
         var cy = vh - top;
-        return "circle(" + irisRadius(amt).toFixed(1) + "px at 50% " + cy.toFixed(1) + "px)";
+        var r = irisRadius(amt);
+        /* feathered edge: a soft 90px falloff instead of a hard cut */
+        var feather = Math.min(90, r * 0.35);
+        return "radial-gradient(circle " + r.toFixed(1) + "px at 50% " + cy.toFixed(1) + "px, #000 " + Math.max(0, r - feather).toFixed(1) + "px, transparent " + r.toFixed(1) + "px)";
       }
       /* Glow rim riding the iris edge (pins4 #03/#04): navy beam between
          sections, orange plasma into Kontakt. One accent per viewport. */
@@ -478,7 +481,7 @@
         var clip = irisFor(amt);
         /* Content follows the mask: headings fade/rise in only once the
            circle has opened past them, so the edge never slices a title. */
-        var cf = REDUCED ? 1 : Math.max(0, Math.min(1, (amt - 0.32) / 0.4));
+        var cf = REDUCED ? 1 : Math.max(0, Math.min(1, (amt - 0.58) / 0.34));
         cf = cf * cf * (3 - 2 * cf);
         var cfs = cf.toFixed(3);
         if (cfs !== lastFade) {
@@ -487,8 +490,8 @@
           lastFade = cfs;
         }
         if (clip !== lastClip || (amt > 0.001 && amt < 0.985)) {
-          clipTarget.style.clipPath = clip;
-          clipTarget.style.webkitClipPath = clip;
+          clipTarget.style.maskImage = clip;
+          clipTarget.style.webkitMaskImage = clip;
           lastClip = clip;
         }
         applyPose(amt);
