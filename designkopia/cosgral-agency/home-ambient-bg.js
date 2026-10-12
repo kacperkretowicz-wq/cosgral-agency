@@ -178,6 +178,7 @@
     var dprCap = SCALE_BY_TIER[0];
     var tierSkip = SKIP_BY_TIER[0];
 
+    var forceDraw = false;
     function resize() {
       var dpr = dprCap;
       var w = Math.round(window.innerWidth * dpr);
@@ -186,6 +187,17 @@
         canvas.width = w;
         canvas.height = h;
         gl.viewport(0, 0, w, h);
+        /* Resizing clears the buffer to black (alpha:false). Repaint on the very
+           next frame, ignoring skip/scroll-pause, or a perf-tier change mid-scroll
+           flashed a black frame over the cream field (Wybrane -> Strony). */
+        forceDraw = true;
+        if (typeof program !== "undefined" && program && typeof quad !== "undefined") {
+          gl.useProgram(program);
+          gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+          gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+          gl.uniform2f(uRes, w, h);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+        }
       }
     }
 
@@ -214,13 +226,15 @@
       if (!running) return;
       requestAnimationFrame(frame);
       if (document.hidden) return;
-      if (MOBILE && now < scrollPauseUntil) return;
+      var mustDraw = forceDraw;
+      forceDraw = false;
+      if (!mustDraw && MOBILE && now < scrollPauseUntil) return;
       var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
       var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 5 : 3) : MOBILE ? 3 : 1);
       var paper = window.__cosgralPaper || 0;
       var paperMoved = uPaper && Math.abs(paper - lastPaper) > 0.0006;
       frameSkip += 1;
-      if (skipN > 1 && frameSkip % skipN !== 0 && !paperMoved) return;
+      if (!mustDraw && skipN > 1 && frameSkip % skipN !== 0 && !paperMoved) return;
       var ptr = window.cosgralPointer;
       if (ptr) {
         mouse.tx = ptr.nx;
