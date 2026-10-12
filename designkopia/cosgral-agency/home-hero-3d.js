@@ -1,7 +1,7 @@
 /** One glass model, a reversible scroll choreography, and a soft optical wake. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261012editorial3';
-import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial3';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261012editorial4';
+import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 
 (async function () {

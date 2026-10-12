@@ -84,9 +84,11 @@ export function createOpticalWake(THREE,scene,count){
     get visible(){return mesh.visible;},
     setPath(points){for(let i=0;i<4;i++)uniforms['uP'+i].value.copy(points[i]);},
     update({time,progress,menuBlend,scale,pointerX,pointerY,fade}){
-      mesh.visible=progress>0.008&&fade>0&&menuBlend<0.99;
+      mesh.visible=progress>0.008&&progress<0.998&&fade>0&&menuBlend<0.99;
       uniforms.uTime.value=time;uniforms.uProgress.value=progress;uniforms.uMenu.value=menuBlend;
-      uniforms.uScale.value=scale;uniforms.uFade.value=fade;uniforms.uPointer.value.set(pointerX,pointerY);
+      const t=THREE.MathUtils.clamp((progress-0.84)/0.16,0,1);
+      const tailFade=1-t*t*(3-2*t);
+      uniforms.uScale.value=scale;uniforms.uFade.value=fade*tailFade;uniforms.uPointer.value.set(pointerX,pointerY);
     }
   };
 }
