@@ -161,7 +161,10 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   m.transparent = true;
-  m.depthWrite = false;
+  // A closed solid already gets a rear-face transmission pass in r170.
+  // Use depth for the front surface and avoid two extra alpha-blended draws.
+  m.forceSinglePass = true;
+  m.depthWrite = true;
   m.customProgramCacheKey = () => 'cosgral-glass-swirl-v1';
   const mesh = new THREE.Mesh(geometry, m);
   mesh.name = 'CosgralGlassCube';
@@ -308,7 +311,9 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
     }
     const ambient = window.cosgralAmbientFrame;
     if (ambient) {
-      backdropMaterial.uniforms.uTime.value = ambient.time;
+      // Let refracted light keep flowing while the full-page background is
+      // paused behind navigation. Both clocks reconnect without a phase jump.
+      backdropMaterial.uniforms.uTime.value = ambient.time + (performance.now() - (ambient.at || performance.now())) / 1000;
       backdropMaterial.uniforms.uMouse.value.set(ambient.mouse.x, ambient.mouse.y);
     }
   };

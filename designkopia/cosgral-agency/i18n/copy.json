@@ -1126,5 +1126,83 @@
       "pl": "W projekcie ważna jest czytelność: najpierw stan, potem zmiana w czasie i sygnał wymagający uwagi. Dzięki temu panel wspiera szybkie decyzje operacyjne.",
       "en": "Clarity matters here: first the current state, then change over time, then the signal requiring attention. The panel supports quick operational decisions."
     }
+  },
+  "editorial": {
+    "hero_note": {
+      "pl": "Od pierwszej idei.<br>Do ostatniego detalu.",
+      "en": "From the first idea.<br>To the final detail."
+    },
+    "services_index": {
+      "pl": "01 / Nasze możliwości",
+      "en": "01 / What we do"
+    },
+    "services_lead": {
+      "pl": "Łączymy projektowanie z technologią. Tworzymy strony, produkty i systemy, które działają razem.",
+      "en": "We connect design with technology. We build websites, products and systems that work together."
+    },
+    "work_index": {
+      "pl": "02 / Wybrane realizacje",
+      "en": "02 / Selected work"
+    },
+    "work_note": {
+      "pl": "Cztery obszary.<br>Jedna perspektywa.",
+      "en": "Four disciplines.<br>One perspective."
+    },
+    "composition": {
+      "pl": "Kompozycja",
+      "en": "Composition"
+    },
+    "grid": {
+      "pl": "Siatka",
+      "en": "Grid"
+    },
+    "wipe_lead": {
+      "pl": "Strategia spotyka formę.",
+      "en": "Where strategy meets form."
+    },
+    "wipe_title": {
+      "pl": "OD POMYSŁU.<br>DO EFEKTU.",
+      "en": "FROM IDEA.<br>TO IMPACT."
+    },
+    "faq_index": {
+      "pl": "03 / FAQ",
+      "en": "03 / FAQ"
+    },
+    "faq_note": {
+      "pl": "Prosto i konkretnie",
+      "en": "Clear and simple"
+    },
+    "process_note": {
+      "pl": "Dobry efekt zaczyna się od dobrego procesu.",
+      "en": "Good outcomes start with a good process."
+    },
+    "process_title": {
+      "pl": "ZA FORMĄ.<br>STOI PROCES.",
+      "en": "BEHIND THE FORM.<br>THERE IS PROCESS."
+    },
+    "portfolio_note": {
+      "pl": "Kreacja + technologia",
+      "en": "Creativity + technology"
+    },
+    "apps_art": {
+      "pl": "IDEA.<br>INTERFEJS.<br>PRODUKT.",
+      "en": "IDEA.<br>INTERFACE.<br>PRODUCT."
+    },
+    "seo_art": {
+      "pl": "DAJ SIĘ<br><em>ZNALEŹĆ.</em>",
+      "en": "GET<br><em>FOUND.</em>"
+    },
+    "auto_art": {
+      "pl": "MNIEJ<br>RUTYNY.<br>WIĘCEJ<br>MOŻLIWOŚCI.",
+      "en": "LESS<br>ROUTINE.<br>MORE<br>IMPACT."
+    },
+    "crm_art": {
+      "pl": "Wszystko.<br>W jednym.",
+      "en": "Everything.<br>Connected."
+    },
+    "gyro_label": {
+      "pl": "Włącz żyroskop",
+      "en": "Enable gyroscope"
+    }
   }
 }

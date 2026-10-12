@@ -121,8 +121,11 @@
     gateEl.type = "button";
     gateEl.className = "gyro-enable";
     gateEl.setAttribute("data-no-transition", "");
-    gateEl.setAttribute("aria-label", "TURN ON 3D");
-    gateEl.textContent = "TURN ON 3D";
+    gateEl.setAttribute("data-i18n", "editorial.gyro_label");
+    gateEl.setAttribute("data-i18n-aria-label", "editorial.gyro_label");
+    var gyroLabel = window.cosgralI18n?.t("editorial.gyro_label") || "Włącz żyroskop";
+    gateEl.setAttribute("aria-label", gyroLabel);
+    gateEl.textContent = gyroLabel;
     gateEl.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();

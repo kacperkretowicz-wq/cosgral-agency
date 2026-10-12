@@ -1,13 +1,14 @@
 /** One glass model, a reversible scroll choreography, and a soft optical wake. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261012refine1';
-import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012refine1';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261012editorial3';
+import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial3';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
   if (!canvas || document.documentElement.classList.contains('reduce-motion')) return;
   const HALF = 1.35;
+  const glassLook={glass:{iridescence:0.12,dispersion:0.25,edgeGlow:0.12,envMapIntensity:1.15,farSideDim:0.38,thickness:0.7},env:{power:1.5,sheen:0.4}};
   const clamp = THREE.MathUtils.clamp;
   const smooth = (a,b,x) => {const p=clamp((x-a)/(b-a),0,1);return p*p*(3-2*p);};
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -66,7 +67,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
   function heroSize(){return 0.92*(mobile?Math.min(width*0.57,height*0.27):Math.min(width*0.31,height*0.34));}
   function menuSize(){return Math.min(width*(mobile?0.72:0.54),height*0.55);}
   function updatePath(){
-    screenPosition(width*0.5,height*(mobile?0.29:0.265),0.36,path[0]);
+    screenPosition(width*0.5,height*(mobile?0.31:0.30),0.36,path[0]);
     screenPosition(width*0.80,height*0.27,0.80,path[1]);
     screenPosition(width*0.36,height*0.85,-0.05,path[2]);
     screenPosition(-width*0.18,-height*0.12,-0.8,path[3]);
@@ -136,8 +137,8 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     if(!reduced)pose.position.y+=Math.sin(time*0.60)*0.045*idle;
     const turn=smooth(0.015,0.95,progress),bank=Math.sin(progress*Math.PI)*0.12;
     const drift=reduced?0:idle;
-    euler.set(0.48+turn*Math.PI*0.12-pointerY*0.10*idle+Math.sin(time*0.37)*0.065*drift,
-      -0.72+turn*Math.PI*0.46+pointerX*0.16*idle+Math.sin(time*0.29)*0.10*drift,
+    euler.set(0.15+turn*Math.PI*0.12-pointerY*0.10*idle+Math.sin(time*0.37)*0.065*drift,
+      -0.18+turn*Math.PI*0.34+pointerX*0.16*idle+Math.sin(time*0.29)*0.10*drift,
       -bank+pointerX*0.020*idle+Math.sin(time*0.41)*0.024*drift);
     pose.quaternion.setFromEuler(euler);
     const grow=1+Math.sin(progress*Math.PI)*(mobile?0.14:0.22);
@@ -184,7 +185,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     // reset. Rebuild that studio together with the model before resuming.
     try {
       const previous=glass;
-      glass=await installGlassCube(THREE,renderer,scene,group,HALF);
+      glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
       if(previous){
         group.remove(previous);scene.remove(previous.userData.transmissionBackdrop);
         previous.geometry.dispose();previous.material.dispose();previous.userData.environmentTarget?.dispose();
@@ -201,7 +202,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     wakeContextLost=false;wakeRenderer.setPixelRatio(pixelRatio);wakeRenderer.setSize(width,height,false);
   });
   try{
-    glass=await installGlassCube(THREE,renderer,scene,group,HALF);
+    glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
     canvas.parentElement.classList.add('has-glass-model');
   }catch(error){
     canvas.parentElement.classList.add('has-cube-fallback');
@@ -232,7 +233,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     if(!introDone&&progress<0.01&&menuBlend<0.01){
       pose.position.x+=(1-intro)*worldHeight(0.36)*camera.aspect*0.8;
       pose.position.y-=(1-intro)*worldHeight(0.36)*0.45;
-      pose.quaternion.setFromEuler(euler.set(0.48+(1-intro)*0.25,-0.72-(1-intro)*0.70,(1-intro)*0.15));
+      pose.quaternion.setFromEuler(euler.set(0.15+(1-intro)*0.25,-0.18-(1-intro)*0.55,(1-intro)*0.15));
       pose.scale*=0.78+intro*0.22;
     }
     if(menuBlend>0){
@@ -256,15 +257,22 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*24));group.updateMatrixWorld(true);
     const dissolve=1-smooth(0.76,0.98,progress);
     glass.material.opacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
+    glass.material.depthWrite=glass.material.opacity>0.995;
     glass.visible=glass.material.opacity>0.008;group.visible=glass.visible&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');
     const servicesVisible=window.cosgralSand?.servicesVisible;
-    wake.update({time,progress,menuBlend,scale:pose.scale,pointerX,pointerY,fade:footer?0:servicesVisible?0.58:1});
+    const covered=document.documentElement.classList.contains('is-ambient-covered');
+    wake.update({time,progress,menuBlend,scale:pose.scale,pointerX,pointerY,fade:footer||covered?0:0.65});
     const portalVisible=!(footer&&menuBlend<0.01);
     if(portalVisible!==lastPortalVisible){canvas.parentElement.style.visibility=portalVisible?'visible':'hidden';lastPortalVisible=portalVisible;}
     if(footer&&menuBlend<0.01)return;
-    if(!group.visible&&!wake.visible)return;
+    if(!group.visible&&!wake.visible){
+      canvas.style.visibility='hidden';
+      if(wakeWasVisible&&!wakeContextLost)wakeRenderer.clear();
+      wakeWasVisible=false;
+      return;
+    }
     if(now<effectPauseUntil)return;
     // UI and input still update at the display rate; expensive effect renders
     // are capped at 60Hz on 120/144/240Hz monitors.

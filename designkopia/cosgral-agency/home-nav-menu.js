@@ -429,7 +429,7 @@
       }
       var target = document.getElementById(id);
       if (target && window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1 });
+        window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1, offset: -94 });
       } else if (target) {
         target.scrollIntoView({ behavior: "smooth" });
       }
