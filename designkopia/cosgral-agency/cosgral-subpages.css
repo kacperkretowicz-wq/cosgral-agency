@@ -5010,10 +5010,3 @@ html.reduce-motion .portfolio-intro__lead {
 }
 .portfolio-page--showcase .home-scroll-rail__title { display: none !important; }
 .portfolio-page--showcase .home-scroll-rail { opacity: 0.5; }
-
-/* Hide-on-scroll-down bar for subpages (mirrors the homepage). */
-.site-nav { transition: translate 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
-body.is-nav-hidden:not(.is-nav-menu-open) .site-nav {
-  translate: 0 -110%;
-  pointer-events: none;
-}

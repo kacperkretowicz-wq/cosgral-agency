@@ -703,25 +703,3 @@ body.is-nav-open .cg-chat-root,
     transform: translateX(-50%);
   }
 }
-
-/* Systems circle board owns the bottom of the screen — fade the chat cube out. */
-html.is-systems-board .cg-chat-launcher {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform: translateY(12px) scale(0.92);
-  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Short phones (iPhone SE/8, 667px): the centred cube sat on top of section
-   copy (Proces steps, Kontakt heading). Smaller, lower, label hidden. */
-@media (max-width: 900px) and (max-height: 720px) {
-  .cg-chat-root {
-    bottom: calc(0.9rem + env(safe-area-inset-bottom, 0px));
-  }
-  .cg-chat-launcher {
-    --cg-chat-cube: 3.3rem;
-  }
-  .cg-chat-launcher .cg-chat-label {
-    display: none;
-  }
-}

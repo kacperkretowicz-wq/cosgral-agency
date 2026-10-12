@@ -352,8 +352,6 @@
       dot.setAttribute("data-sys-fan-dot", String(i));
       dot.setAttribute("role", "tab");
       dot.setAttribute("aria-label", item.title);
-      /* Thumbnail of the system in each small circle (spec: thumb arc). */
-      if (item.img) dot.style.setProperty("--sys-thumb", 'url("' + item.img + '")');
       if (i === index) dot.setAttribute("aria-current", "true");
       dot.addEventListener("click", function (e) {
         e.stopPropagation();
@@ -643,12 +641,7 @@
       if (destroyed) return;
       var casesNow = getCases();
       var nearest = clampIndex(Math.round(index), n);
-      /* Measure relative to the fan root, not the viewport: the chapter can sit
-         off-screen (horizontal realizacje rail) when layout runs, which used
-         to bake huge negative offsets into the cards. */
-      var rootRect0 = root.getBoundingClientRect();
-      var stageRect0 = stage.getBoundingClientRect();
-      var stageRect = { left: stageRect0.left - rootRect0.left, top: stageRect0.top - rootRect0.top };
+      var stageRect = stage.getBoundingClientRect();
       var vw = window.innerWidth || 1;
       var vh = window.innerHeight || 1;
       var mobile = vw < 760;
@@ -669,35 +662,13 @@
       if (pill && !root.classList.contains("is-iris-open")) {
         var slot = circlePose(0);
         pill.style.left = slot.x - stageRect.left + "px";
-        /* Sit the pill in the upper half of the front disc: the thumb arc
-           covers the lower half, which used to hide "Zobacz więcej". */
-        pill.style.top = slot.y - stageRect.top - (mobile ? vw * 0.2 : vw * 0.135) + "px";
+        pill.style.top = slot.y - stageRect.top + vw * 0.045 + "px";
       }
       if (navEl && dotsEl) {
-        var navRect0 = navEl.getBoundingClientRect();
-        var navRect = {
-          left: navRect0.left - rootRect0.left,
-          top: navRect0.top - rootRect0.top,
-          bottom: navRect0.bottom - rootRect0.top,
-        };
+        var navRect = navEl.getBoundingClientRect();
         var arcCx = vw * 0.5;
+        var arcCy = mobile ? navRect.bottom - 4 : vh * 0.989;
         var arcR = vw * (mobile ? 0.34 : 0.2925);
-        /* Hang the thumb arc just below the front disc so the selected thumb
-           never sits on top of the big circle (was overlapping ~40%). */
-        var frontCard = cards[nearest] || cards[0];
-        var cardR = frontCard ? frontCard.offsetHeight / 2 : vw * 0.2;
-        var dotR = dotButtons[0] ? dotButtons[0].offsetWidth / 2 : vw * 0.05;
-        var frontPose = circlePose(0);
-        var arcTop = frontPose.y + cardR + dotR + (mobile ? 10 : 14);
-        arcTop = Math.min(arcTop, vh - dotR - 6);
-        var arcCy = arcTop + arcR;
-        var semiEl = root.querySelector(".sys-fan__semi");
-        if (semiEl) {
-          var semiH = Math.max(40, vh - (arcTop + dotR * 1.7));
-          semiEl.style.height = semiH + "px";
-          semiEl.style.width = semiH * 2 + "px";
-          semiEl.style.borderRadius = semiH + "px " + semiH + "px 0 0";
-        }
         var stepAng = mobile ? 36 : 47.5;
         dotButtons.forEach(function (dot, i) {
           var raw = wrapRaw(i);
@@ -706,7 +677,7 @@
           var y = arcCy - Math.cos(ang) * arcR;
           var on = i === nearest;
           var show = Math.abs(raw) < 2.35 && y < vh + 4;
-          // arc is anchored to the front disc now; no nav-box clipping
+          if (mobile) show = show && y > navRect.top + 2;
           dot.style.left = x - navRect.left + "px";
           dot.style.top = y - navRect.top + "px";
           dot.style.opacity = show ? "1" : "0";
@@ -1225,33 +1196,6 @@
       });
     }
     if (autoplay) startAuto();
-
-    /* While the systems circle fills the screen, park the live-chat cube:
-       it sat right on the thumb semicircle. Also re-layout on entry so the
-       arc is measured in its final on-screen position. */
-    if (circle && "IntersectionObserver" in window) {
-      var boardIO = new IntersectionObserver(
-        function (entries) {
-          var e0 = entries[entries.length - 1];
-          var on = e0.isIntersecting && e0.intersectionRatio > 0.55;
-          document.documentElement.classList.toggle("is-systems-board", on);
-          if (on && !destroyed) layout();
-        },
-        { threshold: [0, 0.55, 0.8, 1] }
-      );
-      boardIO.observe(root);
-      window.addEventListener("keydown", function (e) {
-        if (destroyed || root.classList.contains("is-iris-open")) return;
-        if (!document.documentElement.classList.contains("is-systems-board")) return;
-        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-        var t = e.target;
-        if (t && t.closest && t.closest("input, textarea, select, [contenteditable]")) return;
-        e.preventDefault();
-        stopAuto();
-        nudge(e.key === "ArrowRight" ? 1 : -1);
-        if (autoplay) startAuto();
-      });
-    }
 
     var api = {
       root: root,

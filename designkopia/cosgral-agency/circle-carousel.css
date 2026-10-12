@@ -38,8 +38,8 @@
 /* Big circles — 40vw, thin light ring, grayscale UI stills */
 #realizacje .sys-fan--circle .sys-fan__card,
 #realizacje .sys-fan--circle .sys-fan__card.is-front {
-  width: min(40vw, 58vh);
-  height: min(40vw, 58vh);
+  width: 40vw;
+  height: 40vw;
   aspect-ratio: auto;
   border: 0 !important;
   border-radius: 50%;
@@ -468,47 +468,4 @@ html.reduce-motion .sys-iris__copy,
 html.reduce-motion .sys-iris__hint,
 html.reduce-motion .sys-iris__neck {
   transition: none !important;
-}
-
-/* Thumb circles: show the system still, softened onto the cream arc. */
-#realizacje .sys-fan--circle .sys-fan__dot::before {
-  content: "";
-  position: absolute;
-  inset: 8%;
-  border-radius: 50%;
-  background: var(--sys-thumb) center / cover no-repeat;
-  filter: grayscale(1) contrast(1.05);
-  opacity: 0.55;
-  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), inset 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-#realizacje .sys-fan--circle .sys-fan__dot:hover::before { opacity: 0.85; }
-#realizacje .sys-fan--circle .sys-fan__dot.is-active::before { opacity: 1; inset: 6%; }
-#realizacje .sys-fan--circle .sys-fan__dot.is-active::after {
-  z-index: 1;
-  width: 14%;
-  height: 14%;
-  box-shadow: 0 0 0 3px #f7f3ec;
-}
-
-/* Smaller thumbs on desktop; the arc now hangs under the front disc. */
-@media (min-width: 761px) {
-  #realizacje .sys-fan--circle .sys-fan__dot {
-    width: min(7.2vw, 11vh) !important;
-    height: min(7.2vw, 11vh) !important;
-  }
-}
-/* Description open: tuck the thumb arc away so it never covers the copy. */
-#realizacje .sys-fan--circle .sys-fan__semi,
-#realizacje .sys-fan--circle .sys-fan__dot {
-  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-#realizacje .sys-fan--circle.is-iris-open .sys-fan__nav {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: opacity 0.4s ease;
-}
-
-@media (max-width: 760px) {
-  /* keep the open description clear of the iris neck at the bottom */
-  .sys-iris__copy { bottom: 25vh; bottom: 25svh; max-height: 33vh; max-height: 33svh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2.5rem; -webkit-mask-image: linear-gradient(#000 calc(100% - 3rem), transparent); mask-image: linear-gradient(#000 calc(100% - 3rem), transparent); }
 }

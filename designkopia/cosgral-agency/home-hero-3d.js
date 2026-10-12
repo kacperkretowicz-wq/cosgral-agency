@@ -876,32 +876,13 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       { passive: true }
     );
   }
-  var servicesElCache = null;
-  function introActiveNow() {
-    return typeof introStarted !== "undefined" && introStarted && typeof introDone !== "undefined" && !introDone;
-  }
-  var mobileCubeFade = 1;
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
     /* While the page is moving, keep the last hero frame. The draw is the stall. */
-    /* Phones: if the last drawn frame still holds the cube but services is
-       already up (fast flick / menu jump), don't freeze on that stale frame. */
-    var staleCube = false;
-    if (MOBILE && cubeGroup && cubeGroup.visible && menuTween.blend < 0.001) {
-      var se = servicesElCache || (servicesElCache = document.getElementById("uslugi"));
-      if (se && se.getBoundingClientRect().top < (window.innerHeight || 800) * 0.28) staleCube = true;
-    }
-    if (staleCube && !introActiveNow()) {
-      /* drop the cube from the frame right now (menu jump / fast flick) */
-      cubeGroup.visible = false;
-      if (shards) shards.visible = false;
-      mobileCubeFade = 0;
-      try { renderScene(); } catch (e) {}
-    }
-    if (!staleCube && LOW_PERF && menuTween.blend < 0.001 && performance.now() < scrollPauseUntil) return;
+    if (LOW_PERF && menuTween.blend < 0.001 && performance.now() < scrollPauseUntil) return;
     /* Off-screen mobile: skip the whole tick, not only the WebGL draw. */
-    if (!staleCube && LOW_PERF && !zoneVisible && menuTween.blend < 0.001) {
+    if (LOW_PERF && !zoneVisible && menuTween.blend < 0.001) {
       offZoneGated = true;
       if (++offZoneTick % outOfZoneEvery !== 0) return;
     } else {
@@ -977,14 +958,13 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     var heroZ = 0.36;
     var heroScale = CUBE_SCALE * HERO_SCALE_MUL;
     var peakScale = CUBE_SCALE * PEAK_SCALE_MUL;
-    var cornerX = MOBILE ? 5.6 : 6.1; /* exit fully past the corner; it used to park over the services heading */
-    var cornerY = MOBILE ? 4.3 : 4.3;
+    var cornerX = MOBILE ? 4.35 : 5.55;
+    var cornerY = MOBILE ? 3.05 : 3.85;
     var centerX = mouse.x * 0.028;
     var centerY = mouse.y * 0.018;
 
     var approach = smooth01(0, 0.34, motion);
-    /* Phones: leave sooner so a fast flick never parks the cube over the first service card. */
-    var depart = MOBILE ? smooth01(0.26, 0.7, motion) : smooth01(0.32, 0.93, motion);
+    var depart = smooth01(0.32, 0.93, motion);
     var heroReady = document.body.classList.contains("is-ready");
     var inHero = motion < 0.01 && menuBlend < 0.001;
 
@@ -1159,26 +1139,6 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     root.rotation.set(0, 0, 0);
 
     var cubeVisible = depart < 0.93;
-    /* Phones: the scrubbed motion lags a fast flick, so also gate on where the
-       services scene really is — once its heading is up, the cube is gone. */
-    if (MOBILE && cubeVisible && menuBlend < 0.001) {
-      var svcEl = servicesElCache || (servicesElCache = document.getElementById("uslugi"));
-      var vhh = window.innerHeight || 800;
-      var svcTop = svcEl ? svcEl.getBoundingClientRect().top : vhh;
-      var target = smooth01(vhh * 0.28, vhh * 0.62, svcTop);
-      /* jumps (menu / anchors) far past services: no lingering dissolve */
-      if (svcTop < -vhh * 0.5) mobileCubeFade = 0;
-      /* ease toward the target so even a fast flick dissolves the cube instead of popping it */
-      mobileCubeFade += (target - mobileCubeFade) * (target < mobileCubeFade ? 0.22 : 0.3);
-      if (Math.abs(target - mobileCubeFade) < 0.003) mobileCubeFade = target;
-      if (mobileCubeFade < 0.01) cubeVisible = false;
-    } else if (!MOBILE || menuBlend >= 0.001) {
-      mobileCubeFade = 1;
-    } else {
-      var svcEl2 = servicesElCache || (servicesElCache = document.getElementById("uslugi"));
-      var vh2 = window.innerHeight || 800;
-      mobileCubeFade = svcEl2 ? smooth01(vh2 * 0.28, vh2 * 0.62, svcEl2.getBoundingClientRect().top) : 1;
-    }
 
     var tilesOp = readUslugiPanelOpacity();
 
@@ -1249,7 +1209,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       shell.material.opacity = SHELL_OP * cubeDim;
       edges.material.opacity = EDGE_OP * cubeDim;
     } else {
-      var fade = cubeVisible ? (MOBILE ? mobileCubeFade : 1) : 0;
+      var fade = cubeVisible ? 1 : 0;
       sMat.uniforms.uFade.value = fade;
       shell.material.opacity = SHELL_OP * fade;
       setWireOpacity(wire, 0.12 * fade);
@@ -1259,11 +1219,6 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       }
     }
 
-    /* Final phone gate (after intro overrides): once the services scene is up,
-       the hero cube is never drawn over later sections, e.g. after a menu jump. */
-    if (MOBILE && menuBlend < 0.001 && mobileCubeFade < 0.01) {
-      cubeVisible = false;
-    }
     cubeGroup.visible = cubeVisible;
     homeCubeVisible = cubeVisible && menuBlend < 0.001;
 
@@ -1374,7 +1329,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     // W strefie sześcianu i przy otwartym menu zawsze pełna liczba klatek.
     // Poza nią częstotliwość ustala sterownik jakości (na tier 0 też co klatkę).
     var fullRate = zoneVisible || menuBlend > 0.001;
-    if (!staleCube && !offZoneGated && !fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
+    if (!offZoneGated && !fullRate && outOfZoneEvery > 1 && offZoneTick++ % outOfZoneEvery !== 0) return;
 
     camera.position.set(mouse.x * 0.08, mouse.y * 0.05, 5.4);
     camera.lookAt(0, 0, 0);

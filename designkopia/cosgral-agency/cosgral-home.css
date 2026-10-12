@@ -29,10 +29,6 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { background: var(--bg); }
-/* Phones: bleeding carousels/rails widened the layout viewport (390 -> 448 on
-   iPhone), which zoomed the page out and pushed the fixed cube canvas off to the
-   right. Clip horizontal overflow at the root so fixed layers match the screen. */
-html:has(body.home-page) { overflow-x: clip; }
 body.home-page {
   background: transparent;
   color: var(--ink);
@@ -3639,36 +3635,4 @@ html.reduce-motion body.home-page .site-nav {
   body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
     filter: brightness(0.34) saturate(0.7);
   }
-}
-
-/* iOS: dvh changes every time Safari's toolbar collapses/expands, which
-   re-laid out every sticky scene mid-scroll (pins shaking, content jumping).
-   Use the stable small viewport for content panels so nothing is cut under
-   the toolbar and nothing re-flows while scrolling. */
-@supports (height: 1svh) {
-  @media (hover: none) and (pointer: coarse) {
-    main.home-film > .home-scene { min-height: 100svh; }
-    .home-hero { height: 100svh; }
-    .home-hero .home-scene__panel { min-height: 100svh; }
-    html.is-free-scroll .cube-runway { height: 50svh; }
-  }
-}
-
-/* Iris handoff: incoming scene content trails the circle mask. */
-main.home-film .home-scene__panel > * {
-  opacity: var(--iris-fade, 1);
-  translate: 0 var(--iris-rise, 0px);
-}
-
-
-
-/* Depth-push handoff: incoming panel settles from a slight over-scale. */
-main.home-film .home-scene__panel { scale: var(--push-scale, 1); }
-/* Opaque-fill scenes (Kontakt) fade their fill in instead of wiping up. */
-main.home-film > #kontakt.home-scene { background-color: rgba(3, 3, 3, var(--push-bg, 1)); }
-
-/* Realizacje receding into FAQ: only the current board recedes; neighbours
-   (e.g. the systems board's cream arc) no longer poke into frame. */
-#realizacje.is-depth-recessed .portfolio-chapter:not(.is-active) {
-  visibility: hidden;
 }

@@ -323,10 +323,7 @@
       }
       var u = easeInOut((p - holdEnd) / Math.max(1 - holdEnd, 0.001));
       /* Pod koniec przyspiesz zanik — w połowie jeszcze widać, przy cover=1 już nie */
-      /* Clear the receding scene by ~65% of the cover so the incoming one
-         never double-exposes over it (same cinematic recess, no ghosting). */
-      var fq = Math.min(1, u / 0.65);
-      var fade = fq * fq * (3 - 2 * fq);
+      var fade = u * u;
       /* opacity (nie autoAlpha) — klikalne w trakcie blur / transition */
       gsap.set(panel, {
         opacity: 1 - (1 - exitAlpha) * fade,
@@ -396,30 +393,8 @@
     /* Recess z live rect następnej — pełny zakres scrolla, bo sticky psuje
        start/end ST i zostawiał lukę (Kontakt na ostrym Procesie). */
     if (fadeOut && next) {
-      var nextPanel = next.querySelector(".home-scene__panel") || next;
-      var lastPush = "";
-      /* Depth push (same language as the realizacje boards: scale + soft
-         crossfade + content after): the outgoing scene recedes (applyPose),
-         the incoming one settles from a slight over-scale, its own fill fades
-         in, and its content appears only once it has fully landed — so no
-         heading is ever cut by an edge. No masks, no glows. */
-      function easeOutExpo(t) {
-        return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
-      }
       function syncCover() {
         var amt = coverAmount();
-        var push = REDUCED ? 1 : easeOutExpo(Math.max(0, Math.min(1, amt)));
-        var bgA = REDUCED ? 1 : Math.max(0, Math.min(1, amt / 0.6));
-        var cf = REDUCED ? 1 : Math.max(0, Math.min(1, (amt - 0.72) / 0.26));
-        cf = cf * cf * (3 - 2 * cf);
-        var key = push.toFixed(3) + "|" + bgA.toFixed(3) + "|" + cf.toFixed(3);
-        if (key !== lastPush) {
-          lastPush = key;
-          next.style.setProperty("--push-bg", bgA.toFixed(3));
-          nextPanel.style.setProperty("--push-scale", (1.06 - 0.06 * push).toFixed(4));
-          nextPanel.style.setProperty("--iris-fade", cf.toFixed(3));
-          nextPanel.style.setProperty("--iris-rise", ((1 - cf) * 22).toFixed(1) + "px");
-        }
         applyPose(amt);
         if (opts.onUpdate) opts.onUpdate({ progress: amt });
       }
@@ -687,7 +662,7 @@
       priority: 2,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 0 : 10,
+      exitBlur: MOBILE ? 10 : 18,
       hideWhenGone: true,
       onEnter: function () {
         /* Nie lockuj cinema wcześnie — shatter-beat prowadzi do Usługi top */
@@ -742,7 +717,7 @@
       priority: 3,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 0 : 10,
+      exitBlur: MOBILE ? 10 : 18,
       hideWhenGone: true,
       onEnter: function () {
         lockSandStream();
@@ -759,7 +734,7 @@
       priority: 4,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 0 : 10,
+      exitBlur: MOBILE ? 10 : 18,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
@@ -773,7 +748,7 @@
       priority: 5,
       exitAlpha: 0,
       exitScale: MOBILE ? 0.8 : 0.7,
-      exitBlur: MOBILE ? 0 : 10,
+      exitBlur: MOBILE ? 10 : 18,
       hideWhenGone: true,
       onEnter: lockSandStream,
       onEnterBack: lockSandStream,
