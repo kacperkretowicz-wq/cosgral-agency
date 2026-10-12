@@ -397,102 +397,28 @@
        start/end ST i zostawiał lukę (Kontakt na ostrym Procesie). */
     if (fadeOut && next) {
       var nextPanel = next.querySelector(".home-scene__panel") || next;
-      var lastClip = "";
-      /* Sections with their own opaque fill (Kontakt) must be masked as a
-         whole, or their background slides in as a flat straight-edged wipe. */
-      var clipTarget = nextPanel;
-      var clipTargetResolved = false;
-      function resolveClipTarget() {
-        if (clipTargetResolved) return;
-        clipTargetResolved = true;
-        var bg = window.getComputedStyle(next).backgroundColor || "";
-        var m = bg.match(/rgba?\(([^)]+)\)/);
-        var alpha = m ? (m[1].split(",")[3] === undefined ? 1 : parseFloat(m[1].split(",")[3])) : 0;
-        if (alpha > 0.5) {
-          clipTarget = next;
-          nextPanel.style.maskImage = "";
-          nextPanel.style.webkitMaskImage = "";
-        }
-      }
-      var lastFade = "";
-      /* Same iris language as the realizacje boards (spec-a circle mask,
-         cubic-bezier(.25,1,.5,1)-like ease): the incoming scene opens from a
-         circle rising at the bottom centre while the outgoing one recedes. */
-      /* Rising-dome iris: circle anchored at the bottom-centre of the screen,
-         radius kept inside the incoming scene's leading edge so the reveal is
-         always a clean arc (no straight wipe), then blooming to full frame. */
-      function irisRadius(amt) {
-        var vw = window.innerWidth || 1;
-        var vh = window.innerHeight || 1;
-        var full = Math.hypot(vw * 0.5, vh) + 24;
-        var dome = vh * amt * 0.985;
-        var k = Math.max(0, Math.min(1, (amt - 0.62) / 0.38));
-        k = k * k * (3 - 2 * k);
-        return dome + (full - dome) * k;
-      }
-      function irisFor(amt) {
-        if (REDUCED) return "";
-        if (amt <= 0.001) return "radial-gradient(circle 0px at 50% 100%, #000 0, transparent 0)";
-        if (amt >= 0.985) return "";
-        var vh = window.innerHeight || 1;
-        var top = clipTarget.getBoundingClientRect().top;
-        var cy = vh - top;
-        var r = irisRadius(amt);
-        /* feathered edge: a soft 90px falloff instead of a hard cut */
-        var feather = Math.min(90, r * 0.35);
-        return "radial-gradient(circle " + r.toFixed(1) + "px at 50% " + cy.toFixed(1) + "px, #000 " + Math.max(0, r - feather).toFixed(1) + "px, transparent " + r.toFixed(1) + "px)";
-      }
-      /* Glow rim riding the iris edge (pins4 #03/#04): navy beam between
-         sections, orange plasma into Kontakt. One accent per viewport. */
-      var rimColor = next.id === "kontakt" ? "255, 106, 40" : "58, 123, 213";
-      function irisRim() {
-        var el = document.getElementById("cg-iris-rim");
-        if (!el) {
-          el = document.createElement("div");
-          el.id = "cg-iris-rim";
-          el.setAttribute("aria-hidden", "true");
-          document.body.appendChild(el);
-        }
-        return el;
-      }
-      function syncRim(amt) {
-        if (REDUCED) return;
-        var el = irisRim();
-        var live = amt > 0.02 && amt < 0.9;
-        if (!live) {
-          if (el.__owner === scene.id || !el.__owner) {
-            el.style.opacity = "0";
-            el.__owner = null;
-          }
-          return;
-        }
-        el.__owner = scene.id;
-        var a = Math.min(1, amt / 0.85);
-        var r = irisRadius(amt);
-        var glow = Math.sin(Math.PI * a);
-        el.style.background =
-          "radial-gradient(circle at 50% 100%, transparent " + Math.max(0, r - 2).toFixed(0) + "px, rgba(" + rimColor + ", 0.55) " + r.toFixed(0) + "px, rgba(" + rimColor + ", 0.16) " + (r + 34).toFixed(0) + "px, transparent " + (r + 120).toFixed(0) + "px)";
-        el.style.opacity = (glow * 0.9).toFixed(3);
+      var lastPush = "";
+      /* Depth push (same language as the realizacje boards: scale + soft
+         crossfade + content after): the outgoing scene recedes (applyPose),
+         the incoming one settles from a slight over-scale, its own fill fades
+         in, and its content appears only once it has fully landed — so no
+         heading is ever cut by an edge. No masks, no glows. */
+      function easeOutExpo(t) {
+        return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
       }
       function syncCover() {
         var amt = coverAmount();
-        syncRim(amt);
-        if (amt > 0.001) resolveClipTarget();
-        var clip = irisFor(amt);
-        /* Content follows the mask: headings fade/rise in only once the
-           circle has opened past them, so the edge never slices a title. */
-        var cf = REDUCED ? 1 : Math.max(0, Math.min(1, (amt - 0.58) / 0.34));
+        var push = REDUCED ? 1 : easeOutExpo(Math.max(0, Math.min(1, amt)));
+        var bgA = REDUCED ? 1 : Math.max(0, Math.min(1, amt / 0.6));
+        var cf = REDUCED ? 1 : Math.max(0, Math.min(1, (amt - 0.72) / 0.26));
         cf = cf * cf * (3 - 2 * cf);
-        var cfs = cf.toFixed(3);
-        if (cfs !== lastFade) {
-          nextPanel.style.setProperty("--iris-fade", cfs);
-          nextPanel.style.setProperty("--iris-rise", ((1 - cf) * 28).toFixed(1) + "px");
-          lastFade = cfs;
-        }
-        if (clip !== lastClip || (amt > 0.001 && amt < 0.985)) {
-          clipTarget.style.maskImage = clip;
-          clipTarget.style.webkitMaskImage = clip;
-          lastClip = clip;
+        var key = push.toFixed(3) + "|" + bgA.toFixed(3) + "|" + cf.toFixed(3);
+        if (key !== lastPush) {
+          lastPush = key;
+          next.style.setProperty("--push-bg", bgA.toFixed(3));
+          nextPanel.style.setProperty("--push-scale", (1.06 - 0.06 * push).toFixed(4));
+          nextPanel.style.setProperty("--iris-fade", cf.toFixed(3));
+          nextPanel.style.setProperty("--iris-rise", ((1 - cf) * 22).toFixed(1) + "px");
         }
         applyPose(amt);
         if (opts.onUpdate) opts.onUpdate({ progress: amt });

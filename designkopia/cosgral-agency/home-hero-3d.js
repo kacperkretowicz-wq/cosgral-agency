@@ -877,6 +877,9 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     );
   }
   var servicesElCache = null;
+  function introActiveNow() {
+    return typeof introStarted !== "undefined" && introStarted && typeof introDone !== "undefined" && !introDone;
+  }
   var mobileCubeFade = 1;
   function animate() {
     requestAnimationFrame(animate);
@@ -888,6 +891,13 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     if (MOBILE && cubeGroup && cubeGroup.visible && menuTween.blend < 0.001) {
       var se = servicesElCache || (servicesElCache = document.getElementById("uslugi"));
       if (se && se.getBoundingClientRect().top < (window.innerHeight || 800) * 0.28) staleCube = true;
+    }
+    if (staleCube && !introActiveNow()) {
+      /* drop the cube from the frame right now (menu jump / fast flick) */
+      cubeGroup.visible = false;
+      if (shards) shards.visible = false;
+      mobileCubeFade = 0;
+      try { renderScene(); } catch (e) {}
     }
     if (!staleCube && LOW_PERF && menuTween.blend < 0.001 && performance.now() < scrollPauseUntil) return;
     /* Off-screen mobile: skip the whole tick, not only the WebGL draw. */

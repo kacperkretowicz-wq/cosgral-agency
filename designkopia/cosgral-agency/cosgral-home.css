@@ -3655,17 +3655,20 @@ html.reduce-motion body.home-page .site-nav {
 }
 
 /* Iris handoff: incoming scene content trails the circle mask. */
-main.home-film > .home-scene > .home-scene__panel > * {
+main.home-film .home-scene__panel > * {
   opacity: var(--iris-fade, 1);
   translate: 0 var(--iris-rise, 0px);
 }
 
-#cg-iris-rim {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0;
-  mix-blend-mode: screen;
-  will-change: opacity, background;
+
+
+/* Depth-push handoff: incoming panel settles from a slight over-scale. */
+main.home-film .home-scene__panel { scale: var(--push-scale, 1); }
+/* Opaque-fill scenes (Kontakt) fade their fill in instead of wiping up. */
+main.home-film > #kontakt.home-scene { background-color: rgba(3, 3, 3, var(--push-bg, 1)); }
+
+/* Realizacje receding into FAQ: only the current board recedes; neighbours
+   (e.g. the systems board's cream arc) no longer poke into frame. */
+#realizacje.is-depth-recessed .portfolio-chapter:not(.is-active) {
+  visibility: hidden;
 }
