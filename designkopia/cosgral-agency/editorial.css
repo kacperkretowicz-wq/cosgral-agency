@@ -227,3 +227,8 @@ body.editorial-page {background:var(--carbon); color:var(--paper);line-height:1.
   .tone-wipe {height:60svh;}.tone-wipe__sticky{height:60svh;position:relative;}.tone-wipe__surface{clip-path:none;}
   .art-tile__art,.project-card {transition:none;}
 }
+@media (max-width:600px) and (max-height:600px) {
+  .editorial-hero .home-hero__content {bottom:16%;padding-block:0;}
+  .hero-caption {bottom:22px;}
+  .hero-caption__right {display:none;}
+}
