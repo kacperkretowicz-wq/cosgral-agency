@@ -140,12 +140,16 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     var visualFade = 1;
     var running = true;
     var last = performance.now();
+    var lastRender = 0;
+    var pointerRect = null;
+    var pointerRectAt = 0;
     var LOOK = MOBILE ? 0.48 : 0.58;
     var IDLE_SPIN = MOBILE ? 0.2 : 0.26;
     /* Mega-menu style dim when chat panel is open (~40% darker). */
     var OPEN_DIM = 0.58;
 
     function resize() {
+      pointerRect = null;
       var rect = canvas.getBoundingClientRect();
       var w = Math.max(1, Math.round(rect.width));
       var h = Math.max(1, Math.round(rect.height));
@@ -178,7 +182,12 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
         return;
       }
 
-      var rect = canvas.getBoundingClientRect();
+      var now = performance.now();
+      if (!pointerRect || now - pointerRectAt > 250) {
+        pointerRect = canvas.getBoundingClientRect();
+        pointerRectAt = now;
+      }
+      var rect = pointerRect;
       var cx = rect.left + rect.width * 0.5;
       var cy = rect.top + rect.height * 0.5;
       var px = ptr.x != null ? ptr.x : window.innerWidth * 0.5;
@@ -207,6 +216,8 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
         scrollHidden ||
         (canvas.offsetParent === null && getComputedStyle(canvas).visibility === "hidden");
       if (hidden) return;
+      if (now - lastRender < 28) return;
+      lastRender = now;
 
       if (open) {
         /* Face front + dim — same language as mega-menu cube settle. */

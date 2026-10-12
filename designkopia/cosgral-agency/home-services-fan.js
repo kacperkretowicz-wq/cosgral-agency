@@ -36,7 +36,7 @@
   var wheelAccumX = 0;
   var wheelCooldown = false;
   var lastNavAt = 0;
-  var NAV_COOLDOWN_MS = 620;
+  var NAV_COOLDOWN_MS = 260;
   var WHEEL_THRESHOLD = 165;
   var HORIZONTAL_RATIO = 2.4;
   var wheelDecayTimer = null;
@@ -181,6 +181,9 @@
 
   /* Usługi w kadrze (IO threshold 0.35) — bramka odtwarzania wideo w layout(). */
   var videoZoneVisible = false;
+  var videoPlayback = new WeakMap();
+  var cardVideos = cards.map(function (card) { return card.querySelector("video"); });
+  window.addEventListener("cosgral:menu-state", function () { layout(displayPos); });
 
   function ensureVideoSrc(video) {
     if (!video || video.getAttribute("src")) return;
@@ -192,6 +195,7 @@
 
   function layout(position) {
     var activeIndex = ((Math.round(wrapPos(position)) % total) + total) % total;
+    var mayPlay = videoZoneVisible && !document.body.classList.contains("is-nav-menu-open") && !document.hidden;
 
     cards.forEach(function (card, i) {
       var o = wrapOffset(i, position);
@@ -216,15 +220,19 @@
       card.tabIndex = isActive ? 0 : -1;
       card.style.pointerEvents = isActive ? "auto" : "none";
 
-      var video = card.querySelector("video");
+      var video = cardVideos[i];
       if (video) {
         /* Odtwarzaj tylko, gdy Usługi są w kadrze — wcześniej aktywna karta grała
            od załadowania strony (4 MB + dekodowanie w tle przez całe intro hero).
            Wejście sekcji w kadr woła layout() ponownie (IntersectionObserver niżej). */
-        if (isActive && videoZoneVisible) {
-          ensureVideoSrc(video);
-          video.play().catch(function () {});
-        } else video.pause();
+        var shouldPlay = isActive && mayPlay;
+        if (videoPlayback.get(video) !== shouldPlay) {
+          videoPlayback.set(video, shouldPlay);
+          if (shouldPlay) {
+            ensureVideoSrc(video);
+            video.play().catch(function () {});
+          } else if (!video.paused) video.pause();
+        }
       }
     });
 
@@ -306,40 +314,46 @@
 
   function goTo(nextIndex) {
     var wrapped = ((nextIndex % total) + total) % total;
-    if (wrapped === index && Math.abs(shortestDelta(displayPos, wrapped)) < 0.05) return;
+    if (wrapped === targetPos && Math.abs(shortestDelta(displayPos, wrapped)) < 0.05) return;
     targetPos = wrapped;
+    if (REDUCED) { displayPos = wrapped; layout(wrapped); return; }
     scheduleTick();
   }
 
   function next() {
-    goTo(index + 1);
+    goTo(targetPos + 1);
   }
 
   function prev() {
-    goTo(index - 1);
+    goTo(targetPos - 1);
   }
 
   var ticking = false;
+  var lastTickAt = 0;
   function scheduleTick() {
     if (ticking || REDUCED) return;
     ticking = true;
     requestAnimationFrame(tick);
   }
 
-  function tick() {
+  function tick(now) {
     ticking = false;
     var delta = shortestDelta(displayPos, targetPos);
     if (Math.abs(delta) > 0.01) {
       fan.classList.add("is-animating");
-      displayPos = wrapPos(displayPos + delta * LERP);
+      var dt = Math.min(0.05, Math.max(0.001, (now - (lastTickAt || now - 16.7)) / 1000));
+      lastTickAt = now;
+      displayPos = wrapPos(displayPos + delta * (1 - Math.exp(-dt * (MOBILE ? 20 : 18))));
       layout(displayPos);
       scheduleTick();
     } else if (Math.abs(delta) > 0.0005) {
       displayPos = targetPos;
       layout(displayPos);
       fan.classList.remove("is-animating");
+      lastTickAt = 0;
     } else {
       fan.classList.remove("is-animating");
+      lastTickAt = 0;
     }
   }
 
@@ -528,6 +542,7 @@
   }
 
   layout(0);
+  document.addEventListener("visibilitychange", function () { layout(displayPos); });
   scheduleTick();
 
   // Warm video sources once Usługi is near the viewport (40% vh before).

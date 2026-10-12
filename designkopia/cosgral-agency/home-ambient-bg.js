@@ -136,6 +136,7 @@
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
   var start = performance.now();
+  window.cosgralAmbientFrame = { time: 0, mouse: mouse };
   var lastFrameTime = 0;
 
   var SCALE_BY_TIER = MOBILE ? [0.55, 0.45, 0.38] : [0.52, 0.44, 0.36];
@@ -165,6 +166,10 @@
 
   function frame(now) {
     if (!running) return;
+    if (document.documentElement.classList.contains("is-nav-menu-open")) {
+      requestAnimationFrame(frame);
+      return;
+    }
 
     // Kiedy użytkownik jest w sekcji Kontakt lub Stopka, nieprzezroczyste tło (#030303)
     // całkowicie zasłania ten canvas — wstrzymujemy rysowanie (0% GPU/CPU na dole strony).
@@ -189,7 +194,8 @@
     mouse.y += (mouse.ty - mouse.y) * 0.06;
 
     gl.uniform2f(uRes, canvas.width, canvas.height);
-    gl.uniform1f(uTime, (now - start) / 1000);
+    window.cosgralAmbientFrame.time = (now - start) / 1000;
+    gl.uniform1f(uTime, window.cosgralAmbientFrame.time);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
