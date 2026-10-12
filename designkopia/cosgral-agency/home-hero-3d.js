@@ -877,6 +877,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
     );
   }
   var servicesElCache = null;
+  var mobileCubeFade = 1;
   function animate() {
     requestAnimationFrame(animate);
     if (document.hidden) return;
@@ -1145,7 +1146,14 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
        services scene really is — once its heading is up, the cube is gone. */
     if (MOBILE && cubeVisible && menuBlend < 0.001) {
       var svcEl = servicesElCache || (servicesElCache = document.getElementById("uslugi"));
-      if (svcEl && svcEl.getBoundingClientRect().top < (window.innerHeight || 800) * 0.3) cubeVisible = false;
+      var vhh = window.innerHeight || 800;
+      var target = svcEl ? smooth01(vhh * 0.28, vhh * 0.62, svcEl.getBoundingClientRect().top) : 1;
+      /* ease toward the target so even a fast flick dissolves the cube instead of popping it */
+      mobileCubeFade += (target - mobileCubeFade) * (target < mobileCubeFade ? 0.22 : 0.3);
+      if (Math.abs(target - mobileCubeFade) < 0.003) mobileCubeFade = target;
+      if (mobileCubeFade < 0.01) cubeVisible = false;
+    } else {
+      mobileCubeFade = 1;
     }
 
     var tilesOp = readUslugiPanelOpacity();
@@ -1217,7 +1225,7 @@ import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=202609
       shell.material.opacity = SHELL_OP * cubeDim;
       edges.material.opacity = EDGE_OP * cubeDim;
     } else {
-      var fade = cubeVisible ? 1 : 0;
+      var fade = cubeVisible ? (MOBILE ? mobileCubeFade : 1) : 0;
       sMat.uniforms.uFade.value = fade;
       shell.material.opacity = SHELL_OP * fade;
       setWireOpacity(wire, 0.12 * fade);
