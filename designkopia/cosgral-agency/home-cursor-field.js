@@ -9,10 +9,6 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
-  var noGyroPages =
-    document.body.classList.contains("graphics-gallery-page") ||
-    document.body.classList.contains("reels-gallery-page");
-
   var COARSE = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
@@ -114,15 +110,39 @@
     }, 420);
   }
 
+  function heroInView() {
+    var hero = document.getElementById("top");
+    if (!hero || !document.body.classList.contains("home-page")) return false;
+    var r = hero.getBoundingClientRect();
+    var vh = window.innerHeight || 1;
+    if (r.bottom <= 8 || r.top >= vh - 8) return false;
+    var visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+    return visible >= Math.min(vh, Math.max(r.height, 1)) * 0.42;
+  }
+
+  function syncGyroGate() {
+    if (!MOBILE || !needsIosPermission || orient.active || orient.permission === "denied") {
+      if (gateEl) gateEl.classList.add("is-away");
+      return;
+    }
+    if (!heroInView()) {
+      if (gateEl) gateEl.classList.add("is-away");
+      return;
+    }
+    showGate();
+    if (gateEl) gateEl.classList.remove("is-away");
+  }
+
   function showGate() {
     if (!MOBILE || gateEl || orient.active) return;
     if (orient.permission === "denied") return;
+    if (!heroInView()) return;
     gateEl = document.createElement("button");
     gateEl.type = "button";
     gateEl.className = "gyro-enable";
     gateEl.setAttribute("data-no-transition", "");
-    gateEl.setAttribute("aria-label", "TURN ON 3D");
-    gateEl.textContent = "TURN ON 3D";
+    gateEl.setAttribute("aria-label", "Włącz żyroskop");
+    gateEl.textContent = "Włącz żyroskop";
     gateEl.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -238,16 +258,16 @@
       state.y = (-state.ny * 0.5 + 0.5) * window.innerHeight;
       state.fromOrientation = true;
     } else if (MOBILE) {
-      state.x += (state.tx - state.x) * 0.18;
-      state.y += (state.ty - state.y) * 0.18;
-      state.nx += (state.tnx - state.nx) * 0.18;
-      state.ny += (state.tny - state.ny) * 0.18;
+      state.x += (state.tx - state.x) * 0.12;
+      state.y += (state.ty - state.y) * 0.12;
+      state.nx += (state.tnx - state.nx) * 0.12;
+      state.ny += (state.tny - state.ny) * 0.12;
       state.fromOrientation = false;
     } else {
-      state.x += (state.tx - state.x) * 0.20;
-      state.y += (state.ty - state.y) * 0.20;
-      state.nx += (state.tnx - state.nx) * 0.20;
-      state.ny += (state.tny - state.ny) * 0.20;
+      state.x += (state.tx - state.x) * 0.08;
+      state.y += (state.ty - state.y) * 0.08;
+      state.nx += (state.tnx - state.nx) * 0.08;
+      state.ny += (state.tny - state.ny) * 0.08;
       state.fromOrientation = false;
     }
     applyPointer();
@@ -270,33 +290,21 @@
     if (remembered) {
       // Po wcześniejszym TURN ON 3D — od razu nasłuchuj na każdej podstronie.
       enableOrientation();
-      window.setTimeout(function () {
-        if (!orient.active && needsIosPermission) showGate();
-      }, 2200);
-      return;
-    }
-
-    if (needsIosPermission) {
-      var reveal = function () {
-        if (!orient.active) showGate();
-      };
-      if (document.body.classList.contains("is-ready")) reveal();
-      else {
-        window.addEventListener(
-          "load",
-          function () {
-            window.setTimeout(reveal, 700);
-          },
-          { once: true }
-        );
-        window.setTimeout(reveal, 4200);
-      }
-    } else {
+    } else if (!needsIosPermission) {
       requestOrientationAccess(false);
     }
+
+    /* Przycisk tylko na hero. Poza nim znika; na podstronach nie ma hero. */
+    window.addEventListener("scroll", syncGyroGate, { passive: true });
+    window.addEventListener("resize", syncGyroGate);
+    if (document.body.classList.contains("is-ready")) syncGyroGate();
+    window.addEventListener("load", function () {
+      window.setTimeout(syncGyroGate, 700);
+    });
+    window.setTimeout(syncGyroGate, remembered ? 2200 : 400);
   }
 
-  if (!noGyroPages) armMobileGyro();
+  armMobileGyro();
   applyPointer();
   requestAnimationFrame(tick);
 })();

@@ -9,11 +9,24 @@
 <link rel="manifest" href="site.webmanifest" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Polityka prywatności — cosgral.agency</title>
-<meta name="description" content="Polityka prywatności i informacje o przetwarzaniu danych kontaktowych w cosgral.agency." />
+<meta name="description" content="Polityka prywatności COSGRAL — informacje o przetwarzaniu danych osobowych, plikach cookies oraz prawach użytkownika zgodnie z RODO." />
+<link rel="canonical" href="https://cosgral.pl/privacy-policy.html" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pl_PL" />
+<meta property="og:site_name" content="COSGRAL" />
+<meta property="og:url" content="https://cosgral.pl/privacy-policy.html" />
+<meta property="og:title" content="Polityka prywatności — cosgral.agency" />
+<meta property="og:description" content="Polityka prywatności COSGRAL — informacje o przetwarzaniu danych osobowych, plikach cookies oraz prawach użytkownika zgodnie z RODO." />
+<meta property="og:image" content="https://cosgral.pl/og-cover.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://cosgral.pl/og-cover.png" />
+<meta name="theme-color" content="#050505" />
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260924polish1" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" />
+<link rel="stylesheet" href="cosgral-subpages.css?v=20261011menu" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
-<link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
+<link rel="stylesheet" href="page-transitions.css?v=20260920ui10" />
+<link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
 <script>
   (function () {
     if (sessionStorage.getItem("cosgral-page-transition")) {
@@ -21,10 +34,11 @@
     }
   })();
 </script>
-<script src="page-transitions.js?v=20260924hash1"></script>
+<script src="cookie-consent.js?v=20261001a"></script>
+<script src="page-transitions.js?v=20260925fix21"></script>
 <script src="cosgral-motion-pref.js?v=20260919a"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
-  <link rel="stylesheet" href="site-chat.css?v=20260922ui51" />
+<link rel="stylesheet" href="site-chat.css?v=20261011scroll" />
 </head>
 <body class="subpage privacy-page">
 <a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
@@ -60,10 +74,10 @@
 <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
   <div class="nav-overlay__backdrop" data-nav-close></div>
   <div class="nav-overlay__stage">
-    <nav class="nav-overlay__links" aria-label="Menu główne">
+    <nav class="nav-overlay__links" aria-label="Menu główne" data-i18n-aria-label="nav_overlay.main_menu">
       <ul class="nav-overlay__list">
         <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
-        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="index.html#realizacje" data-nav-close data-i18n="nav.work">Realizacje</a></li>
         <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
         <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
@@ -77,23 +91,40 @@
 <main id="main">
   <article class="privacy-content">
     <h1 data-i18n="privacy.title">Polityka prywatności</h1>
-    <p class="privacy-content__updated" data-i18n="privacy.updated">Ostatnia aktualizacja: sierpień 2026</p>
-    <p class="privacy-content__intro" data-i18n="privacy.intro">Dbamy o Twoje dane. Poniżej krótko opisujemy, co zbieramy i po co — bez zbędnego żargonu.</p>
+    <p class="privacy-content__updated" data-i18n="privacy.updated">Ostatnia aktualizacja: wrzesień 2026</p>
+    <p class="privacy-content__intro" data-i18n="privacy.intro">Zależy nam na Twojej prywatności. Poniżej znajdziesz pełne informacje o tym, jakie dane zbieramy, w jakim celu i na jakiej podstawie — zgodnie z art. 13 RODO.</p>
 
-    <h2 data-i18n="privacy.s1_title">Administrator</h2>
-    <p data-i18n="privacy.s1_body">Administratorem danych jest cosgral.agency (kontakt: kontakt@cosgral.pl).</p>
+    <h2 data-i18n="privacy.s1_title">Administrator danych</h2>
+    <p data-i18n="privacy.s1_body">Administratorem Twoich danych osobowych jest Jakub Gral i Kacper Kosikowski prowadzący agencję cyfrową COSGRAL (marka nieposiadająca rejestracji jako podmiot gospodarczy). Kontakt w sprawach danych: kontakt@cosgral.pl.</p>
 
     <h2 data-i18n="privacy.s2_title">Jakie dane zbieramy</h2>
-    <p data-i18n="privacy.s2_body">Przez formularz kontaktowy lub e-mail możemy otrzymać imię, adres e-mail, nazwę firmy oraz treść wiadomości. Telefony podane na stronie służą wyłącznie do kontaktu biznesowego.</p>
+    <p data-i18n="privacy.s2_body">Za pośrednictwem formularza kontaktowego lub e-maila możemy otrzymać: imię i nazwisko, adres e-mail, nazwę firmy oraz treść wiadomości. Numery telefonów podane na stronie służą wyłącznie do kontaktu biznesowego.</p>
 
-    <h2 data-i18n="privacy.s3_title">Cel i podstawa</h2>
-    <p data-i18n="privacy.s3_body">Dane przetwarzamy, aby odpowiedzieć na zapytanie i prowadzić rozmowę o współpracy (art. 6 ust. 1 lit. b lub f RODO — wykonanie działań przed umową / prawnie uzasadniony interes).</p>
+    <h2 data-i18n="privacy.s3_title">Cel i podstawa prawna</h2>
+    <p data-i18n="privacy.s3_body">Dane przetwarzamy w celu odpowiedzi na zapytanie i prowadzenia rozmów o współpracy (art. 6 ust. 1 lit. b RODO — działania przed zawarciem umowy) lub na podstawie prawnie uzasadnionego interesu (art. 6 ust. 1 lit. f RODO).</p>
 
-    <h2 data-i18n="privacy.s4_title">Jak długo przechowujemy</h2>
-    <p data-i18n="privacy.s4_body">Korespondencję trzymamy tak długo, jak jest potrzebna do obsługi zapytania i ewentualnej współpracy, a potem usuwamy lub archiwizujemy zgodnie z obowiązującymi przepisami.</p>
+    <h2 data-i18n="privacy.s4_title">Rozliczenia i faktury</h2>
+    <p data-i18n="privacy.s4_body">Usługi COSGRAL mogą być rozliczane za pośrednictwem platformy Useme, systemu płatności Stripe lub przez podmiot trzeci (osoba fizyczna prowadząca działalność gospodarczą powiązana z agencją). Dane niezbędne do wystawienia faktury przetwarzamy wyłącznie w celu realizacji umowy i obowiązków rachunkowych (art. 6 ust. 1 lit. c RODO).</p>
 
-    <h2 data-i18n="privacy.s5_title">Twoje prawa</h2>
-    <p data-i18n="privacy.s5_body">Masz prawo dostępu, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu oraz skargi do Prezesa UODO. W sprawach danych napisz na kontakt@cosgral.pl.</p>
+    <h2 data-i18n="privacy.s5_title">Pliki cookies</h2>
+    <p data-i18n="privacy.s5_body">Strona używa plików cookies. Cookies niezbędne zapewniają podstawowe działanie strony (np. zapamiętanie preferencji językowych i motywu) — podstawą jest nasz uzasadniony interes. Cookies analityczne i marketingowe stosujemy wyłącznie po uzyskaniu Twojej zgody (art. 6 ust. 1 lit. a RODO). Zgodę możesz wycofać w każdej chwili, usuwając dane z localStorage przeglądarki lub klikając ponownie baner cookies.</p>
+    <ul class="privacy-content__list">
+      <li data-i18n="privacy.s5_cat1">Niezbędne — preferencje językowe, motyw, sesja. Czas: trwale w localStorage.</li>
+      <li data-i18n="privacy.s5_cat2">Analityczne — statystyki odwiedzin (tylko za zgodą). Czas: do 13 miesięcy.</li>
+      <li data-i18n="privacy.s5_cat3">Marketingowe — remarketing i kampanie (tylko za zgodą). Czas: do 90 dni.</li>
+    </ul>
+
+    <h2 data-i18n="privacy.s6_title">Jak długo przechowujemy dane</h2>
+    <p data-i18n="privacy.s6_body">Korespondencję i dane kontaktowe przechowujemy przez czas niezbędny do obsługi zapytania i ewentualnej współpracy, jednak nie dłużej niż 3 lata od ostatniego kontaktu. Dane fakturowe przechowujemy przez 5 lat zgodnie z przepisami rachunkowymi.</p>
+
+    <h2 data-i18n="privacy.s7_title">Odbiorcy danych</h2>
+    <p data-i18n="privacy.s7_body">Twoje dane mogą być przekazywane dostawcom usług technicznych (hosting Seohost, poczta e-mail, narzędzia projektowe) oraz platformom rozliczeniowym (Useme, Stripe) wyłącznie w zakresie niezbędnym do świadczenia usług. Nie sprzedajemy danych osobom trzecim.</p>
+
+    <h2 data-i18n="privacy.s8_title">Twoje prawa</h2>
+    <p data-i18n="privacy.s8_body">Na podstawie RODO przysługują Ci prawa: dostępu do danych, sprostowania, usunięcia ("prawo do bycia zapomnianym"), ograniczenia przetwarzania, przenoszenia danych oraz sprzeciwu wobec przetwarzania. Masz też prawo do złożenia skargi do Prezesa Urzędu Ochrony Danych Osobowych (UODO), ul. Stawki 2, 00-193 Warszawa. W sprawach danych pisz na: kontakt@cosgral.pl.</p>
+
+    <h2 data-i18n="privacy.s9_title">Zmiany polityki</h2>
+    <p data-i18n="privacy.s9_body">Zastrzegamy prawo do aktualizacji niniejszej polityki. O istotnych zmianach poinformujemy poprzez zmianę daty aktualizacji na tej stronie.</p>
   </article>
 </main>
 
@@ -105,7 +136,7 @@
         <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
         <ul>
           <li><a href="index.html#top" data-i18n="nav.start">Start</a></li>
-          <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
+          <li><a href="index.html#realizacje" data-i18n="nav.work">Realizacje</a></li>
           <li><a href="index.html#uslugi" data-i18n="nav.services">Usługi</a></li>
           <li><a href="o-nas.html" data-i18n="nav.about">O nas</a></li>
           <li><a href="index.html#kontakt" data-i18n="nav.contact">Kontakt</a></li>
@@ -115,7 +146,7 @@
         <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
         <ul>
           <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
-          <li><a href="tel:+48533790518" data-i18n="contact.phone_kuba">Kuba · +48 533 790 518</a></li>
+          <li><a href="tel:+48533790518" data-i18n="contact.phone_kuba">Jakub · +48 533 790 518</a></li>
           <li><a href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a></li>
         </ul>
       </div>
@@ -128,14 +159,14 @@
 </footer>
 
 <script src="i18n.js?v=20260920ui10"></script>
-<script src="home-cursor-field.js?v=20260920ui7"></script>
+<script src="home-cursor-field.js?v=20261011gyro"></script>
 <script src="home-cursor.js?v=20260920ui10"></script>
 <script src="home-tile-interact.js?v=20260920ui9"></script>
-<script src="subpage-ambient-bg.js?v=20260924polish1"></script>
-<script type="module" src="subpage-cube.js?v=20260924polish1"></script>
-<script type="module" src="portfolio-hero-sand.js?v=20260924scrollidle1"></script>
-<script defer src="home-nav-menu.js?v=20260924polish1"></script>
-<script defer src="site-chat.js?v=20260924idle1"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
+<script src="subpage-ambient-bg.js?v=20261011scroll"></script>
+<script type="module" src="subpage-cube.js?v=20261011menu"></script>
+<script type="module" src="portfolio-hero-sand.js?v=20261011menu"></script>
+<script defer src="home-nav-menu.js?v=20261012loop1"></script>
+<script defer src="site-chat.js?v=20260926chat7"></script>
+<script type="module" src="site-chat-cube.js?v=20261011perf"></script>
 </body>
 </html>

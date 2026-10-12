@@ -3,8 +3,9 @@
  * Materials + surface shimmer match home-hero-3d.js (same look on mobile & desktop).
  * Framed with padding so rotated cube never clips the canvas.
  */
-import * as THREE from "./vendor/three-0.170.0.module.min.js";
-import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
+import * as THREE from "./vendor/three-0.170.0.module.min.js?v=20261011scroll";
+import { createIntactCubeParts, whenCubeReady, installGlassScene, randomCubeSurface } from "./cube-shape.js?v=20261011menu";
+import { heroCubeLook, createCubeShimmerMaterial } from "./cube-look.js?v=20260926cube1";
 
 (function () {
   "use strict";
@@ -24,22 +25,24 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     if (tries < 40) window.setTimeout(findCanvas, 50);
   }
 
-  function boot() {
+  async function boot() {
     var MOBILE = window.matchMedia("(max-width: 900px)").matches;
-    var HALF = 1.35;
+    var look = heroCubeLook(MOBILE);
+    var HALF = look.half;
     /* Same visual recipe as hero; framing only differs (camera / scale). */
     var CUBE_SCALE = MOBILE ? 0.72 : 0.76;
-    var SHELL_OP = 0.45;
-    var EDGE_OP = 0.24;
+    var SHELL_OP = look.shellOp;
+    var EDGE_OP = look.edgeOp;
 
     var renderer = new THREE.WebGLRenderer({
       canvas: canvas,
-      antialias: true,
+      antialias: !MOBILE,
       alpha: true,
       powerPreference: "low-power",
       premultipliedAlpha: false,
     });
     renderer.setClearColor(0x000000, 0);
+    renderer.setClearAlpha(0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     var scene = new THREE.Scene();
@@ -50,9 +53,26 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     root.scale.setScalar(CUBE_SCALE);
     scene.add(root);
 
+    await whenCubeReady();
+    installGlassScene(renderer, scene, camera, { plate: false, clearColor: 0x000000, clearAlpha: 0 });
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.setClearColor(0x000000, 0);
+    renderer.setClearAlpha(0);
+
     var parts = createIntactCubeParts(HALF);
-    parts.shell.material.opacity = SHELL_OP;
-    parts.shell.material.depthWrite = true;
+    /* No scene plate, so transmission would refract the cleared black and
+       read as a dark square. Draw the same physical glass with alpha instead. */
+    parts.shell.material.transmission = 0;
+    parts.shell.material.thickness = 0;
+    parts.shell.material.depthWrite = false;
+    parts.shell.material.depthTest = true;
+    parts.shell.material.opacity = 0.998;
+    parts.shell.material.transparent = true;
+    /* Shared glass material is premultiplied (One, OneMinusSrcAlpha). On a
+       straight-alpha canvas that paints the whole face as a dark square. */
+    parts.shell.material.premultipliedAlpha = false;
+    parts.shell.material.blending = THREE.NormalBlending;
+    if (parts.shell.material.userData.uChatClear) parts.shell.material.userData.uChatClear.value = 1;
     parts.edges.material.opacity = EDGE_OP;
     parts.edges.material.depthTest = true;
     parts.edges.material.depthWrite = false;
@@ -75,7 +95,7 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     var sPos = new Float32Array(SURFACE * 3);
     var sSize = new Float32Array(SURFACE);
     for (var si = 0; si < SURFACE; si++) {
-      var sp = randomOnCube(HALF);
+      var sp = randomCubeSurface(HALF);
       sPos[si * 3] = sp[0];
       sPos[si * 3 + 1] = sp[1];
       sPos[si * 3 + 2] = sp[2];
@@ -85,50 +105,11 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
     sGeo.setAttribute("size", new THREE.BufferAttribute(sSize, 1));
 
-    /* Identical shimmer shader to home-hero-3d.js */
-    var sMat = new THREE.ShaderMaterial({
-      transparent: true,
-      depthWrite: false,
-      depthTest: true,
-      blending: THREE.AdditiveBlending,
-      uniforms: {
-        uTime: { value: 0 },
-        uMouse: { value: new THREE.Vector2(0, 0) },
-        uFade: { value: 1 },
-        uAlphaMul: { value: 1 },
-      },
-      vertexShader: [
-        "attribute float size;",
-        "uniform float uTime;",
-        "uniform vec2 uMouse;",
-        "uniform float uFade;",
-        "uniform float uAlphaMul;",
-        "varying float vAlpha;",
-        "void main() {",
-        "  vec3 pos = position;",
-        "  float pulse = sin(uTime * 0.55 + pos.y * 4.0 + pos.x * 3.0) * 0.012;",
-        "  pos += normalize(pos + 0.0001) * pulse;",
-        "  float dist = length(pos.xy - uMouse * 1.4);",
-        "  float ripple = sin(dist * 9.0 - uTime * 2.8) * smoothstep(2.6, 0.0, dist) * 0.07;",
-        "  pos.xy += normalize(pos.xy + 0.0001) * ripple;",
-        "  vec4 mv = modelViewMatrix * vec4(pos, 1.0);",
-        "  gl_PointSize = size * (190.0 / -mv.z) * (1.0 + smoothstep(2.2, 0.0, dist) * 0.75);",
-        "  gl_Position = projectionMatrix * mv;",
-        "  vAlpha = (0.16 + smoothstep(2.8, 0.0, dist) * 0.25) * uFade * uAlphaMul;",
-        "}",
-      ].join("\n"),
-      fragmentShader: [
-        "varying float vAlpha;",
-        "void main() {",
-        "  float d = length(gl_PointCoord - 0.5);",
-        "  if (d > 0.5) discard;",
-        "  float glow = 1.0 - smoothstep(0.0, 0.5, d);",
-        "  gl_FragColor = vec4(0.7, 0.7, 0.72, vAlpha * glow * 0.5);",
-        "}",
-      ].join("\n"),
-    });
+    var sMat = createCubeShimmerMaterial(THREE, { alphaMul: 1 });
 
-    root.add(parts.shell, parts.edges, new THREE.Points(sGeo, sMat));
+    var surfacePoints = new THREE.Points(sGeo, sMat);
+    surfacePoints.visible = false;
+    root.add(parts.shell, parts.edges, surfacePoints);
 
     var spin = 0.35;
     var leanX = 0;
@@ -141,7 +122,9 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
     var running = true;
     var last = performance.now();
     var LOOK = MOBILE ? 0.48 : 0.58;
-    var IDLE_SPIN = MOBILE ? 0.2 : 0.26;
+    var IDLE_SPIN = (MOBILE ? 0.2 : 0.26) * 1.75;
+    var driftX = 0;
+    var driftY = 0;
     /* Mega-menu style dim when chat panel is open (~40% darker). */
     var OPEN_DIM = 0.58;
 
@@ -149,7 +132,7 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
       var rect = canvas.getBoundingClientRect();
       var w = Math.max(1, Math.round(rect.width));
       var h = Math.max(1, Math.round(rect.height));
-      var dpr = Math.min(window.devicePixelRatio || 1, 2.25);
+      var dpr = Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2);
       renderer.setPixelRatio(dpr);
       renderer.setSize(w, h, false);
       camera.aspect = w / Math.max(h, 1);
@@ -192,6 +175,27 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
       mouseY = clamp(-(py - cy) / Math.max(rect.height * 0.55, 1), -1.2, 1.2);
     }
 
+    var chatOnScreen = true;
+    var chatFrame = 0;
+    var scrollPauseUntil = 0;
+    if (MOBILE) {
+      window.addEventListener(
+        "scroll",
+        function () {
+          scrollPauseUntil = performance.now() + 160;
+        },
+        { passive: true }
+      );
+    }
+    if (typeof IntersectionObserver === "function") {
+      new IntersectionObserver(function (entries) {
+        chatOnScreen = false;
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting) chatOnScreen = true;
+        }
+      }).observe(canvas);
+    }
+
     function frame(now) {
       if (!running) return;
       requestAnimationFrame(frame);
@@ -202,11 +206,11 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
       var open = launcher && launcher.getAttribute("aria-expanded") === "true";
       var chatRoot = document.querySelector(".cg-chat-root");
       var scrollHidden = chatRoot && !chatRoot.classList.contains("is-chat-visible");
-      var hidden =
-        document.hidden ||
-        scrollHidden ||
-        (canvas.offsetParent === null && getComputedStyle(canvas).visibility === "hidden");
+      var hidden = document.hidden || scrollHidden || !chatOnScreen;
       if (hidden) return;
+      if (MOBILE && !open && now < scrollPauseUntil) return;
+      /* Closed FAB on a phone: half rate. The cube is small and still reads as motion. */
+      if (MOBILE && !open && (chatFrame++ & 1)) return;
 
       if (open) {
         /* Face front + dim — same language as mega-menu cube settle. */
@@ -223,17 +227,31 @@ import { createIntactCubeParts } from "./cube-shape.js?v=20260919mob";
       leanY += (targetLeanY - leanY) * Math.min(1, follow * 12);
       if (!open) spin += dt * IDLE_SPIN;
 
-      root.rotation.x = leanX;
+      var driftW = (Math.PI * 2) / 8;
+      var nowS = now * 0.001;
+      var driftTargetX = open ? 0 : Math.sin(nowS * driftW) * 0.05;
+      var driftTargetY = open ? 0 : Math.cos(nowS * driftW * 0.8) * 0.035;
+      var driftFollow = Math.min(1, follow * 3);
+      driftX += (driftTargetX - driftX) * driftFollow;
+      driftY += (driftTargetY - driftY) * driftFollow;
+      root.position.x = driftX;
+      root.position.y = driftY;
+
+      root.rotation.x = leanX + (open ? 0 : Math.sin(nowS * driftW * 0.83) * 0.03);
       root.rotation.y = (open ? 0.22 : spin * 0.5) + leanY;
-      root.rotation.z = leanY * -0.12 + leanX * 0.04;
+      root.rotation.z = leanY * -0.12 + leanX * 0.04 + (open ? 0 : Math.cos(nowS * driftW * 0.67) * 0.02);
 
       var fadeTarget = open ? OPEN_DIM : 1;
       visualFade += (fadeTarget - visualFade) * Math.min(1, follow * 8);
       sMat.uniforms.uTime.value = spin;
       sMat.uniforms.uMouse.value.set(mouseX, mouseY);
       sMat.uniforms.uFade.value = visualFade;
-      parts.shell.material.opacity = SHELL_OP * visualFade;
+      parts.shell.material.transmission = 0;
+      parts.shell.material.opacity = 0.998 * visualFade;
+      if (parts.shell.material.userData.uChatClear) parts.shell.material.userData.uChatClear.value = 1;
       parts.edges.material.opacity = EDGE_OP * visualFade;
+      renderer.setClearColor(0x000000, 0);
+      renderer.setClearAlpha(0);
       renderer.render(scene, camera);
     }
 

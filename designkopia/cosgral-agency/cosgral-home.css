@@ -64,7 +64,7 @@ body.home-page::after {
   inset: 0;
   z-index: 9998;
   pointer-events: none;
-  opacity: 0.07;
+  opacity: calc(0.07 * (1 - var(--paper, 0)));
   mix-blend-mode: overlay;
   background-image: url("images/cosgral-agency/approved/charcoal-grain.jpg");
   background-size: 280px;
@@ -113,13 +113,13 @@ body.home-page::after {
       rgba(255, 255, 255, 0.004) 58%,
       transparent 66%
     );
-  opacity: 0.55;
+  opacity: calc(0.55 * (1 - var(--paper, 0)));
   transform: translate3d(50vw, 50vh, 0);
   will-change: transform;
 }
 @media (max-width: 900px) {
   .home-ambient__blur {
-    opacity: 0.4;
+    opacity: calc(0.4 * (1 - var(--paper, 0)));
   }
 }
 .home-ambient__shade {
@@ -128,6 +128,7 @@ body.home-page::after {
   z-index: 0;
   pointer-events: none;
   background: rgba(3, 3, 3, 0.28);
+  opacity: calc(1 - var(--paper, 0));
 }
 .home-sand {
   position: fixed;
@@ -202,16 +203,28 @@ html.is-free-scroll main.home-film {
     --depth-dwell: 26dvh;
   }
 }
-/* Kontakt kończy główną treść; stopka płynie zaraz po nim. Dodatkowy tor i
-   ujemny margines zostawiały pod stopką widoczną kopię kontaktu. */
+/* Kontakt + stopka = jedna ciągła taśma (bez sticky cover / -100dvh overlay).
+   Spacer i ujemny margin powodowały zacinanie przy handoffie — usunięte. */
 html.is-free-scroll main.home-film::after {
-  content: none;
+  content: none !important;
+  display: none !important;
+  height: 0 !important;
+  pointer-events: none;
 }
 html.is-free-scroll main.home-film > #kontakt.home-depth {
-  margin-bottom: 0;
+  position: relative !important;
+  top: auto !important;
+  margin-bottom: 0 !important;
+  background: var(--bg, #030303);
+  overflow: visible;
+  justify-content: flex-start;
 }
 html.is-free-scroll .site-footer {
-  margin-top: 0;
+  margin-top: 0 !important;
+  min-height: auto !important;
+  box-sizing: border-box;
+  background: var(--bg, #030303);
+  justify-content: flex-start;
 }
 @media (max-width: 900px) {
   html.is-free-scroll main.home-film {
@@ -232,10 +245,31 @@ html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone {
   opacity: 0 !important;
   z-index: 0 !important;
 }
-/* Keep tiles / CTAs clickable while the scene is still partly visible */
-html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone),
-html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-recessed:not(.is-depth-gone),
-html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-active:not(.is-depth-gone) {
+/* Shell nie przechwytuje klików — tylko interaktywne cele.
+   Dzięki temu kafelki / CTA spod zblurowanej warstwy działają w trakcie przejścia. */
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) {
+  pointer-events: none !important;
+}
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) a,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) button,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) input,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) textarea,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) select,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) label,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) summary,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .home-work__card,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .glass-btn,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .faq-item,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .faq-item__q,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .services-fan__card,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .services-fan__side-hit,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-fan-side],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-tile-interact],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [data-faq-toggle],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [href],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) [role="button"],
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .portfolio-chapters,
+html.is-free-scroll main.home-film > .home-scene.home-depth:not(.is-depth-gone) .portfolio-chapters__scroller {
   pointer-events: auto !important;
 }
 html.is-free-scroll main.home-film > .home-scene.home-depth.is-depth-gone .home-scene__panel,
@@ -267,17 +301,10 @@ html.is-free-scroll #uslugi.home-depth,
 html.is-free-scroll #uslugi.is-visible.home-scene {
   z-index: 20 !important;
 }
-/* Kontakt i stopka jako osobne, sekwencyjne struktury.
-   Kontakt przykrywa Proces (wyższy z-index 60, nieprzezroczyste tło),
-   ale NIE jest sticky – po wejściu przewija się naturalnie do góry,
-   a stopka płynie bezpośrednio pod nim, bez nakładania się i ucinania formularza. */
-html.is-free-scroll main.home-film > #kontakt.home-depth,
+/* Kontakt: dokumentowy ciąg z stopką (nie sticky overlay). Tło kryje Proces przy wjeździe. */
 html.is-free-scroll #kontakt.home-depth {
-  position: relative !important;
-  top: auto !important;
   z-index: 60 !important;
-  background: var(--bg, #030303) !important;
-  margin-bottom: 0 !important;
+  background: var(--bg, #030303);
 }
 html.is-free-scroll #proces.home-depth {
   z-index: 50 !important;
@@ -323,9 +350,15 @@ html.is-sand-stream .home-scene-curtain {
 }
 html.is-sand-stream .home-cube-portal,
 html.is-shattering .home-cube-portal {
-  z-index: 4;
+  /* Stay in the same stacking context as main (z-index 1, earlier in the DOM).
+     Raising this fixed WebGL layer above main hides every section once the
+     canvas has any opaque pixels. */
   opacity: 1;
   visibility: visible;
+}
+.home-cube-portal,
+.home-cube-portal .home-hero__canvas {
+  background: transparent;
 }
 /* Nie ustawiaj position:relative — psuje GSAP pin (Lenis + transform). */
 #uslugi.is-visible.home-scene {
@@ -456,6 +489,29 @@ html.reduce-motion .home-scene [data-enter] {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
+  visibility: visible !important;
+}
+/* Free-scroll: data-enter używa opacity (nie autoAlpha), więc visibility zostaje visible.
+   Kafelki / CTA klikalne też w trakcie blur / przejścia do kolejnej sekcji. */
+html.is-free-scroll .home-scene:not(.is-depth-gone) [data-enter],
+html.is-free-scroll .home-scene:not(.is-depth-gone) .reveal-word > span {
+  visibility: visible !important;
+}
+html.is-free-scroll .home-scene:not(.is-depth-gone) .home-work__card,
+html.is-free-scroll .home-scene:not(.is-depth-gone) .home-work__link,
+html.is-free-scroll .home-scene:not(.is-depth-gone) .glass-btn,
+html.is-free-scroll .home-scene.is-depth-recessed:not(.is-depth-gone) a,
+html.is-free-scroll .home-scene.is-depth-recessed:not(.is-depth-gone) button {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+/* Grid/data-enter nie może zostać na opacity:0 — dzieci dziedziczą niewidoczność */
+html.is-free-scroll .home-scene.is-entered:not(.is-depth-gone) .home-work__grid,
+html.is-free-scroll .home-scene.is-visible:not(.is-depth-gone) .home-work__grid,
+html.is-free-scroll .home-scene.is-depth-active:not(.is-depth-gone) .home-work__grid,
+html.is-free-scroll .home-scene.is-entered:not(.is-depth-gone) .home-work__footer {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 .site-footer {
   position: relative;
@@ -470,12 +526,7 @@ html.reduce-motion .home-scene [data-enter] {
   padding: clamp(1.5rem, 4vh, 2.75rem) var(--gutter) clamp(1.75rem, 5vh, 3rem);
 }
 
-/* Stopka — cover Kontaktu prowadzi depth ticker (section-flow), bez zmiany layoutu.
-   is-footer-step (cover > 0.45) odpala wejścia stopki; is-footer-covered (cover ≥ 0.985)
-   chowa portal sześcianu/piasku dopiero, gdy stopka zakrywa go w całości — wcześniej
-   piasek nad górną, jeszcze widoczną częścią Kontaktu znikałby skokiem. */
-
-/* Kontakt → stopka: bez runway — jedna ciągła taśma na --bg */
+/* Kontakt → stopka: jedna ciągła taśma na --bg (bez runway / cover hide Kontaktu) */
 html.is-free-scroll .footer-runway {
   display: none;
   height: 0;
@@ -568,6 +619,11 @@ html:not(.reduce-motion) body.home-page:not(.is-ready) {
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.1rem var(--gutter);
   mix-blend-mode: difference;
+  transition: translate 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+body.home-page.is-nav-hidden:not(.is-nav-menu-open) .site-nav {
+  translate: 0 -110%;
+  pointer-events: none;
 }
 .site-nav__logo {
   display: inline-flex;
@@ -781,6 +837,26 @@ body.is-nav-menu-open .home-scroll-rail {
   opacity: 0;
   pointer-events: none;
 }
+
+/* Mega menu — zablokuj scroll strony (Lenis + natywny) */
+html.is-nav-menu-open,
+html.is-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  height: 100%;
+  touch-action: none;
+}
+body.is-nav-menu-open,
+body.is-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+html.is-nav-menu-open .nav-overlay,
+body.is-nav-menu-open .nav-overlay {
+  touch-action: auto;
+  overscroll-behavior: contain;
+}
 html.reduce-motion .nav-overlay__list a {
   opacity: 1;
   transform: none;
@@ -794,17 +870,38 @@ html.reduce-motion .nav-overlay__char {
 }
 
 .btn {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  padding: 0.9rem 1.75rem; border-radius: 999px;
-  font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(12px);
-  transition: transform 0.35s var(--ease), background 0.25s, border-color 0.25s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.12rem 0;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  background: none;
+  backdrop-filter: none;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--ink);
+  transition: border-color 0.45s ease;
 }
-.btn:hover { transform: scale(1.04); border-color: rgba(255,255,255,0.35); }
-.btn--primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.btn--primary:hover { background: #ddd; }
+.btn:hover,
+.btn:focus-visible {
+  transform: none;
+  border-color: #fff;
+  outline: none;
+}
+.btn--primary {
+  background: none;
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.btn--primary:hover {
+  background: none;
+  border-color: #fff;
+}
 
 .section-label {
   font-family: var(--font-mono);
@@ -976,11 +1073,34 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
 }
 .services-fan.home-scene .services-fan__head { margin-bottom: 0.35rem; }
 
+/* Pełne boczne strefy kliknięcia — nad aktywnym kafelkiem (z:100), pe:auto mimo pe:none na sekcji */
+.services-fan__side-hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 42%;
+  max-width: none;
+  z-index: 120;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto !important;
+  -webkit-tap-highlight-color: transparent;
+}
+.services-fan__side-hit--prev { left: 0; }
+.services-fan__side-hit--next { right: 0; }
+.services-fan__side-hit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: -4px;
+}
+
 /* Pulsujące podpowiedzi kliknięcia — 3 s po wejściu w sekcję */
 .services-fan__tap-pulse {
   position: absolute;
   top: 50%;
-  z-index: 20;
+  z-index: 31;
   translate: 0 -50%;
   width: clamp(68px, 11vw, 104px);
   height: clamp(68px, 11vw, 104px);
@@ -1503,58 +1623,69 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   text-transform: uppercase;
 }
 .home-work__card-cta {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #fff;
   white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  padding-bottom: 0.12rem;
+  transition: border-color 0.45s ease;
+}
+.home-work__card:hover .home-work__card-cta,
+.home-work__card:focus-visible .home-work__card-cta {
+  border-color: #fff;
 }
 .home-work__footer {
   margin-top: 0;
   flex-shrink: 0;
   display: flex;
   justify-content: flex-start;
-  gap: .65rem;
-  flex-wrap: wrap;
 }
 .home-work__link {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.75rem 1.4rem;
-  font-size: 0.88rem;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 0.12rem 0;
+  font-size: 0.92rem;
   text-decoration: none;
 }
+/* Text links — same underline motif as „Zobacz więcej” (no pill / glass box) */
 .glass-btn {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   border: 0;
-  border-radius: 999px;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 0.12rem 0;
+  min-height: 0;
   color: var(--ink);
-  background: rgba(245, 240, 235, 0.04);
-  -webkit-backdrop-filter: blur(10px) saturate(1.4);
-  backdrop-filter: blur(10px) saturate(1.4);
-  box-shadow:
-    0 0 8px rgba(0, 0, 0, 0.03),
-    0 2px 6px rgba(0, 0, 0, 0.08),
-    inset 3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.09),
-    inset -3px -3px 0.5px -3.5px rgba(255, 255, 255, 0.85),
-    inset 1px 1px 1px -0.5px rgba(255, 255, 255, 0.6),
-    inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.6),
-    inset 0 0 6px 6px rgba(255, 255, 255, 0.12),
-    inset 0 0 2px 2px rgba(255, 255, 255, 0.06),
-    0 0 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s var(--ease-out), filter 0.2s ease;
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  text-decoration: none;
+  transition: border-color 0.45s ease;
 }
 .glass-btn:hover,
 .glass-btn:focus-visible {
-  transform: scale(1.05);
-  filter: brightness(1.15);
+  transform: none;
+  filter: none;
+  border-color: #fff;
+  outline: none;
 }
 .glass-btn:active {
-  transform: scale(0.98);
-  filter: brightness(0.9);
+  transform: none;
+  filter: none;
 }
 @media (max-height: 820px) and (min-width: 901px) {
   .home-work.home-scene {
@@ -1785,6 +1916,31 @@ body.home-page.is-hero-intro-done .home-hero__tagline {
   padding-block: clamp(1rem, 3.5vh, 2.25rem);
   overflow: hidden;
   box-sizing: border-box;
+}
+html.is-free-scroll .home-contact.home-scene {
+  overflow: visible;
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding-block: 0;
+}
+html.is-free-scroll #kontakt.home-depth > .home-scene__panel {
+  align-self: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-block: clamp(1rem, 3.5vh, 2.25rem);
+  box-sizing: border-box;
+}
+html.is-free-scroll #kontakt .site-footer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin-top: 0;
+  flex-shrink: 0;
+  /* Nadpisz globalny z-index:8 — stopka jest w środku #kontakt */
+  z-index: 1;
 }
 .home-contact.home-scene .home-scene__panel {
   position: relative;
@@ -2341,10 +2497,13 @@ html.reduce-motion .reveal-word > span {
   animation: scroll-rail-hold-pulse 1.8s ease-in-out infinite;
 }
 @keyframes scroll-rail-hold-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06), 0 0 10px rgba(255, 255, 255, 0.2); }
-  50% { box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.1), 0 0 18px rgba(255, 255, 255, 0.42); }
+  0%, 100% { box-shadow: 0 0 0 4px var(--rail-ring, rgba(255, 255, 255, 0.06)), 0 0 10px var(--rail-glow, rgba(255, 255, 255, 0.2)); }
+  50% { box-shadow: 0 0 0 7px var(--rail-ring, rgba(255, 255, 255, 0.1)), 0 0 18px var(--rail-glow, rgba(255, 255, 255, 0.42)); }
 }
 html.reduce-motion .home-scroll-rail { display: none; }
+@media (max-width: 768px) {
+  .home-scroll-rail { display: none !important; }
+}
 
 .home-scroll-rail__arrows {
   display: none !important;
@@ -2428,8 +2587,6 @@ html.reduce-motion .home-scroll-rail { display: none; }
 
   #kontakt.home-contact.home-scene,
   html.is-free-scroll #kontakt.home-depth {
-    position: relative !important;
-    top: auto !important;
     min-height: auto;
     overflow: visible;
     justify-content: flex-start;
@@ -2474,16 +2631,16 @@ html.reduce-motion .home-scroll-rail { display: none; }
   }
   .home-work__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(0.42rem, 1.6vw, 0.62rem);
+    gap: clamp(0.34rem, 1.35vw, 0.52rem);
   }
   .home-work__card-body {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.22rem;
-    padding: clamp(0.55rem, 2vw, 0.7rem);
+    gap: 0.18rem;
+    padding: clamp(0.45rem, 1.7vw, 0.6rem);
   }
   .home-work__card-tag {
-    font-size: clamp(0.58rem, 2.35vw, 0.74rem);
+    font-size: clamp(0.54rem, 2.15vw, 0.68rem);
     line-height: 1.18;
     hyphens: none;
     word-break: normal;
@@ -2491,17 +2648,18 @@ html.reduce-motion .home-scroll-rail { display: none; }
     text-wrap: balance;
   }
   .home-work__card-cta {
-    font-size: 0.5rem;
+    font-size: 0.48rem;
     letter-spacing: 0.12em;
     white-space: nowrap;
   }
   .home-work__card,
   .home-work__card--wide {
-    min-height: clamp(7.25rem, 24vw, 9.75rem);
+    min-height: clamp(6.25rem, 21vw, 8.4rem);
+    border-radius: 0.55rem;
   }
   .home-work__card--wide {
     grid-column: 1 / -1;
-    min-height: clamp(8.25rem, 27vw, 10.75rem);
+    min-height: clamp(7.1rem, 24vw, 9.25rem);
   }
   .home-work__card-media video,
   .home-work__card-media img {
@@ -2629,7 +2787,8 @@ html.reduce-motion .home-scroll-rail { display: none; }
   .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 0.6rem; margin-bottom: 0.55rem; }
   .site-footer {
     overflow: visible;
-    min-height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
     justify-content: flex-start;
     padding-top: clamp(1.1rem, 3.5dvh, 1.75rem);
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
@@ -2708,7 +2867,8 @@ html.reduce-motion .home-scroll-rail { display: none; }
   }
 
   html.is-footer-step .site-footer {
-    min-height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
     justify-content: flex-start;
     padding-top: clamp(1.1rem, 3.5dvh, 1.75rem);
     padding-bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
@@ -2961,7 +3121,7 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
   transition: filter 0.45s var(--ease);
 }
 
-/* Mobile gyro permission gate (iOS requires a tap) — home + subpages */
+/* Mobile gyro permission gate (iOS requires a tap) — underline motif, no pill */
 .gyro-enable {
   position: fixed;
   left: auto;
@@ -2969,28 +3129,37 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
   bottom: calc(3.35rem + env(safe-area-inset-bottom, 0px));
   z-index: 12050;
   transform: none;
-  height: 3.45rem;
-  padding: 0 1.2rem;
+  height: auto;
+  min-height: 0;
+  padding: 0.12rem 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 14px;
-  background: rgba(8, 8, 8, 0.82);
-  color: #f2f2f2;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  background: none;
+  color: #fff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  font-family: var(--font-body, "Satoshi", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
   cursor: pointer;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-  transition: opacity 0.35s var(--ease, ease), transform 0.35s var(--ease, ease);
+  box-shadow: none;
+  opacity: 1;
+  transition: opacity 0.45s var(--ease, ease), border-color 0.45s ease;
 }
-.gyro-enable.is-done {
+.gyro-enable:hover,
+.gyro-enable:focus-visible {
+  border-color: #fff;
+  outline: none;
+}
+.gyro-enable.is-done,
+.gyro-enable.is-away {
   opacity: 0;
-  transform: translateY(8px);
   pointer-events: none;
 }
 @media (min-width: 901px) and (hover: hover) {
@@ -2998,8 +3167,472 @@ body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
     display: none !important;
   }
 }
-/* Navigation stays readable when GSAP or the 3D scene loads slowly. */
-.nav-overlay.is-open .nav-overlay__list > li > a {
+
+/* Quiet scroll distance for the line-field lightening. No shape, no plate. */
+.paper-bridge,
+.paper-return {
+  height: 44vh;
+  pointer-events: none;
+}
+html.reduce-motion .paper-bridge,
+html.reduce-motion .paper-return {
+  display: none;
+}
+
+@supports (color: color-mix(in srgb, black, white)) {
+  #uslugi .section-label,
+  #uslugi .services-fan__title,
+  #realizacje .section-label,
+  #realizacje .home-work__title {
+    color: color-mix(in srgb, #1c1c1b calc(var(--paper, 0) * 100%), var(--ink));
+  }
+  #uslugi .services-fan__counter,
+  #realizacje .home-work__lead {
+    color: color-mix(in srgb, #5c5c5a calc(var(--paper, 0) * 100%), var(--muted));
+  }
+  #realizacje .glass-btn {
+    color: color-mix(in srgb, #1c1c1b calc(var(--paper, 0) * 100%), var(--ink));
+    border-bottom-color: color-mix(
+      in srgb,
+      rgba(28, 28, 27, 0.45) calc(var(--paper, 0) * 100%),
+      rgba(255, 255, 255, 0.45)
+    );
+  }
+  #realizacje .glass-btn:hover,
+  #realizacje .glass-btn:focus-visible {
+    border-color: color-mix(in srgb, #1c1c1b calc(var(--paper, 0) * 100%), #fff);
+  }
+  #realizacje .home-work__card,
+  #realizacje .home-work__card-tag,
+  #realizacje .home-work__card-cta {
+    color: #fff;
+  }
+  body.home-page .cg-chat-launcher {
+    color: color-mix(in srgb, #1a1a1a calc(var(--paper, 0) * 100%), var(--cg-chat-ink, #f5f5f5));
+  }
+  .home-scroll-rail__track {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, rgba(0, 0, 0, 0.06) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.04)) 0%,
+      color-mix(in srgb, rgba(0, 0, 0, 0.22) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14)) 12%,
+      color-mix(in srgb, rgba(0, 0, 0, 0.22) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14)) 88%,
+      color-mix(in srgb, rgba(0, 0, 0, 0.06) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.04)) 100%
+    );
+  }
+  .home-scroll-rail__fill {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, rgba(0, 0, 0, 0.35) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.35)),
+      color-mix(in srgb, rgba(0, 0, 0, 0.82) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.85))
+    );
+  }
+  .home-scroll-rail__title {
+    color: color-mix(in srgb, rgba(22, 22, 22, 0.62) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.52));
+  }
+  .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:hover,
+  .home-scroll-rail__item.is-title-revealed .home-scroll-rail__title:focus-visible,
+  .home-scroll-rail__item.is-title-revealed.is-current .home-scroll-rail__title {
+    color: color-mix(in srgb, rgba(12, 12, 12, 0.92) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.88));
+  }
+  .home-scroll-rail__dot {
+    --rail-ring: color-mix(in srgb, rgba(17, 17, 17, 0.08) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.06));
+    --rail-glow: color-mix(in srgb, rgba(17, 17, 17, 0.22) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.2));
+    border-color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.28));
+    background: color-mix(in srgb, transparent calc(var(--paper, 0) * 100%), rgba(8, 8, 8, 0.65));
+  }
+  .home-scroll-rail__dot.is-active {
+    border-color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.55));
+    background: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.22));
+  }
+  .home-scroll-rail__dot.is-hold {
+    border-color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.95));
+    background: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.92));
+  }
+  .home-scroll-rail__dot.is-passed {
+    border-color: color-mix(in srgb, rgba(17, 17, 17, 0.55) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.42));
+    background: color-mix(in srgb, rgba(17, 17, 17, 0.35) calc(var(--paper, 0) * 100%), rgba(255, 255, 255, 0.14));
+  }
+  body.home-page:not(.is-nav-menu-open) .site-nav {
+    mix-blend-mode: normal;
+    color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), #f5f5f5);
+  }
+  body.home-page:not(.is-nav-menu-open) .site-nav__logo-img {
+    filter: brightness(calc(1 - var(--paper, 0)));
+  }
+  body.home-page:not(.is-nav-menu-open) .lang-switch button {
+    opacity: calc(0.45 + var(--paper, 0) * 0.27);
+  }
+  body.home-page:not(.is-nav-menu-open) .lang-switch button[aria-pressed="true"] {
+    opacity: 1;
+  }
+  html:has(body.home-page) .cg-chat-label {
+    color: color-mix(in srgb, #111 calc(var(--paper, 0) * 100%), #f5f5f5);
+  }
+}
+
+/* Homepage realizacje — portfolio chapters on the light field.
+   The section is a tall pin; a sticky viewport maps vertical scroll across five slides. */
+.home-work__title--sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+#realizacje.home-work.home-scene {
+  padding: 0;
+  justify-content: flex-start;
+  display: block;
+  height: 500dvh;
+  min-height: 500dvh;
+  max-height: none;
+  overflow: visible;
+  overflow-anchor: none;
+}
+#realizacje .home-work-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 100dvh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow-anchor: none;
+}
+html.is-free-scroll main.home-film > #realizacje.home-depth {
+  position: relative !important;
+  top: auto !important;
+  margin-bottom: 0 !important;
+  overflow: visible !important;
+}
+#realizacje .home-scene__panel {
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+#realizacje .home-scene__panel > .home-tilt-layer,
+#realizacje .home-scene__panel > .home-tilt-layer > .home-tilt-face {
+  height: 100%;
+  min-height: 0;
+}
+#realizacje .portfolio-chapters {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  background: transparent;
+}
+#realizacje .portfolio-chapters__scroller {
+  display: block;
+  overflow: hidden;
+  scroll-snap-type: none;
+  touch-action: pan-y;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+}
+#realizacje .portfolio-chapters__track {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: 100%;
+  width: 100%;
+  will-change: transform;
+}
+#realizacje .portfolio-chapter:not(.portfolio-chapter--grid) .portfolio-chapter__copy,
+#realizacje .chapter-lux__foot {
+  display: none !important;
+}
+#realizacje .chapter-lux__word {
+  font-size: clamp(1.45rem, 4.4vw, 2.8rem);
+  letter-spacing: -0.045em;
+}
+#realizacje .portfolio-chapters__scroller.is-axis-x {
+  scroll-snap-type: none;
+}
+#realizacje .portfolio-chapter {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  color: #111;
+  background: transparent;
+}
+#realizacje .portfolio-chapter__bg,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media,
+#realizacje .chapter-lux,
+#realizacje .chapter-os,
+#realizacje .chapter-montaz,
+#realizacje .chapter-show {
+  background: transparent;
+}
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+#realizacje .portfolio-chapter__bg .portfolio-tile__media > .chapter-show {
+  filter: none;
+}
+#realizacje .portfolio-chapter__title,
+#realizacje .portfolio-chapter__lead,
+#realizacje .portfolio-chapter__more,
+#realizacje .chapter-lux,
+#realizacje .chapter-lux__word,
+#realizacje .chapter-lux__meta,
+#realizacje .chapter-lux__foot,
+#realizacje .chapter-show,
+#realizacje .chapter-show__word,
+#realizacje .portfolio-tile__viz-word {
+  color: #111;
+  text-shadow: 0 10px 24px rgba(50, 42, 32, 0.16);
+}
+#realizacje .portfolio-chapter__lead {
+  color: rgba(17, 17, 17, 0.78);
+}
+#realizacje .portfolio-chapter__more {
+  border-bottom-color: rgba(17, 17, 17, 0.45);
+}
+#realizacje .portfolio-chapter.is-active .portfolio-chapter__more:hover,
+#realizacje .portfolio-chapter.is-active .portfolio-chapter__more:focus-visible {
+  border-color: #111;
+}
+#realizacje .chapter-lux__shot,
+#realizacje .chapter-show__tile {
+  box-shadow: 0 16px 36px rgba(40, 32, 22, 0.22);
+}
+#realizacje .sys-fan {
+  touch-action: pan-y;
+  pointer-events: none;
+}
+#realizacje .sys-fan__nav,
+#realizacje .sys-fan__arrow,
+#realizacje .sys-fan__dot {
+  pointer-events: auto;
+}
+#realizacje .sys-fan__card {
+  border-color: rgba(17, 17, 17, 0.14);
+  box-shadow: 0 18px 36px rgba(40, 32, 22, 0.22);
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+#realizacje .portfolio-chapter--grid {
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  text-align: left;
+  gap: clamp(0.85rem, 2dvh, 1.35rem);
+  padding:
+    clamp(4.75rem, 10dvh, 6.25rem)
+    clamp(1.25rem, 4.5vw, 3.25rem)
+    clamp(3.5rem, 8dvh, 4.75rem);
+  color: #1c1c1b;
+}
+#realizacje .portfolio-chapter--grid .home-work__head,
+#realizacje .portfolio-chapter--grid .home-work__footer {
+  flex: 0 0 auto;
+}
+#realizacje .portfolio-chapter--grid .home-work__title,
+#realizacje .portfolio-chapter--grid .section-label {
+  color: #1c1c1b;
+  text-shadow: none;
+}
+#realizacje .portfolio-chapter--grid .home-work__lead {
+  color: #4a4a47;
+  text-shadow: none;
+}
+#realizacje .portfolio-chapter--grid .home-work__grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+#realizacje .portfolio-chapter--grid .glass-btn,
+#realizacje .portfolio-chapter--grid .home-work__link {
+  color: #111;
+  border-bottom-color: rgba(17, 17, 17, 0.45);
+}
+#realizacje .portfolio-chapter--grid .glass-btn:hover,
+#realizacje .portfolio-chapter--grid .glass-btn:focus-visible {
+  border-color: #111;
+}
+#realizacje .sys-fan__card.is-front {
+  border-color: rgba(17, 17, 17, 0.32);
+  box-shadow: 0 28px 52px rgba(40, 32, 22, 0.28);
+}
+/* Keep the systems dots above the centered chat cube. */
+@media (min-width: 901px) {
+  #realizacje .sys-fan--catalog .sys-fan__nav {
+    bottom: 9rem;
+  }
+}
+#realizacje .portfolio-chapters__dot,
+#realizacje .sys-fan__dot {
+  background: rgba(17, 17, 17, 0.28);
+  box-shadow: none;
+}
+#realizacje .portfolio-chapters__dot.is-active,
+#realizacje .sys-fan__dot.is-active {
+  background: #111;
+}
+#realizacje .portfolio-chapters__arrow,
+#realizacje .sys-fan__arrow {
+  color: rgba(17, 17, 17, 0.55);
+}
+#realizacje .portfolio-chapters__arrow:hover:not(:disabled),
+#realizacje .portfolio-chapters__arrow:focus-visible:not(:disabled),
+#realizacje .sys-fan__arrow:hover,
+#realizacje .sys-fan__arrow:focus-visible {
+  color: #111;
+  background: rgba(17, 17, 17, 0.08);
+}
+#realizacje .chapter-montaz__belt.reels-tiles {
+  position: absolute;
+  inset: -18% -10%;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0;
+  transform: rotate(-16deg);
+  transform-origin: center center;
+}
+#realizacje .reels-tiles__stage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+#realizacje .reels-tiles__belt {
+  display: flex;
+  width: max-content;
+  height: min(58vh, 28rem);
+  align-items: center;
+  will-change: transform;
+  animation: home-reels-drift 52s linear infinite;
+  animation-play-state: paused;
+}
+#realizacje .reels-tiles.is-ready .reels-tiles__belt {
+  animation-play-state: running;
+}
+@keyframes home-reels-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+#realizacje .reels-tiles__track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: clamp(0.9rem, 2.2vw, 1.75rem);
+  padding: 0 clamp(1rem, 3vw, 2rem);
+}
+#realizacje .reels-tiles__card {
+  position: relative;
+  flex: 0 0 auto;
+  align-self: center;
+  width: auto;
+  height: 86%;
+  max-height: 100%;
+  aspect-ratio: 9 / 16;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #141414;
+  pointer-events: none;
+  box-shadow: 0 16px 34px rgba(40, 32, 22, 0.28);
+  transform: translateY(calc(var(--lane, 0) * 10px)) scale(var(--tile-scale, 1));
+  filter: blur(var(--tile-blur, 0)) grayscale(1);
+  opacity: var(--tile-opacity, 1);
+  z-index: var(--tile-z, 2);
+}
+#realizacje .reels-tiles__card--xs { height: 64%; }
+#realizacje .reels-tiles__card--sm { height: 74%; }
+#realizacje .reels-tiles__card--md { height: 84%; }
+#realizacje .reels-tiles__card--lg { height: 92%; }
+#realizacje .reels-tiles__card--xl { height: 100%; }
+#realizacje .reels-tiles__card--far {
+  --tile-scale: 0.58;
+  --tile-opacity: 0.55;
+  --tile-z: 1;
+}
+#realizacje .reels-tiles__card--mid {
+  --tile-scale: 0.8;
+  --tile-opacity: 0.8;
+  --tile-z: 2;
+}
+#realizacje .reels-tiles__card--near {
+  --tile-scale: 1;
+  --tile-opacity: 1;
+  --tile-z: 4;
+}
+#realizacje .reels-tiles__card.is-in-focus {
+  filter: none;
   opacity: 1;
-  clip-path: inset(0 0 0 0);
+  z-index: 5;
+  box-shadow: 0 22px 44px rgba(40, 32, 22, 0.34);
+  transform: translateY(calc(var(--lane, 0) * 10px)) scale(calc(var(--tile-scale, 1) * 1.06));
+}
+#realizacje .reels-tiles__card video,
+#realizacje .reels-tiles__card .reels-tiles__poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #141414;
+}
+html.reduce-motion #realizacje .reels-tiles__belt {
+  animation: none;
+}
+@media (max-width: 900px) {
+  #realizacje.home-work.home-scene {
+    padding: 0;
+    justify-content: flex-start;
+    height: 500dvh;
+    min-height: 500dvh;
+    max-height: none;
+    overflow: visible;
+  }
+  #realizacje .home-scene__panel,
+  #realizacje .container {
+    width: 100%;
+    padding-right: 0;
+    padding-inline: 0;
+  }
+  #realizacje .portfolio-chapter--grid {
+    justify-content: flex-start;
+    padding: clamp(4.5rem, 11dvh, 5.5rem) 0.8rem clamp(3.2rem, 9dvh, 4.1rem);
+    gap: 0.65rem;
+  }
+  #realizacje .portfolio-chapter--grid .home-work__grid {
+    grid-template-rows: auto;
+  }
+}
+@media (max-width: 768px) {
+  :root { --rail-safe: 0px; }
+  .home-scroll-rail { display: none !important; }
+}
+html.reduce-motion body.home-page .site-nav {
+  transition: none;
+}
+@media (max-width: 900px) {
+  .nav-overlay__backdrop,
+  body.is-nav-menu-open::before,
+  .nav-overlay.is-services-expanded .nav-overlay__backdrop {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  body.is-nav-menu-open.is-nav-services-expanded .home-cube-portal,
+  body.is-nav-menu-open.is-nav-services-expanded .subpage-cube-portal {
+    filter: brightness(0.34) saturate(0.7);
+  }
 }

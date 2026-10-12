@@ -62,7 +62,6 @@
       "  col += uHighlight * pow(ridge, 14.0) * 0.32;\n" +
       "  col += uAccent * mf * 0.16;\n" +
       "  col *= 0.58 + vignette(uv) * 0.42;\n" +
-      "  col = ((col - 0.5) * 1.04 + 0.5) * 0.78;\n" +
       "  gl_FragColor = vec4(col, 1.0);\n" +
       "}",
 
@@ -266,7 +265,7 @@
 
   function boot() {
     var gl =
-      canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" }) ||
+      canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power", preserveDrawingBuffer: true }) ||
       canvas.getContext("experimental-webgl");
 
     if (!gl) {
@@ -326,7 +325,6 @@
     var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
     var running = false;
     var start = performance.now();
-    var lastDraw = 0;
     var MOBILE =
       window.matchMedia("(max-width: 900px)").matches ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
@@ -347,13 +345,7 @@
 
     function frame(now) {
       if (!running) return;
-      // Fale poruszają się wolno; ograniczenie liczby klatek odciąża GPU,
-      // gdy jednocześnie pracują sceny 3D portfolio i animacja menu.
-      if (now - lastDraw < (MOBILE ? 50 : 33)) {
-        requestAnimationFrame(frame);
-        return;
-      }
-      lastDraw = now;
+      resize();
 
       var ptr = window.cosgralPointer;
       if (ptr) {
@@ -366,6 +358,7 @@
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
+      window.__cosgralAmbient = { t: (now - start) / 1000, x: mouse.x, y: mouse.y };
       gl.uniform3fv(uBase, colors.base);
       gl.uniform3fv(uAccent, colors.accent);
       gl.uniform3fv(uHighlight, colors.highlight);

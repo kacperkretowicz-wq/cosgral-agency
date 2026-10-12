@@ -44,16 +44,24 @@
   }
 
   var SERVICE_PORTFOLIO = {
-    blue: "portfolio.html#strony",
-    purple: "portfolio.html",
-    gold: "portfolio.html",
-    orange: "portfolio.html#automatyzacje",
-    crimson: "portfolio.html#automatyzacje",
-    green: "portfolio.html#montaz",
+    blue: "#strony",
+    purple: "#realizacje",
+    gold: "#realizacje",
+    orange: "#automatyzacje",
+    crimson: "#automatyzacje",
+    green: "#montaz",
   };
 
+  function homeAnchor(hash) {
+    var h = hash || "#realizacje";
+    if (h === "#systemy") h = "#automatyzacje";
+    if (document.body.classList.contains("home-page")) return h;
+    var root = (window.location.pathname || "").indexOf("/uslugi/") !== -1 ? "../" : "";
+    return root + "index.html" + h;
+  }
+
   function portfolioHrefForTheme(themeId) {
-    return SERVICE_PORTFOLIO[themeId] || "portfolio.html";
+    return homeAnchor(SERVICE_PORTFOLIO[themeId] || "#realizacje");
   }
 
   function buildInner(data, themeId) {
@@ -74,7 +82,12 @@
         data.links
           .map(function (l) {
             var label = l.i18n && panelT(l.i18n) ? panelT(l.i18n) : l.label;
-            return '<a href="' + l.href + '" data-panel-link>' + label + " →</a>";
+            var href = l.href || "#realizacje";
+            if (href.charAt(0) === "#" || href.indexOf("portfolio.html") !== -1) {
+              var hash = href.indexOf("#") >= 0 ? href.slice(href.indexOf("#")) : "#realizacje";
+              href = homeAnchor(hash);
+            }
+            return '<a href="' + href + '" data-panel-link>' + label + " →</a>";
           })
           .join("") +
         "</div>";
@@ -412,6 +425,14 @@
         if (openPanel) return;
         var card = e.target.closest(".services-fan__card.is-active");
         if (!card) return;
+        /* Boczne strefy ekranu / kafelka = nawigacja — nie otwieraj panelu */
+        if (window.cosgralServicesFan && typeof window.cosgralServicesFan.isSideNavZone === "function") {
+          if (window.cosgralServicesFan.isSideNavZone(e.clientX)) return;
+        }
+        if (e.target.closest("[data-fan-side]")) return;
+        var cardRect = card.getBoundingClientRect();
+        var cardRatio = (e.clientX - cardRect.left) / Math.max(1, cardRect.width);
+        if (cardRatio < 0.22 || cardRatio > 0.78) return;
         e.preventDefault();
         e.stopPropagation();
         openFromCard(card);

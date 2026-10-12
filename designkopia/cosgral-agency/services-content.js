@@ -181,8 +181,8 @@
           "Efektem jest rozpoznawalna oprawa wizualna wspierająca komunikację marki na każdym kanale.",
         ],
         links: [
-          { label: "Montaż wideo", href: "portfolio.html#montaz", i18n: "bento.montaz" },
-          { label: "Grafiki i social", href: "portfolio.html#grafiki", i18n: "bento.grafiki" },
+          { label: "Montaż wideo", href: "#montaz", i18n: "bento.montaz" },
+          { label: "Grafiki i social", href: "#grafiki", i18n: "bento.grafiki" },
         ],
       },
       en: {
@@ -200,8 +200,8 @@
           "The result is a recognizable visual language that supports brand communication on every channel.",
         ],
         links: [
-          { label: "Video editing", href: "portfolio.html#montaz", i18n: "bento.montaz" },
-          { label: "Graphics & social", href: "portfolio.html#grafiki", i18n: "bento.grafiki" },
+          { label: "Video editing", href: "#montaz", i18n: "bento.montaz" },
+          { label: "Graphics & social", href: "#grafiki", i18n: "bento.grafiki" },
         ],
       },
     },
