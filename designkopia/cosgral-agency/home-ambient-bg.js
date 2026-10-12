@@ -136,7 +136,7 @@
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
   var start = performance.now();
-  window.cosgralAmbientFrame = { time: 0, mouse: mouse };
+  window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse };
   var lastFrameTime = 0;
 
   var SCALE_BY_TIER = MOBILE ? [0.55, 0.45, 0.38] : [0.52, 0.44, 0.36];
@@ -195,6 +195,7 @@
 
     gl.uniform2f(uRes, canvas.width, canvas.height);
     window.cosgralAmbientFrame.time = (now - start) / 1000;
+    window.cosgralAmbientFrame.at = now;
     gl.uniform1f(uTime, window.cosgralAmbientFrame.time);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
     gl.drawArrays(gl.TRIANGLES, 0, 3);

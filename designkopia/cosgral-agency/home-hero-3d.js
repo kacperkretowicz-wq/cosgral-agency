@@ -1,7 +1,7 @@
 /** One glass model, a reversible scroll choreography, and a soft optical wake. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261012refine1';
-import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012refine1';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261012refine3';
+import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012refine3';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 
 (async function () {
@@ -256,6 +256,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*24));group.updateMatrixWorld(true);
     const dissolve=1-smooth(0.76,0.98,progress);
     glass.material.opacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
+    glass.material.depthWrite=glass.material.opacity>0.995;
     glass.visible=glass.material.opacity>0.008;group.visible=glass.visible&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');
@@ -264,7 +265,12 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     const portalVisible=!(footer&&menuBlend<0.01);
     if(portalVisible!==lastPortalVisible){canvas.parentElement.style.visibility=portalVisible?'visible':'hidden';lastPortalVisible=portalVisible;}
     if(footer&&menuBlend<0.01)return;
-    if(!group.visible&&!wake.visible)return;
+    if(!group.visible&&!wake.visible){
+      canvas.style.visibility='hidden';
+      if(wakeWasVisible&&!wakeContextLost)wakeRenderer.clear();
+      wakeWasVisible=false;
+      return;
+    }
     if(now<effectPauseUntil)return;
     // UI and input still update at the display rate; expensive effect renders
     // are capped at 60Hz on 120/144/240Hz monitors.
