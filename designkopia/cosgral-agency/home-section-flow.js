@@ -398,6 +398,7 @@
     if (fadeOut && next) {
       var nextPanel = next.querySelector(".home-scene__panel") || next;
       var lastClip = "";
+      var lastFade = "";
       /* Same iris language as the realizacje boards (spec-a circle mask,
          cubic-bezier(.25,1,.5,1)-like ease): the incoming scene opens from a
          circle rising at the bottom centre while the outgoing one recedes. */
@@ -407,7 +408,9 @@
         if (amt >= 0.985) return "";
         var vw = window.innerWidth || 1;
         var vh = window.innerHeight || 1;
-        var t = amt < 0.5 ? 4 * amt * amt * amt : 1 - Math.pow(-2 * amt + 2, 3) / 2;
+        /* open the circle over the first 72% of the cover, then let it rest */
+        var a = Math.min(1, amt / 0.72);
+        var t = a < 0.5 ? 4 * a * a * a : 1 - Math.pow(-2 * a + 2, 3) / 2;
         /* centre of the screen, expressed in the sliding panel's own box */
         var top = nextPanel.getBoundingClientRect().top;
         var cy = vh * 0.5 - top;
@@ -417,6 +420,16 @@
       function syncCover() {
         var amt = coverAmount();
         var clip = irisFor(amt);
+        /* Content follows the mask: headings fade/rise in only once the
+           circle has opened past them, so the edge never slices a title. */
+        var cf = REDUCED ? 1 : Math.max(0, Math.min(1, (amt - 0.32) / 0.4));
+        cf = cf * cf * (3 - 2 * cf);
+        var cfs = cf.toFixed(3);
+        if (cfs !== lastFade) {
+          nextPanel.style.setProperty("--iris-fade", cfs);
+          nextPanel.style.setProperty("--iris-rise", ((1 - cf) * 28).toFixed(1) + "px");
+          lastFade = cfs;
+        }
         if (clip !== lastClip || (amt > 0.001 && amt < 0.985)) {
           nextPanel.style.clipPath = clip;
           nextPanel.style.webkitClipPath = clip;

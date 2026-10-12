@@ -3653,3 +3653,9 @@ html.reduce-motion body.home-page .site-nav {
     html.is-free-scroll .cube-runway { height: 50svh; }
   }
 }
+
+/* Iris handoff: incoming scene content trails the circle mask. */
+main.home-film > .home-scene > .home-scene__panel > * {
+  opacity: var(--iris-fade, 1);
+  translate: 0 var(--iris-rise, 0px);
+}
