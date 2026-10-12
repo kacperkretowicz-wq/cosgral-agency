@@ -345,6 +345,13 @@
     var cards = [];
     var dotButtons = [];
 
+    function placeholderMedia() {
+      var ph = document.createElement("span");
+      ph.className = "sys-illu__placeholder";
+      ph.setAttribute("aria-hidden", "true");
+      return ph;
+    }
+
     currentCases.forEach(function (item, i) {
       var dot = document.createElement("button");
       dot.type = "button";
@@ -371,21 +378,22 @@
       if (circle) {
         var disc = document.createElement("span");
         disc.className = "sys-fan__disc";
+        var art = document.createElement("span");
+        art.className = "sys-illu";
+        art.appendChild(placeholderMedia());
+        var name = document.createElement("span");
+        name.className = "sys-illu__name";
+        name.textContent = item.title;
+        disc.appendChild(art);
+        disc.appendChild(name);
+        fig.appendChild(disc);
+      } else {
         var img = document.createElement("img");
-        img.src = item.img;
+        img.src = systemPhoto(item.id);
         img.alt = item.title;
         img.decoding = "async";
         img.draggable = false;
-        disc.appendChild(img);
-        fig.appendChild(disc);
-        fig.setAttribute("aria-label", item.title || "");
-      } else {
-        var fanImg = document.createElement("img");
-        fanImg.src = systemPhoto(item.id);
-        fanImg.alt = item.title;
-        fanImg.decoding = "async";
-        fanImg.draggable = false;
-        fig.appendChild(fanImg);
+        fig.appendChild(img);
         var cap = document.createElement("figcaption");
         cap.className = "sys-fan__cap";
         cap.textContent = item.tag;
@@ -589,99 +597,50 @@
       return raw;
     }
 
-    /* Spec-a ease: cubic-bezier(0.25, 1, 0.5, 1) via Newton. */
-    function swipeEase(t) {
-      if (t <= 0) return 0;
-      if (t >= 1) return 1;
-      var u = t;
-      var k;
-      for (k = 0; k < 5; k++) {
-        var x =
-          3 * (1 - u) * (1 - u) * u * 0.25 +
-          3 * (1 - u) * u * u * 0.5 +
-          u * u * u;
-        var dx =
-          3 * (1 - u) * (1 - u) * 0.25 +
-          6 * (1 - u) * u * (0.5 - 0.25) +
-          3 * u * u * (1 - 0.5);
-        if (Math.abs(dx) < 1e-5) break;
-        u -= (x - t) / dx;
-        if (u < 0) u = 0;
-        if (u > 1) u = 1;
-      }
-      return 3 * u - 3 * u * u + u * u * u;
-    }
-
-    function circlePose(raw) {
-      var vw = window.innerWidth || 480;
-      var vh = window.innerHeight || 600;
-      var mobile = vw < 760;
-      var ad = Math.abs(raw);
-      var x = vw * (0.5 + raw * (mobile ? 0.58 : 0.5));
-      var y = ad < 1
-        ? vh * (0.4075 + (0.515 - 0.4075) * ad)
-        : vh * 0.515;
-      var o = ad > 1.05 ? Math.max(0, 1 - (ad - 1.05) / 0.4) : 1;
-      return { x: x, y: y, s: 1, o: o, ad: ad };
-    }
-
-    var pillTimer = 0;
-    function pillOut() {
-      if (!pill) return;
-      pill.classList.remove("is-in");
-      pill.classList.add("is-out");
-    }
-    function pillIn() {
-      if (!pill || root.classList.contains("is-iris-open")) return;
-      pill.classList.remove("is-out");
-      pill.classList.add("is-in");
-    }
-
     function layoutCircle() {
       if (destroyed) return;
       var casesNow = getCases();
       var nearest = clampIndex(Math.round(index), n);
-      var stageRect = stage.getBoundingClientRect();
-      var vw = window.innerWidth || 1;
-      var vh = window.innerHeight || 1;
-      var mobile = vw < 760;
+      var w = stage.clientWidth || window.innerWidth || 1;
+      var h = stage.clientHeight || window.innerHeight || 1;
+      var mobile = (window.innerWidth || w) < 760;
       cards.forEach(function (card, i) {
         var raw = wrapRaw(i);
-        var pose = circlePose(raw);
         var ad = Math.abs(raw);
-        card.style.left = pose.x - stageRect.left + "px";
-        card.style.top = pose.y - stageRect.top + "px";
-        card.style.transform = "translate(-50%, -50%) scale(" + pose.s.toFixed(4) + ")";
-        card.style.opacity = String(Math.max(0, Math.min(1, pose.o)));
-        card.style.visibility = pose.o < 0.04 ? "hidden" : "visible";
-        card.style.pointerEvents = pose.o < 0.12 ? "none" : "auto";
-        card.style.zIndex = String(Math.round(30 - ad * 8));
+        var x = w * (0.5 + raw * (mobile ? 0.62 : 0.5));
+        var y = ad < 1 ? h * (0.36 + 0.1 * ad) : h * 0.46;
+        var o = ad > 1.05 ? Math.max(0, 1 - (ad - 1.05) / 0.35) : 1;
+        card.style.left = x + "px";
+        card.style.top = y + "px";
+        card.style.transform = "translate(-50%, -50%)";
+        card.style.opacity = String(Math.max(0, Math.min(1, o)));
+        card.style.visibility = o < 0.04 ? "hidden" : "visible";
+        card.style.pointerEvents = o < 0.12 ? "none" : "auto";
+        card.style.zIndex = String(Math.round(40 - ad * 8));
         card.classList.toggle("is-front", i === nearest);
         card.classList.toggle("is-side", ad > 0.55);
       });
       if (pill && !root.classList.contains("is-iris-open")) {
-        var slot = circlePose(0);
-        pill.style.left = slot.x - stageRect.left + "px";
-        pill.style.top = slot.y - stageRect.top + vw * 0.045 + "px";
+        pill.style.left = w * 0.5 + "px";
+        pill.style.top = h * 0.36 + Math.min(w, h) * (mobile ? 0.16 : 0.11) + "px";
       }
       if (navEl && dotsEl) {
-        var navRect = navEl.getBoundingClientRect();
-        var arcCx = vw * 0.5;
-        var arcCy = mobile ? navRect.bottom - 4 : vh * 0.989;
-        var arcR = vw * (mobile ? 0.34 : 0.2925);
-        var stepAng = mobile ? 36 : 47.5;
+        var navW = navEl.clientWidth || w;
+        var navH = navEl.clientHeight || h * 0.3;
+        var arcCx = navW * 0.5;
+        var arcCy = navH * 0.98;
+        var arcR = Math.min(navW * (mobile ? 0.34 : 0.22), navH * 0.92);
         dotButtons.forEach(function (dot, i) {
           var raw = wrapRaw(i);
-          var ang = raw * stepAng * (Math.PI / 180);
+          var ang = raw * (mobile ? 32 : 38) * (Math.PI / 180);
           var x = arcCx + Math.sin(ang) * arcR;
           var y = arcCy - Math.cos(ang) * arcR;
-          var on = i === nearest;
-          var show = Math.abs(raw) < 2.35 && y < vh + 4;
-          if (mobile) show = show && y > navRect.top + 2;
-          dot.style.left = x - navRect.left + "px";
-          dot.style.top = y - navRect.top + "px";
+          var show = Math.abs(raw) < 2.15 && y > navH * 0.08;
+          dot.style.left = x + "px";
+          dot.style.top = y + "px";
           dot.style.opacity = show ? "1" : "0";
           dot.style.pointerEvents = show ? "auto" : "none";
+          var on = i === nearest;
           dot.classList.toggle("is-active", on);
           if (on) dot.setAttribute("aria-current", "true");
           else dot.removeAttribute("aria-current");
@@ -690,62 +649,36 @@
       if (typeof opts.onChange === "function") opts.onChange(nearest, casesNow[nearest]);
     }
 
-    function scrollWord() {
-      var t = window.cosgralI18n && window.cosgralI18n.t && window.cosgralI18n.t("hero.scroll");
-      return t || (storyLang() === "en" ? "Scroll" : "Przewiń");
-    }
-
     function fillIris(el, item) {
       var paras = storyOf(item);
-      el.querySelector(".sys-iris__kicker").textContent = item.tag || item.client || "";
+      el.querySelector(".sys-iris__kicker").textContent = item.client || item.tag || "";
       el.querySelector(".sys-iris__h").textContent = item.title || "";
-      var copy = el.querySelector(".sys-iris__copy");
-      if (!copy) return;
-      Array.prototype.slice.call(copy.querySelectorAll(".sys-iris__p")).forEach(function (node) {
-        if (node.parentNode) node.parentNode.removeChild(node);
-      });
-      var more = copy.querySelector(".sys-iris__more");
+      var body = el.querySelector(".sys-iris__body");
+      body.innerHTML = "";
       paras.forEach(function (text) {
         var p = document.createElement("p");
         p.className = "sys-iris__p";
         p.textContent = text;
-        if (more) copy.insertBefore(p, more);
-        else copy.appendChild(p);
+        body.appendChild(p);
       });
-      if (more) more.textContent = pillLabel();
-      var hint = el.querySelector("[data-iris-scroll]");
-      if (hint) hint.textContent = scrollWord();
     }
 
     function buildIris(item, prev, next, rect) {
       var el = document.createElement("div");
       el.className = "sys-iris";
       el.innerHTML =
-        '<svg class="sys-fan__goo-svg" aria-hidden="true"><filter id="sys-iris-goo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo"/><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></svg>' +
         '<div class="sys-iris__disc"></div>' +
-        '<div class="sys-iris__sat sys-iris__sat--a"><img alt=""></div>' +
-        '<div class="sys-iris__sat sys-iris__sat--b"><img alt=""></div>' +
-        '<div class="sys-iris__sat sys-iris__sat--c"><img alt=""></div>' +
-        '<div class="sys-iris__hint"><span data-iris-scroll></span><div class="sys-iris__dots" aria-hidden="true"><i></i><i></i><i></i></div></div>' +
-        '<div class="sys-iris__copy"><p class="sys-iris__kicker"></p><h3 class="sys-iris__h"></h3><button type="button" class="sys-iris__more"></button></div>' +
-        '<div class="sys-iris__nav"><div class="sys-iris__nav-goo"><div class="sys-iris__semi"></div><div class="sys-iris__neck"></div></div></div>';
+        '<div class="sys-iris__sat sys-iris__sat--a"></div>' +
+        '<div class="sys-iris__sat sys-iris__sat--b"></div>' +
+        '<div class="sys-iris__sat sys-iris__sat--c"></div>' +
+        '<div class="sys-iris__copy"><p class="sys-iris__kicker"></p><h3 class="sys-iris__h"></h3><div class="sys-iris__body"></div></div>' +
+        '<button type="button" class="sys-iris__close" aria-label="Zamknij">×</button>';
       var sats = el.querySelectorAll(".sys-iris__sat");
       var trio = [item, prev, next];
       for (var s = 0; s < sats.length; s++) {
-        var satImg = sats[s].querySelector("img");
-        if (!satImg || !trio[s]) continue;
-        satImg.src = trio[s].img;
-        satImg.alt = trio[s].title || "";
+        if (trio[s]) sats[s].appendChild(placeholderMedia());
       }
       fillIris(el, item);
-      var moreBtn = el.querySelector(".sys-iris__more");
-      if (moreBtn) {
-        moreBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          closeIris();
-        });
-      }
       var disc = el.querySelector(".sys-iris__disc");
       disc.style.left = rect.left + "px";
       disc.style.top = rect.top + "px";
@@ -759,9 +692,9 @@
       var vh = window.innerHeight || 1;
       var targets = open
         ? [
-            { x: vw * 0.506, y: vh * 0.513 },
-            { x: vw * 0.41, y: vh * 0.329 },
-            { x: vw * 0.636, y: vh * 0.36 },
+            { x: vw * 0.34, y: vh * 0.42 },
+            { x: vw * 0.22, y: vh * 0.24 },
+            { x: vw * 0.48, y: vh * 0.22 },
           ]
         : [
             { x: cx, y: cy },
@@ -770,9 +703,9 @@
           ];
       if (vw < 760 && open) {
         targets = [
-          { x: vw * 0.34, y: vh * 0.28 },
-          { x: vw * 0.68, y: vh * 0.2 },
-          { x: vw * 0.78, y: vh * 0.38 },
+          { x: vw * 0.28, y: vh * 0.22 },
+          { x: vw * 0.62, y: vh * 0.16 },
+          { x: vw * 0.72, y: vh * 0.32 },
         ];
       }
       var sats = el.querySelectorAll(".sys-iris__sat");
@@ -793,7 +726,10 @@
       var rect = cards[i].getBoundingClientRect();
       var cx = rect.left + rect.width / 2;
       var cy = rect.top + rect.height / 2;
-      pillOut();
+      if (pill) {
+        pill.classList.remove("is-in");
+        pill.classList.add("is-out");
+      }
       root.classList.add("is-iris-open");
       var el = buildIris(item, prev, next, rect);
       placeSats(el, cx, cy, false);
@@ -804,9 +740,17 @@
       irisEl = el;
       irisOpen = true;
       el.addEventListener("click", function (e) {
-        if (e.target.closest && e.target.closest(".sys-iris__more")) return;
+        if (e.target.closest && e.target.closest(".sys-iris__copy")) return;
         closeIris();
       });
+      var closeBtn = el.querySelector(".sys-iris__close");
+      if (closeBtn) {
+        closeBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeIris();
+        });
+      }
       if (reduced) {
         el.classList.add("is-open");
         placeSats(el, cx, cy, true);
@@ -845,10 +789,13 @@
           irisEl = null;
           irisOpen = false;
         }
-        pillIn();
+        if (pill) {
+          pill.classList.remove("is-out");
+          pill.classList.add("is-in");
+        }
         if (autoplay) startAuto();
         if (done) done();
-      }, reduced ? 0 : 900);
+      }, reduced ? 0 : 880);
     }
 
     function onIrisKey(e) {
@@ -989,37 +936,24 @@
       if (!animate || reduced) {
         index = clampIndex(Math.round(to), n);
         layout();
-        if (circle) pillIn();
         return;
       }
       var delta = to - from;
       while (delta > n / 2) delta -= n;
       while (delta < -n / 2) delta += n;
-      if (Math.abs(delta) < 0.001) {
-        index = clampIndex(Math.round(from), n);
-        layout();
-        if (circle) pillIn();
-        return;
-      }
       to = from + delta;
-      if (circle) {
-        pillOut();
-        if (pillTimer) window.clearTimeout(pillTimer);
-      }
       var t0 = performance.now();
-      var dur = circle ? 800 : 1040;
+      var dur = 1040;
       if (raf) cancelAnimationFrame(raf);
       function tick(now) {
         var p = Math.min(1, (now - t0) / dur);
-        var e = circle ? swipeEase(p) : 1 - Math.pow(1 - p, 3);
+        var e = 1 - Math.pow(1 - p, 3);
         index = from + (to - from) * e;
         layout();
         if (p < 1) raf = requestAnimationFrame(tick);
         else {
           index = clampIndex(Math.round(to), n);
           layout();
-          raf = 0;
-          if (circle) pillTimer = window.setTimeout(pillIn, 0);
         }
       }
       raf = requestAnimationFrame(tick);
@@ -1069,9 +1003,7 @@
       dragging = true;
       didDrag = false;
       vel = 0;
-      dragOrigin = index;
       lastX = x;
-      if (circle) pillOut();
       stopAuto();
       stage.classList.add("is-dragging");
       document.body.classList.add("is-sys-fan-dragging");
@@ -1092,7 +1024,6 @@
         vel = 0;
         dragOrigin = index;
         lastX = originX;
-        if (circle) pillOut();
         stopAuto();
         stage.classList.add("is-dragging");
         document.body.classList.add("is-sys-fan-dragging");
@@ -1103,12 +1034,8 @@
       var dx = x - lastX;
       lastX = x;
       if (Math.abs(dx) > 2) didDrag = true;
-      var w = stage.clientWidth || window.innerWidth || 360;
-      var pxPer = circle
-        ? Math.max(88, w * (w < 760 ? 0.34 : 0.22))
-        : 1 / 0.006;
-      vel = dx / pxPer;
-      index -= dx / pxPer;
+      vel = dx * 0.006;
+      index -= dx * 0.006;
       while (index < 0) index += n;
       while (index >= n) index -= n;
       layout();
@@ -1189,11 +1116,6 @@
     layout();
     if (circle) {
       window.addEventListener("resize", layout);
-      requestAnimationFrame(function () {
-        if (destroyed) return;
-        layout();
-        pillIn();
-      });
     }
     if (autoplay) startAuto();
 
@@ -1234,15 +1156,8 @@
           });
         }
         cards.forEach(function (card, di) {
-          if (!currentCases[di]) return;
-          if (circle) {
-            card.setAttribute("aria-label", currentCases[di].title || "");
-            var discImg = card.querySelector(".sys-fan__disc img");
-            if (discImg) {
-              discImg.src = currentCases[di].img;
-              discImg.alt = currentCases[di].title || "";
-            }
-          }
+          var nm = card.querySelector(".sys-illu__name");
+          if (nm && currentCases[di]) nm.textContent = currentCases[di].title;
         });
         if (pill) pill.textContent = pillLabel();
         if (irisEl && irisOpen) {
