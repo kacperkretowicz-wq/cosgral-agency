@@ -63,8 +63,15 @@
   ];
 
   function footerHoldY() {
+    var footer = document.querySelector(".site-footer");
     var max = window.ScrollTrigger ? ScrollTrigger.maxScroll(window) : 1;
-    return Math.max(0, max);
+    if (!footer) return max;
+    var scrollY = window.scrollY || window.pageYOffset || 0;
+    if (window.cosgralSmoothScroll && typeof window.cosgralSmoothScroll.scroll === "number") {
+      scrollY = window.cosgralSmoothScroll.scroll;
+    }
+    var y = footer.getBoundingClientRect().top + scrollY;
+    return Math.min(max, Math.max(0, y));
   }
 
   function sectionLayoutTop(el) {
@@ -171,7 +178,7 @@
       if (scene.footer) {
         var footerY = footerHoldY();
         if (window.cosgralSmoothScroll?.scrollTo) {
-          window.cosgralSmoothScroll.scrollTo(footerY, { duration: MOBILE ? 0.75 : 0.9 });
+          window.cosgralSmoothScroll.scrollTo(footerY, { duration: MOBILE ? 4.4 : 5.28 });
         }
         return;
       }
@@ -181,7 +188,7 @@
       if (window.cosgralSectionSnap?.goToY) {
         window.cosgralSectionSnap.goToY(target);
       } else if (window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(target, { duration: MOBILE ? 0.75 : 0.9 });
+        window.cosgralSmoothScroll.scrollTo(target, { duration: MOBILE ? 2.2 : 2.7 });
       } else {
         window.scrollTo({ top: target, behavior: "smooth" });
       }
@@ -225,6 +232,8 @@
     }
 
     window.addEventListener("cosgral:langchange", refreshRailI18n);
+    /* Expose so outer scope can call after init() */
+    window._railRefreshI18n = refreshRailI18n;
 
     function refreshMetrics() {
       maxScroll = ScrollTrigger.maxScroll(window) || 1;
@@ -294,16 +303,52 @@
     function activeScene() {
       var best = null;
       var bestDist = Infinity;
-      var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
 
-      for (var i = 0; i < SCENES.length; i++) {
-        var center = holdPositions[i] != null ? holdPositions[i] : 0;
+      SCENES.forEach(function (scene, i) {
+        if (scene.footer) {
+          var footerY = footerHoldY();
+          var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
+          var dist = Math.abs(scroll - footerY);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = { scene: scene, st: null, index: i };
+          }
+          return;
+        }
+        var st = ScrollTrigger.getById(scene.stId);
+        if (!st) return;
+        var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
+        var center = holdScroll(st, scene.hold);
+        var dist = Math.abs(scroll - center);
+        if (st.isActive && dist < bestDist) {
+          bestDist = dist;
+          best = { scene: scene, st: st, index: i };
+        }
+      });
+
+      if (best) return best;
+
+      var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
+      SCENES.forEach(function (scene, i) {
+        if (scene.footer) {
+          var footerY = footerHoldY();
+          var dist = Math.abs(scroll - footerY);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = { scene: scene, st: null, index: i };
+          }
+          return;
+        }
+        var st = ScrollTrigger.getById(scene.stId);
+        if (!st) return;
+        var center = holdScroll(st, scene.hold);
         var dist = Math.abs(scroll - center);
         if (dist < bestDist) {
           bestDist = dist;
-          best = { scene: SCENES[i], index: i };
+          best = { scene: scene, st: st, index: i };
         }
-      }
+      });
+
       return best;
     }
 
@@ -312,7 +357,7 @@
     }
 
     function update() {
-      if (!holdPositions.length) refreshMetrics();
+      refreshMetrics();
       var scroll = window.cosgralSmoothScroll?.lenis?.scroll ?? window.scrollY;
       var current = activeScene();
       var fillPct = fillHeightForScroll(scroll);
@@ -365,7 +410,7 @@
       });
     });
 
-    ScrollTrigger.addEventListener("refresh", function () { refreshMetrics(); update(); });
+    ScrollTrigger.addEventListener("refresh", update);
     if (window.cosgralSmoothScroll?.lenis) {
       window.cosgralSmoothScroll.lenis.on("scroll", update);
     } else {
@@ -400,5 +445,13 @@
     });
     if (window.ScrollTrigger) ScrollTrigger.refresh();
     init();
+    /* Apply current language to dots/titles right after init */
+    if (window._railRefreshI18n) {
+      if (window.cosgralI18n && window.cosgralI18n.t) {
+        window._railRefreshI18n();
+      } else {
+        window.addEventListener("cosgral:i18n-ready", window._railRefreshI18n, { once: true });
+      }
+    }
   })();
 })();

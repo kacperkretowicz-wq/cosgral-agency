@@ -70,6 +70,7 @@
     /* Free-scroll depth stack: nie nadpisuj scrubowanych scale/blur/y */
     if (document.documentElement.classList.contains("is-free-scroll")) {
       scene.classList.add("is-entered", "is-visible");
+      snapSceneEntersVisible(scene);
       return;
     }
     gsap.set(panel, {
@@ -78,12 +79,17 @@
       filter: MOBILE ? "none" : "blur(0px)",
     });
     scene.classList.add("is-entered", "is-visible");
+    snapSceneEntersVisible(scene);
   }
 
   function playSceneEnters(scene, opts) {
     if (!scene || REDUCED || !window.gsap) return;
     opts = opts || {};
-    if (!opts.force && enteredScenes.has(scene)) return;
+    if (!opts.force && enteredScenes.has(scene)) {
+      /* Ponowne wejście: upewnij się, że nic nie zostało na visibility:hidden */
+      snapSceneEntersVisible(scene);
+      return;
+    }
     enteredScenes.add(scene);
 
     var targets = sceneEnterTargets(scene);
@@ -96,16 +102,19 @@
         (el.parentElement && el.parentElement.getAttribute("data-enter")) ||
         "bottom";
       var from = enterFrom(dir);
+      /* opacity (nie autoAlpha) — visibility:hidden blokuje kliknięcia w kafelki / CTA */
       gsap.fromTo(
         el,
         {
-          autoAlpha: 0,
+          opacity: 0,
+          visibility: "visible",
           x: from.x,
           y: from.y,
           filter: MOBILE ? "none" : "blur(8px)",
         },
         {
-          autoAlpha: 1,
+          opacity: 1,
+          visibility: "visible",
           x: 0,
           y: 0,
           filter: "none",
@@ -113,9 +122,19 @@
           ease: "power3.out",
           delay: opts.stagger === false ? 0 : i * 0.055,
           overwrite: true,
+          onComplete: function () {
+            el.style.visibility = "visible";
+            el.style.opacity = "1";
+            el.style.pointerEvents = "";
+          },
         }
       );
     });
+    /* Safety: po animacji wymuś widoczność (klik Realizacji) */
+    window.setTimeout(function () {
+      if (!scene.classList.contains("is-visible") && !scene.classList.contains("is-depth-active")) return;
+      snapSceneEntersVisible(scene);
+    }, 1100);
   }
 
   function snapSceneEntersVisible(scene) {
@@ -125,10 +144,16 @@
     if (!targets.length) return;
     gsap.killTweensOf(targets);
     gsap.set(targets, {
-      autoAlpha: 1,
+      opacity: 1,
+      visibility: "visible",
       x: 0,
       y: 0,
       filter: "none",
+    });
+    targets.forEach(function (el) {
+      el.style.visibility = "visible";
+      el.style.opacity = "1";
+      el.style.pointerEvents = "";
     });
   }
 
@@ -146,7 +171,8 @@
         "bottom";
       var from = enterFrom(dir);
       gsap.set(el, {
-        autoAlpha: 0,
+        opacity: 0,
+        visibility: "visible",
         x: from.x,
         y: from.y,
         filter: MOBILE ? "none" : "blur(8px)",
@@ -271,7 +297,8 @@
       p = Math.max(0, Math.min(1, p));
       if (!depth || !fadeOut) {
         gsap.set(panel, {
-          autoAlpha: 1,
+          opacity: 1,
+          visibility: "visible",
           yPercent: 0,
           scale: 1,
           filter: "blur(0px)",
@@ -282,13 +309,14 @@
       }
       if (p <= holdEnd) {
         gsap.set(panel, {
-          autoAlpha: 1,
+          opacity: 1,
+          visibility: "visible",
           yPercent: 0,
           scale: 1,
           filter: "blur(0px)",
           force3D: true,
         });
-        gsap.set(scene, { autoAlpha: 1 });
+        gsap.set(scene, { opacity: 1, visibility: "visible" });
         scene.classList.remove("is-depth-recessed", "is-depth-gone");
         scene.style.pointerEvents = "";
         return;
@@ -296,8 +324,10 @@
       var u = easeInOut((p - holdEnd) / Math.max(1 - holdEnd, 0.001));
       /* Pod koniec przyspiesz zanik — w połowie jeszcze widać, przy cover=1 już nie */
       var fade = u * u;
+      /* opacity (nie autoAlpha) — klikalne w trakcie blur / transition */
       gsap.set(panel, {
-        autoAlpha: 1 - (1 - exitAlpha) * fade,
+        opacity: 1 - (1 - exitAlpha) * fade,
+        visibility: "visible",
         yPercent: exitY * u,
         scale: 1 - (1 - exitScale) * u,
         filter: "blur(" + (exitBlur * u).toFixed(2) + "px)",
@@ -307,18 +337,19 @@
       if (hideWhenGone && u >= 0.98) {
         scene.classList.add("is-depth-gone");
         scene.style.pointerEvents = "none";
-        gsap.set(scene, { autoAlpha: 0 });
-        gsap.set(panel, { autoAlpha: 0, filter: "blur(0px)" });
+        gsap.set(scene, { opacity: 0, visibility: "hidden" });
+        gsap.set(panel, { opacity: 0, visibility: "hidden", filter: "blur(0px)" });
       } else {
         scene.classList.remove("is-depth-gone");
-        gsap.set(scene, { autoAlpha: 1 });
+        gsap.set(scene, { opacity: 1, visibility: "visible" });
         /* Interact while still partly visible — don't wait for a perfect snap */
         scene.style.pointerEvents = "";
       }
     }
 
     gsap.set(panel, {
-      autoAlpha: 1,
+      opacity: 1,
+      visibility: "visible",
       yPercent: 0,
       scale: 1,
       filter: "blur(0px)",
@@ -730,30 +761,39 @@
       next: null,
       priority: 6,
       fadeOut: false,
-      onEnter: lockSandStream,
-      onEnterBack: lockSandStream,
+      onEnter: function () {
+        lockSandStream();
+        document.documentElement.classList.add("is-footer-step");
+      },
+      onEnterBack: function () {
+        lockSandStream();
+        document.documentElement.classList.add("is-footer-step");
+      },
       onLeave: lockSandStream,
-      onLeaveBack: lockSandStream,
+      onLeaveBack: function () {
+        lockSandStream();
+        document.documentElement.classList.remove("is-footer-step", "is-footer-covered");
+      },
     });
 
-    /* Kontakt + stopka: bez fade przez pusty runway — jedna ciągła sekcja na --bg */
-    if (contact && document.querySelector(".site-footer")) {
+    /* Kontakt + stopka: jedna ciągła sekcja — bez cover handoff / is-depth-gone */
+    if (document.querySelector(".site-footer")) {
       ScrollTrigger.create({
-        id: "footer-handoff",
+        id: "footer-step",
         trigger: ".site-footer",
         start: "top 92%",
-        end: "bottom bottom",
-        scrub: MOBILE ? 0.6 : 0.8,
-        onUpdate: function (self) {
-          var fade = self.progress;
-          var eased = fade * fade * (3 - 2 * fade);
-          document.documentElement.classList.toggle("is-footer-step", eased > 0.25);
-          document.documentElement.classList.toggle("is-footer-covered", eased > 0.05);
-          contact.classList.toggle("is-footer-handoff", eased > 0.05);
+        end: "top top",
+        onEnter: function () {
+          document.documentElement.classList.add("is-footer-step");
+        },
+        onEnterBack: function () {
+          document.documentElement.classList.add("is-footer-step");
+          document.documentElement.classList.remove("is-footer-covered");
+        },
+        onLeave: function () {
+          document.documentElement.classList.add("is-footer-step", "is-footer-covered");
         },
         onLeaveBack: function () {
-          contact.classList.remove("is-footer-handoff");
-          document.documentElement.classList.remove("is-footer-step");
           document.documentElement.classList.remove("is-footer-covered");
         },
       });

@@ -15,6 +15,9 @@
   var hint = document.querySelector("[data-fan-hint]");
   var btnPrev = document.querySelector("[data-fan-prev]");
   var btnNext = document.querySelector("[data-fan-next]");
+  var sideHits = Array.prototype.slice.call(
+    section.querySelectorAll("[data-fan-side]")
+  );
   var total = cards.length;
   var REDUCED = document.documentElement.classList.contains("reduce-motion");
   var MOBILE = window.matchMedia("(max-width: 900px)").matches;
@@ -36,7 +39,7 @@
   var wheelAccumX = 0;
   var wheelCooldown = false;
   var lastNavAt = 0;
-  var NAV_COOLDOWN_MS = 260;
+  var NAV_COOLDOWN_MS = 620;
   var WHEEL_THRESHOLD = 165;
   var HORIZONTAL_RATIO = 2.4;
   var wheelDecayTimer = null;
@@ -181,9 +184,6 @@
 
   /* Usługi w kadrze (IO threshold 0.35) — bramka odtwarzania wideo w layout(). */
   var videoZoneVisible = false;
-  var videoPlayback = new WeakMap();
-  var cardVideos = cards.map(function (card) { return card.querySelector("video"); });
-  window.addEventListener("cosgral:menu-state", function () { layout(displayPos); });
 
   function ensureVideoSrc(video) {
     if (!video || video.getAttribute("src")) return;
@@ -195,7 +195,6 @@
 
   function layout(position) {
     var activeIndex = ((Math.round(wrapPos(position)) % total) + total) % total;
-    var mayPlay = videoZoneVisible && !document.body.classList.contains("is-nav-menu-open") && !document.hidden;
 
     cards.forEach(function (card, i) {
       var o = wrapOffset(i, position);
@@ -220,19 +219,15 @@
       card.tabIndex = isActive ? 0 : -1;
       card.style.pointerEvents = isActive ? "auto" : "none";
 
-      var video = cardVideos[i];
+      var video = card.querySelector("video");
       if (video) {
         /* Odtwarzaj tylko, gdy Usługi są w kadrze — wcześniej aktywna karta grała
            od załadowania strony (4 MB + dekodowanie w tle przez całe intro hero).
            Wejście sekcji w kadr woła layout() ponownie (IntersectionObserver niżej). */
-        var shouldPlay = isActive && mayPlay;
-        if (videoPlayback.get(video) !== shouldPlay) {
-          videoPlayback.set(video, shouldPlay);
-          if (shouldPlay) {
-            ensureVideoSrc(video);
-            video.play().catch(function () {});
-          } else if (!video.paused) video.pause();
-        }
+        if (isActive && videoZoneVisible) {
+          ensureVideoSrc(video);
+          video.play().catch(function () {});
+        } else video.pause();
       }
     });
 
@@ -314,71 +309,139 @@
 
   function goTo(nextIndex) {
     var wrapped = ((nextIndex % total) + total) % total;
-    if (wrapped === targetPos && Math.abs(shortestDelta(displayPos, wrapped)) < 0.05) return;
+    if (wrapped === index && Math.abs(shortestDelta(displayPos, wrapped)) < 0.05) return;
     targetPos = wrapped;
-    if (REDUCED) { displayPos = wrapped; layout(wrapped); return; }
     scheduleTick();
   }
 
   function next() {
-    goTo(targetPos + 1);
+    goTo(index + 1);
   }
 
   function prev() {
-    goTo(targetPos - 1);
+    goTo(index - 1);
   }
 
   var ticking = false;
-  var lastTickAt = 0;
   function scheduleTick() {
     if (ticking || REDUCED) return;
     ticking = true;
     requestAnimationFrame(tick);
   }
 
-  function tick(now) {
+  function tick() {
     ticking = false;
     var delta = shortestDelta(displayPos, targetPos);
     if (Math.abs(delta) > 0.01) {
       fan.classList.add("is-animating");
-      var dt = Math.min(0.05, Math.max(0.001, (now - (lastTickAt || now - 16.7)) / 1000));
-      lastTickAt = now;
-      displayPos = wrapPos(displayPos + delta * (1 - Math.exp(-dt * (MOBILE ? 20 : 18))));
+      displayPos = wrapPos(displayPos + delta * LERP);
       layout(displayPos);
       scheduleTick();
     } else if (Math.abs(delta) > 0.0005) {
       displayPos = targetPos;
       layout(displayPos);
       fan.classList.remove("is-animating");
-      lastTickAt = 0;
     } else {
       fan.classList.remove("is-animating");
-      lastTickAt = 0;
     }
   }
 
-  // ——— Nawigacja: cała sekcja Usługi — lewa połowa = prev, prawa = next ———
+  // ——— Nawigacja: boczne strefy (nawet nad kafelkiem) = prev/next;
+  // środek aktywnego kafelka nadal otwiera panel usługi ———
+  var SIDE_ZONE = MOBILE ? 0.36 : 0.42;
+
+  function sideZoneFromX(clientX) {
+    var rect = section.getBoundingClientRect();
+    var ratio = (clientX - rect.left) / Math.max(1, rect.width);
+    if (ratio < SIDE_ZONE) return -1;
+    if (ratio > 1 - SIDE_ZONE) return 1;
+    return 0;
+  }
+
   function sideFromEvent(e) {
+    var zone = sideZoneFromX(e.clientX);
+    if (zone !== 0) return zone;
     var rect = section.getBoundingClientRect();
     var x = e.clientX - rect.left;
     return x < rect.width * 0.5 ? -1 : 1;
   }
 
-  section.addEventListener("click", function (e) {
-    var card = e.target.closest(".services-fan__card");
-    if (card) {
-      if (card.classList.contains("is-active")) return;
-      e.preventDefault();
+  section.addEventListener(
+    "click",
+    function (e) {
+      if (e.target.closest("a")) return;
+      var zone = sideZoneFromX(e.clientX);
+      /* Lewa/prawa strona ekranu — zawsze karuzela, kafelek nie przechwytuje */
+      if (zone !== 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        hideHint();
+        hideTapHint();
+        if (zone < 0) prev();
+        else next();
+        return;
+      }
+      /* Środek: aktywny kafelek → service-panel (document capture); poza kartą → nawigacja */
+      if (e.target.closest(".services-fan__card.is-active")) return;
       hideHint();
       hideTapHint();
-      goTo(cards.indexOf(card));
-      return;
-    }
-    if (e.target.closest("a")) return;
-    hideHint();
-    hideTapHint();
-    if (sideFromEvent(e) < 0) prev();
-    else next();
+      if (sideFromEvent(e) < 0) prev();
+      else next();
+    },
+    true
+  );
+
+  if (btnPrev) {
+    btnPrev.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      hideHint();
+      hideTapHint();
+      prev();
+    });
+  }
+  if (btnNext) {
+    btnNext.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      hideHint();
+      hideTapHint();
+      next();
+    });
+  }
+  sideHits.forEach(function (btn) {
+    btn.addEventListener(
+      "click",
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        hideHint();
+        hideTapHint();
+        if (btn.getAttribute("data-fan-side") === "prev") prev();
+        else next();
+      },
+      true
+    );
+  });
+
+  /* Aktywny kafelek: klik w bocznej 1/3 karty = prev/next, nie panel */
+  cards.forEach(function (card) {
+    card.addEventListener(
+      "click",
+      function (e) {
+        if (!card.classList.contains("is-active")) return;
+        var r = card.getBoundingClientRect();
+        var ratio = (e.clientX - r.left) / Math.max(1, r.width);
+        if (ratio >= 0.22 && ratio <= 0.78) return; /* środek → service-panel */
+        e.preventDefault();
+        e.stopPropagation();
+        hideHint();
+        hideTapHint();
+        if (ratio < 0.5) prev();
+        else next();
+      },
+      true
+    );
   });
 
   section.addEventListener(
@@ -428,13 +491,21 @@
       touchTracking = false;
       touchAxis = null;
 
-      // Krótki tap (bez swipe) — lewa/prawa połowa sekcji.
+      // Krótki tap (bez swipe) — boczne strefy zawsze zmieniają kafelek.
       if (!axis || (Math.abs(dx) < SWIPE_MIN_DX && Math.abs(dy) < SWIPE_MIN_DX)) {
+        var zone = sideZoneFromX(endX);
+        if (zone !== 0) {
+          hideHint();
+          hideTapHint();
+          if (zone < 0) prev();
+          else next();
+          return;
+        }
         var active = section.querySelector(".services-fan__card.is-active");
         if (active) {
           var r = active.getBoundingClientRect();
           if (endX >= r.left && endX <= r.right && endY >= r.top && endY <= r.bottom) {
-            return; // tap w kafelek → zostaw klikowi otwarcie panelu
+            return; // tap w środek kafelka → zostaw klikowi otwarcie panelu
           }
         }
         hideHint();
@@ -542,7 +613,6 @@
   }
 
   layout(0);
-  document.addEventListener("visibilitychange", function () { layout(displayPos); });
   scheduleTick();
 
   // Warm video sources once Usługi is near the viewport (40% vh before).
@@ -571,6 +641,9 @@
   window.cosgralServicesFan = {
     goToIndex: function (nextIndex) {
       goTo(nextIndex);
+    },
+    isSideNavZone: function (clientX) {
+      return sideZoneFromX(clientX) !== 0;
     },
     stepFromWheel: function (deltaY) {
       if (!isUslugiActive() || !canNavigate()) return false;

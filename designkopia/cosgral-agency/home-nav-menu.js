@@ -38,15 +38,8 @@
   }
 
   function serviceHref(theme) {
-    var pages = {
-      blue: "tworzenie-stron-internetowych.html",
-      purple: "projektowanie-aplikacji.html",
-      gold: "pozycjonowanie-seo-geo.html",
-      orange: "wdrazanie-automatyzacji.html",
-      crimson: "systemy-crm.html",
-      green: "grafika-i-montaz-wideo.html",
-    };
-    return siteRoot() + "uslugi/" + pages[theme];
+    if (document.body.classList.contains("home-page")) return "?service=" + theme;
+    return siteRoot() + "index.html?service=" + theme;
   }
 
   function findServicesLink() {
@@ -219,13 +212,12 @@
     return overlay.querySelectorAll(".nav-overlay__char");
   }
 
-  var lastProjection = "";
   function syncStageToCube() {
     if (!isOpen || !stage) return;
 
     var mobile = window.matchMedia("(max-width: 900px)").matches;
-    /* Keep every category on the glass face, including the services submenu. */
-    if (mobile && servicesExpanded && !window.cosgralCube) {
+    /* Services on mobile: left column, same type size as main menu */
+    if (mobile && servicesExpanded) {
       var panelW = Math.min(window.innerWidth * 0.88, 320);
       var inset = Math.max(16, window.innerWidth * 0.06);
       stage.style.left = inset + "px";
@@ -243,28 +235,14 @@
       window.cosgralCube?.getMenuFaceAnchorRect?.() ||
       window.cosgralCube?.getMenuFaceRect?.();
     if (rect && rect.size > 40) {
-      var face = Math.max(rect.size, 80);
-      rect.x = Math.round(rect.x * 4) / 4;
-      rect.y = Math.round(rect.y * 4) / 4;
-      face = Math.round(face * 4) / 4;
-      var reveal = Math.round((window.cosgralCube?.getMenuLabelReveal?.() ?? 1) * 1000) / 1000;
-      var projection = rect.x + "|" + rect.y + "|" + face + "|" + reveal;
-      if (projection === lastProjection) {
-        syncRaf = window.requestAnimationFrame(syncStageToCube);
-        return;
-      }
-      lastProjection = projection;
+      var face = Math.max(rect.size, mobile ? Math.min(window.innerWidth * 0.72, 280) : 240);
       stage.style.left = rect.x + "px";
       stage.style.top = rect.y + "px";
       stage.style.width = face + "px";
       stage.style.height = "auto";
       stage.style.minHeight = face + "px";
       stage.style.setProperty("--menu-face-size", face + "px");
-      stage.style.setProperty("--projected-x", rect.x + "px");
-      stage.style.setProperty("--projected-y", rect.y + "px");
-      stage.style.setProperty("--projected-size", face + "px");
       stage.style.transform = "translate(-50%, -50%)";
-      stage.style.opacity = String(reveal);
     } else {
       var fallback = Math.min(window.innerWidth * (mobile ? 0.86 : 0.72), mobile ? 340 : 360);
       stage.style.left = "50%";
@@ -274,24 +252,13 @@
       stage.style.minHeight = fallback + "px";
       stage.style.setProperty("--menu-face-size", fallback + "px");
       stage.style.transform = "translate(-50%, -50%)";
-      stage.style.opacity = "1";
     }
 
     syncRaf = window.requestAnimationFrame(syncStageToCube);
   }
 
   function startStageSync() {
-    // Project the navigation onto the cube face every frame.
-    stopStageSync();
-    lastProjection = "";
-    if (!stage) return;
-    stage.style.left = "50%";
-    stage.style.top = "50%";
-    stage.style.width = "min(84vw, 360px)";
-    stage.style.height = "auto";
-    stage.style.minHeight = "min(84vw, 360px)";
-    stage.style.setProperty("--menu-face-size", "min(84vw, 360px)");
-    stage.style.transform = "translate(-50%, -50%)";
+    if (syncRaf) window.cancelAnimationFrame(syncRaf);
     syncStageToCube();
   }
 
@@ -308,9 +275,7 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("is-nav-menu-open", open);
     document.documentElement.classList.toggle("is-nav-menu-open", open);
-    var scrolling = window.cosgralSmoothScroll?.lenis;
-    if (scrolling) { if (open) scrolling.stop(); else scrolling.start(); }
-    window.dispatchEvent(new CustomEvent("cosgral:menu-state", { detail: { open: open } }));
+    setScrollLock(open);
     if (open && backdrop && window.gsap) {
       gsap.set(backdrop, { opacity: 1 });
     }
@@ -325,6 +290,33 @@
         servicesLink.setAttribute("aria-expanded", "false");
       }
       if (servicesSublist) servicesSublist.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function setScrollLock(locked) {
+    document.documentElement.classList.toggle("is-scroll-locked", locked);
+    document.body.classList.toggle("is-scroll-locked", locked);
+    var lenis = window.cosgralSmoothScroll && window.cosgralSmoothScroll.lenis;
+    if (lenis) {
+      try {
+        if (locked) lenis.stop();
+        else lenis.start();
+      } catch (err) {}
+    }
+    if (locked) {
+      var y = window.scrollY || window.pageYOffset || 0;
+      document.documentElement.style.setProperty("--scroll-lock-y", "-" + y + "px");
+      document.body.dataset.scrollLockY = String(y);
+    } else if (document.body.dataset.scrollLockY) {
+      var restore = parseInt(document.body.dataset.scrollLockY, 10) || 0;
+      delete document.body.dataset.scrollLockY;
+      document.documentElement.style.removeProperty("--scroll-lock-y");
+      window.scrollTo(0, restore);
+      if (lenis && lenis.scrollTo) {
+        try {
+          lenis.scrollTo(restore, { immediate: true });
+        } catch (err2) {}
+      }
     }
   }
 
@@ -343,17 +335,67 @@
     return Math.max(0, fullDelay - blend * openDur);
   }
 
+  function showLinksImmediate() {
+    Array.prototype.forEach.call(links, function (a) {
+      a.style.opacity = "1";
+      a.style.clipPath = "inset(0 0% 0 0)";
+      a.style.pointerEvents = "auto";
+    });
+    Array.prototype.forEach.call(menuChars(), function (ch) {
+      ch.style.opacity = "1";
+      ch.style.transform = "none";
+      ch.style.filter = "none";
+    });
+  }
+
   function animateLinksForOpen() {
-    if (REDUCED || !window.gsap) return;
+    if (REDUCED || !window.gsap) {
+      showLinksImmediate();
+      return;
+    }
     var chars = menuChars();
+    var delay = linksDelayForBlend();
+
     gsap.killTweensOf(links);
     gsap.killTweensOf(chars);
-    gsap.set(chars, { opacity: 1, y: 0, clearProps: "filter,transform" });
-    gsap.set(links, { clipPath: "inset(0 0% 0 0)" });
-    gsap.fromTo(links, { opacity: 0, y: 8 }, {
-      opacity: 1, y: 0, duration: 0.2, stagger: 0.018,
-      ease: "power2.out", overwrite: true, clearProps: "transform",
-    });
+    gsap.set(links, { opacity: 0, clipPath: "inset(0 100% 0 0)" });
+    if (chars.length) {
+      gsap.set(chars, { opacity: 0, y: 12, filter: "blur(4px)" });
+    }
+
+    gsap.fromTo(
+      links,
+      { clipPath: "inset(0 100% 0 0)", opacity: 0 },
+      {
+        clipPath: "inset(0 0% 0 0)",
+        opacity: 1,
+        duration: 0.38,
+        stagger: 0.045,
+        ease: "power3.out",
+        delay: delay,
+        overwrite: true,
+      }
+    );
+
+    gsap.fromTo(
+      chars,
+      {
+        opacity: 0,
+        y: 12,
+        filter: "blur(4px)",
+      },
+      {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.32,
+        stagger: { each: 0.01, from: "start" },
+        ease: "power3.out",
+        delay: delay + 0.04,
+        overwrite: true,
+        clearProps: "filter,transform",
+      }
+    );
   }
 
   function bindLinkHover() {
@@ -429,7 +471,7 @@
       }
       var target = document.getElementById(id);
       if (target && window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1, offset: -94 });
+        window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1 });
       } else if (target) {
         target.scrollIntoView({ behavior: "smooth" });
       }
@@ -522,7 +564,7 @@
       gsap.to(backdrop, { opacity: 0, duration: 0.26, ease: "power2.in", overwrite: true });
     }
 
-    invokeCubeClose();
+    var cubeTween = invokeCubeClose();
     var overlayDone = false;
 
     var finishOverlay = function () {
@@ -539,8 +581,14 @@
       if (onComplete) onComplete();
     };
 
-    // Never hold links or navigation hostage to the cube's multi-second tween.
-    window.setTimeout(finishAll, REDUCED ? 0 : 220);
+    var closeDur = window.cosgralCube?.getMenuCloseDuration?.() || 2.85;
+    var closeBlend = window.cosgralCube?.getMenuBlend?.() ?? (isOpen ? 1 : 0);
+    var closeMs = Math.max(80, closeDur * closeBlend * 1000 + 80);
+    if (cubeTween && cubeTween.eventCallback) {
+      cubeTween.eventCallback("onComplete", finishAll);
+    } else {
+      window.setTimeout(finishAll, REDUCED ? 0 : closeMs);
+    }
   }
 
   function openNav() {
@@ -633,7 +681,6 @@
 
   document.querySelectorAll("a.site-nav__logo").forEach(function (logo) {
     logo.addEventListener("click", function (e) {
-      if (!document.body.classList.contains("home-page")) return;
       e.preventDefault();
       if (isOpen) closeNav();
       if (window.cosgralSectionSnap?.jumpTo) {
@@ -641,7 +688,7 @@
         return;
       }
       if (window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(0, { duration: 0.8 });
+        window.cosgralSmoothScroll.scrollTo(0, { duration: 2.2 });
         return;
       }
       var top = document.getElementById("top");
