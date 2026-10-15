@@ -195,11 +195,16 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
 
   // The DOM background is outside WebGL. Reproduce its shader only inside
   // Three r170's transmission buffer, leaving the visible DOM backdrop intact.
+  // uText mirrors the real hero headline (see cosgral-hero-lens-text.js), sampled
+  // plain/undistorted at the fragment's own uv — no warp, just a true passthrough.
+  const emptyTextTexture = new THREE.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
+  emptyTextTexture.needsUpdate = true;
   const backdropMaterial = new THREE.ShaderMaterial({
     uniforms: {
       uRes: {value: new THREE.Vector2()}, uTime: {value: 0}, uMouse: {value: new THREE.Vector2()},
       uViewportOrigin: {value: new THREE.Vector2()},
-      uCenter: {value: new THREE.Vector2()}, uSize: {value: new THREE.Vector2(1, 1)}, uEnabled: {value: 1}
+      uCenter: {value: new THREE.Vector2()}, uSize: {value: new THREE.Vector2(1, 1)}, uEnabled: {value: 1},
+      uText: {value: emptyTextTexture}
     },
     vertexShader: 'uniform vec2 uCenter,uSize; uniform float uEnabled; void main(){gl_Position=uEnabled>0.5?vec4(position.xy*uSize+uCenter,0.9999,1.0):vec4(2.0,2.0,2.0,1.0);}',
     fragmentShader: `
@@ -208,6 +213,7 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
     uniform vec2 uViewportOrigin;
     uniform float uTime;
     uniform vec2 uMouse;
+    uniform sampler2D uText;
 
     float wave(vec2 p, float t) {
       float w = 0.0;
@@ -266,6 +272,11 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
       col *= 0.58 + vignette * 0.42;
 
       col = ((col - 0.5) * 1.04 + 0.5) * 0.78;
+
+      // Plain passthrough: the real hero headline, sampled at this exact fragment's
+      // own screen position — no warp, no magnify, just the text as it actually is.
+      vec4 textSample = texture2D(uText, uv);
+      col = mix(col, textSample.rgb, textSample.a);
 
       gl_FragColor = vec4(col, 1.0);
     }

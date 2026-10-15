@@ -1,8 +1,9 @@
 /** One glass model, a reversible scroll choreography, and a soft optical wake. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261012editorial4';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
+import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -58,6 +59,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
   const path=Array.from({length:4},()=>new THREE.Vector3());
   const wake=createOpticalWake(THREE,wakeScene,1800);
   const profile=createFrameProfile(canvas);
+  const heroText=createHeroLensText(THREE);
   function worldHeight(z){return 2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*(camera.position.z-z);}
   function screenPosition(x,y,z,target){
     const h=worldHeight(z);
@@ -186,6 +188,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
     try {
       const previous=glass;
       glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
+      glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
       if(previous){
         group.remove(previous);scene.remove(previous.userData.transmissionBackdrop);
         previous.geometry.dispose();previous.material.dispose();previous.userData.environmentTarget?.dispose();
@@ -203,6 +206,7 @@ import { createFrameProfile } from './cosgral-frame-profile.js';
   });
   try{
     glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
+    glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
     canvas.parentElement.classList.add('has-glass-model');
   }catch(error){
     canvas.parentElement.classList.add('has-cube-fallback');

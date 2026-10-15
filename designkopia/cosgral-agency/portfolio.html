@@ -36,10 +36,12 @@
 </script>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" />
+<link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
+<script src="cookie-consent.js?v=20261001a"></script>
 <link rel="stylesheet" href="cosgral-subpages.css?v=20260928mob1" />
 <link rel="stylesheet" href="portfolio-theme-layers.css?v=20260928type1" />
 <link rel="stylesheet" href="portfolio-tiles.css?v=20260928mob1" />
-<link rel="stylesheet" href="portfolio-expand.css?v=20261014peek1" />
+<link rel="stylesheet" href="portfolio-expand.css?v=20260929nav1" />
 <link rel="stylesheet" href="telforce-cases.css?v=20260928mob1" />
 <link rel="stylesheet" href="case-viz-tiles.css?v=20260928mob2" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
@@ -90,10 +92,7 @@
 <div class="nav-overlay" id="nav-overlay" aria-hidden="true">
   <div class="nav-overlay__backdrop" data-nav-close></div>
   <div class="nav-overlay__stage">
-    <nav class="nav-overlay__links" aria-label="Menu główne">
-      <ul class="nav-overlay__list">
-        <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
-        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+    <nav class="nav-overlay__links" aria-label="Menu główne" data-i18n-aria-label="nav_overlay.main_menu">
         <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
         <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
@@ -117,7 +116,7 @@
 </div>
 
 <main id="main">
-  <div class="portfolio-chapters" data-portfolio-tiles aria-label="Kategorie realizacji">
+  <div class="portfolio-chapters" data-portfolio-tiles aria-label="Kategorie realizacji" data-i18n-aria-label="portfolio.chapters_label">
     <div class="portfolio-chapters__scroller" data-chapters-scroller>
     <section class="portfolio-chapter is-active" data-portfolio-tile data-theme="web" id="strony">
       <div class="portfolio-chapter__bg" aria-hidden="true">
@@ -145,7 +144,7 @@
           </div>
         </div>
       </div>
-      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej"></button>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.web_title">Strony internetowe</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.web_lead">eCommerce, landing page, strony jako część systemu dla działalności</p>
@@ -158,35 +157,10 @@
         <div class="portfolio-tile__media">
           <div class="chapter-os" data-chapter-os>
             <div class="sys-fan sys-fan--catalog" data-systems-fan-catalog aria-hidden="true"></div>
-            <div class="sys-ed-showcase" aria-hidden="true">
-              <div class="sys-ed-tile sys-ed-tile--crm">
-                <div class="sys-ed-tile__top"><span>01 / SYS</span><span>CRM</span></div>
-                <div class="sys-ed-tile__art">
-                  <svg class="sys-ed-orbit" viewBox="0 0 400 400" fill="none" aria-hidden="true"><ellipse cx="200" cy="200" rx="166" ry="65" transform="rotate(-38 200 200)" stroke="currentColor" stroke-opacity=".45"/><ellipse cx="200" cy="200" rx="168" ry="84" transform="rotate(34 200 200)" stroke="currentColor" stroke-opacity=".15"/><path d="M24 200H376M200 30V370" stroke="currentColor" stroke-opacity=".1"/><circle cx="75" cy="265" r="7" fill="#ff482b"/><circle cx="313" cy="137" r="3" fill="currentColor"/><circle cx="214" cy="194" r="13" stroke="currentColor"/><path d="m210 194 3 3 5-6" stroke="currentColor"/></svg>
-                  <strong class="sys-ed-crm-type">Wszystko.<br>W jednym.</strong>
-                </div>
-                <div class="sys-ed-tile__label"><span>Systemy CRM</span><i>↗</i></div>
-              </div>
-              <div class="sys-ed-tile sys-ed-tile--auto">
-                <div class="sys-ed-tile__top"><span>02 / SYS</span><span>AUTOMATYZACJA</span></div>
-                <div class="sys-ed-tile__art">
-                  <strong class="sys-ed-auto-type">MNIEJ<br>RUTYNY.</strong>
-                </div>
-                <div class="sys-ed-tile__label"><span>Automatyzacje</span><i>↗</i></div>
-              </div>
-              <div class="sys-ed-tile sys-ed-tile--flow">
-                <div class="sys-ed-tile__top"><span>03 / SYS</span><span>AI / WORKFLOW</span></div>
-                <div class="sys-ed-tile__art">
-                  <svg class="sys-ed-flow-art" viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="30" cy="100" r="8" stroke="rgba(255,255,255,.35)" stroke-width="1"/><circle cx="100" cy="45" r="8" fill="rgba(255,72,43,.2)" stroke="#ff482b" stroke-width="1"/><circle cx="100" cy="155" r="8" stroke="rgba(255,255,255,.35)" stroke-width="1"/><circle cx="170" cy="100" r="8" stroke="rgba(255,255,255,.35)" stroke-width="1"/><path d="M38 100 L92 45 M38 100 L92 155 M108 45 L162 100 M108 155 L162 100" stroke="rgba(255,255,255,.2)" stroke-width="1"/><circle cx="100" cy="100" r="16" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/><circle cx="100" cy="100" r="5" fill="rgba(255,72,43,.65)"/></svg>
-                  <strong class="sys-ed-flow-type">Connect.<br>Automate.<br>Grow.</strong>
-                </div>
-                <div class="sys-ed-tile__label"><span>AI &amp; Workflow</span><i>↗</i></div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej"></button>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.automation_title">Systemy i automatyzacje</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.automation_tile_lead">CRM, aplikacje i workflow, które odciążają zespół.</p>
@@ -203,7 +177,7 @@
           </div>
         </div>
       </div>
-      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej"></button>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.montaz_title">Montaż wideo</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.montaz_lead">Reels i materiały reklamowe</p>
@@ -220,7 +194,7 @@
           </div>
         </div>
       </div>
-      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej"></button>
+      <button type="button" class="portfolio-chapter__hit" data-tile-expand-hit aria-label="Zobacz więcej" data-i18n-aria-label="portfolio.view_more_aria"></button>
       <div class="portfolio-chapter__copy">
         <h2 class="portfolio-chapter__title" data-i18n="portfolio.grafiki_title">Grafiki</h2>
         <p class="portfolio-chapter__lead" data-i18n="portfolio.grafiki_tile_lead">Posty, stories i key visuale w rytmie pokazu slajdów.</p>
@@ -229,19 +203,19 @@
     </section>
 
     </div>
-    <div class="portfolio-chapters__pager" aria-label="Nawigacja kategorii">
-      <button type="button" class="portfolio-chapters__arrow" data-portfolio-chapter-prev aria-label="Poprzednia kategoria" disabled>
+    <div class="portfolio-chapters__pager" aria-label="Nawigacja kategorii" data-i18n-aria-label="portfolio.chapters_nav">
+      <button type="button" class="portfolio-chapters__arrow" data-portfolio-chapter-prev aria-label="Poprzednia kategoria" data-i18n-aria-label="portfolio.prev_cat" disabled>
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
           <path d="M10.2 2.6L5.4 8l4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <div class="portfolio-chapters__dots" role="tablist" aria-label="Kategorie">
-        <button type="button" class="portfolio-chapters__dot is-active" data-portfolio-chapter-dot aria-label="Strony internetowe" aria-current="true"></button>
-        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Systemy i automatyzacje"></button>
-        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Montaż wideo"></button>
-        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Grafiki"></button>
+      <div class="portfolio-chapters__dots" role="tablist" aria-label="Kategorie" data-i18n-aria-label="portfolio.chapters_dots">
+        <button type="button" class="portfolio-chapters__dot is-active" data-portfolio-chapter-dot aria-label="Strony internetowe" data-i18n-aria-label="portfolio.dot_strony" aria-current="true"></button>
+        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Systemy i automatyzacje" data-i18n-aria-label="portfolio.dot_systemy"></button>
+        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Montaż wideo" data-i18n-aria-label="portfolio.dot_montaz"></button>
+        <button type="button" class="portfolio-chapters__dot" data-portfolio-chapter-dot aria-label="Grafiki" data-i18n-aria-label="portfolio.dot_grafiki"></button>
       </div>
-      <button type="button" class="portfolio-chapters__arrow" data-portfolio-chapter-next aria-label="Następna kategoria">
+      <button type="button" class="portfolio-chapters__arrow" data-portfolio-chapter-next aria-label="Następna kategoria" data-i18n-aria-label="portfolio.next_cat">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
           <path d="M5.8 2.6L10.6 8l-4.8 5.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -257,7 +231,7 @@
 </div>
 
 <div class="portfolio-end">
-<section class="portfolio-contact-cta" aria-label="Kontakt">
+<section class="portfolio-contact-cta" aria-label="Kontakt" data-i18n-aria-label="portfolio.contact_label">
   <div class="container portfolio-contact-cta__inner">
     <h2 class="portfolio-contact-cta__title" data-i18n="panel.cta">Umów bezpłatny audyt</h2>
     <p class="portfolio-contact-cta__lead" data-i18n="portfolio.cta_lead">Masz podobny projekt? Napisz — przygotujemy zakres, plan i wycenę.</p>
@@ -341,11 +315,10 @@
 <script src="portfolio-montaz-bg.js?v=20260927themebg1"></script>
 <script defer src="home-nav-menu.js?v=20260925fix2"></script>
 <script src="telforce-previews.js?v=20260928overlay2"></script>
-<script src="portfolio-systems-fan.js?v=20260928fansys1"></script>
+<script src="portfolio-systems-fan.js?v=20260929desc1"></script>
 <script src="portfolio-montaz.js?v=20260928overlay2"></script>
-<script src="portfolio-expand.js?v=20260928montaz1"></script>
+<script src="portfolio-expand.js?v=20260929web2"></script>
 <script src="portfolio-tiles.js?v=20260928montaz1"></script>
-<script src="portfolio-systems-scroll.js?v=20261014peek1"></script>
 <script defer src="site-chat.js?v=20260926chat7"></script>
 <script type="module" src="site-chat-cube.js?v=20260926cube1"></script>
 </body>

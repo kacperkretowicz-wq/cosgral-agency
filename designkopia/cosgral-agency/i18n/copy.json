@@ -161,6 +161,154 @@
     "card6": {
       "pl": "Grafika i montaż wideo",
       "en": "Graphics & video editing"
+    },
+    "card1_desc": {
+      "pl": "Strony wizytówkowe, landing page pod kampanie i rozbudowane serwisy firmowe — nowoczesny stack, szybkość i design bez kompromisów.",
+      "en": "Landing pages, business sites and full company platforms — a modern stack, speed and design with no compromises."
+    },
+    "card2_desc": {
+      "pl": "Panele klienckie, narzędzia wewnętrzne i integracje z API — aplikacje webowe zaprojektowane pod realny proces pracy Twojego zespołu.",
+      "en": "Client portals, internal tools and API integrations — web apps designed around your team's real workflow."
+    },
+    "card3_desc": {
+      "pl": "Pozycjonowanie stron w Google (SEO) i w odpowiedziach AI (GEO) — audyt techniczny, treści, dane strukturalne i mierzalne efekty zamiast obietnic.",
+      "en": "Ranking in Google (SEO) and in AI answers (GEO) — technical audit, content, structured data and measurable results instead of promises."
+    },
+    "card4_desc": {
+      "pl": "Automatyzacja procesów sprzedażowych, marketingowych i operacyjnych — mniej pracy ręcznej, mniej błędów, więcej czasu na biznes.",
+      "en": "Automating sales, marketing and operational processes — less manual work, fewer mistakes, more time for the business."
+    },
+    "card5_desc": {
+      "pl": "Wdrożenie i konfiguracja CRM, migracja danych i automatyzacja lejka sprzedaży — porządek w relacjach z klientami zamiast rozproszonych arkuszy.",
+      "en": "CRM implementation and setup, data migration and sales-funnel automation — order in client relationships instead of scattered spreadsheets."
+    },
+    "card6_desc": {
+      "pl": "Identyfikacja wizualna, grafika social media i montaż wideo produktowego — spójna oprawa marki na każdym nośniku.",
+      "en": "Visual identity, social media graphics and product video editing — consistent brand presentation across every channel."
+    },
+    "card1_items": {
+      "pl": [
+        "Strony wizytówkowe i landing page pod konkretne kampanie",
+        "Rozbudowane serwisy firmowe z panelem CMS",
+        "Sklepy e-commerce — od prostych po zintegrowane z ERP/CRM",
+        "Animacje i interakcje scroll-driven, gdy marka na to zasługuje",
+        "Optymalizacja SEO, szybkości ładowania i Core Web Vitals"
+      ],
+      "en": [
+        "Brochure sites and landing pages built for specific campaigns",
+        "Full company platforms with a CMS panel",
+        "E-commerce stores — from simple to ERP/CRM-integrated",
+        "Scroll-driven animation and interaction, where the brand earns it",
+        "SEO, load speed and Core Web Vitals optimisation"
+      ]
+    },
+    "card1_effect": {
+      "pl": "Efektem jest strona, która realnie konwertuje — ładuje się szybko, prowadzi użytkownika do działania i staje się argumentem sprzedażowym samym w sobie.",
+      "en": "The result is a site that actually converts — it loads fast, guides the user to act, and becomes a sales argument in itself."
+    },
+    "card2_items": {
+      "pl": [
+        "Panele klienckie i portale B2B",
+        "Narzędzia wewnętrzne usprawniające pracę zespołu",
+        "Integracje z zewnętrznymi API i systemami firmy",
+        "Progressive Web Apps (PWA) dostępne jak natywna aplikacja",
+        "Projektowanie UX pod konkretny proces, nie generyczny wzorzec"
+      ],
+      "en": [
+        "Client portals and B2B platforms",
+        "Internal tools that speed up the team's work",
+        "Integrations with external APIs and company systems",
+        "Progressive Web Apps (PWA) that feel native",
+        "UX designed around your actual process, not a generic pattern"
+      ]
+    },
+    "card2_effect": {
+      "pl": "Efektem jest aplikacja skrojona pod Twój realny przepływ pracy — zespół pracuje szybciej, mniej rzeczy robi się ręcznie, a dane nie giną między systemami.",
+      "en": "The result is an app shaped around your real workflow — the team moves faster, less is done by hand, and data stops falling between systems."
+    },
+    "card3_items": {
+      "pl": [
+        "Audyt techniczny SEO — indeksowanie, szybkość, Core Web Vitals, struktura strony",
+        "Strategia słów kluczowych i treści odpowiadających na realne zapytania klientów",
+        "GEO — widoczność marki w odpowiedziach ChatGPT, Gemini i Perplexity",
+        "Dane strukturalne (schema.org) — żeby wyszukiwarki i modele AI rozumiały, kim jesteś",
+        "SEO lokalne — profil firmy w Google i widoczność w Twoim regionie"
+      ],
+      "en": [
+        "Technical SEO audit — indexing, speed, Core Web Vitals, site structure",
+        "Keyword and content strategy answering the questions clients actually ask",
+        "GEO — brand visibility inside ChatGPT, Gemini and Perplexity answers",
+        "Structured data (schema.org) — so search engines and AI models know who you are",
+        "Local SEO — Google business profile and visibility in your region"
+      ]
+    },
+    "card3_effect": {
+      "pl": "Efektem jest rosnąca widoczność na zapytania, które faktycznie przynoszą pieniądze — mierzona pozycjami, ruchem organicznym i leadami, nie ogólnikami.",
+      "en": "The result is growing visibility on the queries that actually bring money — measured in rankings, organic traffic and leads, not generalities."
+    },
+    "card4_items": {
+      "pl": [
+        "Automatyzacja procesów sprzedażowych i marketingowych",
+        "Integracje narzędzi (Zapier, Make, n8n i inne)",
+        "Automatyczne raportowanie i powiadomienia",
+        "Chatboty i asystenci AI obsługujący pierwszy kontakt",
+        "Audyt procesów pod kątem tego, co w ogóle warto zautomatyzować"
+      ],
+      "en": [
+        "Automation of sales and marketing processes",
+        "Tool integrations (Zapier, Make, n8n and others)",
+        "Automated reporting and notifications",
+        "Chatbots and AI assistants handling first contact",
+        "Process audit of what is actually worth automating"
+      ]
+    },
+    "card4_effect": {
+      "pl": "Efektem jest odzyskany czas zespołu i mniej błędów z ręcznej, powtarzalnej pracy. Nie automatyzujemy dla samej automatyzacji — zaczynamy od audytu.",
+      "en": "The result is time given back to the team and fewer errors from manual, repetitive work. We don't automate for its own sake — we start with an audit."
+    },
+    "card5_items": {
+      "pl": [
+        "Wdrożenie i konfiguracja CRM (HubSpot, Pipedrive, rozwiązania dedykowane)",
+        "Migracja danych z arkuszy i starych systemów",
+        "Automatyzacja lejka sprzedaży i follow-upów",
+        "Integracja CRM z formularzami, mailingiem i stroną",
+        "Szkolenie zespołu i wsparcie po wdrożeniu"
+      ],
+      "en": [
+        "CRM implementation and setup (HubSpot, Pipedrive, custom solutions)",
+        "Data migration from spreadsheets and legacy systems",
+        "Sales funnel and follow-up automation",
+        "CRM integration with forms, mailing and the website",
+        "Team training and post-launch support"
+      ]
+    },
+    "card5_effect": {
+      "pl": "Efektem jest jedno, uporządkowane źródło prawdy o kliencie: widać, na jakim etapie jest każda rozmowa, nic nie umyka, a raportowanie przestaje być ręczną pracą.",
+      "en": "The result is one ordered source of truth about the client: every conversation's stage is visible, nothing slips, and reporting stops being manual work."
+    },
+    "card6_items": {
+      "pl": [
+        "Identyfikacja wizualna i systemy graficzne marki",
+        "Grafika na social media — spójna z resztą komunikacji",
+        "Montaż wideo produktowego, reklamowego i reels",
+        "Motion design pod stronę internetową i kampanie",
+        "AI photoshooty produktów i modeli — editorial, nie generyczny stock"
+      ],
+      "en": [
+        "Visual identity and brand graphic systems",
+        "Social media graphics — consistent with the rest of the communication",
+        "Product, ad and reels video editing",
+        "Motion design for the website and campaigns",
+        "AI photoshoots of products and models — editorial, not generic stock"
+      ]
+    },
+    "card6_effect": {
+      "pl": "Efektem jest oprawa wizualna, która buduje rozpoznawalność marki niezależnie od nośnika — od posta na Instagramie po wideo produktowe na stronie głównej.",
+      "en": "The result is a visual language that builds recognition on any channel — from an Instagram post to the product video on your homepage."
+    },
+    "explode_cta": {
+      "pl": "Zacznijmy od bezpłatnego audytu",
+      "en": "Let's start with a free audit"
     }
   },
   "process": {
