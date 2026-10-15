@@ -9,6 +9,10 @@
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
+  var noGyroPages =
+    document.body.classList.contains("graphics-gallery-page") ||
+    document.body.classList.contains("reels-gallery-page");
+
   var COARSE = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
@@ -117,8 +121,11 @@
     gateEl.type = "button";
     gateEl.className = "gyro-enable";
     gateEl.setAttribute("data-no-transition", "");
-    gateEl.setAttribute("aria-label", "Włącz żyroskop");
-    gateEl.textContent = "Włącz żyroskop";
+    gateEl.setAttribute("data-i18n", "editorial.gyro_label");
+    gateEl.setAttribute("data-i18n-aria-label", "editorial.gyro_label");
+    var gyroLabel = window.cosgralI18n?.t("editorial.gyro_label") || "Włącz żyroskop";
+    gateEl.setAttribute("aria-label", gyroLabel);
+    gateEl.textContent = gyroLabel;
     gateEl.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -234,16 +241,16 @@
       state.y = (-state.ny * 0.5 + 0.5) * window.innerHeight;
       state.fromOrientation = true;
     } else if (MOBILE) {
-      state.x += (state.tx - state.x) * 0.12;
-      state.y += (state.ty - state.y) * 0.12;
-      state.nx += (state.tnx - state.nx) * 0.12;
-      state.ny += (state.tny - state.ny) * 0.12;
+      state.x += (state.tx - state.x) * 0.18;
+      state.y += (state.ty - state.y) * 0.18;
+      state.nx += (state.tnx - state.nx) * 0.18;
+      state.ny += (state.tny - state.ny) * 0.18;
       state.fromOrientation = false;
     } else {
-      state.x += (state.tx - state.x) * 0.08;
-      state.y += (state.ty - state.y) * 0.08;
-      state.nx += (state.tnx - state.nx) * 0.08;
-      state.ny += (state.tny - state.ny) * 0.08;
+      state.x += (state.tx - state.x) * 0.20;
+      state.y += (state.ty - state.y) * 0.20;
+      state.nx += (state.tnx - state.nx) * 0.20;
+      state.ny += (state.tny - state.ny) * 0.20;
       state.fromOrientation = false;
     }
     applyPointer();
@@ -292,7 +299,7 @@
     }
   }
 
-  armMobileGyro();
+  if (!noGyroPages) armMobileGyro();
   applyPointer();
   requestAnimationFrame(tick);
 })();

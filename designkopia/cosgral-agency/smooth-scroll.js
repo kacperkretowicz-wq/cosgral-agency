@@ -42,13 +42,13 @@
 
   var lenis = new Lenis({
     /* Wolniejszy, gładszy krok kółka — dłuższy dwell w sekcji, bez ciężkiego lagu */
-    lerp: MOBILE ? 0.14 : 0.1,
-    duration: MOBILE ? 0.92 : 1.12,
+    lerp: MOBILE ? 0.25 : 0.22,
+    duration: MOBILE ? 0.65 : 0.72,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
     smoothWheel: true,
     smoothTouch: false,
     touchMultiplier: 1.05,
-    wheelMultiplier: MOBILE ? 0.78 : 0.72,
+    wheelMultiplier: 1.0,
   });
 
   window.cosgralSmoothScroll.lenis = lenis;
@@ -102,8 +102,5 @@
   requestAnimationFrame(function () {
     ScrollTrigger.refresh();
     readyResolve(lenis);
-    try {
-      window.dispatchEvent(new CustomEvent("cosgral:smooth-ready", { detail: { lenis: lenis } }));
-    } catch (eReady) {}
   });
 })();
