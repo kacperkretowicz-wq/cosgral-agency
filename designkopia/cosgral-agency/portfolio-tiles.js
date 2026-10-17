@@ -435,10 +435,10 @@
     var prevBehavior = scroller.style.scrollBehavior;
     scroller.style.scrollBehavior = "auto";
     var t0 = performance.now();
-    var dur = 1100;
+    var dur = 1700;
     function tick(now) {
       var p = Math.min(1, (now - t0) / dur);
-      var e = 1 - Math.pow(1 - p, 4);
+      var e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
       scroller.scrollLeft = from + dist * e;
       if (p < 1) {
         scrollAnim = requestAnimationFrame(tick);
@@ -604,7 +604,7 @@
       if (Math.abs(delta) < 8) return;
       e.preventDefault();
       var now = Date.now();
-      if (now - wheelLock < 960) return;
+      if (now - wheelLock < 1500) return;
       wheelLock = now;
       scrollToIndex(activeIndex + (delta > 0 ? 1 : -1));
     },

@@ -46,6 +46,41 @@
   var instances = [];
   var pageCache = {};
 
+  /* Each case as a homepage-style poster tile: one ground, one graphic, one
+     loud line of type. */
+  var BARS = '<div class="sys-art__bars"><i style="--h:.34"></i><i style="--h:.52"></i><i style="--h:.41"></i><i style="--h:.66"></i><i style="--h:.58"></i><i style="--h:.8"></i><i style="--h:.96"></i></div>';
+  var DECOR = {
+    map: '<svg class="sys-art__map" viewBox="0 0 400 320" fill="none"><path d="M18 250C70 230 92 160 150 168S226 246 280 206 330 84 384 70" stroke="currentColor" stroke-width="2" stroke-dasharray="2 9" stroke-linecap="round"/><ellipse cx="200" cy="160" rx="176" ry="70" transform="rotate(-24 200 160)" stroke="currentColor" stroke-opacity=".22"/><circle cx="150" cy="168" r="7" fill="#ff482b"/><circle cx="280" cy="206" r="5" stroke="currentColor"/><circle cx="384" cy="70" r="11" stroke="currentColor"/><circle cx="384" cy="70" r="3" fill="currentColor"/></svg>',
+    barcode: '<div class="sys-art__barcode"></div>',
+    bars: BARS,
+    price: '<div class="sys-art__halftone"></div><div class="sys-art__ticket"><span>PLN</span></div>',
+    sheets: '<div class="sys-art__sheet"></div><div class="sys-art__sheet"></div><div class="sys-art__sheet"></div>',
+    chat: '<div class="sys-art__bubble"></div><div class="sys-art__bubble"></div><div class="sys-art__bubble"></div>',
+    focus: '<div class="sys-art__focus"></div>',
+    prism: '<div class="sys-art__prism"></div>',
+    halftone: '<div class="sys-art__halftone"></div>',
+    spark: '<svg class="sys-art__spark" viewBox="0 0 400 200" fill="none"><path d="M0 170L48 150 96 158 144 118 192 128 240 84 288 96 336 46 400 22" stroke="currentColor" stroke-width="3"/><path d="M0 170L48 150 96 158 144 118 192 128 240 84 288 96 336 46 400 22V200H0Z" fill="currentColor" fill-opacity=".08"/><circle cx="400" cy="22" r="8" fill="#ff482b"/></svg>',
+    graph: '<svg class="sys-art__graph" viewBox="0 0 400 320" fill="none"><g stroke="currentColor" stroke-opacity=".5"><path d="M70 70L200 150 330 60M200 150L120 260M200 150L320 250M330 60L320 250"/></g><circle cx="70" cy="70" r="16" stroke="currentColor"/><circle cx="330" cy="60" r="12" stroke="currentColor"/><circle cx="200" cy="150" r="26" fill="#ff482b"/><circle cx="120" cy="260" r="12" stroke="currentColor"/><circle cx="320" cy="250" r="18" stroke="currentColor"/></svg>'
+  };
+  var ART = {
+    "tfo-crm": { tone: "carbon", kind: "map", pl: "Mapa.<br>Trasa.<br>Raport.", en: "Map.<br>Route.<br>Report." },
+    "tfo-code39": { tone: "paper", kind: "barcode", pl: "*SKU<br>039*", en: "*SKU<br>039*" },
+    "tfo-forecast": { tone: "steel", kind: "bars", pl: "Zanim<br><em>zabraknie.</em>", en: "Before<br><em>it runs out.</em>" },
+    "trove-panel": { tone: "hot", kind: "price", pl: "Cena<br>pod<br>kontrolą.", en: "Price<br>under<br>control." },
+    "crm-leady": { tone: "stone", kind: "sheets", pl: "Lead.<br>Deal.<br>Done.", en: "Lead.<br>Deal.<br>Done." },
+    "chatbot": { tone: "carbon", kind: "chat", pl: "24/7.", en: "24/7." },
+    "trove-flow": { tone: "hot", kind: "focus", pl: "Zamów.<br>Faktura.<br>Paczka.", en: "Order.<br>Invoice.<br>Parcel." },
+    "ai-agent": { tone: "ink", kind: "prism", pl: "AGENT<br>AI.", en: "AGENT<br>AI." },
+    "shelf": { tone: "paper", kind: "halftone", pl: "Zawsze<br><em>na półce.</em>", en: "Always<br><em>on shelf.</em>" },
+    "kpi": { tone: "stone", kind: "spark", pl: "Puls<br>firmy.", en: "Company<br>pulse." },
+    "network": { tone: "carbon", kind: "graph", pl: "IF →<br>THEN.", en: "IF →<br>THEN." }
+  };
+  function artFor(item) {
+    var art = ART[item.id] || { tone: "carbon", kind: "graph", pl: item.title, en: item.title };
+    var lang = (document.documentElement.lang || "pl").toLowerCase().indexOf("en") === 0 ? "en" : "pl";
+    return { tone: art.tone, kind: art.kind, html: (DECOR[art.kind] || "") + '<strong class="sys-art__type">' + art[lang] + "</strong>" };
+  }
+
   function clampIndex(i, n) {
     var x = i % n;
     return x < 0 ? x + n : x;
@@ -188,19 +223,36 @@
     });
 
     currentCases.forEach(function (item, i) {
+      var art = artFor(item);
       var fig = document.createElement("figure");
-      fig.className = "sys-fan__card";
+      fig.className = "sys-fan__card sys-fan__card--" + art.tone + " sys-fan__card--" + art.kind;
       fig.setAttribute("data-sys-fan-card", String(i));
       fig.setAttribute("data-case-id", item.id);
-      var img = document.createElement("img");
-      img.src = item.img;
-      img.alt = item.title;
-      img.decoding = "async";
-      img.draggable = false;
-      fig.appendChild(img);
+      fig.setAttribute("aria-label", item.title);
+      var top = document.createElement("div");
+      top.className = "sys-tile__top";
+      var num = document.createElement("span");
+      num.textContent = (i < 9 ? "0" : "") + (i + 1) + " / COSGRAL";
+      var tag = document.createElement("span");
+      tag.textContent = item.tag;
+      top.appendChild(num);
+      top.appendChild(tag);
+      fig.appendChild(top);
+      var artEl = document.createElement("div");
+      artEl.className = "sys-art sys-art--" + art.kind;
+      artEl.setAttribute("aria-hidden", "true");
+      artEl.innerHTML = art.html;
+      fig.appendChild(artEl);
       var cap = document.createElement("figcaption");
       cap.className = "sys-fan__cap";
-      cap.textContent = item.tag;
+      var title = document.createElement("span");
+      title.className = "sys-tile__title";
+      title.textContent = item.title;
+      var arrow = document.createElement("i");
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "↗";
+      cap.appendChild(title);
+      cap.appendChild(arrow);
       fig.appendChild(cap);
       fig.addEventListener("click", function () {
         if (Math.abs(vel) > 0.08 || didDrag) return;
