@@ -159,7 +159,7 @@ body.editorial-page {background:var(--carbon); color:var(--paper);line-height:1.
 .editorial-page .home-cursor__ring {width:25px;height:25px;margin:-12.5px;}
 .editorial-page .home-cursor__dot {width:4px;height:4px;margin:-2px;}
 .editorial-page .gyro-enable {z-index:130;}
-html.editorial-document.has-light-chat .cg-chat-launcher__stage {background:#121619;border-radius:16px;}
+html.editorial-document.has-light-chat .cg-chat-launcher__stage {background:transparent;border-radius:0;}
 html.editorial-document.has-light-chat .cg-chat-label {color:#181a1c;}
 html.is-gyro-outside-hero .editorial-page:not(.is-nav-menu-open) .gyro-enable {opacity:0;visibility:hidden;pointer-events:none;}
 [data-editorial-reveal] {opacity:1;}

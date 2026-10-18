@@ -81,6 +81,9 @@
     return { tone: art.tone, kind: art.kind, html: (DECOR[art.kind] || "") + '<strong class="sys-art__type">' + art[lang] + "</strong>" };
   }
 
+  /* The unfolded case draws its modules with the same graphics */
+  window.CosgralSysArt = { decor: DECOR };
+
   function clampIndex(i, n) {
     var x = i % n;
     return x < 0 ? x + n : x;
@@ -334,6 +337,7 @@
           } else {
             articleEl.appendChild(body);
             enhanceInjectedCase(body);
+            if (window.CosgralSysPosters) window.CosgralSysPosters.apply(body, item.href);
             placeNavInCaseAside(body);
           }
           articleOpen = true;
