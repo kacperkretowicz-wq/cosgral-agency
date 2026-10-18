@@ -253,7 +253,7 @@
       title.textContent = item.title;
       var arrow = document.createElement("i");
       arrow.setAttribute("aria-hidden", "true");
-      arrow.textContent = "↗";
+      arrow.textContent = "↗︎";
       cap.appendChild(title);
       cap.appendChild(arrow);
       fig.appendChild(cap);

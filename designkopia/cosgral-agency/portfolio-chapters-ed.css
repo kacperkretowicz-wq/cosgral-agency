@@ -822,7 +822,7 @@ body.portfolio-page .sys-fan__more {
   letter-spacing: -0.025em;
 }
 body.portfolio-page .sys-fan__more::after {
-  content: "↗";
+  content: "\2197\FE0E";
   display: grid;
   place-items: center;
   width: 30px;

@@ -157,7 +157,7 @@
       +   '<strong class="sys-ed-exp-type" style="font-weight:' + art.lw + ';font-size:' + art.ls + '">' + art.label + '</strong>'
       + '</div>'
       + '<div class="sys-ed-tile__foot">'
-      +   '<div class="sys-ed-tile__label"><span>' + item.title + '</span><i aria-hidden="true">↗</i></div>'
+      +   '<div class="sys-ed-tile__label"><span>' + item.title + '</span><i aria-hidden="true">↗︎</i></div>'
       +   '<div class="sys-ed-tile__copy">'
       +     '<p class="sys-ed-tile__desc">' + item.desc + '</p>'
       +     '<span class="sys-ed-tile__more">Zobacz więcej ↓</span>'
