@@ -342,10 +342,11 @@
     row: 0.3,
     rowMobile: 0.22,
     load: function () {
-      return fetch("portfolio-media/graphics/manifest.json").then(function (r) { return r.json(); }).then(function (m) {
+      return fetch("portfolio-media/graphics/manifest.json?v=20261018self1").then(function (r) { return r.json(); }).then(function (m) {
         return (m.groups || []).map(function (g) {
           return {
             name: g.name || g.id,
+            self: !!g.self,
             items: (g.items || []).map(function (it) {
               return {
                 image: it.type === "video" ? it.poster : it.src,
@@ -364,9 +365,10 @@
     describe: function (item, g, info, total) {
       info.appendChild(el("strong", null, item.client));
       info.appendChild(el("span", "pf-gfx__num", pad(item.n) + " / " + total));
-      addRows(info, [
+      var fmt = ["Format", item.video ? "Motion / story" : item.ratio < 0.7 ? "Story" : "Post / key visual"];
+      addRows(info, g.self ? [fmt] : [
         [en() ? "Client" : "Klient", item.client],
-        ["Format", item.video ? "Motion / story" : item.ratio < 0.7 ? "Story" : "Post / key visual"]
+        fmt
       ]);
     }
   });

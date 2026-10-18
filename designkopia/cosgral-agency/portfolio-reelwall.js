@@ -78,7 +78,7 @@
   var px = 0, py = 0, sx = 0, sy = 0;
   var lastT = 0;
 
-  fetch("portfolio-media/reels/manifest.json").then(function (r) { return r.json(); }).then(function (m) {
+  fetch("portfolio-media/reels/manifest.json?v=20261018self1").then(function (r) { return r.json(); }).then(function (m) {
     var clients = [];
     (m.groups || []).forEach(function (g) {
       clients.push(g.name || g.id);

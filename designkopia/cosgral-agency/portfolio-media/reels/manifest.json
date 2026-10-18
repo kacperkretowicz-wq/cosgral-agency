@@ -261,6 +261,52 @@
           "h": 1280
         }
       ]
+    },
+    {
+      "id": "self-initiated",
+      "name": "SELF INITIATED PROJECTS",
+      "items": [
+        {
+          "type": "video",
+          "src": "portfolio-media/reels/self-initiated/001.mp4",
+          "poster": "portfolio-media/reels/self-initiated/001-poster.jpg",
+          "full": "portfolio-media/reels/self-initiated/001-full.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/reels/self-initiated/002.mp4",
+          "poster": "portfolio-media/reels/self-initiated/002-poster.jpg",
+          "full": "portfolio-media/reels/self-initiated/002-full.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/reels/self-initiated/003.mp4",
+          "poster": "portfolio-media/reels/self-initiated/003-poster.jpg",
+          "full": "portfolio-media/reels/self-initiated/003-full.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/reels/self-initiated/004.mp4",
+          "poster": "portfolio-media/reels/self-initiated/004-poster.jpg",
+          "full": "portfolio-media/reels/self-initiated/004-full.mp4",
+          "w": 720,
+          "h": 1280
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/reels/orlincy/motion-with-intention.mp4",
+          "poster": "portfolio-media/reels/orlincy/motion-with-intention-poster.jpg",
+          "full": "portfolio-media/reels/self-initiated/005-full.mp4",
+          "w": 720,
+          "h": 1280
+        }
+      ]
     }
   ],
   "collage": [
