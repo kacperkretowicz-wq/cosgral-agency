@@ -139,6 +139,15 @@
 
   var WEB_CASES_PL = [
     {
+      id: "aleksandra",
+      href: "portfolio-strona-aleksandra-szczepanek.html",
+      title: "Aleksandra Szczepanek",
+      lead: "Makijażystka i szkolenia",
+      video: "portfolio-media/showcase/web/aleksandra-szczepanek.mp4",
+      poster: "portfolio-media/showcase/web/aleksandra-szczepanek-poster.jpg",
+      match: /aleksandra|szczepanek/i,
+    },
+    {
       id: "juicy",
       href: "portfolio-strona-juicy-events.html",
       title: "Juicy Events",
@@ -167,6 +176,15 @@
     },
   ];
   var WEB_CASES_EN = [
+    {
+      id: "aleksandra",
+      href: "portfolio-strona-aleksandra-szczepanek.html",
+      title: "Aleksandra Szczepanek",
+      lead: "Makeup artist & courses",
+      video: "portfolio-media/showcase/web/aleksandra-szczepanek.mp4",
+      poster: "portfolio-media/showcase/web/aleksandra-szczepanek-poster.jpg",
+      match: /aleksandra|szczepanek/i,
+    },
     {
       id: "juicy",
       href: "portfolio-strona-juicy-events.html",

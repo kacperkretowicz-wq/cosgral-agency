@@ -1,11 +1,12 @@
 /** Realizacje: the homepage glass cube as the hinge of the chapter slider.
- * Between chapters it recedes into depth, then enters every chapter from the
- * left edge along that chapter's own line, slowly, landing one face further
- * on. It leans toward the pointer, can be spun by dragging, gives
- * under a press, and folds away when a chapter opens.
+ * It never leaves the screen: each chapter has its own place for it, and a
+ * slide carries it there on a critically damped spring — arcing back through
+ * depth and turning one face — so there is no cut however fast the slider
+ * moves. It leans toward the pointer, can be spun by dragging, gives under a
+ * press, and folds away when a chapter opens.
  */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261018acrylic3';
 
 (async function () {
   const canvas = document.getElementById('pf-cube');
@@ -18,10 +19,13 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
   const anchors = chapters.map(c => (c.getAttribute('data-cube-at') || '0.5 0.5').split(' ').map(Number));
   const mobileAnchors = chapters.map(c => (c.getAttribute('data-cube-at-m') || '0.5 0.42').split(' ').map(Number));
   const hits = [...document.querySelectorAll('[data-tile-expand-hit]')];
+  const shockInto = chapters.map(c => c.getAttribute('data-enter') === 'shock');
   const HALF = 1.35;
   const QUARTER = Math.PI / 2;
-  const glassLook = { glass: { iridescence: 0.12, dispersion: 0.25, edgeGlow: 0.12, envMapIntensity: 1.15, farSideDim: 0.38, thickness: 0.7 }, env: { power: 1.5, sheen: 0.4 } };
+  const OMEGA = 3.1;
+  const glassLook = { glass: { iridescence: 0.32, dispersion: 0.45, edgeGlow: 0.2, envMapIntensity: 1.3, farSideDim: 0.38, thickness: 0.7, rainbow: 0.3, acrylic: 0.95 }, env: { power: 1.5, sheen: 0.4 } };
   const clamp = THREE.MathUtils.clamp;
+  const lerp = THREE.MathUtils.lerp;
   const smooth = (a, b, x) => { const p = clamp((x - a) / (b - a), 0, 1); return p * p * (3 - 2 * p); };
   const rate = (r, dt) => 1 - Math.exp(-dt * r);
 
@@ -49,7 +53,8 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
 
   let width = 1, height = 1, tile = 0, mobile = false;
   let lastX = NaN, lastY = NaN;
-  let hover = 0, hoverTarget = 0, dive = 0, hide = 0, press = 0, pressTarget = 0;
+  let pos = null, vel = 0;
+  let hover = 0, hoverTarget = 0, dive = 0, hide = 0, press = 0, pressTarget = 0, intro = reduced ? 1 : 0;
   let pointerX = 0, pointerY = 0, px = 0, py = 0, clientX = -1, clientY = -1;
   let spinX = 0, spinY = 0, velX = 0, velY = 0;
   let drag = null, dragged = false;
@@ -60,10 +65,6 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
   function toWorld(x, y, z, out) {
     const h = worldHeight(z);
     return out.set((x - 0.5) * h * full.aspect, (0.5 - y) * h, z);
-  }
-  function bezier(a, b, c, d, t) {
-    const u = 1 - t;
-    return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d;
   }
   function resize() {
     width = Math.max(1, window.innerWidth);
@@ -102,7 +103,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
     if (!drag) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     const now = performance.now(), step = Math.max(8, now - drag.t) / 1000;
-    if (Math.abs(e.clientX - drag.x0) + Math.abs(e.clientY - drag.y0) > 6) { dragged = true; setDragging(true); }
+    if (Math.abs(e.clientX - drag.x0) + Math.abs(e.clientY - drag.y0) > 6) { dragged = true; window.__pfCubeDragged = true; setDragging(true); }
     spinY += dx * 0.011; spinX += dy * 0.009;
     velY = dx * 0.011 / step; velX = dy * 0.009 / step;
     drag.x = e.clientX; drag.y = e.clientY; drag.t = now;
@@ -131,6 +132,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
   window.addEventListener('click', e => {
     if (!dragged) return;
     dragged = false;
+    window.__pfCubeDragged = false;
     if (e.target.closest && e.target.closest('[data-tile-expand-hit]')) {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -138,6 +140,11 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
   }, true);
   window.addEventListener('portfolio-expand-open', () => { openFlag = true; hoverTarget = 0; });
   window.addEventListener('portfolio-expand-close', () => { openFlag = false; });
+  /* Montaż: the cube taps the glass to send out the wave that uncovers the
+     reel wall, then steps back while the wall is up */
+  let tapAt = -1e9, wallOpen = false;
+  window.addEventListener('pf-wall-open', () => { tapAt = performance.now(); wallOpen = true; hoverTarget = 0; });
+  window.addEventListener('pf-wall-close', () => { wallOpen = false; });
 
   try {
     glass = await installGlassCube(THREE, renderer, scene, group, HALF, glassLook);
@@ -147,29 +154,62 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
     return;
   }
   portal.classList.add('has-glass-model');
+  seeThrough(glass);
   canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); portal.classList.add('has-cube-fallback'); });
 
-  /* Every chapter is entered from the left edge, each along its own line:
-     a flat glide, a swoop from above, a spiral out of depth, a rise from below.
-     Points are [x, y] screen fractions and z depth; the last point is the
-     chapter's anchor. */
-  const EXIT = 0.85, ENTER = 2.9;
-  const PATHS = [
-    (bx, by) => [[-0.26, by + 0.06, -1.2], [0.12, by + 0.2, -0.8], [bx - 0.22, by + 0.06, 0.25]],
-    (bx, by) => [[-0.24, -0.22, -2.6], [0.08, -0.18, -3.2], [bx - 0.26, by + 0.3, 0.6]],
-    (bx, by) => [[-0.32, by, -10], [0.24, by - 0.36, -8], [bx + 0.2, by + 0.26, -2.6]],
-    (bx, by) => [[-0.24, 1.22, -1.6], [0.04, 1.02, -1], [bx - 0.16, by - 0.24, 0.35]]
-  ];
-  let home = null, flight = null;
-  const cur = { x: 0.5, y: 0.5, z: 0, s: 1 };
-  function startFlight(to, now, withExit) {
-    flight = {
-      to,
-      start: now,
-      exit: withExit,
-      from: { x: cur.x, y: cur.y, z: cur.z, s: cur.s },
-      fromFace: flight ? flight.to : (home ?? to)
+  /* Clear glass: the animated ribbon inside is blacked out (hiding it would
+     let three fill the refraction with grey), and coverage follows
+     brightness, so reflections and edges stay crisp while the body lets the
+     page through. Only this page's copy of the material is changed. */
+  function seeThrough(mesh) {
+    const bm = mesh.userData.transmissionBackdrop.material;
+    bm.fragmentShader = bm.fragmentShader
+      .replace('precision highp float;', 'precision highp float;\n    uniform float uHaze;')
+      .replace('gl_FragColor = vec4(col, 1.0);', 'gl_FragColor = vec4(col * uHaze, 1.0);');
+    bm.uniforms.uHaze = { value: 0 };
+    bm.needsUpdate = true;
+    const m = mesh.material;
+    const prev = m.onBeforeCompile;
+    m.onBeforeCompile = (shader, r) => {
+      if (prev) prev(shader, r);
+      shader.fragmentShader = shader.fragmentShader.replace(/}\s*$/,
+        '  float pfLum = max(max(gl_FragColor.r, gl_FragColor.g), gl_FragColor.b);\n' +
+        '  gl_FragColor.a *= clamp(pow(pfLum, 1.7) * 1.9, 0.0, 1.0);\n}');
     };
+    m.customProgramCacheKey = () => 'pf-clear-glass';
+    m.needsUpdate = true;
+  }
+
+  /* What lies behind the cube, seen through it: softened and lifted, clipped
+     to the cube's outline on screen */
+  const lens = document.createElement('div');
+  lens.className = 'pf-cube-lens';
+  portal.insertBefore(lens, canvas);
+
+  const hullPts = Array.from({ length: 8 }, () => new THREE.Vector3());
+  function updateLens(opacity) {
+    if (opacity < 0.02) {
+      if (lens.style.visibility !== 'hidden') lens.style.visibility = 'hidden';
+      return;
+    }
+    const pts = [];
+    let cx = 0, cy = 0;
+    for (let k = 0; k < 8; k++) {
+      const p = hullPts[k].set(k & 1 ? HALF : -HALF, k & 2 ? HALF : -HALF, k & 4 ? HALF : -HALF);
+      p.applyMatrix4(group.matrixWorld).project(full);
+      const x = (p.x * 0.5 + 0.5) * width, y = (-p.y * 0.5 + 0.5) * height;
+      pts.push([x, y]); cx += x; cy += y;
+    }
+    cx /= 8; cy /= 8;
+    pts.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lower = [], upper = [];
+    for (const p of pts) { while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop(); lower.push(p); }
+    for (let k = pts.length - 1; k >= 0; k--) { const p = pts[k]; while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop(); upper.push(p); }
+    const hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+    lens.style.clipPath = 'polygon(' + hull.map(p => ((p[0] - cx) * 0.95 + cx).toFixed(1) + 'px ' + ((p[1] - cy) * 0.95 + cy).toFixed(1) + 'px').join(',') + ')';
+    lens.style.opacity = opacity.toFixed(3);
+    lens.style.visibility = 'visible';
   }
 
   function frame(now) {
@@ -178,12 +218,25 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
     lastTime = now;
     if (document.hidden) return;
     const time = reduced ? 0 : now / 1000;
+    glass.userData.rainbowTime.value = time;
     const n = chapters.length;
     const raw = clamp(scroller.scrollLeft / Math.max(1, scroller.clientWidth), 0, n - 1);
-    const settledRaw = Math.abs(raw - Math.round(raw)) < 0.02;
+
+    /* Critically damped follow: no overshoot, no velocity jumps, retargets
+       mid-travel without a seam. */
+    if (pos === null || reduced) { pos = raw; vel = 0; }
+    else {
+      vel += (OMEGA * OMEGA * (raw - pos) - 2 * OMEGA * vel) * dt;
+      pos += vel * dt;
+      if (Math.abs(raw - pos) < 0.0004 && Math.abs(vel) < 0.002) { pos = raw; vel = 0; }
+    }
+    intro += (1 - intro) * rate(1.6, dt);
     hover += (hoverTarget - hover) * rate(6, dt);
     press += (pressTarget - press) * rate(pressTarget ? 18 : 7, dt);
-    const isOpen = openFlag !== null ? openFlag : document.body.classList.contains('is-tile-expanded');
+    const isOpen = (openFlag !== null ? openFlag : document.body.classList.contains('is-tile-expanded'))
+      || (wallOpen && now - tapAt > 650);
+    const tk = clamp((now - tapAt) / 520, 0, 1);
+    const tap = tk < 1 ? Math.sin(Math.PI * Math.min(1, tk * 1.8)) * (tk < 0.56 ? 1 : 0) + (tk > 0.5 ? Math.sin((tk - 0.5) * Math.PI * 9) * 0.25 * (1 - tk) : 0) : 0;
     dive += ((isOpen ? 1 : 0) - dive) * rate(isOpen ? 4.5 : 2.4, dt);
     hide += ((root.classList.contains('is-nav-menu-open') ? 1 : 0) - hide) * rate(9, dt);
     const pb = rate(4, dt);
@@ -198,92 +251,69 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
       spinX += (0 - spinX) * settle;
     }
 
-    /* Where should the cube be? As soon as the slide leaves its chapter, the
-       next one in the direction of travel; once the slide rests, that one. */
-    let wanted = home;
-    if (settledRaw) wanted = Math.round(raw);
-    else if (home !== null && Math.abs(raw - home) > 0.05) wanted = raw > home ? Math.ceil(raw) : Math.floor(raw);
-    if (home === null) wanted = Math.round(raw);
-    if (reduced) { home = wanted; flight = null; }
-    else if (!flight && wanted !== home) startFlight(wanted, now, home !== null);
-    else if (flight && wanted !== flight.to) {
-      if (now - flight.start < EXIT * 1000) flight.to = wanted;
-      else startFlight(wanted, now, true);
-    }
-
+    const i = Math.min(n - 1, Math.floor(pos));
+    const t = pos - i;
     const set = mobile ? mobileAnchors : anchors;
-    let sx, sy, sz, sc = 1, op = 1, exPitch = 0, exYaw = 0, exRoll = 0, faceIndex = home ?? 0;
-    if (flight) {
-      const el = (now - flight.start) / 1000 + (flight.exit ? 0 : EXIT);
-      const [bx, by] = set[flight.to];
-      faceIndex = flight.to;
-      if (el < EXIT) {
-        /* Recede into depth and fade */
-        const u = clamp(el / EXIT, 0, 1), e = u * u * u;
-        const f = flight.from;
-        sx = f.x; sy = f.y - e * 0.08; sz = f.z - e * 7; sc = f.s * (1 - e * 0.3);
-        op = 1 - smooth(0.25, 1, u);
-        faceIndex = flight.fromFace;
-        exYaw = -e * 1.2; exPitch = e * 0.5;
-      } else {
-        const v = clamp((el - EXIT) / ENTER, 0, 1);
-        const e = 1 - Math.pow(1 - v, 3), r = 1 - e;
-        const k = flight.to % 4;
-        const path = PATHS[k](bx, by);
-        sx = bezier(path[0][0], path[1][0], path[2][0], bx, e);
-        sy = bezier(path[0][1], path[1][1], path[2][1], by, e);
-        sz = bezier(path[0][2], path[1][2], path[2][2], 0, e);
-        sc = 0.72 + 0.28 * e;
-        op = smooth(0, 0.14, v);
-        if (k === 0) { exYaw = r * Math.PI * 2; exRoll = -r * 0.25; }
-        else if (k === 1) { exPitch = r * Math.PI * 1.5; exYaw = r * 0.4; }
-        else if (k === 2) { exRoll = r * Math.PI * 2; exYaw = r * QUARTER; }
-        else { exYaw = -r * Math.PI; exPitch = Math.sin(r * Math.PI * 4) * 0.28 * r; }
-        if (v >= 1) { home = flight.to; flight = null; }
-      }
-    } else {
-      [sx, sy] = set[home ?? 0];
-      sz = 0;
+    const [ax, ay] = set[i], [bx, by] = set[Math.min(n - 1, i + 1)];
+    /* sin² keeps the arc smooth across chapter boundaries during long slides */
+    let arc = reduced ? 0 : Math.pow(Math.sin(Math.PI * t), 2);
+    const dir = vel >= 0 ? 1 : -1;
+    let sx = lerp(ax, bx, t);
+    let sy = lerp(ay, by, t) - arc * 0.07 + Math.sin(time * 0.6) * 0.006;
+    let sz = -arc * 2.3 - (1 - intro) * 6;
+    let dunk = 0;
+    if (!reduced && shockInto[i + 1]) {
+      /* It stays put and taps the glass: a quick push toward the viewer, a
+         springy return with a small tremor; the shockwave starts from here.
+         Only once the black has spread does it glide to its new place. */
+      const move = smooth(0.72, 1, t);
+      arc = Math.pow(Math.sin(Math.PI * move), 2) * 0.6;
+      sx = lerp(ax, bx, move);
+      sy = lerp(ay, by, move) - Math.pow(Math.sin(Math.PI * move), 2) * 0.05;
+      const k = clamp((t - 0.03) / 0.3, 0, 1);
+      const push = Math.sin(Math.PI * Math.min(1, k * 1.8)) * (k < 0.56 ? 1 : 0);
+      const tremor = k > 0.5 ? Math.sin((k - 0.5) * Math.PI * 9) * 0.25 * (1 - k) : 0;
+      sz = 1.45 * push + tremor - Math.pow(Math.sin(Math.PI * move), 2) * 1.2 - (1 - intro) * 6;
+      dunk = push * 0.35 + tremor * 0.4;
     }
-    sy += Math.sin(time * 0.6) * 0.006;
-    cur.x = sx; cur.y = sy; cur.z = sz; cur.s = sc;
+    sz += tap * 1.45;
     toWorld(sx, sy, sz, group.position);
 
     /* Lean toward the pointer, harder when it is on the cube */
     let lx = px * 0.35, ly = py * 0.35;
-    if (hover > 0.01 && clientX >= 0 && !flight) {
+    if (hover > 0.01 && clientX >= 0) {
       const c = cubeScreen(), rr = cubeSize() * 0.9;
       lx = lx * (1 - hover) + clamp((clientX - c.x) / rr, -1, 1) * hover;
       ly = ly * (1 - hover) + clamp((clientY - c.y) / rr, -1, 1) * hover;
     }
     euler.set(
-      0.38 + exPitch + ly * 0.42 + Math.sin(time * 0.37) * 0.05,
-      -0.62 - faceIndex * QUARTER + exYaw + lx * 0.55 + Math.sin(time * 0.29) * 0.07 + dive * Math.PI * 0.6,
-      exRoll + Math.sin(time * 0.41) * 0.02
+      0.38 + arc * 0.75 + dunk * 1.1 + ly * 0.42 + Math.sin(time * 0.37) * 0.05 + (1 - intro) * 1.4,
+      -0.62 - pos * QUARTER + lx * 0.55 + Math.sin(time * 0.29) * 0.07 + dive * Math.PI * 0.6 - (1 - intro) * 2.2,
+      -arc * 0.3 * dir - dunk * 0.5 + Math.sin(time * 0.41) * 0.02
     );
     targetQ.setFromEuler(euler);
     spinQ.setFromAxisAngle(axisY, spinY);
     targetQ.premultiply(spinQ);
     spinQ.setFromAxisAngle(axisX, spinX);
     targetQ.premultiply(spinQ);
-    if (op < 0.02) group.quaternion.copy(targetQ);
-    else group.quaternion.slerp(targetQ, rate(drag ? 22 : flight ? 14 : 9, dt));
+    group.quaternion.slerp(targetQ, rate(drag ? 22 : 10, dt));
     const scale = worldHeight(0) * cubeSize() / height / (2 * HALF);
     const bounce = 1 + hover * 0.09 - press * 0.08;
-    group.scale.setScalar(scale * sc * bounce * (1 - smooth(0, 1, dive) * 0.5));
+    group.scale.setScalar(scale * (1 - arc * 0.14) * bounce * (1 - smooth(0, 1, dive) * 0.5));
     group.updateMatrixWorld(true);
 
-    const opacity = op * (1 - smooth(0.15, 0.85, dive)) * (1 - hide);
+    const opacity = smooth(0, 0.35, intro) * (1 - smooth(0.15, 0.85, dive)) * (1 - hide);
     glass.material.opacity = opacity;
     glass.material.depthWrite = opacity > 0.995;
     group.visible = glass.visible = opacity > 0.01;
     glass.userData.transmissionBackdrop.visible = group.visible;
     if (!group.visible) {
       if (canvas.style.visibility !== 'hidden') canvas.style.visibility = 'hidden';
+      updateLens(0);
       return;
     }
     const settling = Math.abs(Math.round(spinY / QUARTER) * QUARTER - spinY) + Math.abs(spinX) > 0.002;
-    const active = flight || drag || settling || Math.abs(velX) + Math.abs(velY) > 0.01
+    const active = tk < 1 || vel !== 0 || intro < 0.999 || drag || settling || Math.abs(velX) + Math.abs(velY) > 0.01
       || Math.abs(hoverTarget - hover) > 0.002 || Math.abs(pressTarget - press) > 0.002
       || Math.abs(dive - (isOpen ? 1 : 0)) > 0.002 || Math.abs(pointerX - px) + Math.abs(pointerY - py) > 0.004;
     if (now - lastRender < (active ? 14 : 42)) return;
@@ -291,6 +321,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
     crop();
     canvas.style.visibility = 'visible';
     renderer.render(scene, camera);
+    updateLens(opacity);
   }
   requestAnimationFrame(frame);
 })();

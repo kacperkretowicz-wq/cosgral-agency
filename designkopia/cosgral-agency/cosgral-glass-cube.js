@@ -12,6 +12,9 @@ export async function installGlassCube(THREE, renderer, scene, group, half, opti
   const PARAMS = GLASS.env;
   const edgeUniform = { value: GLASS.edgeGlow };
   const farUniform = { value: GLASS.farSideDim };
+  const rainbowUniform = { value: GLASS.rainbow || 0 };
+  const rainbowTime = { value: 0 };
+  const acrylicUniform = { value: GLASS.acrylic || 0 };
 function buildEnvScene() {
   const env = new THREE.Scene();
   env.background = new THREE.Color(PARAMS.ambient, PARAMS.ambient, PARAMS.ambient);
@@ -88,18 +91,26 @@ function buildEnvScene() {
       sh.uniforms.uFar = farUniform;
       sh.uniforms.uIridNoise = { value: GLASS.iridescenceNoise || 0 };
       sh.uniforms.uIridEdge = { value: GLASS.iridescenceEdgeBias || 0 };
+      sh.uniforms.uRainbow = rainbowUniform;
+      sh.uniforms.uRbTime = rainbowTime;
+      sh.uniforms.uAcrylic = acrylicUniform;
       sh.vertexShader = sh.vertexShader
-        .replace('#include <common>', '#include <common>\nvarying vec3 vObjN;\nvarying vec3 vViewN;\nvarying vec3 vObjP;')
-        .replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\nvObjN = normal;\nvViewN = normalMatrix * normal;\nvObjP = position;');
+        .replace('#include <common>', '#include <common>\nvarying vec3 vObjN;\nvarying vec3 vViewN;\nvarying vec3 vObjP;\nvarying vec3 vWorldN;\nvarying float vWorldH;')
+        .replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\nvObjN = normal;\nvViewN = normalMatrix * normal;\nvObjP = position;\nvWorldN = normalize(mat3(modelMatrix) * normal);\nvWorldH = (mat3(modelMatrix) * position).y / (length(modelMatrix[1].xyz) * ' + half.toFixed(4) + ');');
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', `#include <common>
 varying vec3 vObjN;
 varying vec3 vViewN;
 varying vec3 vObjP;
+varying vec3 vWorldN;
+varying float vWorldH;
+uniform float uAcrylic;
 uniform float uEdge;
 uniform float uFar;
 uniform float uIridNoise;
 uniform float uIridEdge;
+uniform float uRainbow;
+uniform float uRbTime;
 float irHash(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
 float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(mix(irHash(i), irHash(i + vec3(1,0,0)), f.x), mix(irHash(i + vec3(0,1,0)), irHash(i + vec3(1,1,0)), f.x), f.y),
@@ -128,6 +139,35 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
             bool farSide = dot(normalize(vViewN), normalize(vViewPosition)) < 0.0;
             float nearFar = farSide ? uFar * 0.5 : 1.0;
             totalEmissiveRadiance += uEdge * nearFar * edge * (0.55 + 0.9 * fres) * vec3(0.96, 0.98, 1.0);
+            // Clear acrylic block: a lit, slightly frosted top, the floor of the block
+            // glowing through, and haze pooling low in the sides; faces only
+            if (uAcrylic > 0.0) {
+              vec3 wn = normalize(vWorldN);
+              float topF = smoothstep(0.55, 0.92, wn.y);
+              float botF = smoothstep(0.55, 0.92, -wn.y);
+              float sideF = 1.0 - max(topF, botF);
+              float hh = clamp(vWorldH * 0.5 + 0.5, 0.0, 1.0);
+              float acr = topF * (0.85 + 0.2 * (1.0 - fres))
+                + botF * (farSide ? 0.7 : 0.2)
+                + sideF * mix(0.14, 0.015, smoothstep(0.0, 0.8, hh));
+              totalEmissiveRadiance += uAcrylic * (1.0 - edge) * acr * vec3(0.965, 0.98, 1.0);
+            }
+            // Quartz-like light: a crisp white rim on the bevels, and spectral
+            // dispersion (blue → violet → red → amber) gathered in the corners,
+            // strongest at grazing angles, drifting very slowly
+            if (uRainbow > 0.0) {
+              vec3 a3 = abs(on);
+              float hi = max(max(a3.x, a3.y), a3.z), lo = min(min(a3.x, a3.y), a3.z);
+              float mid = a3.x + a3.y + a3.z - hi - lo;
+              float edgeM = smoothstep(0.18, 0.5, mid) * (1.0 - smoothstep(0.88, 0.99, hi));
+              float cornerM = smoothstep(0.22, 0.5, lo);
+              float g = pow(fres, 1.6);
+              float h = fract(0.58 + g * 0.55 + dot(vObjP, vec3(0.05, 0.035, 0.025)) + uRbTime * 0.02);
+              vec3 rb = clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+              rb = mix(vec3(1.0), rb, 0.9);
+              totalEmissiveRadiance += rb * uRainbow * nearFar * (edgeM * 0.5 + cornerM * 1.5) * (0.12 + 1.6 * g);
+              totalEmissiveRadiance += vec3(1.0) * uRainbow * nearFar * edgeM * g * 0.7;
+            }
           }`)
         .replace('#include <dithering_fragment>', '#include <dithering_fragment>\n  if (uEdge > 0.0 && dot(normalize(vViewN), normalize(vViewPosition)) < 0.0) gl_FragColor.rgb *= uFar;');
     };
@@ -168,6 +208,7 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
   m.customProgramCacheKey = () => 'cosgral-glass-swirl-v1';
   const mesh = new THREE.Mesh(geometry, m);
   mesh.name = 'CosgralGlassCube';
+  mesh.userData.rainbowTime = rainbowTime;
   const envScene = buildEnvScene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   // fromScene in r170 fixes the studio at 256px. Capture a 512px cube map

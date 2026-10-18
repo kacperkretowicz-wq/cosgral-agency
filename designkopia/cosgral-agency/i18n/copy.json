@@ -972,6 +972,40 @@
       "pl": "Klient oczekiwał sklepu, który uniesie wizerunek vintage luxury i nie zgubi konwersji. Takie wdrożenie oddaliśmy: editorial na wierzchu, e-commerce pod spodem. Nagranie pokazuje, jak katalog i proces zakupowy układają się w jeden rytm.",
       "en": "The client expected a store that could carry a vintage luxury image without losing conversion. That is the delivery: editorial on the surface, e-commerce underneath. The recording shows how the catalog and the purchase flow sit in one rhythm."
     },
+    "aleksandra_title": {
+      "pl": "Aleksandra Szczepanek",
+      "en": "Aleksandra Szczepanek"
+    },
+    "aleksandra_desc": {
+      "pl": "Makijażystka i szkolenia",
+      "en": "Makeup artist & courses"
+    },
+    "aleksandra_meta": {
+      "title": {
+        "pl": "Aleksandra Szczepanek — strona internetowa | COSGRAL",
+        "en": "Aleksandra Szczepanek — website | COSGRAL"
+      },
+      "description": {
+        "pl": "Strona makijażystki Aleksandry Szczepanek — pakiety ślubne, sklep ze szkoleniami online i makijaż komercyjny. Nagranie i opis wdrożenia.",
+        "en": "Website for makeup artist Aleksandra Szczepanek — wedding packages, an online course shop and commercial makeup. Recording and delivery notes."
+      }
+    },
+    "aleksandra_p1": {
+      "pl": "Aleksandra Szczepanek to makijażystka, która łączy trzy światy: makijaż ślubny, pracę przy reklamach i sesjach zdjęciowych oraz szkolenia dla kobiet i makijażystek. Potrzebowała strony, która udźwignie wizerunek premium, a jednocześnie będzie sklepem — z pakietami ślubnymi, zapytaniem o termin i kursami online do kupienia od ręki.",
+      "en": "Aleksandra Szczepanek is a makeup artist who works across three worlds: bridal makeup, commercials and photo shoots, and courses for women and fellow makeup artists. She needed a site that carries a premium image and works as a shop at the same time — with wedding packages, date enquiries and online courses that can be bought on the spot."
+    },
+    "aleksandra_p2": {
+      "pl": "Zależało nam na estetyce jak z sesji beauty: czarno-biała fotografia, spokojna, szeroka typografia i dużo powietrza. Pakiety — ślubny, Exclusive, All Day, makijaże i fryzury — dostały przejrzyste karty z zakresem, żeby panna młoda w kilka sekund wiedziała, czego się spodziewać.",
+      "en": "We wanted it to feel like a beauty editorial: black-and-white photography, calm, wide typography and plenty of air. The packages — bridal, Exclusive, All Day, makeup and hair — got clear cards with their scope, so a bride knows what to expect within seconds."
+    },
+    "aleksandra_p3": {
+      "pl": "Strategia opierała się na dwóch ścieżkach: zapytanie o termin dla usług na żywo i natychmiastowy zakup dla szkoleń. Lekcje i masterclassy online — od wersji BASIC dla każdej kobiety po zajęcia dla makijażystek — trafiają do koszyka i płatności bez dodatkowego kontaktu, a dostęp przychodzi zaraz po zakupie. Realizacje z reklam i sesji budują wiarygodność po drodze.",
+      "en": "The strategy runs on two paths: a date enquiry for live services and an instant purchase for courses. Online lessons and masterclasses — from the BASIC class for every woman to sessions for makeup artists — go straight to the cart and checkout without extra contact, with access granted right after payment. Work from commercials and shoots builds trust along the way."
+    },
+    "aleksandra_p4": {
+      "pl": "Klientka oczekiwała strony, która sprzeda jej wiedzę tak samo dobrze jak usługi. Takie wdrożenie oddaliśmy: wizytówka premium na wierzchu, sklep ze szkoleniami i system zapytań pod spodem. Nagranie pokazuje, jak pakiety, kursy i koszyk układają się w jeden spokojny rytm.",
+      "en": "The client expected a site that sells her knowledge as well as her services. That is the delivery: a premium portfolio on the surface, a course shop and enquiry system underneath. The recording shows how packages, courses and the cart sit in one calm rhythm."
+    },
     "montaz_title": {
       "pl": "Montaż wideo",
       "en": "Video editing"

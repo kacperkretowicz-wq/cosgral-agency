@@ -399,39 +399,26 @@
     function layout() {
       if (destroyed) return;
       var nearest = clampIndex(Math.round(index), n);
-      /* Same geometry in catalog + detail — click only pulls the camera back */
-      var span = 172;
-      var step = span / Math.max(8, n - 1);
-      var radiusX = 78;
-      var radiusY = 12;
-      var baseScale = 1;
+      /* One straight row in catalog and detail alike; it runs past both edges
+         of the screen and opening a case only pulls the camera back. */
+      var cardW = cards[0] ? cards[0].offsetWidth || 280 : 280;
+      var step = cardW * 1.1;
+      var reach = window.innerWidth / 2 + cardW;
 
       cards.forEach(function (card, i) {
         var raw = i - index;
         if (raw > n / 2) raw -= n;
         if (raw < -n / 2) raw += n;
-        var angDeg = raw * step;
-        var ang = (angDeg * Math.PI) / 180;
-        var x = Math.sin(ang) * radiusX;
-        var y = (1 - Math.cos(ang)) * radiusY;
-        var depth = Math.cos(ang);
-        var s = baseScale * (0.58 + 0.42 * depth);
-        var o = Math.max(0, 0.18 + 0.82 * Math.pow(Math.max(0, depth), 1.05));
-        var rot = angDeg * 0.92;
+        var x = raw * step;
+        var near = Math.min(1, Math.abs(raw));
+        var s = 1 - near * 0.05;
         card.style.transform =
-          "translate3d(calc(-50% + " +
-          x.toFixed(3) +
-          "vw), calc(-50% + " +
-          y.toFixed(3) +
-          "vh), 0) rotate(" +
-          rot.toFixed(2) +
-          "deg) scale(" +
-          s.toFixed(3) +
-          ")";
-        card.style.opacity = String(Math.max(0, Math.min(1, o)));
-        card.style.visibility = o < 0.04 ? "hidden" : "visible";
-        card.style.pointerEvents = o < 0.12 ? "none" : "auto";
-        card.style.zIndex = String(Math.round(20 + depth * 30));
+          "translate3d(calc(-50% + " + x.toFixed(2) + "px), -50%, 0) scale(" + s.toFixed(3) + ")";
+        card.style.opacity = "1";
+        var off = Math.abs(x) > reach;
+        card.style.visibility = off ? "hidden" : "visible";
+        card.style.pointerEvents = off ? "none" : "auto";
+        card.style.zIndex = String(Math.round(50 - Math.abs(raw) * 4));
         card.classList.toggle("is-front", i === nearest);
         card.classList.toggle("is-side", Math.abs(raw) > 0.55);
       });

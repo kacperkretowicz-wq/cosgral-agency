@@ -37,47 +37,34 @@
 
   var EXPAND_KEYS = { web: 1, systems: 1, video: 1, graphics: 1 };
 
-  var LUX_SETS = [
-    {
-      lines: [
-        { pl: "New", en: "New" },
-        { pl: "Sites", en: "Sites" },
-      ],
-      shots: [
-        STILL + "web/trove-0-5.jpg",
-        STILL + "web/juicy-1-5.jpg",
-        STILL + "web/mj-2-5.jpg",
-        STILL + "web/trove-3-5.jpg",
-        STILL + "web/juicy-4-5.jpg",
-      ],
-    },
-    {
-      lines: [
-        { pl: "New", en: "New" },
-        { pl: "Craft", en: "Craft" },
-      ],
-      shots: [
-        STILL + "web/juicy-0-5.jpg",
-        STILL + "web/mj-1-5.jpg",
-        STILL + "web/trove-2-5.jpg",
-        STILL + "web/juicy-3-5.jpg",
-        STILL + "web/mj-4-5.jpg",
-      ],
-    },
-    {
-      lines: [
-        { pl: "New", en: "New" },
-        { pl: "Values", en: "Values" },
-      ],
-      shots: [
-        STILL + "web/mj-0-5.jpg",
-        STILL + "web/trove-1-5.jpg",
-        STILL + "web/juicy-2-5.jpg",
-        STILL + "web/mj-3-5.jpg",
-        STILL + "web/trove-4-5.jpg",
-      ],
-    },
+  var LUX_WORDS = [
+    [{ pl: "New", en: "New" }, { pl: "Sites", en: "Sites" }],
+    [{ pl: "New", en: "New" }, { pl: "Craft", en: "Craft" }],
+    [{ pl: "New", en: "New" }, { pl: "Values", en: "Values" }],
   ];
+
+  /* Section screenshots of the live sites, all landscape — shown uncropped */
+  var LUX_POOL = [1, 2, 3, 4].map(function (k) {
+    return "portfolio-media/showcase/web/sections/trove-" + k + "-s.jpg";
+  }).concat([1, 2, 3, 4].map(function (k) {
+    return "portfolio-media/showcase/web/sections/juicy-" + k + "-s.jpg";
+  }));
+
+  /* Five different pictures, none kept in the same place as last time */
+  function luxPick(prev) {
+    var pool = LUX_POOL.slice();
+    for (var i = pool.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+    }
+    var out = [];
+    for (var k = 0; k < 5; k++) {
+      var at = 0;
+      while (at < pool.length - 1 && prev && pool[at] === prev[k]) at++;
+      out.push(pool.splice(at, 1)[0]);
+    }
+    return out;
+  }
 
   /* Systemy — unique B&W tiles only (no repeats) */
   var OS_MEDIA = [
@@ -246,24 +233,34 @@
       );
     }
 
-    function paint(set) {
-      if (wordEl && set.lines) {
+    var current = null;
+    shots.forEach(function (fig) {
+      var img = fig.querySelector("img");
+      if (!img) return;
+      img.addEventListener("load", function () {
+        if (img.naturalWidth && img.naturalHeight) fig.style.setProperty("--lux-ar", (img.naturalWidth / img.naturalHeight).toFixed(4));
+      });
+    });
+
+    function paint(lines) {
+      if (wordEl && lines) {
         var loc = lang();
-        wordEl.innerHTML = set.lines
+        wordEl.innerHTML = lines
           .map(function (line) {
             var t = line[loc] || line.pl;
             return '<span class="chapter-lux__word-line">' + t + "</span>";
           })
           .join("");
       }
+      current = luxPick(current);
       shots.forEach(function (fig, i) {
         var img = fig.querySelector("img");
-        if (!img || !set.shots[i]) return;
-        img.src = set.shots[i];
+        if (!img || !current[i]) return;
+        img.src = current[i];
       });
     }
 
-    paint(LUX_SETS[0]);
+    paint(LUX_WORDS[0]);
     if (REDUCED) return;
 
     function cycle() {
@@ -274,8 +271,8 @@
       lux.classList.add("is-exit-left", "is-flip-out");
       window.setTimeout(function () {
         /* 2) swap while off-screen / edge-on */
-        idx = (idx + 1) % LUX_SETS.length;
-        paint(LUX_SETS[idx]);
+        idx = (idx + 1) % LUX_WORDS.length;
+        paint(LUX_WORDS[idx]);
         clearPhases();
         lux.classList.add("is-enter-right", "is-flip-in");
         void lux.offsetWidth;
@@ -617,6 +614,12 @@
 
   window.addEventListener("portfolio-tile-bg-ready", function () {
     if (pendingTheme) applyTheme(pendingTheme);
+  });
+
+  /* Galleries borrow the chapter's pictures — keep them still meanwhile */
+  window.addEventListener("pf-wall-open", pauseChapterLoops);
+  window.addEventListener("pf-wall-close", function () {
+    if (!expandedKey) resumeChapterLoops();
   });
 
   document.body.classList.add("portfolio-page--tiles");
