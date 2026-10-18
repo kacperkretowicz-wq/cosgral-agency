@@ -4,7 +4,7 @@
  * behind it on any ground.
  */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261018acrylic3';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 
 (async function () {
   const root = document.documentElement;
@@ -43,7 +43,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018acrylic3';
   function resize() {
     const r = canvas.getBoundingClientRect();
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
-    renderer.setPixelRatio(Math.min(2.25, window.devicePixelRatio || 1));
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();

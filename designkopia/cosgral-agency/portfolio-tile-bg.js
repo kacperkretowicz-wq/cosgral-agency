@@ -5,6 +5,9 @@
 import * as THREE from "./vendor/three-0.170.0.module.min.js";
 
 (function () {
+  /* perf: skip GPU work while the canvas is not on screen (display/visibility/opacity/viewport), checked at most every 300ms */
+  function cgShown(el){var now=performance.now();if(el.__cgT&&now-el.__cgT<300)return el.__cgV;el.__cgT=now;var v=!!el.isConnected;if(v){var cs=getComputedStyle(el);if(cs.display==="none"||cs.visibility==="hidden"||parseFloat(cs.opacity)<0.003)v=false;else{var r=el.getBoundingClientRect();if(r.width<1||r.height<1||r.bottom<=0||r.top>=innerHeight||r.right<=0||r.left>=innerWidth)v=false;}}el.__cgV=v;return v;}
+
   "use strict";
 
   var canvas = document.querySelector("[data-portfolio-tile-bg]");
@@ -78,6 +81,7 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     uniforms.uTime.value = REDUCED ? 0 : t;
     uniforms.uMouse.value.set(pointer.x, pointer.y);
     uniforms.uVel.value.set(pointer.vx, pointer.vy);
+    if (!cgShown(canvas)) return;
     renderer.render(scene, camera);
   }
 

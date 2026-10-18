@@ -3,6 +3,9 @@
  * Soft luminous orbs + grain on deep black; reacts to cosgralPointer (mouse / gyro).
  */
 (function () {
+  /* perf: skip GPU work while the canvas is not on screen (display/visibility/opacity/viewport), checked at most every 300ms */
+  function cgShown(el){var now=performance.now();if(el.__cgT&&now-el.__cgT<300)return el.__cgV;el.__cgT=now;var v=!!el.isConnected;if(v){var cs=getComputedStyle(el);if(cs.display==="none"||cs.visibility==="hidden"||parseFloat(cs.opacity)<0.003)v=false;else{var r=el.getBoundingClientRect();if(r.width<1||r.height<1||r.bottom<=0||r.top>=innerHeight||r.right<=0||r.left>=innerWidth)v=false;}}el.__cgV=v;return v;}
+
   "use strict";
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
@@ -155,6 +158,10 @@
       }
       mouse.x += (mouse.tx - mouse.x) * 0.07;
       mouse.y += (mouse.ty - mouse.y) * 0.07;
+      if (!cgShown(canvas)) {
+        requestAnimationFrame(frame);
+        return;
+      }
       gl.useProgram(program);
       gl.bindBuffer(gl.ARRAY_BUFFER, quad);
       gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);

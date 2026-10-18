@@ -75,7 +75,7 @@
     if (isClone) {
       return (
         '<img class="reels-tiles__poster" src="' +
-        mediaUrl(item.poster || item.src) +
+        (item.poster || mediaUrl(item.src)) +
         '" alt="" loading="lazy" decoding="async" />'
       );
     }
@@ -83,7 +83,8 @@
       '<video data-portfolio-video data-video-mode="focus-only" data-video-src="' +
       mediaUrl(item.src) +
       '" poster="' +
-      mediaUrl(item.poster || "") +
+      /* perf: unversioned poster = the same URL the Montaż wall uses, so it downloads once */
+      (item.poster || "") +
       '" muted loop playsinline preload="none"></video>'
     );
   }

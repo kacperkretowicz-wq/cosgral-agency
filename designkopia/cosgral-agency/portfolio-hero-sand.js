@@ -5,6 +5,9 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
 import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 
 (function () {
+  /* perf: skip GPU work while the canvas is not on screen (display/visibility/opacity/viewport), checked at most every 300ms */
+  function cgShown(el){var now=performance.now();if(el.__cgT&&now-el.__cgT<300)return el.__cgV;el.__cgT=now;var v=!!el.isConnected;if(v){var cs=getComputedStyle(el);if(cs.display==="none"||cs.visibility==="hidden"||parseFloat(cs.opacity)<0.003)v=false;else{var r=el.getBoundingClientRect();if(r.width<1||r.height<1||r.bottom<=0||r.top>=innerHeight||r.right<=0||r.left>=innerWidth)v=false;}}el.__cgV=v;return v;}
+
   "use strict";
 
   if (
@@ -614,7 +617,7 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       layer.mat.uniforms.uLayerAlpha.value = layerAlpha;
       layer.mat.uniforms.uMouse.value.set(mouse.x, mouse.y);
       if (matSrc) layer.mat.uniforms.uCubeMat.value.copy(matSrc);
-      if (layerAlpha > 0.001 || menuSandVisible || menuSandBoost || menuParticlePass) {
+      if ((layerAlpha > 0.001 || menuSandVisible || menuSandBoost || menuParticlePass) && cgShown(layer.renderer.domElement)) {
         layer.renderer.render(layer.scene, layer.camera);
       }
     });

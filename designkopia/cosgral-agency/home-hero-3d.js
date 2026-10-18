@@ -1,6 +1,6 @@
 /** One glass model, a reversible scroll choreography, and a soft optical wake. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2';
@@ -87,7 +87,7 @@ import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2'
     // Supersample smaller screens; a 3840-wide display renders at its native 4K.
     // Preserve sharpness instead of changing resolution mid-scroll.
     const limit=mobile?2560:4096;
-    pixelRatio=Math.max(1,Math.min(Math.max(2,nextRatio),limit/Math.max(width,height)));
+    pixelRatio=Math.max(1,Math.min(2,limit/Math.max(width,height)));
     renderer.setPixelRatio(pixelRatio);
     wakeRenderer.setPixelRatio(pixelRatio);wakeRenderer.setSize(width,height,false);
     tileWidth=0;tileHeight=0;setTileSize(menuTarget>0||menuBlend>0.001);updatePath();

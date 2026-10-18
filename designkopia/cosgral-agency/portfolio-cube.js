@@ -6,7 +6,7 @@
  * press, and folds away when a chapter opens.
  */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261018acrylic3';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 
 (async function () {
   const canvas = document.getElementById('pf-cube');

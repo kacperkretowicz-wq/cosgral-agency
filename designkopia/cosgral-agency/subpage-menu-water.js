@@ -34,7 +34,8 @@
     var html = document.documentElement;
     var bend = readVar("--menu-water-bend", 0);
     if (bend < 0.02) {
-      canvas.style.opacity = "0";
+      /* perf: idle frames only touch the style once */
+      if (canvas.style.opacity !== "0") canvas.style.opacity = "0";
       requestAnimationFrame(draw);
       return;
     }

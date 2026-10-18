@@ -9,7 +9,7 @@
  * this module does not own is forwarded to it.
  */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 
 (function () {
   const root = document.documentElement;
@@ -32,8 +32,8 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
     getMenuOpenDuration:()=>1.25,getMenuCloseDuration:()=>0.8,getMenuLinksDelay:()=>0.35,
     getMenuLabelReveal:()=>smooth(0.25,0.78,menuBlend),getMenuLabelReadability:()=>smooth(0.25,0.78,menuBlend),
     getMenuCubeDimMul:()=>1,isSideEntry:()=>true,
-    openMenu(){if(!menuTarget)captureMenuPose();menuTarget=1;menuChangedAt=performance.now();effectPauseUntil=menuChangedAt+100;start();return api;},
-    closeMenu(){captureClosePose();closeStartBlend=Math.max(0.001,menuBlend);menuTarget=0;menuChangedAt=performance.now();effectPauseUntil=menuChangedAt+40;return api;}
+    openMenu(){if(!menuTarget)captureMenuPose();menuTarget=1;menuChangedAt=performance.now();effectPauseUntil=menuChangedAt+100;start();wake();return api;},
+    closeMenu(){captureClosePose();closeStartBlend=Math.max(0.001,menuBlend);menuTarget=0;menuChangedAt=performance.now();effectPauseUntil=menuChangedAt+40;wake();return api;}
   };
   const api = new Proxy(own, {
     get(t,k){
@@ -72,7 +72,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
 
   let camera,fullCamera,scene,group,width=1,height=1,mobile=false;
   let tileWidth=0,tileHeight=0,tileMode=false,pixelRatio=1,resizeQueued=false;
-  let lastCropX=NaN,lastCropY=NaN,lastTime=0,lastRenderAt=0,contextLost=false;
+  let lastCropX=NaN,lastCropY=NaN,lastTime=0,lastRenderAt=0,contextLost=false,rafId=0;
   let pose,menuFrom,closeFrom,targetQ,menuQ,euler,v,corners;
 
   function worldHeight(z){return 2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*(camera.position.z-z);}
@@ -120,7 +120,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
     fullCamera.aspect=width/height;fullCamera.updateProjectionMatrix();fullCamera.updateMatrixWorld(true);
     camera.aspect=width/height;camera.clearViewOffset();camera.updateProjectionMatrix();
     const limit=mobile?2560:4096;
-    pixelRatio=Math.max(1,Math.min(Math.max(2,nextRatio),limit/Math.max(width,height)));
+    pixelRatio=Math.max(1,Math.min(2,limit/Math.max(width,height)));
     renderer.setPixelRatio(pixelRatio);
     tileWidth=0;tileHeight=0;setTileSize(menuTarget>0||menuBlend>0.001);
     lastCropX=NaN;lastCropY=NaN;
@@ -186,18 +186,20 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261015text2';
       failed=true;portal.classList.add('has-cube-fallback');console.error('COSGRAL glass model could not load',error);return;
     }
     if(menuTarget&&menuBlend<0.02){logoPose(menuFrom);group.quaternion.copy(menuFrom.quaternion);}
-    requestAnimationFrame(frame);
+    wake();
   }
 
+  /* perf: the loop sleeps while the menu is closed and the cube hidden; open/close wakes it. */
+  function wake(){if(!rafId&&glass){lastTime=0;rafId=requestAnimationFrame(frame);}}
   function frame(now){
-    requestAnimationFrame(frame);
+    rafId=requestAnimationFrame(frame);
     const dt=Math.min(0.05,Math.max(0.001,(now-(lastTime||now-16.7))/1000));lastTime=now;
     if(document.hidden||contextLost)return;
     menuBlend+=(menuTarget-menuBlend)*(1-Math.exp(-dt*(menuTarget?4.5:7)));
     if(Math.abs(menuTarget-menuBlend)<0.0001)menuBlend=menuTarget;
     const idle=menuTarget===0&&menuBlend===0;
     portal.classList.toggle('is-active',!idle);
-    if(idle&&!group.visible)return;
+    if(idle&&!group.visible){cancelAnimationFrame(rafId);rafId=0;return;}
     const time=now/1000;logoPose(pose);
     if(menuBlend>0){
       const mb=smooth(0,1,menuBlend);screenPosition(width*0.5,height*0.49,0.36,v);
