@@ -366,7 +366,7 @@
       el.addEventListener("click", closeLightbox);
     });
     document.addEventListener("keydown", function (e) {
-      if (lightbox.hidden) return;
+      if (lightbox.hidden || document.documentElement.classList.contains("is-nav-menu-open")) return;
       if (e.key === "Escape") closeLightbox();
       else if (lightboxNav) lightboxNav.onKeydown(e);
     });

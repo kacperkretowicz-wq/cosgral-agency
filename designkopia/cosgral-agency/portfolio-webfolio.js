@@ -601,6 +601,7 @@
   /* While the gallery is up it scrolls on its own; the slider must not move */
   window.addEventListener("wheel", function (e) {
     if (phase === "closed") return;
+    if (document.documentElement.classList.contains("is-nav-menu-open")) { e.stopImmediatePropagation(); return; }
     e.stopImmediatePropagation();
     if (detailOpen || phase !== "open") return;
     var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
@@ -614,7 +615,7 @@
     }
   }, { capture: true, passive: true });
   window.addEventListener("keydown", function (e) {
-    if (phase === "closed") return;
+    if (phase === "closed" || document.documentElement.classList.contains("is-nav-menu-open")) return;
     if (e.key === "Escape") { close(); e.stopImmediatePropagation(); return; }
     if (!detailOpen && phase === "open") {
       if (e.key === "ArrowDown" || e.key === "ArrowRight") go(active + 1, 1);

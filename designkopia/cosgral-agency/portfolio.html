@@ -46,7 +46,7 @@
 <link rel="stylesheet" href="case-viz-tiles.css?v=20260928mob2" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
 <link rel="stylesheet" href="portfolio-live/page-transitions.css?v=20260925webdeck1" />
-<link rel="stylesheet" href="portfolio-chapters-ed.css?v=20261018web1" />
+<link rel="stylesheet" href="portfolio-chapters-ed.css?v=20261018sys2" />
 <script>
   (function () {
     if (sessionStorage.getItem("cosgral-page-transition")) {
@@ -58,6 +58,7 @@
 <script src="cosgral-motion-pref.js?v=20260831e"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
   <link rel="stylesheet" href="portfolio-live/site-chat.css?v=20260925fix2" />
+<link rel="stylesheet" href="cosgral-menu.css?v=20261018menu2" />
 </head>
 <body class="subpage portfolio-page portfolio-page--tiles" data-tile-theme="web" data-tile-ground="home">
 <a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
@@ -92,13 +93,16 @@
     </button>
   </div>
 </nav>
-<div class="nav-overlay" id="nav-overlay" aria-hidden="true">
-  <div class="nav-overlay__backdrop" data-nav-close></div>
+<div class="nav-overlay" id="nav-overlay" data-lenis-prevent aria-hidden="true">
+  <div class="nav-overlay__backdrop" data-nav-backdrop></div>
   <div class="nav-overlay__stage">
     <nav class="nav-overlay__links" aria-label="Menu główne" data-i18n-aria-label="nav_overlay.main_menu">
+      <ul class="nav-overlay__list">
+        <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
+        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
         <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
-        <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
         <li><a href="index.html#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
       </ul>
@@ -315,24 +319,25 @@
 <script src="portfolio-live/home-ambient-bg.js?v=20260927themebg1"></script>
 <script src="portfolio-live/home-tile-interact.js?v=20260928gyro2"></script>
 <script src="subpage-menu-water.js?v=20260814e"></script>
-<script type="module" src="portfolio-live/subpage-cube.js?v=20260928montaz1"></script>
 <script type="module" src="portfolio-hero-sand.js?v=20260928montaz1"></script>
 <script type="module" src="portfolio-tile-bg.js?v=20260927themebg1"></script>
 <script src="portfolio-theme-layers.js?v=20260927menufix1"></script>
 <script src="portfolio-montaz-bg.js?v=20260927themebg1"></script>
-<script defer src="portfolio-live/home-nav-menu.js?v=20260925fix2"></script>
+<script defer src="home-nav-menu.js?v=20261012editorial4"></script>
+<script type="module" src="cosgral-menu-cube.js?v=20261018menu1"></script>
 <script src="telforce-previews.js?v=20260928overlay2"></script>
-<script src="portfolio-systems-fan.js?v=20261018ed40"></script>
-<script src="portfolio-montaz.js?v=20261018self1"></script>
-<script src="portfolio-expand.js?v=20261018aleks1"></script>
-<script src="portfolio-tiles.js?v=20261018web1"></script>
+<script src="sys-case-posters.js?v=20261018sys2"></script>
+<script src="portfolio-systems-fan.js?v=20261018sys2"></script>
+<script src="portfolio-montaz.js?v=20261018menu1"></script>
+<script src="portfolio-expand.js?v=20261018menu1"></script>
+<script src="portfolio-tiles.js?v=20261018menu1"></script>
 <script src="portfolio-horizon.js?v=20261018ed40"></script>
 <script src="portfolio-motion.js?v=20261018ed40"></script>
-<script src="portfolio-reelwall.js?v=20261018self1"></script>
-<script src="portfolio-gfxwall.js?v=20261018self1"></script>
-<script src="portfolio-webfolio.js?v=20261018web2"></script>
+<script src="portfolio-reelwall.js?v=20261018menu1"></script>
+<script src="portfolio-gfxwall.js?v=20261018menu1"></script>
+<script src="portfolio-webfolio.js?v=20261018menu1"></script>
 <script type="module" src="portfolio-cube.js?v=20261018ed40"></script>
 <script defer src="portfolio-live/site-chat.js?v=20260926chat7"></script>
-<script type="module" src="portfolio-live/site-chat-cube.js?v=20260926cube1"></script>
+<script type="module" src="site-chat-cube.js?v=20261012refine1"></script>
 </body>
 </html>

@@ -1968,7 +1968,7 @@
   );
 
   window.addEventListener("keydown", function (e) {
-    if (!expandedKey) return;
+    if (!expandedKey || document.documentElement.classList.contains("is-nav-menu-open")) return;
     if (e.key === "Escape") {
       e.preventDefault();
       close();

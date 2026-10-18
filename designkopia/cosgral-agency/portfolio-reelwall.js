@@ -332,7 +332,7 @@
   /* While the wall is up, the slider underneath must not move */
   window.addEventListener("wheel", function (e) { if (phase !== "closed") e.stopImmediatePropagation(); }, { capture: true, passive: true });
   window.addEventListener("keydown", function (e) {
-    if (phase === "closed") return;
+    if (phase === "closed" || document.documentElement.classList.contains("is-nav-menu-open")) return;
     if (e.key === "Escape") close();
     if (e.key !== "Tab" && e.key !== "Enter" && e.key !== " ") e.stopImmediatePropagation();
   }, true);

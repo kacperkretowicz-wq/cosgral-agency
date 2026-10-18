@@ -319,7 +319,7 @@
     /* While the gallery is up it scrolls on its own; the slider must not move */
     window.addEventListener("wheel", function (e) { if (phase !== "closed") e.stopImmediatePropagation(); }, { capture: true, passive: true });
     window.addEventListener("keydown", function (e) {
-      if (phase === "closed") return;
+      if (phase === "closed" || document.documentElement.classList.contains("is-nav-menu-open")) return;
       if (e.key === "Escape") { if (!panel.hidden) hideSheet(false); else close(); }
       if (!panel.hidden && e.key === "ArrowRight") stepSheet(1);
       if (!panel.hidden && e.key === "ArrowLeft") stepSheet(-1);

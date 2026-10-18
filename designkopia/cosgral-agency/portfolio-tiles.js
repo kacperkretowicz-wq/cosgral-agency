@@ -570,7 +570,7 @@
   });
 
   window.addEventListener("keydown", function (e) {
-    if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
+    if (expandedKey || document.documentElement.classList.contains("is-nav-menu-open") || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
       return;
     }
     if (e.key === "ArrowRight" || e.key === "PageDown") {
@@ -591,7 +591,7 @@
   window.addEventListener(
     "wheel",
     function (e) {
-      if (expandedKey || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
+      if (expandedKey || document.documentElement.classList.contains("is-nav-menu-open") || (window.__portfolioExpand && window.__portfolioExpand.isOpen())) {
         /* gallery / deck / fan handle their own scroll */
         return;
       }
