@@ -241,3 +241,11 @@ html.is-gyro-outside-hero .editorial-page:not(.is-nav-menu-open) .gyro-enable {o
   .hero-caption {bottom:22px;}
   .hero-caption__right {display:none;}
 }
+/* Pionowe nagrania w kartach realizacji: całe wideo, bez przycinania */
+.project-card .project-card__art video.is-portrait {inset:0;width:100%;height:100%;padding:14px 0;object-fit:contain;object-position:50% 50%;}
+.project-card--web .project-card__art video.is-portrait {background:#171b22;}
+.project-card--system .project-card__art video.is-portrait {background:transparent;object-position:82% 50%;}
+.project-card--system .project-system-type {z-index:2;}
+@media (max-width:760px) {
+  .project-card--system .project-card__art video.is-portrait {object-position:90% 50%;}
+}
