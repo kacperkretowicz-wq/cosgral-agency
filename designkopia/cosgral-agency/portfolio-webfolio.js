@@ -25,14 +25,15 @@
   var V = "portfolio-media/showcase/web/";
   var SEC = V + "sections/";
   var PROJECTS = [
-    { id: "aleksandra", name: "Aleksandra Szczepanek", lead: ["Makijażystka i szkolenia", "Makeup artist & courses"], href: "portfolio-strona-aleksandra-szczepanek.html", site: "", video: "aleksandra-szczepanek", ratio: 1280 / 722, tags: ["Strona usługowa", "Sklep ze szkoleniami", "Rezerwacje"], tagsEn: ["Service website", "Course shop", "Enquiries"] },
-    { id: "juicy", name: "Juicy Events", lead: ["Agencja eventowa", "Event agency"], href: "portfolio-strona-juicy-events.html", site: "https://juicyevents.pl/", video: "juicy-events", ratio: 1280 / 720, tags: ["Strona firmowa", "Lead generation", "Mobile first"], tagsEn: ["Company website", "Lead generation", "Mobile first"] },
-    { id: "trove", name: "Trove Archive", lead: ["Ecommerce fashion", "Ecommerce fashion"], href: "portfolio-strona-trove.html", site: "https://trovearchive.com/", video: "trove-archive", ratio: 1280 / 696, tags: ["E-commerce", "Lookbook", "Checkout"], tagsEn: ["E-commerce", "Lookbook", "Checkout"] },
-    { id: "mj", name: "MJ Social Media", lead: ["Content creator", "Content creator"], href: "portfolio-strona-mj.html", site: "https://mjsocialmedia.netlify.app/", video: "mj-social-media", ratio: 1280 / 718, tags: ["Marka osobista", "Landing page", "Social → lead"], tagsEn: ["Personal brand", "Landing page", "Social → lead"] }
+    { id: "aleksandra", name: "Aleksandra Szczepanek", lead: ["Makijażystka i szkolenia", "Makeup artist & courses"], site: "" /* adres strony – uzupełnić, wtedy pojawi się „Odwiedź stronę ↗” */, video: "aleksandra-szczepanek", ratio: 1280 / 722, tags: ["Strona usługowa", "Sklep ze szkoleniami", "Rezerwacje"], tagsEn: ["Service website", "Course shop", "Enquiries"] },
+    { id: "juicy", name: "Juicy Events", lead: ["Agencja eventowa", "Event agency"], site: "https://juicyevents.pl/", video: "juicy-events", mediaV: "20261018j2", ratio: 1280 / 722, tags: ["Strona firmowa", "Lead generation", "Mobile first"], tagsEn: ["Company website", "Lead generation", "Mobile first"] },
+    { id: "trove", name: "Trove Archive", lead: ["Ecommerce fashion", "Ecommerce fashion"], site: "https://trovearchive.com/", video: "trove-archive", ratio: 1280 / 696, tags: ["E-commerce", "Lookbook", "Checkout"], tagsEn: ["E-commerce", "Lookbook", "Checkout"] },
+    { id: "mj", name: "MJ Social Media", lead: ["Content creator", "Content creator"], site: "https://mjsocialmedia.netlify.app/", video: "mj-social-media", ratio: 1280 / 718, tags: ["Marka osobista", "Landing page", "Social → lead"], tagsEn: ["Personal brand", "Landing page", "Social → lead"] }
   ];
   PROJECTS.forEach(function (p) {
-    p.poster = V + p.video + "-poster.jpg";
-    p.clip = V + p.video + ".mp4";
+    var q = p.mediaV ? "?v=" + p.mediaV : "";
+    p.poster = V + p.video + "-poster.jpg" + q;
+    p.clip = V + p.video + ".mp4" + q;
     p.shots = [1, 2, 3, 4].map(function (k) { return SEC + p.id + "-" + k + ".jpg"; });
   });
   var N = PROJECTS.length;
@@ -441,11 +442,13 @@
     detail.appendChild(end);
 
     var foot = el("footer", "pfd-foot");
-    var links = el("div", "pfd-links");
-    links.setAttribute("data-rv", "");
-    if (p.site) links.appendChild(link((en() ? "Visit site" : "Odwiedź stronę") + " ↗", p.site, true));
-    links.appendChild(link((en() ? "Case study" : "Zobacz case") + " →", p.href));
-    foot.appendChild(links);
+    /* Only a link to the live site, and only once its address is known */
+    if (p.site) {
+      var links = el("div", "pfd-links");
+      links.setAttribute("data-rv", "");
+      links.appendChild(link((en() ? "Visit site" : "Odwiedź stronę") + " ↗", p.site, true));
+      foot.appendChild(links);
+    }
     var nextP = PROJECTS[(i + 1) % N];
     var next = el("button", "pfd-next");
     next.type = "button";
