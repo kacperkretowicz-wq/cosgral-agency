@@ -4,7 +4,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019chrome3';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019funnel5';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elastic6';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -304,7 +304,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019funn
     const clearance=sectionClearanceFade(sectionTop);
     const dissolve=(1-smoother(.75,.98,progress))*clearance;
     const cubeOpacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
-    materialStudy.update(progress,menuBlend,cubeOpacity,sectionTop/height,funnelFrame);
+    materialStudy.update(progress,menuBlend,cubeOpacity,sectionTop/height,funnelFrame,dt,nextProgress);
     group.visible=cubeOpacity>0.008&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');
@@ -321,7 +321,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019funn
     if(now<effectPauseUntil)return;
     // UI and input still update at the display rate; expensive effect renders
     // are capped at 60Hz on 120/144/240Hz monitors.
-    const activeMotion=!introDone||pointerMoving||scrollMoving||Math.abs(menuTarget-menuBlend)>0.001;
+    const activeMotion=!introDone||pointerMoving||scrollMoving||materialStudy.moving||Math.abs(menuTarget-menuBlend)>0.001;
     // The resting cube moves only a few pixels over several seconds. Reuse
     // its image between updates; pointer and scroll input restore 60Hz work.
     if(now-lastRenderAt<(activeMotion?14:42))return;

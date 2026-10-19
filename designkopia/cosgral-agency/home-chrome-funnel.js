@@ -1,9 +1,11 @@
-/** Shared contour: one surface for the DOM background and glass transmission. */
+/** One elastic sheet, shared by the page background and glass transmission. */
 (function(){
   const clamp=x=>Math.max(0,Math.min(1,x));
   const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a));return t*t*(3-2*t);};
   const mix=(a,b,t)=>a+(b-a)*t;
+  const idleElastic=new Float32Array(2);
   const glsl=`
+    uniform vec2 uChromeFunnelElastic;
     float cgFunnelHermite(float x,float a,float b,float y0,float y1,float m0,float m1){
       float t=clamp((x-a)/(b-a),0.,1.),t2=t*t,t3=t2*t;
       return (2.*t3-3.*t2+1.)*y0+(t3-2.*t2+t)*(b-a)*m0+(-2.*t3+3.*t2)*y1+(t3-t2)*(b-a)*m1;
@@ -13,29 +15,26 @@
       if(p<.76)return cgFunnelHermite(p,.50,.76,.59,.67,.35,.35);
       return cgFunnelHermite(p,.76,1.,.67,1.,.35,1.4);
     }
-    float cgFunnelSmoothUnion(float a,float b,float k){
-      float h=clamp(.5+.5*(b-a)/k,0.,1.);
-      return mix(b,a,h)-k*h*(1.-h);
-    }
     float cgFunnelDistance(vec2 point,vec4 frame,float boundary,float aspect){
       float raw=clamp(frame.w,0.,1.),p=cgFunnelPhase(raw);
-      float release=smoothstep(.70,.87,raw);
-      float recoil=sin(smoothstep(.635,.79,p)*3.14159265);
       float dx=point.x-frame.x*aspect;
-      float width=mix(.23,.055,smoothstep(.34,.67,p));
-      float depth=.145*sin(p*3.14159265)*(1.-smoothstep(.60,.73,p));
-      float bell=exp(-dx*dx/(width*width));
-      float base=boundary+.86*(raw-p)-.18-.80*smoothstep(.36,.92,p)-.016*recoil;
-      float shoulder=.022*sin(p*3.14159265)*sin(dx*4.1+.4);
-      float dTop=point.y-base-depth*bell-shoulder;
-      float slope=-2.*depth*dx/(width*width)*bell;
-      dTop/=sqrt(1.+slope*slope);
-      vec2 radius=vec2(clamp(frame.z*.36,.045,.105),.090)*(1.-release)+vec2(.0008);
-      vec2 center=vec2(frame.x*aspect+.014*release,frame.y-.035-.038*release);
-      float dCap=(length((point-center)/radius)-1.)*min(radius.x,radius.y);
-      dCap+=.003*smoothstep(.92,1.,release);
-      float tension=mix(.135,.035,smoothstep(.52,.68,p));
-      return cgFunnelSmoothUnion(dTop,dCap,tension);
+      float base=boundary+.86*(raw-p)-.18-.80*smoothstep(.36,.92,p);
+      float belly=.095*sin(p*3.14159265)*(1.-smoothstep(.48,.68,raw));
+      float bellyWidth=mix(.26,.18,smoothstep(.34,.67,p));
+      // A taut narrow tip opens into a broad wave as its stored force releases.
+      float strain=smoothstep(0.,.27,abs(uChromeFunnelElastic.x));
+      float tipWidth=mix(.21,.052,strain)*clamp(frame.z/.20,.8,1.3);
+      float tip=uChromeFunnelElastic.x-uChromeFunnelElastic.y;
+      float shoulder=uChromeFunnelElastic.y;
+      float a=exp(-dx*dx/(bellyWidth*bellyWidth));
+      float b=exp(-dx*dx/(tipWidth*tipWidth));
+      float c=exp(-dx*dx/(.29*.29));
+      float sweep=.016*sin(p*3.14159265);
+      float surface=base+belly*a+tip*b+shoulder*c+sweep*sin(dx*4.1+.4);
+      float slope=-2.*dx*(belly*a/(bellyWidth*bellyWidth)+tip*b/(tipWidth*tipWidth)+shoulder*c/(.29*.29))
+        +sweep*4.1*cos(dx*4.1+.4);
+      // A heightfield always has one connected edge: no detached cap or dot.
+      return (point.y-surface)/sqrt(1.+slope*slope);
     }
     vec4 cgFunnelOptics(vec2 uv,vec2 resolution,vec4 frame,float boundary){
       float aspect=resolution.x/resolution.y;
@@ -89,20 +88,64 @@
   function phase(p){
     return p<.50?hermite(p,0,.50,0,.59,1.2,.35):p<.76?hermite(p,.50,.76,.59,.67,.35,.35):hermite(p,.76,1,.67,1,.35,1.4);
   }
-  function distance(x,y,aspect,frame,boundary){
-    const raw=clamp(frame[3]),p=phase(raw),release=smooth(.70,.87,raw),recoil=Math.sin(smooth(.635,.79,p)*Math.PI);
-    const dx=(x-frame[0])*aspect,width=mix(.23,.055,smooth(.34,.67,p));
-    const depth=.145*Math.sin(p*Math.PI)*(1-smooth(.60,.73,p)),bell=Math.exp(-dx*dx/(width*width));
-    const base=boundary+.86*(raw-p)-.18-.80*smooth(.36,.92,p)-.016*recoil;
-    const shoulder=.022*Math.sin(p*Math.PI)*Math.sin(dx*4.1+.4);
-    const slope=-2*depth*dx/(width*width)*bell;
-    const top=(y-base-depth*bell-shoulder)/Math.sqrt(1+slope*slope);
-    const rx=Math.max(.045,Math.min(.105,frame[2]*.36))*(1-release)+.0008;
-    const ry=.090*(1-release)+.0008;
-    const cx=frame[0]*aspect+.014*release,cy=frame[1]-.035-.038*release;
-    const cap=(Math.hypot((x*aspect-cx)/rx,(y-cy)/ry)-1)*Math.min(rx,ry)+.003*smooth(.92,1,release);
-    const tension=mix(.135,.035,smooth(.52,.68,p)),h=clamp(.5+.5*(cap-top)/tension);
-    return mix(cap,top,h)-tension*h*(1-h);
+  function profile(frame,boundary){
+    const raw=clamp(frame[3]),p=phase(raw);
+    return {raw,p,base:boundary+.86*(raw-p)-.18-.80*smooth(.36,.92,p),
+      belly:.095*Math.sin(p*Math.PI)*(1-smooth(.48,.68,raw)),
+      bellyWidth:mix(.26,.18,smooth(.34,.67,p)),sweep:.016*Math.sin(p*Math.PI)};
   }
-  window.cosgralChromeFunnel={glsl,distance};
+  function distance(x,y,aspect,frame,boundary,elastic=idleElastic){
+    const {base,belly,bellyWidth,sweep}=profile(frame,boundary);
+    const dx=(x-frame[0])*aspect;
+    const tipWidth=mix(.21,.052,smooth(0,.27,Math.abs(elastic[0])))*Math.max(.8,Math.min(1.3,frame[2]/.20));
+    const tip=elastic[0]-elastic[1],shoulder=elastic[1];
+    const a=Math.exp(-dx*dx/(bellyWidth*bellyWidth)),b=Math.exp(-dx*dx/(tipWidth*tipWidth)),c=Math.exp(-dx*dx/(.29*.29));
+    const surface=base+belly*a+tip*b+shoulder*c+sweep*Math.sin(dx*4.1+.4);
+    const slope=-2*dx*(belly*a/(bellyWidth*bellyWidth)+tip*b/(tipWidth*tipWidth)+shoulder*c/(.29*.29))+sweep*4.1*Math.cos(dx*4.1+.4);
+    return (y-surface)/Math.sqrt(1+slope*slope);
+  }
+  // Exact integration of an underdamped spring. It keeps its momentum when
+  // scroll stops and behaves consistently at 30, 60 and 120Hz.
+  function advance(s,target,stiffness,damping,dt){
+    const decay=damping*.5,omega=Math.sqrt(stiffness-decay*decay);
+    const e=Math.exp(-decay*dt),c=Math.cos(omega*dt),sn=Math.sin(omega*dt)/omega;
+    const displacement=s.x-target,v=s.v;
+    s.x=target+e*(displacement*c+(v+decay*displacement)*sn);
+    s.v=e*(v*c-(decay*v+stiffness*displacement)*sn);
+    if(Math.abs(s.x-target)<.00006&&Math.abs(s.v)<.0004){s.x=target;s.v=0;}
+  }
+  function createSpring(reduced=false){
+    const tip={x:0,v:0},shoulder={x:0,v:0},value=new Float32Array(2);
+    let initialized=false,released=false,moving=false;
+    function reset(){tip.x=tip.v=shoulder.x=shoulder.v=0;value.fill(0);moving=false;}
+    return {
+      value,
+      get moving(){return moving;},
+      update(frame,boundary,dt=1/60,menu=0,inputProgress=frame[3]){
+        const {raw,base,belly,sweep}=profile(frame,boundary);
+        // Restored scroll may already be below the hero while the cube's
+        // smoothed progress is still catching up. Do not replay that snap.
+        if(!initialized){released=inputProgress>=.635;initialized=true;}
+        // A small hysteresis prevents repeated snaps around the release point.
+        if(raw<.56&&inputProgress<.56)released=false;
+        else if(raw>=.635)released=true;
+        if(raw<.26||raw>.985||menu>.98){reset();return value;}
+        const gap=Math.max(0,Math.min(.34,frame[1]-.018-base-belly-sweep*Math.sin(.4)));
+        const pull=gap*smooth(.28,.48,raw);
+        const target=reduced?pull*(1-smooth(.60,.72,raw)):released?0:pull;
+        const step=Math.max(.001,Math.min(.05,dt));
+        if(reduced){tip.x=target;tip.v=0;shoulder.x=target*.22;shoulder.v=0;}
+        else {
+          advance(tip,target,released?100:640,released?6.2:42,step);
+          // The wider sheet follows late, carrying the rebound out from the tip.
+          advance(shoulder,tip.x*.22,80,12,step);
+        }
+        value[0]=tip.x*(1-menu);value[1]=shoulder.x*(1-menu);
+        moving=Math.abs(tip.v)+Math.abs(shoulder.v)>.001||Math.abs(tip.x-target)>.00015;
+        return value;
+      },
+      reset
+    };
+  }
+  window.cosgralChromeFunnel={glsl,distance,createSpring};
 })();

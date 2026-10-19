@@ -19,6 +19,7 @@
   var funnelLibrary = window.cosgralChromeFunnel;
   var hasFunnel = !!funnelLibrary;
   var defaultFunnel = new Float32Array([.5,.45,.18,0]);
+  var defaultElastic = new Float32Array(2);
 
   var FRAG = `
     precision ${hasFunnel ? 'highp' : 'mediump'} float;
@@ -150,6 +151,7 @@
   var uChromePaper = gl.getUniformLocation(program, "uChromePaper");
   var uChromeBoundary = gl.getUniformLocation(program, "uChromeBoundary");
   var uChromeFunnelFrame = gl.getUniformLocation(program, "uChromeFunnelFrame");
+  var uChromeFunnelElastic = gl.getUniformLocation(program, "uChromeFunnelElastic");
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
@@ -219,6 +221,7 @@
     gl.uniform1f(uChromePaper, window.cosgralChromeStudio?.paper || 0);
     gl.uniform1f(uChromeBoundary, window.cosgralChromeStudio?.boundary ?? 2);
     gl.uniform4fv(uChromeFunnelFrame, window.cosgralChromeStudio?.funnel || defaultFunnel);
+    gl.uniform2fv(uChromeFunnelElastic, window.cosgralChromeStudio?.elastic || defaultElastic);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     requestAnimationFrame(frame);
@@ -242,6 +245,7 @@
   gl.uniform2f(uMouse, 0, 0);
   gl.uniform1f(uChromeBoundary, 2);
   gl.uniform4fv(uChromeFunnelFrame, defaultFunnel);
+  gl.uniform2fv(uChromeFunnelElastic, defaultElastic);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   play();
 
