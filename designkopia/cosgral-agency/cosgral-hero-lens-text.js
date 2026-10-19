@@ -9,30 +9,31 @@ export function createHeroLensText(THREE) {
   texture.generateMipmaps = false;
   texture.minFilter = THREE.LinearFilter;
 
-  if (document.documentElement.classList.contains('reduce-motion')) return { texture };
+  if (document.documentElement.classList.contains('reduce-motion')) return { texture, setActive() {} };
 
   const ctx = canvas.getContext('2d');
-  let queued = false;
+  let queued = false, active = false, dirty = true, lastDrawAt = -Infinity, timer = 0;
 
   // Every text element the cube's flight path can visually cross while it's
   // on screen — not just the hero title. #rozpad's runway word is the same
   // element "shatter-beat" (the cube's own scroll timeline) is built around,
   // so the cube reliably passes right over it.
-  function targets() {
-    return [
+  const targets = [
       document.querySelector('.home-hero__title'),
       document.querySelector('.home-hero__tagline'),
       document.querySelector('#rozpad .runway-word')
     ].filter(Boolean);
-  }
 
   function draw() {
     queued = false;
-    const els = targets();
+    if (!active) return;
+    dirty = false;lastDrawAt = performance.now();
+    const els = targets;
     if (!els.length) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = Math.max(1, window.innerWidth);
     const h = Math.max(1, window.innerHeight);
+    // This texture is only seen inside a small glass object, not fullscreen.
+    const dpr = Math.min(window.devicePixelRatio || 1, 1, 1536 / w, 1024 / h);
     const pw = Math.round(w * dpr);
     const ph = Math.round(h * dpr);
     if (canvas.width !== pw || canvas.height !== ph) {
@@ -45,7 +46,7 @@ export function createHeroLensText(THREE) {
     ctx.textBaseline = 'middle';
     for (const el of els) {
       const rect = el.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) continue;
+      if (rect.width <= 0 || rect.height <= 0 || rect.bottom < 0 || rect.top > h) continue;
       const cs = getComputedStyle(el);
       const opacity = parseFloat(cs.opacity);
       if (!(opacity > 0.05)) continue;
@@ -78,7 +79,10 @@ export function createHeroLensText(THREE) {
   }
 
   function queueDraw() {
-    if (queued) return;
+    dirty = true;
+    if (!active || queued || timer) return;
+    const wait = 32 - (performance.now() - lastDrawAt);
+    if (wait > 0) {timer = setTimeout(() => {timer = 0;queueDraw();}, wait);return;}
     queued = true;
     requestAnimationFrame(draw);
   }
@@ -106,14 +110,19 @@ export function createHeroLensText(THREE) {
         document.body.classList.contains('is-ready') ||
         document.body.classList.contains('editorial-ready')) {
       window.setTimeout(queueDraw, 300);
+      readyObserver.disconnect();
     }
   });
   readyObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   readyObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-  // ...and as a blunt safety net, keep re-drawing a few times regardless —
-  // each redraw is a couple of cheap fillText calls, not worth guarding further.
+  // Initial font/reveal changes only queue a capture while glass is visible.
   [0, 400, 1200, 2500, 4000].forEach((delay) => window.setTimeout(queueDraw, delay));
 
-  return { texture, redraw: queueDraw };
+  return { texture, redraw: queueDraw, setActive(value) {
+    if (active === value) return;
+    active = value;
+    if (!active) {clearTimeout(timer);timer = 0;}
+    else if (dirty) queueDraw();
+  }};
 }

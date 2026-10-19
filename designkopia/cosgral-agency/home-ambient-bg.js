@@ -20,6 +20,7 @@
   var hasFunnel = !!funnelLibrary;
   var defaultFunnel = new Float32Array([.5,.45,.18,0]);
   var defaultElastic = new Float32Array(2);
+  var defaultShape = new Float32Array([2,0,.4,0]);
 
   var FRAG = `
     precision ${hasFunnel ? 'highp' : 'mediump'} float;
@@ -51,7 +52,17 @@
 
     void main() {
       vec2 uv = gl_FragCoord.xy / uRes.xy;
-      ${hasFunnel ? 'vec4 funnelOptics=cgFunnelOptics(uv,uRes,uChromeFunnelFrame,uChromeBoundary); vec2 funnelUv=cgFunnelWarp(uv,funnelOptics,uRes,uChromeFunnelFrame);' : 'vec2 funnelUv=uv;'}
+      ${hasFunnel ? `
+      vec3 carbon=vec3(.03137255,.03529412,.03529412)/(.6+.4*uChromePaper);
+      if(1.-uv.y>uChromeBoundary-.008){gl_FragColor=vec4(carbon,1.);return;}
+      vec4 funnelOptics=cgFunnelOptics(uv,uRes,uChromeFunnelFrame,uChromeBoundary);
+      if(funnelOptics.w<.0001&&funnelOptics.z>14./uRes.y){gl_FragColor=vec4(carbon,1.);return;}
+      // Fully lit paper has no procedural waves underneath to calculate.
+      if(uChromePaper>.999){
+        gl_FragColor=vec4(cgFunnelPaint(vec3(0.),uv,uRes,uChromeFunnelFrame,uChromeBoundary,uChromePaper,funnelOptics),1.);return;
+      }
+      vec2 funnelUv=cgFunnelWarp(uv,funnelOptics,uRes,uChromeFunnelFrame);
+      ` : 'vec2 funnelUv=uv;'}
       vec2 m = uMouse * 0.5 + 0.5;
       vec2 toM = uv - m;
       float mDist = length(toM);
@@ -152,31 +163,36 @@
   var uChromeBoundary = gl.getUniformLocation(program, "uChromeBoundary");
   var uChromeFunnelFrame = gl.getUniformLocation(program, "uChromeFunnelFrame");
   var uChromeFunnelElastic = gl.getUniformLocation(program, "uChromeFunnelElastic");
+  var uChromeFunnelShape = gl.getUniformLocation(program, "uChromeFunnelShape");
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
   var start = performance.now();
   window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse };
   var lastFrameTime = 0;
+  var qualityTier = 0, coveredPainted = false;
 
-  var SCALE_BY_TIER = hasFunnel ? (MOBILE ? [.85,.65,.5] : [.75,.60,.45]) : (MOBILE ? [.55,.45,.38] : [.52,.44,.36]);
+  var SCALE_BY_TIER = hasFunnel ? (MOBILE ? [.75,.60,.45] : [.60,.48,.38]) : (MOBILE ? [.55,.45,.38] : [.52,.44,.36]);
   var dprCap = SCALE_BY_TIER[0];
 
   function resize() {
     var dpr = dprCap;
-    var maxW = hasFunnel ? (MOBILE ? 900 : 1920) : (MOBILE ? 720 : 1280);
-    var maxH = hasFunnel ? 1080 : (MOBILE ? 540 : 720);
+    var maxW = hasFunnel ? (MOBILE ? 780 : 1440) : (MOBILE ? 720 : 1280);
+    var maxH = hasFunnel ? 900 : (MOBILE ? 540 : 720);
+    if(hasFunnel)dpr=Math.min(dpr,maxW/window.innerWidth,maxH/window.innerHeight);
     var w = Math.min(maxW, Math.round(window.innerWidth * dpr));
     var h = Math.min(maxH, Math.round(window.innerHeight * dpr));
     if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
       canvas.width = w;
       canvas.height = h;
       gl.viewport(0, 0, w, h);
+      coveredPainted = false;
     }
   }
 
   if (window.cosgralPerf) {
     window.cosgralPerf.subscribe(function (t) {
+      qualityTier = t;
       var cap = SCALE_BY_TIER[t] || SCALE_BY_TIER[0];
       if (cap === dprCap) return;
       dprCap = cap;
@@ -190,6 +206,9 @@
       requestAnimationFrame(frame);
       return;
     }
+    var studio = window.cosgralChromeStudio;
+    if(!studio?.covered)coveredPainted=false;
+    if(studio?.covered&&coveredPainted){requestAnimationFrame(frame);return;}
 
     // Kiedy użytkownik jest w sekcji Kontakt lub Stopka, nieprzezroczyste tło (#030303)
     // całkowicie zasłania ten canvas — wstrzymujemy rysowanie (0% GPU/CPU na dole strony).
@@ -199,7 +218,8 @@
     }
 
     // Limit 60 FPS dla monitorów 144Hz/240Hz, aby nie przepalać GPU
-    if (now - lastFrameTime < 14) {
+    var interval = hasFunnel ? (qualityTier===2 ? 30 : studio?.moving ? 14 : 30) : 14;
+    if (now - lastFrameTime < interval) {
       requestAnimationFrame(frame);
       return;
     }
@@ -222,7 +242,9 @@
     gl.uniform1f(uChromeBoundary, window.cosgralChromeStudio?.boundary ?? 2);
     gl.uniform4fv(uChromeFunnelFrame, window.cosgralChromeStudio?.funnel || defaultFunnel);
     gl.uniform2fv(uChromeFunnelElastic, window.cosgralChromeStudio?.elastic || defaultElastic);
+    gl.uniform4fv(uChromeFunnelShape, window.cosgralChromeStudio?.shape || defaultShape);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if(studio?.covered)coveredPainted=true;
 
     requestAnimationFrame(frame);
   }
@@ -246,6 +268,7 @@
   gl.uniform1f(uChromeBoundary, 2);
   gl.uniform4fv(uChromeFunnelFrame, defaultFunnel);
   gl.uniform2fv(uChromeFunnelElastic, defaultElastic);
+  gl.uniform4fv(uChromeFunnelShape, defaultShape);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   play();
 

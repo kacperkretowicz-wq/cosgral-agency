@@ -2,10 +2,12 @@
 import * as THREE from './vendor/three-0.170.0.module.min.js';
 const smooth=(a,b,x)=>THREE.MathUtils.smoothstep(x,a,b),mix=THREE.MathUtils.lerp;
 const url=new URL(location.href);url.searchParams.set('cube','chrome');history.replaceState(null,'',url);
-const studio=window.cosgralChromeStudio={paper:0,boundary:2,funnel:new Float32Array([.5,.45,.18,0]),elastic:new Float32Array(2)};
+const studio=window.cosgralChromeStudio={paper:0,boundary:2,funnel:new Float32Array([.5,.45,.18,0]),elastic:new Float32Array(2),shape:new Float32Array([2,0,.4,0]),covered:false,moving:false};
 const style=document.createElement('style');
 style.textContent=`
 html.editorial-document .editorial-page .home-cube-portal{z-index:6}
+html:not(.reduce-motion) .editorial-page .editorial-runway{height:72svh}
+html:not(.reduce-motion) .editorial-page .editorial-services{background:transparent}
 .chrome-studio-on .editorial-hero .home-hero__title{color:#181a1a}
 .chrome-studio-on .editorial-hero .home-hero__tagline,
 .chrome-studio-on .editorial-hero .hero-notes,
@@ -51,6 +53,7 @@ export function createCubeMaterialStudy(glass){
   backdrop.uniforms.uChromeBoundary={value:2};
   backdrop.uniforms.uChromeFunnelFrame={value:new THREE.Vector4(.5,.45,.18,0)};
   backdrop.uniforms.uChromeFunnelElastic={value:new THREE.Vector2()};
+  backdrop.uniforms.uChromeFunnelShape={value:new THREE.Vector4(2,0,.4,0)};
   backdrop.fragmentShader=backdrop.fragmentShader.replace('uniform float uTime;',
     'uniform float uTime;\nuniform float uChromePaper;\nuniform float uChromeBoundary;\nuniform vec4 uChromeFunnelFrame;\n'+funnel.glsl);
   backdrop.fragmentShader=backdrop.fragmentShader.replace('vec2 p = uv * vec2(2.8, 2.0);',`
@@ -64,45 +67,63 @@ export function createCubeMaterialStudy(glass){
     vec4 textSample = texture2D(uText, uv);
   `);
   backdrop.needsUpdate=true;
-  let light=false,lastPaper=-1;
+  let light=false,lastPaper=-1,lastShade=-1,nextToneAt=0,lastProgress=-1;
   return {
     get moving(){return spring.moving;},
-    update(progress,menuBlend,opacity,boundary,frame,dt,inputProgress){
+    get pull(){return studio.elastic[0];},
+    clipPath(width,height,progress,menuBlend){
+      if(progress<.35||menuBlend>.001)return 'none';
+      const points=['0px 0px',`${width}px 0px`],aspect=width/height;
+      for(let i=56;i>=0;i--){
+        const x=i/56,y=Math.min(studio.boundary-.012,funnel.surface(x,aspect,studio.funnel,studio.shape,studio.elastic));
+        points.push(`${(x*width).toFixed(1)}px ${Math.max(-8,Math.min(height+8,y*height)).toFixed(1)}px`);
+      }
+      return `polygon(${points.join(',')})`;
+    },
+    update(progress,menuBlend,boundary,guard,frame,dt,inputProgress){
       const menu=smooth(0,.2,menuBlend);
-      studio.elastic.set(spring.update(frame,boundary,dt,menu,inputProgress));
-      // Lab 05's complete material curve, fitted to the visible hero interval.
-      const p=Math.min(1,progress/.80);
-      const metal=smooth(.15,.80,p)*(1-menu);
-      const paper=smooth(.12,.82,p)*(1-menu);
-      grain.value=smooth(.80,1,p)*(1-menu);
+      funnel.profile(frame,boundary,studio.shape);
+      studio.elastic.set(spring.update(frame,studio.shape,guard,dt,menu,inputProgress));
+      studio.moving=spring.moving||Math.abs(lastProgress-progress)>.0001;
+      lastProgress=progress;
+      // Finish the material early, then hold real chrome through the handoff.
+      const metal=smooth(.10,.43,progress)*(1-menu);
+      const paper=smooth(.08,.43,progress)*(1-menu);
+      grain.value=smooth(.36,.54,progress)*(1-menu);
       mat.color.setHex(0xffffff);mat.attenuationColor.setHex(0xf6f9ff);mat.attenuationDistance=12;
-      mat.metalness=metal;mat.transmission=Math.max(.0001,1-metal);
+      mat.metalness=metal;mat.transmission=metal>.995?0:1-metal;
       mat.roughness=mix(.035,.12,metal)+grain.value*.055;
       const tension=smooth(.02,.25,Math.abs(studio.elastic[0]));
       mat.envMapIntensity=mix(1.15+paper*.3,1.6,metal)+tension*.07*(1-menu);
       mat.iridescence=.08;mat.dispersion=.20;mat.thickness=.7;
       mat.clearcoat=1;mat.clearcoatRoughness=0;
-      mat.opacity=opacity;mat.depthWrite=opacity>.995;glass.visible=opacity>.008;
+      mat.opacity=1;mat.depthWrite=true;
+      glass.userData.transmissionBackdrop.visible=mat.transmission>0;
       // Both passes read the same elastic state, including the final recoil.
       studio.paper=paper;backdrop.uniforms.uChromePaper.value=studio.paper;
-      studio.boundary=boundary;backdrop.uniforms.uChromeBoundary.value=boundary;
+      studio.boundary=guard;backdrop.uniforms.uChromeBoundary.value=guard;
       studio.funnel.set(frame);studio.funnel[3]*=1-menu;
       backdrop.uniforms.uChromeFunnelFrame.value.fromArray(studio.funnel);
       backdrop.uniforms.uChromeFunnelElastic.value.fromArray(studio.elastic);
-      if(shade)shade.style.opacity=String(1-studio.paper);
+      backdrop.uniforms.uChromeFunnelShape.value.fromArray(studio.shape);
+      studio.covered=progress>.98&&studio.shape[0]+Math.abs(studio.elastic[0]-studio.elastic[1])+Math.abs(studio.elastic[1])+studio.shape[1]+Math.abs(studio.shape[3])<-.02;
+      if(shade&&(Math.abs(lastShade-studio.paper)>.003||studio.paper===1&&lastShade!==1||studio.paper===0&&lastShade!==0)){lastShade=studio.paper;shade.style.opacity=String(1-studio.paper);}
+      const now=performance.now();
+      if(now<nextToneAt)return;
+      nextToneAt=now+65;
       let surfaceLight=0;
       for(const target of toneTargets){
         const rect=target.getBoundingClientRect();
         if(rect.bottom>0&&rect.top<innerHeight){
-          const d=funnel.distance((rect.left+rect.width/2)/innerWidth,(rect.top+rect.height/2)/innerHeight,
-            innerWidth/innerHeight,studio.funnel,boundary,studio.elastic);
+          const x=(rect.left+rect.width/2)/innerWidth,y=(rect.top+rect.height/2)/innerHeight;
+          const d=y-funnel.surface(x,innerWidth/innerHeight,studio.funnel,studio.shape,studio.elastic);
           surfaceLight=1-smooth(-.008,.008,d);break;
         }
       }
-      const nextLight=studio.paper*surfaceLight>.5;
+      const nextLight=studio.paper*surfaceLight>(light ? .44 : .56);
       if(nextLight!==light){light=nextLight;document.documentElement.classList.toggle('chrome-studio-on',light);window.dispatchEvent(new CustomEvent('cosgral:chrome-tone'));}
       if(Math.abs(studio.paper-lastPaper)>.05){lastPaper=studio.paper;window.dispatchEvent(new CustomEvent('cosgral:chrome-tone'));}
     },
-    dispose(){spring.reset();studio.elastic.fill(0);studio.paper=0;if(shade)shade.style.opacity='';document.documentElement.classList.remove('chrome-studio-on');}
+    dispose(){spring.reset();studio.elastic.fill(0);studio.paper=0;studio.covered=false;if(shade)shade.style.opacity='';document.documentElement.classList.remove('chrome-studio-on');}
   };
 }

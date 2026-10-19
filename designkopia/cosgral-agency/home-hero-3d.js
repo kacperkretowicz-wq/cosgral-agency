@@ -1,10 +1,9 @@
-/** One glass model, a reversible scroll choreography, and a soft optical wake. */
+/** One model: glass, a long chrome hold, and a viscous spring handoff. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
 import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
-import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
-import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019chrome3';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elastic6';
+import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019viscous7';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019viscous7';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -29,14 +28,6 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMappingExposure=1;
   const scene=new THREE.Scene();
-  const wakeScene=new THREE.Scene();
-  const wakeCanvas=document.createElement('canvas');
-  wakeCanvas.className='home-optical-dust';
-  wakeCanvas.setAttribute('aria-hidden','true');
-  canvas.parentElement.insertBefore(wakeCanvas,canvas);
-  const wakeRenderer=new THREE.WebGLRenderer({canvas:wakeCanvas,alpha:true,antialias:false,depth:false,stencil:false,powerPreference:'high-performance'});
-  wakeRenderer.setClearColor(0x000000,0);
-  wakeRenderer.outputColorSpace=THREE.SRGBColorSpace;
   const camera=new THREE.PerspectiveCamera(42,1,0.1,100);
   camera.position.set(0,0,5.4);
   const fullCamera=camera.clone();
@@ -44,11 +35,12 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
   const group=new THREE.Group();scene.add(group);
   let width=1,height=1,mobile=false,glass=null,materialStudy=null;
   let tileWidth=0,tileHeight=0,tileMode=false,pixelRatio=1,resizeQueued=false;
-  let lastCropX=NaN,lastCropY=NaN,lastPortalVisible=null,wakeWasVisible=false,lastRenderAt=0;
+  let lastCropX=NaN,lastCropY=NaN,lastPortalVisible=null,lastRenderAt=0,lastClip='';
+  let qualityTier=0,sectionDocumentTop=0,contentDocumentTop=0,scrollSpan=1;
   let menuBlend=0,menuTarget=0,progress=0,lastTime=0;
   let menuChangedAt=0;
   let effectPauseUntil=0;
-  let introStart=null,introDone=false,contextLost=false,wakeContextLost=false;
+  let introStart=null,introDone=false,contextLost=false;
   let pointerX=0,pointerY=0;
   const pose={position:new THREE.Vector3(),quaternion:new THREE.Quaternion(),scale:1};
   const menuFrom={position:new THREE.Vector3(),quaternion:new THREE.Quaternion(),scale:1};
@@ -61,8 +53,6 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
   const exitPoint=new THREE.Vector3();
   const funnelFrame=new Float32Array([.5,.45,.18,0]);
   const nextSection=document.getElementById('uslugi');
-  const path=Array.from({length:4},()=>new THREE.Vector3());
-  const wake=createOpticalWake(THREE,wakeScene,1800);
   const profile=createFrameProfile(canvas);
   const heroText=createHeroLensText(THREE);
   function worldHeight(z){return 2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*(camera.position.z-z);}
@@ -73,29 +63,33 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
   function screenScale(px,z){return px/height*worldHeight(z)/(2*HALF);}
   function heroSize(){return 0.92*(mobile?Math.min(width*0.57,height*0.27):Math.min(width*0.31,height*0.34));}
   function menuSize(){return Math.min(width*(mobile?0.72:0.54),height*0.55);}
-  function updatePath(){
-    screenPosition(width*0.5,height*(mobile?0.31:0.30),0.36,path[0]);
-    screenPosition(width*0.80,height*0.27,0.80,path[1]);
-    screenPosition(width*0.36,height*0.85,-0.05,path[2]);
-    screenPosition(-width*0.18,-height*0.12,-0.8,path[3]);
-    wake.setPath(path);
+  function layoutTop(element){
+    let top=0;
+    for(let node=element;node;node=node.offsetParent)top+=node.offsetTop;
+    return top;
+  }
+  function measureHeroLayout(){
+    sectionDocumentTop=nextSection?layoutTop(nextSection):height*1.72;
+    const content=nextSection?.querySelector('.section-index');
+    contentDocumentTop=content?layoutTop(content):sectionDocumentTop+80;
+    scrollSpan=Math.max(height*.86,sectionDocumentTop-height*.24);
   }
   function resize(){
     resizeQueued=false;
     const nextWidth=Math.max(1,canvas.parentElement.clientWidth||window.innerWidth);
     const nextHeight=Math.max(1,canvas.parentElement.clientHeight||window.innerHeight);
     const nextRatio=window.devicePixelRatio||1;
-    if(nextWidth===width && nextHeight===height && nextRatio===resize.deviceRatio)return;
+    if(nextWidth===width && nextHeight===height && nextRatio===resize.deviceRatio&&qualityTier===resize.qualityTier)return;
     width=nextWidth;height=nextHeight;resize.deviceRatio=nextRatio;mobile=width<=900;
+    resize.qualityTier=qualityTier;
     fullCamera.aspect=width/height;fullCamera.updateProjectionMatrix();fullCamera.updateMatrixWorld(true);
     camera.aspect=width/height;camera.clearViewOffset();camera.updateProjectionMatrix();
-    // Supersample smaller screens; a 3840-wide display renders at its native 4K.
-    // Preserve sharpness instead of changing resolution mid-scroll.
-    const limit=mobile?2560:4096;
-    pixelRatio=Math.max(1,Math.min(2,limit/Math.max(width,height)));
+    // Respect real device DPR. The old forced 2x rendered four pixels even
+    // for each physical pixel on a normal 1x display.
+    const cap=[1.5,1.15,1][qualityTier],limit=mobile?1800:2560;
+    pixelRatio=Math.max(.75,Math.min(nextRatio,cap,limit/Math.max(width,height)));
     renderer.setPixelRatio(pixelRatio);
-    wakeRenderer.setPixelRatio(pixelRatio);wakeRenderer.setSize(width,height,false);
-    tileWidth=0;tileHeight=0;setTileSize(menuTarget>0||menuBlend>0.001);updatePath();
+    tileWidth=0;tileHeight=0;setTileSize(menuTarget>0||menuBlend>0.001);measureHeroLayout();
     lastCropX=NaN;lastCropY=NaN;
   }
   function queueResize(){if(!resizeQueued){resizeQueued=true;requestAnimationFrame(resize);}}
@@ -124,26 +118,25 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
   }
   resize();window.addEventListener('resize',queueResize,{passive:true});
   window.visualViewport?.addEventListener('resize',queueResize,{passive:true});
-  function pointOnPath(t,out){
-    const u=1-t;out.copy(path[0]).multiplyScalar(u*u*u);
-    out.addScaledVector(path[1],3*u*u*t);out.addScaledVector(path[2],3*u*t*t);
-    return out.addScaledVector(path[3],t*t*t);
-  }
+  window.cosgralPerf?.subscribe(tier=>{if(tier!==qualityTier){qualityTier=tier;queueResize();}});
+  window.ScrollTrigger?.addEventListener('refresh',measureHeroLayout);
+  window.addEventListener('cosgral:langchange',()=>requestAnimationFrame(measureHeroLayout));
+  document.fonts?.ready.then(measureHeroLayout);
   function scrollProgress(){
-    // The complete study fits in the first screen's scroll, before services.
-    // It is independent of the old downward flight through the runway.
     const scrollY=window.cosgralSmoothScroll?.lenis?.scroll??window.scrollY;
-    return clamp(scrollY/(height*.86),0,1);
+    return clamp(scrollY/scrollSpan,0,1);
   }
   function buildScrollPose(time){
     // A restrained 76-degree turn and an upward side arc. Quintic timing
     // starts and stops with zero velocity and acceleration, in both directions.
-    const h=worldHeight(.36),turn=smoother(.04,.94,progress),arc=smoother(.08,.92,progress);
+    const h=worldHeight(.36),turn=smoother(.04,.84,progress),arc=smoother(.08,.80,progress);
     const sway=Math.sin(Math.PI*arc),drift=reduced?0:Math.sin(time*.34)*.012;
-    const y=THREE.MathUtils.lerp(mobile?.31:.30,mobile?.275:.255,arc)-sway*.025;
+    const contact=smoother(.43,.64,progress),pull=reduced?0:clamp(materialStudy?.pull||0,-.12,.32)*contact;
+    const dip=smoother(.88,1,progress);
+    const y=THREE.MathUtils.lerp(mobile?.31:.30,mobile?.275:.255,arc)-sway*.025+pull*.28+dip*.27;
     screenPosition(width*.5,height*y,.36,pose.position);
-    euler.set(.48+drift-pointerY*.045+sway*.075,
-      -.67+pointerX*.075+turn*Math.PI*.42,-sway*.045);
+    euler.set(.48+drift-pointerY*.045+sway*.075+dip*.12,
+      -.67+pointerX*.075+turn*Math.PI*.42,-sway*.045+pull*.25-dip*.10);
     pose.quaternion.setFromEuler(euler);
     pose.scale=screenScale(heroSize(),.36)*(1+sway*.05);
     // Leave room for the actual rotated model rather than cutting it off on
@@ -160,6 +153,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
     const available=Math.max(0,width-right-Math.max(20,width*.055));
     const travel=Math.min(width*(mobile?.19:.24),available*.85);
     pose.position.x+=travel/height*h*arc;
+    pose.position.x-=(pull*.12+dip*width/height*.065)*h;
   }
   function captureMenuPose(){
     menuFrom.position.copy(group.position);menuFrom.quaternion.copy(group.quaternion);menuFrom.scale=group.scale.x;
@@ -167,10 +161,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
       screenPosition(width*0.06,height*0.07,0.36,menuFrom.position);menuFrom.scale=screenScale(54,0.36);
     }
   }
-  function sectionClearanceFade(sectionTop){
-    if(!nextSection||!glass)return 1;
-    // Fade the complete model before the section boundary reaches its lowest
-    // projected corner. A z-index change alone would only hide the hard cut.
+  function updateFunnelFrame(){
+    if(!glass)return;
     const box=glass.geometry.boundingBox;
     let bottom=-Infinity,left=Infinity,right=-Infinity;
     for(let i=0;i<8;i++){
@@ -181,13 +173,17 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
     }
     exitPoint.copy(group.position).project(fullCamera);
     const centerX=exitPoint.x*.5+.5;
-    const trailingCorner=(left+(right-left)*.07)/width;
-    // Pull from the trailing lower edge. A neck hidden behind the opaque
-    // chrome face would conceal the very separation the user should see.
-    funnelFrame[0]=THREE.MathUtils.lerp(centerX,trailingCorner,smoother(.26,.62,progress));
+    const trailingCorner=(left+(right-left)*.32)/width;
+    funnelFrame[0]=THREE.MathUtils.lerp(centerX,trailingCorner,smoother(.40,.68,progress));
     funnelFrame[1]=bottom/height;
     funnelFrame[2]=(right-left)/height*.5;funnelFrame[3]=progress;
-    return smoother(height*.035,height*.23,sectionTop-bottom);
+  }
+  async function warmMaterialPrograms(){
+    const material=glass.material,transmission=material.transmission;
+    try {
+      material.transmission=0;await renderer.compileAsync(scene,camera);
+      material.transmission=transmission;await renderer.compileAsync(scene,camera);
+    } finally {material.transmission=transmission;}
   }
   function faceRect(){
     if(!glass||menuBlend<0.035||!group.visible)return null;
@@ -229,6 +225,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
       glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
       glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
       materialStudy?.dispose();materialStudy=await createCubeMaterialStudy(glass,group);
+      await warmMaterialPrograms();
       if(previous){
         group.remove(previous);scene.remove(previous.userData.transmissionBackdrop);
         previous.geometry.dispose();previous.material.dispose();previous.userData.environmentTarget?.dispose();
@@ -240,15 +237,13 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
       console.warn('COSGRAL: glass recovery failed',error);
     }
   });
-  wakeCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();wakeContextLost=true;});
-  wakeCanvas.addEventListener('webglcontextrestored',()=>{
-    wakeContextLost=false;wakeRenderer.setPixelRatio(pixelRatio);wakeRenderer.setSize(width,height,false);
-  });
   try{
     glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
     glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
     materialStudy=await createCubeMaterialStudy(glass,group);
+    await warmMaterialPrograms();
     canvas.parentElement.classList.add('has-glass-model');
+    requestAnimationFrame(()=>window.ScrollTrigger?.refresh());
   }catch(error){
     canvas.parentElement.classList.add('has-cube-fallback');
     console.error('COSGRAL glass model could not load',error);introDone=true;
@@ -268,8 +263,10 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
     const pointerMoving=Math.abs((pointer?.nx||0)-pointerX)+Math.abs((pointer?.ny||0)-pointerY)>0.004;
     pointerX+=((pointer?.nx||0)-pointerX)*blend;pointerY+=((pointer?.ny||0)-pointerY)*blend;
     const nextProgress=scrollProgress();
+    if(progress===1&&nextProgress===1&&menuBlend===0&&menuTarget===0&&window.cosgralChromeStudio?.covered)return;
     const scrollMoving=Math.abs(nextProgress-progress)>0.0004;
     progress+=(nextProgress-progress)*(1-Math.exp(-dt*8));
+    if(Math.abs(nextProgress-progress)<.0001)progress=nextProgress;
     menuBlend+=(menuTarget-menuBlend)*(1-Math.exp(-dt*(menuTarget?4.5:7)));
     if(Math.abs(menuTarget-menuBlend)<0.0001)menuBlend=menuTarget;
     const time=now/1000;buildScrollPose(time);
@@ -300,22 +297,19 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
       group.position.copy(pose.position);targetQ.copy(pose.quaternion);group.scale.setScalar(pose.scale);
     }
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*14));group.updateMatrixWorld(true);
-    const sectionTop=nextSection?nextSection.getBoundingClientRect().top:height*2;
-    const clearance=sectionClearanceFade(sectionTop);
-    const dissolve=(1-smoother(.75,.98,progress))*clearance;
-    const cubeOpacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
-    materialStudy.update(progress,menuBlend,cubeOpacity,sectionTop/height,funnelFrame,dt,nextProgress);
-    group.visible=cubeOpacity>0.008&&introStart!==null;
-    glass.userData.transmissionBackdrop.visible=group.visible;
+    const scrollY=window.cosgralSmoothScroll?.lenis?.scroll??window.scrollY;
+    const sectionTop=sectionDocumentTop-scrollY,guard=(contentDocumentTop-scrollY)/height-.012;
+    updateFunnelFrame();
+    materialStudy.update(progress,menuBlend,sectionTop/height,guard,funnelFrame,dt,nextProgress);
+    group.visible=(progress<.998||menuBlend>.001)&&introStart!==null;
+    glass.userData.transmissionBackdrop.visible=group.visible&&glass.material.transmission>0;
+    heroText.setActive(group.visible&&glass.material.transmission>.01);
     const footer=document.documentElement.classList.contains('is-footer-covered');
-    wake.update({time,progress,menuBlend,scale:pose.scale,pointerX,pointerY,fade:0});
     const portalVisible=!(footer&&menuBlend<0.01);
     if(portalVisible!==lastPortalVisible){canvas.parentElement.style.visibility=portalVisible?'visible':'hidden';lastPortalVisible=portalVisible;}
     if(footer&&menuBlend<0.01)return;
-    if(!group.visible&&!wake.visible){
+    if(!group.visible){
       canvas.style.visibility='hidden';
-      if(wakeWasVisible&&!wakeContextLost)wakeRenderer.clear();
-      wakeWasVisible=false;
       return;
     }
     if(now<effectPauseUntil)return;
@@ -327,13 +321,10 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019elas
     if(now-lastRenderAt<(activeMotion?14:42))return;
     lastRenderAt=now;
     const renderStart=profile ? performance.now() : 0;
-    if(group.visible){updateCrop(now);canvas.style.visibility='visible';renderer.render(scene,camera);}
-    else if(canvas.style.visibility!=='hidden')canvas.style.visibility='hidden';
-    if(!wakeContextLost){
-      if(wake.visible)wakeRenderer.render(wakeScene,fullCamera);
-      else if(wakeWasVisible)wakeRenderer.clear();
-    }
-    wakeWasVisible=wake.visible;
+    updateCrop(now);canvas.style.visibility='visible';
+    const clip=materialStudy.clipPath(width,height,progress,menuBlend);
+    if(clip!==lastClip){lastClip=clip;canvas.parentElement.style.clipPath=clip;}
+    renderer.render(scene,camera);
     if (profile) profile.render(performance.now()-renderStart);
   }
   requestAnimationFrame(frame);
