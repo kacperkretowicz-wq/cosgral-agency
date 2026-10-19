@@ -9,7 +9,7 @@
  * this module does not own is forwarded to it.
  */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261019editorial14';
 
 (function () {
   const root = document.documentElement;
@@ -74,6 +74,8 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   let tileWidth=0,tileHeight=0,tileMode=false,pixelRatio=1,resizeQueued=false;
   let lastCropX=NaN,lastCropY=NaN,lastTime=0,lastRenderAt=0,contextLost=false,rafId=0;
   let pose,menuFrom,closeFrom,targetQ,menuQ,euler,v,corners;
+  let logoRect=null,warmTimer=0;
+  function measureLogo(){const logo=document.querySelector('.site-nav__logo-img');logoRect=logo?logo.getBoundingClientRect():null;}
 
   function worldHeight(z){return 2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*(camera.position.z-z);}
   function screenPosition(x,y,z,target){const h=worldHeight(z);return target.set((x/width-0.5)*h*camera.aspect,(0.5-y/height)*h,z);}
@@ -81,8 +83,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   function menuSize(){return Math.min(width*(mobile?0.72:0.54),height*0.55);}
   /* Resting place: the cube logo in the navigation (homepage: 6% / 7%, 54px). */
   function logoPose(out){
-    const logo=document.querySelector('.site-nav__logo-img');
-    const r=logo&&logo.getBoundingClientRect();
+    const r=logoRect;
     if(r&&r.width>4&&r.bottom>0){screenPosition(r.left+r.width/2,r.top+r.height/2,0.36,out.position);out.scale=screenScale(Math.max(36,r.width*1.12),0.36);}
     else{screenPosition(width*0.06,height*0.07,0.36,out.position);out.scale=screenScale(54,0.36);}
     out.quaternion.setFromEuler(euler.set(0.15+Math.PI*0.12,-0.18+Math.PI*0.34,0));
@@ -90,6 +91,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   }
   function captureMenuPose(){
     if(!group)return;
+    measureLogo();
     if(!group.visible||!glass?.visible){logoPose(menuFrom);group.quaternion.copy(menuFrom.quaternion);}
     else{menuFrom.position.copy(group.position);menuFrom.quaternion.copy(group.quaternion);menuFrom.scale=group.scale.x;}
   }
@@ -117,6 +119,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     const nextRatio=window.devicePixelRatio||1;
     if(nextWidth===width&&nextHeight===height&&nextRatio===resize.deviceRatio)return;
     width=nextWidth;height=nextHeight;resize.deviceRatio=nextRatio;mobile=width<=900;
+    measureLogo();
     fullCamera.aspect=width/height;fullCamera.updateProjectionMatrix();fullCamera.updateMatrixWorld(true);
     camera.aspect=width/height;camera.clearViewOffset();camera.updateProjectionMatrix();
     const limit=mobile?2560:4096;
@@ -149,6 +152,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 
   async function start(){
     if(started||failed||reduced)return;
+    clearTimeout(warmTimer);
     started=true;
     try{
       renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
@@ -168,12 +172,12 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     corners=Array.from({length:4},()=>new THREE.Vector3());
     resize();window.addEventListener('resize',queueResize,{passive:true});
     window.visualViewport?.addEventListener('resize',queueResize,{passive:true});
-    canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();contextLost=true;});
+    canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();contextLost=true;cancelAnimationFrame(rafId);rafId=0;});
     canvas.addEventListener('webglcontextrestored',async()=>{
       try{
         const prev=glass;glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
         if(prev){group.remove(prev);scene.remove(prev.userData.transmissionBackdrop);prev.geometry.dispose();prev.material.dispose();prev.userData.environmentTarget?.dispose();}
-        tileWidth=0;resize.deviceRatio=0;queueResize();contextLost=false;
+        tileWidth=0;resize.deviceRatio=0;queueResize();contextLost=false;wake();
       }catch(error){portal.classList.add('has-cube-fallback');console.warn('COSGRAL: glass recovery failed',error);}
     });
     logoPose(pose);
@@ -190,11 +194,12 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   }
 
   /* perf: the loop sleeps while the menu is closed and the cube hidden; open/close wakes it. */
-  function wake(){if(!rafId&&glass){lastTime=0;rafId=requestAnimationFrame(frame);}}
+  function wake(){if(!rafId&&glass&&!document.hidden&&!contextLost){lastTime=0;rafId=requestAnimationFrame(frame);}}
   function frame(now){
+    rafId=0;
+    if(document.hidden||contextLost)return;
     rafId=requestAnimationFrame(frame);
     const dt=Math.min(0.05,Math.max(0.001,(now-(lastTime||now-16.7))/1000));lastTime=now;
-    if(document.hidden||contextLost)return;
     menuBlend+=(menuTarget-menuBlend)*(1-Math.exp(-dt*(menuTarget?4.5:7)));
     if(Math.abs(menuTarget-menuBlend)<0.0001)menuBlend=menuTarget;
     const idle=menuTarget===0&&menuBlend===0;
@@ -231,8 +236,16 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     updateCrop(now);canvas.style.visibility='visible';renderer.render(scene,camera);
   }
 
-  /* Warm the model up after load so the first MENU press is instant. */
-  const warm=()=>{const idle=window.requestIdleCallback||((f)=>setTimeout(f,600));idle(()=>start(),{timeout:2500});};
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(rafId);rafId=0;}else wake();});
+  window.addEventListener('pagehide',()=>{cancelAnimationFrame(rafId);rafId=0;});
+  window.addEventListener('pageshow',wake);
+  // Pointer or keyboard intent prepares MENU immediately; automatic warmup
+  // waits for the visible page's first work rather than sharing its startup.
+  const intent=()=>{start();};
+  const control=document.querySelector('.site-nav__toggle');
+  control?.addEventListener('pointerenter',intent,{once:true});
+  control?.addEventListener('focus',intent,{once:true});
+  const warm=()=>{warmTimer=setTimeout(()=>{const idle=window.requestIdleCallback||((f)=>setTimeout(f,600));idle(()=>{if(!document.hidden)start();},{timeout:2500});},1500);};
   if(document.readyState==='complete')warm();else window.addEventListener('load',warm,{once:true});
   window.dispatchEvent(new CustomEvent('cosgral:cube-ready'));
 })();

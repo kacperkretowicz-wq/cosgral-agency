@@ -201,5 +201,10 @@ import * as THREE from "./vendor/three-0.170.0.module.min.js";
     window.dispatchEvent(new CustomEvent("portfolio-tile-bg-ready"));
   }
 
-  boot();
+  // The chapter catalogue permanently hides this legacy canvas in CSS.
+  // Keep its public theme API, without allocating an invisible WebGL context.
+  if (document.body.classList.contains("portfolio-page--tiles")) {
+    window.__portfolioTileBg = { setTheme: setTheme, resize: resize };
+    window.dispatchEvent(new CustomEvent("portfolio-tile-bg-ready"));
+  } else boot();
 })();

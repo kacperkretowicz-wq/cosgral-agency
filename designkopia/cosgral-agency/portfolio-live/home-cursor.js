@@ -28,6 +28,10 @@
   var rx = 0;
   var ry = 0;
   var dragZone = null;
+  var cursorRaf = 0;
+  function wakeCursor() {
+    if (!cursorRaf && !document.hidden) cursorRaf = requestAnimationFrame(tick);
+  }
 
   document.addEventListener("mousemove", function (e) {
     cx = e.clientX;
@@ -38,6 +42,7 @@
       root.classList.toggle("is-drag-left", e.clientX < mid);
       root.classList.toggle("is-drag-right", e.clientX >= mid);
     }
+    wakeCursor();
   });
 
   document.addEventListener("mouseover", function (e) {
@@ -80,6 +85,8 @@
   var lastDot = "";
   var lastRing = "";
   function tick() {
+    cursorRaf = 0;
+    if (document.hidden) return;
     rx += (cx - rx) * 0.12;
     ry += (cy - ry) * 0.12;
     if (dot) {
@@ -101,7 +108,11 @@
         ring.style.transform = r;
       }
     }
-    requestAnimationFrame(tick);
+    if (Math.abs(cx - rx) + Math.abs(cy - ry) > 0.02) wakeCursor();
   }
   tick();
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { cancelAnimationFrame(cursorRaf); cursorRaf = 0; }
+    else wakeCursor();
+  });
 })();

@@ -12,13 +12,15 @@
   var video = document.querySelector(".service-page-video__media");
 
   if (!video || !theme?.video) return;
+  var inView = true;
+  var suspended = false;
 
   if (!video.getAttribute("src")) {
     video.setAttribute("src", theme.video);
   }
 
   function play() {
-    if (REDUCED) return;
+    if (REDUCED || document.hidden || suspended || !inView || !video.paused) return;
     video.play().catch(function () {});
   }
 
@@ -33,4 +35,12 @@
     if (document.hidden) pause();
     else play();
   });
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (entries) {
+      inView = entries[0].isIntersecting;
+      if (inView) play(); else pause();
+    }).observe(video);
+  }
+  window.addEventListener("pagehide", function () { suspended = true; pause(); });
+  window.addEventListener("pageshow", function () { suspended = false; play(); });
 })();

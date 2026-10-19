@@ -100,6 +100,7 @@
       tile.setAttribute("role", "listitem");
       tile.setAttribute("aria-label", item.client + " — " + item.n);
       var img = document.createElement("img");
+      img.loading = "lazy";
       img.src = item.poster;
       img.alt = "";
       img.decoding = "async";
@@ -112,10 +113,10 @@
       cap.appendChild(document.createTextNode((item.n < 10 ? " 0" : " ") + item.n));
       tile.appendChild(cap);
       tile.addEventListener("click", function () { toggle(i); });
-      tile.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") hover = i; });
-      tile.addEventListener("pointerleave", function () { if (hover === i) hover = -1; });
-      tile.addEventListener("focus", function () { hover = i; });
-      tile.addEventListener("blur", function () { if (hover === i) hover = -1; });
+      tile.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") { hover = i; wake(); } });
+      tile.addEventListener("pointerleave", function () { if (hover === i) { hover = -1; wake(); } });
+      tile.addEventListener("focus", function () { hover = i; wake(); });
+      tile.addEventListener("blur", function () { if (hover === i) { hover = -1; wake(); } });
       field.appendChild(tile);
       return tile;
     });
@@ -168,12 +169,14 @@
   }
 
   function step(now) {
-    loop = phase === "closed" ? 0 : requestAnimationFrame(step);
+    loop = 0;
+    if (phase === "closed" || document.hidden || root.classList.contains("is-nav-menu-open")) { lastT = 0; return; }
     var dt = Math.min(0.05, Math.max(0.001, (now - (lastT || now - 16)) / 1000));
     lastT = now;
     var k = reduced ? 1 : 1 - Math.exp(-dt * 9);
     sx += (px - sx) * (1 - Math.exp(-dt * 3));
     sy += (py - sy) * (1 - Math.exp(-dt * 3));
+    var moving = Math.abs(px - sx) + Math.abs(py - sy) > .00005;
     var tg = targets();
     tiles.forEach(function (tile, i) {
       var t = tg[i], c = cur[i];
@@ -181,6 +184,8 @@
       c.y += (t.cy - t.h / 2 - c.y) * k;
       c.w += (t.w - c.w) * k;
       c.h += (t.h - c.h) * k;
+      if (Math.abs(t.cx - t.w / 2 - c.x) + Math.abs(t.cy - t.h / 2 - c.y) +
+          Math.abs(t.w - c.w) + Math.abs(t.h - c.h) > .001) moving = true;
       var still = i === active || i === hover;
       var d = still ? 0 : base[i].depth * 16;
       tile.style.left = c.x.toFixed(1) + "px";
@@ -190,10 +195,15 @@
       tile.style.transform = "translate3d(" + (-sx * d).toFixed(2) + "px," + (-sy * d).toFixed(2) + "px,0)";
       tile.classList.toggle("is-hover", i === hover && i !== active);
     });
+    if (moving) wake(); else lastT = 0;
+  }
+  function wake() {
+    if (!loop && phase !== "closed" && !document.hidden && !root.classList.contains("is-nav-menu-open")) loop = requestAnimationFrame(step);
   }
   window.addEventListener("pointermove", function (e) {
     px = e.clientX / window.innerWidth - 0.5;
     py = e.clientY / window.innerHeight - 0.5;
+    wake();
   }, { passive: true });
 
   function stop(i) {
@@ -203,15 +213,18 @@
     var video = tile.querySelector("video");
     if (video) {
       video.pause();
-      setTimeout(function () { if (!tile.classList.contains("is-active")) video.remove(); }, 700);
+      setTimeout(function () {
+        if (!tile.classList.contains("is-active")) { video.removeAttribute("src"); video.load(); video.remove(); }
+      }, 700);
     }
   }
   function toggle(i) {
     if (phase !== "open") return;
     var prev = active;
     if (prev >= 0) stop(prev);
-    if (prev === i) { active = -1; return; }
+    if (prev === i) { active = -1; wake(); return; }
     active = i;
+    wake();
     var tile = tiles[i];
     tile.classList.add("is-active");
     var video = tile.querySelector("video");
@@ -226,7 +239,11 @@
     }
     video.muted = false;
     var p = video.play();
-    if (p && p.catch) p.catch(function () { video.muted = true; video.play().catch(function () {}); });
+    if (p && p.catch) p.catch(function () {
+      if (phase === "open" && active === i && !document.hidden && !root.classList.contains("is-nav-menu-open") && tile.classList.contains("is-active")) {
+        video.muted = true; video.play().catch(function () {});
+      }
+    });
   }
 
   /* ——— The shockwave: an irregular front grown from the cube ——— */
@@ -299,7 +316,7 @@
     window.dispatchEvent(new CustomEvent("pf-wall-open"));
     lastT = 0;
     cancelAnimationFrame(loop);
-    loop = requestAnimationFrame(step);
+    loop = 0; wake();
     run(true, function () {
       wall.style.clipPath = "";
       phase = "open";
@@ -317,6 +334,7 @@
       wall.style.clipPath = "";
       body.classList.remove("pf-wall-open");
       phase = "closed";
+      cancelAnimationFrame(loop); loop = 0; lastT = 0;
     });
   }
 
@@ -336,5 +354,17 @@
     if (e.key === "Escape") close();
     if (e.key !== "Tab" && e.key !== "Enter" && e.key !== " ") e.stopImmediatePropagation();
   }, true);
-  window.addEventListener("resize", function () { measure(false); }, { passive: true });
+  window.addEventListener("resize", function () { measure(false); wake(); }, { passive: true });
+  function syncActivity() {
+    if (document.hidden || root.classList.contains("is-nav-menu-open")) {
+      cancelAnimationFrame(loop); loop = 0; lastT = 0;
+      tiles.forEach(function (tile) { var video = tile.querySelector("video"); if (video) video.pause(); });
+    } else {
+      wake();
+      var video = active >= 0 && tiles[active].querySelector("video");
+      if (video && phase === "open") video.play().catch(function () {});
+    }
+  }
+  document.addEventListener("visibilitychange", syncActivity);
+  if (window.MutationObserver) new MutationObserver(syncActivity).observe(root, { attributes: true, attributeFilter: ["class"] });
 })();

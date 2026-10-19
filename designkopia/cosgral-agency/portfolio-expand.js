@@ -29,6 +29,11 @@
   var webDetailOpen = false;
   var catalogRevealTimer = 0;
   var ghostClearTimer = 0;
+  var mediaPosterObserver = null;
+
+  function ensureVideoSource(video) {
+    if(video.dataset.lazySrc&&!video.getAttribute('src'))video.src=video.dataset.lazySrc;
+  }
 
   function shuffleList(list) {
     var a = Array.prototype.slice.call(list);
@@ -321,6 +326,8 @@
   bindExpandBack();
 
   function clearBody() {
+    if(mediaPosterObserver){mediaPosterObserver.disconnect();mediaPosterObserver=null;}
+    bodyEl.querySelectorAll('video').forEach(function(video){video.pause();video.removeAttribute('src');video.load();});
     if (ghostClearTimer) {
       window.clearTimeout(ghostClearTimer);
       ghostClearTimer = 0;
@@ -417,11 +424,11 @@
       var video = card.querySelector("video");
       if (video) {
         if (i === n) {
-          var p = video.play();
-          if (p && p.catch) p.catch(function () {});
+          ensureVideoSource(video);
+          if(video.paused){var p = video.play();if (p && p.catch) p.catch(function () {});}
         } else {
           try {
-            video.pause();
+            if(!video.paused)video.pause();
           } catch (e) {}
         }
       }
@@ -616,9 +623,9 @@
       video.muted = true;
       video.loop = true;
       video.playsInline = true;
-      video.preload = "metadata";
+      video.preload = "none";
       video.poster = item.poster;
-      video.src = item.video;
+      video.dataset.lazySrc = item.video;
       media.appendChild(video);
       card.appendChild(media);
       var body = document.createElement("div");
@@ -889,6 +896,7 @@
 
       btn.addEventListener("mouseenter", function () {
         btn.classList.add("is-reel-hover");
+        ensureVideoSource(video);
         if (active !== btn) setMuted(video, true);
         var p = video.play();
         if (p && p.catch) p.catch(function () {});
@@ -1387,6 +1395,13 @@
     gallery.innerHTML = "";
     var seeds = opts.seedPosters || [];
     var groups = data.groups || [];
+    if(mediaPosterObserver)mediaPosterObserver.disconnect();
+    var posterObserver=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){if(!entry.isIntersecting)return;
+        var video=entry.target;video.poster=video.dataset.lazyPoster;posterObserver.unobserve(video);
+      });
+    },{rootMargin:'600px 0px'});
+    mediaPosterObserver=posterObserver;
     if (kind === "reels" && opts.prioritizeGroup) {
       groups = orderReelGroups(groups, opts.prioritizeGroup);
     }
@@ -1440,18 +1455,18 @@
           video.playsInline = true;
           video.setAttribute("playsinline", "");
           video.setAttribute("muted", "");
-          video.preload = ii < 4 ? "metadata" : "none";
-          if (item.poster) video.poster = item.poster;
+          video.preload = "none";
+          if (item.poster) {video.dataset.lazyPoster=item.poster;mediaPosterObserver.observe(video);}
           /* Expand uses full files (AAC). Silent previews break click-to-unmute. */
-          video.src = (kind === "reels" && item.full) ? item.full : item.src;
+          video.dataset.lazySrc = (kind === "reels" && item.full) ? item.full : item.src;
           if (kind === "reels") {
             btn.setAttribute("data-reel-preview", item.src || "");
             btn.setAttribute("data-reel-full", item.full || item.src || "");
-            if (item.full) video.dataset.usingFull = "1";
           }
           btn.appendChild(video);
           if (kind !== "reels") {
             btn.addEventListener("mouseenter", function () {
+              ensureVideoSource(video);
               var p = video.play();
               if (p && p.catch) p.catch(function () {});
             });
@@ -1463,10 +1478,11 @@
           }
         } else {
           var img = document.createElement("img");
+          img.loading = gi === 0 && ii < 4 ? "eager" : "lazy";
+          img.decoding = "async";
           if (gi === 0 && ii === 0 && seeds[0]) img.src = seeds[0];
           else img.src = item.src;
           img.alt = "";
-          img.loading = ii < 4 ? "eager" : "lazy";
           btn.appendChild(img);
         }
         masonry.appendChild(btn);

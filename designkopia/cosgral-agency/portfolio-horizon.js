@@ -20,7 +20,7 @@
   var reduced = document.documentElement.classList.contains("reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;
   var PAPER = [0.93333, 0.92941, 0.9098];
   var gl = null, uniforms = null, lost = false, raf = 0;
-  var W = 1, H = 1, last = "";
+  var W = 1, H = 1, last = "", chapterWidth = 1;
 
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function ss(a, b, x) { var p = clamp((x - a) / (b - a), 0, 1); return p * p * (3 - 2 * p); }
@@ -34,7 +34,7 @@
   /* The ground trails the slide on a critically damped spring */
   var smoothPos = null, smoothVel = 0, lastTick = 0, OMEGA = 3.6;
   function rawPos() {
-    return clamp(scroller.scrollLeft / Math.max(1, scroller.clientWidth), 0, chapters.length - 1);
+    return clamp(scroller.scrollLeft / chapterWidth, 0, chapters.length - 1);
   }
   function scrollState() {
     var n = chapters.length;
@@ -66,15 +66,8 @@
     return -1;
   }
   function runSweep(from, to, done) {
-    var start = performance.now(), dur = 1900;
-    sweep = { from: from, to: to, t: 0 };
-    (function step(now) {
-      if (!sweep || sweep.from !== from) return;
-      var p = clamp((now - start) / dur, 0, 1);
-      sweep.t = 0.5 - Math.cos(Math.PI * p) / 2;
-      draw();
-      if (p < 1) requestAnimationFrame(step); else if (done) done();
-    })(start);
+    sweep = { from: from, to: to, t: 0, start: performance.now(), duration: 1900, animating: true, done: done };
+    queue();
   }
   window.addEventListener("portfolio-expand-open", function () {
     openFlag = true;
@@ -135,8 +128,10 @@
   var gridCanvas = document.createElement("canvas");
   var gridCtx = gridCanvas.getContext("2d");
   var posters = [];
-  var gridDirty = true;
+  var gridDirty = true, postersRequested = false;
   function loadPosters() {
+    if (postersRequested) return;
+    postersRequested = true;
     fetch("portfolio-media/reels/manifest.json").then(function (r) { return r.json(); }).then(function (m) {
       (m.groups || []).forEach(function (g) {
         (g.items || []).forEach(function (item) {
@@ -190,12 +185,12 @@
   var trail = document.createElement("canvas");
   var trailCtx = trail.getContext("2d");
   var TW = 320, TH = 200;
-  var wake = { x: -1, y: -1, lastRing: 0, moved: 0 };
+  var wake = { x: -1, y: -1, lastRing: 0, moved: -1e9 };
   var rings = [];
   function sizeTrail() {
     TW = W <= 900 ? 300 : 520;
     TH = Math.max(80, Math.round(TW * H / W));
-    trail.width = TW; trail.height = TH;
+    if (trail.width !== TW || trail.height !== TH) { trail.width = TW; trail.height = TH; }
   }
   function stamp(x, y, r, a) {
     var g = trailCtx.createRadialGradient(x, y, 0, x, y, r);
@@ -352,6 +347,18 @@
     var s = state();
     syncClasses(s);
     var solid = solidTone(s);
+    // Solid carbon/paper needs no shader. Build the thermal pass on the first
+    // changing boundary; request the reel wall only near its own chapter.
+    if (!postersRequested) {
+      var position = rawPos();
+      if (abyss.some(function (value, index) { return value && Math.abs(index - position) < 1; })) loadPosters();
+    }
+    if (!gl && !lost && (solid === -1 || s.abyss)) {
+      try {
+        if (initGl()) { gl.viewport(0, 0, canvas.width, canvas.height); canvas.style.backgroundColor = 'transparent'; }
+        else lost = true;
+      } catch (_) { gl = null; lost = true; }
+    }
     if (!gl || lost) {
       var tone = solid === -1 ? (s.t > 0.5 ? s.to : s.from) : solid;
       canvas.style.backgroundColor = tone ? "#eeede8" : (s.abyss ? "#000" : "transparent");
@@ -363,7 +370,7 @@
       gl.clear(gl.COLOR_BUFFER_BIT);
       return;
     }
-    if (gridDirty) paintGrid();
+    if (gridDirty && (deepSolid || s.shock || s.abyss)) paintGrid();
     gl.uniform2f(uniforms.viewport, W, H);
     gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
     gl.uniform2f(uniforms.texel, 1.5 / TW, 1.5 / TH);
@@ -386,6 +393,13 @@
   }
   function tick(now) {
     raf = 0;
+    if (document.hidden) { lastTick = 0; return; }
+    var sweepDone = null;
+    if (sweep && sweep.animating) {
+      var progress = clamp((now - sweep.start) / sweep.duration, 0, 1);
+      sweep.t = 0.5 - Math.cos(Math.PI * progress) / 2;
+      if (progress === 1) { sweep.animating = false; sweepDone = sweep.done; }
+    }
     var raw = rawPos();
     if (smoothPos === null || reduced) { smoothPos = raw; smoothVel = 0; }
     var dt = lastTick ? Math.min(0.05, (now - lastTick) / 1000) : 0.016;
@@ -397,17 +411,20 @@
     var deepVisible = s.abyss && !expanded();
     if (deepVisible) stepTrail(now);
     draw();
-    if (smoothPos !== raw || s.shock || (deepVisible && wakeAlive(now))) raf = requestAnimationFrame(tick);
+    if (sweepDone) sweepDone();
+    if (smoothPos !== raw || s.shock || (sweep && sweep.animating) || (deepVisible && wakeAlive(now))) queue();
     else lastTick = 0;
   }
-  function queue() { if (!raf) raf = requestAnimationFrame(tick); }
+  function queue() { if (!raf && !document.hidden) raf = requestAnimationFrame(tick); }
 
   function resize() {
+    chapterWidth = Math.max(1, scroller.clientWidth);
     W = Math.max(1, window.innerWidth);
     H = Math.max(1, window.innerHeight);
     var ratio = Math.min(window.devicePixelRatio || 1, W < 700 ? 1.5 : 1.25);
-    canvas.width = Math.round(W * ratio);
-    canvas.height = Math.round(H * ratio);
+    var bufferWidth = Math.round(W * ratio), bufferHeight = Math.round(H * ratio);
+    if (canvas.width !== bufferWidth) canvas.width = bufferWidth;
+    if (canvas.height !== bufferHeight) canvas.height = bufferHeight;
     if (gl && !lost) gl.viewport(0, 0, canvas.width, canvas.height);
     sizeTrail();
     gridDirty = true;
@@ -415,15 +432,20 @@
     queue();
   }
 
-  try { if (!initGl()) gl = null; } catch (_) { gl = null; }
   canvas.addEventListener("webglcontextlost", function (e) { e.preventDefault(); lost = true; queue(); });
   canvas.addEventListener("webglcontextrestored", function () {
     try { lost = !initGl(); } catch (_) { lost = true; }
+    if (!lost) canvas.style.backgroundColor = 'transparent';
     resize();
   });
   scroller.addEventListener("scroll", queue, { passive: true });
+  new ResizeObserver(resize).observe(scroller);
   new MutationObserver(queue).observe(body, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", resize, { passive: true });
-  loadPosters();
+  document.addEventListener("visibilitychange", function () {
+    cancelAnimationFrame(raf); raf = 0; lastTick = 0;
+    if (!document.hidden) queue();
+  });
+  window.addEventListener("pageshow", queue);
   resize();
 })();

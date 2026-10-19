@@ -13,6 +13,7 @@
   var reduced = document.documentElement.classList.contains("reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;
   var last = [];
   var raf = 0;
+  var offsets = [], layoutDirty = true;
 
   chapters.forEach(function (chapter, i) {
     var mark = document.createElement("div");
@@ -97,9 +98,15 @@
   function update() {
     raf = 0;
     var w = Math.max(1, scroller.clientWidth);
+    // Read the chapter layout together. Scroll frames only write transforms;
+    // no offsetLeft read follows another chapter's CSS property writes.
+    if (layoutDirty) {
+      offsets = chapters.map(function (chapter) { return chapter.offsetLeft; });
+      layoutDirty = false;
+    }
     var left = scroller.scrollLeft;
     chapters.forEach(function (chapter, i) {
-      var d = reduced ? 0 : Math.max(-1.25, Math.min(1.25, (chapter.offsetLeft - left) / w));
+      var d = reduced ? 0 : Math.max(-1.25, Math.min(1.25, (offsets[i] - left) / w));
       var key = d.toFixed(4);
       if (last[i] === key) return;
       last[i] = key;
@@ -111,8 +118,12 @@
     });
   }
   function queue() { if (!raf) raf = requestAnimationFrame(update); }
+  function invalidateLayout() { layoutDirty = true; last = []; queue(); }
   scroller.addEventListener("scroll", queue, { passive: true });
-  window.addEventListener("resize", function () { last = []; queue(); }, { passive: true });
+  window.addEventListener("resize", invalidateLayout, { passive: true });
+  window.addEventListener("cosgral:langchange", invalidateLayout);
+  document.fonts?.ready.then(invalidateLayout);
+  new ResizeObserver(invalidateLayout).observe(scroller);
   document.documentElement.classList.add("pf-motion");
   update();
 })();

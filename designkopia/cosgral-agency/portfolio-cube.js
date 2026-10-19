@@ -6,7 +6,7 @@
  * press, and folds away when a chapter opens.
  */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261019editorial14';
 
 (async function () {
   const canvas = document.getElementById('pf-cube');
@@ -51,14 +51,18 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   const v = new THREE.Vector3();
   const axisX = new THREE.Vector3(1, 0, 0), axisY = new THREE.Vector3(0, 1, 0);
 
-  let width = 1, height = 1, tile = 0, mobile = false;
+  let width = 1, height = 1, tile = 0, mobile = false, chapterWidth = 1;
   let lastX = NaN, lastY = NaN;
   let pos = null, vel = 0;
   let hover = 0, hoverTarget = 0, dive = 0, hide = 0, press = 0, pressTarget = 0, intro = reduced ? 1 : 0;
   let pointerX = 0, pointerY = 0, px = 0, py = 0, clientX = -1, clientY = -1;
   let spinX = 0, spinY = 0, velX = 0, velY = 0;
   let drag = null, dragged = false;
-  let lastTime = 0, lastRender = 0, glass = null, openFlag = null;
+  let lastTime = 0, lastRender = 0, glass = null, openFlag = null, raf = 0, contextLost = false;
+  let sizeWidth = 0, sizeHeight = 0, sizeRatio = 0;
+  function queue() {
+    if (!raf && glass && !document.hidden && !contextLost) raf = requestAnimationFrame(frame);
+  }
 
   function worldHeight(z) { return 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * (camera.position.z - z); }
   function cubeSize() { return 0.86 * (mobile ? Math.min(width * 0.4, height * 0.21) : Math.min(width * 0.2, height * 0.3)); }
@@ -67,17 +71,21 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     return out.set((x - 0.5) * h * full.aspect, (0.5 - y) * h, z);
   }
   function resize() {
-    width = Math.max(1, window.innerWidth);
-    height = Math.max(1, window.innerHeight);
+    chapterWidth = Math.max(1, scroller.clientWidth);
+    const nextWidth = Math.max(1, window.innerWidth), nextHeight = Math.max(1, window.innerHeight);
+    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    if (nextWidth === sizeWidth && nextHeight === sizeHeight && ratio === sizeRatio) { queue(); return; }
+    width = sizeWidth = nextWidth; height = sizeHeight = nextHeight; sizeRatio = ratio;
     mobile = width <= 900;
     full.aspect = camera.aspect = width / height;
     full.updateProjectionMatrix(); full.updateMatrixWorld(true);
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.setPixelRatio(ratio);
     const size = Math.min(Math.max(width, height), Math.ceil((cubeSize() * 2.05 + 40) / 32) * 32);
     tile = size;
     renderer.setSize(size, size, false);
     canvas.style.width = canvas.style.height = size + 'px';
     lastX = lastY = NaN;
+    queue();
   }
   function crop() {
     v.copy(group.position).project(full);
@@ -138,13 +146,13 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
       e.stopImmediatePropagation();
     }
   }, true);
-  window.addEventListener('portfolio-expand-open', () => { openFlag = true; hoverTarget = 0; });
-  window.addEventListener('portfolio-expand-close', () => { openFlag = false; });
+  window.addEventListener('portfolio-expand-open', () => { openFlag = true; hoverTarget = 0; queue(); });
+  window.addEventListener('portfolio-expand-close', () => { openFlag = false; queue(); });
   /* Montaż: the cube taps the glass to send out the wave that uncovers the
      reel wall, then steps back while the wall is up */
   let tapAt = -1e9, wallOpen = false;
-  window.addEventListener('pf-wall-open', () => { tapAt = performance.now(); wallOpen = true; hoverTarget = 0; });
-  window.addEventListener('pf-wall-close', () => { wallOpen = false; });
+  window.addEventListener('pf-wall-open', () => { tapAt = performance.now(); wallOpen = true; hoverTarget = 0; queue(); });
+  window.addEventListener('pf-wall-close', () => { wallOpen = false; queue(); });
 
   try {
     glass = await installGlassCube(THREE, renderer, scene, group, HALF, glassLook);
@@ -155,7 +163,21 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   }
   portal.classList.add('has-glass-model');
   seeThrough(glass);
-  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); portal.classList.add('has-cube-fallback'); });
+  canvas.addEventListener('webglcontextlost', e => {
+    e.preventDefault(); contextLost = true; cancelAnimationFrame(raf); raf = 0;
+    portal.classList.add('has-cube-fallback');
+  });
+  canvas.addEventListener('webglcontextrestored', async () => {
+    try {
+      const previous = glass;
+      glass = await installGlassCube(THREE, renderer, scene, group, HALF, glassLook);
+      seeThrough(glass);
+      group.remove(previous); scene.remove(previous.userData.transmissionBackdrop);
+      previous.geometry.dispose(); previous.material.dispose(); previous.userData.environmentTarget?.dispose();
+      contextLost = false; lastTime = lastRender = 0; lastX = lastY = NaN;
+      portal.classList.remove('has-cube-fallback'); queue();
+    } catch (error) { console.warn('COSGRAL: portfolio cube recovery unavailable', error); }
+  });
 
   /* Clear glass: the animated ribbon inside is blacked out (hiding it would
      let three fill the refraction with grey), and coverage follows
@@ -187,40 +209,43 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   portal.insertBefore(lens, canvas);
 
   const hullPts = Array.from({ length: 8 }, () => new THREE.Vector3());
+  const lensPts = Array.from({ length: 8 }, () => [0, 0]), lower = [], upper = [];
   function updateLens(opacity) {
     if (opacity < 0.02) {
       if (lens.style.visibility !== 'hidden') lens.style.visibility = 'hidden';
       return;
     }
-    const pts = [];
+    const pts = lensPts;
     let cx = 0, cy = 0;
     for (let k = 0; k < 8; k++) {
       const p = hullPts[k].set(k & 1 ? HALF : -HALF, k & 2 ? HALF : -HALF, k & 4 ? HALF : -HALF);
       p.applyMatrix4(group.matrixWorld).project(full);
       const x = (p.x * 0.5 + 0.5) * width, y = (-p.y * 0.5 + 0.5) * height;
-      pts.push([x, y]); cx += x; cy += y;
+      pts[k][0] = x; pts[k][1] = y; cx += x; cy += y;
     }
     cx /= 8; cy /= 8;
     pts.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
     const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-    const lower = [], upper = [];
+    lower.length = upper.length = 0;
     for (const p of pts) { while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop(); lower.push(p); }
     for (let k = pts.length - 1; k >= 0; k--) { const p = pts[k]; while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop(); upper.push(p); }
     const hull = lower.slice(0, -1).concat(upper.slice(0, -1));
-    lens.style.clipPath = 'polygon(' + hull.map(p => ((p[0] - cx) * 0.95 + cx).toFixed(1) + 'px ' + ((p[1] - cy) * 0.95 + cy).toFixed(1) + 'px').join(',') + ')';
-    lens.style.opacity = opacity.toFixed(3);
-    lens.style.visibility = 'visible';
+    const clipPath = 'polygon(' + hull.map(p => ((p[0] - cx) * 0.95 + cx).toFixed(1) + 'px ' + ((p[1] - cy) * 0.95 + cy).toFixed(1) + 'px').join(',') + ')';
+    if (lens.style.clipPath !== clipPath) lens.style.clipPath = clipPath;
+    const alpha = opacity.toFixed(3);
+    if (lens.style.opacity !== alpha) lens.style.opacity = alpha;
+    if (lens.style.visibility !== 'visible') lens.style.visibility = 'visible';
   }
 
   function frame(now) {
-    requestAnimationFrame(frame);
+    raf = 0;
     const dt = Math.min(0.05, Math.max(0.001, (now - (lastTime || now - 16.7)) / 1000));
     lastTime = now;
-    if (document.hidden) return;
+    if (document.hidden || contextLost) { lastTime = 0; return; }
     const time = reduced ? 0 : now / 1000;
     glass.userData.rainbowTime.value = time;
     const n = chapters.length;
-    const raw = clamp(scroller.scrollLeft / Math.max(1, scroller.clientWidth), 0, n - 1);
+    const raw = clamp(scroller.scrollLeft / chapterWidth, 0, n - 1);
 
     /* Critically damped follow: no overshoot, no velocity jumps, retargets
        mid-travel without a seam. */
@@ -310,8 +335,11 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     if (!group.visible) {
       if (canvas.style.visibility !== 'hidden') canvas.style.visibility = 'hidden';
       updateLens(0);
+      if (intro < 0.999 || Math.abs(dive - (isOpen ? 1 : 0)) > 0.002 || Math.abs(hide - (root.classList.contains('is-nav-menu-open') ? 1 : 0)) > 0.002) queue();
+      else lastTime = 0;
       return;
     }
+    queue();
     const settling = Math.abs(Math.round(spinY / QUARTER) * QUARTER - spinY) + Math.abs(spinX) > 0.002;
     const active = tk < 1 || vel !== 0 || intro < 0.999 || drag || settling || Math.abs(velX) + Math.abs(velY) > 0.01
       || Math.abs(hoverTarget - hover) > 0.002 || Math.abs(pressTarget - press) > 0.002
@@ -323,5 +351,14 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     renderer.render(scene, camera);
     updateLens(opacity);
   }
-  requestAnimationFrame(frame);
+  scroller.addEventListener('scroll', queue, { passive: true });
+  new ResizeObserver(resize).observe(scroller);
+  new MutationObserver(queue).observe(root, { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(queue).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  document.addEventListener('visibilitychange', () => {
+    cancelAnimationFrame(raf); raf = 0; lastTime = 0;
+    if (!document.hidden) queue();
+  });
+  window.addEventListener('pageshow', () => { lastTime = 0; queue(); });
+  queue();
 })();

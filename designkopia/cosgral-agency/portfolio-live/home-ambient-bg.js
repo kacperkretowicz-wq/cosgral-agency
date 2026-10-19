@@ -3,12 +3,24 @@
  * Boots every #home-ambient / [data-home-ambient] canvas on the page.
  */
 (function () {
-  /* perf: skip GPU work while the canvas is not on screen (display/visibility/opacity/viewport), checked at most every 300ms */
-  function cgShown(el){var now=performance.now();if(el.__cgT&&now-el.__cgT<300)return el.__cgV;el.__cgT=now;var v=!!el.isConnected;if(v){var cs=getComputedStyle(el);if(cs.display==="none"||cs.visibility==="hidden"||parseFloat(cs.opacity)<0.003)v=false;else{var r=el.getBoundingClientRect();if(r.width<1||r.height<1||r.bottom<=0||r.top>=innerHeight||r.right<=0||r.left>=innerWidth)v=false;}}el.__cgV=v;return v;}
-
   "use strict";
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
+  var ambientStart = performance.now();
+
+  function isShown(canvas) {
+    if (!canvas.isConnected || document.hidden) return false;
+    var opacity = 1;
+    for (var node = canvas; node; node = node.parentElement) {
+      var style = getComputedStyle(node);
+      if (style.display === "none" || style.visibility === "hidden") return false;
+      opacity *= parseFloat(style.opacity) || (style.opacity === "0" ? 0 : 1);
+      if (opacity < 0.003) return false;
+    }
+    var r = canvas.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight &&
+      r.right > 0 && r.left < innerWidth;
+  }
 
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
@@ -161,7 +173,8 @@
 
     var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
     var running = false;
-    var start = performance.now();
+    var start = ambientStart;
+    var rafId = 0;
     var frameSkip = 0;
     var SCALE_BY_TIER = MOBILE ? [0.75, 0.6, 0.5] : [0.66, 0.5, 0.4];
     var SKIP_BY_TIER = MOBILE ? [2, 3, 4] : [1, 2, 3];
@@ -190,12 +203,13 @@
     }
 
     function frame(now) {
+      rafId = 0;
       if (!running) return;
       var sandHeavy = document.documentElement.classList.contains("is-sand-stream");
       var skipN = Math.max(tierSkip, sandHeavy ? (MOBILE ? 4 : 3) : MOBILE ? 2 : 1);
       frameSkip += 1;
       if (skipN > 1 && frameSkip % skipN !== 0) {
-        requestAnimationFrame(frame);
+        schedule();
         return;
       }
       var ptr = window.cosgralPointer;
@@ -205,10 +219,11 @@
       }
       mouse.x += (mouse.tx - mouse.x) * 0.06;
       mouse.y += (mouse.ty - mouse.y) * 0.06;
-      if (!cgShown(canvas)) {
-        requestAnimationFrame(frame);
-        return;
-      }
+      paint(now);
+      schedule();
+    }
+
+    function paint(now) {
       gl.useProgram(program);
       gl.bindBuffer(gl.ARRAY_BUFFER, quad);
       gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
@@ -216,28 +231,71 @@
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      requestAnimationFrame(frame);
     }
 
+    function schedule() {
+      if (running && !rafId && !document.hidden) rafId = requestAnimationFrame(frame);
+    }
     function play() {
-      if (!running) {
+      if (!running && !document.hidden) {
         running = true;
-        requestAnimationFrame(frame);
+        // Keep the first visible frame synchronous; a resumed theme must not
+        // expose an empty canvas while waiting for its next animation tick.
+        paint(performance.now());
+        schedule();
       }
+    }
+    function pause() {
+      running = false;
+      cancelAnimationFrame(rafId);
+      rafId = 0;
     }
 
     window.addEventListener("resize", resize);
     resize();
-    gl.uniform2f(uRes, canvas.width, canvas.height);
-    gl.uniform1f(uTime, 0);
-    gl.uniform2f(uMouse, 0, 0);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-    play();
+    return { play: play, pause: pause };
+  }
 
+  function mountCanvas(canvas) {
+    var effect = null, checkRaf = 0, suspended = false;
+    function ensureEffect() {
+      if (!effect) effect = bootCanvas(canvas);
+      return effect;
+    }
+    function check() {
+      checkRaf = 0;
+      if (!suspended && isShown(canvas)) { var current = ensureEffect(); if (current) current.play(); }
+      else if (effect) effect.pause();
+    }
+    function queueCheck() {
+      if (!checkRaf) checkRaf = requestAnimationFrame(check);
+    }
+    // Observe the wrapping theme layer too: opacity on a parent is not inherited
+    // by getComputedStyle(canvas). Hidden graphics used to render continuously.
+    var observer = new MutationObserver(queueCheck);
+    for (var node = canvas; node; node = node.parentElement) {
+      observer.observe(node, { attributes: true, attributeFilter: ["class", "style", "hidden"] });
+    }
+    if (window.IntersectionObserver) {
+      var intersection = new IntersectionObserver(queueCheck);
+      intersection.observe(canvas);
+    }
+    window.addEventListener("scroll", queueCheck, { passive: true });
+    window.addEventListener("resize", queueCheck, { passive: true });
+    window.addEventListener("pageshow", function () { suspended = false; queueCheck(); });
+    window.addEventListener("pagehide", function () { suspended = true; if (effect) effect.pause(); });
     document.addEventListener("visibilitychange", function () {
-      if (document.hidden) running = false;
-      else play();
+      if (document.hidden) { if (effect) effect.pause(); }
+      else queueCheck();
     });
+    check();
+    // Prepare the hidden second theme after the visible page has started.
+    // Its renderer stays asleep until the layer actually contributes pixels.
+    setTimeout(function () {
+      var warm = function () { if (!document.hidden && !suspended && canvas.isConnected && !effect) ensureEffect(); };
+      if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 2500 });
+      else warm();
+    }, 1500);
   }
 
   var nodes = document.querySelectorAll("#home-ambient, [data-home-ambient]");
@@ -245,6 +303,6 @@
   for (var i = 0; i < nodes.length; i++) {
     if (seen.indexOf(nodes[i]) !== -1) continue;
     seen.push(nodes[i]);
-    bootCanvas(nodes[i]);
+    mountCanvas(nodes[i]);
   }
 })();

@@ -1,6 +1,6 @@
 /* COSGRAL — shared subpage theme (matches homepage tokens + ambient)
    Typografia jak Parhouse (Geomanist): Satoshi — wolny geometryczny odpowiednik */
-@import url("https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap");
+@import url("../assets/fonts/satoshi/satoshi.css?v=20261020portfolio1");
 
 :root {
   --bg: #030303;

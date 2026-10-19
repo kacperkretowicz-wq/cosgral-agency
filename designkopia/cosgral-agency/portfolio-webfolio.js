@@ -92,6 +92,7 @@
     slide.type = "button";
     slide.setAttribute("aria-label", p.name);
     var img = el("img");
+    img.loading = "lazy";
     img.src = p.poster;
     img.alt = "";
     img.decoding = "async";
@@ -102,7 +103,6 @@
     video.playsInline = true;
     video.setAttribute("playsinline", "");
     video.preload = "none";
-    video.poster = p.poster;
     slide.appendChild(video);
     slide.addEventListener("click", function () {
       if (phase !== "open" || detailOpen) return;
@@ -191,10 +191,13 @@
   function playActive() {
     slides.forEach(function (slide, i) {
       var v = slide.querySelector("video");
-      if (i !== active || detailOpen || phase === "closed") { if (!v.paused) v.pause(); slide.classList.remove("is-playing"); return; }
+      if (i !== active || detailOpen || phase !== "open" || document.hidden || root.classList.contains("is-nav-menu-open")) { if (!v.paused) v.pause(); slide.classList.remove("is-playing"); return; }
+      if (!v.poster) v.poster = PROJECTS[i].poster;
       if (!v.getAttribute("src")) v.src = PROJECTS[i].clip;
       var p = v.play();
-      if (p && p.then) p.then(function () { slide.classList.add("is-playing"); }).catch(function () {});
+      if (p && p.then) p.then(function () {
+        if (i === active && !detailOpen && phase === "open" && !document.hidden && !root.classList.contains("is-nav-menu-open")) slide.classList.add("is-playing");
+      }).catch(function () {});
     });
   }
 
@@ -337,10 +340,10 @@
     var f = el("figure", "pfd-fig " + cls);
     f.setAttribute("data-rv", "");
     var img = el("img");
+    img.loading = "lazy";
     img.src = src;
     img.alt = p.name + " — " + (en() ? "section " : "sekcja ") + k;
     img.decoding = "async";
-    img.loading = "lazy";
     f.appendChild(img);
     var cap = el("figcaption");
     cap.appendChild(el("span", null, pad(k + 1) + " — " + (en() ? "Section" : "Sekcja")));
@@ -403,9 +406,9 @@
     v.loop = true;
     v.playsInline = true;
     v.setAttribute("playsinline", "");
-    v.preload = "metadata";
+    v.preload = "none";
     v.poster = p.poster;
-    v.src = p.clip;
+    v.setAttribute("data-detail-clip", p.clip);
     vf.appendChild(v);
     var vc = el("figcaption");
     vc.appendChild(el("span", null, "01 — " + (en() ? "Site recording" : "Nagranie strony")));
@@ -484,22 +487,30 @@
   var parRaf = 0;
   function parallax() {
     parRaf = 0;
+    if (!detailOpen || detail.hidden) return;
     var H = window.innerHeight;
-    Array.prototype.forEach.call(detail.querySelectorAll("[data-par]"), function (n) {
+    var layers = reduced ? [] : Array.prototype.map.call(detail.querySelectorAll("[data-par]"), function (n) {
       var r = n.getBoundingClientRect();
-      var c = r.top + r.height / 2 - H / 2;
-      n.style.translate = "0 " + (c * Number(n.getAttribute("data-par"))).toFixed(1) + "px";
+      return { node: n, offset: (r.top + r.height / 2 - H / 2) * Number(n.getAttribute("data-par")) };
     });
     var v = detail.querySelector(".pfd-video video");
+    var vr = v && v.getBoundingClientRect();
+    layers.forEach(function (layer) { layer.node.style.translate = "0 " + layer.offset.toFixed(1) + "px"; });
     if (v) {
-      var vr = v.getBoundingClientRect();
-      var seen = vr.bottom > 0 && vr.top < H;
+      var allowed = !document.hidden && !root.classList.contains("is-nav-menu-open");
+      if (allowed && vr.bottom > -H * .5 && vr.top < H * 1.5 && !v.getAttribute("src")) {
+        v.preload = "metadata"; v.src = v.getAttribute("data-detail-clip");
+      }
+      var seen = allowed && vr.bottom > 0 && vr.top < H;
       if (seen && v.paused) v.play().catch(function () {});
       if (!seen && !v.paused) v.pause();
     }
     detail.classList.toggle("is-scrolled", detail.scrollTop > H * 0.35);
   }
-  detail.addEventListener("scroll", function () { if (!parRaf && !reduced) parRaf = requestAnimationFrame(parallax); }, { passive: true });
+  detail.addEventListener("scroll", function () { if (!parRaf) parRaf = requestAnimationFrame(parallax); }, { passive: true });
+  function syncPlayback() { playActive(); parallax(); }
+  document.addEventListener("visibilitychange", syncPlayback);
+  if (window.MutationObserver) new MutationObserver(syncPlayback).observe(root, { attributes: true, attributeFilter: ["class"] });
 
   function openDetail() {
     if (phase !== "open" || detailOpen) return;

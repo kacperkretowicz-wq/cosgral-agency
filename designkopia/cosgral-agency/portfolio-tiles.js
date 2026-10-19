@@ -29,6 +29,27 @@
   var restartLux = null;
   var restartOs = null;
   var restartShow = null;
+  var initializedChapters = {};
+  function chapterCanRun(theme) {
+    return !loopsPaused && !document.hidden && !document.documentElement.classList.contains('is-nav-menu-open') &&
+      chapters[activeIndex] && chapters[activeIndex].getAttribute('data-theme') === theme;
+  }
+  function ensureChapter(theme) {
+    if (initializedChapters[theme]) return;
+    initializedChapters[theme] = true;
+    if (theme === 'web') initLux();
+    else if (theme === 'systems') initOs();
+    else if (theme === 'graphics') initShow();
+  }
+  function syncChapterLoops() {
+    if (!chapterCanRun('web') && luxTimer) { clearInterval(luxTimer);luxTimer=null; }
+    if (!chapterCanRun('graphics') && showTimer) { clearInterval(showTimer);showTimer=null; }
+    if (systemsFan && (!chapterCanRun('systems') || REDUCED)) systemsFan.pause();
+    if (REDUCED) return;
+    if (restartLux) restartLux();
+    if (restartOs) restartOs();
+    if (restartShow) restartShow();
+  }
 
   var STILL = "portfolio-media/showcase/chapter-stills/";
   var ACC = STILL + "accents/";
@@ -264,7 +285,7 @@
     if (REDUCED) return;
 
     function cycle() {
-      if (busy) return;
+      if (busy || !chapterCanRun('web')) return;
       busy = true;
       clearPhases();
       /* 1) tiles whip left + word turns edge-on (flat from the side) */
@@ -288,7 +309,7 @@
     }
 
     restartLux = function () {
-      if (luxTimer || REDUCED || loopsPaused) return;
+      if (luxTimer || REDUCED || !chapterCanRun('web')) return;
       luxTimer = window.setInterval(cycle, 5600);
     };
     restartLux();
@@ -301,10 +322,10 @@
     if (!mount || !window.CosgralSystemsFan) return;
     systemsFan = window.CosgralSystemsFan.create(mount, {
       mode: "catalog",
-      autoplay: !REDUCED,
+      autoplay: !REDUCED && chapterCanRun('systems'),
     });
     restartOs = function () {
-      if (systemsFan && !loopsPaused) systemsFan.resume();
+      if (systemsFan && chapterCanRun('systems')) systemsFan.resume();
     };
   }
 
@@ -359,7 +380,7 @@
     if (REDUCED) return;
 
     restartShow = function () {
-      if (showTimer || REDUCED || loopsPaused) return;
+      if (showTimer || REDUCED || !chapterCanRun('graphics')) return;
       showTimer = window.setInterval(function () {
         show.classList.add("is-swap");
         window.setTimeout(function () {
@@ -404,6 +425,8 @@
     if (prevBtn) prevBtn.disabled = index <= 0;
     if (nextBtn) nextBtn.disabled = index >= chapters.length - 1;
     var chapter = chapters[index];
+    ensureChapter(chapter.getAttribute('data-theme') || 'web');
+    syncChapterLoops();
     applyTheme(chapter.getAttribute("data-theme") || "web");
     /* Montaż belt must scroll while the chapter is active (IO can miss horizontal slides) */
     if (chapter && chapter.id === "montaz") {
@@ -473,10 +496,7 @@
     if (!loopsPaused) return;
     loopsPaused = false;
     if (REDUCED) return;
-    if (restartLux) restartLux();
-    if (restartOs) restartOs();
-    if (systemsFan) systemsFan.resume();
-    if (restartShow) restartShow();
+    syncChapterLoops();
     startVizShowLoop();
   }
 
@@ -611,6 +631,8 @@
   window.addEventListener("resize", function () {
     scrollToIndex(activeIndex < 0 ? 0 : activeIndex, "auto");
   });
+  document.addEventListener('visibilitychange', syncChapterLoops);
+  window.addEventListener('cosgral:menu-state', syncChapterLoops);
 
   window.addEventListener("portfolio-tile-bg-ready", function () {
     if (pendingTheme) applyTheme(pendingTheme);
@@ -623,13 +645,18 @@
   });
 
   document.body.classList.add("portfolio-page--tiles");
-  initLux();
-  initOs();
-  initShow();
   startVizShowLoop();
-  scrollToIndex(0, "auto");
+  function hashIndex(hash) {
+    var id = (hash || window.location.hash || '').replace(/^#/, '');
+    if (id === 'systemy') id = 'automatyzacje';
+    var index = chapters.findIndex(function(chapter){return chapter.id === id;});
+    return index < 0 ? 0 : index;
+  }
+  var initialIndex = hashIndex();
+  scrollToIndex(initialIndex, "auto");
   window.setTimeout(function () {
-    scrollToIndex(0, "auto");
+    scrollToIndex(initialIndex, "auto");
     if (pendingTheme) applyTheme(pendingTheme);
   }, 80);
+  window.addEventListener('hashchange',function(){if(!expandedKey)scrollToIndex(hashIndex(),'auto');});
 })();

@@ -14,9 +14,14 @@
   document.body.appendChild(canvas);
 
   var ctx = canvas.getContext("2d");
+  if (!ctx) { canvas.remove(); return; }
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var rafId = 0;
+  var needsResize = true;
+  canvas.style.opacity = "0";
 
   function resize() {
+    needsResize = false;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(window.innerWidth * dpr);
     canvas.height = Math.round(window.innerHeight * dpr);
@@ -31,14 +36,15 @@
   }
 
   function draw() {
-    var html = document.documentElement;
+    rafId = 0;
+    if (document.hidden) return;
     var bend = readVar("--menu-water-bend", 0);
     if (bend < 0.02) {
       /* perf: idle frames only touch the style once */
       if (canvas.style.opacity !== "0") canvas.style.opacity = "0";
-      requestAnimationFrame(draw);
       return;
     }
+    if (needsResize) resize();
 
     canvas.style.opacity = String(Math.min(1, bend * 1.15));
 
@@ -96,10 +102,23 @@
       ctx.fillRect(0, 0, w, h);
     }
 
-    requestAnimationFrame(draw);
+    wake();
   }
 
-  window.addEventListener("resize", resize);
-  resize();
-  requestAnimationFrame(draw);
+  function wake() {
+    if (!rafId && !document.hidden) rafId = requestAnimationFrame(draw);
+  }
+  // The menu writes these variables on <html>. Sleep between actual waves.
+  new MutationObserver(wake).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["style"]
+  });
+  window.addEventListener("cosgral:menu-state", wake);
+  window.addEventListener("cosgral:cube-menu", wake);
+  window.addEventListener("resize", function () { needsResize = true; wake(); }, { passive: true });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { cancelAnimationFrame(rafId); rafId = 0; }
+    else wake();
+  });
+  window.addEventListener("pageshow", wake);
+  wake();
 })();

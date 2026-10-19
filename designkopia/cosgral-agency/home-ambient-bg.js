@@ -16,21 +16,11 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var VERT = "\n    attribute vec2 aPos;\n    void main() { gl_Position = vec4(aPos, 0.0, 1.0); }\n  ";
-  var funnelLibrary = window.cosgralChromeFunnel;
-  var hasFunnel = !!funnelLibrary;
-  var defaultFunnel = new Float32Array([.5,.45,.18,0]);
-  var defaultElastic = new Float32Array(2);
-  var defaultShape = new Float32Array([2,0,.4,0]);
-
   var FRAG = `
-    precision ${hasFunnel ? 'highp' : 'mediump'} float;
+    precision mediump float;
     uniform vec2 uRes;
     uniform float uTime;
-    uniform float uChromePaper;
-    uniform float uChromeBoundary;
-    uniform vec4 uChromeFunnelFrame;
     uniform vec2 uMouse;
-    ${hasFunnel ? funnelLibrary.glsl : ''}
 
     float wave(vec2 p, float t) {
       float w = 0.0;
@@ -52,23 +42,12 @@
 
     void main() {
       vec2 uv = gl_FragCoord.xy / uRes.xy;
-      ${hasFunnel ? `
-      vec3 carbon=vec3(.03137255,.03529412,.03529412)/(.6+.4*uChromePaper);
-      if(1.-uv.y>uChromeBoundary-.008){gl_FragColor=vec4(carbon,1.);return;}
-      vec4 funnelOptics=cgFunnelOptics(uv,uRes,uChromeFunnelFrame,uChromeBoundary);
-      if(funnelOptics.w<.0001&&funnelOptics.z>14./uRes.y){gl_FragColor=vec4(carbon,1.);return;}
-      // Fully lit paper has no procedural waves underneath to calculate.
-      if(uChromePaper>.999){
-        gl_FragColor=vec4(cgFunnelPaint(vec3(0.),uv,uRes,uChromeFunnelFrame,uChromeBoundary,uChromePaper,funnelOptics),1.);return;
-      }
-      vec2 funnelUv=cgFunnelWarp(uv,funnelOptics,uRes,uChromeFunnelFrame);
-      ` : 'vec2 funnelUv=uv;'}
       vec2 m = uMouse * 0.5 + 0.5;
       vec2 toM = uv - m;
       float mDist = length(toM);
       float mForce = smoothstep(0.62, 0.0, mDist);
 
-      vec2 p = funnelUv * vec2(2.8, 2.0);
+      vec2 p = uv * vec2(2.8, 2.0);
       p += normalize(toM + 0.0001) * mForce * 0.17 * sin(uTime * 1.7 + mDist * 13.0);
       p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;
 
@@ -101,13 +80,6 @@
 
       col = ((col - 0.5) * 1.04 + 0.5) * 0.78;
 
-      ${hasFunnel ? 'col=cgFunnelPaint(col,uv,uRes,uChromeFunnelFrame,uChromeBoundary,uChromePaper,funnelOptics);' : `float chromeMask=1.0-smoothstep(.36,.86,1.0-uv.y);
-      vec3 chromeLight=vec3(.91,.905,.88)-smoothstep(.05,1.25,uv.x+uv.y*.25)*.055;
-      col=mix(col,chromeLight,uChromePaper*chromeMask);
-      float chromeSeam=smoothstep(uChromeBoundary-.26,uChromeBoundary-.025,1.0-uv.y);
-      vec3 seamColor=vec3(.03137255,.03529412,.03529412)/(.6+.4*uChromePaper);
-      col=mix(col,seamColor,chromeSeam);
-      `}
       gl_FragColor = vec4(col, 1.0);
     }
   `;
@@ -159,34 +131,28 @@
   var uRes = gl.getUniformLocation(program, "uRes");
   var uTime = gl.getUniformLocation(program, "uTime");
   var uMouse = gl.getUniformLocation(program, "uMouse");
-  var uChromePaper = gl.getUniformLocation(program, "uChromePaper");
-  var uChromeBoundary = gl.getUniformLocation(program, "uChromeBoundary");
-  var uChromeFunnelFrame = gl.getUniformLocation(program, "uChromeFunnelFrame");
-  var uChromeFunnelElastic = gl.getUniformLocation(program, "uChromeFunnelElastic");
-  var uChromeFunnelShape = gl.getUniformLocation(program, "uChromeFunnelShape");
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-  var running = false;
+  var running = false, raf = 0;
   var start = performance.now();
-  window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse, render: function (now) { frame(now, true); } };
+  window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse, render: function (now) { frame(now, true); }, sync: syncPlayback };
   var lastFrameTime = 0;
-  var qualityTier = 0, coveredPainted = false;
+  var qualityTier = 0;
 
-  var SCALE_BY_TIER = hasFunnel ? (MOBILE ? [.75,.60,.45] : [.60,.48,.38]) : (MOBILE ? [.55,.45,.38] : [.52,.44,.36]);
+  var SCALE_BY_TIER = MOBILE ? [.55,.45,.38] : [.52,.44,.36];
   var dprCap = SCALE_BY_TIER[0];
 
   function resize() {
     var dpr = dprCap;
-    var maxW = hasFunnel ? (MOBILE ? 780 : 1440) : (MOBILE ? 720 : 1280);
-    var maxH = hasFunnel ? 900 : (MOBILE ? 540 : 720);
-    if(hasFunnel)dpr=Math.min(dpr,maxW/window.innerWidth,maxH/window.innerHeight);
+    var maxW = MOBILE ? 720 : 1280;
+    var maxH = MOBILE ? 540 : 720;
+    dpr=Math.min(dpr,maxW/window.innerWidth,maxH/window.innerHeight);
     var w = Math.min(maxW, Math.round(window.innerWidth * dpr));
     var h = Math.min(maxH, Math.round(window.innerHeight * dpr));
     if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
       canvas.width = w;
       canvas.height = h;
       gl.viewport(0, 0, w, h);
-      coveredPainted = false;
     }
   }
 
@@ -200,35 +166,42 @@
     });
   }
 
+  function schedule() {
+    if (!running || raf || window.cosgralChromeStudio?.synchronized) return;
+    raf = requestAnimationFrame(function (now) {
+      raf = 0;
+      frame(now, false);
+    });
+  }
+
   function frame(now, external) {
     external = external === true;
-    function schedule() { if (!external) requestAnimationFrame(frame); }
+    function next() { if (!external) schedule(); }
     if (!running) return;
     var studio = window.cosgralChromeStudio;
-    // The hero owns both draws once its model is ready: no one-frame gap
-    // between the projected cube contact and the liquid surface underneath it.
-    if (studio?.synchronized && !external) { schedule(); return; }
+    // The hero synchronizes both draws while visible. Once it leaves,
+    // this loop keeps the dark backdrop moving independently.
+    if (studio?.synchronized && !external) return;
     if (document.documentElement.classList.contains("is-nav-menu-open")) {
-      schedule();
+      next();
       return;
     }
-    if(!studio?.covered)coveredPainted=false;
-    if(studio?.covered&&coveredPainted){schedule();return;}
 
     // Kiedy użytkownik jest w sekcji Kontakt lub Stopka, nieprzezroczyste tło (#030303)
     // całkowicie zasłania ten canvas — wstrzymujemy rysowanie (0% GPU/CPU na dole strony).
     if ((document.documentElement.classList.contains("is-footer-covered") || document.documentElement.classList.contains("is-ambient-covered"))) {
-      schedule();
+      next();
       return;
     }
 
     // Limit 60 FPS dla monitorów 144Hz/240Hz, aby nie przepalać GPU
-    var interval = hasFunnel ? (qualityTier===2 ? 30 : studio?.moving ? 14 : 30) : 14;
-    if (!external && now - lastFrameTime < interval) {
-      schedule();
+    var interval = 1000 / (qualityTier===2 ? 30 : 60);
+    var elapsed = now - lastFrameTime;
+    if (!external && elapsed < interval - .65) {
+      next();
       return;
     }
-    lastFrameTime = now;
+    lastFrameTime = elapsed>=interval ? now-elapsed%interval : now;
 
     var ptr = window.cosgralPointer;
     if (ptr) {
@@ -243,26 +216,33 @@
     window.cosgralAmbientFrame.at = now;
     gl.uniform1f(uTime, window.cosgralAmbientFrame.time);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
-    gl.uniform1f(uChromePaper, window.cosgralChromeStudio?.paper || 0);
-    gl.uniform1f(uChromeBoundary, window.cosgralChromeStudio?.boundary ?? 2);
-    gl.uniform4fv(uChromeFunnelFrame, window.cosgralChromeStudio?.funnel || defaultFunnel);
-    gl.uniform2fv(uChromeFunnelElastic, window.cosgralChromeStudio?.elastic || defaultElastic);
-    gl.uniform4fv(uChromeFunnelShape, window.cosgralChromeStudio?.shape || defaultShape);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    if(studio?.covered)coveredPainted=true;
 
-    schedule();
+    next();
   }
 
   function play() {
-    if (!running) {
-      running = true;
-      requestAnimationFrame(frame);
-    }
+    if (running) return;
+    running = true;
+    lastFrameTime = 0;
+    schedule();
   }
 
   function pause() {
     running = false;
+    cancelAnimationFrame(raf);
+    raf = 0;
+  }
+
+  function syncPlayback() {
+    var classes = document.documentElement.classList;
+    if (document.hidden || classes.contains('is-nav-menu-open') ||
+        classes.contains('is-footer-covered') || classes.contains('is-ambient-covered')) pause();
+    else {
+      play();
+      if (window.cosgralChromeStudio?.synchronized) { cancelAnimationFrame(raf);raf=0; }
+      else schedule();
+    }
   }
 
   window.addEventListener("resize", resize);
@@ -270,15 +250,9 @@
   gl.uniform2f(uRes, canvas.width, canvas.height);
   gl.uniform1f(uTime, 0);
   gl.uniform2f(uMouse, 0, 0);
-  gl.uniform1f(uChromeBoundary, 2);
-  gl.uniform4fv(uChromeFunnelFrame, defaultFunnel);
-  gl.uniform2fv(uChromeFunnelElastic, defaultElastic);
-  gl.uniform4fv(uChromeFunnelShape, defaultShape);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
-  play();
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden) pause();
-    else play();
-  });
+  syncPlayback();
+  document.addEventListener('visibilitychange', syncPlayback);
+  window.addEventListener('pageshow', syncPlayback);
+  new MutationObserver(syncPlayback).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 })();

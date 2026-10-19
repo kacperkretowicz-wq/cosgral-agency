@@ -3,9 +3,6 @@
  * Soft luminous orbs + grain on deep black; reacts to cosgralPointer (mouse / gyro).
  */
 (function () {
-  /* perf: skip GPU work while the canvas is not on screen (display/visibility/opacity/viewport), checked at most every 300ms */
-  function cgShown(el){var now=performance.now();if(el.__cgT&&now-el.__cgT<300)return el.__cgV;el.__cgT=now;var v=!!el.isConnected;if(v){var cs=getComputedStyle(el);if(cs.display==="none"||cs.visibility==="hidden"||parseFloat(cs.opacity)<0.003)v=false;else{var r=el.getBoundingClientRect();if(r.width<1||r.height<1||r.bottom<=0||r.top>=innerHeight||r.right<=0||r.left>=innerWidth)v=false;}}el.__cgV=v;return v;}
-
   "use strict";
 
   if (document.documentElement.classList.contains("reduce-motion")) return;
@@ -128,7 +125,7 @@
     var uMouse = gl.getUniformLocation(program, "uMouse");
 
     var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-    var running = false;
+    var running = false, raf = 0;
     var start = performance.now();
     var frameSkip = 0;
     var dprCap = MOBILE ? 0.7 : 0.85;
@@ -145,10 +142,11 @@
     }
 
     function frame(now) {
-      if (!running) return;
+      raf = 0;
+      if (!running || document.hidden) return;
       frameSkip += 1;
       if (MOBILE && frameSkip % 2 !== 0) {
-        requestAnimationFrame(frame);
+        raf = requestAnimationFrame(frame);
         return;
       }
       var ptr = window.cosgralPointer;
@@ -158,10 +156,6 @@
       }
       mouse.x += (mouse.tx - mouse.x) * 0.07;
       mouse.y += (mouse.ty - mouse.y) * 0.07;
-      if (!cgShown(canvas)) {
-        requestAnimationFrame(frame);
-        return;
-      }
       gl.useProgram(program);
       gl.bindBuffer(gl.ARRAY_BUFFER, quad);
       gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
@@ -169,30 +163,56 @@
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      requestAnimationFrame(frame);
+      raf = requestAnimationFrame(frame);
     }
 
     function play() {
-      if (!running) {
-        running = true;
-        requestAnimationFrame(frame);
-      }
+      running = true;
+      if (!raf && !document.hidden) raf = requestAnimationFrame(frame);
+    }
+    function pause() {
+      running = false;
+      cancelAnimationFrame(raf); raf = 0;
     }
 
-    window.addEventListener("resize", resize, { passive: true });
     resize();
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.uniform1f(uTime, 0);
     gl.uniform2f(uMouse, 0, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    play();
+    return { play: play, pause: pause, resize: resize };
+  }
 
-    document.addEventListener("visibilitychange", function () {
-      if (document.hidden) running = false;
-      else play();
-    });
+  function watchCanvas(canvas) {
+    var layer = canvas.closest(".portfolio-theme-layer"), controller = null, failed = false;
+    var inView = false;
+    function sync() {
+      var body = document.body, html = document.documentElement;
+      var visible = inView && !document.hidden && (!layer || layer.classList.contains("is-theme-active")) &&
+        !html.classList.contains("is-nav-menu-open") && !body.classList.contains("pf-wall-open") &&
+        !body.classList.contains("pf-gfx-open");
+      if (visible && !failed) {
+        if (!controller) { controller = bootCanvas(canvas); failed = !controller; }
+        if (controller) controller.play();
+      } else if (controller) controller.pause();
+    }
+    if (window.IntersectionObserver) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) { inView = entry.isIntersecting; }); sync();
+      });
+      io.observe(canvas);
+    } else { inView = true; sync(); }
+    if (window.MutationObserver) {
+      var activity = new MutationObserver(sync);
+      [document.documentElement, document.body, layer].forEach(function (node) {
+        if (node) activity.observe(node, { attributes: true, attributeFilter: ["class"] });
+      });
+    }
+    document.addEventListener("visibilitychange", sync);
+    window.addEventListener("pageshow", sync, { passive: true });
+    window.addEventListener("resize", function () { if (controller) controller.resize(); sync(); }, { passive: true });
   }
 
   var nodes = document.querySelectorAll("[data-montaz-ambient]");
-  for (var i = 0; i < nodes.length; i++) bootCanvas(nodes[i]);
+  for (var i = 0; i < nodes.length; i++) watchCanvas(nodes[i]);
 })();

@@ -1,12 +1,13 @@
 /** Imported COSGRAL model and glass shader from the supplied cube archive. */
+let cubeAssets;
 export async function installGlassCube(THREE, renderer, scene, group, half, options = {}) {
   const assetURL = new URL('./assets/glass-cube/', import.meta.url);
-  const [settings, model] = await Promise.all([
-    fetch(new URL('web_glass.json', assetURL)),
-    fetch(new URL('cube_web_raw.glb', assetURL))
-  ]);
-  if (!settings.ok || !model.ok) throw new Error('Glass cube assets could not be loaded');
-  const GLASS = await settings.json();
+  cubeAssets ||= Promise.all([
+    fetch(new URL('web_glass.json', assetURL)).then(r=>{if(!r.ok)throw new Error('Cube settings unavailable');return r.json();}),
+    fetch(new URL('cube_web_raw.glb', assetURL)).then(r=>{if(!r.ok)throw new Error('Cube model unavailable');return r.arrayBuffer();})
+  ]).catch(error=>{cubeAssets=null;throw error;});
+  const [settings, modelBytes]=await cubeAssets;
+  const GLASS=structuredClone(settings);
   Object.assign(GLASS, options.glass || {});
   Object.assign(GLASS.env, options.env || {});
   const PARAMS = GLASS.env;
@@ -44,14 +45,18 @@ function buildEnvScene() {
     gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.55, 'rgba(255,255,255,0.25)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
     g2.fillStyle = gr; g2.fillRect(0, 0, 4, 256);
     const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace;
-    const sheen = (pos, size, power, rot) => {
+    const sheen = (pos, size, power, rot, tint=0xffffff) => {
       const m = new THREE.MeshBasicMaterial({ map: gt, side: THREE.DoubleSide, transparent: true, depthWrite: false });
-      m.color.setScalar(power);
+      m.color.setHex(tint).multiplyScalar(power);
       const mesh = new THREE.Mesh(plane, m);
       mesh.position.set(...pos); mesh.scale.set(size[0], size[1], 1); mesh.lookAt(0, 0, 0); mesh.rotateZ(rot || 0);
       env.add(mesh);
     };
     const S = PARAMS.sheen;
+    // A narrow violet studio light appears only in the reflected highlight.
+    if(PARAMS.violetSheen>0){
+      sheen([-6,3,7],[.55,3.4],P*PARAMS.violetSheen,-.48,0xa99ee9);
+    }
     sheen([7, 7, -7], [12, 12], 0.9 * S, Math.PI);      // top face mirror (behind-right, above)
     sheen([-7, -7, -7], [12, 12], 0.85 * S, 0);         // front-left face mirror (below, left-behind)
     sheen([7, -7, 7], [12, 12], 0.85 * S, 0);           // right face mirror (below, right-front)
@@ -174,7 +179,7 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
 
   // This exporter supplies one uncompressed, indexed mesh (no external buffers).
   // Validate that layout rather than silently misreading a different GLB.
-  const data = await model.arrayBuffer();
+  const data = modelBytes;
   const view = new DataView(data);
   if (view.getUint32(0, true) !== 0x46546c67 || view.getUint32(4, true) !== 2)
     throw new Error('Invalid glass cube GLB');

@@ -18,10 +18,15 @@
       if(entry.isIntersecting)visible.add(entry.target);else visible.delete(entry.target);
       sync(entry.target);
     }
-  },{rootMargin:'120px 0px',threshold:0.01});
+  },{rootMargin:'0px',threshold:0.01});
   videos.forEach(video=>observer.observe(video));
   const update=()=>videos.forEach(sync);
   document.addEventListener('visibilitychange',update);
+  window.addEventListener('pageshow',event=>{
+    if(!event.persisted)return;
+    videos.forEach(video=>desired.delete(video));
+    update();
+  });
   window.addEventListener('cosgral:menu-state',update);
   reduced.addEventListener('change',update);
 })();

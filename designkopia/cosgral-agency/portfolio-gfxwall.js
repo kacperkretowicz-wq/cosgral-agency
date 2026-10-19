@@ -47,7 +47,7 @@
     body.appendChild(closeBtn);
 
     var groups = [], items = [], cards = [], rows = [];
-    var phase = "closed", borrowed = [], anim = 0, fxRaf = 0, current = -1, fx = 0, builtFor = "";
+    var phase = "closed", borrowed = [], anim = 0, fxRaf = 0, current = -1, fx = 0, builtFor = "", panelCloseTimer = 0;
 
     cfg.load().then(function (list) {
       list.forEach(function (g, gi) {
@@ -96,10 +96,10 @@
             card.setAttribute("aria-label", item.client + " — " + item.n);
             var fig = el("span", "pf-gfx__fig");
             var img = el("img");
+            img.loading = "lazy";
             img.src = item.image;
             img.alt = "";
             img.decoding = "async";
-            img.loading = "lazy";
             fig.appendChild(img);
             if (item.badge) fig.appendChild(el("span", "pf-gfx__badge", item.badge));
             card.appendChild(fig);
@@ -121,12 +121,16 @@
     function rowFx() {
       fxRaf = 0;
       var H = window.innerHeight, top = scroller.scrollTop;
-      rows.forEach(function (row) {
-        var c = row.offsetTop + row.offsetHeight / 2 - top - H / 2;
+      var geometry = rows.map(function (row) {
+        return { top: row.offsetTop, height: row.offsetHeight, width: row.scrollWidth };
+      });
+      rows.forEach(function (row, i) {
+        var bounds = geometry[i];
+        var c = bounds.top + bounds.height / 2 - top - H / 2;
         var d = Math.min(1, Math.abs(c) / H);
         var s = 1 - d * 0.16 * fx;
-        var drift = (row.offsetTop - top) * 0.12 * fx * Number(row.dataset.dir);
-        var room = Math.max(0, (row.scrollWidth - window.innerWidth) / 2);
+        var drift = (bounds.top - top) * 0.12 * fx * Number(row.dataset.dir);
+        var room = Math.max(0, (bounds.width - window.innerWidth) / 2);
         drift = Math.max(-room - 40, Math.min(room + 40, drift));
         row.style.transform = "translate3d(" + drift.toFixed(1) + "px,0,0) scale(" + s.toFixed(4) + ")";
       });
@@ -256,8 +260,10 @@
 
     /* ——— The white sheet ——— */
     function show(i) {
+      clearTimeout(panelCloseTimer);
       current = i;
       var item = items[i];
+      releaseMedia();
       media.textContent = "";
       var m;
       if (item.video) {
@@ -274,7 +280,6 @@
         m.alt = item.client + " — " + item.n;
       }
       media.appendChild(m);
-      if (item.video) { var p = m.play(); if (p && p.catch) p.catch(function () { m.muted = true; m.play().catch(function () {}); }); }
       info.textContent = "";
       cfg.describe(item, groups[item.group].data, info, groups[item.group].items.length);
       var nav = el("div", "pf-gfx__nav");
@@ -286,17 +291,34 @@
       info.appendChild(nav);
       if (panel.hidden) {
         panel.hidden = false;
-        requestAnimationFrame(function () { panel.classList.add("is-in"); });
+        requestAnimationFrame(function () { panel.classList.add("is-in"); syncPlayback(); });
       }
+      syncPlayback();
       panel.querySelector(".pf-gfx__x").focus({ preventScroll: true });
+    }
+    function releaseMedia() {
+      var v = media.querySelector("video");
+      if (v) { v.pause(); v.removeAttribute("src"); v.load(); }
+    }
+    function syncPlayback() {
+      var v = media.querySelector("video");
+      if (!v) return;
+      if (document.hidden || panel.hidden || !panel.classList.contains("is-in") || root.classList.contains("is-nav-menu-open")) { v.pause(); return; }
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {
+        if (media.contains(v) && !document.hidden && !panel.hidden && panel.classList.contains("is-in") && !root.classList.contains("is-nav-menu-open")) {
+          v.muted = true; v.play().catch(function () {});
+        }
+      });
     }
     function hideSheet(now) {
       if (panel.hidden) return;
       var v = media.querySelector("video");
       if (v) v.pause();
       panel.classList.remove("is-in");
-      var done = function () { panel.hidden = true; media.textContent = ""; current = -1; };
-      if (now) done(); else setTimeout(done, 650);
+      clearTimeout(panelCloseTimer);
+      var done = function () { panel.hidden = true; releaseMedia(); media.textContent = ""; current = -1; };
+      if (now) done(); else panelCloseTimer = setTimeout(done, 650);
     }
     function stepSheet(d) {
       if (current < 0) return;
@@ -326,6 +348,8 @@
       if (e.key !== "Tab" && e.key !== "Enter" && e.key !== " ") e.stopImmediatePropagation();
     }, true);
     window.addEventListener("resize", function () { if (phase === "open") rowFx(); }, { passive: true });
+    document.addEventListener("visibilitychange", syncPlayback);
+    if (window.MutationObserver) new MutationObserver(syncPlayback).observe(root, { attributes: true, attributeFilter: ["class"] });
   }
 
   function addRows(info, pairs) {

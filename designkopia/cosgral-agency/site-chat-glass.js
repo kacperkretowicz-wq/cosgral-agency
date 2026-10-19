@@ -4,7 +4,7 @@
  * behind it on any ground.
  */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261019editorial14';
 
 (async function () {
   const root = document.documentElement;
@@ -24,6 +24,49 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   });
   if (!canvas) return;
   const stage = canvas.parentElement;
+  const launcher = canvas.closest('.cg-chat-launcher');
+  let stageRect;
+  // Prepare the hidden button shortly before it enters. An opened chat is
+  // always ready immediately; an untouched hero keeps the GPU to itself.
+  function waitForChatApproach() {
+    return new Promise(resolve => {
+      const hero = document.querySelector('#top.home-hero, .home-hero') ||
+        document.querySelector('.portfolio-hero, .about-hero, .gallery-hero, .service-hero') ||
+        document.querySelector('#main > header, #main > section');
+      const ready = () => !hero || launcher?.getAttribute('aria-expanded') === 'true' ||
+        hero.getBoundingClientRect().bottom <= (window.innerHeight || 1) * .70;
+      if (ready()) { resolve(); return; }
+      let pending = 0, finished = false;
+      const observer = launcher && window.MutationObserver ? new MutationObserver(queue) : null;
+      function finish() {
+        finished = true;
+        cancelAnimationFrame(pending);
+        pending = 0;
+        ['scroll', 'resize', 'pageshow'].forEach(type => window.removeEventListener(type, queue));
+        observer?.disconnect();
+        resolve();
+      }
+      function check() {
+        pending = 0;
+        if (!finished && ready()) finish();
+      }
+      function queue() {
+        if (!finished && !pending) pending = requestAnimationFrame(check);
+      }
+      ['scroll', 'resize', 'pageshow'].forEach(type => window.addEventListener(type, queue, { passive: true }));
+      observer?.observe(launcher, { attributes: true, attributeFilter: ['aria-expanded'] });
+    });
+  }
+  await waitForChatApproach();
+  // The existing launcher icon stays interactive during hero shader warmup.
+  if(!reduced&&document.querySelector('#hero-3d')&&!root.classList.contains('has-hero-cube-frame')){
+    await new Promise(resolve=>{
+      const finish=()=>{clearTimeout(timer);window.removeEventListener('cosgral:cube-intro-done',finish);resolve();};
+      const timer=setTimeout(finish,4500);
+      window.addEventListener('cosgral:cube-intro-done',finish,{once:true});
+    });
+  }
+  await new Promise(resolve=>window.requestIdleCallback?requestIdleCallback(resolve,{timeout:1200}):setTimeout(resolve,80));
 
   let renderer;
   try {
@@ -40,10 +83,15 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   const group = new THREE.Group();
   scene.add(group);
 
+  let renderWidth = 0, renderHeight = 0, renderRatio = 0;
   function resize() {
     const r = canvas.getBoundingClientRect();
+    stageRect=r;
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    if (w === renderWidth && h === renderHeight && ratio === renderRatio) return;
+    renderWidth = w; renderHeight = h; renderRatio = ratio;
+    renderer.setPixelRatio(ratio);
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -58,6 +106,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     return;
   }
   seeThrough(glass);
+  await renderer.compileAsync(scene,camera);
   stage.classList.add('has-glass-cube');
 
   /* Same clear glass as Realizacje: the ribbon inside is blacked out and
@@ -108,9 +157,25 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 
   const euler = new THREE.Euler();
   const targetQ = new THREE.Quaternion();
-  let spin = 0.6, leanX = 0, leanY = 0, last = 0, lastRender = 0;
-  const launcher = canvas.closest('.cg-chat-launcher');
+  let spin = 0.6, leanX = 0, leanY = 0, last = 0, lastRender = 0, raf = 0;
   const chatRoot = document.querySelector('.cg-chat-root');
+
+  function canAnimate() {
+    if (document.hidden || (chatRoot && !chatRoot.classList.contains('is-chat-visible'))) return false;
+    const open = launcher?.getAttribute('aria-expanded') === 'true';
+    // Keep one quiet frame while the hero owns the composition. Hover,
+    // keyboard focus and an open conversation resume the button immediately.
+    return !lastRender || open || !root.classList.contains('is-hero-cube-focus') ||
+      !!launcher?.matches(':hover, :focus-within');
+  }
+  function requestFrame() {
+    if (!canAnimate()) {
+      cancelAnimationFrame(raf);
+      raf = 0; last = 0;
+      return;
+    }
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
 
   function readPointer() {
     const ptr = window.cosgralPointer;
@@ -118,7 +183,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     if (ptr.fromOrientation || (window.cosgralOrientation && window.cosgralOrientation.active)) {
       return [clamp(ptr.ny || 0, -1, 1), clamp(ptr.nx || 0, -1, 1)];
     }
-    const r = canvas.getBoundingClientRect();
+    const r = stageRect;
     const px = ptr.x != null ? ptr.x : window.innerWidth / 2;
     const py = ptr.y != null ? ptr.y : window.innerHeight / 2;
     return [
@@ -128,11 +193,14 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
   }
 
   function frame(now) {
-    requestAnimationFrame(frame);
+    raf = 0;
+    if (!canAnimate()) {last=0;return;}
+    const open = launcher && launcher.getAttribute('aria-expanded') === 'true';
+    const interval=1000/30,elapsed=now-lastRender;
+    if(elapsed<interval-.65){requestFrame();return;}
+    // Integrate the time between rendered frames, including skipped rAF ticks.
     const dt = Math.min(0.05, Math.max(0.001, (now - (last || now - 16.7)) / 1000));
     last = now;
-    if (document.hidden || (chatRoot && !chatRoot.classList.contains('is-chat-visible'))) return;
-    const open = launcher && launcher.getAttribute('aria-expanded') === 'true';
     const [ty, tx] = open ? [0, 0] : readPointer();
     leanX += (ty * 0.5 - leanX) * rate(6, dt);
     leanY += (tx * 0.6 - leanY) * rate(6, dt);
@@ -148,15 +216,25 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
     group.quaternion.slerp(targetQ, rate(open ? 5 : 10, dt));
     group.updateMatrixWorld(true);
     /* About thirty frames a second is plenty for a button */
-    if (now - lastRender < 30) return;
-    lastRender = now;
+    lastRender = elapsed>=interval ? now-elapsed%interval : now;
     renderer.render(scene, camera);
-    const r = canvas.getBoundingClientRect();
-    updateLens(r.width, r.height);
+    updateLens(stageRect.width, stageRect.height);
+    requestFrame();
   }
 
-  window.addEventListener('resize', resize, { passive: true });
-  if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { last = 0; resize(); } });
-  requestAnimationFrame(frame);
+  function resizeAndWake() { resize(); requestFrame(); }
+  function resume() { last = 0; if (!document.hidden) resize(); requestFrame(); }
+  window.addEventListener('resize', resizeAndWake, { passive: true });
+  window.addEventListener('pageshow', resume, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(resizeAndWake).observe(stage);
+  if (window.MutationObserver) {
+    const activity = new MutationObserver(requestFrame);
+    activity.observe(root, { attributes: true, attributeFilter: ['class'] });
+    if (chatRoot) activity.observe(chatRoot, { attributes: true, attributeFilter: ['class'] });
+    if (launcher) activity.observe(launcher, { attributes: true, attributeFilter: ['aria-expanded'] });
+  }
+  ['pointerenter', 'pointerleave', 'focusin', 'focusout'].forEach(type =>
+    launcher?.addEventListener(type, requestFrame, { passive: true }));
+  document.addEventListener('visibilitychange', resume);
+  requestFrame();
 })();

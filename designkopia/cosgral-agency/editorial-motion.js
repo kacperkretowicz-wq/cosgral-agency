@@ -1,4 +1,4 @@
-import { createHorizon } from './editorial-horizon.js?v=20261013motion1';
+import { createHorizon, sampleHorizonProgress } from './editorial-horizon.js?v=20261019editorial16';
 
 /* Native flow, a thermal horizon, and artwork entrances that follow the scroll. */
 const root=document.documentElement, preference=matchMedia('(prefers-reduced-motion: reduce)');
@@ -8,6 +8,16 @@ const reduced=root.classList.contains('reduce-motion')||(preference.matches&&!fo
 const gsap=window.gsap, ScrollTrigger=window.ScrollTrigger;
 const gallery=document.querySelector('[data-project-gallery]');
 const clamp=v=>Math.max(0,Math.min(1,v));
+// Fit once per layout change; scrolling only moves the already sized words.
+const runway=document.querySelector('.editorial-runway'),runwayWord=runway?.querySelector('.runway-word');
+function fitRunway(){
+  if(!runwayWord)return;
+  const style=getComputedStyle(runway),size=parseFloat(getComputedStyle(runwayWord).fontSize);
+  const room=runway.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+  const measured=runwayWord.getBoundingClientRect().width;
+  if(measured>0)runwayWord.style.fontSize=`${(size*room/measured).toFixed(3)}px`;
+}
+if(runway){new ResizeObserver(fitRunway).observe(runway);document.fonts?.ready.then(fitRunway);fitRunway();}
 await window.cosgralSmoothScroll?.ready;
 const lenis=window.cosgralSmoothScroll?.lenis;
 document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',event=>{
@@ -28,12 +38,13 @@ document.querySelectorAll('[data-tone-wipe]').forEach(section=>{
   const horizon=createHorizon(section,!animated);horizons.push(horizon);
   if(!animated||section.classList.contains('is-static'))return;
   const state={progress:0};
-  animations.push(gsap.to(state,{progress:1,ease:'none',onUpdate:()=>horizon.update(state.progress),
-    scrollTrigger:{trigger:section,start:'top top',end:'bottom bottom',scrub:.24,invalidateOnRefresh:true}}));
+  const first=!section.classList.contains('tone-wipe--dark');
+  animations.push(gsap.to(state,{progress:1,ease:'none',onUpdate:()=>horizon.update(first?sampleHorizonProgress(state.progress):state.progress),
+    scrollTrigger:{trigger:section,start:'top top',end:'bottom bottom',scrub:first ? .65 : .5,invalidateOnRefresh:true}}));
 });
 if(ScrollTrigger){
   ScrollTrigger.create({id:'shatter-beat',start:()=>innerHeight*.18,end:()=>innerHeight*1.32});
-  ScrollTrigger.create({trigger:'#uslugi',start:'top top',end:'max',
+  ScrollTrigger.create({trigger:'[data-tone-wipe]',start:'bottom bottom',end:'max',
     onToggle:self=>root.classList.toggle('is-ambient-covered',self.isActive)});
   ScrollTrigger.create({trigger:'#uslugi',start:'top 90%',end:'max',
     onToggle:self=>root.classList.toggle('is-gyro-outside-hero',self.isActive)});
@@ -113,32 +124,49 @@ if(animated&&matchMedia('(hover: hover) and (pointer: fine)').matches){
 }
 // Navigation changes tone when the moving boundary passes the fixed controls.
 const lightStart=document.querySelector('[data-tone-wipe]'),lightEnd=document.querySelector('.tone-wipe--dark');
-function lightNavigation(){
-  const a=lightStart.getBoundingClientRect(),b=lightEnd.getBoundingClientRect();
-  function lightAt(x,y){
-    for(const [i,rect] of [a,b].entries()){
-      if(rect.top<=y&&rect.bottom>y){
-        const sticky=(i?lightEnd:lightStart).querySelector('.tone-wipe__sticky').getBoundingClientRect();
-        return horizons[i].isLightAt(x,(y-sticky.top)/sticky.height);
-      }
-    }
-    return a.bottom<=y&&b.top>y;
-  }
-  document.body.classList.toggle('has-light-section',lightAt(.06,48));
+let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null;
+function measureLightNavigation(){
+  const scroll=window.scrollY;
+  lightGeometry=[lightStart,lightEnd].map(el=>{
+    const rect=el.getBoundingClientRect();
+    return {top:rect.top+scroll,bottom:rect.bottom+scroll,height:el.querySelector('.tone-wipe__sticky').offsetHeight};
+  });
   const chat=document.querySelector('.cg-chat-label');
-  const chatY=chat?chat.getBoundingClientRect().top:innerHeight-50;
-  root.classList.toggle('has-light-chat',lightAt(.5,chatY));
-}
-if(ScrollTrigger){
-  ScrollTrigger.create({start:0,end:'max',onUpdate:lightNavigation,onRefresh:lightNavigation});
-  // The shader is scrubbed, so navigation uses the displayed progress as well.
-  if(animated)gsap.ticker.add(lightNavigation);
+  chatLine=chat?chat.getBoundingClientRect().top:innerHeight-45;
   lightNavigation();
 }
+function lightNavigation(){
+  if(lightGeometry.length!==2)return;
+  const scroll=lenis?.scroll??window.scrollY;
+  function lightAt(x,y){
+    const docY=scroll+y;
+    for(let i=0;i<2;i++){
+      const rect=lightGeometry[i];
+      if(rect.top<=docY&&rect.bottom>docY){
+        const stickyTop=Math.max(rect.top-scroll,Math.min(0,rect.bottom-scroll-rect.height));
+        return horizons[i].isLightAt(x,(y-stickyTop)/rect.height);
+      }
+    }
+    return lightGeometry[0].bottom<=docY&&lightGeometry[1].top>docY;
+  }
+  const navLight=lightAt(.06,48),chatLight=lightAt(.5,chatLine);
+  if(navLight!==lastNavLight){lastNavLight=navLight;document.body.classList.toggle('has-light-section',navLight);}
+  if(chatLight!==lastChatLight){lastChatLight=chatLight;root.classList.toggle('has-light-chat',chatLight);}
+}
+if(ScrollTrigger){
+  ScrollTrigger.create({start:0,end:'max',onUpdate:lightNavigation,onRefresh:measureLightNavigation});
+  if(animated)gsap.ticker.add(lightNavigation);
+  measureLightNavigation();
+}
+window.addEventListener('resize',measureLightNavigation,{passive:true});
+window.addEventListener('pageshow',event=>{
+  if(!event.persisted)return;
+  requestAnimationFrame(()=>{lenis?.resize();ScrollTrigger?.refresh();measureLightNavigation();});
+});
 const faqObserver=new ResizeObserver(refresh);
 document.querySelectorAll('.faq-item__a').forEach(el=>faqObserver.observe(el));
 window.addEventListener('cosgral:cube-intro-done',()=>document.body.classList.add('editorial-ready'));
-window.addEventListener('cosgral:langchange',refresh);
+window.addEventListener('cosgral:langchange',event=>{if(event.detail?.layoutChanged!==false)refresh();});
 setTimeout(()=>document.body.classList.add('editorial-ready'),1800);
 ScrollTrigger?.refresh();
 preference.addEventListener('change',event=>{

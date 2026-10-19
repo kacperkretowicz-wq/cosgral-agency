@@ -6,7 +6,24 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 
 (function () {
   /* perf: skip GPU work while the canvas is not on screen (display/visibility/opacity/viewport), checked at most every 300ms */
-  function cgShown(el){var now=performance.now();if(el.__cgT&&now-el.__cgT<300)return el.__cgV;el.__cgT=now;var v=!!el.isConnected;if(v){var cs=getComputedStyle(el);if(cs.display==="none"||cs.visibility==="hidden"||parseFloat(cs.opacity)<0.003)v=false;else{var r=el.getBoundingClientRect();if(r.width<1||r.height<1||r.bottom<=0||r.top>=innerHeight||r.right<=0||r.left>=innerWidth)v=false;}}el.__cgV=v;return v;}
+  function cgShown(el) {
+    var now = performance.now();
+    if (el.__cgT && now - el.__cgT < 300) return el.__cgV;
+    el.__cgT = now;
+    var visible = !!el.isConnected;
+    // The Montaż chapter fades the portal, rather than the canvas itself.
+    for (var node = el; visible && node && node !== document.body; node = node.parentElement) {
+      var style = getComputedStyle(node);
+      var fading = parseFloat(style.opacity) < 0.003 && node.getAnimations?.().some(function (animation) { return animation.playState === 'running'; });
+      if (style.display === "none" || style.visibility === "hidden" || (parseFloat(style.opacity) < 0.003 && !fading)) visible = false;
+    }
+    if (visible) {
+      var rect = el.getBoundingClientRect();
+      visible = rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth;
+    }
+    el.__cgV = visible;
+    return visible;
+  }
 
   "use strict";
 
@@ -413,6 +430,8 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
       var w = layer.renderer.domElement.clientWidth;
       var h = layer.renderer.domElement.clientHeight;
       if (!w || !h) return;
+      if (layer.width === w && layer.height === h) return;
+      layer.width = w; layer.height = h;
       layer.renderer.setSize(w, h, false);
       layer.camera.aspect = w / h;
       layer.camera.updateProjectionMatrix();
@@ -421,6 +440,9 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
 
   window.addEventListener("resize", resize);
   resize();
+  function invalidateVisibility() { backCanvas.__cgT = frontCanvas.__cgT = 0; }
+  new MutationObserver(invalidateVisibility).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(invalidateVisibility).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   function syncPointer() {
@@ -462,9 +484,13 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     return 1 - Math.pow(Math.max(0, 1 - blend), 0.68);
   }
 
+  var sandRaf = 0;
+  function queueSand() { if (!sandRaf && !document.hidden) sandRaf = requestAnimationFrame(animate); }
   function animate() {
-    requestAnimationFrame(animate);
+    sandRaf = 0;
     if (document.hidden) return;
+    queueSand();
+    if (!cgShown(backCanvas) && !cgShown(frontCanvas)) return;
     var menuIsActive = (window.cosgralCube?.getMenuBlend?.() || 0) > 0.001;
     var sectionIndex = window.cosgralPortfolioStepper?.getIndex?.();
     // Keep the existing sand frame while scrolling past the hero. Its tiny
@@ -787,5 +813,10 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
   /* Instant sand before first rAF — no shatter/build on refresh */
   skipIntro(introSectionIndex());
   introBootHandled = true;
+  document.addEventListener('visibilitychange', function () {
+    cancelAnimationFrame(sandRaf); sandRaf = 0;
+    if (!document.hidden) queueSand();
+  });
+  window.addEventListener('pageshow', queueSand);
   animate();
 })();

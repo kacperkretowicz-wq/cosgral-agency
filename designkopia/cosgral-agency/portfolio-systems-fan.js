@@ -90,15 +90,17 @@
   }
 
   function fetchCaseHtml(href) {
-    if (pageCache[href]) return Promise.resolve(pageCache[href]);
-    return fetch(href, { credentials: "same-origin" })
+    if (pageCache[href]) return pageCache[href];
+    pageCache[href] = fetch(href, { credentials: "same-origin" })
       .then(function (r) {
+        if (!r.ok) throw new Error("Case unavailable");
         return r.text();
       })
-      .then(function (html) {
-        pageCache[href] = html;
-        return html;
+      .catch(function (error) {
+        delete pageCache[href];
+        throw error;
       });
+    return pageCache[href];
   }
 
   function extractCaseBody(html) {
@@ -165,6 +167,8 @@
     var vel = 0;
     var raf = 0;
     var autoTimer = 0;
+    var autoRequested = false, autoInView = !window.IntersectionObserver;
+    var autoObserver = null, autoActivity = null, autoChapter = root.closest(".portfolio-chapter");
     var copyEl = null;
     var articleEl = null;
     var articleOpen = false;
@@ -533,8 +537,14 @@
     }
 
     function startAuto() {
+      autoRequested = true;
+      syncAuto();
+    }
+    function syncAuto() {
       stopAuto();
-      if (!autoplay || destroyed) return;
+      if (!autoplay || !autoRequested || destroyed || dragging || document.hidden || !autoInView ||
+          document.documentElement.classList.contains("is-nav-menu-open") ||
+          (autoChapter && document.body.classList.contains("portfolio-page--tiles") && !autoChapter.classList.contains("is-active"))) return;
       autoTimer = window.setInterval(function () {
         if (dragging || destroyed) return;
         index += 0.014;
@@ -645,6 +655,19 @@
     }
     root.addEventListener("wheel", onWheel, { passive: false });
 
+    if (window.IntersectionObserver) {
+      autoObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) { autoInView = entry.isIntersecting; }); syncAuto();
+      });
+      autoObserver.observe(root);
+    }
+    if (window.MutationObserver) {
+      autoActivity = new MutationObserver(syncAuto);
+      autoActivity.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+      if (autoChapter) autoActivity.observe(autoChapter, { attributes: true, attributeFilter: ["class"] });
+    }
+    document.addEventListener("visibilitychange", syncAuto);
+
     layout();
     if (autoplay) startAuto();
 
@@ -658,7 +681,7 @@
       setIndex: function (i) {
         setIndex(i, true);
       },
-      pause: stopAuto,
+      pause: function () { autoRequested = false; stopAuto(); },
       resume: function () {
         if (autoplay) startAuto();
       },
@@ -691,6 +714,9 @@
       destroy: function () {
         destroyed = true;
         stopAuto();
+        if (autoObserver) autoObserver.disconnect();
+        if (autoActivity) autoActivity.disconnect();
+        document.removeEventListener("visibilitychange", syncAuto);
         if (raf) cancelAnimationFrame(raf);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);

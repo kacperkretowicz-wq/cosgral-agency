@@ -49,6 +49,10 @@
 
   window.cosgralPointer = state;
   window.cosgralOrientation = orient;
+  var pointerRaf = 0;
+  function startPointerLoop() {
+    if (!pointerRaf && !document.hidden) pointerRaf = requestAnimationFrame(tick);
+  }
 
   function clamp(v, min, max) {
     return Math.max(min, Math.min(max, v));
@@ -76,6 +80,7 @@
       }
       applyPointer();
     }
+    startPointerLoop();
   }
 
   function onDeviceOrientation(e) {
@@ -91,6 +96,7 @@
     orient.tnx = clamp(dg / ORIENT_GAMMA_RANGE, -1, 1);
     orient.tny = clamp(-db / ORIENT_BETA_RANGE, -1, 1);
     orient.active = true;
+    startPointerLoop();
     state.fromOrientation = true;
     try {
       sessionStorage.setItem(GYRO_KEY, "1");
@@ -232,6 +238,7 @@
   }
 
   function tick() {
+    pointerRaf = 0;
     if (orient.active) {
       state.tnx += (orient.tnx - state.tnx) * 0.22;
       state.tny += (orient.tny - state.tny) * 0.22;
@@ -254,7 +261,10 @@
       state.fromOrientation = false;
     }
     applyPointer();
-    requestAnimationFrame(tick);
+    var remaining = Math.abs(state.tx-state.x)+Math.abs(state.ty-state.y)+
+      1000*(Math.abs(state.tnx-state.nx)+Math.abs(state.tny-state.ny));
+    if (orient.active) remaining = 1000*(Math.abs(orient.tnx-state.nx)+Math.abs(orient.tny-state.ny));
+    if (remaining > 0.03) startPointerLoop();
   }
 
   function armMobileGyro() {
@@ -301,5 +311,9 @@
 
   if (!noGyroPages) armMobileGyro();
   applyPointer();
-  requestAnimationFrame(tick);
+  startPointerLoop();
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { cancelAnimationFrame(pointerRaf); pointerRaf=0; }
+    else startPointerLoop();
+  });
 })();

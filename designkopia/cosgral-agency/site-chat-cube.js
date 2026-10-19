@@ -1,2 +1,2 @@
 /** Live chat button cube — the clear glass cube from Realizacje. */
-import "./site-chat-glass.js?v=20261018perf1";
+import "./site-chat-glass.js?v=20261019perf17";
