@@ -4,7 +4,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surface1';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surface2';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -57,6 +57,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
   const menuQ=new THREE.Quaternion();
   const euler=new THREE.Euler(),v=new THREE.Vector3();
   const corners=Array.from({length:4},()=>new THREE.Vector3());
+  const exitPoint=new THREE.Vector3();
+  const nextSection=document.getElementById('uslugi');
   const path=Array.from({length:4},()=>new THREE.Vector3());
   const wake=createOpticalWake(THREE,wakeScene,1800);
   const profile=createFrameProfile(canvas);
@@ -153,6 +155,19 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
       screenPosition(width*0.06,height*0.07,0.36,menuFrom.position);menuFrom.scale=screenScale(54,0.36);
     }
   }
+  function sectionClearanceFade(){
+    if(!nextSection||!glass)return 1;
+    // Fade the complete model before the section boundary reaches its lowest
+    // projected corner. A z-index change alone would only hide the hard cut.
+    const box=glass.geometry.boundingBox;
+    let bottom=-Infinity;
+    for(let i=0;i<8;i++){
+      exitPoint.set(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z);
+      exitPoint.applyMatrix4(group.matrixWorld).project(fullCamera);
+      bottom=Math.max(bottom,(.5-exitPoint.y*.5)*height);
+    }
+    return smooth(height*.025,height*.20,nextSection.getBoundingClientRect().top-bottom);
+  }
   function faceRect(){
     if(!glass||menuBlend<0.035||!group.visible)return null;
     // The supplied mesh has its smooth faces on Z; X and Y carry the grooves.
@@ -190,7 +205,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
       const previous=glass;
       glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
       glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
-      materialStudy?.dispose();materialStudy=createCubeMaterialStudy(glass,group);
+      materialStudy?.dispose();materialStudy=await createCubeMaterialStudy(glass,group);
       if(previous){
         group.remove(previous);scene.remove(previous.userData.transmissionBackdrop);
         previous.geometry.dispose();previous.material.dispose();previous.userData.environmentTarget?.dispose();
@@ -209,7 +224,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
   try{
     glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
     glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
-    materialStudy=createCubeMaterialStudy(glass,group);
+    materialStudy=await createCubeMaterialStudy(glass,group);
     canvas.parentElement.classList.add('has-glass-model');
   }catch(error){
     canvas.parentElement.classList.add('has-cube-fallback');
@@ -262,15 +277,16 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
       group.position.copy(pose.position);targetQ.copy(pose.quaternion);group.scale.setScalar(pose.scale);
     }
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*24));group.updateMatrixWorld(true);
-    const dissolve=1-smooth(0.76,0.98,progress);
+    const clearance=sectionClearanceFade();
+    const dissolve=(1-smooth(0.76,0.98,progress))*clearance;
     const cubeOpacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
-    materialStudy.update(progress,menuBlend,cubeOpacity);
+    materialStudy.update(progress,menuBlend,cubeOpacity,time);
     group.visible=cubeOpacity>0.008&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');
     const servicesVisible=window.cosgralSand?.servicesVisible;
     const covered=document.documentElement.classList.contains('is-ambient-covered');
-    wake.update({time,progress,menuBlend,scale:pose.scale,pointerX,pointerY,fade:footer||covered?0:0.65});
+    wake.update({time,progress,menuBlend,scale:pose.scale,pointerX,pointerY,fade:footer||covered?0:0.65*THREE.MathUtils.lerp(clearance,1,smooth(0,.2,menuBlend))});
     const portalVisible=!(footer&&menuBlend<0.01);
     if(portalVisible!==lastPortalVisible){canvas.parentElement.style.visibility=portalVisible?'visible':'hidden';lastPortalVisible=portalVisible;}
     if(footer&&menuBlend<0.01)return;

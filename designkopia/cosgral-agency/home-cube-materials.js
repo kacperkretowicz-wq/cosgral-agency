@@ -1,6 +1,6 @@
 /** Test-branch surface studies. The existing hero owns every global transform. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { makeOctants } from './home-cube-fragments.js';
+import { createCubeFluid } from './home-cube-fluid.js?v=20261019fluid2';
 
 const smooth = (a,b,x) => THREE.MathUtils.smoothstep(x,a,b);
 const mix = THREE.MathUtils.lerp;
@@ -29,64 +29,73 @@ const style=document.createElement('style');style.textContent=`
 .cube-material-preview button{appearance:none;border:1px solid transparent;border-radius:3px;padding:9px 10px;background:transparent;color:#bbb;font:inherit;cursor:pointer}
 .cube-material-preview button[aria-pressed="true"]{background:#e5e5df;color:#111}
 .cube-material-preview button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+html.editorial-document .editorial-page .home-cube-portal{z-index:6}
 @media(max-width:600px){.cube-material-preview{left:10px;bottom:10px;max-width:calc(100vw - 20px);gap:0}.cube-material-preview span{display:none}.cube-material-preview button{font-size:10px;padding:10px 8px}}
 `;document.head.append(style);
 
-export function createCubeMaterialStudy(glass,group){
+export async function createCubeMaterialStudy(glass,group){
   const base=glass.material;
-  const initial={metalness:base.metalness,transmission:base.transmission,roughness:base.roughness,env:base.envMapIntensity,iridescence:base.iridescence,dispersion:base.dispersion};
-  const pieces=makeOctants(glass.geometry,base);
-  const meshes=[glass,...pieces];
-  for(const piece of pieces){
-    // Build inward, inside the existing silhouette, rather than moving the hero.
-    const home=piece.userData.home;
-    piece.userData.start=new THREE.Vector3(-home.z*.72,home.x*.72,-home.y*.72);
-    piece.visible=false;group.add(piece);
+  const initial={metalness:base.metalness,transmission:base.transmission,roughness:base.roughness,env:base.envMapIntensity,iridescence:base.iridescence,dispersion:base.dispersion,clearcoat:base.clearcoat};
+  const fluid=await createCubeFluid(glass,group);
+  const matte={value:0},clock={value:0},resolve={value:1};
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for(const [mat,isFluid] of [[base,false],[fluid.mesh.material,true]]){
+    const previous=mat.onBeforeCompile;
+    mat.onBeforeCompile=shader=>{
+      previous(shader);
+      shader.uniforms.uCgMatte=matte;shader.uniforms.uCgStaticTime=clock;
+      shader.uniforms.uCgResolve=resolve;
+      shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
+        uniform float uCgMatte,uCgStaticTime,uCgResolve;
+        float cgSurfaceHash(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
+      `).replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
+        float cgScreenDither=cgSurfaceHash(vec3(floor(gl_FragCoord.xy),17.));
+        ${isFluid?'if(cgScreenDither<uCgResolve)discard;':'if(cgScreenDither>=uCgResolve)discard;'}
+      `).replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+        float cgGrain=cgSurfaceHash(floor(vObjP*165.));
+        float cgFootprint=max(length(dFdx(vObjP)),length(dFdy(vObjP)))*165.;
+        float cgDetail=1./max(1.,cgFootprint*.55);
+        roughnessFactor=clamp(roughnessFactor+(cgGrain-.5)*.34*uCgMatte*cgDetail,.015,.9);
+        float cgMicroHeight=(cgGrain-.5)*.0007*uCgMatte*cgDetail;
+      `).replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+        vec3 cgDx=dFdx(-vViewPosition),cgDy=dFdy(-vViewPosition);
+        vec3 cgR1=cross(cgDy,normal),cgR2=cross(normal,cgDx);
+        float cgDet=dot(cgDx,cgR1);
+        normal=normalize(abs(cgDet)*normal-sign(cgDet)*(dFdx(cgMicroHeight)*cgR1+dFdy(cgMicroHeight)*cgR2));
+      `).replace('#include <dithering_fragment>',`#include <dithering_fragment>
+        // Neutral fine static stays on the object; studio lighting still reads.
+        float cgStatic=cgSurfaceHash(vec3(floor(gl_FragCoord.xy),uCgStaticTime));
+        gl_FragColor.rgb=mix(gl_FragColor.rgb,vec3(cgStatic*.52+.055),uCgMatte*.16);
+      `);
+    };
+    mat.customProgramCacheKey=()=>`cosgral-surface-static-fluid-v2-${isFluid}`;mat.needsUpdate=true;
   }
-  const originalBounds=glass.geometry.boundingBox.clone();
-  const bounds=new THREE.Box3(),partBounds=new THREE.Box3();
-  const fit=new THREE.Vector3(1,1,1);
   return {
-    update(progress,menuBlend,opacity){
+    update(progress,menuBlend,opacity,time){
       // The menu must retain its uninterrupted front face and readable links.
       const inMenu=smooth(0,.22,menuBlend);
-      const chrome=selected==='chrome'?smooth(.15,.80,progress)*(1-inMenu):0;
-      const assembly=selected==='magnetic'&&progress<.50&&inMenu<.999;
-      for(const mesh of meshes){
-        const mat=mesh.material;
-        mat.metalness=mix(initial.metalness,1,chrome);
-        // A nonzero floor retains one transmission shader throughout the scrub.
-        mat.transmission=mix(initial.transmission,.0001,chrome);
-        mat.roughness=mix(initial.roughness,.12,chrome);
-        mat.envMapIntensity=mix(initial.env,1.6,chrome);
-        mat.iridescence=initial.iridescence*(1-chrome);
-        mat.dispersion=initial.dispersion*(1-chrome);
-        mat.opacity=opacity;mat.depthWrite=opacity>.995;
-      }
-      glass.visible=!assembly&&opacity>.008;
-      bounds.makeEmpty();
-      pieces.forEach((piece,i)=>{
-        piece.visible=assembly&&opacity>.008;
-        if(!assembly)return;
-        const t=mix(smooth(.02+i*.035,.25+i*.035,progress),1,inMenu);
-        const free=1-t,a=i*2.399;
-        piece.position.copy(piece.userData.start).lerp(piece.userData.home,t);
-        piece.rotation.set(free*Math.sin(a)*.28,free*Math.cos(a)*.32,free*Math.sin(a*.7)*.18);
-        piece.scale.setScalar(.48+.52*t);piece.updateMatrix();
-        partBounds.copy(piece.geometry.boundingBox).applyMatrix4(piece.matrix);bounds.union(partBounds);
-      });
-      if(assembly){
-        // Fit every vertex into the original local bounds; the hero's global
-        // scale, camera crop, position and rotation are never changed here.
-        fit.set(1,1,1);
-        for(const axis of ['x','y','z']){
-          if(bounds.max[axis]>originalBounds.max[axis])fit[axis]=Math.min(fit[axis],originalBounds.max[axis]/bounds.max[axis]);
-          if(bounds.min[axis]<originalBounds.min[axis])fit[axis]=Math.min(fit[axis],originalBounds.min[axis]/bounds.min[axis]);
-        }
-        const factor=Math.min(fit.x,fit.y,fit.z);
-        for(const piece of pieces){piece.position.multiplyScalar(factor);piece.scale.multiplyScalar(factor);}
-      }
+      // Finish the material story while the cube is still clear of section 2.
+      const phase=Math.min(1,progress/.29);
+      const chrome=selected==='chrome'?smooth(.06,.60,phase)*(1-inMenu):0;
+      matte.value=selected==='chrome'?smooth(.48,.90,phase)*(1-inMenu):0;
+      clock.value=reduced?0:Math.floor(time*5);
+      base.metalness=mix(initial.metalness,1,chrome);
+      base.transmission=mix(initial.transmission,.0001,chrome);
+      base.roughness=mix(mix(initial.roughness,.11,chrome),.43,matte.value);
+      base.envMapIntensity=mix(initial.env,1.8,chrome);
+      base.iridescence=initial.iridescence*(1-chrome);
+      base.dispersion=initial.dispersion*(1-chrome);
+      base.clearcoat=mix(initial.clearcoat,.10,matte.value);
+      base.clearcoatRoughness=mix(0,.38,matte.value);
+      for(const mat of [base,fluid.mesh.material]){mat.opacity=opacity;mat.depthWrite=opacity>.995;}
+      const fluidActive=selected==='magnetic'&&inMenu<.999&&opacity>.008;
+      fluid.update(mix(phase,1,inMenu),reduced?0:time,fluidActive&&(phase<.995||fluid.phase<.995));
+      // Resolve against the surface actually returned by the worker, so a
+      // fast scroll cannot reveal the GLB before the liquid has reached it.
+      resolve.value=selected==='magnetic'?mix(smooth(.90,.995,Math.min(phase,fluid.phase)),1,inMenu):1;
+      fluid.mesh.visible=fluidActive&&resolve.value<.9999;
+      glass.visible=resolve.value>.0001&&opacity>.008;
     },
-    dispose(){for(const piece of pieces){group.remove(piece);piece.geometry.dispose();piece.material.dispose();}}
+    dispose(){fluid.dispose();}
   };
 }
