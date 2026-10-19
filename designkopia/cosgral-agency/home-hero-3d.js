@@ -4,6 +4,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surface1';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -40,7 +41,7 @@ import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2'
   const fullCamera=camera.clone();
   fullCamera.updateMatrixWorld(true);
   const group=new THREE.Group();scene.add(group);
-  let width=1,height=1,mobile=false,glass=null;
+  let width=1,height=1,mobile=false,glass=null,materialStudy=null;
   let tileWidth=0,tileHeight=0,tileMode=false,pixelRatio=1,resizeQueued=false;
   let lastCropX=NaN,lastCropY=NaN,lastPortalVisible=null,wakeWasVisible=false,lastRenderAt=0;
   let menuBlend=0,menuTarget=0,progress=0,lastTime=0;
@@ -148,7 +149,7 @@ import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2'
   }
   function captureMenuPose(){
     menuFrom.position.copy(group.position);menuFrom.quaternion.copy(group.quaternion);menuFrom.scale=group.scale.x;
-    if(!group.visible||!glass?.visible){
+    if(!group.visible){
       screenPosition(width*0.06,height*0.07,0.36,menuFrom.position);menuFrom.scale=screenScale(54,0.36);
     }
   }
@@ -189,6 +190,7 @@ import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2'
       const previous=glass;
       glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
       glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
+      materialStudy?.dispose();materialStudy=createCubeMaterialStudy(glass,group);
       if(previous){
         group.remove(previous);scene.remove(previous.userData.transmissionBackdrop);
         previous.geometry.dispose();previous.material.dispose();previous.userData.environmentTarget?.dispose();
@@ -207,6 +209,7 @@ import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2'
   try{
     glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
     glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
+    materialStudy=createCubeMaterialStudy(glass,group);
     canvas.parentElement.classList.add('has-glass-model');
   }catch(error){
     canvas.parentElement.classList.add('has-cube-fallback');
@@ -260,9 +263,9 @@ import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2'
     }
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*24));group.updateMatrixWorld(true);
     const dissolve=1-smooth(0.76,0.98,progress);
-    glass.material.opacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
-    glass.material.depthWrite=glass.material.opacity>0.995;
-    glass.visible=glass.material.opacity>0.008;group.visible=glass.visible&&introStart!==null;
+    const cubeOpacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
+    materialStudy.update(progress,menuBlend,cubeOpacity);
+    group.visible=cubeOpacity>0.008&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');
     const servicesVisible=window.cosgralSand?.servicesVisible;
