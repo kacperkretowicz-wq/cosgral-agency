@@ -3,14 +3,14 @@ import * as THREE from './vendor/three-0.170.0.module.min.js';
 import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
-import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261015text2';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surface2';
+import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019chrome3';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chrome3';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
   if (!canvas || document.documentElement.classList.contains('reduce-motion')) return;
   const HALF = 1.35;
-  const glassLook={glass:{iridescence:0.12,dispersion:0.25,edgeGlow:0.12,envMapIntensity:1.15,farSideDim:0.38,thickness:0.7},env:{power:1.5,sheen:0.4}};
+  const glassLook={glass:{transmission:1,metalness:0,roughness:.035,iridescence:.08,dispersion:.20,edgeGlow:.13,envMapIntensity:1.15,farSideDim:.4,thickness:.7},env:{power:1.5,sheen:.45}};
   const clamp = THREE.MathUtils.clamp;
   const smooth = (a,b,x) => {const p=clamp((x-a)/(b-a),0,1);return p*p*(3-2*p);};
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -128,26 +128,22 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
     return out.addScaledVector(path[3],t*t*t);
   }
   function scrollProgress(){
-    // One authoritative timeline. Section jump flags cannot reset the model.
-    const st=window.ScrollTrigger?.getById('shatter-beat');
-    if(st&&st.end>st.start){
-      const scrollY=window.cosgralSmoothScroll?.lenis?.scroll??window.scrollY;
-      return clamp((scrollY-st.start)/(st.end-st.start),0,1);
-    }
-    return clamp(window.cosgralSand?.cinema||0,0,1);
+    // The complete study fits in the first screen's scroll, before services.
+    // It is independent of the old downward flight through the runway.
+    const scrollY=window.cosgralSmoothScroll?.lenis?.scroll??window.scrollY;
+    return clamp(scrollY/(height*.86),0,1);
   }
   function buildScrollPose(time){
-    pointOnPath(progress,pose.position);
-    const idle=1-smooth(0,0.10,progress);
-    if(!reduced)pose.position.y+=Math.sin(time*0.60)*0.045*idle;
-    const turn=smooth(0.015,0.95,progress),bank=Math.sin(progress*Math.PI)*0.12;
-    const drift=reduced?0:idle;
-    euler.set(0.15+turn*Math.PI*0.12-pointerY*0.10*idle+Math.sin(time*0.37)*0.065*drift,
-      -0.18+turn*Math.PI*0.34+pointerX*0.16*idle+Math.sin(time*0.29)*0.10*drift,
-      -bank+pointerX*0.020*idle+Math.sin(time*0.41)*0.024*drift);
+    // Lab 01: a fixed vertical anchor, one measured turn, a slight bank and
+    // 12% breathing scale. Keep the real page's original initial pixel size.
+    const h=worldHeight(.36),turn=smooth(0,1,progress),sine=Math.sin(progress*Math.PI);
+    const drift=reduced?0:Math.sin(time*.52)*.025;
+    screenPosition(width*.5,height*(mobile?.31:.30),.36,pose.position);
+    pose.position.x+=smooth(.2,1,progress)*h*(mobile?.075:.16);
+    euler.set(.48+drift-pointerY*.07+sine*.22,
+      -.67+pointerX*.12+turn*Math.PI*1.15,-sine*.12);
     pose.quaternion.setFromEuler(euler);
-    const grow=1+Math.sin(progress*Math.PI)*(mobile?0.14:0.22);
-    pose.scale=screenScale(heroSize(),0.36)*grow*(1-smooth(0.75,1,progress)*0.22)*(1+Math.sin(time*0.60)*0.009*drift);
+    pose.scale=screenScale(heroSize(),.36)*(1+sine*.12);
   }
   function captureMenuPose(){
     menuFrom.position.copy(group.position);menuFrom.quaternion.copy(group.quaternion);menuFrom.scale=group.scale.x;
@@ -185,7 +181,9 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
   }
   function beginIntro(){if(introStart===null)introStart=performance.now();}
   window.cosgralCube={
-    group,debug:{renderer,scene,camera,renderFrame:()=>renderer.render(scene,camera),fxaa:false},
+    group,debug:{renderer,scene,camera,renderFrame:()=>renderer.render(scene,camera),fxaa:false,
+      get chrome(){return {progress,metalness:glass?.material.metalness,roughness:glass?.material.roughness,
+        transmission:glass?.material.transmission,opacity:glass?.material.opacity,paper:window.cosgralChromeStudio?.paper};}},
     introDone:()=>introDone,forceIntro:beginIntro,getMenuBlend:()=>menuBlend,
     getMenuFaceRect:faceRect,getMenuFaceAnchorRect:()=>null,
     getMenuOpenDuration:()=>1.25,getMenuCloseDuration:()=>0.8,getMenuLinksDelay:()=>0.35,
@@ -241,12 +239,12 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
     const dt=Math.min(0.05,Math.max(0.001,(now-(lastTime||now-16.7))/1000));lastTime=now;
     if(document.hidden||contextLost)return;
     profile?.frame(now);
-    const blend=1-Math.exp(-dt*14),pointer=window.cosgralPointer;
+    const blend=1-Math.exp(-dt*8),pointer=window.cosgralPointer;
     const pointerMoving=Math.abs((pointer?.nx||0)-pointerX)+Math.abs((pointer?.ny||0)-pointerY)>0.004;
     pointerX+=((pointer?.nx||0)-pointerX)*blend;pointerY+=((pointer?.ny||0)-pointerY)*blend;
     const nextProgress=scrollProgress();
     const scrollMoving=Math.abs(nextProgress-progress)>0.0004;
-    progress+=(nextProgress-progress)*(1-Math.exp(-dt*24));
+    progress+=(nextProgress-progress)*(1-Math.exp(-dt*8));
     menuBlend+=(menuTarget-menuBlend)*(1-Math.exp(-dt*(menuTarget?4.5:7)));
     if(Math.abs(menuTarget-menuBlend)<0.0001)menuBlend=menuTarget;
     const time=now/1000;buildScrollPose(time);
@@ -255,7 +253,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
     if(!introDone&&progress<0.01&&menuBlend<0.01){
       pose.position.x+=(1-intro)*worldHeight(0.36)*camera.aspect*0.8;
       pose.position.y-=(1-intro)*worldHeight(0.36)*0.45;
-      pose.quaternion.setFromEuler(euler.set(0.15+(1-intro)*0.25,-0.18-(1-intro)*0.55,(1-intro)*0.15));
+      pose.quaternion.setFromEuler(euler.set(.48+(1-intro)*.25,-.67-(1-intro)*.55,(1-intro)*.15));
       pose.scale*=0.78+intro*0.22;
     }
     if(menuBlend>0){
@@ -276,17 +274,15 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019surf
     }else{
       group.position.copy(pose.position);targetQ.copy(pose.quaternion);group.scale.setScalar(pose.scale);
     }
-    group.quaternion.slerp(targetQ,1-Math.exp(-dt*24));group.updateMatrixWorld(true);
+    group.quaternion.slerp(targetQ,1-Math.exp(-dt*14));group.updateMatrixWorld(true);
     const clearance=sectionClearanceFade();
-    const dissolve=(1-smooth(0.76,0.98,progress))*clearance;
+    const dissolve=(1-smooth(.76,.98,progress))*clearance;
     const cubeOpacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
     materialStudy.update(progress,menuBlend,cubeOpacity,time);
     group.visible=cubeOpacity>0.008&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');
-    const servicesVisible=window.cosgralSand?.servicesVisible;
-    const covered=document.documentElement.classList.contains('is-ambient-covered');
-    wake.update({time,progress,menuBlend,scale:pose.scale,pointerX,pointerY,fade:footer||covered?0:0.65*THREE.MathUtils.lerp(clearance,1,smooth(0,.2,menuBlend))});
+    wake.update({time,progress,menuBlend,scale:pose.scale,pointerX,pointerY,fade:0});
     const portalVisible=!(footer&&menuBlend<0.01);
     if(portalVisible!==lastPortalVisible){canvas.parentElement.style.visibility=portalVisible?'visible':'hidden';lastPortalVisible=portalVisible;}
     if(footer&&menuBlend<0.01)return;

@@ -21,6 +21,7 @@
     precision mediump float;
     uniform vec2 uRes;
     uniform float uTime;
+    uniform float uChromePaper;
     uniform vec2 uMouse;
 
     float wave(vec2 p, float t) {
@@ -81,6 +82,9 @@
 
       col = ((col - 0.5) * 1.04 + 0.5) * 0.78;
 
+      float chromeMask=1.0-smoothstep(.36,.86,1.0-uv.y);
+      vec3 chromeLight=vec3(.91,.905,.88)-smoothstep(.05,1.25,uv.x+uv.y*.25)*.055;
+      col=mix(col,chromeLight,uChromePaper*chromeMask);
       gl_FragColor = vec4(col, 1.0);
     }
   `;
@@ -132,6 +136,7 @@
   var uRes = gl.getUniformLocation(program, "uRes");
   var uTime = gl.getUniformLocation(program, "uTime");
   var uMouse = gl.getUniformLocation(program, "uMouse");
+  var uChromePaper = gl.getUniformLocation(program, "uChromePaper");
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
@@ -198,6 +203,7 @@
     window.cosgralAmbientFrame.at = now;
     gl.uniform1f(uTime, window.cosgralAmbientFrame.time);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.uniform1f(uChromePaper, window.cosgralChromeStudio?.paper || 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     requestAnimationFrame(frame);

@@ -84,6 +84,7 @@ export function createHeroLensText(THREE) {
   }
 
   window.addEventListener('cosgral:cube-intro-done', queueDraw);
+  window.addEventListener('cosgral:chrome-tone', queueDraw);
   window.addEventListener('cosgral:langchange', () => window.setTimeout(queueDraw, 60));
   window.addEventListener('cosgral:i18n-ready', queueDraw);
   window.addEventListener('resize', queueDraw, { passive: true });

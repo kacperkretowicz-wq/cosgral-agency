@@ -1,60 +1,54 @@
-# Kostka — materiały na oryginalnej stronie
+# Szkło → chrom + Bezwładność — rewizja 3
 
-Baza: `a24c43d37b64f3634826977c829a486b120fdc8d`.
-Gałąź: `test/cube-chrome-magnetic`.
+Baza strony: `a24c43d37b64f3634826977c829a486b120fdc8d`.
+Gałąź: `test/cube-chrome-magnetic` (zachowana nazwa istniejącej gałęzi).
 Źródła: `designkopia/cosgral-agency`.
 
-## Podgląd
+## Bieżący zakres
 
-Uruchom serwer HTTP z katalogu źródeł, np. `python -m http.server 8798 --bind 127.0.0.1`.
+Użytkownik wybrał dalszą pracę wyłącznie nad szkłem → chromem.
+Aktualna strona nie pokazuje przełącznika ani montażu magnetycznego i nie ładuje
+modułu cieczy, Workera, pola 96³ ani geometrii fragmentów. Ich wcześniejsze
+pliki i commity pozostają historią eksperymentu.
 
-- `/?forceMotion=1&cube=chrome` — szkło → chrom (domyślny).
-- `/?forceMotion=1&cube=magnetic` — magnetyczny montaż.
-- `/?forceMotion=1&cube=original` — oryginał do porównania.
+Podgląd: `http://127.0.0.1:8796/?forceMotion=1&cube=chrome&rev=3`.
+Osobne laboratorium odniesienia: `http://127.0.0.1:8797/?v=5` (materiał),
+`http://127.0.0.1:8797/?v=1` (ruch). Źródło odniesienia: `outputs/cube-lab/lab.js`
+z rozmowy, poza repozytorium.
 
-Przełącznik w lewym dolnym rogu działa bez przeładowania i bez resetowania scrolla.
+## Ruch z wariantu 01
 
-## Zakres
+Stała wysokość: 30% ekranu desktop / 31% mobile. Bez starego lotu w dół przez
+runway ani uciekania poza ekran. Ten sam początkowy rozmiar w pikselach co na
+stronie bazowej. Bazowe kąty 0,48 / -0,67; obrót Y `smoothstep(p) * PI * 1,15`,
+kołysanie X `sin(p * PI) * 0,22`, bank Z `-sin(p * PI) * 0,12`.
+Skala oddycha o maks. 12%. Przesunięcie poziome 0,16 wysokości świata,
+zmniejszone do 0,075 na telefonie. Dryf `sin(time * 0,52) * 0,025` oraz reakcja
+na kursor 0,07 / 0,12. Tłumienie progress i kursora: `1 - exp(-dt * 8)`.
 
-Zachowane są oryginalne `heroSize`, `screenScale`, `updatePath`,
-`buildScrollPose`, intro i reakcja na kursor z commita bazowego.
-Nie przeniesiono osobnej choreografii ani tła z laboratorium.
+Oś trwa 86% wysokości viewportu przewinięcia od góry. Zanik pozostaje zależny
+od faktycznej odległości do sekcji usług i zaczyna się także przy 76% osi.
+Kostka nie jest przycinana granicą sekcji. Menu zachowuje swoje istniejące
+transformacje i wraca do szkła.
 
-## Rewizja 2 — matowy chrom i ciecz bez grawitacji
+## Materiał z wariantu 05
 
-Obie historie materiałowe kończą się przy 29% dotychczasowej osi scrolla,
-zanim tor kostki zbliży się do drugiej sekcji. Nie wydłużają ruchu głównej grupy.
+Krzywe `metal = smoothstep(0,15; 0,80; p)` i
+`paper = smoothstep(0,12; 0,82; p)`, dopasowane do widocznego fragmentu hero
+przez `p = progress / 0,80`. Roughness 0,035 → 0,12, transmission 1 → 0,0001,
+metalness 0 → 1. Intensywność środowiska jak w laboratorium:
+`lerp(1,15 + paper * 0,3; 1,6; metal)`. Parametry studia, dyspersji,
+irydescencji i krawędzi odtworzone z wersji laboratoryjnej.
 
-Szkło → chrom: najpierw odbijający metal, potem matowe srebro o chropowatości
-0,43, drobnej losowej strukturze chropowatości i normalnych, zmniejszonej
-warstwie lakieru oraz subtelnym monochromatycznym szumie 5 Hz na obiekcie.
-Ustawienie ograniczonego ruchu zatrzymuje szum.
+Końcowe mikroziarno zmienia normalne i chropowatość (do ok. 0,175),
+nie dopisuje losowych pikseli do gotowego koloru. Brak migotania i nakładki TV.
+Światło tła rozjaśnia górną część hero i przechodzi w istniejące ciemne tło
+poniżej. Ten sam kolor jest używany w buforze transmisji, z uwzględnieniem
+zaciemniającej warstwy strony. Kolor tekstu hero dostosowuje się do oświetlenia.
 
-Magnetyczny montaż: osiem miękkich, asymetrycznie rozmieszczonych skupisk
-dryfuje w trzech osiach. Ich pole gęstości tworzy jedną ciągłą powierzchnię,
-więc przy zbliżaniu faktycznie powstają szyjki i połączenia między kroplami.
-Z postępem scrolla pole przechodzi w pole odległości oryginalnego znaku.
-Nie jest to sfera z nałożonym logo. Docelowe pole 96³ jest wypiekane z GLB
-przez `scripts/generate-cube-field.py` (numpy/scipy). Generowanie powierzchni:
-Three.js r170 MarchingCubes, 80³ desktop / 64³ mobile, maksymalnie 30 aktualizacji
-geometrii na sekundę, w osobnym Web Workerze. Bufory są przekazywane i używane
-ponownie; scroll i render nie czekają na obliczenia geometrii. Ostatnie 10% przejścia odsłania oryginalny GLB przez
-komplementarną maskę ditheringu, aby zachować jego szczegóły i uniknąć podwójnej
-przezroczystości. Scroll wstecz odtwarza rozdzielenie w odwrotnej kolejności.
+## Stan
 
-Wygaszanie: projekcja ośmiu narożników kostki wyznacza jej dolną krawędź
-w ekranie. Kostka oraz optyczny ślad zanikają, gdy odstęp od sekcji `#uslugi`
-maleje z 20% do 2,5% wysokości ekranu. Warstwa kostki jest nad sekcją usług,
-co chroni przed jej ostrym odcięciem podczas szybkiego scrolla. Fade pozostaje
-odwracalny. Materiały kończą transformację przed tą granicą.
-
-W menu oba efekty wracają do pełnego szklanego obiektu, aby zachować powierzchnię
-z linkami. Odtworzenie kontekstu WebGL odbudowuje także fragmenty.
-
-Pliki: `home-cube-materials.js`, `home-cube-fluid.js`, `home-cube-fluid-worker.js`, pole
-`assets/glass-cube/logo-field-96.bin`, vendor MarchingCubes, integracja
-w `home-hero-3d.js` i zmiana wersji modułu w `index.html`.
-
-Implementacja na gałęzi testowej. Bez publikacji na produkcję.
-Nie uruchamiano testów. Podgląd przeglądarki nie był dostępny w tej sesji:
-lokalne sterowanie przeglądarką jest wyłączone w ustawieniach Work.
+Implementacja na gałęzi testowej. Brak publikacji na produkcję.
+Nie uruchamiano zestawów testów. Ocena wizualna wymaga dostępnej przeglądarki;
+w trakcie implementacji narzędzie nadal zgłaszało wyłączone lokalne sterowanie
+w Work, mimo deklaracji użytkownika, że je włączy.
