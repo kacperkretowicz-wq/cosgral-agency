@@ -168,7 +168,7 @@
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
   var start = performance.now();
-  window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse };
+  window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse, render: function (now) { frame(now, true); } };
   var lastFrameTime = 0;
   var qualityTier = 0, coveredPainted = false;
 
@@ -200,27 +200,32 @@
     });
   }
 
-  function frame(now) {
+  function frame(now, external) {
+    external = external === true;
+    function schedule() { if (!external) requestAnimationFrame(frame); }
     if (!running) return;
+    var studio = window.cosgralChromeStudio;
+    // The hero owns both draws once its model is ready: no one-frame gap
+    // between the projected cube contact and the liquid surface underneath it.
+    if (studio?.synchronized && !external) { schedule(); return; }
     if (document.documentElement.classList.contains("is-nav-menu-open")) {
-      requestAnimationFrame(frame);
+      schedule();
       return;
     }
-    var studio = window.cosgralChromeStudio;
     if(!studio?.covered)coveredPainted=false;
-    if(studio?.covered&&coveredPainted){requestAnimationFrame(frame);return;}
+    if(studio?.covered&&coveredPainted){schedule();return;}
 
     // Kiedy użytkownik jest w sekcji Kontakt lub Stopka, nieprzezroczyste tło (#030303)
     // całkowicie zasłania ten canvas — wstrzymujemy rysowanie (0% GPU/CPU na dole strony).
     if ((document.documentElement.classList.contains("is-footer-covered") || document.documentElement.classList.contains("is-ambient-covered"))) {
-      requestAnimationFrame(frame);
+      schedule();
       return;
     }
 
     // Limit 60 FPS dla monitorów 144Hz/240Hz, aby nie przepalać GPU
     var interval = hasFunnel ? (qualityTier===2 ? 30 : studio?.moving ? 14 : 30) : 14;
-    if (now - lastFrameTime < interval) {
-      requestAnimationFrame(frame);
+    if (!external && now - lastFrameTime < interval) {
+      schedule();
       return;
     }
     lastFrameTime = now;
@@ -246,7 +251,7 @@
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     if(studio?.covered)coveredPainted=true;
 
-    requestAnimationFrame(frame);
+    schedule();
   }
 
   function play() {

@@ -1,128 +1,107 @@
-/** Mirrors the real hero headline onto a canvas texture so the glass cube's
- * transmission pass can show the actual DOM text (plain, undistorted, in
- * cosgral-glass-cube.js) instead of only the procedural ambient-background ribbon. */
+/** Capture the real DOM behind the lens in the same frame as transmission.
+ * Only the small region around the cube is uploaded, at native text detail. */
 export function createHeroLensText(THREE) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 2;
-  canvas.height = 2;
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.generateMipmaps = false;
-  texture.minFilter = THREE.LinearFilter;
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=2;
+  const texture=new THREE.CanvasTexture(canvas);
+  texture.generateMipmaps=false;texture.minFilter=THREE.LinearFilter;
+  const rect=new THREE.Vector4(0,0,1,1),ctx=canvas.getContext('2d');
+  const title=document.querySelector('.home-hero__title');
+  const targets=Array.from(document.querySelectorAll('.home-hero__title,.home-hero__tagline,.hero-notes span,.hero-scroll span,.hero-caption__right,#rozpad .runway-word'));
+  const layouts=new WeakMap();
+  let active=false,revision=0,lastKey='',hasInk=false,uploads=0;
+  const invalidate=()=>{revision++;lastKey='';};
+  window.addEventListener('resize',invalidate,{passive:true});
+  window.visualViewport?.addEventListener('resize',invalidate,{passive:true});
+  window.addEventListener('cosgral:langchange',invalidate);
+  window.addEventListener('cosgral:i18n-ready',invalidate);
+  window.addEventListener('cosgral:chrome-tone',invalidate);
+  document.fonts?.ready.then(invalidate);
 
-  if (document.documentElement.classList.contains('reduce-motion')) return { texture, setActive() {} };
-
-  const ctx = canvas.getContext('2d');
-  let queued = false, active = false, dirty = true, lastDrawAt = -Infinity, timer = 0;
-
-  // Every text element the cube's flight path can visually cross while it's
-  // on screen — not just the hero title. #rozpad's runway word is the same
-  // element "shatter-beat" (the cube's own scroll timeline) is built around,
-  // so the cube reliably passes right over it.
-  const targets = [
-      document.querySelector('.home-hero__title'),
-      document.querySelector('.home-hero__tagline'),
-      document.querySelector('#rozpad .runway-word')
-    ].filter(Boolean);
-
-  function draw() {
-    queued = false;
-    if (!active) return;
-    dirty = false;lastDrawAt = performance.now();
-    const els = targets;
-    if (!els.length) return;
-    const w = Math.max(1, window.innerWidth);
-    const h = Math.max(1, window.innerHeight);
-    // This texture is only seen inside a small glass object, not fullscreen.
-    const dpr = Math.min(window.devicePixelRatio || 1, 1, 1536 / w, 1024 / h);
-    const pw = Math.round(w * dpr);
-    const ph = Math.round(h * dpr);
-    if (canvas.width !== pw || canvas.height !== ph) {
-      canvas.width = pw;
-      canvas.height = ph;
+  function words(element,box){
+    let cached=layouts.get(element);
+    if(cached&&cached.revision===revision&&cached.width===box.width&&cached.height===box.height)return cached.words;
+    const list=[],walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT);
+    for(let node=walker.nextNode();node;node=walker.nextNode()){
+      const style=getComputedStyle(node.parentElement);
+      if(style.visibility==='hidden'||style.display==='none')continue;
+      const font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      ctx.font=font;
+      const metrics=ctx.measureText('Hg');
+      const ascent=metrics.fontBoundingBoxAscent??parseFloat(style.fontSize)*.8;
+      const descent=metrics.fontBoundingBoxDescent??parseFloat(style.fontSize)*.2;
+      const range=document.createRange();
+      for(const match of node.textContent.matchAll(/\S+/g)){
+        range.setStart(node,match.index);range.setEnd(node,match.index+match[0].length);
+        const word=range.getBoundingClientRect();
+        if(!word.width||!word.height)continue;
+        let text=match[0];
+        if(style.textTransform==='uppercase')text=text.toLocaleUpperCase('pl');
+        else if(style.textTransform==='lowercase')text=text.toLocaleLowerCase('pl');
+        list.push({text,font,color:style.color,spacing:style.letterSpacing,
+          x:word.left-box.left,y:word.top-box.top,width:word.width,height:word.height,
+          baseline:(word.height-ascent-descent)*.5+ascent});
+      }
     }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    for (const el of els) {
-      const rect = el.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0 || rect.bottom < 0 || rect.top > h) continue;
-      const cs = getComputedStyle(el);
-      const opacity = parseFloat(cs.opacity);
-      if (!(opacity > 0.05)) continue;
-      ctx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-      try { ctx.letterSpacing = cs.letterSpacing; } catch (e) { /* unsupported — tighter text, still readable */ }
-      ctx.globalAlpha = opacity;
-
-      // Split into colored runs so inline emphasis (e.g. <em>KODUJEMY.</em>)
-      // keeps its own color instead of the whole line flattening to one.
-      const runs = [];
-      el.childNodes.forEach((node) => {
-        const text = node.textContent || '';
-        if (!text) return;
-        const color = node.nodeType === 1 ? getComputedStyle(node).color : cs.color;
-        runs.push({ text, color });
-      });
-      if (!runs.length) continue;
-      const widths = runs.map((r) => ctx.measureText(r.text).width);
-      const totalWidth = widths.reduce((a, b) => a + b, 0);
-      let x = rect.left + rect.width / 2 - totalWidth / 2;
-      const cy = rect.top + rect.height / 2;
-      runs.forEach((r, i) => {
-        ctx.fillStyle = r.color;
-        ctx.fillText(r.text, x, cy);
-        x += widths[i];
-      });
-    }
-    ctx.globalAlpha = 1;
-    texture.needsUpdate = true;
+    layouts.set(element,{revision,width:box.width,height:box.height,words:list});
+    return list;
   }
-
-  function queueDraw() {
-    dirty = true;
-    if (!active || queued || timer) return;
-    const wait = 32 - (performance.now() - lastDrawAt);
-    if (wait > 0) {timer = setTimeout(() => {timer = 0;queueDraw();}, wait);return;}
-    queued = true;
-    requestAnimationFrame(draw);
+  function opacity(element,cache){
+    if(!element||element===document.body)return 1;
+    if(cache.has(element))return cache.get(element);
+    const style=getComputedStyle(element);
+    const alpha=style.visibility==='hidden'||style.display==='none'?0:Number(style.opacity)*opacity(element.parentElement,cache);
+    cache.set(element,alpha);return alpha;
   }
-
-  window.addEventListener('cosgral:cube-intro-done', queueDraw);
-  window.addEventListener('cosgral:chrome-tone', queueDraw);
-  window.addEventListener('cosgral:langchange', () => window.setTimeout(queueDraw, 60));
-  window.addEventListener('cosgral:i18n-ready', queueDraw);
-  window.addEventListener('resize', queueDraw, { passive: true });
-  window.visualViewport?.addEventListener('resize', queueDraw, { passive: true });
-  document.fonts?.ready.then(queueDraw);
-
-  // Some targets (e.g. #rozpad's runway word) use a scroll-scrubbed reveal —
-  // their opacity/position changes continuously as you scroll, not just once.
-  // A one-time capture goes stale the moment the user keeps scrolling, so
-  // redraw on every scroll tick too (queueDraw already dedupes to one rAF).
-  window.addEventListener('scroll', queueDraw, { passive: true });
-  window.cosgralSmoothScroll?.lenis?.on?.('scroll', queueDraw);
-
-  // The hero's own reveal (preloader exit, editorial-motion fade-in) can still be
-  // mid-transition when the triggers above fire, leaving this canvas captured
-  // blank. Catch the moment the real text actually becomes visible...
-  const readyObserver = new MutationObserver(() => {
-    if (document.documentElement.classList.contains('editorial-ready') ||
-        document.body.classList.contains('is-ready') ||
-        document.body.classList.contains('editorial-ready')) {
-      window.setTimeout(queueDraw, 300);
-      readyObserver.disconnect();
-    }
-  });
-  readyObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-  readyObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-
-  // Initial font/reveal changes only queue a capture while glass is visible.
-  [0, 400, 1200, 2500, 4000].forEach((delay) => window.setTimeout(queueDraw, delay));
-
-  return { texture, redraw: queueDraw, setActive(value) {
-    if (active === value) return;
-    active = value;
-    if (!active) {clearTimeout(timer);timer = 0;}
-    else if (dirty) queueDraw();
-  }};
+  return {
+    texture,rect,redraw:invalidate,
+    setActive(value){active=value;},
+    headlineClearance(bounds){
+      if(!title)return 1;
+      const box=title.getBoundingClientRect();
+      if(!box.width)return 1;
+      const dx=Math.max(0,box.left-bounds.right,bounds.left-box.right);
+      const dy=Math.max(0,box.top-bounds.bottom,bounds.top-box.bottom);
+      return THREE.MathUtils.smoothstep(Math.hypot(dx,dy),24,Math.max(72,innerHeight*.14));
+    },
+    sync({x,y,width,height,viewportWidth,viewportHeight}){
+      if(!active||!ctx)return;
+      const left=Math.max(0,Math.floor(x-32)),top=Math.max(0,Math.floor(y-32));
+      const right=Math.min(viewportWidth,Math.ceil(x+width+32)),bottom=Math.min(viewportHeight,Math.ceil(y+height+32));
+      const w=Math.max(1,right-left),h=Math.max(1,bottom-top);
+      rect.set(left/viewportWidth,1-(top+h)/viewportHeight,w/viewportWidth,h/viewportHeight);
+      const visible=[],alphas=new Map();
+      for(const element of targets){
+        const box=element.getBoundingClientRect();
+        if(box.right<=left||box.left>=right||box.bottom<=top||box.top>=bottom)continue;
+        const alpha=opacity(element,alphas);
+        if(alpha<.004)continue;
+        visible.push({box,alpha,words:words(element,box)});
+      }
+      if(!visible.length){
+        if(hasInk){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);texture.needsUpdate=true;uploads++;hasInk=false;}
+        lastKey='';return;
+      }
+      const scale=Math.min(window.devicePixelRatio||1,2,1280/Math.max(w,h));
+      const key=[revision,left,top,w,h,scale,...visible.flatMap(v=>[v.box.left.toFixed(2),v.box.top.toFixed(2),v.alpha.toFixed(3)])].join('|');
+      if(key===lastKey)return;
+      lastKey=key;
+      const pw=Math.max(1,Math.round(w*scale)),ph=Math.max(1,Math.round(h*scale));
+      if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}
+      ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,pw,ph);
+      ctx.setTransform(scale,0,0,scale,-left*scale,-top*scale);
+      ctx.textAlign='left';ctx.textBaseline='alphabetic';
+      for(const entry of visible){
+        ctx.globalAlpha=entry.alpha;
+        for(const word of entry.words){
+          const px=entry.box.left+word.x,py=entry.box.top+word.y;
+          if(px+word.width<left||px>right||py+word.height<top||py>bottom)continue;
+          ctx.font=word.font;ctx.fillStyle=word.color;
+          if('letterSpacing' in ctx)ctx.letterSpacing=word.spacing==='normal'?'0px':word.spacing;
+          ctx.fillText(word.text,px,py+word.baseline);
+        }
+      }
+      ctx.globalAlpha=1;texture.needsUpdate=true;uploads++;hasInk=true;
+    },
+    get debug(){return {active,uploads,buffer:[canvas.width,canvas.height]};}
+  };
 }

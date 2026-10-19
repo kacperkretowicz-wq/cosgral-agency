@@ -1,8 +1,8 @@
 /** Lab 05 glass/chrome material, paired with lab 01 inertia on the real page. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
 const smooth=(a,b,x)=>THREE.MathUtils.smoothstep(x,a,b),mix=THREE.MathUtils.lerp;
-const url=new URL(location.href);url.searchParams.set('cube','chrome');url.searchParams.set('rev','8');history.replaceState(null,'',url);
-const studio=window.cosgralChromeStudio={paper:0,boundary:2,funnel:new Float32Array([.5,.45,.18,0]),elastic:new Float32Array(2),shape:new Float32Array([2,0,.4,0]),covered:false,moving:false};
+const url=new URL(location.href);url.searchParams.set('cube','chrome');url.searchParams.set('rev','9');history.replaceState(null,'',url);
+const studio=window.cosgralChromeStudio={paper:0,boundary:2,funnel:new Float32Array([.5,.45,.18,0]),elastic:new Float32Array(2),shape:new Float32Array([2,0,.4,0]),covered:false,moving:false,synchronized:false};
 const style=document.createElement('style');
 style.textContent=`
 html.editorial-document .editorial-page .home-cube-portal{z-index:6}
@@ -61,38 +61,33 @@ export function createCubeMaterialStudy(glass,initialProgress=0){
     vec2 funnelUv=cgFunnelWarp(uv,funnelOptics,uRes,uChromeFunnelFrame);
     vec2 p=funnelUv*vec2(2.8,2.0);
   `);
-  backdrop.fragmentShader=backdrop.fragmentShader.replace('vec4 textSample = texture2D(uText, uv);',`
+  backdrop.fragmentShader=backdrop.fragmentShader.replace('vec4 textSample = cgTextSample(uv);',`
     col=cgFunnelPaint(col,uv,uRes,uChromeFunnelFrame,uChromeBoundary,uChromePaper,funnelOptics);
     col*=.6+.4*uChromePaper;
-    vec4 textSample = texture2D(uText, uv);
+    vec4 textSample = cgTextSample(uv);
   `);
   backdrop.needsUpdate=true;
-  let light=false,lastPaper=-1,lastShade=-1,nextToneAt=0,lastProgress=-1;
+  let light=false,lastShade=-1,nextToneAt=0,lastProgress=-1;
+  let metalState=smooth(.34,.62,initialProgress),materialMoving=false;
   return {
-    get moving(){return spring.moving;},
+    get moving(){return spring.moving||materialMoving;},
     get pull(){return studio.elastic[0];},
     get lift(){return spring.lift;},
-    clipPath(width,height,progress,menuBlend){
-      // Release the occlusion while the model still clears the liquid. It
-      // must lift in front of the retreating surface, rather than disappear.
-      if(progress<.35||spring.lift>.015||menuBlend>.001)return 'none';
-      const points=['0px 0px',`${width}px 0px`],aspect=width/height;
-      for(let i=56;i>=0;i--){
-        const x=i/56,y=Math.min(studio.boundary-.012,funnel.surface(x,aspect,studio.funnel,studio.shape,studio.elastic));
-        points.push(`${(x*width).toFixed(1)}px ${Math.max(-8,Math.min(height+8,y*height)).toFixed(1)}px`);
-      }
-      return `polygon(${points.join(',')})`;
-    },
-    update(progress,menuBlend,boundary,guard,frame,dt,inputProgress){
+    update({progress,menuBlend,boundary,guard,frame,dt,inputProgress,headlineClearance=1}){
       const menu=smooth(0,.2,menuBlend);
-      funnel.profile(frame,boundary,studio.shape);
+      funnel.profile(frame,boundary,studio.shape,guard,spring.finish);
       studio.elastic.set(spring.update(frame,studio.shape,guard,dt,menu,inputProgress));
-      studio.moving=spring.moving||Math.abs(lastProgress-progress)>.0001;
+      // Let the real headline pass through pure glass before metal takes over.
+      const targetMetal=smooth(.34,.62,progress)*headlineClearance*(1-menu);
+      metalState=Math.min(metalState,headlineClearance);
+      metalState+=(targetMetal-metalState)*(1-Math.exp(-dt*14));
+      if(Math.abs(metalState-targetMetal)<.0001)metalState=targetMetal;
+      materialMoving=Math.abs(metalState-targetMetal)>.0002;
+      studio.moving=spring.moving||materialMoving||Math.abs(lastProgress-progress)>.0001;
       lastProgress=progress;
-      // Finish the material early, then hold real chrome through the handoff.
-      const metal=smooth(.10,.43,progress)*(1-menu);
-      const paper=smooth(.08,.43,progress)*(1-menu);
-      grain.value=smooth(.36,.54,progress)*(1-menu);
+      const metal=metalState;
+      const paper=smooth(.32,.62,progress)*(1-menu);
+      grain.value=smooth(.59,.76,progress)*metal*(1-menu);
       mat.color.setHex(0xffffff);mat.attenuationColor.setHex(0xf6f9ff);mat.attenuationDistance=12;
       mat.metalness=metal;mat.transmission=metal>.995?0:1-metal;
       mat.roughness=mix(.035,.12,metal)+grain.value*.055;
@@ -125,8 +120,7 @@ export function createCubeMaterialStudy(glass,initialProgress=0){
       }
       const nextLight=studio.paper*surfaceLight>(light ? .44 : .56);
       if(nextLight!==light){light=nextLight;document.documentElement.classList.toggle('chrome-studio-on',light);window.dispatchEvent(new CustomEvent('cosgral:chrome-tone'));}
-      if(Math.abs(studio.paper-lastPaper)>.05){lastPaper=studio.paper;window.dispatchEvent(new CustomEvent('cosgral:chrome-tone'));}
     },
-    dispose(){spring.reset();studio.elastic.fill(0);studio.paper=0;studio.covered=false;if(shade)shade.style.opacity='';document.documentElement.classList.remove('chrome-studio-on');}
+    dispose(){spring.reset();studio.elastic.fill(0);studio.paper=0;studio.covered=false;studio.synchronized=false;if(shade)shade.style.opacity='';document.documentElement.classList.remove('chrome-studio-on');}
   };
 }

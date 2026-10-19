@@ -1,9 +1,9 @@
 /** One model: glass, a long chrome hold, and a viscous spring handoff. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
-import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
+import { installGlassCube } from './cosgral-glass-cube.js?v=20261019coupled9';
 import { createFrameProfile } from './cosgral-frame-profile.js';
-import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019buoyant8';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoyant8';
+import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019coupled9';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019coupled9';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -35,7 +35,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
   const group=new THREE.Group();scene.add(group);
   let width=1,height=1,mobile=false,glass=null,materialStudy=null;
   let tileWidth=0,tileHeight=0,tileMode=false,pixelRatio=1,resizeQueued=false;
-  let lastCropX=NaN,lastCropY=NaN,lastPortalVisible=null,lastRenderAt=0,lastClip='';
+  let lastCropX=NaN,lastCropY=NaN,lastPortalVisible=null,lastRenderAt=0;
   let qualityTier=0,sectionDocumentTop=0,contentDocumentTop=0,scrollSpan=1;
   let menuBlend=0,menuTarget=0,progress=0,lastTime=0;
   let tailProgress=0,heroExited=false;
@@ -53,6 +53,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
   const corners=Array.from({length:4},()=>new THREE.Vector3());
   const exitPoint=new THREE.Vector3();
   const funnelFrame=new Float32Array([.5,.45,.18,0]);
+  let supportGeometry=new Float32Array(0),supportPoints=new Float32Array(0);
+  const cubeBounds={left:0,top:0,right:0,bottom:0};
   const nextSection=document.getElementById('uslugi');
   const profile=createFrameProfile(canvas);
   const heroText=createHeroLensText(THREE);
@@ -172,21 +174,56 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
       screenPosition(width*0.06,height*0.07,0.36,menuFrom.position);menuFrom.scale=screenScale(54,0.36);
     }
   }
+  function cacheSupportGeometry(){
+    // A small hull taken from the supplied mesh, including its round bevels.
+    // Box corners are outside the real solid and used to leave a visible gap.
+    const positions=glass.geometry.attributes.position,chosen=new Set();
+    const golden=Math.PI*(3-Math.sqrt(5));
+    for(let sample=0;sample<162;sample++){
+      const y=1-2*(sample+.5)/162,r=Math.sqrt(1-y*y),angle=sample*golden;
+      const x=Math.cos(angle)*r,z=Math.sin(angle)*r;
+      let best=-Infinity,index=0;
+      for(let i=0;i<positions.count;i++){
+        const score=x*positions.getX(i)+y*positions.getY(i)+z*positions.getZ(i);
+        if(score>best){best=score;index=i;}
+      }
+      chosen.add(index);
+    }
+    supportGeometry=new Float32Array(chosen.size*3);
+    let offset=0;
+    for(const index of chosen){
+      supportGeometry[offset++]=positions.getX(index);
+      supportGeometry[offset++]=positions.getY(index);
+      supportGeometry[offset++]=positions.getZ(index);
+    }
+    supportPoints=new Float32Array(chosen.size*2);
+  }
   function updateFunnelFrame(){
     if(!glass)return;
     const box=glass.geometry.boundingBox;
-    let bottom=-Infinity,left=Infinity,right=-Infinity;
+    let bottom=-Infinity,top=Infinity,left=Infinity,right=-Infinity;
     for(let i=0;i<8;i++){
       exitPoint.set(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z);
       exitPoint.applyMatrix4(group.matrixWorld).project(fullCamera);
-      bottom=Math.max(bottom,(.5-exitPoint.y*.5)*height);
-      const x=(exitPoint.x*.5+.5)*width;left=Math.min(left,x);right=Math.max(right,x);
+      const y=(.5-exitPoint.y*.5)*height,x=(exitPoint.x*.5+.5)*width;
+      bottom=Math.max(bottom,y);top=Math.min(top,y);left=Math.min(left,x);right=Math.max(right,x);
     }
-    exitPoint.copy(group.position).project(fullCamera);
-    const centerX=exitPoint.x*.5+.5;
-    const trailingCorner=(left+(right-left)*.32)/width;
-    funnelFrame[0]=THREE.MathUtils.lerp(centerX,trailingCorner,smoother(.40,.68,progress));
-    funnelFrame[1]=bottom/height;
+    Object.assign(cubeBounds,{left,top,right,bottom});
+    let supportBottom=-Infinity;
+    for(let i=0,j=0;i<supportGeometry.length;i+=3,j+=2){
+      exitPoint.fromArray(supportGeometry,i).applyMatrix4(group.matrixWorld).project(fullCamera);
+      const x=(exitPoint.x*.5+.5)*width,y=(.5-exitPoint.y*.5)*height;
+      supportPoints[j]=x;supportPoints[j+1]=y;supportBottom=Math.max(supportBottom,y);
+    }
+    // Both coordinates come from the same support point. Soft weighting
+    // travels continuously along the lower edge as the cube changes face.
+    let weights=0,anchorX=0,anchorY=0;
+    for(let i=0;i<supportPoints.length;i+=2){
+      const weight=Math.exp((supportPoints[i+1]-supportBottom)/(height*.0075));
+      weights+=weight;anchorX+=supportPoints[i]*weight;anchorY+=supportPoints[i+1]*weight;
+    }
+    funnelFrame[0]=anchorX/weights/width;
+    funnelFrame[1]=anchorY/weights/height;
     funnelFrame[2]=(right-left)/height*.5;funnelFrame[3]=progress;
   }
   async function warmMaterialPrograms(){
@@ -216,7 +253,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
     group,debug:{renderer,scene,camera,renderFrame:()=>renderer.render(scene,camera),fxaa:false,
       get chrome(){return {progress,metalness:glass?.material.metalness,roughness:glass?.material.roughness,
         transmission:glass?.material.transmission,opacity:glass?.material.opacity,paper:window.cosgralChromeStudio?.paper,
-        lift:materialStudy?.lift,tailProgress,heroExited};}},
+        lift:materialStudy?.lift,tailProgress,heroExited,contact:Array.from(funnelFrame),text:heroText.debug};}},
     introDone:()=>introDone,forceIntro:beginIntro,getMenuBlend:()=>menuBlend,
     getMenuFaceRect:faceRect,getMenuFaceAnchorRect:()=>null,
     getMenuOpenDuration:()=>1.25,getMenuCloseDuration:()=>0.8,getMenuLinksDelay:()=>0.35,
@@ -228,14 +265,16 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
     }
   };
   window.dispatchEvent(new CustomEvent('cosgral:cube-ready'));
-  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();contextLost=true;});
+  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();contextLost=true;window.cosgralChromeStudio.synchronized=false;});
   canvas.addEventListener('webglcontextrestored',async()=>{
     // Render-target environments have no CPU pixels to re-upload after a GPU
     // reset. Rebuild that studio together with the model before resuming.
     try {
       const previous=glass;
       glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
+      cacheSupportGeometry();
       glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
+      glass.userData.transmissionBackdrop.material.uniforms.uTextRect.value=heroText.rect;
       materialStudy?.dispose();materialStudy=await createCubeMaterialStudy(glass,scrollProgress());
       await warmMaterialPrograms();
       if(previous){
@@ -243,7 +282,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
         previous.geometry.dispose();previous.material.dispose();previous.userData.environmentTarget?.dispose();
       }
       tileWidth=0;resize.deviceRatio=0;queueResize();
-      canvas.parentElement.classList.remove('has-cube-fallback');contextLost=false;
+      canvas.parentElement.classList.remove('has-cube-fallback');contextLost=false;window.cosgralChromeStudio.synchronized=true;
     } catch(error) {
       canvas.parentElement.classList.add('has-cube-fallback');
       console.warn('COSGRAL: glass recovery failed',error);
@@ -251,10 +290,13 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
   });
   try{
     glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
+    cacheSupportGeometry();
     glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
+    glass.userData.transmissionBackdrop.material.uniforms.uTextRect.value=heroText.rect;
     materialStudy=await createCubeMaterialStudy(glass,scrollProgress());
     await warmMaterialPrograms();
     canvas.parentElement.classList.add('has-glass-model');
+    window.cosgralChromeStudio.synchronized=true;
     requestAnimationFrame(()=>window.ScrollTrigger?.refresh());
   }catch(error){
     canvas.parentElement.classList.add('has-cube-fallback');
@@ -316,8 +358,9 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*14));group.updateMatrixWorld(true);
     const sectionTop=sectionDocumentTop-scrollY,guard=(contentDocumentTop-scrollY)/height-.012;
     updateFunnelFrame();
-    heroExited=progress===1&&funnelFrame[1]<-.025;
-    materialStudy.update(progress,menuBlend,sectionTop/height,guard,funnelFrame,dt,nextProgress);
+    heroExited=progress===1&&cubeBounds.bottom/height<-.025;
+    const headlineClearance=progress<.62?heroText.headlineClearance(cubeBounds):1;
+    materialStudy.update({progress,menuBlend,boundary:sectionTop/height,guard,frame:funnelFrame,dt,inputProgress:nextProgress,headlineClearance});
     group.visible=(!heroExited||menuBlend>.001)&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible&&glass.material.transmission>0;
     heroText.setActive(group.visible&&glass.material.transmission>.01);
@@ -327,6 +370,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
     if(footer&&menuBlend<0.01)return;
     if(!group.visible){
       canvas.style.visibility='hidden';
+      window.cosgralAmbientFrame?.render?.(now);
       return;
     }
     if(now<effectPauseUntil)return;
@@ -335,12 +379,13 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoy
     const activeMotion=!introDone||pointerMoving||scrollMoving||Math.abs(nextTail-tailProgress)>.0004||materialStudy.moving||Math.abs(menuTarget-menuBlend)>0.001;
     // The resting cube moves only a few pixels over several seconds. Reuse
     // its image between updates; pointer and scroll input restore 60Hz work.
-    if(now-lastRenderAt<(activeMotion?14:42))return;
+    if(now-lastRenderAt<(activeMotion?(qualityTier===2?30:14):42))return;
     lastRenderAt=now;
     const renderStart=profile ? performance.now() : 0;
     updateCrop(now);canvas.style.visibility='visible';
-    const clip=materialStudy.clipPath(width,height,progress,menuBlend);
-    if(clip!==lastClip){lastClip=clip;canvas.parentElement.style.clipPath=clip;}
+    heroText.sync({x:lastCropX,y:lastCropY,width:tileWidth,height:tileHeight,viewportWidth:width,viewportHeight:height});
+    glass.userData.transmissionBackdrop.material.uniformsNeedUpdate=true;
+    window.cosgralAmbientFrame?.render?.(now);
     renderer.render(scene,camera);
     if (profile) profile.render(performance.now()-renderStart);
   }
