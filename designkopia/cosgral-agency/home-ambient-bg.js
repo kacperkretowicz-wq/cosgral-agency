@@ -16,14 +16,19 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var VERT = "\n    attribute vec2 aPos;\n    void main() { gl_Position = vec4(aPos, 0.0, 1.0); }\n  ";
+  var funnelLibrary = window.cosgralChromeFunnel;
+  var hasFunnel = !!funnelLibrary;
+  var defaultFunnel = new Float32Array([.5,.45,.18,0]);
 
   var FRAG = `
-    precision mediump float;
+    precision ${hasFunnel ? 'highp' : 'mediump'} float;
     uniform vec2 uRes;
     uniform float uTime;
     uniform float uChromePaper;
     uniform float uChromeBoundary;
+    uniform vec4 uChromeFunnelFrame;
     uniform vec2 uMouse;
+    ${hasFunnel ? funnelLibrary.glsl : ''}
 
     float wave(vec2 p, float t) {
       float w = 0.0;
@@ -45,12 +50,13 @@
 
     void main() {
       vec2 uv = gl_FragCoord.xy / uRes.xy;
+      ${hasFunnel ? 'vec4 funnelOptics=cgFunnelOptics(uv,uRes,uChromeFunnelFrame,uChromeBoundary); vec2 funnelUv=cgFunnelWarp(uv,funnelOptics,uRes,uChromeFunnelFrame);' : 'vec2 funnelUv=uv;'}
       vec2 m = uMouse * 0.5 + 0.5;
       vec2 toM = uv - m;
       float mDist = length(toM);
       float mForce = smoothstep(0.62, 0.0, mDist);
 
-      vec2 p = uv * vec2(2.8, 2.0);
+      vec2 p = funnelUv * vec2(2.8, 2.0);
       p += normalize(toM + 0.0001) * mForce * 0.17 * sin(uTime * 1.7 + mDist * 13.0);
       p += vec2(sin(uTime * 0.2 + uv.y * 3.0), cos(uTime * 0.17 + uv.x * 2.5)) * 0.045;
 
@@ -83,12 +89,13 @@
 
       col = ((col - 0.5) * 1.04 + 0.5) * 0.78;
 
-      float chromeMask=1.0-smoothstep(.36,.86,1.0-uv.y);
+      ${hasFunnel ? 'col=cgFunnelPaint(col,uv,uRes,uChromeFunnelFrame,uChromeBoundary,uChromePaper,funnelOptics);' : `float chromeMask=1.0-smoothstep(.36,.86,1.0-uv.y);
       vec3 chromeLight=vec3(.91,.905,.88)-smoothstep(.05,1.25,uv.x+uv.y*.25)*.055;
       col=mix(col,chromeLight,uChromePaper*chromeMask);
       float chromeSeam=smoothstep(uChromeBoundary-.26,uChromeBoundary-.025,1.0-uv.y);
       vec3 seamColor=vec3(.03137255,.03529412,.03529412)/(.6+.4*uChromePaper);
       col=mix(col,seamColor,chromeSeam);
+      `}
       gl_FragColor = vec4(col, 1.0);
     }
   `;
@@ -142,6 +149,7 @@
   var uMouse = gl.getUniformLocation(program, "uMouse");
   var uChromePaper = gl.getUniformLocation(program, "uChromePaper");
   var uChromeBoundary = gl.getUniformLocation(program, "uChromeBoundary");
+  var uChromeFunnelFrame = gl.getUniformLocation(program, "uChromeFunnelFrame");
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
@@ -149,13 +157,13 @@
   window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse };
   var lastFrameTime = 0;
 
-  var SCALE_BY_TIER = MOBILE ? [0.55, 0.45, 0.38] : [0.52, 0.44, 0.36];
+  var SCALE_BY_TIER = hasFunnel ? (MOBILE ? [.85,.65,.5] : [.75,.60,.45]) : (MOBILE ? [.55,.45,.38] : [.52,.44,.36]);
   var dprCap = SCALE_BY_TIER[0];
 
   function resize() {
     var dpr = dprCap;
-    var maxW = MOBILE ? 720 : 1280;
-    var maxH = MOBILE ? 540 : 720;
+    var maxW = hasFunnel ? (MOBILE ? 900 : 1920) : (MOBILE ? 720 : 1280);
+    var maxH = hasFunnel ? 1080 : (MOBILE ? 540 : 720);
     var w = Math.min(maxW, Math.round(window.innerWidth * dpr));
     var h = Math.min(maxH, Math.round(window.innerHeight * dpr));
     if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
@@ -210,6 +218,7 @@
     gl.uniform2f(uMouse, mouse.x, mouse.y);
     gl.uniform1f(uChromePaper, window.cosgralChromeStudio?.paper || 0);
     gl.uniform1f(uChromeBoundary, window.cosgralChromeStudio?.boundary ?? 2);
+    gl.uniform4fv(uChromeFunnelFrame, window.cosgralChromeStudio?.funnel || defaultFunnel);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     requestAnimationFrame(frame);
@@ -232,6 +241,7 @@
   gl.uniform1f(uTime, 0);
   gl.uniform2f(uMouse, 0, 0);
   gl.uniform1f(uChromeBoundary, 2);
+  gl.uniform4fv(uChromeFunnelFrame, defaultFunnel);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   play();
 

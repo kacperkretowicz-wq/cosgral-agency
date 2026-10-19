@@ -1,4 +1,4 @@
-# Szkło → chrom — wolniejszy łuk i płynne przejście, rewizja 4
+# Szkło → chrom — lejek i odłączenie przy kostce, rewizja 5
 
 Baza strony: `a24c43d37b64f3634826977c829a486b120fdc8d`.
 Gałąź: `test/cube-chrome-magnetic` (zachowana nazwa istniejącej gałęzi).
@@ -11,7 +11,7 @@ Aktualna strona nie pokazuje przełącznika ani montażu magnetycznego i nie ła
 modułu cieczy, Workera, pola 96³ ani geometrii fragmentów. Ich wcześniejsze
 pliki i commity pozostają historią eksperymentu.
 
-Podgląd: `http://127.0.0.1:8796/?forceMotion=1&cube=chrome&rev=4`.
+Podgląd: `http://127.0.0.1:8796/?forceMotion=1&cube=chrome&rev=5`.
 Osobne laboratorium odniesienia: `http://127.0.0.1:8797/?v=5` (materiał),
 `http://127.0.0.1:8797/?v=1` (ruch). Źródło odniesienia: `outputs/cube-lab/lab.js`
 z rozmowy, poza repozytorium.
@@ -49,15 +49,39 @@ nie dopisuje losowych pikseli do gotowego koloru. Brak migotania i nakładki TV.
 Światło tła rozjaśnia górną część hero i przechodzi w istniejące ciemne tło
 poniżej. Ten sam kolor jest używany w buforze transmisji, z uwzględnieniem
 zaciemniającej warstwy strony. Kolor tekstu hero dostosowuje się do oświetlenia.
-Nowy parametr `uChromeBoundary` śledzi rzeczywistą pozycję początku usług.
-Ostatnie 26% wysokości viewportu przed sekcją przechodzi w jej dokładny kolor
-`#080909`, osiągając go 2,5% wysokości przed krawędzią. Gradient obejmuje także
-oryginalne smugi ambientu, a nie tylko jasną warstwę chromu. Pozwala to uniknąć
-widocznej poziomej granicy pokazanej przez użytkownika na screenie.
+## Wybrane przejście — lejek przy kostce
+
+Użytkownik wybrał asymetryczny lejek z porównania kierunków i poprosił
+o dopracowanie odłączenia. `home-chrome-funnel.js` zawiera wspólny shader
+oraz odpowiednik pola konturu w JavaScript do doboru koloru tekstu.
+Ten sam shader obsługuje tło i bufor transmisji kostki.
+
+Połączenie powstaje jako płynna suma dwóch pól: górnej jasnej powierzchni
+z asymetrycznym przewężeniem oraz małej soczewki przy kostce. Z postępem
+scrolla szyjka ciągle zwęża się do zera i topologicznie rozdziela powierzchnie.
+Pozostały fragment kurczy się i cofa w krawędź kostki; górna powierzchnia ma
+niewielki ruch cofnięcia. Brak osobnej animacji czasowej, ruch jest odwracalny.
+
+Punkt zaczepienia przechodzi ze środka kostki ku jej tylnej, dolnej krawędzi,
+wyznaczanej z projekcji oryginalnego modelu. Odłączenie pozostaje dzięki temu
+widoczne obok chromowanej ściany. Hermite remap zwalnia samą fazę przewężenia
+przy zachowaniu ciągłej prędkości. Obrót i boczny łuk kostki pozostają z rewizji 4.
+
+Kontur ma antyaliasing zależny od rozdzielczości, wąski metaliczny menisk,
+subtelne załamanie smug tła i mały akcent odbić w momencie naprężenia.
+Jasna powierzchnia ma własne domknięcie — opacity kostki nie usuwa jej przed
+zakończeniem odłączenia. Poniżej całego konturu shader osiąga dokładnie
+`#080909` przed fizyczną krawędzią sekcji usług. Nie ma poziomego odcięcia maski.
+
+Podwyższona rozdzielczość tła obowiązuje tylko stronę z aktywnym lejkiem;
+pozostałe podstrony korzystają z dotychczasowej wersji. W wyższych progach
+obciążenia zachowane są niższe rozdzielczości. Nie ma nowego kontekstu WebGL
+ani dodatkowego renderera dla przejścia.
 
 ## Stan
 
 Implementacja na gałęzi testowej. Brak publikacji na produkcję.
-Nie uruchamiano zestawów testów. Ocena wizualna wymaga dostępnej przeglądarki;
-w trakcie implementacji narzędzie nadal zgłaszało wyłączone lokalne sterowanie
-w Work, mimo deklaracji użytkownika, że je włączy.
+Nie uruchamiano zestawów testów. Obejrzano statyczne schematy kolejnych faz
+konturu; nie są zrzutami strony ani potwierdzeniem wyglądu całej animacji.
+Podgląd strony pozostaje nieobejrzany: narzędzie zgłasza wyłączone lokalne
+sterowanie przeglądarką w Work.

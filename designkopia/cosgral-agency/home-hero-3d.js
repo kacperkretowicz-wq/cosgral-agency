@@ -4,7 +4,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019chrome3';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chrome4';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019funnel5';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -59,6 +59,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
   const euler=new THREE.Euler(),v=new THREE.Vector3();
   const corners=Array.from({length:4},()=>new THREE.Vector3());
   const exitPoint=new THREE.Vector3();
+  const funnelFrame=new Float32Array([.5,.45,.18,0]);
   const nextSection=document.getElementById('uslugi');
   const path=Array.from({length:4},()=>new THREE.Vector3());
   const wake=createOpticalWake(THREE,wakeScene,1800);
@@ -171,12 +172,21 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
     // Fade the complete model before the section boundary reaches its lowest
     // projected corner. A z-index change alone would only hide the hard cut.
     const box=glass.geometry.boundingBox;
-    let bottom=-Infinity;
+    let bottom=-Infinity,left=Infinity,right=-Infinity;
     for(let i=0;i<8;i++){
       exitPoint.set(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z);
       exitPoint.applyMatrix4(group.matrixWorld).project(fullCamera);
       bottom=Math.max(bottom,(.5-exitPoint.y*.5)*height);
+      const x=(exitPoint.x*.5+.5)*width;left=Math.min(left,x);right=Math.max(right,x);
     }
+    exitPoint.copy(group.position).project(fullCamera);
+    const centerX=exitPoint.x*.5+.5;
+    const trailingCorner=(left+(right-left)*.07)/width;
+    // Pull from the trailing lower edge. A neck hidden behind the opaque
+    // chrome face would conceal the very separation the user should see.
+    funnelFrame[0]=THREE.MathUtils.lerp(centerX,trailingCorner,smoother(.26,.62,progress));
+    funnelFrame[1]=bottom/height;
+    funnelFrame[2]=(right-left)/height*.5;funnelFrame[3]=progress;
     return smoother(height*.035,height*.23,sectionTop-bottom);
   }
   function faceRect(){
@@ -294,7 +304,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
     const clearance=sectionClearanceFade(sectionTop);
     const dissolve=(1-smoother(.75,.98,progress))*clearance;
     const cubeOpacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
-    materialStudy.update(progress,menuBlend,cubeOpacity,sectionTop/height);
+    materialStudy.update(progress,menuBlend,cubeOpacity,sectionTop/height,funnelFrame);
     group.visible=cubeOpacity>0.008&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');
