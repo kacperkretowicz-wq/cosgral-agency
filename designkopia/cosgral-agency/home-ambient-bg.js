@@ -22,6 +22,7 @@
     uniform vec2 uRes;
     uniform float uTime;
     uniform float uChromePaper;
+    uniform float uChromeBoundary;
     uniform vec2 uMouse;
 
     float wave(vec2 p, float t) {
@@ -85,6 +86,9 @@
       float chromeMask=1.0-smoothstep(.36,.86,1.0-uv.y);
       vec3 chromeLight=vec3(.91,.905,.88)-smoothstep(.05,1.25,uv.x+uv.y*.25)*.055;
       col=mix(col,chromeLight,uChromePaper*chromeMask);
+      float chromeSeam=smoothstep(uChromeBoundary-.26,uChromeBoundary-.025,1.0-uv.y);
+      vec3 seamColor=vec3(.03137255,.03529412,.03529412)/(.6+.4*uChromePaper);
+      col=mix(col,seamColor,chromeSeam);
       gl_FragColor = vec4(col, 1.0);
     }
   `;
@@ -137,6 +141,7 @@
   var uTime = gl.getUniformLocation(program, "uTime");
   var uMouse = gl.getUniformLocation(program, "uMouse");
   var uChromePaper = gl.getUniformLocation(program, "uChromePaper");
+  var uChromeBoundary = gl.getUniformLocation(program, "uChromeBoundary");
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   var running = false;
@@ -204,6 +209,7 @@
     gl.uniform1f(uTime, window.cosgralAmbientFrame.time);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
     gl.uniform1f(uChromePaper, window.cosgralChromeStudio?.paper || 0);
+    gl.uniform1f(uChromeBoundary, window.cosgralChromeStudio?.boundary ?? 2);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     requestAnimationFrame(frame);
@@ -225,6 +231,7 @@
   gl.uniform2f(uRes, canvas.width, canvas.height);
   gl.uniform1f(uTime, 0);
   gl.uniform2f(uMouse, 0, 0);
+  gl.uniform1f(uChromeBoundary, 2);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   play();
 

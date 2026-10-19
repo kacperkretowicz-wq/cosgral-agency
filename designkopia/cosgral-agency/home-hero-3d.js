@@ -4,7 +4,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createOpticalWake } from './cosgral-optical-wake.js?v=20261012editorial4';
 import { createFrameProfile } from './cosgral-frame-profile.js';
 import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019chrome3';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chrome3';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chrome4';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -13,6 +13,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
   const glassLook={glass:{transmission:1,metalness:0,roughness:.035,iridescence:.08,dispersion:.20,edgeGlow:.13,envMapIntensity:1.15,farSideDim:.4,thickness:.7},env:{power:1.5,sheen:.45}};
   const clamp = THREE.MathUtils.clamp;
   const smooth = (a,b,x) => {const p=clamp((x-a)/(b-a),0,1);return p*p*(3-2*p);};
+  const smoother = (a,b,x) => {const p=clamp((x-a)/(b-a),0,1);return p*p*p*(p*(p*6-15)+10);};
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let renderer;
   try {
@@ -134,16 +135,30 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
     return clamp(scrollY/(height*.86),0,1);
   }
   function buildScrollPose(time){
-    // Lab 01: a fixed vertical anchor, one measured turn, a slight bank and
-    // 12% breathing scale. Keep the real page's original initial pixel size.
-    const h=worldHeight(.36),turn=smooth(0,1,progress),sine=Math.sin(progress*Math.PI);
-    const drift=reduced?0:Math.sin(time*.52)*.025;
-    screenPosition(width*.5,height*(mobile?.31:.30),.36,pose.position);
-    pose.position.x+=smooth(.2,1,progress)*h*(mobile?.075:.16);
-    euler.set(.48+drift-pointerY*.07+sine*.22,
-      -.67+pointerX*.12+turn*Math.PI*1.15,-sine*.12);
+    // A restrained 76-degree turn and an upward side arc. Quintic timing
+    // starts and stops with zero velocity and acceleration, in both directions.
+    const h=worldHeight(.36),turn=smoother(.04,.94,progress),arc=smoother(.08,.92,progress);
+    const sway=Math.sin(Math.PI*arc),drift=reduced?0:Math.sin(time*.34)*.012;
+    const y=THREE.MathUtils.lerp(mobile?.31:.30,mobile?.275:.255,arc)-sway*.025;
+    screenPosition(width*.5,height*y,.36,pose.position);
+    euler.set(.48+drift-pointerY*.045+sway*.075,
+      -.67+pointerX*.075+turn*Math.PI*.42,-sway*.045);
     pose.quaternion.setFromEuler(euler);
-    pose.scale=screenScale(heroSize(),.36)*(1+sine*.12);
+    pose.scale=screenScale(heroSize(),.36)*(1+sway*.05);
+    // Leave room for the actual rotated model rather than cutting it off on
+    // narrow screens. The safe travel is blended through the same side arc.
+    let right=width*.5;
+    if(glass){
+      const box=glass.geometry.boundingBox;
+      for(let i=0;i<8;i++){
+        exitPoint.set(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z);
+        exitPoint.multiplyScalar(pose.scale).applyQuaternion(pose.quaternion).add(pose.position).project(fullCamera);
+        right=Math.max(right,(exitPoint.x*.5+.5)*width);
+      }
+    }
+    const available=Math.max(0,width-right-Math.max(20,width*.055));
+    const travel=Math.min(width*(mobile?.19:.24),available*.85);
+    pose.position.x+=travel/height*h*arc;
   }
   function captureMenuPose(){
     menuFrom.position.copy(group.position);menuFrom.quaternion.copy(group.quaternion);menuFrom.scale=group.scale.x;
@@ -151,7 +166,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
       screenPosition(width*0.06,height*0.07,0.36,menuFrom.position);menuFrom.scale=screenScale(54,0.36);
     }
   }
-  function sectionClearanceFade(){
+  function sectionClearanceFade(sectionTop){
     if(!nextSection||!glass)return 1;
     // Fade the complete model before the section boundary reaches its lowest
     // projected corner. A z-index change alone would only hide the hard cut.
@@ -162,7 +177,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
       exitPoint.applyMatrix4(group.matrixWorld).project(fullCamera);
       bottom=Math.max(bottom,(.5-exitPoint.y*.5)*height);
     }
-    return smooth(height*.025,height*.20,nextSection.getBoundingClientRect().top-bottom);
+    return smoother(height*.035,height*.23,sectionTop-bottom);
   }
   function faceRect(){
     if(!glass||menuBlend<0.035||!group.visible)return null;
@@ -275,10 +290,11 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019chro
       group.position.copy(pose.position);targetQ.copy(pose.quaternion);group.scale.setScalar(pose.scale);
     }
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*14));group.updateMatrixWorld(true);
-    const clearance=sectionClearanceFade();
-    const dissolve=(1-smooth(.76,.98,progress))*clearance;
+    const sectionTop=nextSection?nextSection.getBoundingClientRect().top:height*2;
+    const clearance=sectionClearanceFade(sectionTop);
+    const dissolve=(1-smoother(.75,.98,progress))*clearance;
     const cubeOpacity=THREE.MathUtils.lerp(dissolve,1,smooth(0,0.2,menuBlend));
-    materialStudy.update(progress,menuBlend,cubeOpacity,time);
+    materialStudy.update(progress,menuBlend,cubeOpacity,sectionTop/height);
     group.visible=cubeOpacity>0.008&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible;
     const footer=document.documentElement.classList.contains('is-footer-covered');

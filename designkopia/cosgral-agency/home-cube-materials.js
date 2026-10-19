@@ -2,7 +2,7 @@
 import * as THREE from './vendor/three-0.170.0.module.min.js';
 const smooth=(a,b,x)=>THREE.MathUtils.smoothstep(x,a,b),mix=THREE.MathUtils.lerp;
 const url=new URL(location.href);url.searchParams.set('cube','chrome');history.replaceState(null,'',url);
-const studio=window.cosgralChromeStudio={paper:0};
+const studio=window.cosgralChromeStudio={paper:0,boundary:2};
 const style=document.createElement('style');
 style.textContent=`
 html.editorial-document .editorial-page .home-cube-portal{z-index:6}
@@ -45,19 +45,22 @@ export function createCubeMaterialStudy(glass){
   // Use the same lighting field inside the real transmission pass as outside.
   const backdrop=glass.userData.transmissionBackdrop.material;
   backdrop.uniforms.uChromePaper={value:0};
+  backdrop.uniforms.uChromeBoundary={value:2};
   backdrop.fragmentShader=backdrop.fragmentShader.replace('uniform float uTime;',
-    'uniform float uTime;\nuniform float uChromePaper;');
+    'uniform float uTime;\nuniform float uChromePaper;\nuniform float uChromeBoundary;');
   backdrop.fragmentShader=backdrop.fragmentShader.replace('vec4 textSample = texture2D(uText, uv);',`
     float chromeMask=1.-smoothstep(.36,.86,1.-uv.y);
     vec3 chromeLight=vec3(.91,.905,.88)-smoothstep(.05,1.25,uv.x+uv.y*.25)*.055;
     col=mix(col,chromeLight,uChromePaper*chromeMask);
     col*=.6+.4*uChromePaper;
+    float chromeSeam=smoothstep(uChromeBoundary-.26,uChromeBoundary-.025,1.-uv.y);
+    col=mix(col,vec3(.03137255,.03529412,.03529412),chromeSeam);
     vec4 textSample = texture2D(uText, uv);
   `);
   backdrop.needsUpdate=true;
   let light=false,lastPaper=-1;
   return {
-    update(progress,menuBlend,opacity){
+    update(progress,menuBlend,opacity,boundary){
       const menu=smooth(0,.2,menuBlend);
       // Lab 05's complete material curve, fitted to the visible hero interval.
       const p=Math.min(1,progress/.80);
@@ -72,6 +75,7 @@ export function createCubeMaterialStudy(glass){
       mat.clearcoat=1;mat.clearcoatRoughness=0;
       mat.opacity=opacity;mat.depthWrite=opacity>.995;glass.visible=opacity>.008;
       studio.paper=paper*opacity;backdrop.uniforms.uChromePaper.value=studio.paper;
+      studio.boundary=boundary;backdrop.uniforms.uChromeBoundary.value=boundary;
       if(shade)shade.style.opacity=String(1-studio.paper);
       const nextLight=studio.paper>.5;
       if(nextLight!==light){light=nextLight;document.documentElement.classList.toggle('chrome-studio-on',light);window.dispatchEvent(new CustomEvent('cosgral:chrome-tone'));}
