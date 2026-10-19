@@ -17,13 +17,13 @@
       if(point.y>uChromeFunnelShape.x+reach)return vec4(0.,1.,1.,0.);
       if(point.y<uChromeFunnelShape.x-reach)return vec4(0.,1.,-1.,1.);
       float dx=point.x-frame.x*aspect;
-      float strain=smoothstep(0.,.40,abs(uChromeFunnelElastic.x));
-      float tipWidth=max(.16,frame.z*mix(2.10,1.55,strain));
+      float strain=smoothstep(0.,.28,abs(uChromeFunnelElastic.x));
+      float tipWidth=max(.13,frame.z*mix(1.65,1.05,strain));
       float a=exp(-dx*dx/(uChromeFunnelShape.z*uChromeFunnelShape.z));
       float b=exp(-dx*dx/(tipWidth*tipWidth));
-      float c=exp(-dx*dx/(.46*.46));
+      float c=exp(-dx*dx/(.38*.38));
       float surface=uChromeFunnelShape.x+uChromeFunnelShape.y*a+tip*b+shoulder*c+uChromeFunnelShape.w*sin(dx*3.2+.4);
-      float slope=-2.*dx*(uChromeFunnelShape.y*a/(uChromeFunnelShape.z*uChromeFunnelShape.z)+tip*b/(tipWidth*tipWidth)+shoulder*c/(.46*.46))
+      float slope=-2.*dx*(uChromeFunnelShape.y*a/(uChromeFunnelShape.z*uChromeFunnelShape.z)+tip*b/(tipWidth*tipWidth)+shoulder*c/(.38*.38))
         +uChromeFunnelShape.w*3.2*cos(dx*3.2+.4);
       float invLength=inversesqrt(1.+slope*slope);
       float distance=(point.y-surface)*invLength;
@@ -60,15 +60,15 @@
   `;
   function profile(frame,boundary,out=new Float32Array(4)){
     const raw=clamp(frame[3]);
-    out[0]=mix(boundary-.12,.35,smooth(.20,.55,raw))-.62*smooth(.87,1,raw);
-    out[1]=.12*Math.sin(raw*Math.PI)*(1-smooth(.62,.82,raw));
-    out[2]=.40;out[3]=.020*Math.sin(raw*Math.PI);
+    out[0]=mix(boundary-.10,.45,smooth(.22,.56,raw))-.70*smooth(.90,1,raw);
+    out[1]=.10*Math.sin(raw*Math.PI)*(1-smooth(.78,.97,raw));
+    out[2]=.30;out[3]=.015*Math.sin(raw*Math.PI);
     return out;
   }
   function surface(x,aspect,frame,shape,elastic=idleElastic){
     const dx=(x-frame[0])*aspect;
-    const width=Math.max(.16,frame[2]*mix(2.10,1.55,smooth(0,.40,Math.abs(elastic[0]))));
-    const a=Math.exp(-dx*dx/(shape[2]*shape[2])),b=Math.exp(-dx*dx/(width*width)),c=Math.exp(-dx*dx/(.46*.46));
+    const width=Math.max(.13,frame[2]*mix(1.65,1.05,smooth(0,.28,Math.abs(elastic[0]))));
+    const a=Math.exp(-dx*dx/(shape[2]*shape[2])),b=Math.exp(-dx*dx/(width*width)),c=Math.exp(-dx*dx/(.38*.38));
     return shape[0]+shape[1]*a+(elastic[0]-elastic[1])*b+elastic[1]*c+shape[3]*Math.sin(dx*3.2+.4);
   }
   function advance(s,target,stiffness,damping,dt){
@@ -79,31 +79,42 @@
     s.v=e*(v*c-(decay*v+stiffness*displacement)*sn);
     if(Math.abs(s.x-target)<.00006&&Math.abs(s.v)<.0004){s.x=target;s.v=0;}
   }
-  function createSpring(reduced=false){
-    const tip={x:0,v:0},shoulder={x:0,v:0},value=new Float32Array(2);
-    let initialized=false,released=false,moving=false;
-    function reset(){tip.x=tip.v=shoulder.x=shoulder.v=0;value.fill(0);moving=false;}
+  function createSpring(reduced=false,initialProgress){
+    const tip={x:0,v:0},shoulder={x:0,v:0},body={x:0,v:0},value=new Float32Array(2);
+    let initialized=Number.isFinite(initialProgress),released=initialized&&initialProgress>=.76,moving=false,menuAmount=0;
+    body.x=released?1:0;
+    function reset(){tip.x=tip.v=shoulder.x=shoulder.v=body.x=body.v=0;value.fill(0);moving=false;}
     return {
       value,
       get moving(){return moving;},
+      get lift(){return Math.max(0,Math.min(1.025,body.x))*(1-menuAmount);},
       update(frame,shape,guard,dt=1/60,menu=0,inputProgress=frame[3]){
-        const raw=clamp(frame[3]);
-        if(!initialized){released=inputProgress>=.80;initialized=true;}
-        if(raw<.69&&inputProgress<.69)released=false;
-        else if(raw>=.80)released=true;
-        if(raw<.32||raw>.998||menu>.98){reset();return value;}
+        const raw=clamp(frame[3]),step=Math.max(.001,Math.min(.05,dt));
+        menuAmount=menu;
+        if(!initialized){released=inputProgress>=.76;body.x=released?1:0;initialized=true;}
+        if(raw<.64&&inputProgress<.64)released=false;
+        else if(raw>=.76)released=true;
+        // The cube has its own buoyant response. The sheet's recoil cannot
+        // drag it down or hide it before it has had time to rise.
+        if(reduced){body.x=released?1:0;body.v=0;}
+        else advance(body,released?1:0,36,9.8,step);
+        if(raw<.32||raw>.998||menu>.98){
+          tip.x=tip.v=shoulder.x=shoulder.v=0;value.fill(0);
+          moving=Math.abs(body.v)>.002;return value;
+        }
         const room=Math.max(0,guard-shape[0]-shape[1]-.035);
-        const gap=Math.max(0,Math.min(.48,room,(frame[1]+.035-shape[0]-shape[1]-shape[3]*Math.sin(.4))*1.28));
-        const pull=gap*smooth(.35,.55,raw);
-        const target=reduced?pull*(1-smooth(.78,.88,raw)):released?0:pull;
-        const step=Math.max(.001,Math.min(.05,dt));
+        const gap=Math.max(0,Math.min(.44,room,(frame[1]+.10-shape[0]-shape[1]-shape[3]*Math.sin(.4))*1.35));
+        const pull=gap*smooth(.38,.57,raw);
+        const target=reduced?pull*(1-smooth(.74,.84,raw)):released?0:pull;
         if(reduced){tip.x=target;tip.v=0;shoulder.x=target*.28;shoulder.v=0;}
         else {
-          advance(tip,target,released?70:400,released?5.6:32,step);
-          advance(shoulder,tip.x*.28,56,10,step);
+          advance(tip,target,released?70:400,released?8.2:32,step);
+          advance(shoulder,tip.x*.28,56,12,step);
         }
-        value[0]=tip.x*(1-menu);value[1]=shoulder.x*(1-menu);
-        moving=Math.abs(tip.v)+Math.abs(shoulder.v)>.001||Math.abs(tip.x-target)>.00015;
+        // A soft lower limit keeps the return from inverting the long funnel.
+        value[0]=(tip.x<0 ? .012*Math.tanh(tip.x/.012) : tip.x)*(1-menu);
+        value[1]=shoulder.x*(1-menu);
+        moving=Math.abs(tip.v)+Math.abs(shoulder.v)+Math.abs(body.v)>.001||Math.abs(tip.x-target)>.00015;
         return value;
       },
       reset

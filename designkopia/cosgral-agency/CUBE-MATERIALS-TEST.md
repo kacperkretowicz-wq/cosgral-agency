@@ -1,9 +1,10 @@
-# Szkło → chrom — lepka ciecz, zanurzenie i wydajność, rewizja 7
+# Szkło → chrom — niższy lejek i miękkie wypłynięcie, rewizja 8
 
 Baza: `a24c43d37b64f3634826977c829a486b120fdc8d`.
 Gałąź: `test/cube-chrome-magnetic` (zachowana nazwa).
 Źródła: `designkopia/cosgral-agency`.
-Podgląd: `http://127.0.0.1:8796/?forceMotion=1&cube=chrome&rev=7`.
+Podgląd: `http://127.0.0.1:8796/?forceMotion=1&cube=chrome&rev=8`.
+Przeładowanie istniejącej karty pobiera nowe moduły; adres otrzymuje rev=8.
 
 Zakres: tylko szkło → chrom i przejście do usług. Laboratorium odniesienia
 pozostaje na porcie 8797: wariant 5 — materiał; wariant 1 — bezwładność.
@@ -12,9 +13,10 @@ pozostaje na porcie 8797: wariant 5 — materiał; wariant 1 — bezwładność.
 
 Początkowy rozmiar modelu, wysokość 30% desktop / 31% mobile i bazowe kąty
 0,48 / -0,67 pozostają zachowane. Spokojny łuk w prawo i obrót Y o 75,6°
-dochodzą do pozycji chromowanej kostki. W końcowej fazie dochodzi reakcja na
-naciągniętą powierzchnię: opór w bok, pionowe ugięcie i mały przechył.
-Odbicie sprężyny oddziałuje na model także po zatrzymaniu scrolla.
+dochodzą do pozycji chromowanej kostki. Przy kontakcie kostka osiada niżej,
+po czym łagodnie wypływa do góry. Wypór ma własną tłumioną sprężynę, więc
+jej ruch trwa również po zatrzymaniu scrolla. Reakcja nie kopiuje bezpośrednio
+ujemnego wychylenia lejka i nie wciąga modelu pod cofającą się krawędź.
 
 Runway ma teraz 72svh zamiast 32vh desktop / 28vh mobile. Koniec osi wynika
 z rzeczywistej pozycji usług: `scrollSpan = sectionTop - viewportHeight * .24`.
@@ -22,26 +24,37 @@ Przy hero 100svh daje to ok. 148vh przewinięcia zamiast 86vh.
 
 Metalność i jasne tło dochodzą do pełnej wartości do 43% osi; mikroziarno
 do 54%. Następnie materiał pozostaje chromowany przez kontakt z cieczą,
-naciągnięcie i odbicie. Zachowano roughness 0,035 → ok. 0,175, światło studia,
+naciągnięcie i wypłynięcie. Zachowano roughness 0,035 → ok. 0,175, światło studia,
 dyspersję, irydescencję i model z wariantu laboratoryjnego.
 
 ## Duży lejek związany z kostką
 
 Kontur pozostaje jedną ciągłą powierzchnią, bez odrywanej soczewki/kropki.
-Szyjka jest kilka razy szersza niż w rewizji 6; rozmiar wynika z projekcji
-modelu. Szerokie ramiona cieczy reagują z opóźnieniem, a punkt zaczepienia
-znajduje się bliżej środka kostki. Powierzchnia ma charakter gęstej cieczy.
+Poziom powierzchni w fazie kontaktu jest obniżony z 35% do 45% viewportu.
+Dolna część jest dłuższa i bardziej pionowa; szyjka ma minimum 0,13 wysokości
+viewportu i zwęża się zgodnie z naprężeniem oraz rozmiarem modelu. Ramiona
+cieczy reagują z opóźnieniem. Bazowe ugięcie pozostaje dłużej po puszczeniu;
+ujemne wychylenie ma miękkie ograniczenie do 1,2% wysokości, więc lejek
+nie odwraca się w wysoki garb podczas powrotu.
 
-Przy 80% osi sprężyna puszcza (swobodnie: sztywność 70, tłumienie 5,6).
-Powrót poniżej 69% ponownie mocuje powierzchnię. Momentum i odbicie są
-przekazywane do pozycji i przechyłu kostki, z ograniczoną amplitudą.
-Począwszy od 88% osi model kieruje się w dół i lekko do środka lejka.
+Przy 76% osi sprężyna puszcza (swobodnie: sztywność 70, tłumienie 8,2).
+Powrót poniżej 64% ponownie mocuje powierzchnię. Osobna sprężyna wyporu
+kostki (sztywność 36, tłumienie 9,8) daje spokojne uniesienie z niewielkim
+przeregulowaniem. Amplituda wynika z projekcji ośmiu narożników oryginalnego
+modelu i dostępnego miejsca nad kostką, z marginesem 6,5% wysokości.
+Cały model pozostaje w kadrze podczas samego wypłynięcia.
+
+Dopiero dalszy scroll przenosi kostkę nad górną krawędź viewportu. Ten tor
+zaczyna się 22vh przed końcem osi, ma łagodny początek i jest odwracalny.
+Ukrycie renderera następuje po wyjściu całego modelu ponad ekran, na podstawie
+rzeczywistej projekcji jego dolnego narożnika, a nie progu postępu animacji.
 
 Usunięto wcześniejszy fade opacity i fade zależny od dystansu do sekcji.
 Model ma opacity 1. Zamiast zaniku jego obraz zasłania maska będąca tym
-samym konturem co tło: kostka zanurza się za meniskiem. Maska jest liczona
-w 57 punktach na CPU i przekazywana jako polygon clip-path na portal kostki.
-Ograniczenie do części konturu działa również przy scrollowaniu wstecz.
+samym konturem co tło, tylko w fazie kontaktu. Kiedy rozpoczyna się wypór,
+maska jest zdejmowana jeszcze przed cofnięciem powierzchni. Kostka unosi się
+w całości przed cieczą i nie zanika przy jej odbiciu. Maska używa 57 punktów
+na CPU. Przy scrollowaniu wstecz wraca dopiero po ponownym osadzeniu modelu.
 
 Tło usług jest przezroczyste, a shader pod nim daje identyczny #080909.
 Pozwala to cieczy wejść w górny margines drugiej sekcji; zabezpieczenie

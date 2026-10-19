@@ -2,8 +2,8 @@
 import * as THREE from './vendor/three-0.170.0.module.min.js';
 import { installGlassCube } from './cosgral-glass-cube.js?v=20261018perf1';
 import { createFrameProfile } from './cosgral-frame-profile.js';
-import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019viscous7';
-import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019viscous7';
+import { createHeroLensText } from './cosgral-hero-lens-text.js?v=20261019buoyant8';
+import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019buoyant8';
 
 (async function () {
   const canvas = document.getElementById('hero-3d');
@@ -38,6 +38,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
   let lastCropX=NaN,lastCropY=NaN,lastPortalVisible=null,lastRenderAt=0,lastClip='';
   let qualityTier=0,sectionDocumentTop=0,contentDocumentTop=0,scrollSpan=1;
   let menuBlend=0,menuTarget=0,progress=0,lastTime=0;
+  let tailProgress=0,heroExited=false;
   let menuChangedAt=0;
   let effectPauseUntil=0;
   let introStart=null,introDone=false,contextLost=false;
@@ -131,29 +132,39 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
     // starts and stops with zero velocity and acceleration, in both directions.
     const h=worldHeight(.36),turn=smoother(.04,.84,progress),arc=smoother(.08,.80,progress);
     const sway=Math.sin(Math.PI*arc),drift=reduced?0:Math.sin(time*.34)*.012;
-    const contact=smoother(.43,.64,progress),pull=reduced?0:clamp(materialStudy?.pull||0,-.12,.32)*contact;
-    const dip=smoother(.88,1,progress);
-    const y=THREE.MathUtils.lerp(mobile?.31:.30,mobile?.275:.255,arc)-sway*.025+pull*.28+dip*.27;
+    const contact=smoother(.43,.64,progress);
+    const strain=smooth(0,.28,Math.max(0,materialStudy?.pull||0))*contact;
+    const lift=materialStudy?.lift||0;
+    // Settle into the lowered sheet, then float up with one damped response.
+    // Further scrolling carries the intact cube out above the viewport.
+    const leave=tailProgress*(1-Math.exp(-tailProgress/.07));
+    const y=THREE.MathUtils.lerp(mobile?.31:.30,mobile?.275:.255,arc)-sway*.025
+      +contact*.12+strain*.025;
     screenPosition(width*.5,height*y,.36,pose.position);
-    euler.set(.48+drift-pointerY*.045+sway*.075+dip*.12,
-      -.67+pointerX*.075+turn*Math.PI*.42,-sway*.045+pull*.25-dip*.10);
+    euler.set(.48+drift-pointerY*.045+sway*.075+lift*.035,
+      -.67+pointerX*.075+turn*Math.PI*.42,-sway*.045+strain*.018-lift*.025);
     pose.quaternion.setFromEuler(euler);
     pose.scale=screenScale(heroSize(),.36)*(1+sway*.05);
     // Leave room for the actual rotated model rather than cutting it off on
     // narrow screens. The safe travel is blended through the same side arc.
-    let right=width*.5;
+    let right=width*.5,top=height;
     if(glass){
       const box=glass.geometry.boundingBox;
       for(let i=0;i<8;i++){
         exitPoint.set(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z);
         exitPoint.multiplyScalar(pose.scale).applyQuaternion(pose.quaternion).add(pose.position).project(fullCamera);
         right=Math.max(right,(exitPoint.x*.5+.5)*width);
+        top=Math.min(top,(.5-exitPoint.y*.5)*height);
       }
     }
+    // Reserve real headroom for the complete rotating model. The buoyant
+    // rise settles inside the viewport; only continued scroll takes it out.
+    const rise=Math.max(0,Math.min(.19,(top/height-.065)*.94));
+    pose.position.y+=(rise*lift+leave*1.3)*h;
     const available=Math.max(0,width-right-Math.max(20,width*.055));
     const travel=Math.min(width*(mobile?.19:.24),available*.85);
     pose.position.x+=travel/height*h*arc;
-    pose.position.x-=(pull*.12+dip*width/height*.065)*h;
+    pose.position.x-=(strain*.010+lift*width/height*.018)*h;
   }
   function captureMenuPose(){
     menuFrom.position.copy(group.position);menuFrom.quaternion.copy(group.quaternion);menuFrom.scale=group.scale.x;
@@ -204,7 +215,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
   window.cosgralCube={
     group,debug:{renderer,scene,camera,renderFrame:()=>renderer.render(scene,camera),fxaa:false,
       get chrome(){return {progress,metalness:glass?.material.metalness,roughness:glass?.material.roughness,
-        transmission:glass?.material.transmission,opacity:glass?.material.opacity,paper:window.cosgralChromeStudio?.paper};}},
+        transmission:glass?.material.transmission,opacity:glass?.material.opacity,paper:window.cosgralChromeStudio?.paper,
+        lift:materialStudy?.lift,tailProgress,heroExited};}},
     introDone:()=>introDone,forceIntro:beginIntro,getMenuBlend:()=>menuBlend,
     getMenuFaceRect:faceRect,getMenuFaceAnchorRect:()=>null,
     getMenuOpenDuration:()=>1.25,getMenuCloseDuration:()=>0.8,getMenuLinksDelay:()=>0.35,
@@ -224,7 +236,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
       const previous=glass;
       glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
       glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
-      materialStudy?.dispose();materialStudy=await createCubeMaterialStudy(glass,group);
+      materialStudy?.dispose();materialStudy=await createCubeMaterialStudy(glass,scrollProgress());
       await warmMaterialPrograms();
       if(previous){
         group.remove(previous);scene.remove(previous.userData.transmissionBackdrop);
@@ -240,7 +252,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
   try{
     glass=await installGlassCube(THREE,renderer,scene,group,HALF,glassLook);
     glass.userData.transmissionBackdrop.material.uniforms.uText.value=heroText.texture;
-    materialStudy=await createCubeMaterialStudy(glass,group);
+    materialStudy=await createCubeMaterialStudy(glass,scrollProgress());
     await warmMaterialPrograms();
     canvas.parentElement.classList.add('has-glass-model');
     requestAnimationFrame(()=>window.ScrollTrigger?.refresh());
@@ -256,6 +268,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
   window.setTimeout(beginIntro,2200);
   function frame(now){
     requestAnimationFrame(frame);
+    const firstFrame=lastTime===0;
     const dt=Math.min(0.05,Math.max(0.001,(now-(lastTime||now-16.7))/1000));lastTime=now;
     if(document.hidden||contextLost)return;
     profile?.frame(now);
@@ -263,9 +276,13 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
     const pointerMoving=Math.abs((pointer?.nx||0)-pointerX)+Math.abs((pointer?.ny||0)-pointerY)>0.004;
     pointerX+=((pointer?.nx||0)-pointerX)*blend;pointerY+=((pointer?.ny||0)-pointerY)*blend;
     const nextProgress=scrollProgress();
-    if(progress===1&&nextProgress===1&&menuBlend===0&&menuTarget===0&&window.cosgralChromeStudio?.covered)return;
+    const scrollY=window.cosgralSmoothScroll?.lenis?.scroll??window.scrollY;
+    const nextTail=Math.max(0,(scrollY-(scrollSpan-height*.22))/height);
+    if(firstFrame){progress=nextProgress;tailProgress=nextTail;}
+    if(progress===1&&nextProgress===1&&heroExited&&nextTail>=tailProgress&&menuBlend===0&&menuTarget===0&&window.cosgralChromeStudio?.covered)return;
     const scrollMoving=Math.abs(nextProgress-progress)>0.0004;
     progress+=(nextProgress-progress)*(1-Math.exp(-dt*8));
+    tailProgress+=(nextTail-tailProgress)*blend;
     if(Math.abs(nextProgress-progress)<.0001)progress=nextProgress;
     menuBlend+=(menuTarget-menuBlend)*(1-Math.exp(-dt*(menuTarget?4.5:7)));
     if(Math.abs(menuTarget-menuBlend)<0.0001)menuBlend=menuTarget;
@@ -297,11 +314,11 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
       group.position.copy(pose.position);targetQ.copy(pose.quaternion);group.scale.setScalar(pose.scale);
     }
     group.quaternion.slerp(targetQ,1-Math.exp(-dt*14));group.updateMatrixWorld(true);
-    const scrollY=window.cosgralSmoothScroll?.lenis?.scroll??window.scrollY;
     const sectionTop=sectionDocumentTop-scrollY,guard=(contentDocumentTop-scrollY)/height-.012;
     updateFunnelFrame();
+    heroExited=progress===1&&funnelFrame[1]<-.025;
     materialStudy.update(progress,menuBlend,sectionTop/height,guard,funnelFrame,dt,nextProgress);
-    group.visible=(progress<.998||menuBlend>.001)&&introStart!==null;
+    group.visible=(!heroExited||menuBlend>.001)&&introStart!==null;
     glass.userData.transmissionBackdrop.visible=group.visible&&glass.material.transmission>0;
     heroText.setActive(group.visible&&glass.material.transmission>.01);
     const footer=document.documentElement.classList.contains('is-footer-covered');
@@ -315,7 +332,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019visc
     if(now<effectPauseUntil)return;
     // UI and input still update at the display rate; expensive effect renders
     // are capped at 60Hz on 120/144/240Hz monitors.
-    const activeMotion=!introDone||pointerMoving||scrollMoving||materialStudy.moving||Math.abs(menuTarget-menuBlend)>0.001;
+    const activeMotion=!introDone||pointerMoving||scrollMoving||Math.abs(nextTail-tailProgress)>.0004||materialStudy.moving||Math.abs(menuTarget-menuBlend)>0.001;
     // The resting cube moves only a few pixels over several seconds. Reuse
     // its image between updates; pointer and scroll input restore 60Hz work.
     if(now-lastRenderAt<(activeMotion?14:42))return;

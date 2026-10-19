@@ -1,7 +1,7 @@
 /** Lab 05 glass/chrome material, paired with lab 01 inertia on the real page. */
 import * as THREE from './vendor/three-0.170.0.module.min.js';
 const smooth=(a,b,x)=>THREE.MathUtils.smoothstep(x,a,b),mix=THREE.MathUtils.lerp;
-const url=new URL(location.href);url.searchParams.set('cube','chrome');history.replaceState(null,'',url);
+const url=new URL(location.href);url.searchParams.set('cube','chrome');url.searchParams.set('rev','8');history.replaceState(null,'',url);
 const studio=window.cosgralChromeStudio={paper:0,boundary:2,funnel:new Float32Array([.5,.45,.18,0]),elastic:new Float32Array(2),shape:new Float32Array([2,0,.4,0]),covered:false,moving:false};
 const style=document.createElement('style');
 style.textContent=`
@@ -17,10 +17,10 @@ html:not(.reduce-motion) .editorial-page .editorial-services{background:transpar
 `;
 document.head.append(style);
 
-export function createCubeMaterialStudy(glass){
+export function createCubeMaterialStudy(glass,initialProgress=0){
   const mat=glass.material;
   const funnel=window.cosgralChromeFunnel;
-  const spring=funnel.createSpring(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const spring=funnel.createSpring(window.matchMedia('(prefers-reduced-motion: reduce)').matches,initialProgress);
   const shade=document.querySelector('.home-ambient__shade');
   const toneTargets=[document.querySelector('.home-hero__title'),document.querySelector('.hero-caption')].filter(Boolean);
   const grain={value:0};
@@ -71,8 +71,11 @@ export function createCubeMaterialStudy(glass){
   return {
     get moving(){return spring.moving;},
     get pull(){return studio.elastic[0];},
+    get lift(){return spring.lift;},
     clipPath(width,height,progress,menuBlend){
-      if(progress<.35||menuBlend>.001)return 'none';
+      // Release the occlusion while the model still clears the liquid. It
+      // must lift in front of the retreating surface, rather than disappear.
+      if(progress<.35||spring.lift>.015||menuBlend>.001)return 'none';
       const points=['0px 0px',`${width}px 0px`],aspect=width/height;
       for(let i=56;i>=0;i--){
         const x=i/56,y=Math.min(studio.boundary-.012,funnel.surface(x,aspect,studio.funnel,studio.shape,studio.elastic));
