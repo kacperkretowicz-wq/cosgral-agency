@@ -9,7 +9,7 @@ export function createHorizon(section, reduced) {
   const surface=section.querySelector('.tone-wipe__surface');
   const copy=section.querySelector('.tone-wipe__copy');
   const reverse=section.classList.contains('tone-wipe--dark');
-  const paperBackground='radial-gradient(circle,rgba(255,255,255,.48) .8px,transparent 1.8px) 0 0/6px 6px fixed,linear-gradient(0deg,#b4cbf5,#f7faff) 0 0/100% 100vh fixed';
+  const paperBackground='url(./studio-surface.svg) center/100% 100vh fixed';
   const clamp=v=>Math.max(0,Math.min(1,v));
   let progress=reduced?1:0,gl,program,buffer,uniforms,canvas,lost=false;
   let width=1,height=1,near=false,raf=0,last=0,bend=0,speed=0,dirty=true,destroyed=false;

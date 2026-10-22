@@ -264,7 +264,7 @@
     "void main(){",
     "  vec2 px=vec2(uv.x*viewport.x,(1.-uv.y)*viewport.y);",
     "  vec2 t=vec2(uv.x,1.-uv.y);",
-    "  vec3 paper=vec3(.93333,.92941,.9098);",
+    "  vec3 paper=mix(vec3(.70588,.79608,.96078),vec3(.96863,.98039,1.),uv.y);",
     "  float grain=fract(sin(dot(floor(uv*resolution),vec2(12.9898,78.233)))*43758.5453)-.5;",
     "  if(mode>1.5){gl_FragColor=vec4(deep(t),1.);return;}",
     "  if(mode>.5){",
@@ -361,7 +361,7 @@
     }
     if (!gl || lost) {
       var tone = solid === -1 ? (s.t > 0.5 ? s.to : s.from) : solid;
-      canvas.style.backgroundColor = tone ? "#eeede8" : (s.abyss ? "#000" : "transparent");
+      canvas.style.background = tone ? "url(./studio-surface.svg) center/100% 100%" : (s.abyss ? "#000" : "transparent");
       return;
     }
     var deepSolid = solid === 0 && s.abyss;
@@ -449,3 +449,4 @@
   window.addEventListener("pageshow", queue);
   resize();
 })();
+

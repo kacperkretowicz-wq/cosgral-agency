@@ -20,7 +20,7 @@ function initFAQ(section){
   let reduced=preference.matches||document.documentElement.classList.contains('reduce-motion');
   let top=0,span=1,start=0,end=1,bottom=0,raf=0,last=0,progress=0,target=0,near=false,model=null,loading=false;
   let origin=.12,visualIndex=-1,holdGesture=false,answerBlend=0;
-  const pose={flight:0,progress:0,reveal:0,charge:0,x:0,y:0,opened:false,exit:0,answerBlend:0};
+  const pose={flight:0,progress:0,reveal:0,charge:0,x:0,y:0,opened:false,exit:0,answerBlend:0,typeEntry:0,typeLeave:0,typeAlpha:0};
   const english=()=>document.documentElement.lang==='en',t=(pl,en)=>english()?en:pl;
   function labels(){
     const q=items[Math.max(active,0)].querySelector('[data-i18n^="faq.q"]').textContent.trim();
@@ -88,7 +88,7 @@ function initFAQ(section){
   function wake(){if(!raf&&!document.hidden)raf=requestAnimationFrame(draw);}
   async function load(){
     if(loading||model)return;loading=true;
-    try{const {createFAQCube}=await import('./faq-scroll-cube.js?v=20261022noomo2');model=await createFAQCube(portal,pose,()=>reduced);model.setVisible(near&&!document.hidden);}
+    try{const {createFAQCube}=await import('./faq-scroll-cube.js?v=20261022story3');model=await createFAQCube(portal,pose,()=>reduced);model.setVisible(near&&!document.hidden);}
     catch(error){portal.classList.add('is-fallback');console.warn('COSGRAL FAQ: poster fallback',error);}
   }
   function draw(now){
@@ -113,15 +113,16 @@ function initFAQ(section){
     if(!unlocked||reveal<.9)qp=0;
     if(unlocked&&!reduced)select(Math.min(items.length-1,Math.floor(qp*items.length)));
     const phase=Math.min(.999,qp*items.length-active);
-    const enter=active===0?1:ease(0,.22,phase),leave=active===items.length-1?0:ease(.77,1,phase);
-    const alpha=unlocked?ease(.38,.94,reveal)*enter*(1-leave)*(1-ease(.02,.78,departure)):0;
-    const displacement=reduced?0:(1-enter)*68-leave*78;
-    const depth=reduced?0:-(1-enter)*440+leave*190;
-    const yaw=reduced?0:(1-enter)*58-leave*64;
+    const enter=active===0?ease(.16,.94,reveal):ease(0,.28,phase),leave=active===items.length-1?0:ease(.72,1,phase);
+    const alpha=unlocked?ease(0,.25,enter)*(1-ease(.7,1,leave))*(1-ease(.02,.78,departure)):0;
+    pose.typeEntry=enter;pose.typeLeave=leave;pose.typeAlpha=alpha;
+    const displacement=reduced?0:Math.sin((1-enter)*1.25)*4;
+    const depth=reduced?0:-(1-enter)*200+leave*150;
+    const yaw=reduced?0:(1-enter)*12-leave*14;
     question.style.transform=`translate3d(0,${-innerHeight*.065*answerBlend}px,0) scale(${1-answerBlend*.54})`;
     question.style.gap=((innerWidth<=700?16:12)*(1-answerBlend*.62))+"vh";
     lines.forEach((line,i)=>{
-      line.style.transform=`translate3d(${displacement*(i?-1:1)}vw,${(1-enter)*(i?60:24)-leave*30}px,${depth}px) rotateY(${yaw*(i?-1:1)}deg) rotateZ(${(1-enter)*(i?5:-5)-leave*(i?3:-3)}deg)`;
+      line.style.transform=`translate3d(${displacement*(i?-1:1)}vw,${(1-enter)*innerHeight*.9-leave*innerHeight*.7}px,${depth}px) rotateX(${-(1-enter)*58-leave*62}deg) rotateY(${yaw}deg) rotateZ(${(1-enter)*(i?5:-5)-leave*(i?3:-3)}deg)`;
       line.style.opacity=String(alpha*(1-answerBlend*.06));
     });
     question.setAttribute('aria-hidden',String(!unlocked));

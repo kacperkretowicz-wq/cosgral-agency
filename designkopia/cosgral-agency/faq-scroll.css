@@ -1,5 +1,5 @@
 /* A single cool studio surface continues from selected work into the pinned scene. */
-:root{--noomo-surface:radial-gradient(circle,rgba(255,255,255,.48) .8px,transparent 1.8px) 0 0/6px 6px fixed,linear-gradient(0deg,#b4cbf5,#f7faff) 0 0/100% 100vh fixed;}
+:root{--noomo-surface:url(./studio-surface.svg) center/100% 100vh fixed;}
 .editorial-page .tone-light,.editorial-page .faq-scroll{background:var(--noomo-surface);color:#080909;}
 .editorial-page .tone-wipe:not(.tone-wipe--dark){background:#dbe5f8;}
 .editorial-page .tone-light .gallery-switch{border-color:#1113;}
@@ -65,3 +65,13 @@
 .faq-glass-portal::before{content:"";position:absolute;left:30%;top:34%;width:40%;height:28%;background:conic-gradient(from 32deg at 50% 50%,transparent 0deg,rgba(175,197,255,.1) 31deg,transparent 61deg,rgba(225,200,255,.07) 180deg,transparent 220deg,rgba(195,228,255,.1) 298deg,transparent);filter:blur(32px);mix-blend-mode:soft-light;pointer-events:none;}
 .faq-scroll__answer{will-change:opacity,transform;}
 @media(prefers-reduced-motion:reduce){.faq-scroll__question{will-change:auto;}}
+
+/* The accessible DOM mirrors glyphs; the WebGL camera owns their visual motion. */
+.faq-scroll.is-webgl-type .faq-scroll__line,.faq-scroll.is-webgl-type .faq-scroll__intro{opacity:0!important;}
+.faq-hold-ui{width:82px;height:82px;background:#f6f8ff18;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+.faq-hold-ui svg{width:94px;height:94px;}
+.faq-glass-portal::before{display:none;}
+.editorial-page.has-light-section:not(.is-nav-menu-open) .site-nav__actions{background:rgba(235,243,255,.85);}
+/* The same studio replaces the paper chapters on the portfolio page. */
+.portfolio-page--tiles{--pf-paper:#e4edff;--paper:#e4edff;}
+.portfolio-page--tiles [data-portfolio-tile][data-ground="light"]{background:var(--noomo-surface)!important;}
