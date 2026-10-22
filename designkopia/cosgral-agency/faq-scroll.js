@@ -48,7 +48,7 @@ function initFAQ(section){
   }
   function measure(){
     const y=scrollY;top=section.getBoundingClientRect().top+y;bottom=top+section.offsetHeight;span=Math.max(1,section.offsetHeight-stage.offsetHeight);
-    const wr=work?.getBoundingClientRect();start=wr?wr.top+y+wr.height*.42-innerHeight*.45:top-innerHeight*1.6;end=top;
+    const wr=work?.getBoundingClientRect();start=wr?wr.top+y+wr.height*.32-innerHeight*.45:top-innerHeight*1.6;end=top;
     fit();wake();
   }
   function unlock(){
@@ -70,14 +70,14 @@ function initFAQ(section){
     if(performance.now()<suppressClickUntil||reveal<.85)return;
     if(opened)close();else{
       opened=true;pose.opened=true;answer.hidden=false;section.classList.add('is-answer-open');cube.setAttribute('aria-expanded','true');labels();
-      if(!reduced)answer.animate([{opacity:0,transform:'translate(-50%,20px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:750,easing:'cubic-bezier(.16,1,.3,1)'});
+      if(!reduced)answer.animate([{opacity:0,transform:'translate(-50%,20px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:1100,easing:'cubic-bezier(.16,1,.3,1)'});
     }wake();
   });
   function jump(i){
     i=Math.max(0,Math.min(items.length-1,i));if(!unlocked)return;
     if(reduced){select(i);progress=target=origin+(1-origin)*(i+.35)/items.length;wake();return;}
     const y=top+span*(origin+(1-origin)*(i+.35)/items.length),lenis=window.cosgralSmoothScroll?.lenis;
-    if(lenis)lenis.scrollTo(y,{duration:1.4});else scrollTo({top:y,behavior:'smooth'});
+    if(lenis)lenis.scrollTo(y,{duration:2.2});else scrollTo({top:y,behavior:'smooth'});
   }
   buttons.forEach((b,i)=>b.addEventListener('click',()=>jump(i)));
   stage.addEventListener('keydown',event=>{
@@ -93,7 +93,7 @@ function initFAQ(section){
   }
   function draw(now){
     raf=0;const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
-    target=clamp((scrollY-top)/span);if(!reduced)progress+=(target-progress)*(1-Math.exp(-dt*7));
+    target=clamp((scrollY-top)/span);if(!reduced)progress+=(target-progress)*(1-Math.exp(-dt*3.2));
     const flight=reduced?1:ease(0,1,(scrollY-start)/Math.max(1,end-start));pose.flight=flight;
     near=scrollY>start-innerHeight*.3&&scrollY<bottom-innerHeight*.15;
     portal.classList.toggle('is-visible',near);portal.style.setProperty('--flight',String(flight));
@@ -101,7 +101,7 @@ function initFAQ(section){
     model?.setVisible(near&&!document.hidden);if(near)load();
     if(holding&&!unlocked){hold=clamp(hold+dt/1.25);if(hold>=1)unlock();}
     else if(!unlocked)hold=Math.max(0,hold-dt*1.8);
-    if(unlocked)reveal=reduced?1:ease(.12,1.8,(now-unlockAt)/1000);
+    if(unlocked)reveal=reduced?1:ease(.18,3.5,(now-unlockAt)/1000);
     pose.reveal=reveal;pose.charge=hold;
     let qp=clamp((progress-origin)/Math.max(.08,1-origin));
     if(!unlocked||reveal<.9)qp=0;
@@ -109,9 +109,11 @@ function initFAQ(section){
     const phase=Math.min(.999,qp*items.length-active);
     const enter=active===0?1:ease(0,.22,phase),leave=active===items.length-1?0:ease(.77,1,phase);
     const alpha=unlocked?ease(.38,.94,reveal)*enter*(1-leave):0;
-    const displacement=reduced?0:(1-enter)*60-leave*65;
+    const displacement=reduced?0:(1-enter)*68-leave*78;
+    const depth=reduced?0:-(1-enter)*360+leave*150;
+    const yaw=reduced?0:(1-enter)*48-leave*57;
     lines.forEach((line,i)=>{
-      line.style.transform=`translate3d(${displacement*(i?-1:1)}vw,${(1-enter)*38}px,0) rotateY(${displacement*(i?-1:1)*.18}deg)`;
+      line.style.transform=`translate3d(${displacement*(i?-1:1)}vw,${(1-enter)*(i?60:24)-leave*30}px,${depth}px) rotateY(${yaw*(i?-1:1)}deg) rotateZ(${(1-enter)*(i?5:-5)-leave*(i?3:-3)}deg)`;
       line.style.opacity=String(alpha*(opened ? .1 : 1));
     });
     question.setAttribute('aria-hidden',String(!unlocked));
