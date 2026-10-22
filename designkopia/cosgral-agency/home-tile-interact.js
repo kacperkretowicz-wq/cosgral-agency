@@ -51,12 +51,12 @@
     if (tx !== lastTx || ty !== lastTy) {
       lastTx = tx;
       lastTy = ty;
-      root.style.setProperty("--global-tilt-x", tx);
-      root.style.setProperty("--global-tilt-y", ty);
+      // Transform visible layers directly. The old inherited CSS variables
+      // were unused and invalidated the whole document on every pointer move.
     }
 
-    var faceKey = tx + "|" + ty + "|" + faces().length;
-    if (faceKey === lastFaceKey && !menuOpen) return;
+    var faceKey = tx + "|" + ty + "|" + faces().length + "|" + menuOpen;
+    if (faceKey === lastFaceKey) return;
     lastFaceKey = faceKey;
 
     var tf = menuOpen ? "none" : "rotateX(" + tx + ") rotateY(" + ty + ")";

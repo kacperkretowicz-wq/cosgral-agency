@@ -75,15 +75,16 @@
     if (isClone) {
       return (
         '<img class="reels-tiles__poster" src="' +
-        mediaUrl(item.poster || item.src) +
+        (item.poster || mediaUrl(item.src)) +
         '" alt="" loading="lazy" decoding="async" />'
       );
     }
     return (
       '<video data-portfolio-video data-video-mode="focus-only" data-video-src="' +
       mediaUrl(item.src) +
-      '" poster="' +
-      mediaUrl(item.poster || "") +
+      '" data-video-poster="' +
+      /* perf: unversioned poster = the same URL the Montaż wall uses, so it downloads once */
+      (item.poster || "") +
       '" muted loop playsinline preload="none"></video>'
     );
   }
@@ -178,6 +179,7 @@
       "</div>";
 
     if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.scan(tilesRoot);
+    initTilePosters();
     initTilesEntrance();
     initTilesCenterFocus();
     syncDriftSpeed();
@@ -185,7 +187,7 @@
   }
 
   /* Stała prędkość w px/s — na mobile krótsza belka przy 52s wyglądała wolniej */
-  var DRIFT_PX_PER_SEC = 96;
+  var DRIFT_PX_PER_SEC = 48;
   var driftResizeBound = false;
 
   function syncDriftSpeed() {
@@ -220,48 +222,86 @@
 
     var radius = cmToPx(7);
     var radiusSq = radius * radius;
-    var running = false;
+    var inView = false, raf = 0, wasRunning = false;
+    var cards = Array.prototype.slice.call(stage.querySelectorAll(".reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card"));
+    function canRun() {
+      var html = document.documentElement, body = document.body;
+      return inView && !document.hidden && !html.classList.contains("is-nav-menu-open") &&
+        !body.classList.contains("pf-wall-open") && !body.classList.contains("pf-gfx-open") &&
+        !body.classList.contains("is-lightbox-open") &&
+        !(body.classList.contains("portfolio-page--tiles") && !section.classList.contains("is-active"));
+    }
 
     function updateFocus() {
       var cx = window.innerWidth * 0.5;
       var cy = window.innerHeight * 0.5;
-      stage.querySelectorAll(".reels-tiles__track:not(.reels-tiles__track--clone) .reels-tiles__card").forEach(function (card) {
+      var focus = cards.map(function (card) {
         var rect = card.getBoundingClientRect();
         var dx = rect.left + rect.width * 0.5 - cx;
         var dy = rect.top + rect.height * 0.5 - cy;
-        card.classList.toggle("is-in-focus", dx * dx + dy * dy <= radiusSq);
+        return dx * dx + dy * dy <= radiusSq;
+      });
+      cards.forEach(function (card, i) {
+        if (card.classList.contains("is-in-focus") !== focus[i]) card.classList.toggle("is-in-focus", focus[i]);
       });
       if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.syncReelsFocus(stage);
     }
 
     function loop() {
-      if (!running) return;
+      raf = 0;
+      if (!canRun()) { syncActivity(); return; }
       updateFocus();
-      requestAnimationFrame(loop);
+      raf = requestAnimationFrame(loop);
+    }
+    function syncActivity() {
+      var running = canRun();
+      if (running && !raf) raf = requestAnimationFrame(loop);
+      else if (!running) {
+        cancelAnimationFrame(raf); raf = 0;
+        if (wasRunning) {
+          cards.forEach(function (card) { card.classList.remove("is-in-focus"); });
+          if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.pauseAllIn(stage);
+        }
+      }
+      wasRunning = running;
     }
 
     var io = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            if (!running) {
-              running = true;
-              requestAnimationFrame(loop);
-            }
-          } else {
-            running = false;
-            stage.querySelectorAll(".reels-tiles__card.is-in-focus").forEach(function (card) {
-              card.classList.remove("is-in-focus");
-            });
-            if (window.CosgralPortfolioVideo) window.CosgralPortfolioVideo.pauseAllIn(stage);
-          }
+          inView = entry.isIntersecting;
         });
+        syncActivity();
       },
       { threshold: 0.05 }
     );
 
     io.observe(section);
-    window.addEventListener("resize", updateFocus);
+    window.addEventListener("resize", syncActivity, { passive: true });
+    window.addEventListener("pageshow", syncActivity, { passive: true });
+    document.addEventListener("visibilitychange", syncActivity);
+    if (window.MutationObserver) {
+      var activity = new MutationObserver(syncActivity);
+      [document.documentElement, document.body, section].forEach(function (node) {
+        activity.observe(node, { attributes: true, attributeFilter: ["class"] });
+      });
+    }
+  }
+
+  function initTilePosters() {
+    var section = document.getElementById("montaz") || tilesRoot;
+    function prepare() {
+      tilesRoot.querySelectorAll("video[data-video-poster]").forEach(function (video) {
+        var poster = video.getAttribute("data-video-poster");
+        if (poster) video.poster = poster;
+        video.removeAttribute("data-video-poster");
+      });
+    }
+    if (!window.IntersectionObserver) { prepare(); return; }
+    var io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (entry) { return entry.isIntersecting; })) { prepare(); io.disconnect(); }
+    }, { rootMargin: "100% 0px" });
+    io.observe(section);
   }
 
   function cmToPx(cm) {
@@ -366,7 +406,7 @@
       el.addEventListener("click", closeLightbox);
     });
     document.addEventListener("keydown", function (e) {
-      if (lightbox.hidden) return;
+      if (lightbox.hidden || document.documentElement.classList.contains("is-nav-menu-open")) return;
       if (e.key === "Escape") closeLightbox();
       else if (lightboxNav) lightboxNav.onKeydown(e);
     });
@@ -374,7 +414,7 @@
 
   bindLightboxUi();
 
-  fetch("portfolio-media/reels/manifest.json?v=20260814g")
+  fetch("portfolio-media/reels/manifest.json?v=20261018self1")
     .then(function (r) {
       return r.json();
     })

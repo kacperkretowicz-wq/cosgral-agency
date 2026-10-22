@@ -325,6 +325,7 @@
 
     var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
     var running = false;
+    var rafId = 0, visibilityRaf = 0, visible = true, suspended = false;
     var start = performance.now();
     var lastDraw = 0;
     var MOBILE =
@@ -342,15 +343,17 @@
         canvas.width = w;
         canvas.height = h;
         gl.viewport(0, 0, w, h);
+        gl.uniform2f(uRes, w, h);
       }
     }
 
     function frame(now) {
+      rafId = 0;
       if (!running) return;
       // Fale poruszają się wolno; ograniczenie liczby klatek odciąża GPU,
       // gdy jednocześnie pracują sceny 3D portfolio i animacja menu.
       if (now - lastDraw < (MOBILE ? 50 : 33)) {
-        requestAnimationFrame(frame);
+        schedule();
         return;
       }
       lastDraw = now;
@@ -363,33 +366,57 @@
       mouse.x += (mouse.tx - mouse.x) * 0.06;
       mouse.y += (mouse.ty - mouse.y) * 0.06;
 
-      gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform2f(uMouse, mouse.x, mouse.y);
-      gl.uniform3fv(uBase, colors.base);
-      gl.uniform3fv(uAccent, colors.accent);
-      gl.uniform3fv(uHighlight, colors.highlight);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-      requestAnimationFrame(frame);
+      schedule();
     }
 
+    function schedule() {
+      if (running && !rafId && !document.hidden && !suspended) rafId = requestAnimationFrame(frame);
+    }
     function play() {
-      if (!running) {
+      if (!running && visible && !document.hidden && !suspended) {
         running = true;
-        requestAnimationFrame(frame);
+        schedule();
       }
     }
 
     function pause() {
       running = false;
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+
+    function checkVisibility() {
+      visibilityRaf = 0;
+      visible = !!canvas.isConnected && !document.hidden && !suspended;
+      for (var node = canvas; visible && node; node = node.parentElement) {
+        var style = getComputedStyle(node);
+        if (style.display === "none" || style.visibility === "hidden" || parseFloat(style.opacity) < 0.003) visible = false;
+      }
+      if (visible) {
+        var rect = canvas.getBoundingClientRect();
+        visible = rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth;
+      }
+      if (visible) play(); else pause();
+    }
+    function queueVisibility() {
+      if (!visibilityRaf) visibilityRaf = requestAnimationFrame(checkVisibility);
     }
 
     if (themeId !== "default") {
       canvas.classList.add("subpage-ambient--themed");
     }
 
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", function () { resize(); queueVisibility(); }, { passive: true });
+    window.addEventListener("scroll", queueVisibility, { passive: true });
+    var visibilityObserver = new MutationObserver(queueVisibility);
+    for (var node = canvas; node; node = node.parentElement) {
+      visibilityObserver.observe(node, { attributes: true, attributeFilter: ["class", "style", "hidden"] });
+    }
+    if (window.IntersectionObserver) new IntersectionObserver(queueVisibility).observe(canvas);
     resize();
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.uniform1f(uTime, 0);
@@ -398,17 +425,16 @@
     gl.uniform3fv(uAccent, colors.accent);
     gl.uniform3fv(uHighlight, colors.highlight);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    play();
+    checkVisibility();
 
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) pause();
-      else play();
+      else queueVisibility();
     });
+    window.addEventListener("pagehide", function () { suspended = true; pause(); });
+    window.addEventListener("pageshow", function () { suspended = false; queueVisibility(); });
   }
 
-  if (themeId !== "default" && "requestIdleCallback" in window) {
-    requestIdleCallback(boot, { timeout: 120 });
-  } else {
-    boot();
-  }
+  // Boot immediately — idle delay left the subpage backdrop blank on first paint.
+  boot();
 })();

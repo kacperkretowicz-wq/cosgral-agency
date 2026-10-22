@@ -219,12 +219,13 @@
     return overlay.querySelectorAll(".nav-overlay__char");
   }
 
+  var lastProjection = "";
   function syncStageToCube() {
     if (!isOpen || !stage) return;
 
     var mobile = window.matchMedia("(max-width: 900px)").matches;
-    /* Services on mobile: left column, same type size as main menu */
-    if (mobile && servicesExpanded) {
+    /* Keep every category on the glass face, including the services submenu. */
+    if (mobile && servicesExpanded && !window.cosgralCube) {
       var panelW = Math.min(window.innerWidth * 0.88, 320);
       var inset = Math.max(16, window.innerWidth * 0.06);
       stage.style.left = inset + "px";
@@ -242,14 +243,28 @@
       window.cosgralCube?.getMenuFaceAnchorRect?.() ||
       window.cosgralCube?.getMenuFaceRect?.();
     if (rect && rect.size > 40) {
-      var face = Math.max(rect.size, mobile ? Math.min(window.innerWidth * 0.72, 280) : 240);
+      var face = Math.max(rect.size, 80);
+      rect.x = Math.round(rect.x * 4) / 4;
+      rect.y = Math.round(rect.y * 4) / 4;
+      face = Math.round(face * 4) / 4;
+      var reveal = Math.round((window.cosgralCube?.getMenuLabelReveal?.() ?? 1) * 1000) / 1000;
+      var projection = rect.x + "|" + rect.y + "|" + face + "|" + reveal;
+      if (projection === lastProjection) {
+        syncRaf = window.requestAnimationFrame(syncStageToCube);
+        return;
+      }
+      lastProjection = projection;
       stage.style.left = rect.x + "px";
       stage.style.top = rect.y + "px";
       stage.style.width = face + "px";
       stage.style.height = "auto";
       stage.style.minHeight = face + "px";
       stage.style.setProperty("--menu-face-size", face + "px");
+      stage.style.setProperty("--projected-x", rect.x + "px");
+      stage.style.setProperty("--projected-y", rect.y + "px");
+      stage.style.setProperty("--projected-size", face + "px");
       stage.style.transform = "translate(-50%, -50%)";
+      stage.style.opacity = String(reveal);
     } else {
       var fallback = Math.min(window.innerWidth * (mobile ? 0.86 : 0.72), mobile ? 340 : 360);
       stage.style.left = "50%";
@@ -259,15 +274,16 @@
       stage.style.minHeight = fallback + "px";
       stage.style.setProperty("--menu-face-size", fallback + "px");
       stage.style.transform = "translate(-50%, -50%)";
+      stage.style.opacity = "1";
     }
 
     syncRaf = window.requestAnimationFrame(syncStageToCube);
   }
 
   function startStageSync() {
-    // The 3D cube may be offscreen or still loading. Keep navigation in a
-    // predictable place and let the cube animate behind it.
+    // Project the navigation onto the cube face every frame.
     stopStageSync();
+    lastProjection = "";
     if (!stage) return;
     stage.style.left = "50%";
     stage.style.top = "50%";
@@ -276,6 +292,7 @@
     stage.style.minHeight = "min(84vw, 360px)";
     stage.style.setProperty("--menu-face-size", "min(84vw, 360px)");
     stage.style.transform = "translate(-50%, -50%)";
+    syncStageToCube();
   }
 
   function stopStageSync() {
@@ -291,6 +308,9 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("is-nav-menu-open", open);
     document.documentElement.classList.toggle("is-nav-menu-open", open);
+    var scrolling = window.cosgralSmoothScroll?.lenis;
+    if (scrolling) { if (open) scrolling.stop(); else scrolling.start(); }
+    window.dispatchEvent(new CustomEvent("cosgral:menu-state", { detail: { open: open } }));
     if (open && backdrop && window.gsap) {
       gsap.set(backdrop, { opacity: 1 });
     }
@@ -409,7 +429,7 @@
       }
       var target = document.getElementById(id);
       if (target && window.cosgralSmoothScroll?.scrollTo) {
-        window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1 });
+        window.cosgralSmoothScroll.scrollTo(target, { duration: 1.1, offset: -94 });
       } else if (target) {
         target.scrollIntoView({ behavior: "smooth" });
       }

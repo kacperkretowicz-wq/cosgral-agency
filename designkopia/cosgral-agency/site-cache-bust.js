@@ -1,5 +1,6 @@
 /**
- * Wymusza przeładowanie po deployu (localStorage) i po BFCache na iOS Safari.
+ * Asset URLs carry their own versions. Record the build without restarting
+ * an already fresh page or discarding the browser's saved back navigation.
  */
 (function () {
   "use strict";
@@ -9,16 +10,6 @@
   var key = "cosgral-build";
 
   if (build) {
-    var prev = localStorage.getItem(key);
-    if (prev && prev !== build) {
-      localStorage.setItem(key, build);
-      location.reload();
-      return;
-    }
-    localStorage.setItem(key, build);
+    try { localStorage.setItem(key, build); } catch (_) {}
   }
-
-  window.addEventListener("pageshow", function (event) {
-    if (event.persisted) location.reload();
-  });
 })();

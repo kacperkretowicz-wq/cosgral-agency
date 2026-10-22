@@ -165,6 +165,14 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   var _qDrift = new THREE.Quaternion();
   var menuPhase = { time: 0, qHold: new THREE.Quaternion() };
   var lastAnimT = 0;
+  var animationRaf = 0, suspended = false, externalMenuOpen = false, menuRequested = false;
+  var portalRect = null, idlePortalOpacity = null;
+  function wakeAnimation() {
+    if (!animationRaf && !document.hidden && !suspended && !externalMenuOpen) {
+      lastAnimT = 0;
+      animationRaf = requestAnimationFrame(animate);
+    }
+  }
   var mobileDriftSpinReady = false;
   var mobileDriftSeedP = null;
 
@@ -386,6 +394,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     portfolioFlight.t = 1;
     portfolioFlight.hideAfter = false;
     cubeGroup.visible = true;
+    wakeAnimation();
   }
 
   var heroPassToken = 0;
@@ -415,13 +424,15 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     portfolioFlight.hideAfter = false;
     cubeGroup.visible = false;
     setCubeVisualFade(0);
+    wakeAnimation();
   }
 
   function startPortfolioHeroPass(opts) {
     if (!isSandHeroPage) return;
     opts = opts || {};
     var duration = opts.duration != null ? opts.duration : MOBILE ? 2.6 : 3.35;
-    var delay = opts.delay != null ? opts.delay : MOBILE ? 0.55 : 0.72;
+    // Keep a tiny lead-in so layout can settle, but don't leave the cube blank.
+    var delay = opts.delay != null ? opts.delay : MOBILE ? 0.08 : 0.12;
     var ease = opts.ease || "power2.inOut";
 
     heroPassToken++;
@@ -437,6 +448,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       portfolioFlight.phase = "hero-pass";
       portfolioFlight.t = 0;
       cubeGroup.visible = true;
+      wakeAnimation();
       if (window.gsap) {
         gsap.to(portfolioFlight, {
           t: 1,
@@ -475,6 +487,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     portfolioFlight.phase = "stronies-enter";
     portfolioFlight.t = 0;
     cubeGroup.visible = true;
+    wakeAnimation();
     if (window.gsap) {
       gsap.to(portfolioFlight, {
         t: 1,
@@ -500,6 +513,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     portfolioFlight.phase = "stronies-exit";
     portfolioFlight.t = 0;
     cubeGroup.visible = true;
+    wakeAnimation();
     if (window.gsap) {
       gsap.to(portfolioFlight, {
         t: 1,
@@ -772,6 +786,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     portfolioFlight.t = 1;
     portfolioFlight.hideAfter = false;
     cubeGroup.visible = true;
+    wakeAnimation();
     if (portal) {
       portal.style.opacity = "";
       portal.style.visibility = "visible";
@@ -902,6 +917,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     portfolioFlight.t = 1;
     portfolioFlight.hideAfter = false;
     cubeGroup.visible = true;
+    wakeAnimation();
     if (portal) {
       portal.style.removeProperty("opacity");
       portal.style.visibility = "visible";
@@ -983,7 +999,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     if (ptr.fromOrientation) {
       return { nx: ptr.nx, ny: ptr.ny };
     }
-    var r = portal.getBoundingClientRect();
+    var r = portalRect || portal.getBoundingClientRect();
     if (r.width < 1) return { nx: 0, ny: 0 };
     var cx = r.left + r.width * 0.5;
     var cy = r.top + r.height * 0.5;
@@ -1653,6 +1669,9 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
 
   function syncMenuPortalLayer() {
     if (menuBlend <= 0.001) {
+      var opacity = grafikiMenuActive ? String(grafikiFade) : isSandHeroPage && portfolioFlight.phase === "hidden" ? "0" : "";
+      if (idlePortalOpacity === opacity) return;
+      idlePortalOpacity = opacity;
       document.body.classList.remove("is-cube-menu-front", "is-cube-menu-passing", "is-cube-menu-bg-exit", "is-cube-menu-drift-bg");
       if (portal) {
         if (grafikiMenuActive) portal.style.opacity = String(grafikiFade);
@@ -1662,6 +1681,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       }
       return;
     }
+    idlePortalOpacity = null;
 
     if (menuFrom.sideEntry) {
       syncSideEntryPortalLayer();
@@ -1821,10 +1841,22 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   // MSAA prawie darmowe) zostaje MSAA jak dotąd. Cap DPR 1.5 zamiast 2:
   // miękkie cząstki nie zyskują na wyższym DPR, a fill-rate spada o ~44%.
   var USE_FXAA = !MOBILE;
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: MOBILE, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-  renderer.setClearColor(0x000000, 0);
-  var fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
+  var renderer = null, fxaa = null, rendererFailed = false;
+  function ensureRenderer() {
+    if (renderer || rendererFailed) return !!renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: MOBILE, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setClearColor(0x000000, 0);
+      fxaa = USE_FXAA ? createFxaaPass(THREE, renderer) : null;
+      resize();
+      return true;
+    } catch (error) {
+      rendererFailed = true;
+      console.warn("[subpage-cube] WebGL unavailable", error);
+      return false;
+    }
+  }
 
   var scene = new THREE.Scene();
   var root = new THREE.Group();
@@ -1834,6 +1866,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   camera.position.z = 5.4;
 
   var cubeGroup = new THREE.Group();
+  cubeGroup.visible = !isSandHeroPage || isFilmPage || isShowcasePage;
   cubeGroup.scale.set(CUBE_SCALE, CUBE_SCALE, CUBE_SCALE);
   cubeGroup.rotation.set(0.22, -0.35, 0);
   root.add(cubeGroup);
@@ -1913,7 +1946,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     var w = canvas.clientWidth;
     var h = canvas.clientHeight;
     if (w < 1 || h < 1) return;
-    renderer.setSize(w, h, false);
+    if (portal) portalRect = portal.getBoundingClientRect();
+    if (renderer) renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     if (fxaa) fxaa.resize();
@@ -1921,6 +1955,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
 
   function onScroll() {
     scrollProgress = getScrollProgress();
+    wakeAnimation();
   }
 
   window.addEventListener("scroll", onScroll, { passive: true });
@@ -1929,12 +1964,22 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
   resize();
 
   function animate() {
-    requestAnimationFrame(animate);
-    if (document.hidden) return;
+    animationRaf = 0;
+    if (document.hidden || suspended || externalMenuOpen) return;
+    if (document.body.classList.contains("is-portfolio-cube-off") && menuTween.blend <= 0.001 && !menuRequested) return;
+    if (isSandHeroPage && portfolioFlight.phase === "hidden" && menuTween.blend <= 0.001 && !menuRequested) {
+      syncCamera();
+      root.position.set(0, 0, 0); root.rotation.set(0, 0, 0);
+      cubeGroup.visible = false; setCubeVisualFade(0);
+      cubeGroup.updateMatrixWorld(true);
+      syncMenuPortalLayer();
+      return;
+    }
     // W strefie Grafiki portal jest niewidoczny. Nie renderuj kosztownej
     // sceny WebGL do czasu otwarcia menu lub powrotu do innej sekcji.
     if (isPortfolioMainPage && grafikiMenuActive && menuTween.blend <= 0.001 &&
-        !document.body.classList.contains("is-nav-menu-open")) return;
+        !menuRequested) return;
+    animationRaf = requestAnimationFrame(animate);
     try {
       var nowMs = performance.now();
       var t = nowMs * 0.001;
@@ -2132,7 +2177,7 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
         sMat.uniforms.uMouse.value.set(mouse.x, mouse.y);
       }
       cubeGroup.updateMatrixWorld(true);
-      if (cubeGroup.visible || menuBlend > 0.001) {
+      if ((cubeGroup.visible || menuBlend > 0.001) && ensureRenderer()) {
         if (fxaa) fxaa.render(scene, camera);
         else renderer.render(scene, camera);
       }
@@ -2141,7 +2186,25 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     }
   }
 
-  requestAnimationFrame(animate);
+  wakeAnimation();
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { cancelAnimationFrame(animationRaf); animationRaf = 0; }
+    else wakeAnimation();
+  });
+  window.addEventListener("pagehide", function () { suspended = true; cancelAnimationFrame(animationRaf); animationRaf = 0; });
+  window.addEventListener("pageshow", function () { suspended = false; wakeAnimation(); });
+  window.addEventListener("cosgral:menu-state", function (event) {
+    externalMenuOpen = !!(event.detail && event.detail.open && document.querySelector(".cosgral-menu-cube"));
+    if (externalMenuOpen) { cancelAnimationFrame(animationRaf); animationRaf = 0; }
+    else wakeAnimation();
+  });
+  var wasCubeOff = document.body.classList.contains("is-portfolio-cube-off");
+  new MutationObserver(function () {
+    var cubeOff = document.body.classList.contains("is-portfolio-cube-off");
+    if (cubeOff === wasCubeOff) return;
+    wasCubeOff = cubeOff;
+    wakeAnimation();
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
   if (isShowcasePage) {
     enableShowcaseMode();
@@ -2230,6 +2293,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     setGrafikiMenuActive: function (active) {
       grafikiMenuActive = !!active;
       grafikiFade = active ? 0 : 0.68;
+      idlePortalOpacity = null;
+      wakeAnimation();
       if (!portal) return;
       if (grafikiMenuActive && menuBlend <= 0.001) {
         portal.style.opacity = "0";
@@ -2291,6 +2356,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     cancelPortfolioHeroPass: cancelPortfolioHeroPass,
     applyPortfolioBootSection: applyPortfolioBootSection,
     openMenu: function () {
+      menuRequested = true;
+      wakeAnimation();
       var freshOpen = menuTween.blend < 0.02;
       var wasClosing = menuTween.closing;
       if (freshOpen) prepareMenuOpenFromClosed();
@@ -2310,6 +2377,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
       return null;
     },
     closeMenu: function () {
+      menuRequested = false;
+      wakeAnimation();
       menuTween.closing = true;
       var closeDur = resolveMenuCloseDuration();
       var remaining = Math.max(MENU_SEG_MIN_DUR, closeDur * menuTween.blend);

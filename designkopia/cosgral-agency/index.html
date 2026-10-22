@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl" data-i18n-meta="meta">
+<html class="editorial-document" lang="pl" data-i18n-meta="meta">
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" href="favicon.ico" sizes="any" />
@@ -11,9 +11,9 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="cosgral-build" content="20260919a" />
-<script src="site-cache-bust.js?v=20260919a"></script>
-<title>COSGRAL — agencja cyfrowa | strony, aplikacje, CRM, automatyzacje</title>
+<meta name="cosgral-build" content="20261020-copy18" />
+<script src="site-cache-bust.js?v=20261019editorial15"></script>
+<title>COSGRAL — agencja cyfrowa | strony, wideo, automatyzacje</title>
 <meta name="description" content="COSGRAL — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo. Budujemy produkty cyfrowe i systemy dla firm." />
 <link rel="canonical" href="https://cosgral.pl/" />
 <meta property="og:type" content="website" />
@@ -28,6 +28,16 @@
 <meta name="twitter:description" content="Strony, aplikacje, CRM, automatyzacje, SEO/GEO i kreacja wideo." />
 <meta name="twitter:image" content="https://cosgral.pl/og-cover.png" />
 <meta name="theme-color" content="#050505" />
+<link rel="preload" as="image" type="image/webp" href="assets/glass-cube/hero-first-frame-desktop.webp" media="(min-width:901px)" fetchpriority="high" />
+<link rel="preload" as="image" type="image/webp" href="assets/glass-cube/hero-first-frame-mobile.webp" media="(max-width:900px)" fetchpriority="high" />
+<link rel="modulepreload" href="vendor/three-0.170.0.module.min.js" />
+<link rel="modulepreload" href="cosgral-glass-cube.js?v=20261022boot1" />
+<link rel="modulepreload" href="home-hero-3d.js?v=20261022boot1" />
+<link rel="modulepreload" href="cosgral-frame-profile.js?v=20261019motion11" />
+<link rel="modulepreload" href="home-cube-materials.js?v=20261022boot1" />
+<link rel="modulepreload" href="cosgral-hero-lens-text.js?v=20261019coupled9" />
+<link rel="preload" href="assets/glass-cube/cube_web_raw.glb" as="fetch" crossorigin />
+<link rel="preload" href="assets/glass-cube/web_glass.json" as="fetch" crossorigin />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -47,10 +57,8 @@
   "description": "Agencja cyfrowa — strony internetowe, aplikacje, CRM, automatyzacje, SEO/GEO, grafika i montaż wideo."
 }
 </script>
-<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
 <link rel="stylesheet" href="cosgral-home.css?v=20260924fix4" />
-<link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
-<link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
+<link rel="stylesheet" href="cosgral-optical.css?v=20261012refine1" />
 <script>
   (function () {
     var pages = { blue: 'tworzenie-stron-internetowych', purple: 'projektowanie-aplikacji', gold: 'pozycjonowanie-seo-geo', orange: 'wdrazanie-automatyzacji', crimson: 'systemy-crm', green: 'grafika-i-montaz-wideo' };
@@ -80,45 +88,20 @@
 </script>
 <script>
   (function () {
-    if (sessionStorage.getItem("cosgral-page-transition")) {
-      document.documentElement.classList.add("is-page-enter");
-    }
+    try {
+      if (sessionStorage.getItem("cosgral-page-transition")) {
+        document.documentElement.classList.add("is-page-enter");
+      }
+    } catch (_) {}
   })();
 </script>
 <script src="service-themes.js?v=20260810l"></script>
-<script src="page-transitions.js?v=20260924hash1"></script>
 <script src="cosgral-motion-pref.js?v=20260919a"></script>
-<script src="theme-mode.js?v=20260920ui34"></script>
-  <link rel="stylesheet" href="site-chat.css?v=20260922ui51" />
+<link rel="stylesheet" href="site-chat.css?v=20261018chat1" />
+<link rel="stylesheet" href="editorial.css?v=20261020copy18" />
+<link rel="stylesheet" href="cosgral-services-explode.css?v=20261015explode2" />
 </head>
-<body class="home-page">
-
-<canvas id="home-ambient" class="home-ambient" aria-hidden="true"></canvas>
-<div class="home-ambient__blur" aria-hidden="true"></div>
-<div class="home-ambient__shade" aria-hidden="true"></div>
-<canvas id="home-sand" class="home-sand" aria-hidden="true"></canvas>
-
-<div class="home-thump" aria-hidden="true">
-  <div class="home-thump__ring"></div>
-  <div class="home-thump__ring home-thump__ring--late"></div>
-  <div class="home-thump__ring home-thump__ring--soft"></div>
-</div>
-
-<div class="home-cursor" data-cursor aria-hidden="true">
-  <div class="home-cursor__dot"></div>
-  <div class="home-cursor__ring"></div>
-</div>
-
-<div id="preloader" aria-hidden="true">
-  <div class="preloader__inner">
-    <div class="preloader__cube-slot" aria-hidden="true">
-      <img class="preloader__cube" src="images/cosgral-agency/brand/cosgral-logo-cube-transparent.png" alt="" width="64" height="64" decoding="async" />
-    </div>
-    <div class="preloader__bar" aria-hidden="true">
-      <div class="preloader__bar-fill" id="preloader-bar"></div>
-    </div>
-  </div>
-</div>
+<body class="home-page editorial-page is-ready editorial-ready"><canvas id="home-ambient" class="home-ambient" aria-hidden="true"></canvas><div class="home-ambient__blur" aria-hidden="true"></div><div class="home-ambient__shade" aria-hidden="true"></div><div class="home-cursor" data-cursor aria-hidden="true"><div class="home-cursor__dot"></div><div class="home-cursor__ring"></div></div>
 
 <a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
 
@@ -144,7 +127,7 @@
     <nav class="nav-overlay__links" aria-label="Menu główne">
       <ul class="nav-overlay__list">
         <li><a href="#top" data-nav-close data-i18n="nav.start">Start</a></li>
-        <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
+        <li><a href="#realizacje" data-nav-close data-i18n="nav.work">Realizacje</a></li>
         <li><a href="#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
         <li><a href="#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
         <li><a href="#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
@@ -155,188 +138,26 @@
   </div>
 </div>
 
-<div class="home-scene-curtain" data-scene-curtain aria-hidden="true"></div>
-
 <div class="home-cube-portal" aria-hidden="true">
+
   <canvas id="hero-3d" class="home-hero__canvas"></canvas>
-</div>
-
-<main id="main" class="home-film">
-
-<!-- 1. HERO -->
-<section id="top" class="home-hero home-scene">
-  <div class="home-scene__panel">
-  <div class="home-hero__veil" aria-hidden="true"></div>
-  <div class="home-hero__content">
-    <h1 class="home-hero__title" aria-label="COSGRAL">
-      <span class="home-hero__letter">C</span><span class="home-hero__letter">O</span><span class="home-hero__letter">S</span><span class="home-hero__letter">G</span><span class="home-hero__letter">R</span><span class="home-hero__letter">A</span><span class="home-hero__letter">L</span>
-    </h1>
-    <p class="home-hero__tagline" data-i18n="hero.monopo_tagline">Projektujemy i wdrażamy produkty cyfrowe dla firm</p>
-  </div>
-  <a href="#rozpad" class="home-hero__scroll">
-    <span class="home-hero__scroll-line" aria-hidden="true"></span>
-    <span data-i18n="hero.scroll">Przewiń</span>
-  </a>
-  </div>
+</div><main id="main" class="editorial-film">
+<section id="top" class="editorial-hero home-hero">
+  <picture class="home-cube-poster">
+    <source media="(max-width:900px)" type="image/webp" srcset="assets/glass-cube/hero-first-frame-mobile.webp" />
+    <source type="image/webp" srcset="assets/glass-cube/hero-first-frame-desktop.webp" />
+    <source media="(max-width:900px)" srcset="assets/glass-cube/hero-first-frame-mobile.png" />
+    <img src="assets/glass-cube/hero-first-frame-desktop.png" width="464" height="464" alt="" loading="eager" fetchpriority="high" decoding="sync" />
+  </picture>
+  <div class="hero-notes micro"><span>Independent digital agency</span><span>Design · Development · Motion</span></div>
+  <div class="home-hero__content"><h1 class="home-hero__title">COSGRAL</h1><p class="home-hero__tagline" data-i18n="hero.monopo_tagline">Projektujemy i wdrażamy produkty cyfrowe dla firm</p></div>
+  <div class="hero-caption"><a class="hero-scroll" href="#uslugi"><span data-i18n="hero.scroll">Przewiń</span></a><p class="hero-caption__right micro" data-i18n="editorial.hero_note" data-i18n-html>Od pierwszej idei.<br>Do ostatniego detalu.</p></div>
 </section>
-
-<!-- 2. Tor animacji sześcianu → Usługi zaraz potem -->
-<section id="rozpad" class="home-shatter home-scene" aria-hidden="true">
-  <div class="home-scene__panel"></div>
-</section>
-<div class="cube-runway" id="cube-runway" aria-hidden="true"></div>
-
-<!-- 3. USŁUGI -->
-<section id="uslugi" class="services-fan home-scene">
-  <div class="home-scene__panel">
-  <div class="container services-fan__head">
-    <p class="section-label" data-enter="left" data-i18n="services.eyebrow">Usługi</p>
-    <h2 class="services-fan__title" data-reveal-words data-i18n="services.title">Co robimy</h2>
-  </div>
-
-  <div class="services-fan__meta" data-enter="bottom">
-    <span class="services-fan__counter" data-fan-counter aria-live="polite">01 / 06</span>
-    <div class="services-fan__progress" aria-hidden="true"><span data-fan-progress></span></div>
-  </div>
-
-  <div class="services-fan__stage" data-fan-stage data-enter="right">
-    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--prev" data-fan-prev aria-label="Kliknij lewą stronę ekranu" aria-hidden="true" tabindex="-1">
-      <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
-      <span class="services-fan__tap-pulse-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M13 4L7 10l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
-    </button>
-    <button type="button" class="services-fan__tap-pulse services-fan__tap-pulse--next" data-fan-next aria-label="Kliknij prawą stronę ekranu" aria-hidden="true" tabindex="-1">
-      <span class="services-fan__tap-pulse-ring" aria-hidden="true"></span>
-      <span class="services-fan__tap-pulse-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
-    </button>
-    <div class="services-fan__hint" data-fan-hint>
-      <span class="services-fan__hint-gesture" aria-hidden="true">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14h16M16 10l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="14" r="2.5" stroke="currentColor" stroke-width="1.2"/></svg>
-      </span>
-      <span class="services-fan__hint-text" data-i18n="services.fan_hint">Przesuń w lewo lub prawo — touchpad, palec lub strzałki</span>
-    </div>
-    <div class="services-fan__carousel" data-services-fan>
-      <a href="uslugi/tworzenie-stron-internetowych.html" class="services-fan__card" data-service-theme="blue" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/stock/hero-abstract.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">01</span>
-        <span class="services-fan__name" data-i18n="services.card1">Strony internetowe</span>
-      </a>
-      <a href="uslugi/projektowanie-aplikacji.html" class="services-fan__card" data-service-theme="purple" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/aplikacje.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">02</span>
-        <span class="services-fan__name" data-i18n="services.card2">Aplikacje</span>
-      </a>
-      <a href="uslugi/pozycjonowanie-seo-geo.html" class="services-fan__card" data-service-theme="gold" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/pozycjonowanie-seo.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">03</span>
-        <span class="services-fan__name" data-i18n="services.card3">Pozycjonowanie SEO &amp; GEO</span>
-      </a>
-      <a href="uslugi/wdrazanie-automatyzacji.html" class="services-fan__card" data-service-theme="orange" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/automatyzacje.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">04</span>
-        <span class="services-fan__name" data-i18n="services.card4">Automatyzacje</span>
-      </a>
-      <a href="uslugi/systemy-crm.html" class="services-fan__card" data-service-theme="crimson" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/crm.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">05</span>
-        <span class="services-fan__name" data-i18n="services.card5">Systemy CRM</span>
-      </a>
-      <a href="uslugi/grafika-i-montaz-wideo.html" class="services-fan__card" data-service-theme="green" data-tile-interact>
-        <div class="services-fan__card-media" aria-hidden="true">
-          <video muted loop playsinline preload="none" data-fan-video-src="assets/services/grafika-montaz.mp4"></video>
-          <div class="services-fan__card-tint" aria-hidden="true"></div>
-          <div class="services-fan__card-liquid"></div>
-        </div>
-        <span class="services-fan__num">06</span>
-        <span class="services-fan__name" data-i18n="services.card6">Grafika i montaż wideo</span>
-      </a>
-    </div>
-  </div>
-  </div>
-</section>
-
-<!-- 4. REALIZACJE -->
-<section id="realizacje" class="home-work home-scene">
-  <div class="home-scene__panel">
-  <div class="container home-work__head">
-    <p class="section-label" data-enter="left" data-i18n="work.eyebrow">Realizacje</p>
-    <h2 class="home-work__title" data-reveal-words data-i18n="work.title">Wybrane realizacje</h2>
-    <p class="home-work__lead" data-enter="right" data-i18n="work.bentoLead">Montaż wideo, produkty cyfrowe i kreacja — w jednym portfolio.</p>
-  </div>
-
-  <div class="home-work__grid container" data-enter="bottom">
-    <a class="home-work__card home-work__card--wide" href="portfolio.html#strony" data-tile-interact>
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" src="portfolio-media/showcase/web/trove-archive.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.strony">Strony internetowe</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#montaz" data-tile-interact>
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/reels/orlincy/001-poster.jpg" src="portfolio-media/reels/orlincy/001.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.montaz">Montaż wideo</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#grafiki" data-tile-interact>
-      <div class="home-work__card-media" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" poster="portfolio-media/showcase/graphics/home-grafiki-social-poster.jpg" src="portfolio-media/showcase/graphics/home-grafiki-social.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="bento.grafiki">Grafiki &amp; social</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-    <a class="home-work__card" href="portfolio.html#automatyzacje" data-tile-interact>
-      <div class="home-work__card-media home-work__card-media--dim" aria-hidden="true">
-        <video muted loop playsinline preload="metadata" src="assets/services/automatyzacje.mp4"></video>
-      </div>
-      <div class="home-work__card-body">
-        <span class="home-work__card-tag" data-i18n="work.card_automation">Systemy i automatyzacje</span>
-        <span class="home-work__card-cta" data-i18n="work.caseStudy">Zobacz realizacje</span>
-      </div>
-    </a>
-  </div>
-
-  <div class="container home-work__footer" data-enter="bottom">
-    <a class="home-work__link glass-btn" href="portfolio.html" data-i18n="work.fullPortfolio">Zobacz pełne portfolio</a>
-  </div>
-  </div>
-</section>
-
-<!-- 5. FAQ -->
-<section id="faq" class="home-faq home-scene">
-  <div class="home-scene__panel">
-  <h2 class="home-faq__title" data-reveal-words data-i18n="faq.title">Najczęstsze pytania</h2>
-  <div class="faq-item" data-open="false" data-enter="left">
+<div id="rozpad" class="editorial-runway" aria-hidden="true"><div class="runway-word">KREUJEMY. <em>KODUJEMY.</em></div></div>
+<section id="uslugi" class="editorial-section editorial-services"><div class="editorial-section__inner">
+<div class="section-index micro" data-editorial-reveal><span data-i18n="editorial.services_index">01 / Nasze możliwości</span></div>
+<div class="editorial-head" data-editorial-reveal><h2 data-i18n="services.title">Co robimy</h2></div>
+<div class="services-art-grid"><a class="art-tile art-tile--web" href="uslugi/tworzenie-stron-internetowych.html" data-editorial-reveal><div class="art-tile__top micro"><span>01 / COSGRAL</span><span>DIGITAL EXPERIENCES</span></div><div class="art-tile__art" aria-hidden="true"><div class="browser-sheet"></div><div class="browser-sheet"></div><div class="browser-sheet kinetic-art"></div><strong class="web-word">WWW.</strong></div><div class="art-tile__label"><span data-i18n="services.card1">Strony internetowe</span><i aria-hidden="true">↗︎</i></div></a><a class="art-tile art-tile--apps" href="uslugi/projektowanie-aplikacji.html" data-editorial-reveal><div class="art-tile__top micro"><span>02 / COSGRAL</span><span>IDEA → PRODUCT</span></div><div class="art-tile__art" aria-hidden="true"><div class="prism-art kinetic-art"></div><strong class="apps-type" data-i18n="editorial.apps_art" data-i18n-html>IDEA.<br>INTERFEJS.<br>PRODUKT.</strong></div><div class="art-tile__label"><span data-i18n="services.card2">Aplikacje</span><i aria-hidden="true">↗︎</i></div></a><a class="art-tile art-tile--seo" href="uslugi/pozycjonowanie-seo-geo.html" data-editorial-reveal><div class="art-tile__top micro"><span>03 / COSGRAL</span><span>VISIBILITY / SEARCH</span></div><div class="art-tile__art" aria-hidden="true"><div class="halftone-art kinetic-art"></div><strong class="seo-type" data-i18n="editorial.seo_art" data-i18n-html>DAJ SIĘ<br><em>ZNALEŹĆ.</em></strong></div><div class="art-tile__label"><span data-i18n="services.card3">SEO &amp; GEO</span><i aria-hidden="true">↗︎</i></div></a><a class="art-tile art-tile--automation" href="uslugi/wdrazanie-automatyzacji.html" data-editorial-reveal><div class="art-tile__top micro"><span>04 / COSGRAL</span><span>LESS ROUTINE</span></div><div class="art-tile__art" aria-hidden="true"><div class="auto-focus kinetic-art"></div><strong class="auto-type" data-i18n="editorial.auto_art" data-i18n-html>MNIEJ<br>RUTYNY.<br>WIĘCEJ<br>MOŻLIWOŚCI.</strong></div><div class="art-tile__label"><span data-i18n="services.card4">Automatyzacje</span><i aria-hidden="true">↗︎</i></div></a><a class="art-tile art-tile--crm" href="uslugi/systemy-crm.html" data-editorial-reveal><div class="art-tile__top micro"><span>05 / COSGRAL</span><span>PEOPLE / DATA / SYSTEMS</span></div><div class="art-tile__art" aria-hidden="true"><svg class="orbit-art kinetic-art" viewBox="0 0 400 400" fill="none" aria-hidden="true"><ellipse cx="200" cy="200" rx="166" ry="65" transform="rotate(-38 200 200)" stroke="currentColor" stroke-opacity=".45"/><ellipse cx="200" cy="200" rx="168" ry="84" transform="rotate(34 200 200)" stroke="currentColor" stroke-opacity=".15"/><path d="M24 200H376M200 30V370" stroke="currentColor" stroke-opacity=".1"/><circle cx="75" cy="265" r="7" fill="#ff482b"/><circle cx="313" cy="137" r="3" fill="currentColor"/><circle cx="214" cy="194" r="13" stroke="currentColor"/><path d="m210 194 3 3 5-6" stroke="currentColor"/></svg><strong class="crm-type" data-i18n="editorial.crm_art" data-i18n-html>Wszystko.<br>W jednym.</strong></div><div class="art-tile__label"><span data-i18n="services.card5">Systemy CRM</span><i aria-hidden="true">↗︎</i></div></a><a class="art-tile art-tile--creative" href="uslugi/grafika-i-montaz-wideo.html" data-editorial-reveal><div class="art-tile__top micro"><span>06 / COSGRAL</span><span>ART DIRECTION / MOTION</span></div><div class="art-tile__art" aria-hidden="true"><strong class="creative-type"><span>KREUJEMY</span><span>KODUJEMY</span><span>SKALUJEMY</span><span>KREUJEMY</span><span>KODUJEMY</span><span>SKALUJEMY</span></strong><div class="foil-ribbon kinetic-art"></div></div><div class="art-tile__label"><span data-i18n="services.card6">Grafika i wideo</span><i aria-hidden="true">↗︎</i></div></a></div></div></section><section class="tone-wipe " data-tone-wipe aria-label="Od pomysłu do realizacji"><div class="tone-wipe__sticky"><div class="tone-wipe__surface"><div class="tone-wipe__copy"><span class="micro" data-i18n="editorial.wipe_lead">Strategia spotyka formę.</span><strong data-i18n="editorial.wipe_title" data-i18n-html>OD POMYSŁU.<br>DO EFEKTU.</strong><span class="micro">COSGRAL / 02</span></div></div></div></section><section id="realizacje" class="editorial-section editorial-work home-work tone-light"><div class="editorial-section__inner"><div class="section-index micro" data-editorial-reveal><span data-i18n="editorial.work_index">02 / Wybrane realizacje</span><span>Design with intent</span></div><div class="editorial-head" data-editorial-reveal><h2 data-i18n="work.title">Wybrane realizacje</h2></div><div class="gallery-toolbar"><div class="gallery-switch" role="group" aria-label="Układ realizacji"><button type="button" data-gallery-layout="composition" aria-pressed="true" data-i18n="editorial.composition">Kompozycja</button><button type="button" data-gallery-layout="grid" aria-pressed="false" data-i18n="editorial.grid">Siatka</button></div></div><div class="project-gallery" data-project-gallery data-layout="composition"><a class="project-card project-card--web" href="portfolio.html#strony" data-editorial-reveal><div class="project-card__art" aria-hidden="true"><video class="is-portrait" muted loop playsinline preload="none" poster="portfolio-media/showcase/home/web-vertical-poster.jpg?v=20261018vert1" data-lazy-src="portfolio-media/showcase/home/web-vertical.mp4?v=20261018vert1"></video></div><div class="project-card__meta"><span><b class="micro">01 / 04</b><span data-i18n="bento.strony">Strony internetowe</span></span><i aria-hidden="true">↗︎</i></div></a><a class="project-card project-card--video" href="portfolio.html#montaz" data-editorial-reveal><div class="project-card__art" aria-hidden="true"><video muted loop playsinline preload="none" poster="portfolio-media/reels/orlincy/motion-with-intention-poster.jpg?v=20261018final1" data-lazy-src="portfolio-media/reels/orlincy/motion-with-intention.mp4?v=20261018final1"></video></div><div class="project-card__meta"><span><b class="micro">02 / 04</b><span data-i18n="bento.montaz">Montaż wideo</span></span><i aria-hidden="true">↗︎</i></div></a><a class="project-card project-card--graphic" href="portfolio.html#grafiki" data-editorial-reveal><div class="project-card__art" aria-hidden="true"><strong class="project-graphic-type">LET<br>IDEAS<br>FLOW.</strong><video class="is-wide" muted loop playsinline preload="none" poster="portfolio-media/showcase/home/graphics-wide-poster.jpg?v=20261018final1" data-lazy-src="portfolio-media/showcase/home/graphics-wide.mp4?v=20261018final1"></video></div><div class="project-card__meta"><span><b class="micro">03 / 04</b><span data-i18n="bento.grafiki">Grafika &amp; social</span></span><i aria-hidden="true">↗︎</i></div></a><a class="project-card project-card--system" href="portfolio.html#automatyzacje" data-editorial-reveal><div class="project-card__art" aria-hidden="true"><video class="is-portrait" muted loop playsinline preload="none" poster="portfolio-media/showcase/home/systems-vertical-poster.jpg?v=20261018vert1" data-lazy-src="portfolio-media/showcase/home/systems-vertical.mp4?v=20261018vert1"></video><strong class="project-system-type">Connect.<br>Automate.<br>Grow.</strong></div><div class="project-card__meta"><span><b class="micro">04 / 04</b><span data-i18n="work.card_automation">Systemy i automatyzacje</span></span><i aria-hidden="true">↗︎</i></div></a></div><div class="portfolio-foot"><a class="editorial-link" href="portfolio.html"><span data-i18n="work.fullPortfolio">Zobacz pełne portfolio</span><i aria-hidden="true">↗︎</i></a></div></div></section><section id="faq" class="editorial-section editorial-faq home-faq tone-light"><div class="editorial-section__inner"><div class="section-index micro" data-editorial-reveal><span data-i18n="editorial.faq_index">03 / FAQ</span></div><div class="editorial-faq__layout"><h2 data-i18n="faq.title" data-editorial-reveal>Najczęstsze pytania</h2><div data-editorial-reveal>  <div class="faq-item" data-open="false" data-enter="left">
     <button class="faq-item__q" data-faq-toggle aria-expanded="false">
       <span data-i18n="faq.q1">Ile kosztuje wdrożenie CRM lub nowej strony?</span>
       <span class="faq-item__icon" aria-hidden="true">+</span>
@@ -357,64 +178,65 @@
     </button>
     <div class="faq-item__a"><div class="faq-item__a-inner"><p data-i18n="faq.a3">Nie. Po stronie klienta wystarczą cele biznesowe i decyzje. Stronę techniczną prowadzimy my i komunikujemy ją jasno.</p></div></div>
   </div>
-  </div>
-</section>
-
-<!-- 6. WORKFLOW -->
-<section id="proces" class="home-process home-scene">
-  <div class="home-scene__panel">
-  <div class="container">
+</div></div></div></section><div id="light-end"></div><section class="tone-wipe tone-wipe--dark" data-tone-wipe aria-label="Od realizacji do procesu"><div class="tone-wipe__sticky"><div class="tone-wipe__surface"><div class="tone-wipe__copy"><span class="micro" data-i18n="editorial.process_note">Dobry efekt zaczyna się od dobrego procesu.</span><strong data-i18n="editorial.process_title" data-i18n-html>ZA FORMĄ.<br>STOI PROCES.</strong><span class="micro">COSGRAL / 04</span></div></div></div></section><section id="proces" class="editorial-section editorial-process">
+  <div class="editorial-section__inner process-layout">
+  <div class="home-process__head">
     <p class="section-label" data-enter="top" data-i18n="process.eyebrow">Jak pracujemy</p>
     <h2 class="home-services__title" data-reveal-words data-i18n="process.title">Proces współpracy</h2>
-    <p class="home-process__lead" data-enter="right" data-i18n="process.lead">Od audytu po wdrożenie — jasny zakres, terminy i odpowiedzialności.</p>
+
   </div>
   <div class="home-process__steps container">
     <div class="home-process__step is-active" data-tile-interact data-enter="left">
       <span class="home-process__num">01</span>
       <div>
-        <h3 class="home-process__step-title" data-i18n="process.step1_title">Audyt i analiza</h3>
-        <p class="home-process__step-body" data-i18n="process.step1_body">Analizujemy cele biznesowe, procesy i ograniczenia, aby dobrać zakres, który realnie wspiera sprzedaż i operacje.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step1_title">Rozmawiamy o pomyśle</h3>
+        <p class="home-process__step-body" data-i18n="process.step1_body">Opowiadasz nam, czego potrzebujesz i co chcesz zmienić. Pytamy o budżet i termin.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="right">
       <span class="home-process__num">02</span>
       <div>
-        <h3 class="home-process__step-title" data-i18n="process.step2_title">Strategia i architektura</h3>
-        <p class="home-process__step-body" data-i18n="process.step2_body">Ustalamy architekturę rozwiązania, integracje i plan wdrożenia — zanim zacznie się produkcja.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step2_title">Ustalamy szczegóły</h3>
+        <p class="home-process__step-body" data-i18n="process.step2_body">Dostajesz zakres prac, wycenę i plan. Ustalamy je wspólnie, zanim zaczniemy projekt.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="left">
       <span class="home-process__num">03</span>
       <div>
-        <h3 class="home-process__step-title" data-i18n="process.step3_title">Wdrożenie i rozwój</h3>
-        <p class="home-process__step-body" data-i18n="process.step3_body">Budujemy, integrujemy i testujemy iteracyjnie, z regularnymi przeglądami postępu i jakości.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step3_title">Projektujemy i budujemy</h3>
+        <p class="home-process__step-body" data-i18n="process.step3_body">Pokazujemy Ci kolejne etapy pracy. Zbieramy uwagi i wprowadzamy uzgodnione zmiany.</p>
       </div>
     </div>
     <div class="home-process__step" data-tile-interact data-enter="bottom">
       <span class="home-process__num">04</span>
       <div>
-        <h3 class="home-process__step-title" data-i18n="process.step4_title">Optymalizacja i wsparcie</h3>
-        <p class="home-process__step-body" data-i18n="process.step4_body">Szkolimy zespół, przekazujemy dokumentację i zapewniamy wsparcie po wdrożeniu.</p>
+        <h3 class="home-process__step-title" data-i18n="process.step4_title">Uruchamiamy i wspieramy</h3>
+        <p class="home-process__step-body" data-i18n="process.step4_body">Sprawdzamy gotowy projekt i oddajemy go do użytku. Pokazujemy, jak z niego korzystać i pomagamy po starcie.</p>
       </div>
     </div>
   </div>
   </div>
 </section>
 
-<!-- 7. KONTAKT — audyt (stopka osobno poniżej) -->
-<section id="kontakt" class="home-contact home-scene">
-  <div class="home-scene__panel">
-  <div class="home-contact__shade" aria-hidden="true"></div>
-  <div class="home-contact__inner">
-    <div class="audit-form__success" data-audit-success hidden>
+
+</main>
+<footer id="kontakt" class="site-footer home-contact editorial-section editorial-contact contact-footer">
+  <div class="editorial-section__inner">
+    <div class="home-contact__inner">
+      <div class="audit-form__success" data-audit-success hidden>
       <h3 class="audit-form__success-title" data-i18n="form.success_title">Dziękujemy za kontakt</h3>
-      <p class="audit-form__success-body" data-i18n="form.success_body">Otrzymaliśmy Twoją wiadomość. Wrócimy do Ciebie w ciągu jednego dnia roboczego — zwykle szybciej.</p>
+      <p class="audit-form__success-body" data-i18n="form.success_body">Otrzymaliśmy Twoją wiadomość. Zwykle odpowiadamy w ciągu jednego dnia roboczego.</p>
     </div>
-    <div class="home-contact__content" data-contact-content>
-      <h2 class="home-contact__title" data-reveal-words data-i18n="contact.call_title">Kontakt</h2>
-      <p class="home-contact__lead" data-enter="right" data-i18n="contact.call_lead">Zadzwoń lub napisz — odpowiadamy zwykle w ciągu jednego dnia roboczego.</p>
-      <p class="home-contact__social-label" data-enter="bottom" data-i18n="contact.social_label">Social media</p>
-      <div class="home-contact__social footer-social" role="list" data-enter="bottom">
+      <div class="home-contact__content contact-footer__layout" data-contact-content>
+        <div class="contact-footer__intro">
+          <h2 class="home-contact__title" data-i18n="contact.call_title">Kontakt</h2>
+          <p class="home-contact__lead" data-enter="right" data-i18n="contact.call_lead">Zadzwoń lub napisz. Zwykle odpowiadamy w ciągu jednego dnia roboczego.</p>
+          <a class="contact-footer__email" href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl <span aria-hidden="true">↗</span></a>
+          <div class="home-contact__phones" data-enter="left">
+        <a class="home-contact__phone" href="tel:+48533790518" data-i18n="contact.phone_kuba">Jakub · +48 533 790 518</a>
+        <a class="home-contact__phone" href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a>
+      </div>
+          <div class="home-contact__social footer-social" role="list" data-enter="bottom">
         <a class="footer-social__link" href="https://www.facebook.com/people/cosgralagency/61591582027536/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" data-no-transition>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.027 4.388 11.026 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.099 24 18.1 24 12.073z"/></svg>
         </a>
@@ -425,124 +247,47 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.062 2.062 0 114.126 0 2.063 2.063 0 01-2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
         </a>
       </div>
-      <div class="home-contact__phones" data-enter="left">
-        <a class="home-contact__phone" href="tel:+48533790518" data-i18n="contact.phone_kuba">Jakub · +48 533 790 518</a>
-        <a class="home-contact__phone" href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a>
-      </div>
-      <form id="audit-form" class="audit-form" name="audit-contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" data-audit-form data-lenis-prevent>
+        </div>
+        <form id="audit-form" class="audit-form" name="audit-contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" data-audit-form data-lenis-prevent>
         <input type="hidden" name="form-name" value="audit-contact" />
         <p class="visually-hidden" hidden>
           <label>Nie wypełniaj: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
         </p>
       <div class="audit-form__row" data-enter="left">
-        <label for="audit-name" data-i18n="form.name">Imię</label>
+        <label for="audit-name" data-i18n="form.name">Imię*</label>
         <input type="text" id="audit-name" name="name" autocomplete="name" required />
       </div>
       <div class="audit-form__row" data-enter="right">
-        <label for="audit-email" data-i18n="form.email">Email*</label>
+        <label for="audit-email" data-i18n="form.email">Adres e-mail*</label>
         <input type="email" id="audit-email" name="email" placeholder="jan@firma.pl" data-i18n="form.placeholder_email" data-i18n-placeholder autocomplete="email" required />
       </div>
       <div class="audit-form__row" data-enter="left">
-        <label for="audit-company" data-i18n="form.company">Firma</label>
+        <label for="audit-company" data-i18n="form.company">Firma (opcjonalnie)</label>
         <input type="text" id="audit-company" name="company" autocomplete="organization" />
       </div>
       <div class="audit-form__row" data-enter="right">
         <label for="audit-message" data-i18n="form.message">Wiadomość</label>
-        <textarea id="audit-message" name="message" data-i18n="form.placeholder_message" data-i18n-placeholder placeholder="Opisz krótko projekt, cele i termin — wrócimy z propozycją kolejnych kroków."></textarea>
+        <textarea id="audit-message" name="message" data-i18n="form.placeholder_message" data-i18n-placeholder placeholder="Co chcesz zrobić lub poprawić? Napisz kilka słów o swoim pomyśle."></textarea>
       </div>
-      <button type="submit" class="btn btn--primary audit-form__submit" data-enter="bottom" data-i18n="form.submit">Wyślij</button>
+      <button type="submit" class="btn btn--primary audit-form__submit" data-enter="bottom" data-i18n="form.submit">Wyślij wiadomość</button>
       <p class="audit-form__status" data-audit-status role="status" aria-live="polite"></p>
     </form>
-    </div>
-  </div>
-  </div>
-</section>
-
-</main>
-
-<div class="footer-runway" id="footer-runway" aria-hidden="true"></div>
-
-<footer class="site-footer">
-  <div class="site-footer__ambient" aria-hidden="true"></div>
-  <div class="site-footer__rule" aria-hidden="true"><span></span></div>
-  <div class="footer-grid container">
-    <div class="footer-cta" data-enter="left">
-      <p class="cosgral-footer-wordmark" data-i18n="footer.wordmark">cosgral agency</p>
-    </div>
-    <div class="footer-col" data-enter="right">
-      <p class="footer-col__title" data-i18n="footer.sections">Sekcje</p>
-      <ul>
-        <li><a href="#top" data-i18n="nav.start">Start</a></li>
-        <li><a href="portfolio.html" data-i18n="nav.work">Realizacje</a></li>
-        <li><a href="#uslugi" data-i18n="nav.services">Usługi</a></li>
-        <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
-        <li><a href="#proces" data-i18n="nav.process">Proces</a></li>
-        <li><a href="o-nas.html" data-i18n="nav.about">O nas</a></li>
-        <li><a href="#kontakt" data-i18n="nav.contact">Kontakt</a></li>
-      </ul>
-    </div>
-    <div class="footer-col" data-enter="top">
-      <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
-      <ul>
-        <li><a href="uslugi/tworzenie-stron-internetowych.html" data-i18n="footer.link_websites">Strony</a></li>
-        <li><a href="uslugi/projektowanie-aplikacji.html" data-i18n="services.card2">Aplikacje</a></li>
-        <li><a href="uslugi/pozycjonowanie-seo-geo.html" data-i18n="services.card3">SEO / GEO</a></li>
-        <li><a href="uslugi/wdrazanie-automatyzacji.html" data-i18n="services.card4">Automatyzacje</a></li>
-        <li><a href="uslugi/systemy-crm.html" data-i18n="footer.link_crm">CRM</a></li>
-        <li><a href="uslugi/grafika-i-montaz-wideo.html" data-i18n="footer.link_video">Wideo</a></li>
-      </ul>
-    </div>
-    <div class="footer-col" data-enter="bottom">
-      <p class="footer-col__title" data-i18n="footer.contact">Kontakt</p>
-      <ul>
-        <li><a href="mailto:kontakt@cosgral.pl">kontakt@cosgral.pl</a></li>
-        <li><a href="tel:+48533790518" data-i18n="contact.phone_kuba">Jakub · +48 533 790 518</a></li>
-        <li><a href="tel:+48571798397" data-i18n="contact.phone_kacper">Kacper · +48 571 798 397</a></li>
-      </ul>
-    </div>
-    <div class="footer-col footer-col--social" data-enter="bottom">
-      <p class="footer-col__title" data-i18n="footer.social">Social</p>
-      <div class="footer-social" role="list">
-        <a class="footer-social__link" href="https://www.facebook.com/people/cosgralagency/61591582027536/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" data-no-transition>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.027 4.388 11.026 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.099 24 18.1 24 12.073z"/></svg>
-        </a>
-        <a class="footer-social__link" href="https://www.instagram.com/cosgral.agency?igsh=Ynl6dmJucTEzYTk2" target="_blank" rel="noopener noreferrer" aria-label="Instagram" role="listitem" data-no-transition>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.881 0 1.44 1.44 0 012.881 0z"/></svg>
-        </a>
-        <a class="footer-social__link" href="https://www.linkedin.com/company/cosgral-agency" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" role="listitem" data-no-transition>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.062 2.062 0 114.126 0 2.063 2.063 0 01-2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        </a>
       </div>
     </div>
-  </div>
-  <div class="footer-bottom container" data-enter="bottom">
-    <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
-    <a href="privacy-policy.html" data-i18n="footer.privacy">Privacy Policy</a>
+    <div class="contact-footer__signature">
+      <a href="#top" class="cosgral-footer-wordmark" aria-label="COSGRAL — na górę strony">cosgral agency</a>
+      <nav class="contact-footer__nav" aria-label="Dodatkowe linki">
+        <a href="portfolio.html" data-i18n="nav.work">Realizacje</a>
+        <a href="#uslugi" data-i18n="nav.services">Usługi</a>
+        <a href="o-nas.html" data-i18n="nav.about">O nas</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.copyright">© 2026 cosgral agency</span>
+      <a href="privacy-policy.html" data-i18n="footer.privacy">Polityka prywatności</a>
+    </div>
   </div>
 </footer>
 
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
-<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-<script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="i18n.js?v=20260919gyro"></script>
-<script src="preloader.js?v=20260923test2"></script>
-<script src="smooth-scroll.js?v=20260924polish1"></script>
-<script src="cosgral-perf.js?v=20260924recover1"></script>
-<script src="home-cursor-field.js?v=20260920ui7"></script>
-<script src="home-ambient-bg.js?v=20260924fix4"></script>
-<script type="module" src="home-hero-3d.js?v=20260924fix4"></script>
-<script src="home-cursor.js?v=20260917ad"></script>
-<script src="home-sand-stream.js?v=20260731s"></script>
-<script src="home-thump.js?v=20260731ae"></script>
-<script src="home-services-fan.js?v=20260923fix3"></script>
-<script src="home-section-flow.js?v=20260924fix4"></script>
-<script src="home-scroll-rail.js?v=20260924fix4"></script>
-<script src="home-section-stepper.js?v=20260924fix4"></script>
-<script src="home-director.js?v=20260920ui37"></script>
-<script src="home-tile-interact.js?v=20260920ui9"></script>
-<script defer src="home-nav-menu.js?v=20260924polish1"></script>
-<script defer src="site-chat.js?v=20260924idle1"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
-</body>
-</html>
+<script src="vendor/gsap-3.15.0.min.js"></script><script src="vendor/ScrollTrigger-3.15.0.min.js"></script><script src="vendor/lenis-1.1.18.min.js"></script><script>gsap.registerPlugin(ScrollTrigger);</script>
+<script src="i18n.js?v=20261020copy18"></script><script src="smooth-scroll.js?v=20260924polish1"></script><script src="home-cursor-field.js?v=20261019editorial14"></script><script src="cosgral-perf.js?v=20261019coupled9"></script><script src="home-chrome-funnel.js?v=20261019coupled9"></script><script src="home-ambient-bg.js?v=20261022boot1"></script><script type="module" src="home-hero-3d.js?v=20261022boot1"></script><script src="home-cursor.js?v=20261019editorial14"></script><script defer src="home-nav-menu.js?v=20261012editorial4"></script><script src="home-media-lifecycle.js?v=20261019editorial15"></script><script src="editorial-ui.js?v=20261012editorial4"></script><script type="module" src="editorial-motion.js?v=20261019perf17"></script><script defer src="site-chat.js?v=20260924idle1"></script><script type="module" src="site-chat-cube.js?v=20261019perf17"></script><script defer src="cosgral-services-explode.js?v=20261015explode2"></script></body></html>
