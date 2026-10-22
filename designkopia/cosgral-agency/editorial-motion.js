@@ -1,4 +1,4 @@
-import { createHorizon, sampleHorizonProgress } from './editorial-horizon.js?v=20261019editorial16';
+import { createHorizon, sampleHorizonProgress } from './editorial-horizon.js?v=20261022noomo2';
 
 /* Native flow, a thermal horizon, and artwork entrances that follow the scroll. */
 const root=document.documentElement, preference=matchMedia('(prefers-reduced-motion: reduce)');
@@ -144,7 +144,7 @@ function lightNavigation(){
   const scroll=lenis?.scroll??window.scrollY;
   function lightAt(x,y){
     const docY=scroll+y;
-    if(faqGeometry&&faqGeometry.top<=docY&&faqGeometry.bottom>docY)return false;
+    if(faqGeometry&&faqGeometry.top<=docY&&faqGeometry.bottom>docY)return true;
     for(let i=0;i<2;i++){
       const rect=lightGeometry[i];
       if(rect.top<=docY&&rect.bottom>docY){

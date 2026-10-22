@@ -1,4 +1,4 @@
-/* Scroll-driven warm horizon. One draw per display frame, and no idle work. */
+/* Scroll-driven cool horizon. One draw per display frame, and no idle work. */
 export function sampleHorizonProgress(value){
   // The shader already eases its boundary. An extra early acceleration here
   // used to reveal half the white surface while the services were still visible.
@@ -9,12 +9,13 @@ export function createHorizon(section, reduced) {
   const surface=section.querySelector('.tone-wipe__surface');
   const copy=section.querySelector('.tone-wipe__copy');
   const reverse=section.classList.contains('tone-wipe--dark');
+  const paperBackground='radial-gradient(circle,rgba(255,255,255,.48) .8px,transparent 1.8px) 0 0/6px 6px fixed,linear-gradient(0deg,#b4cbf5,#f7faff) 0 0/100% 100vh fixed';
   const clamp=v=>Math.max(0,Math.min(1,v));
   let progress=reduced?1:0,gl,program,buffer,uniforms,canvas,lost=false;
   let width=1,height=1,near=false,raf=0,last=0,bend=0,speed=0,dirty=true,destroyed=false;
   function fallback(){
     section.classList.add('is-static');
-    surface.style.backgroundColor=reverse?'#080909':'#eeede8';
+    surface.style.background=reverse?'#080909':paperBackground;
     if(canvas)canvas.hidden=true;
     copy.style.opacity='1';copy.style.transform='none';
     window.dispatchEvent(new Event('cosgral:horizon-layout'));
@@ -36,17 +37,20 @@ export function createHorizon(section, reduced) {
       float slope=-2.*x/.38*arch/aspect;
       float distance=(y-edge)*viewport.y/sqrt(1.+slope*slope);
       float q=distance/clamp(min(viewport.x,viewport.y)*.12,45.,125.);
-      vec3 ink=vec3(.03137,.03529,.03529),paper=vec3(.93333,.92941,.90980);
+      vec3 ink=vec3(.03137,.03529,.03529),paper=mix(vec3(.70588,.79608,.96078),vec3(.96863,.98039,1.),uv.y);
       vec3 color=mix(ink,paper,smoothstep(-.45,1.9,q));
       float rose=exp(-pow((q+.12)/.72,2.));
       float ember=exp(-pow((q-.48)/.8,2.));
-      color=mix(color,vec3(.54,.10,.14),rose*.52);
-      color=mix(color,vec3(1.,.43,.26),ember*.62);
+      color=mix(color,vec3(.57,.63,.88),rose*.28);
+      color=mix(color,vec3(.70,.78,.97),ember*.38);
       float gold=exp(-pow((q-1.08)/.72,2.));
-      color=mix(color,vec3(1.,.87,.36),gold*.56);
+      color=mix(color,vec3(.96,.98,1.),gold*.56);
       float grain=fract(sin(dot(floor(uv*resolution),vec2(12.9898,78.233)))*43758.5453)-.5;
       float band=smoothstep(-.8,-.1,q)*(1.-smoothstep(1.5,2.3,q));
       float coverage=reverse>.5?1.:smoothstep(-.85,.75,q);
+      vec2 dots=mod(uv*viewport,6.)-3.;
+      float dotMask=1.-smoothstep(.65,1.65,length(dots));
+      color=mix(color,vec3(1.),dotMask*.22*smoothstep(.2,2.3,q));
       gl_FragColor=vec4(color+grain*.007*band,coverage);
     }`;
   function initialize(){
@@ -80,7 +84,7 @@ export function createHorizon(section, reduced) {
     if(lost||destroyed||section.classList.contains('is-static'))return;
     const endpoint=progress<=.001||progress>=.999,end=progress>=.999;
     canvas.hidden=endpoint;
-    surface.style.backgroundColor=reverse?(end?'#080909':'#eeede8'):(end?'#eeede8':'transparent');
+    surface.style.background=reverse?(end?'#080909':paperBackground):(end?paperBackground:'transparent');
     let reveal=clamp((progress-.70)/.2);reveal=reveal*reveal*(3-2*reveal);
     copy.style.opacity=reveal.toFixed(4);copy.style.transform=`translate3d(0,${((1-reveal)*22).toFixed(2)}px,0)`;
     if(endpoint)return;
@@ -143,3 +147,4 @@ export function createHorizon(section, reduced) {
     }
   };
 }
+
