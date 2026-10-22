@@ -19,7 +19,7 @@ function initFAQ(section){
   let active=-1,opened=false,unlocked=false,holding=false,hold=0,reveal=0,unlockAt=0,suppressClickUntil=0;
   let reduced=preference.matches||document.documentElement.classList.contains('reduce-motion');
   let top=0,span=1,start=0,end=1,bottom=0,raf=0,last=0,progress=0,target=0,near=false,model=null,loading=false;
-  let origin=.12,visualIndex=-1;
+  let origin=.12,visualIndex=-1,holdGesture=false;
   const pose={flight:0,progress:0,reveal:0,charge:0,x:0,y:0,opened:false};
   const english=()=>document.documentElement.lang==='en',t=(pl,en)=>english()?en:pl;
   function labels(){
@@ -55,12 +55,12 @@ function initFAQ(section){
     if(unlocked)return;unlocked=true;holding=false;hold=1;unlockAt=performance.now();origin=clamp((scrollY-top)/span);
     suppressClickUntil=unlockAt+450;section.classList.add('is-unlocked');select(0,true);labels();wake();
   }
-  function begin(){if(unlocked||holding)return;holding=true;last=0;cube.classList.add('is-holding');wake();}
+  function begin(){if(unlocked||holding)return;holdGesture=true;holding=true;last=0;cube.classList.add('is-holding');wake();}
   function cancel(){holding=false;cube.classList.remove('is-holding');wake();}
   cube.addEventListener('pointerdown',event=>{
     if(event.button!==0||unlocked)return;event.preventDefault();cube.setPointerCapture(event.pointerId);begin();
   });
-  cube.addEventListener('pointerup',cancel);cube.addEventListener('pointercancel',cancel);cube.addEventListener('lostpointercapture',cancel);
+  cube.addEventListener('pointerup',()=>{if(holdGesture)suppressClickUntil=performance.now()+450;holdGesture=false;cancel();});cube.addEventListener('pointercancel',cancel);cube.addEventListener('lostpointercapture',cancel);
   cube.addEventListener('contextmenu',event=>event.preventDefault());
   cube.addEventListener('keydown',event=>{if(!unlocked&&(event.code==='Space'||event.code==='Enter')){event.preventDefault();if(reduced)unlock();else begin();}});
   cube.addEventListener('keyup',event=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();cancel();}});
