@@ -251,6 +251,8 @@
   gl.uniform1f(uTime, 0);
   gl.uniform2f(uMouse, 0, 0);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
+  // Animate from the first tick — do not wait for the hero cube to couple.
+  play();
   syncPlayback();
   document.addEventListener('visibilitychange', syncPlayback);
   window.addEventListener('pageshow', syncPlayback);

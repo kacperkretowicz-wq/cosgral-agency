@@ -435,9 +435,6 @@
     window.addEventListener("pageshow", function () { suspended = false; queueVisibility(); });
   }
 
-  if (themeId !== "default" && "requestIdleCallback" in window) {
-    requestIdleCallback(boot, { timeout: 120 });
-  } else {
-    boot();
-  }
+  // Boot immediately — idle delay left the subpage backdrop blank on first paint.
+  boot();
 })();

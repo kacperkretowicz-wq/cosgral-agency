@@ -431,7 +431,8 @@ import { createFxaaPass } from "./three-fxaa-pass.js";
     if (!isSandHeroPage) return;
     opts = opts || {};
     var duration = opts.duration != null ? opts.duration : MOBILE ? 2.6 : 3.35;
-    var delay = opts.delay != null ? opts.delay : MOBILE ? 0.55 : 0.72;
+    // Keep a tiny lead-in so layout can settle, but don't leave the cube blank.
+    var delay = opts.delay != null ? opts.delay : MOBILE ? 0.08 : 0.12;
     var ease = opts.ease || "power2.inOut";
 
     heroPassToken++;

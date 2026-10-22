@@ -216,9 +216,9 @@ float irNoise(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 *
   mesh.userData.rainbowTime = rainbowTime;
   const envScene = buildEnvScene();
   const pmrem = new THREE.PMREMGenerator(renderer);
-  // fromScene in r170 fixes the studio at 256px. Capture a 512px cube map
-  // first so glass highlights stay clean when the hero is enlarged.
-  const envCapture = new THREE.WebGLCubeRenderTarget(512, {
+  // 256px studio map: first paint is ~4× cheaper than 512, and PMREM already
+  // filters the result. Enlarged menu still reads clean at this size.
+  const envCapture = new THREE.WebGLCubeRenderTarget(256, {
     type: renderer.extensions.has('EXT_color_buffer_float') ? THREE.HalfFloatType : THREE.UnsignedByteType,
     colorSpace: THREE.LinearSRGBColorSpace,
     generateMipmaps: false

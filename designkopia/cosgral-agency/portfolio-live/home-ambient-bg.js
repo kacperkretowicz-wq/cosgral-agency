@@ -289,13 +289,13 @@
       else queueCheck();
     });
     check();
-    // Prepare the hidden second theme after the visible page has started.
-    // Its renderer stays asleep until the layer actually contributes pixels.
-    setTimeout(function () {
-      var warm = function () { if (!document.hidden && !suspended && canvas.isConnected && !effect) ensureEffect(); };
-      if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 2500 });
-      else warm();
-    }, 1500);
+    // Warm hidden theme canvases soon after first paint so theme switches
+    // do not flash an empty backdrop.
+    var warm = function () {
+      if (!document.hidden && !suspended && canvas.isConnected && !effect) ensureEffect();
+    };
+    if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 400 });
+    else setTimeout(warm, 120);
   }
 
   var nodes = document.querySelectorAll("#home-ambient, [data-home-ambient]");
