@@ -19,8 +19,8 @@ function initFAQ(section){
   let active=-1,opened=false,unlocked=false,holding=false,hold=0,reveal=0,unlockAt=0,suppressClickUntil=0;
   let reduced=preference.matches||document.documentElement.classList.contains('reduce-motion');
   let top=0,span=1,start=0,end=1,bottom=0,raf=0,last=0,progress=0,target=0,near=false,model=null,loading=false;
-  let origin=.12,visualIndex=-1,holdGesture=false;
-  const pose={flight:0,progress:0,reveal:0,charge:0,x:0,y:0,opened:false};
+  let origin=.12,visualIndex=-1,holdGesture=false,answerBlend=0;
+  const pose={flight:0,progress:0,reveal:0,charge:0,x:0,y:0,opened:false,exit:0,answerBlend:0};
   const english=()=>document.documentElement.lang==='en',t=(pl,en)=>english()?en:pl;
   function labels(){
     const q=items[Math.max(active,0)].querySelector('[data-i18n^="faq.q"]').textContent.trim();
@@ -70,13 +70,13 @@ function initFAQ(section){
     if(performance.now()<suppressClickUntil||reveal<.85)return;
     if(opened)close();else{
       opened=true;pose.opened=true;answer.hidden=false;section.classList.add('is-answer-open');cube.setAttribute('aria-expanded','true');labels();
-      if(!reduced)answer.animate([{opacity:0,transform:'translate(-50%,20px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:1100,easing:'cubic-bezier(.16,1,.3,1)'});
+      if(!reduced)answer.animate([{opacity:0,transform:'translate(-50%,46px)',filter:'blur(4px)'},{opacity:1,transform:'translate(-50%,0)',filter:'blur(0px)'}],{duration:1500,delay:240,fill:'backwards',easing:'cubic-bezier(.16,1,.3,1)'});
     }wake();
   });
   function jump(i){
     i=Math.max(0,Math.min(items.length-1,i));if(!unlocked)return;
-    if(reduced){select(i);progress=target=origin+(1-origin)*(i+.35)/items.length;wake();return;}
-    const y=top+span*(origin+(1-origin)*(i+.35)/items.length),lenis=window.cosgralSmoothScroll?.lenis;
+    if(reduced){select(i);progress=target=origin+(1-origin)*.77*(i+.35)/items.length;wake();return;}
+    const y=top+span*(origin+(1-origin)*.77*(i+.35)/items.length),lenis=window.cosgralSmoothScroll?.lenis;
     if(lenis)lenis.scrollTo(y,{duration:2.2});else scrollTo({top:y,behavior:'smooth'});
   }
   buttons.forEach((b,i)=>b.addEventListener('click',()=>jump(i)));
@@ -95,7 +95,7 @@ function initFAQ(section){
     raf=0;const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
     target=clamp((scrollY-top)/span);if(!reduced)progress+=(target-progress)*(1-Math.exp(-dt*3.2));
     const flight=reduced?1:ease(0,1,(scrollY-start)/Math.max(1,end-start));pose.flight=flight;
-    near=scrollY>start-innerHeight*.3&&scrollY<bottom-innerHeight*.15;
+    near=scrollY>start-innerHeight*.3&&scrollY<bottom+innerHeight*.3;
     portal.classList.toggle('is-visible',near);portal.style.setProperty('--flight',String(flight));
     portal.style.setProperty('--fallback-x',((-.3+.8*flight)*100)+'vw');
     model?.setVisible(near&&!document.hidden);if(near)load();
@@ -103,28 +103,37 @@ function initFAQ(section){
     else if(!unlocked)hold=Math.max(0,hold-dt*1.8);
     if(unlocked)reveal=reduced?1:ease(.18,3.5,(now-unlockAt)/1000);
     pose.reveal=reveal;pose.charge=hold;
-    let qp=clamp((progress-origin)/Math.max(.08,1-origin));
+    const sceneProgress=clamp((progress-origin)/Math.max(.08,1-origin));
+    const departure=reduced?0:ease(.79,1.04,sceneProgress);
+    pose.exit=departure;
+    section.setAttribute("data-scene-exit",departure.toFixed(3));
+    answerBlend=reduced?(opened?1:0):answerBlend+((opened?1:0)-answerBlend)*(1-Math.exp(-dt*3.3));
+    pose.answerBlend=answerBlend;
+    let qp=clamp(sceneProgress/.77);
     if(!unlocked||reveal<.9)qp=0;
     if(unlocked&&!reduced)select(Math.min(items.length-1,Math.floor(qp*items.length)));
     const phase=Math.min(.999,qp*items.length-active);
     const enter=active===0?1:ease(0,.22,phase),leave=active===items.length-1?0:ease(.77,1,phase);
-    const alpha=unlocked?ease(.38,.94,reveal)*enter*(1-leave):0;
+    const alpha=unlocked?ease(.38,.94,reveal)*enter*(1-leave)*(1-ease(.02,.78,departure)):0;
     const displacement=reduced?0:(1-enter)*68-leave*78;
-    const depth=reduced?0:-(1-enter)*360+leave*150;
-    const yaw=reduced?0:(1-enter)*48-leave*57;
+    const depth=reduced?0:-(1-enter)*440+leave*190;
+    const yaw=reduced?0:(1-enter)*58-leave*64;
+    question.style.transform=`translate3d(0,${-innerHeight*.065*answerBlend}px,0) scale(${1-answerBlend*.54})`;
+    question.style.gap=((innerWidth<=700?16:12)*(1-answerBlend*.62))+"vh";
     lines.forEach((line,i)=>{
       line.style.transform=`translate3d(${displacement*(i?-1:1)}vw,${(1-enter)*(i?60:24)-leave*30}px,${depth}px) rotateY(${yaw*(i?-1:1)}deg) rotateZ(${(1-enter)*(i?5:-5)-leave*(i?3:-3)}deg)`;
-      line.style.opacity=String(alpha*(opened ? .1 : 1));
+      line.style.opacity=String(alpha*(1-answerBlend*.06));
     });
     question.setAttribute('aria-hidden',String(!unlocked));
     intro.style.opacity=String((1-ease(.04,.58,reveal))*.9);
     intro.style.transform=`translate3d(${pose.x*-14}px,${pose.y*-9}px,0) scale(${1+hold*.035})`;
-    holdUI.style.visibility=scrollY>=top-40?'visible':'hidden';holdUI.style.opacity=String(1-ease(0,.45,reveal));holdUI.style.setProperty('--hold',String(hold));
+    holdUI.style.visibility=scrollY>=top-40?'visible':'hidden';holdUI.style.opacity=String((1-ease(0,.45,reveal))*(1-departure));holdUI.style.setProperty('--hold',String(hold));
     cube.classList.toggle('is-holding',holding);cube.classList.toggle('is-unlocked',unlocked);
-    cube.disabled=unlocked&&(reveal<.85||alpha<.8)&&!opened;
-    hint.style.opacity=opened?'0':String(unlocked?alpha:1);
+    cube.disabled=departure>.05||unlocked&&(reveal<.85||alpha<.8)&&!opened;
+    hint.style.opacity=opened||departure>.05?'0':String(unlocked?alpha:1);
+    answer.style.opacity=String(1-ease(.02,.68,departure));
     stage.style.setProperty('--faq-progress',String(unlocked?Math.max(.02,qp):hold));
-    section.classList.toggle('is-available',unlocked&&reveal>.85);
+    section.classList.toggle('is-available',unlocked&&reveal>.85&&departure<.15);
     pose.progress=qp;model?.wake();
     if(near&&!reduced||holding||Math.abs(progress-target)>.0001)wake();else last=0;
   }
