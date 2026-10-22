@@ -124,9 +124,13 @@ if(animated&&matchMedia('(hover: hover) and (pointer: fine)').matches){
 }
 // Navigation changes tone when the moving boundary passes the fixed controls.
 const lightStart=document.querySelector('[data-tone-wipe]'),lightEnd=document.querySelector('.tone-wipe--dark');
+let faqGeometry=null;
 let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null;
 function measureLightNavigation(){
   const scroll=window.scrollY;
+  const faq=document.querySelector("[data-faq-scroll]");
+  const faqRect=faq?.getBoundingClientRect();
+  faqGeometry=faqRect?{top:faqRect.top+scroll,bottom:faqRect.bottom+scroll}:null;
   lightGeometry=[lightStart,lightEnd].map(el=>{
     const rect=el.getBoundingClientRect();
     return {top:rect.top+scroll,bottom:rect.bottom+scroll,height:el.querySelector('.tone-wipe__sticky').offsetHeight};
@@ -140,6 +144,7 @@ function lightNavigation(){
   const scroll=lenis?.scroll??window.scrollY;
   function lightAt(x,y){
     const docY=scroll+y;
+    if(faqGeometry&&faqGeometry.top<=docY&&faqGeometry.bottom>docY)return false;
     for(let i=0;i<2;i++){
       const rect=lightGeometry[i];
       if(rect.top<=docY&&rect.bottom>docY){
@@ -178,3 +183,4 @@ preference.addEventListener('change',event=>{
   document.querySelectorAll('[data-editorial-reveal]').forEach(el=>{el.style.opacity='1';el.style.transform='none';});
   horizons.forEach(horizon=>horizon.destroy());refresh();
 });
+
