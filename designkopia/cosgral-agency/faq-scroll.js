@@ -19,7 +19,7 @@ function initFAQ(section){
   let active=-1,opened=false,unlocked=false,holding=false,hold=0,reveal=0,unlockAt=0,suppressClickUntil=0;
   let reduced=preference.matches||document.documentElement.classList.contains('reduce-motion');
   let top=0,span=1,start=0,end=1,bottom=0,raf=0,last=0,progress=0,target=0,near=false,model=null,loading=false;
-  let origin=.12,visualIndex=-1,holdGesture=false,answerBlend=0;
+  let origin=.12,visualIndex=-1,holdGesture=false,answerBlend=0,holdStarted=0;
   const pose={flight:0,progress:0,reveal:0,charge:0,x:0,y:0,opened:false,exit:0,answerBlend:0,typeEntry:0,typeLeave:0,typeAlpha:0};
   const english=()=>document.documentElement.lang==='en',t=(pl,en)=>english()?en:pl;
   function labels(){
@@ -55,7 +55,7 @@ function initFAQ(section){
     if(unlocked)return;unlocked=true;holding=false;hold=1;unlockAt=performance.now();origin=clamp((scrollY-top)/span);
     suppressClickUntil=unlockAt+450;section.classList.add('is-unlocked');select(0,true);labels();wake();
   }
-  function begin(){if(unlocked||holding)return;holdGesture=true;holding=true;last=0;cube.classList.add('is-holding');wake();}
+  function begin(){if(unlocked||holding)return;holdGesture=true;holding=true;holdStarted=performance.now();hold=0;last=0;cube.classList.add('is-holding');wake();}
   function cancel(){holding=false;cube.classList.remove('is-holding');wake();}
   cube.addEventListener('pointerdown',event=>{
     if(event.button!==0||unlocked)return;event.preventDefault();cube.setPointerCapture(event.pointerId);begin();
@@ -99,7 +99,7 @@ function initFAQ(section){
     portal.classList.toggle('is-visible',near);portal.style.setProperty('--flight',String(flight));
     portal.style.setProperty('--fallback-x',((-.3+.8*flight)*100)+'vw');
     model?.setVisible(near&&!document.hidden);if(near)load();
-    if(holding&&!unlocked){hold=clamp(hold+dt/1.25);if(hold>=1)unlock();}
+    if(holding&&!unlocked){hold=clamp((now-holdStarted)/1250);if(hold>=1)unlock();}
     else if(!unlocked)hold=Math.max(0,hold-dt*1.8);
     if(unlocked)reveal=reduced?1:ease(.18,3.5,(now-unlockAt)/1000);
     pose.reveal=reveal;pose.charge=hold;

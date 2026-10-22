@@ -5,7 +5,7 @@ import {prismPath,smooth,storyOrbit} from './faq-story-motion.js';
 export async function createFAQCube(portal,pose,isReduced){
  const canvas=portal.querySelector('canvas');
  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
- renderer.setClearColor(0,0);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.toneMapping=THREE.NeutralToneMapping;renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.setClearColor(0,0);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));renderer.toneMapping=THREE.NeutralToneMapping;renderer.outputColorSpace=THREE.SRGBColorSpace;
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.1,80);camera.position.z=10;
  const core=new THREE.Group();scene.add(core);
  // Identical geometry, material overrides and studio light family to portfolio-cube.js.
@@ -26,13 +26,13 @@ export async function createFAQCube(portal,pose,isReduced){
  const lineNodes=[];let textKey='',introTexture;
  for(let i=0;i<2;i++){
   const sheet=document.createElement('canvas');sheet.width=2048;sheet.height=320;
-  const texture=new THREE.CanvasTexture(sheet);texture.colorSpace=THREE.SRGBColorSpace;texture.minFilter=THREE.LinearFilter;texture.generateMipmaps=false;
-  const material=new THREE.MeshBasicMaterial({map:texture,transparent:false,alphaTest:.02,depthWrite:true,color:0xffffff,side:THREE.DoubleSide,toneMapped:false});
+  const texture=new THREE.CanvasTexture(sheet);texture.colorSpace=THREE.SRGBColorSpace;texture.minFilter=THREE.LinearMipmapLinearFilter;texture.generateMipmaps=true;texture.anisotropy=4;
+  const material=new THREE.MeshBasicMaterial({map:texture,transparent:false,alphaTest:.02,alphaToCoverage:true,depthWrite:true,color:0xffffff,side:THREE.DoubleSide,toneMapped:false});
   const plane=new THREE.Mesh(new THREE.PlaneGeometry(1,1),material);typeRig.add(plane);lineNodes.push({sheet,texture,plane});
  }
  const introCanvas=document.createElement('canvas');introCanvas.width=2048;introCanvas.height=480;
  introTexture=new THREE.CanvasTexture(introCanvas);introTexture.colorSpace=THREE.SRGBColorSpace;introTexture.minFilter=THREE.LinearFilter;
- const intro=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:introTexture,transparent:false,alphaTest:.02,depthWrite:true,side:THREE.DoubleSide,toneMapped:false}));scene.add(intro);
+ const intro=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:introTexture,transparent:false,alphaTest:.02,alphaToCoverage:true,depthWrite:true,side:THREE.DoubleSide,toneMapped:false}));scene.add(intro);
  function typeset(){
   const words=[...document.querySelectorAll('[data-faq-line]')].map(x=>x.textContent.toLocaleUpperCase(document.documentElement.lang));
   const title=document.querySelector('.faq-scroll__intro')?.textContent||'ZAPYTAJ.';
@@ -40,7 +40,9 @@ export async function createFAQCube(portal,pose,isReduced){
   lineNodes.forEach(({sheet,texture},i)=>{const c=sheet.getContext('2d');c.clearRect(0,0,sheet.width,sheet.height);c.fillStyle='#07090d';c.textAlign='center';c.textBaseline='middle';c.font='400 220px Anton, Impact, sans-serif';c.letterSpacing='-5px';const measured=c.measureText(words[i]).width;c.save();c.translate(1024,160);c.scale(Math.min(1,1990/measured),1);c.fillText(words[i],0,10);c.restore();texture.needsUpdate=true;});
   const c=introCanvas.getContext('2d');c.clearRect(0,0,2048,480);c.fillStyle='#07090d';c.textAlign='center';c.textBaseline='middle';c.font='400 410px Anton, Impact, sans-serif';c.fillText(title,1024,255,2000);introTexture.needsUpdate=true;
  }
- const shardMaterial=new THREE.MeshPhysicalMaterial({color:0xffffff,transmission:1,metalness:0,roughness:.025,thickness:.065,ior:1.46,clearcoat:1,clearcoatRoughness:.015,envMapIntensity:1.15,iridescence:.12,dispersion:.32,side:THREE.DoubleSide});
+ const shardMaterial=new THREE.MeshPhysicalMaterial({color:0xffffff,transmission:1,metalness:0,roughness:.025,thickness:.065,ior:1.46,clearcoat:1,clearcoatRoughness:.015,envMapIntensity:1.15,iridescence:.12,dispersion:.32,transparent:true,side:THREE.FrontSide});
+ shardMaterial.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace(/}\s*$/,'float prismLight=max(max(gl_FragColor.r,gl_FragColor.g),gl_FragColor.b);gl_FragColor.a*=clamp(pow(prismLight,1.35)*2.4,0.,1.); }');};
+ shardMaterial.customProgramCacheKey=()=> 'clear-optical-prisms-v1';
  const asset=await fetch(new URL('./faq-prisms.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Prism geometry missing');return r.json();});
  const shards=await Promise.all(asset.shards.map(async(spec,i)=>{
   const packed=Uint8Array.from(atob(spec.mesh),c=>c.charCodeAt(0));
@@ -64,7 +66,7 @@ export async function createFAQCube(portal,pose,isReduced){
   const dt=Math.min(.04,last?(now-last)/1000:.016);last=now;const reduced=isReduced(),b=reduced?1:1-Math.exp(-dt*3.1);clock+=reduced?0:dt;
   flight=damp(flight,pose.flight,b);release=damp(release,pose.reveal,b);px=damp(px,pose.x,b*.7);py=damp(py,pose.y,b*.7);exit=damp(exit,pose.exit||0,b);answer=damp(answer,pose.answerBlend||0,b);
   const viewH=2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z,viewW=viewH*camera.aspect;
-  const cubeUnit=Math.min(viewW*(width<700?.39:.225),viewH*.34)/2;
+  const cubeUnit=Math.min(viewW*(width<700?.39:.19),viewH*.34)/2;
   const x=-.46+.96*flight+exit*1.12,y=.57-.09*flight+exit*.43;
   const cx=(x-.5)*viewW,cy=(.5-y)*viewH;
   core.position.set(cx+px*.035,cy+Math.sin(clock*.24)*.025-answer*.06,0);
