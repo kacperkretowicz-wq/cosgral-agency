@@ -37,7 +37,7 @@ body.home-page {
   line-height: 1.55;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  cursor: none;
+  cursor: auto;
 }
 html:has(body.home-page) {
   scrollbar-width: none;
@@ -53,7 +53,7 @@ h1, h2, h3 {
   letter-spacing: -0.02em;
 }
 a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 img { display: block; max-width: 100%; }
 .container { max-width: var(--container); margin: 0 auto; padding-inline: var(--gutter); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

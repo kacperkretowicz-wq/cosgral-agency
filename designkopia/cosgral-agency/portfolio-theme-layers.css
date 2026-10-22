@@ -1,0 +1,258 @@
+/* Shared category theme layers — tabs + category subpages */
+
+.portfolio-theme-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.portfolio-theme-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  /* Only fade opacity — transitioning visibility can leave layers stuck invisible */
+  transition: opacity 0.45s ease;
+}
+
+/* Active on tiles page via data-tile-theme / is-theme-active class */
+body.portfolio-page--tiles[data-tile-theme="video"] .portfolio-theme-layer[data-theme-layer="video"],
+body.portfolio-page--tiles[data-tile-theme="graphics"] .portfolio-theme-layer[data-theme-layer="graphics"],
+body.portfolio-page--tiles[data-tile-theme="systems"] .portfolio-theme-layer[data-theme-layer="systems"],
+body.portfolio-page--tiles[data-tile-theme="web"] .portfolio-theme-layer[data-theme-layer="web"],
+body.portfolio-theme-page--video .portfolio-theme-layer[data-theme-layer="video"],
+body.portfolio-theme-page--graphics .portfolio-theme-layer[data-theme-layer="graphics"],
+body.portfolio-theme-page--systems .portfolio-theme-layer[data-theme-layer="systems"],
+body.portfolio-theme-page--web .portfolio-theme-layer[data-theme-layer="web"],
+.portfolio-theme-layer.is-theme-active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: none;
+}
+
+body.portfolio-theme-page--video {
+  background: #050505;
+  color: #f5f5f5;
+}
+body.portfolio-theme-page--graphics {
+  background: #f2f2f4;
+  color: #111;
+}
+body.portfolio-theme-page--systems {
+  background: #eef1f6;
+  color: #111;
+}
+body.portfolio-theme-page--web {
+  background: #040404;
+  color: #f5f5f5;
+}
+
+body.portfolio-theme-page--graphics .site-nav__toggle,
+body.portfolio-theme-page--graphics .lang-switch button,
+body.portfolio-theme-page--systems .site-nav__toggle,
+body.portfolio-theme-page--systems .lang-switch button {
+  color: #111;
+}
+body.portfolio-theme-page--graphics .site-nav__toggle-bars span,
+body.portfolio-theme-page--systems .site-nav__toggle-bars span {
+  background: #111;
+}
+
+body.portfolio-theme-page .subpage-ambient,
+body.portfolio-theme-page .subpage-ambient__blur,
+body.portfolio-theme-page .subpage-ambient__shade {
+  display: none !important;
+}
+/* Keep sand ribbon + cube for megamenu (homepage-parity) */
+body.portfolio-theme-page .portfolio-sand-portal {
+  display: block !important;
+}
+body.portfolio-theme-page:not(.is-nav-menu-open) .subpage-cube-portal {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+body.portfolio-theme-page.is-nav-menu-open .subpage-cube-portal {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+  filter: brightness(1.55) saturate(1.08);
+}
+
+body.portfolio-theme-page .portfolio-theme-stage {
+  z-index: 0;
+}
+body.portfolio-theme-page #main,
+body.portfolio-theme-page.is-portfolio-sand-active #main {
+  position: relative;
+  z-index: 2;
+  background: transparent !important;
+}
+body.portfolio-theme-page .portfolio-hero,
+body.portfolio-theme-page .reels-gallery,
+body.portfolio-theme-page .graphics-gallery,
+body.portfolio-theme-page .portfolio-cases,
+body.portfolio-theme-page .graphics-masonry {
+  background: transparent !important;
+}
+
+.portfolio-theme-layer__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.portfolio-theme-layer__veil--video {
+  background:
+    linear-gradient(180deg, rgba(5, 5, 5, 0.28), rgba(5, 5, 5, 0.06) 22%, rgba(5, 5, 5, 0.08) 70%, rgba(5, 5, 5, 0.38)),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.18), transparent 18%, transparent 82%, rgba(5, 5, 5, 0.18));
+}
+.portfolio-theme-layer__veil--graphics {
+  background:
+    linear-gradient(180deg, rgba(242, 242, 244, 0.35), rgba(242, 242, 244, 0.08) 22%, rgba(242, 242, 244, 0.2) 72%, rgba(242, 242, 244, 0.55));
+}
+body.portfolio-theme-page--video .portfolio-theme-layer__veil--video {
+  background:
+    linear-gradient(180deg, rgba(5, 5, 5, 0.42), rgba(5, 5, 5, 0.1) 20%, rgba(5, 5, 5, 0.14) 68%, rgba(5, 5, 5, 0.55)),
+    linear-gradient(90deg, rgba(5, 5, 5, 0.24), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.24));
+}
+
+/* —— Montaż: animated abstract aesthetic field (no reel stream) —— */
+.portfolio-montaz-field {
+  position: absolute;
+  inset: 0;
+  background: #050505;
+  overflow: hidden;
+}
+.portfolio-montaz-field canvas[data-montaz-ambient],
+.portfolio-montaz-field .portfolio-montaz-ambient {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background:
+    radial-gradient(ellipse 120% 80% at 40% 35%, #2a2a2e 0%, #0a0a0a 55%, #050505 100%);
+}
+
+/* —— Grafiki / Strony: light or dark homepage ambient only (no drifting media) —— */
+.portfolio-grafiki-ambient-wrap,
+.portfolio-web-ambient-wrap {
+  position: absolute;
+  inset: 0;
+}
+.portfolio-grafiki-ambient-wrap .home-ambient,
+.portfolio-grafiki-ambient-wrap canvas.home-ambient {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 1;
+  filter: none;
+  background:
+    radial-gradient(ellipse 140% 90% at 50% 38%, #f6f6f8 0%, #ececf0 42%, #e4e4ea 100%);
+}
+.portfolio-web-ambient-wrap .home-ambient,
+.portfolio-web-ambient-wrap canvas.home-ambient {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background:
+    radial-gradient(ellipse 140% 90% at 50% 38%, #0e0e0e 0%, #040404 42%, #000 100%);
+}
+.portfolio-grafiki-ambient-wrap .home-ambient__blur,
+.portfolio-web-ambient-wrap .home-ambient__blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80vmax;
+  height: 80vmax;
+  margin: -40vmax 0 0 -40vmax;
+  opacity: 0.35;
+  transform: translate3d(50vw, 50vh, 0);
+  will-change: transform;
+}
+.portfolio-grafiki-ambient-wrap .home-ambient__blur {
+  background:
+    radial-gradient(
+      circle closest-side,
+      rgba(40, 40, 50, 0.12) 0%,
+      rgba(40, 40, 50, 0.06) 30%,
+      transparent 66%
+    );
+}
+.portfolio-web-ambient-wrap .home-ambient__blur {
+  opacity: 0.55;
+  background:
+    radial-gradient(
+      circle closest-side,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.055) 22%,
+      rgba(255, 255, 255, 0.012) 50%,
+      transparent 66%
+    );
+}
+.portfolio-grafiki-ambient-wrap .home-ambient__shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.22);
+}
+.portfolio-web-ambient-wrap .home-ambient__shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 3, 3, 0.28);
+}
+
+/* Systems field (shared with tiles) */
+body.portfolio-theme-page--systems .portfolio-tile-bg {
+  opacity: 1 !important;
+  z-index: 1;
+}
+body.portfolio-theme-page--systems .portfolio-theme-stage {
+  z-index: 0;
+}
+
+/* Case pages on systems WebGL — light field needs dark type */
+body.case-page.portfolio-theme-page--systems {
+  color: #111;
+}
+body.case-page.portfolio-theme-page--systems #main {
+  background: transparent !important;
+}
+body.case-page.portfolio-theme-page--systems .case-study,
+body.case-page.portfolio-theme-page--systems .case-study--systems,
+body.case-page.portfolio-theme-page--systems .case-study--viz {
+  color: #111;
+}
+body.case-page.portfolio-theme-page--systems .case-study__title,
+body.case-page.portfolio-theme-page--systems .case-viz-tile__title,
+body.case-page.portfolio-theme-page--systems .case-viz-intro .case-study__title {
+  color: #111;
+}
+body.case-page.portfolio-theme-page--systems .case-study__lede,
+body.case-page.portfolio-theme-page--systems .case-study__back a,
+body.case-page.portfolio-theme-page--systems .case-viz-tile__text,
+body.case-page.portfolio-theme-page--systems .case-viz-tile__hint,
+body.case-page.portfolio-theme-page--systems .case-viz-intro__index a,
+body.case-page.portfolio-theme-page--systems .case-study__meta {
+  color: rgba(17, 17, 17, 0.72);
+}
+body.case-page.portfolio-theme-page--systems .site-nav__toggle,
+body.case-page.portfolio-theme-page--systems .lang-switch button {
+  color: #111;
+}
+body.case-page.portfolio-theme-page--systems .site-nav__toggle-bars span {
+  background: #111;
+}
+
+/* Legacy drift / stream markup — never show */
+.portfolio-grafiki-drift,
+.portfolio-montaz-stream,
+.portfolio-montaz-drift {
+  display: none !important;
+}

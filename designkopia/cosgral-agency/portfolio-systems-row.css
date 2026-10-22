@@ -1,0 +1,172 @@
+/* Systemy i automatyzacje — the row is one set of cards in two states.
+   Closed: three cards fill the section. Open: the same cards step back and the
+   remaining eight unfold from both sides. Every change is a transition on the
+   same element, so the two directions are the same animation read backwards. */
+
+.sys-ed-showcase {
+  /* The row is interactive now — it is the component, not a backdrop */
+  pointer-events: auto;
+  gap: 0;
+  align-items: center;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  --card-gap: clamp(5px, 0.9vw, 12px);
+  --card-w: calc((100% - 2 * var(--card-gap)) / 3);
+  --card-h: 100%;
+}
+.sys-ed-showcase::-webkit-scrollbar { display: none; }
+
+.sys-ed-showcase .sys-ed-tile {
+  flex: 0 0 var(--card-w);
+  height: var(--card-h);
+  margin-inline: calc(var(--card-gap) / 2);
+  cursor: pointer;
+  transform-origin: 50% 50%;
+  transition:
+    flex-basis 0.82s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.82s cubic-bezier(0.22, 1, 0.36, 1),
+    margin-inline 0.82s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease,
+    filter 0.5s ease,
+    box-shadow 0.5s ease;
+}
+
+/* Closed: only the middle three carry width — the rest take up no space at all,
+   which is why opening has nothing to fade in. */
+.sys-ed-showcase:not(.is-open) .sys-ed-tile:not(.is-lead) {
+  flex-basis: 0;
+  margin-inline: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ——— Open: the camera pulls back ——— */
+/* Both axes scale by the same factor, so the open card is the closed card seen
+   from further back — identical proportions, never a reshape. */
+.sys-ed-showcase.is-open {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  --card-w: calc((100% - 2 * var(--card-gap)) / 3 * 0.74);
+  --card-h: 74%;
+}
+/* The artwork gives up its lower third so the copy has somewhere to unfold */
+.sys-ed-showcase.is-open .sys-ed-tile__art {
+  inset: 12% 6% 44%;
+  transition: inset 0.82s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sys-ed-showcase.is-open .sys-ed-tile {
+  scroll-snap-align: center;
+  /* --focus is written per frame from the distance to the row's centre */
+  opacity: calc(0.34 + 0.66 * var(--focus, 1));
+  filter: saturate(calc(0.55 + 0.45 * var(--focus, 1)));
+}
+.sys-ed-showcase.is-open .sys-ed-tile:not(.is-reading) {
+  box-shadow: 0 18px 50px rgba(0, 0, 0, calc(0.5 * var(--focus, 1)));
+}
+
+/* Copy on the card — collapsed while closed so the three tiles keep the exact
+   look the section had before the click. */
+.sys-ed-tile__foot {
+  position: absolute;
+  left: clamp(9px, 1.2vw, 17px);
+  right: clamp(9px, 1.2vw, 17px);
+  bottom: clamp(9px, 1.5vh, 17px);
+  z-index: 3;
+  color: currentColor;
+}
+.sys-ed-showcase .sys-ed-tile__label {
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+}
+.sys-ed-tile__copy {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+}
+.sys-ed-tile__copy > * { overflow: hidden; }
+.sys-ed-showcase.is-open .sys-ed-tile__copy {
+  grid-template-rows: 1fr;
+  opacity: calc(0.25 + 0.75 * var(--focus, 1));
+  transition-delay: 0.3s, 0.3s;
+}
+.sys-ed-tile__desc {
+  margin: 0.55rem 0 0;
+  font-size: clamp(0.72rem, 0.92vw, 0.9rem);
+  line-height: 1.6;
+  opacity: 0.72;
+}
+.sys-ed-tile__more {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding-bottom: 0.1rem;
+  border-bottom: 1px solid currentColor;
+  font-size: clamp(0.56rem, 0.76vw, 0.72rem);
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+/* ——— Reading: the card's own background runs on below it ———
+   An absolutely positioned box whose height comes from its content gives `fr`
+   nothing to take a fraction of, so the grid-rows trick resolves to zero here —
+   max-height is the one that actually animates in this position. */
+.sys-ed-tile__long {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  max-height: 0;
+  overflow: hidden;
+  background: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 0;
+  transition: max-height 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sys-ed-tile__long-inner {
+  max-height: 46vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.sys-ed-tile__long-inner::-webkit-scrollbar { display: none; }
+.sys-ed-tile__long p {
+  margin: 0;
+  padding: clamp(12px, 2vh, 20px) clamp(9px, 1.2vw, 17px) clamp(14px, 2.4vh, 24px);
+  font-size: clamp(0.84rem, 1.02vw, 1.02rem);
+  line-height: 1.68;
+  color: currentColor;
+  opacity: 0.78;
+}
+
+.sys-ed-showcase.is-reading {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: none;
+  align-items: start;
+  padding-block: clamp(12px, 2.5vh, 28px);
+}
+.sys-ed-showcase.is-reading .sys-ed-tile {
+  /* The row keeps its height while one card runs past it */
+  height: var(--card-h);
+}
+.sys-ed-showcase.is-reading .sys-ed-tile.is-reading {
+  overflow: visible;
+  z-index: 4;
+  flex-basis: calc(var(--card-w) * 1.6);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+.sys-ed-showcase.is-reading .sys-ed-tile.is-reading .sys-ed-tile__long {
+  max-height: 46vh;
+}
+.sys-ed-showcase.is-reading .sys-ed-tile:not(.is-reading) {
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+html.reduce-motion .sys-ed-showcase .sys-ed-tile,
+html.reduce-motion .sys-ed-tile__copy,
+html.reduce-motion .sys-ed-tile__long {
+  transition: none !important;
+}

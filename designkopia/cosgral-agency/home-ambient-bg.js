@@ -16,7 +16,6 @@
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   var VERT = "\n    attribute vec2 aPos;\n    void main() { gl_Position = vec4(aPos, 0.0, 1.0); }\n  ";
-
   var FRAG = `
     precision mediump float;
     uniform vec2 uRes;
@@ -134,17 +133,20 @@
   var uMouse = gl.getUniformLocation(program, "uMouse");
 
   var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-  var running = false;
+  var running = false, raf = 0;
   var start = performance.now();
+  window.cosgralAmbientFrame = { time: 0, at: start, mouse: mouse, render: function (now) { frame(now, true); }, sync: syncPlayback };
   var lastFrameTime = 0;
+  var qualityTier = 0;
 
-  var SCALE_BY_TIER = MOBILE ? [0.55, 0.45, 0.38] : [0.52, 0.44, 0.36];
+  var SCALE_BY_TIER = MOBILE ? [.55,.45,.38] : [.52,.44,.36];
   var dprCap = SCALE_BY_TIER[0];
 
   function resize() {
     var dpr = dprCap;
     var maxW = MOBILE ? 720 : 1280;
     var maxH = MOBILE ? 540 : 720;
+    dpr=Math.min(dpr,maxW/window.innerWidth,maxH/window.innerHeight);
     var w = Math.min(maxW, Math.round(window.innerWidth * dpr));
     var h = Math.min(maxH, Math.round(window.innerHeight * dpr));
     if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
@@ -156,6 +158,7 @@
 
   if (window.cosgralPerf) {
     window.cosgralPerf.subscribe(function (t) {
+      qualityTier = t;
       var cap = SCALE_BY_TIER[t] || SCALE_BY_TIER[0];
       if (cap === dprCap) return;
       dprCap = cap;
@@ -163,22 +166,42 @@
     });
   }
 
-  function frame(now) {
+  function schedule() {
+    if (!running || raf || window.cosgralChromeStudio?.synchronized) return;
+    raf = requestAnimationFrame(function (now) {
+      raf = 0;
+      frame(now, false);
+    });
+  }
+
+  function frame(now, external) {
+    external = external === true;
+    function next() { if (!external) schedule(); }
     if (!running) return;
+    var studio = window.cosgralChromeStudio;
+    // The hero synchronizes both draws while visible. Once it leaves,
+    // this loop keeps the dark backdrop moving independently.
+    if (studio?.synchronized && !external) return;
+    if (document.documentElement.classList.contains("is-nav-menu-open")) {
+      next();
+      return;
+    }
 
     // Kiedy użytkownik jest w sekcji Kontakt lub Stopka, nieprzezroczyste tło (#030303)
     // całkowicie zasłania ten canvas — wstrzymujemy rysowanie (0% GPU/CPU na dole strony).
-    if (document.documentElement.classList.contains("is-footer-covered")) {
-      requestAnimationFrame(frame);
+    if ((document.documentElement.classList.contains("is-footer-covered") || document.documentElement.classList.contains("is-ambient-covered"))) {
+      next();
       return;
     }
 
     // Limit 60 FPS dla monitorów 144Hz/240Hz, aby nie przepalać GPU
-    if (now - lastFrameTime < 14) {
-      requestAnimationFrame(frame);
+    var interval = 1000 / (qualityTier===2 ? 30 : 60);
+    var elapsed = now - lastFrameTime;
+    if (!external && elapsed < interval - .65) {
+      next();
       return;
     }
-    lastFrameTime = now;
+    lastFrameTime = elapsed>=interval ? now-elapsed%interval : now;
 
     var ptr = window.cosgralPointer;
     if (ptr) {
@@ -189,22 +212,37 @@
     mouse.y += (mouse.ty - mouse.y) * 0.06;
 
     gl.uniform2f(uRes, canvas.width, canvas.height);
-    gl.uniform1f(uTime, (now - start) / 1000);
+    window.cosgralAmbientFrame.time = (now - start) / 1000;
+    window.cosgralAmbientFrame.at = now;
+    gl.uniform1f(uTime, window.cosgralAmbientFrame.time);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-    requestAnimationFrame(frame);
+    next();
   }
 
   function play() {
-    if (!running) {
-      running = true;
-      requestAnimationFrame(frame);
-    }
+    if (running) return;
+    running = true;
+    lastFrameTime = 0;
+    schedule();
   }
 
   function pause() {
     running = false;
+    cancelAnimationFrame(raf);
+    raf = 0;
+  }
+
+  function syncPlayback() {
+    var classes = document.documentElement.classList;
+    if (document.hidden || classes.contains('is-nav-menu-open') ||
+        classes.contains('is-footer-covered') || classes.contains('is-ambient-covered')) pause();
+    else {
+      play();
+      if (window.cosgralChromeStudio?.synchronized) { cancelAnimationFrame(raf);raf=0; }
+      else schedule();
+    }
   }
 
   window.addEventListener("resize", resize);
@@ -213,10 +251,8 @@
   gl.uniform1f(uTime, 0);
   gl.uniform2f(uMouse, 0, 0);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
-  play();
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden) pause();
-    else play();
-  });
+  syncPlayback();
+  document.addEventListener('visibilitychange', syncPlayback);
+  window.addEventListener('pageshow', syncPlayback);
+  new MutationObserver(syncPlayback).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 })();

@@ -6,7 +6,8 @@
 
   var STORAGE_KEY = "cosgral-lang";
   var copy = null;
-  var lang = localStorage.getItem(STORAGE_KEY) || "pl";
+  var lang = "pl";
+  try { lang = localStorage.getItem(STORAGE_KEY) || "pl"; } catch (_) {}
 
   function copyJsonUrl() {
     var scripts = document.getElementsByTagName("script");
@@ -38,8 +39,9 @@
 
   function applyLang(next) {
     lang = next === "en" ? "en" : "pl";
-    localStorage.setItem(STORAGE_KEY, lang);
-    document.documentElement.lang = lang;
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (_) {}
+    var layoutChanged = document.documentElement.lang !== lang;
+    if (layoutChanged) document.documentElement.lang = lang;
 
     var metaKey = document.documentElement.getAttribute("data-i18n-meta") || "meta";
     if (copy && get(copy, metaKey)) {
@@ -61,35 +63,38 @@
       var val = t(key);
       if (val == null) return;
       if (el.hasAttribute("data-i18n-placeholder")) {
-        el.placeholder = val;
+        if (el.placeholder !== val) el.placeholder = val;
       } else if (el.hasAttribute("data-i18n-html")) {
-        el.innerHTML = val;
+        if (el.innerHTML !== val) { el.innerHTML = val; layoutChanged = true; }
       } else if (el.hasAttribute("data-reveal-words")) {
-        el.textContent = val;
-        delete el.dataset.wordsReady;
-        if (window.cosgralRevealWords) window.cosgralRevealWords.build(el);
+        if (el.textContent !== val) {
+          el.textContent = val; layoutChanged = true;
+          delete el.dataset.wordsReady;
+          if (window.cosgralRevealWords) window.cosgralRevealWords.build(el);
+        }
       } else {
-        el.textContent = val;
+        if (el.textContent !== val) { el.textContent = val; layoutChanged = true; }
       }
     });
 
     document.querySelectorAll("[data-i18n-aria-label]").forEach(function (el) {
       var ariaVal = t(el.getAttribute("data-i18n-aria-label"));
-      if (ariaVal != null) el.setAttribute("aria-label", ariaVal);
+      if (ariaVal != null && el.getAttribute("aria-label") !== ariaVal) el.setAttribute("aria-label", ariaVal);
     });
 
     document.querySelectorAll("[data-i18n-title]").forEach(function (el) {
       var titleVal = t(el.getAttribute("data-i18n-title"));
-      if (titleVal != null) el.setAttribute("title", titleVal);
+      if (titleVal != null && el.getAttribute("title") !== titleVal) el.setAttribute("title", titleVal);
     });
 
     document.querySelectorAll("[data-i18n-lang-btn]").forEach(function (btn) {
       var btnLang = btn.getAttribute("data-i18n-lang-btn");
       btn.classList.toggle("is-active", btnLang === lang);
-      btn.setAttribute("aria-pressed", btnLang === lang ? "true" : "false");
+      var pressed = btnLang === lang ? "true" : "false";
+      if (btn.getAttribute("aria-pressed") !== pressed) btn.setAttribute("aria-pressed", pressed);
     });
 
-    window.dispatchEvent(new CustomEvent("cosgral:langchange", { detail: { lang: lang } }));
+    window.dispatchEvent(new CustomEvent("cosgral:langchange", { detail: { lang: lang, layoutChanged: layoutChanged } }));
   }
 
   function bindSwitcher() {

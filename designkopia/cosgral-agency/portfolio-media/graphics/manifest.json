@@ -182,6 +182,153 @@
       ]
     },
     {
+      "id": "self-initiated",
+      "name": "SELF INITIATED PROJECTS",
+      "self": true,
+      "items": [
+        {
+          "src": "portfolio-media/graphics/self-initiated/01-glos-klientow.jpg",
+          "full": "portfolio-media/graphics/self-initiated/01-glos-klientow.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/02-juz-nie.jpg",
+          "full": "portfolio-media/graphics/self-initiated/02-juz-nie.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/03-skalujemy-kreujemy-kodujemy.jpg",
+          "full": "portfolio-media/graphics/self-initiated/03-skalujemy-kreujemy-kodujemy.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/04-meta-ads-01-brutalna-prawda.jpg",
+          "full": "portfolio-media/graphics/self-initiated/04-meta-ads-01-brutalna-prawda.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/05-meta-ads-02-ctr.jpg",
+          "full": "portfolio-media/graphics/self-initiated/05-meta-ads-02-ctr.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/06-meta-ads-03-algorytm.jpg",
+          "full": "portfolio-media/graphics/self-initiated/06-meta-ads-03-algorytm.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/07-meta-ads-04-kreacja.jpg",
+          "full": "portfolio-media/graphics/self-initiated/07-meta-ads-04-kreacja.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/08-meta-ads-05-strona-zabija-reklame.jpg",
+          "full": "portfolio-media/graphics/self-initiated/08-meta-ads-05-strona-zabija-reklame.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/09-meta-ads-06-checklista.jpg",
+          "full": "portfolio-media/graphics/self-initiated/09-meta-ads-06-checklista.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/10-kazda-marka-nosi-sie-inaczej.jpg",
+          "full": "portfolio-media/graphics/self-initiated/10-kazda-marka-nosi-sie-inaczej.jpg",
+          "w": 1080,
+          "h": 1350,
+          "type": "image"
+        },
+        {
+          "src": "portfolio-media/graphics/self-initiated/11-klient-pyta-ai.jpg",
+          "full": "portfolio-media/graphics/self-initiated/11-klient-pyta-ai.jpg",
+          "w": 900,
+          "h": 1600,
+          "type": "image"
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/12-ai-seo.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/12-ai-seo-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/13-strony-www.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/13-strony-www-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/14-ai-twoj-klient-pyta.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/14-ai-twoj-klient-pyta-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/15-zrobione-teraz.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/15-zrobione-teraz-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/16-cma-lilia.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/16-cma-lilia-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/17-standard-to-nie-wyroznik.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/17-standard-to-nie-wyroznik-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/18-seo-geo-widoczni-dla-ai.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/18-seo-geo-widoczni-dla-ai-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/19-twoj-typografia.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/19-twoj-typografia-poster.jpg",
+          "w": 900,
+          "h": 1600
+        },
+        {
+          "type": "video",
+          "src": "portfolio-media/graphics/self-initiated/20-seo-geo-kamien.mp4",
+          "poster": "portfolio-media/graphics/self-initiated/20-seo-geo-kamien-poster.jpg",
+          "w": 900,
+          "h": 1600
+        }
+      ]
+    },
+    {
       "id": "far-east",
       "name": "Far East",
       "items": [

@@ -8,23 +8,25 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="manifest" href="site.webmanifest" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<script>
-  (function () {
-    try {
-      sessionStorage.setItem("cosgral-web-case", "trove");
-      sessionStorage.setItem("cosgral-page-transition", "1");
-      sessionStorage.setItem("cosgral-scroll-target", "#strony");
-    } catch (e) {}
-    location.replace("portfolio.html#strony");
-  })();
-</script>
 <title>Trove Archive — strona internetowa | COSGRAL</title>
 <meta name="description" content="Sklep Trove Archive — vintage luxury e-commerce. Nagranie, opis wdrożenia i link do sklepu." />
 <link rel="canonical" href="https://cosgral.pl/portfolio-strona-trove.html" />
-<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-<link rel="stylesheet" href="cosgral-subpages.css?v=20260924polish1" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pl_PL" />
+<meta property="og:site_name" content="COSGRAL" />
+<meta property="og:url" content="https://cosgral.pl/portfolio-strona-trove.html" />
+<meta property="og:title" content="Strona internetowa Trove Archive | COSGRAL" />
+<meta property="og:description" content="Strona e-commerce dla vintage store Trove Archive." />
+<meta property="og:image" content="https://cosgral.pl/og-cover.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://cosgral.pl/og-cover.png" />
+
+<link rel="stylesheet" href="assets/fonts/satoshi/satoshi.css?v=20261020portfolio1" />
+<link rel="stylesheet" href="cookie-consent.css?v=20261001a" />
+<script src="cookie-consent.js?v=20261001a"></script>
+<link rel="stylesheet" href="cosgral-subpages.css?v=20261020portfolio1" />
 <link rel="stylesheet" href="theme-mode.css?v=20260920ui34" />
-<link rel="stylesheet" href="page-transitions.css?v=20260924polish1" />
+<link rel="stylesheet" href="page-transitions.css?v=20260810h" />
 <script>
   (function () {
     if (sessionStorage.getItem("cosgral-page-transition")) {
@@ -32,10 +34,26 @@
     }
   })();
 </script>
-<script src="page-transitions.js?v=20260924hash1"></script>
+<script src="page-transitions.js?v=20260925fix21"></script>
 <script src="cosgral-motion-pref.js?v=20260919a"></script>
 <script src="theme-mode.js?v=20260920ui34"></script>
-  <link rel="stylesheet" href="site-chat.css?v=20260922ui51" />
+  <link rel="stylesheet" href="site-chat.css?v=20261018chat1" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": "Strona internetowa — Trove Archive",
+  "description": "Strona e-commerce dla vintage store Trove Archive — nowoczesny design i UX.",
+  "url": "https://cosgral.pl/portfolio-strona-trove.html",
+  "creator": {
+    "@type": "Organization",
+    "name": "COSGRAL",
+    "url": "https://cosgral.pl/"
+  },
+  "inLanguage": ["pl", "en"]
+}
+</script>
+<link rel="stylesheet" href="cosgral-menu.css?v=20261018menu2" />
 </head>
 <body class="subpage portfolio-page case-page">
 <a class="visually-hidden" href="#main" data-i18n="common.skip">Przejdź do treści</a>
@@ -68,16 +86,16 @@
     </button>
   </div>
 </nav>
-<div class="nav-overlay" id="nav-overlay" aria-hidden="true">
-  <div class="nav-overlay__backdrop" data-nav-close></div>
+<div class="nav-overlay" id="nav-overlay" data-lenis-prevent aria-hidden="true">
+  <div class="nav-overlay__backdrop" data-nav-backdrop></div>
   <div class="nav-overlay__stage">
-    <nav class="nav-overlay__links" aria-label="Menu główne">
+    <nav class="nav-overlay__links" aria-label="Menu główne" data-i18n-aria-label="nav_overlay.main_menu">
       <ul class="nav-overlay__list">
         <li><a href="index.html#top" data-nav-close data-i18n="nav.start">Start</a></li>
         <li><a href="portfolio.html" data-nav-close data-i18n="nav.work">Realizacje</a></li>
         <li><a href="index.html#uslugi" data-nav-close data-nav-services-toggle data-no-transition data-i18n="nav.services">Usługi</a></li>
-        <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="index.html#faq" data-nav-close data-i18n="nav.faq">FAQ</a></li>
+        <li><a href="index.html#proces" data-nav-close data-i18n="nav.process">Proces</a></li>
         <li><a href="o-nas.html" data-nav-close data-i18n="nav.about">O nas</a></li>
         <li><a href="index.html#kontakt" data-nav-close data-i18n="nav.contact">Kontakt</a></li>
       </ul>
@@ -136,12 +154,12 @@
       <div class="footer-col">
         <p class="footer-col__title" data-i18n="footer.services">Usługi</p>
         <ul>
-          <li><a href="uslugi/tworzenie-stron-internetowych.html" data-i18n="services.card1">Strony internetowe</a></li>
-          <li><a href="uslugi/projektowanie-aplikacji.html" data-i18n="services.card2">Aplikacje</a></li>
-          <li><a href="uslugi/pozycjonowanie-seo-geo.html" data-i18n="services.card3">Pozycjonowanie SEO/GEO</a></li>
-          <li><a href="uslugi/wdrazanie-automatyzacji.html" data-i18n="services.card4">Automatyzacje</a></li>
-          <li><a href="uslugi/systemy-crm.html" data-i18n="services.card5">Systemy CRM</a></li>
-          <li><a href="uslugi/grafika-i-montaz-wideo.html" data-i18n="services.card6">Grafika i wideo</a></li>
+          <li><a href="index.html?service=blue" data-i18n="services.card1">Strony internetowe</a></li>
+          <li><a href="index.html?service=purple" data-i18n="services.card2">Aplikacje</a></li>
+          <li><a href="index.html?service=gold" data-i18n="services.card3">Pozycjonowanie SEO/GEO</a></li>
+          <li><a href="index.html?service=orange" data-i18n="services.card4">Automatyzacje</a></li>
+          <li><a href="index.html?service=crimson" data-i18n="services.card5">Systemy CRM</a></li>
+          <li><a href="index.html?service=green" data-i18n="services.card6">Grafika i wideo</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -174,22 +192,23 @@
   </div>
 </footer>
 
-<script src="i18n.js?v=20260919gyro"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/gsap.min.js"></script>
-<script src="https://cdn.prod.website-files.com/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script src="i18n.js?v=20261020copy18"></script>
+<script src="vendor/gsap-3.15.0.min.js"></script>
+<script src="vendor/ScrollTrigger-3.15.0.min.js"></script>
 <script>gsap.registerPlugin(ScrollTrigger);</script>
-<script src="home-cursor-field.js?v=20260920ui7"></script>
-<script src="home-cursor.js?v=20260916a"></script>
-<script src="home-tile-interact.js?v=20260920ui9"></script>
-<script src="subpage-ambient-bg.js?v=20260924polish1"></script>
-<script src="subpage-menu-water.js?v=20260814e"></script>
-<script type="module" src="subpage-cube.js?v=20260924polish1"></script>
-<script type="module" src="portfolio-hero-sand.js?v=20260924scrollidle1"></script>
-<script defer src="home-nav-menu.js?v=20260924polish1"></script>
+<script src="home-cursor-field.js?v=20261019editorial14"></script>
+<script src="home-cursor.js?v=20261019editorial14"></script>
+<script src="home-tile-interact.js?v=20260928gyro1"></script>
+<script src="subpage-ambient-bg.js?v=20261020portfolio1"></script>
+<script src="subpage-menu-water.js?v=20261020portfolio1"></script>
+<script type="module" src="subpage-cube.js?v=20261020portfolio1"></script>
+<script type="module" src="portfolio-hero-sand.js?v=20261020portfolio1"></script>
+<script defer src="home-nav-menu.js?v=20261012editorial4"></script>
+<script type="module" src="cosgral-menu-cube.js?v=20261020portfolio1"></script>
 <script src="sand-hero-subpage.js?v=20260816a"></script>
 <script src="sections.js?v=20260814e"></script>
-<script src="portfolio-video.js?v=20260807ag"></script>
-<script defer src="site-chat.js?v=20260924idle1"></script>
-<script type="module" src="site-chat-cube.js?v=20260922ui51"></script>
+<script src="portfolio-video.js?v=20261020portfolio1"></script>
+<script defer src="site-chat.js?v=20260926chat7"></script>
+<script type="module" src="site-chat-cube.js?v=20261019perf17"></script>
 </body>
 </html>

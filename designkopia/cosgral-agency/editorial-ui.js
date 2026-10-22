@@ -1,0 +1,184 @@
+/**
+ * Homepage director — UI, hero intro, process highlight, form.
+ */
+(function () {
+  "use strict";
+
+  var REDUCED = document.documentElement.classList.contains("reduce-motion");
+
+  document.querySelectorAll("[data-faq-toggle]").forEach(function (btn) {
+    if (btn.dataset.faqBound === "1") return;
+    btn.dataset.faqBound = "1";
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      var item = btn.closest(".faq-item");
+      if (!item) return;
+      var isOpen = item.getAttribute("data-open") === "true";
+      var next = !isOpen;
+
+      document.querySelectorAll(".faq-item[data-open='true']").forEach(function (other) {
+        if (other === item) return;
+        other.setAttribute("data-open", "false");
+        var otherBtn = other.querySelector("[data-faq-toggle]");
+        if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
+      });
+
+      item.setAttribute("data-open", String(next));
+      btn.setAttribute("aria-expanded", String(next));
+    });
+  });
+
+  var form = document.querySelector("[data-audit-form]");
+  var status = document.querySelector("[data-audit-status]");
+  var contactContent = document.querySelector("[data-contact-content]");
+  var successPanel = document.querySelector("[data-audit-success]");
+  var MOBILE =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+  function scrollFieldIntoView(el) {
+    if (!MOBILE || !el || typeof el.getBoundingClientRect !== "function") return;
+    var run = function () {
+      var vv = window.visualViewport;
+      var viewH = vv ? vv.height : window.innerHeight;
+      var viewTop = vv ? vv.offsetTop : 0;
+      var rect = el.getBoundingClientRect();
+      var margin = 20;
+      var targetBottom = viewTop + viewH - margin;
+      if (rect.bottom > targetBottom) {
+        var offset = rect.bottom - targetBottom + 12;
+        var lenis = window.cosgralSmoothScroll?.lenis;
+        if (lenis) {
+          lenis.scrollTo(lenis.scroll + offset, { immediate: true });
+        } else {
+          window.scrollBy(0, offset);
+        }
+      } else if (rect.top < viewTop + margin) {
+        var up = rect.top - (viewTop + margin) - 8;
+        var lenisUp = window.cosgralSmoothScroll?.lenis;
+        if (lenisUp) {
+          lenisUp.scrollTo(lenisUp.scroll + up, { immediate: true });
+        } else {
+          window.scrollBy(0, up);
+        }
+      }
+    };
+    requestAnimationFrame(function () {
+      requestAnimationFrame(run);
+    });
+  }
+
+  if (form) {
+    form.addEventListener("focusin", function (e) {
+      if (window.cosgralSectionSnap?.setFormFocusLock) {
+        window.cosgralSectionSnap.setFormFocusLock(true);
+      }
+      scrollFieldIntoView(e.target);
+    });
+
+    form.addEventListener("focusout", function () {
+      window.setTimeout(function () {
+        if (!form.contains(document.activeElement)) {
+          if (window.cosgralSectionSnap?.setFormFocusLock) {
+            window.cosgralSectionSnap.setFormFocusLock(false);
+          }
+        }
+      }, 80);
+    });
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", function () {
+        var active = document.activeElement;
+        if (form.contains(active)) scrollFieldIntoView(active);
+      });
+    }
+  }
+
+  function resetContactSection() {
+    if (contactContent) contactContent.hidden = false;
+    if (successPanel) successPanel.hidden = true;
+    if (form) form.reset();
+    if (status) {
+      status.dataset.state = "";
+      status.textContent = "";
+    }
+    var submitBtn = form && form.querySelector('[type="submit"]');
+    if (submitBtn) submitBtn.disabled = false;
+  }
+
+  function showContactSuccess() {
+    if (contactContent) contactContent.hidden = true;
+    if (successPanel) successPanel.hidden = false;
+    if (status) {
+      status.dataset.state = "";
+      status.textContent = "";
+    }
+  }
+
+  window.addEventListener("cosgral:section-step", function (e) {
+    if (e.detail && e.detail.id !== "kontakt") resetContactSection();
+  });
+
+  if (form && status) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var data = new FormData(form);
+      var email = (data.get("email") || "").toString().trim();
+      var i18n = window.cosgralI18n;
+      if (!email) {
+        status.dataset.state = "error";
+        status.textContent = (i18n && i18n.t("form.error_email")) || "Podaj adres email.";
+        return;
+      }
+
+      var submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+      status.dataset.state = "";
+      status.textContent = "";
+
+      var params = new URLSearchParams();
+      params.append("form-name", "audit-contact");
+      ["name", "email", "company", "message", "bot-field"].forEach(function (key) {
+        params.append(key, (data.get(key) || "").toString());
+      });
+      params.append("lang", (i18n && i18n.getLang && i18n.getLang()) || document.documentElement.lang || "pl");
+
+      /* Produkcja (SEOHOST, cosgral.pl): contact.php → mail() na kontakt@cosgral.pl.
+         Podgląd Netlify (*.netlify.app) nie ma PHP — tam POST na "/" łapią Netlify Forms.
+         Wcześniej POST "/" szedł wszędzie: na SEOHOST zwracał 200 (HTML strony),
+         więc formularz pokazywał sukces, a mail nigdy nie wychodził. */
+      var host = location.hostname || "";
+      var netlify = /\.netlify\.app$/.test(host);
+      var endpoint = netlify ? "/" : form.getAttribute("action") || "contact.php";
+
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
+        body: params.toString(),
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error("send failed");
+          if (netlify) return;
+          var ct = res.headers.get("content-type") || "";
+          /* Bez PHP (GitHub Pages, python http.server) serwer oddaje plik .php jako tekst z 200 */
+          if (ct.indexOf("application/json") < 0) throw new Error("no backend");
+          return res.json().then(function (json) {
+            if (!json || json.ok !== true) throw new Error("send failed");
+          });
+        })
+        .then(function () {
+          showContactSuccess();
+        })
+        .catch(function () {
+          status.dataset.state = "error";
+          status.textContent =
+            (i18n && i18n.t("form.error_send")) ||
+            "Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na kontakt@cosgral.pl.";
+        })
+        .finally(function () {
+          if (submitBtn) submitBtn.disabled = false;
+        });
+    });
+  }
+
+})();

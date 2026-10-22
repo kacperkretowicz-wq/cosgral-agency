@@ -8,6 +8,7 @@
   var MAX_PLAYING = 3;
   var playing = [];
   var observed = new WeakSet();
+  var playRequests = new WeakMap();
 
   function shouldSkip(video) {
     return !!video.closest(".reels-tiles__track--clone");
@@ -52,34 +53,43 @@
 
   function pauseVideo(video) {
     if (!video) return;
+    playRequests.delete(video);
     if (!video.paused) video.pause();
     removeFromPlaying(video);
   }
 
   function playVideo(video) {
-    if (!video || shouldSkip(video)) return;
+    if (!video || shouldSkip(video) || document.hidden) return;
     ensureSrc(video);
     var idx = playing.indexOf(video);
     if (idx >= 0) {
       playing.splice(idx, 1);
       playing.unshift(video);
       if (video.paused) {
-        var resume = video.play();
-        if (resume && resume.catch) resume.catch(function () {});
+        requestPlay(video);
       }
       return;
     }
     while (playing.length >= MAX_PLAYING) {
       pauseVideo(playing[playing.length - 1]);
     }
-    var promise = video.play();
-    if (promise && promise.then) {
-      promise
-        .then(function () {
-          playing.unshift(video);
-        })
-        .catch(function () {});
+    // Reserve the decoder before play() resolves. Otherwise one observer batch
+    // can start every video while all promises still see an empty playing list.
+    playing.unshift(video);
+    requestPlay(video);
+  }
+
+  function requestPlay(video) {
+    var request = {};
+    playRequests.set(video, request);
+    function failed() {
+      if (playRequests.get(video) !== request) return;
+      playRequests.delete(video);removeFromPlaying(video);
     }
+    try {
+      var promise=video.play();
+      if(promise&&promise.catch)promise.catch(failed);
+    } catch (_) { failed(); }
   }
 
   function prepareVideo(video) {
@@ -197,5 +207,14 @@
 
   document.addEventListener("portfolio:media-ready", function () {
     scan();
+  });
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden)playing.slice().forEach(pauseVideo);
+    else {
+      document.querySelectorAll('video[data-portfolio-video], video[data-video-src]').forEach(function(video){
+        if(video.dataset.videoMode==='focus-only')return;
+        visibilityIo.unobserve(video);visibilityIo.observe(video);
+      });
+    }
   });
 })();
