@@ -2,7 +2,7 @@
    The only sampled artwork is our own title canvas, so no poster can taint it. */
 (function () {
   'use strict';
-  const chapter=document.getElementById('montaz'), scroller=document.querySelector('[data-chapters-scroller]');
+  const chapter=document.getElementById('montaz'), scroller=document.querySelector('[data-chapters-scroller]'), horizon=document.querySelector('[data-pf-horizon]');
   if(!chapter||!scroller)return;
   const surface=document.createElement('div');surface.className='pf-montage-reveal';surface.hidden=true;surface.setAttribute('aria-hidden','true');
   const title=document.createElement('strong');title.className='pf-montage-word';
@@ -107,13 +107,13 @@
   }
   function sync(){
     const index=[...scroller.querySelectorAll('[data-portfolio-tile]')].indexOf(chapter);
-    const settled=Math.abs(scroller.scrollLeft/Math.max(1,scroller.clientWidth)-index)<.025;
+    const settled=Math.abs(scroller.scrollLeft/Math.max(1,scroller.clientWidth)-index)<.0005&&horizon?.dataset.settledChapter===String(index);
     const value=settled&&!document.hidden&&!document.body.classList.contains('pf-wall-open')&&!document.documentElement.classList.contains('is-nav-menu-open');
     if(value!==visible){visible=value;surface.hidden=!value;points.length=0;oldPointer=null;if(!value){cancelAnimationFrame(raf);raf=0;last=0;reset();}}
   }
   window.addEventListener('pointermove',e=>{if(!visible||e.pointerType==='touch')return;points.push({x:e.clientX/innerWidth*GW,y:e.clientY/innerHeight*GH});if(points.length>8)points.shift();moved=performance.now();if(!raf)raf=requestAnimationFrame(frame);},{passive:true});
   window.addEventListener('pointerout',e=>{if(!e.relatedTarget)oldPointer=null;});
-  scroller.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',resize,{passive:true});window.addEventListener('cosgral:langchange',language);window.addEventListener('pageshow',sync);document.addEventListener('visibilitychange',sync);
+  window.addEventListener('pf-horizon-state',sync);scroller.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',resize,{passive:true});window.addEventListener('cosgral:langchange',language);window.addEventListener('pageshow',sync);document.addEventListener('visibilitychange',sync);
   new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();cancelAnimationFrame(raf);raf=0;surface.hidden=true;});
   canvas.addEventListener('webglcontextrestored',()=>{textures=[];try{initialize();resize();surface.hidden=!visible;}catch(_){surface.hidden=true;}});

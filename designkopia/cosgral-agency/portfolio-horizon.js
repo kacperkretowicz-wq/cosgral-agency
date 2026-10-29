@@ -309,8 +309,18 @@
     return true;
   }
 
+  function publishGroundState(s) {
+    var raw = rawPos();
+    var settled = !sweep && smoothPos === raw && solidTone(s) !== -1;
+    var chapter = settled ? String(Math.round(raw)) : "";
+    if (canvas.dataset.settledChapter === chapter) return;
+    canvas.dataset.settledChapter = chapter;
+    window.dispatchEvent(new CustomEvent("pf-horizon-state"));
+  }
+
   function draw() {
     var s = state();
+    publishGroundState(s);
     syncClasses(s);
     var solid = solidTone(s);
     // Solid carbon/paper needs no shader. Build the thermal pass on the first
@@ -404,7 +414,14 @@
     if (!lost) canvas.style.backgroundColor = 'transparent';
     resize();
   });
-  scroller.addEventListener("scroll", queue, { passive: true });
+  scroller.addEventListener("scroll", function () {
+    // The water layer must release the horizon from the first scroll frame.
+    if (canvas.dataset.settledChapter !== "") {
+      canvas.dataset.settledChapter = "";
+      window.dispatchEvent(new CustomEvent("pf-horizon-state"));
+    }
+    queue();
+  }, { passive: true });
   new ResizeObserver(resize).observe(scroller);
   new MutationObserver(queue).observe(body, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", resize, { passive: true });
