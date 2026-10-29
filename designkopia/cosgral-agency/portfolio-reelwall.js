@@ -26,18 +26,48 @@
   function language() {
     intro.textContent=label(); wall.setAttribute('aria-label',root.lang==='en'?'Edits gallery':'Galeria montażu'); closeBtn.textContent=root.lang==='en'?'Back':'Wróć';
   }
-  window.__pfWallFrame = function(W,H) { return {mobile:W<=900,top:100,bottom:40,side:24}; };
-  window.__pfWallLayout = function(W,H,n) {
-    const mobile=W<=900, cols=mobile?5:7, rows=Math.max(1,Math.ceil(n/cols));
-    const aw=W*(mobile?2:1.8), ah=H*(mobile?1.8:1.7), cw=aw/cols,ch=ah/rows;
-    return Array.from({length:n},(_,i)=>{
-      const scale=.58+rnd(i,1)*.88;
-      const h=Math.min(H*.37,Math.max(mobile?92:105,ch*.86*scale));
-      const aspect=items[i]?.aspect||9/16,w=h*aspect;
-      const x=(W-aw)/2+cw*(i%cols+.5)+(rnd(i,2)-.5)*cw*.54-w/2;
-      const y=(H-ah)/2+ch*(Math.floor(i/cols)+.5)+(rnd(i,3)-.5)*ch*.42-h/2+30;
-      return {x,y,w,h,depth:.25+rnd(i,4)*.75};
+  window.__pfWallFrame = function(W,H) { return {mobile:W<=600,top:Math.min(110,H*.16),bottom:Math.min(48,H*.08),side:W<=600?14:32}; };
+  window.__pfWallCollage = function(aw,ah,indices) {
+    const n=indices.length,gap=Math.max(7,Math.min(17,aw*.012)),unit=Math.sqrt(aw*ah/n/(9/16))*.83;
+    const boxes=indices.map(i=>{
+      const aspect=items[i]?.aspect||9/16;
+      const h=unit*(.44+Math.pow(rnd(i,1),.85)*1.04),w=h*aspect;
+      return {cx:(rnd(i,22)-.5)*aw,cy:(rnd(i,23)-.5)*ah,w,h,depth:.25+rnd(i,4)*.75};
     });
+    for(let pass=0;pass<240;pass++){
+      let collision=false;
+      for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+        const a=boxes[i],b=boxes[j],ox=(a.w+b.w)/2+gap-Math.abs(a.cx-b.cx),oy=(a.h+b.h)/2+gap-Math.abs(a.cy-b.cy);
+        if(ox<=0||oy<=0)continue;
+        collision=true;
+        if(ox<oy){const d=(a.cx>=b.cx?1:-1)*(ox+.01)/2;a.cx+=d;b.cx-=d;}
+        else{const d=(a.cy>=b.cy?1:-1)*(oy+.01)/2;a.cy+=d;b.cy-=d;}
+      }
+      if(!collision)break;
+    }
+    const left=Math.min(...boxes.map(b=>b.cx-b.w/2)),right=Math.max(...boxes.map(b=>b.cx+b.w/2));
+    const top=Math.min(...boxes.map(b=>b.cy-b.h/2)),bottom=Math.max(...boxes.map(b=>b.cy+b.h/2));
+    const scale=Math.min(aw/(right-left),ah/(bottom-top));
+    const ox=(aw-(right-left)*scale)/2,oy=(ah-(bottom-top)*scale)/2;
+    return boxes.map(b=>({x:ox+(b.cx-b.w/2-left)*scale,y:oy+(b.cy-b.h/2-top)*scale,w:b.w*scale,h:b.h*scale,depth:b.depth}));
+  };
+  window.__pfWallLayout = function(W,H,n) {
+    const f=window.__pfWallFrame(W,H),mx=Math.min(22,W*.02),my=Math.min(16,H*.02);
+    return window.__pfWallCollage(W-2*f.side-2*mx,H-f.top-f.bottom-2*my,Array.from({length:n},(_,i)=>i)).map(b=>({...b,x:b.x+f.side+mx,y:b.y+f.top+my}));
+  };
+  window.__pfWallFocusedLayout = function(W,H,n,selected) {
+    const key=[W,H,n,selected].join(':');
+    if(window.__pfWallFocusCache?.key===key)return window.__pfWallFocusCache.boxes;
+    const f=window.__pfWallFrame(W,H),mx=Math.min(22,W*.02),my=Math.min(16,H*.02),gap=Math.min(18,W*.025);
+    const aw=W-2*f.side-2*mx,ah=H-f.top-f.bottom-2*my;
+    // Every selected reel uses the same large portrait frame.
+    const h=Math.min(600,H*.7,ah*.92,aw*.64/(9/16)),w=h*9/16,side=(aw-w)/2-gap;
+    const out=Array(n),rest=Array.from({length:n},(_,i)=>i).filter(i=>i!==selected).sort((a,b)=>base[a].x-base[b].x),split=Math.ceil(rest.length/2);
+    for(const [group,x] of [[rest.slice(0,split),f.side+mx],[rest.slice(split),W-f.side-mx-side]]){
+      window.__pfWallCollage(side,ah,group).forEach((b,k)=>{out[group[k]]={cx:x+b.x+b.w/2,cy:f.top+my+b.y+b.h/2,w:b.w,h:b.h};});
+    }
+    out[selected]={cx:W/2,cy:f.top+my+ah/2,w,h};
+    window.__pfWallFocusCache={key,boxes:out};return out;
   };
   function measure(snap) {
     base=window.__pfWallLayout(innerWidth,innerHeight,items.length);
@@ -100,20 +130,36 @@
     build();
   }).catch(()=>{wall.dataset.loadError='true';});
   function targets() {
-    const W=innerWidth,H=innerHeight,panX=-sx*W*.48,panY=-sy*H*.56;
+    const W=innerWidth,H=innerHeight,f=window.__pfWallFrame(W,H);
+    const panX=-sx*Math.min(44,W*.04),panY=-sy*Math.min(32,H*.04);
+    if(active>=0)return window.__pfWallFocusedLayout(W,H,base.length,active).map(b=>({...b,cx:b.cx+panX,cy:b.cy+panY}));
     const out=base.map((b,i)=>{
-      const factor=i===active?1.62:i===hover?1.2:1;
+      const factor=i===hover?1.2:1;
       return {cx:b.x+b.w/2+panX,cy:b.y+b.h/2+panY,w:b.w*factor,h:b.h*factor};
     });
     const focus=active>=0?active:hover;
     if(focus>=0){
-      const a=out[focus];a.cx=Math.max(a.w/2+30,Math.min(W-a.w/2-30,a.cx));a.cy=Math.max(a.h/2+104,Math.min(H-a.h/2-35,a.cy));
-      for(let pass=0;pass<3;pass++)out.forEach((t,i)=>{
-        if(i===focus)return;
-        const ox=(a.w+t.w)/2+18-Math.abs(t.cx-a.cx),oy=(a.h+t.h)/2+22-Math.abs(t.cy-a.cy);
-        if(ox>0&&oy>0){if(ox<oy)t.cx+=(t.cx>=a.cx?1:-1)*ox;else t.cy+=(t.cy>=a.cy?1:-1)*oy;}
-      });
-    }return out;
+      for(let pass=0;pass<240;pass++){
+        let collision=false;
+        for(let i=0;i<out.length;i++)for(let j=i+1;j<out.length;j++){
+          const a=out[i],b=out[j],ox=(a.w+b.w)/2+6-Math.abs(a.cx-b.cx),oy=(a.h+b.h)/2+9-Math.abs(a.cy-b.cy);
+          if(ox<=0||oy<=0)continue;
+          collision=true;
+          const wa=i===focus?0:j===focus?1:.5,wb=1-wa;
+          if(ox<oy){const sign=a.cx>=b.cx?1:-1;a.cx+=sign*(ox+.01)*wa;b.cx-=sign*(ox+.01)*wb;}
+          else{const sign=a.cy>=b.cy?1:-1;a.cy+=sign*(oy+.01)*wa;b.cy-=sign*(oy+.01)*wb;}
+        }
+        if(!collision)break;
+      }
+    }
+    const left=Math.min(...out.map(b=>b.cx-b.w/2)),right=Math.max(...out.map(b=>b.cx+b.w/2));
+    const top=Math.min(...out.map(b=>b.cy-b.h/2)),bottom=Math.max(...out.map(b=>b.cy+b.h/2));
+    const scale=Math.min(1,(W-2*f.side)/(right-left),(H-f.top-f.bottom)/(bottom-top));
+    const cx=(left+right)/2,cy=(top+bottom)/2;
+    const dx=Math.max(f.side-(cx+(left-cx)*scale),Math.min(0,W-f.side-(cx+(right-cx)*scale)));
+    const dy=Math.max(f.top-(cy+(top-cy)*scale),Math.min(0,H-f.bottom-(cy+(bottom-cy)*scale)));
+    out.forEach(b=>{b.cx=cx+(b.cx-cx)*scale+dx;b.cy=cy+(b.cy-cy)*scale+dy;b.w*=scale;b.h*=scale;});
+    return out;
   }
   function startFlight() {
     if(phase!=='title')return;
@@ -143,9 +189,9 @@
       const f=flights[i];let p=phase==='entering'?Math.max(0,Math.min(1,(now-entryStart-f.delay)/f.duration)):1;
       if(p===0){tile.style.visibility='hidden';return;}
       const e=ease(p),x=f.x+(c.x-f.x)*e,y=f.y+(c.y-f.y)*e,z=f.z*(1-e),scale=f.scale+(1-f.scale)*e;
-      const depth=(i===active||i===hover)?0:b.depth*20;
+
       tile.style.visibility='visible';tile.style.opacity=String(Math.min(1,p*4));
-      tile.style.transform='translate3d('+(x-sx*depth).toFixed(2)+'px,'+(y-sy*depth).toFixed(2)+'px,'+z.toFixed(1)+'px) rotate('+(f.rot*(1-e)).toFixed(2)+'deg) scale('+(c.w/b.w*scale).toFixed(4)+')';
+      tile.style.transform='translate3d('+x.toFixed(2)+'px,'+y.toFixed(2)+'px,'+z.toFixed(1)+'px) rotate('+(f.rot*(1-e)).toFixed(2)+'deg) scale('+(c.w/b.w*scale).toFixed(4)+')';
       tile.classList.toggle('is-hover',i===hover&&i!==active);
       tile.style.pointerEvents=p===1?'auto':'none';tile.tabIndex=p===1?0:-1;
     });

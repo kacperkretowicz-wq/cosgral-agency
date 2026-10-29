@@ -8,7 +8,7 @@
 .pf-wall .pf-wall__intro.is-fading { opacity:0; }
 .pf-wall .pf-wall__intro[hidden] { display:none; }
 .pf-wall__field { transform-style:preserve-3d; }
-.pf-wall .pf-wall__tile { transform-origin:50% 50%; will-change:transform,opacity; backface-visibility:hidden; }
+.pf-wall .pf-wall__tile { transform-origin:0 0; will-change:transform,opacity; backface-visibility:hidden; }
 .pf-wall .pf-wall__tile img,.pf-wall .pf-wall__tile video { object-fit:cover; box-shadow:0 5px 16px rgb(0 0 0 / .08); border-radius:3px; }
 .pf-wall .pf-wall__tile video { opacity:0; transition:opacity .28s ease; }
 .pf-wall .pf-wall__tile.is-previewing video,.pf-wall .pf-wall__tile.is-active video { opacity:1; }
@@ -18,3 +18,10 @@
 .pf-wall .pf-wall__tile.is-hover .pf-wall__cap,.pf-wall .pf-wall__tile.is-active .pf-wall__cap { opacity:1; }
 body.pf-wall-open .pf-montage-reveal { display:none; }
 @media(prefers-reduced-motion:reduce) { .pf-wall .pf-wall__intro { transition-duration:.12s; } }
+
+/* Keep the montage teaser quiet; its only headline lives beneath the water. */
+body.portfolio-page #montaz .pf-ch-index,
+body.portfolio-page #montaz .pf-hit-label,
+body.portfolio-page #montaz .pf-ch-mark,
+body.portfolio-page #montaz::before,
+body.portfolio-page #montaz::after { display:none !important; }
