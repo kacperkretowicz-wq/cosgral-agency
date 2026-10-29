@@ -127,62 +127,25 @@
   /* ——— The reel wall under the water ——— */
   var gridCanvas = document.createElement("canvas");
   var gridCtx = gridCanvas.getContext("2d");
-  var posters = [];
   var gridDirty = true, postersRequested = false;
-  function loadPosters() {
-    if (postersRequested) return;
-    postersRequested = true;
-    fetch("portfolio-media/reels/manifest.json").then(function (r) { return r.json(); }).then(function (m) {
-      (m.groups || []).forEach(function (g) {
-        (g.items || []).forEach(function (item) {
-          if (!item.poster) return;
-          var img = new Image();
-          // Preview CDNs redirect binary assets to another origin. Request
-          // CORS before src so the poster canvas stays usable as a GL texture.
-          img.crossOrigin = "anonymous";
-          img.decoding = "async";
-          img.onload = function () { gridDirty = true; queue(); };
-          img.src = item.poster;
-          posters.push(img);
-        });
-      });
-    }).catch(function () {});
-  }
+  function loadPosters() { postersRequested = true; }
   function paintGrid() {
     gridDirty = false;
-    var scale = Math.min(1, 1400 / W);
-    var gw = Math.max(2, Math.round(W * scale)), gh = Math.max(2, Math.round(H * scale));
-    if (gridCanvas.width !== gw || gridCanvas.height !== gh) { gridCanvas.width = gw; gridCanvas.height = gh; }
-    /* The same white, client-ordered wall the cube uncovers */
-    gridCtx.fillStyle = "#f6f5f1";
-    gridCtx.fillRect(0, 0, gw, gh);
-    if (!window.__pfWallLayout) return;
-    var rects = window.__pfWallLayout(W, H, posters.length);
-    gridCtx.fillStyle = "#121417";
+    gridCanvas.width = Math.max(2, Math.round(Math.min(W, 1400)));
+    gridCanvas.height = Math.max(2, Math.round(H * gridCanvas.width / W));
+    gridCtx.fillStyle = "#fff";
+    gridCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
+    gridCtx.fillStyle = "#000";
     gridCtx.textAlign = "center";
     gridCtx.textBaseline = "middle";
-    gridCtx.font = "700 " + Math.round(Math.max(20, Math.min(34, W * 0.022)) * scale) + "px Arial, Helvetica, sans-serif";
-    gridCtx.fillText(document.documentElement.lang === "en" ? "VIDEO EDITING" : "MONTAŻ WIDEO", gw / 2, gh / 2 - 8 * scale);
-    posters.forEach(function (img, k) {
-      if (!img.complete || !img.naturalWidth || !rects[k]) return;
-      var q = rects[k];
-      var x = q.x * scale, y = q.y * scale, tw = q.w * scale, th = q.h * scale;
-      var ir = img.naturalWidth / img.naturalHeight, tr = tw / th;
-      var sw = ir > tr ? img.naturalHeight * tr : img.naturalWidth;
-      var sh = ir > tr ? img.naturalHeight : img.naturalWidth / tr;
-      gridCtx.save();
-      gridCtx.beginPath();
-      if (gridCtx.roundRect) gridCtx.roundRect(x, y, tw, th, 3 * scale); else gridCtx.rect(x, y, tw, th);
-      gridCtx.clip();
-      gridCtx.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, x, y, tw, th);
-      gridCtx.restore();
-    });
+    gridCtx.font = "700 " + Math.round(Math.min(270, Math.max(78, W * .17)) * gridCanvas.width / W) + "px Arial, Helvetica, sans-serif";
+    gridCtx.fillText(document.documentElement.lang === "en" ? "EDITS" : "MONTAŻ", gridCanvas.width / 2, gridCanvas.height / 2);
     if (gl && !lost && uniforms) {
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, gridTex);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, gridTex);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, gridCanvas);
     }
   }
+  window.addEventListener("cosgral:langchange", function () { gridDirty = true; queue(); });
 
   /* ——— A finger through black water: a fading wake plus spreading rings ——— */
   var trail = document.createElement("canvas");

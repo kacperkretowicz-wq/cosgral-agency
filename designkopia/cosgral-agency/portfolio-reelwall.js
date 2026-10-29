@@ -1,252 +1,170 @@
-/* Montaż — the reel wall. Tapping the cube sends a shockwave out of it that
- * uncovers every reel at once: small reels scattered over white around a
- * centred title, ordered by client on a loose, balanced grid. A reel under
- * the pointer grows; a chosen reel grows much larger, plays with sound, and
- * nudges its neighbours just far enough that none of them is hidden.
- * Every tile eases toward its target on a spring, so nothing ever jumps.
- */
+/* Montage: white title -> staged arrival -> a floating, interactive reel wall. */
 (function () {
-  "use strict";
-  var chapter = document.getElementById("montaz");
+  'use strict';
+  const chapter = document.getElementById('montaz');
   if (!chapter) return;
-  var root = document.documentElement;
-  var body = document.body;
-  var reduced = root.classList.contains("reduce-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var lang = function () { return (root.lang || "pl").toLowerCase().indexOf("en") === 0 ? "en" : "pl"; };
-
-  function rnd(i, k) {
-    var s = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453;
-    return s - Math.floor(s);
-  }
-  /* Shared with the wall drawn under the black water (portfolio-horizon.js) */
-  window.__pfWallFrame = function (W, H) {
-    var mobile = W <= 900;
-    return { mobile: mobile, cols: mobile ? 5 : 10, top: mobile ? 118 : 124, side: mobile ? 16 : Math.max(28, Math.round(W * 0.05)), bottom: mobile ? 28 : 56 };
-  };
-  window.__pfWallLayout = function (W, H, n) {
-    var f = window.__pfWallFrame(W, H);
-    var rows = Math.ceil(n / f.cols);
-    var aw = W - 2 * f.side, ah = H - f.top - f.bottom;
-    var cw = aw / f.cols, ch = ah / rows;
-    var rects = [];
-    for (var i = 0; i < n; i++) {
-      var c = i % f.cols, r = Math.floor(i / f.cols);
-      var inRow = Math.min(f.cols, n - r * f.cols);
-      var shift = (f.cols - inRow) * cw / 2;
-      var th = ch * (0.6 + rnd(i, 1) * 0.2);
-      var tw = th * 9 / 16;
-      if (tw > cw * 0.78) { tw = cw * 0.78; th = tw * 16 / 9; }
-      /* Never smaller than a comfortable target */
-      if (tw < 46) { tw = Math.min(46, cw * 0.86); th = Math.min(tw * 16 / 9, ch * 0.9); }
-      var cx = f.side + shift + cw * (c + 0.5) + (rnd(i, 2) - 0.5) * (cw - tw) * 0.7;
-      var cy = f.top + ch * (r + 0.5) + (rnd(i, 3) - 0.5) * (ch - th) * 0.7;
-      rects.push({ x: cx - tw / 2, y: cy - th / 2, w: tw, h: th, depth: 0.35 + rnd(i, 4) * 0.65 });
-    }
-    return rects;
-  };
-
-  var wall = document.createElement("section");
-  wall.className = "pf-wall";
-  wall.hidden = true;
-  wall.setAttribute("aria-label", "Montaż wideo");
-  wall.innerHTML = '<div class="pf-wall__title" aria-hidden="true"><strong></strong><span></span></div><div class="pf-wall__field" role="list"></div>';
+  const root = document.documentElement, body = document.body;
+  const reduced = root.classList.contains('reduce-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rnd = (i,k) => { const x=Math.sin(i*12.9898+k*78.233)*43758.5453; return x-Math.floor(x); };
+  const ease = x => 1-Math.pow(1-x,3);
+  const label = () => root.lang === 'en' ? 'EDITS' : 'MONTAŻ';
+  const wall = document.createElement('section');
+  wall.className='pf-wall'; wall.hidden=true; wall.setAttribute('role','dialog'); wall.setAttribute('aria-modal','true'); wall.setAttribute('aria-label','Montaż');
+  wall.innerHTML='<strong class="pf-wall__intro"></strong><div class="pf-wall__field" role="list"></div>';
   body.appendChild(wall);
-  var field = wall.querySelector(".pf-wall__field");
-  var titleEl = wall.querySelector(".pf-wall__title");
-  /* Above the navigation bar, so it can always be pressed */
-  var closeBtn = document.createElement("button");
-  closeBtn.type = "button";
-  closeBtn.className = "pf-wall__close";
-  closeBtn.hidden = true;
-  body.appendChild(closeBtn);
-  /* Outside the clipped wall, so the front glows on both sides of its edge */
-  var waveCanvas = document.createElement("canvas");
-  waveCanvas.className = "pf-wall__wave";
-  waveCanvas.setAttribute("aria-hidden", "true");
-  body.appendChild(waveCanvas);
-  var wctx = waveCanvas.getContext("2d");
-
-  var items = [];
-  var tiles = [];
-  var base = [];
-  var cur = [];
-  var active = -1;
-  var hover = -1;
-  var phase = "closed";
-  var anim = 0;
-  var loop = 0;
-  var px = 0, py = 0, sx = 0, sy = 0;
-  var lastT = 0;
-
-  fetch("portfolio-media/reels/manifest.json?v=20261018self1").then(function (r) { return r.json(); }).then(function (m) {
-    var clients = [];
-    (m.groups || []).forEach(function (g) {
-      clients.push(g.name || g.id);
-      (g.items || []).forEach(function (item, k) {
-        items.push({ client: g.name || g.id, n: k + 1, first: k === 0, poster: item.poster, src: item.full || item.src });
-      });
-    });
-    titleEl.querySelector("strong").textContent = lang() === "en" ? "Video editing" : "Montaż wideo";
-    titleEl.querySelector("span").textContent = items.length + " — " + clients.join(" · ");
-    build();
-  }).catch(function () {});
-
-  function build() {
-    field.textContent = "";
-    tiles = items.map(function (item, i) {
-      var tile = document.createElement("button");
-      tile.type = "button";
-      tile.className = "pf-wall__tile" + (item.first ? " is-first" : "");
-      tile.setAttribute("role", "listitem");
-      tile.setAttribute("aria-label", item.client + " — " + item.n);
-      var img = document.createElement("img");
-      img.loading = "lazy";
-      img.src = item.poster;
-      img.alt = "";
-      img.decoding = "async";
-      tile.appendChild(img);
-      var cap = document.createElement("span");
-      cap.className = "pf-wall__cap";
-      var b = document.createElement("b");
-      b.textContent = item.client;
-      cap.appendChild(b);
-      cap.appendChild(document.createTextNode((item.n < 10 ? " 0" : " ") + item.n));
-      tile.appendChild(cap);
-      tile.addEventListener("click", function () { toggle(i); });
-      tile.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") { hover = i; wake(); } });
-      tile.addEventListener("pointerleave", function () { if (hover === i) { hover = -1; wake(); } });
-      tile.addEventListener("focus", function () { hover = i; wake(); });
-      tile.addEventListener("blur", function () { if (hover === i) { hover = -1; wake(); } });
-      field.appendChild(tile);
-      return tile;
-    });
-    measure(true);
+  const field=wall.querySelector('.pf-wall__field'), intro=wall.querySelector('.pf-wall__intro');
+  const closeBtn=document.createElement('button'); closeBtn.type='button'; closeBtn.className='pf-wall__close'; closeBtn.hidden=true; body.appendChild(closeBtn);
+  const waveCanvas=document.createElement('canvas'); waveCanvas.className='pf-wall__wave'; waveCanvas.setAttribute('aria-hidden','true'); body.appendChild(waveCanvas);
+  const wctx=waveCanvas.getContext('2d');
+  let items=[],tiles=[],base=[],cur=[],flights=[],phase='closed',active=-1,hover=-1,anim=0,loop=0,lastT=0,entryStart=0,entryEnd=0;
+  let px=0,py=0,sx=0,sy=0,returnFocus=null;
+  const timers=[];
+  const releases=new Map();
+  function later(fn,ms) { timers.push(setTimeout(fn,ms)); }
+  function clearTimers() { timers.splice(0).forEach(clearTimeout); }
+  function setPhase(value) { phase=value; wall.dataset.phase=value; }
+  function language() {
+    intro.textContent=label(); wall.setAttribute('aria-label',root.lang==='en'?'Edits gallery':'Galeria montażu'); closeBtn.textContent=root.lang==='en'?'Back':'Wróć';
   }
-
+  window.__pfWallFrame = function(W,H) { return {mobile:W<=900,top:100,bottom:40,side:24}; };
+  window.__pfWallLayout = function(W,H,n) {
+    const mobile=W<=900, cols=mobile?5:7, rows=Math.max(1,Math.ceil(n/cols));
+    const aw=W*(mobile?2:1.8), ah=H*(mobile?1.8:1.7), cw=aw/cols,ch=ah/rows;
+    return Array.from({length:n},(_,i)=>{
+      const scale=.58+rnd(i,1)*.88;
+      const h=Math.min(H*.37,Math.max(mobile?92:105,ch*.86*scale));
+      const aspect=items[i]?.aspect||9/16,w=h*aspect;
+      const x=(W-aw)/2+cw*(i%cols+.5)+(rnd(i,2)-.5)*cw*.54-w/2;
+      const y=(H-ah)/2+ch*(Math.floor(i/cols)+.5)+(rnd(i,3)-.5)*ch*.42-h/2+30;
+      return {x,y,w,h,depth:.25+rnd(i,4)*.75};
+    });
+  };
   function measure(snap) {
-    base = window.__pfWallLayout(window.innerWidth, window.innerHeight, items.length);
-    if (snap || cur.length !== base.length) cur = base.map(function (b) { return { x: b.x, y: b.y, w: b.w, h: b.h }; });
+    base=window.__pfWallLayout(innerWidth,innerHeight,items.length);
+    if(snap||cur.length!==base.length) cur=base.map(b=>({...b}));
+    base.forEach((b,i)=>{tiles[i].style.width=b.w+'px';tiles[i].style.height=b.h+'px';});
   }
-
-  function clampBox(cx, cy, w, h, f, W, H) {
-    var minX = f.side + w / 2, maxX = W - f.side - w / 2;
-    var minY = f.top + h / 2, maxY = H - f.bottom - h / 2;
-    return [minX > maxX ? W / 2 : Math.min(maxX, Math.max(minX, cx)), minY > maxY ? (f.top + H - f.bottom) / 2 : Math.min(maxY, Math.max(minY, cy))];
-  }
-
-  /* Where each tile wants to be this frame */
-  function targets() {
-    var W = window.innerWidth, H = window.innerHeight, f = window.__pfWallFrame(W, H);
-    var out = base.map(function (b) { return { cx: b.x + b.w / 2, cy: b.y + b.h / 2, w: b.w, h: b.h }; });
-    var A = null;
-    if (active >= 0) {
-      var a = out[active];
-      var ah = Math.min((H - f.top - f.bottom) * 0.94, H * (f.mobile ? 0.5 : 0.62));
-      var aw = ah * 9 / 16;
-      var c = clampBox(a.cx, a.cy, aw, ah, f, W, H);
-      A = { cx: c[0], cy: c[1], w: aw, h: ah };
-      out[active] = A;
-    }
-    out.forEach(function (t, i) {
-      if (i === active) return;
-      if (i === hover) {
-        var hc = clampBox(t.cx, t.cy, t.w * 2, t.h * 2, f, W, H);
-        t.cx = hc[0]; t.cy = hc[1]; t.w *= 2; t.h *= 2;
+  function allowed() {return !document.hidden&&!root.classList.contains('is-nav-menu-open')&&(phase==='open'||phase==='entering');}
+  function play(i) {
+    const tile=tiles[i]; if(!tile)return;
+    let video=tile.querySelector('video');
+    const wanted=allowed()&&(i===active||i===hover);
+    if(!wanted) {
+      if(video) {
+        video.pause();video.muted=true;
+        if(!releases.has(i))releases.set(i,setTimeout(()=>{
+          releases.delete(i);
+          if(i!==active&&i!==hover&&video.isConnected){video.removeAttribute('src');video.load();video.remove();}
+        },700));
       }
-      if (!A) return;
-      /* Step aside just enough to stay in view */
-      var m = 14;
-      var ox = (A.w / 2 + t.w / 2 + m) - Math.abs(t.cx - A.cx);
-      var oy = (A.h / 2 + t.h / 2 + m) - Math.abs(t.cy - A.cy);
-      if (ox > 0 && oy > 0) {
-        if (ox < oy) t.cx += (t.cx >= A.cx ? 1 : -1) * ox;
-        else t.cy += (t.cy >= A.cy ? 1 : -1) * oy;
-        var cc = clampBox(t.cx, t.cy, t.w, t.h, f, W, H);
-        t.cx = cc[0]; t.cy = cc[1];
-      }
-    });
-    return out;
-  }
-
-  function step(now) {
-    loop = 0;
-    if (phase === "closed" || document.hidden || root.classList.contains("is-nav-menu-open")) { lastT = 0; return; }
-    var dt = Math.min(0.05, Math.max(0.001, (now - (lastT || now - 16)) / 1000));
-    lastT = now;
-    var k = reduced ? 1 : 1 - Math.exp(-dt * 9);
-    sx += (px - sx) * (1 - Math.exp(-dt * 3));
-    sy += (py - sy) * (1 - Math.exp(-dt * 3));
-    var moving = Math.abs(px - sx) + Math.abs(py - sy) > .00005;
-    var tg = targets();
-    tiles.forEach(function (tile, i) {
-      var t = tg[i], c = cur[i];
-      c.x += (t.cx - t.w / 2 - c.x) * k;
-      c.y += (t.cy - t.h / 2 - c.y) * k;
-      c.w += (t.w - c.w) * k;
-      c.h += (t.h - c.h) * k;
-      if (Math.abs(t.cx - t.w / 2 - c.x) + Math.abs(t.cy - t.h / 2 - c.y) +
-          Math.abs(t.w - c.w) + Math.abs(t.h - c.h) > .001) moving = true;
-      var still = i === active || i === hover;
-      var d = still ? 0 : base[i].depth * 16;
-      tile.style.left = c.x.toFixed(1) + "px";
-      tile.style.top = c.y.toFixed(1) + "px";
-      tile.style.width = c.w.toFixed(1) + "px";
-      tile.style.height = c.h.toFixed(1) + "px";
-      tile.style.transform = "translate3d(" + (-sx * d).toFixed(2) + "px," + (-sy * d).toFixed(2) + "px,0)";
-      tile.classList.toggle("is-hover", i === hover && i !== active);
-    });
-    if (moving) wake(); else lastT = 0;
-  }
-  function wake() {
-    if (!loop && phase !== "closed" && !document.hidden && !root.classList.contains("is-nav-menu-open")) loop = requestAnimationFrame(step);
-  }
-  window.addEventListener("pointermove", function (e) {
-    px = e.clientX / window.innerWidth - 0.5;
-    py = e.clientY / window.innerHeight - 0.5;
-    wake();
-  }, { passive: true });
-
-  function stop(i) {
-    var tile = tiles[i];
-    if (!tile) return;
-    tile.classList.remove("is-active");
-    var video = tile.querySelector("video");
-    if (video) {
-      video.pause();
-      setTimeout(function () {
-        if (!tile.classList.contains("is-active")) { video.removeAttribute("src"); video.load(); video.remove(); }
-      }, 700);
+      tile.classList.remove('is-previewing');return;
     }
+    if(releases.has(i)){clearTimeout(releases.get(i));releases.delete(i);}
+    if(!video) {
+      video=document.createElement('video'); video.loop=true;video.playsInline=true;video.muted=true;video.preload='metadata';video.poster=items[i].poster;video.setAttribute('playsinline','');
+      video.src=items[i].src;tile.insertBefore(video,tile.querySelector('.pf-wall__cap'));
+      video.addEventListener('playing',()=>{if(allowed()&&(i===active||i===hover))tile.classList.add('is-previewing');else video.pause();});
+    }
+    video.muted=i!==active;
+    const promise=video.play();
+    if(promise)promise.catch(()=>{if(allowed()&&(i===active||i===hover)){video.muted=true;video.play().catch(()=>{});}});
+  }
+  function syncVideos() {tiles.forEach((_,i)=>play(i));}
+  function setHover(i) {
+    if(phase!=='open')return;
+    const old=hover;hover=i;
+    if(old>=0&&old!==active)play(old);
+    if(i>=0)play(i);wake();
   }
   function toggle(i) {
-    if (phase !== "open") return;
-    var prev = active;
-    if (prev >= 0) stop(prev);
-    if (prev === i) { active = -1; wake(); return; }
-    active = i;
-    wake();
-    var tile = tiles[i];
-    tile.classList.add("is-active");
-    var video = tile.querySelector("video");
-    if (!video) {
-      video = document.createElement("video");
-      video.src = items[i].src;
-      video.poster = items[i].poster;
-      video.loop = true;
-      video.playsInline = true;
-      video.setAttribute("playsinline", "");
-      tile.insertBefore(video, tile.querySelector(".pf-wall__cap"));
-    }
-    video.muted = false;
-    var p = video.play();
-    if (p && p.catch) p.catch(function () {
-      if (phase === "open" && active === i && !document.hidden && !root.classList.contains("is-nav-menu-open") && tile.classList.contains("is-active")) {
-        video.muted = true; video.play().catch(function () {});
-      }
-    });
+    if(phase!=='open')return;
+    const old=active;active=active===i?-1:i;
+    tiles.forEach((tile,k)=>{tile.classList.toggle('is-active',k===active);tile.setAttribute('aria-pressed',String(k===active));});
+    if(old>=0)play(old);play(i);wall.dataset.selected=String(active);wake();
   }
-
-  /* ——— The shockwave: an irregular front grown from the cube ——— */
+  function build() {
+    field.textContent='';
+    tiles=items.map((item,i)=>{
+      const tile=document.createElement('button');tile.type='button';tile.className='pf-wall__tile';tile.setAttribute('aria-label',item.client+' — '+item.n);tile.setAttribute('aria-pressed','false');tile.tabIndex=-1;
+      const img=document.createElement('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=item.poster;tile.appendChild(img);
+      const cap=document.createElement('span');cap.className='pf-wall__cap';const name=document.createElement('b');name.textContent=item.client;cap.append(name,document.createTextNode(' '+String(item.n).padStart(2,'0')));tile.appendChild(cap);
+      tile.style.visibility='hidden';tile.addEventListener('click',e=>{if(touchMoved){e.preventDefault();touchMoved=false;return;}toggle(i);});
+      tile.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')setHover(i);});
+      tile.addEventListener('pointerleave',()=>{if(hover===i)setHover(-1);});
+      tile.addEventListener('focus',()=>setHover(i));tile.addEventListener('blur',()=>{if(hover===i)setHover(-1);});
+      field.appendChild(tile);return tile;
+    });measure(true);
+  }
+  fetch('portfolio-media/reels/manifest.json?v=20261018self1').then(r=>{if(!r.ok)throw Error('manifest');return r.json();}).then(m=>{
+    (m.groups||[]).forEach(g=>(g.items||[]).forEach((item,k)=>items.push({client:g.name||g.id,n:k+1,poster:item.poster,src:item.full||item.src,aspect:Math.max(.5,Math.min(1.8,(item.w||720)/(item.h||1280)))})));
+    build();
+  }).catch(()=>{wall.dataset.loadError='true';});
+  function targets() {
+    const W=innerWidth,H=innerHeight,panX=-sx*W*.48,panY=-sy*H*.56;
+    const out=base.map((b,i)=>{
+      const factor=i===active?1.62:i===hover?1.2:1;
+      return {cx:b.x+b.w/2+panX,cy:b.y+b.h/2+panY,w:b.w*factor,h:b.h*factor};
+    });
+    const focus=active>=0?active:hover;
+    if(focus>=0){
+      const a=out[focus];a.cx=Math.max(a.w/2+30,Math.min(W-a.w/2-30,a.cx));a.cy=Math.max(a.h/2+104,Math.min(H-a.h/2-35,a.cy));
+      for(let pass=0;pass<3;pass++)out.forEach((t,i)=>{
+        if(i===focus)return;
+        const ox=(a.w+t.w)/2+18-Math.abs(t.cx-a.cx),oy=(a.h+t.h)/2+22-Math.abs(t.cy-a.cy);
+        if(ox>0&&oy>0){if(ox<oy)t.cx+=(t.cx>=a.cx?1:-1)*ox;else t.cy+=(t.cy>=a.cy?1:-1)*oy;}
+      });
+    }return out;
+  }
+  function startFlight() {
+    if(phase!=='title')return;
+    setPhase('entering');entryStart=performance.now();
+    const order=items.map((_,i)=>i).sort((a,b)=>rnd(a,18)-rnd(b,18));
+    const ranks=new Map(order.map((i,k)=>[i,k]));
+    flights=base.map((b,i)=>{
+      const edge=Math.floor(rnd(i,12)*8),margin=Math.max(innerWidth,innerHeight)*(.22+rnd(i,13)*.35);
+      const x=edge===0||edge===4||edge===7?-margin:edge===1||edge===5||edge===6?innerWidth+margin:rnd(i,14)*innerWidth;
+      const y=edge===2||edge===4||edge===5?-margin:edge===3||edge===6||edge===7?innerHeight+margin:rnd(i,15)*innerHeight;
+      return {x,y,z:rnd(i,16)>.55?380:-1400,scale:rnd(i,16)>.55?2.15:.25,rot:(rnd(i,17)-.5)*35,delay:reduced?0:ranks.get(i)*26,duration:reduced?1:1100+rnd(i,19)*650};
+    });
+    entryEnd=Math.max(0,...flights.map(f=>f.delay+f.duration));wake();
+  }
+  function step(now) {
+    loop=0;
+    if(!allowed()){lastT=0;return;}
+    const dt=lastT?Math.min(.05,(now-lastT)/1000):.016;lastT=now;
+    const k=reduced?1:1-Math.exp(-dt*9),pk=reduced?1:1-Math.exp(-dt*3.5);
+    sx+=(px-sx)*pk;sy+=(py-sy)*pk;
+    let moving=Math.abs(px-sx)+Math.abs(py-sy)>.0001;
+    const tg=targets();
+    tiles.forEach((tile,i)=>{
+      const t=tg[i],c=cur[i],b=base[i];
+      c.x+=(t.cx-t.w/2-c.x)*k;c.y+=(t.cy-t.h/2-c.y)*k;c.w+=(t.w-c.w)*k;c.h+=(t.h-c.h)*k;
+      if(Math.abs(t.cx-t.w/2-c.x)+Math.abs(t.cy-t.h/2-c.y)+Math.abs(t.w-c.w)+Math.abs(t.h-c.h)>.05)moving=true;
+      const f=flights[i];let p=phase==='entering'?Math.max(0,Math.min(1,(now-entryStart-f.delay)/f.duration)):1;
+      if(p===0){tile.style.visibility='hidden';return;}
+      const e=ease(p),x=f.x+(c.x-f.x)*e,y=f.y+(c.y-f.y)*e,z=f.z*(1-e),scale=f.scale+(1-f.scale)*e;
+      const depth=(i===active||i===hover)?0:b.depth*20;
+      tile.style.visibility='visible';tile.style.opacity=String(Math.min(1,p*4));
+      tile.style.transform='translate3d('+(x-sx*depth).toFixed(2)+'px,'+(y-sy*depth).toFixed(2)+'px,'+z.toFixed(1)+'px) rotate('+(f.rot*(1-e)).toFixed(2)+'deg) scale('+(c.w/b.w*scale).toFixed(4)+')';
+      tile.classList.toggle('is-hover',i===hover&&i!==active);
+      tile.style.pointerEvents=p===1?'auto':'none';tile.tabIndex=p===1?0:-1;
+    });
+    if(phase==='entering'){
+      moving=true;
+      if(now-entryStart>=entryEnd){setPhase('open');intro.hidden=true;moving=false;}
+    }
+    wall.dataset.pan=sx.toFixed(3)+','+sy.toFixed(3);
+    if(moving)wake();else lastT=0;
+  }
+  function wake(){if(!loop&&allowed())loop=requestAnimationFrame(step);}
+  window.addEventListener('pointermove',e=>{
+    if(phase!=='open')return;
+    px=Math.max(-.5,Math.min(.5,e.clientX/innerWidth-.5));py=Math.max(-.5,Math.min(.5,e.clientY/innerHeight-.5));wake();
+  },{passive:true});
+  let touch=null,touchMoved=false;
+  wall.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'){touchMoved=false;touch={x:e.clientX,y:e.clientY,px,py};}});
+  wall.addEventListener('pointermove',e=>{if(touch&&phase==='open'){if(Math.hypot(e.clientX-touch.x,e.clientY-touch.y)>8)touchMoved=true;px=Math.max(-.5,Math.min(.5,touch.px-(e.clientX-touch.x)/innerWidth));py=Math.max(-.5,Math.min(.5,touch.py-(e.clientY-touch.y)/innerHeight));wake();}});
+  window.addEventListener('pointerup',()=>{touch=null;});
   function centre() {
     var attr = window.innerWidth <= 900 ? "data-cube-at-m" : "data-cube-at";
     var v = (chapter.getAttribute(attr) || "0.5 0.5").split(" ").map(Number);
@@ -305,66 +223,48 @@
   }
 
   function open() {
-    if (phase !== "closed" || !items.length) return;
-    phase = "opening";
-    measure(true);
-    wall.hidden = false;
-    wall.style.clipPath = "polygon(0 0,0 0,0 0)";
-    closeBtn.textContent = lang() === "en" ? "Back" : "Wróć";
-    closeBtn.hidden = false;
-    body.classList.add("pf-wall-open");
-    window.dispatchEvent(new CustomEvent("pf-wall-open"));
-    lastT = 0;
-    cancelAnimationFrame(loop);
-    loop = 0; wake();
-    run(true, function () {
-      wall.style.clipPath = "";
-      phase = "open";
+    if(phase!=='closed'||!items.length)return;
+    clearTimers();returnFocus=document.activeElement;active=hover=-1;px=py=sx=sy=0;language();
+    tiles.forEach(tile=>{tile.style.visibility='hidden';tile.style.opacity='0';tile.tabIndex=-1;tile.classList.remove('is-active','is-hover');tile.setAttribute('aria-pressed','false');});
+    measure(true);intro.hidden=false;intro.classList.remove('is-fading');wall.hidden=false;wall.style.clipPath='polygon(0 0,0 0,0 0)';closeBtn.hidden=false;
+    setPhase('opening');body.classList.add('pf-wall-open');window.dispatchEvent(new CustomEvent('pf-wall-open'));
+    run(true,()=>{
+      if(phase!=='opening')return;
+      wall.style.clipPath='';setPhase('title');closeBtn.focus({preventScroll:true});
+      later(()=>{if(phase!=='title')return;intro.classList.add('is-fading');later(startFlight,reduced?0:500);},reduced?100:400);
     });
   }
   function close() {
-    if (phase !== "open") return;
-    phase = "closing";
-    if (active >= 0) { stop(active); active = -1; }
-    hover = -1;
-    closeBtn.hidden = true;
-    window.dispatchEvent(new CustomEvent("pf-wall-close"));
-    run(false, function () {
-      wall.hidden = true;
-      wall.style.clipPath = "";
-      body.classList.remove("pf-wall-open");
-      phase = "closed";
-      cancelAnimationFrame(loop); loop = 0; lastT = 0;
+    if(phase==='closed'||phase==='closing')return;
+    clearTimers();cancelAnimationFrame(loop);loop=0;lastT=0;active=hover=-1;setPhase('closing');syncVideos();
+    closeBtn.hidden=true;window.dispatchEvent(new CustomEvent('pf-wall-close'));
+    run(false,()=>{
+      wall.hidden=true;wall.style.clipPath='';body.classList.remove('pf-wall-open');setPhase('closed');
+      tiles.forEach(tile=>{tile.tabIndex=-1;const video=tile.querySelector('video');if(video){video.pause();video.removeAttribute('src');video.load();video.remove();}tile.classList.remove('is-previewing','is-active');});
+      if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true});
     });
   }
-
-  closeBtn.addEventListener("click", close);
-  /* The cube and "see more" in Montaż open the wall instead of the old gallery */
-  window.addEventListener("click", function (e) {
-    var t = e.target.closest && e.target.closest("#montaz [data-tile-expand-hit], #montaz [data-tile-expand]");
-    if (!t || e.defaultPrevented || window.__pfCubeDragged) return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    open();
-  }, true);
-  /* While the wall is up, the slider underneath must not move */
-  window.addEventListener("wheel", function (e) { if (phase !== "closed") e.stopImmediatePropagation(); }, { capture: true, passive: true });
-  window.addEventListener("keydown", function (e) {
-    if (phase === "closed" || document.documentElement.classList.contains("is-nav-menu-open")) return;
-    if (e.key === "Escape") close();
-    if (e.key !== "Tab" && e.key !== "Enter" && e.key !== " ") e.stopImmediatePropagation();
-  }, true);
-  window.addEventListener("resize", function () { measure(false); wake(); }, { passive: true });
-  function syncActivity() {
-    if (document.hidden || root.classList.contains("is-nav-menu-open")) {
-      cancelAnimationFrame(loop); loop = 0; lastT = 0;
-      tiles.forEach(function (tile) { var video = tile.querySelector("video"); if (video) video.pause(); });
-    } else {
-      wake();
-      var video = active >= 0 && tiles[active].querySelector("video");
-      if (video && phase === "open") video.play().catch(function () {});
+  closeBtn.addEventListener('click',close);
+  window.addEventListener('click',e=>{
+    const target=e.target.closest?.('#montaz [data-tile-expand-hit],#montaz [data-tile-expand]');
+    if(!target||e.defaultPrevented||window.__pfCubeDragged)return;
+    e.preventDefault();e.stopImmediatePropagation();open();
+  },true);
+  window.addEventListener('wheel',e=>{if(phase!=='closed'){e.preventDefault();e.stopImmediatePropagation();if(phase==='open'){py=Math.max(-.5,Math.min(.5,py+e.deltaY/innerHeight*.3));px=Math.max(-.5,Math.min(.5,px+e.deltaX/innerWidth*.3));wake();}}},{capture:true,passive:false});
+  window.addEventListener('keydown',e=>{
+    if(phase==='closed'||root.classList.contains('is-nav-menu-open'))return;
+    if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close();return;}
+    if(e.key==='Tab'){
+      const buttons=[closeBtn,...tiles.filter(t=>t.tabIndex===0)],i=buttons.indexOf(document.activeElement),next=e.shiftKey?(i<=0?buttons.length-1:i-1):(i+1)%buttons.length;
+      e.preventDefault();buttons[next].focus();return;
     }
-  }
-  document.addEventListener("visibilitychange", syncActivity);
-  if (window.MutationObserver) new MutationObserver(syncActivity).observe(root, { attributes: true, attributeFilter: ["class"] });
+    if(e.key.startsWith('Arrow')&&phase==='open'){e.preventDefault();if(e.key==='ArrowLeft')px=Math.max(-.5,px-.12);if(e.key==='ArrowRight')px=Math.min(.5,px+.12);if(e.key==='ArrowUp')py=Math.max(-.5,py-.12);if(e.key==='ArrowDown')py=Math.min(.5,py+.12);wake();}
+    if(!['Enter',' '].includes(e.key))e.stopImmediatePropagation();
+  },true);
+  window.addEventListener('resize',()=>{measure(false);wake();},{passive:true});
+  window.addEventListener('cosgral:langchange',language);
+  function activity(){syncVideos();wake();}
+  document.addEventListener('visibilitychange',activity);
+  new MutationObserver(activity).observe(root,{attributes:true,attributeFilter:['class']});
+  language();
 })();
