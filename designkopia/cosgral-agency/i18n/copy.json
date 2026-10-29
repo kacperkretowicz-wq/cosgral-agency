@@ -321,40 +321,40 @@
       "en": "How collaboration works"
     },
     "lead": {
-      "pl": "Najpierw ustalamy, co robimy, za ile i na kiedy.",
-      "en": "First, we agree on the work, price and timeline."
+      "pl": "Od audytu po wdrożenie — jasny zakres, terminy i odpowiedzialności.",
+      "en": "From audit to launch — clear scope, timelines and ownership."
     },
     "step1_title": {
-      "pl": "Rozmawiamy o pomyśle",
-      "en": "We talk about your idea"
+      "pl": "Audyt i analiza",
+      "en": "Audit & analysis"
     },
     "step1_body": {
-      "pl": "Opowiadasz nam, czego potrzebujesz i co chcesz zmienić. Pytamy o budżet i termin.",
-      "en": "You tell us what you need and what you want to change. We ask about your budget and timing."
+      "pl": "Analizujemy cele biznesowe, procesy i ograniczenia, aby dobrać zakres, który realnie wspiera sprzedaż i operacje.",
+      "en": "We analyze business goals, processes and constraints to define a scope that actually supports sales and operations."
     },
     "step2_title": {
-      "pl": "Ustalamy szczegóły",
-      "en": "We agree on the details"
+      "pl": "Strategia i architektura",
+      "en": "Strategy & architecture"
     },
     "step2_body": {
-      "pl": "Dostajesz zakres prac, wycenę i plan. Ustalamy je wspólnie, zanim zaczniemy projekt.",
-      "en": "You receive a scope, quote and schedule. We agree on the details before starting work."
+      "pl": "Ustalamy architekturę rozwiązania, integracje i plan wdrożenia — zanim zacznie się produkcja.",
+      "en": "We define solution architecture, integrations and an implementation plan — before production starts."
     },
     "step3_title": {
-      "pl": "Projektujemy i budujemy",
-      "en": "We design and build"
+      "pl": "Wdrożenie i rozwój",
+      "en": "Implementation & development"
     },
     "step3_body": {
-      "pl": "Pokazujemy Ci kolejne etapy pracy. Zbieramy uwagi i wprowadzamy uzgodnione zmiany.",
-      "en": "We show you the work as it takes shape. You share your feedback, and we make the changes we agree on."
+      "pl": "Budujemy, integrujemy i testujemy iteracyjnie, z regularnymi przeglądami postępu i jakości.",
+      "en": "We build, integrate and test iteratively, with regular progress and quality reviews."
     },
     "step4_title": {
-      "pl": "Uruchamiamy i wspieramy",
-      "en": "We launch and support"
+      "pl": "Optymalizacja i wsparcie",
+      "en": "Optimization & support"
     },
     "step4_body": {
-      "pl": "Sprawdzamy gotowy projekt i oddajemy go do użytku. Pokazujemy, jak z niego korzystać i pomagamy po starcie.",
-      "en": "We check the finished project and launch it. We show you how to use it and help after launch."
+      "pl": "Szkolimy zespół, przekazujemy dokumentację i zapewniamy wsparcie po wdrożeniu.",
+      "en": "We train your team, hand over documentation and provide post-launch support."
     }
   },
   "faq": {
@@ -393,28 +393,28 @@
   },
   "form": {
     "name": {
-      "pl": "Imię*",
-      "en": "Name*"
+      "pl": "Imię",
+      "en": "Name"
     },
     "email": {
-      "pl": "Adres e-mail*",
-      "en": "Email address*"
+      "pl": "Email*",
+      "en": "Email*"
     },
     "company": {
-      "pl": "Firma (opcjonalnie)",
-      "en": "Company (optional)"
+      "pl": "Firma",
+      "en": "Company"
     },
     "message": {
       "pl": "Wiadomość",
       "en": "Message"
     },
     "submit": {
-      "pl": "Wyślij wiadomość",
-      "en": "Send message"
+      "pl": "Wyślij",
+      "en": "Send"
     },
     "placeholder_message": {
-      "pl": "Co chcesz zrobić lub poprawić? Napisz kilka słów o swoim pomyśle.",
-      "en": "What would you like to create or improve? Tell us a little about your idea."
+      "pl": "Opisz krótko projekt, cele i termin — wrócimy z propozycją kolejnych kroków.",
+      "en": "Briefly describe the project, goals and timeline — we'll reply with next steps."
     },
     "placeholder_email": {
       "pl": "jan@firma.pl",
@@ -425,16 +425,16 @@
       "en": "Please enter your email address."
     },
     "success_mailto": {
-      "pl": "Otworzyliśmy program pocztowy. Wyślij w nim wiadomość.",
-      "en": "Your email app is open. Send your message there."
+      "pl": "Otworzyliśmy program pocztowy — wyślij wiadomość.",
+      "en": "We opened your mail app — send the message."
     },
     "success_title": {
       "pl": "Dziękujemy za kontakt",
       "en": "Thank you for reaching out"
     },
     "success_body": {
-      "pl": "Otrzymaliśmy Twoją wiadomość. Zwykle odpowiadamy w ciągu jednego dnia roboczego.",
-      "en": "We have received your message. We usually reply within one business day."
+      "pl": "Otrzymaliśmy Twoją wiadomość. Wrócimy do Ciebie w ciągu jednego dnia roboczego — zwykle szybciej.",
+      "en": "We've received your message. We'll get back to you within one business day — usually sooner."
     },
     "error_send": {
       "pl": "Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na kontakt@cosgral.pl.",
@@ -501,8 +501,8 @@
       "en": "Contact"
     },
     "call_lead": {
-      "pl": "Zadzwoń lub napisz. Zwykle odpowiadamy w ciągu jednego dnia roboczego.",
-      "en": "Call or write to us. We usually reply within one business day."
+      "pl": "Zadzwoń lub napisz — odpowiadamy zwykle w ciągu jednego dnia roboczego.",
+      "en": "Call or write us — we usually reply within one business day."
     },
     "social_label": {
       "pl": "Social media",
@@ -1013,7 +1013,7 @@
     "montaz_teaser": {
       "pl": "REELS, materiały reklamowe — od surowego footage po formaty gotowe do publikacji.",
       "en": "REELS, ads — from raw footage to publish-ready formats."
-    },
+},
     "montaz_lead": {
       "pl": "Reels, materiały reklamowe i BTS — od surowego footage po formaty gotowe do publikacji.",
       "en": "Reels, ads and BTS — from raw footage to publish-ready formats."
