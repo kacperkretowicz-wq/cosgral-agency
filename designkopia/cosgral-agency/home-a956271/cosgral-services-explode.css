@@ -1,0 +1,130 @@
+/* Services grid explode: click a tile → it + the rest scatter toward corners,
+   the service's full content is written over the vacated center.
+   See cosgral-services-explode.js */
+
+.services-art-grid {
+  position: relative;
+}
+
+.art-tile {
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+  will-change: transform;
+}
+/* editorial-motion.js (GSAP) owns `transform` inline on every [data-editorial-reveal]
+   tile and also pins `translate/rotate/scale` to none, so an author !important
+   declaration is the only thing that can take the transform over while exploded. */
+.services-art-grid.is-exploded .art-tile {
+  transform: translate(var(--explode-x, 0), var(--explode-y, 0)) scale(var(--explode-scale, 1)) !important;
+  z-index: 1;
+}
+.services-art-grid.is-exploded .art-tile.is-active {
+  z-index: 3;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.services-explode__desc {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 7%, 72px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.services-art-grid.is-exploded .services-explode__desc {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.25s;
+}
+.services-explode__desc-inner {
+  max-width: 34rem;
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  text-align: left;
+}
+.services-explode__desc-inner::-webkit-scrollbar { display: none; }
+
+.services-explode__tag {
+  display: block;
+  color: rgba(238, 237, 232, 0.5);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+.services-explode__title {
+  margin: 0.55rem 0 0.6rem;
+  font-family: var(--font-display, "Satoshi", sans-serif);
+  font-weight: 300;
+  font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: var(--paper, #eeede8);
+}
+.services-explode__lead {
+  margin: 0 0 1.1rem;
+  font-size: clamp(0.84rem, 1.1vw, 0.98rem);
+  line-height: 1.6;
+  color: rgba(238, 237, 232, 0.74);
+}
+.services-explode__list {
+  list-style: none;
+  margin: 0 0 1.1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.42rem;
+  border-top: 1px solid rgba(238, 237, 232, 0.14);
+  padding-top: 0.9rem;
+}
+.services-explode__list li {
+  position: relative;
+  padding-left: 1.05rem;
+  font-size: clamp(0.78rem, 1vw, 0.9rem);
+  line-height: 1.5;
+  color: rgba(238, 237, 232, 0.82);
+}
+.services-explode__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 1px;
+  background: var(--hot, #ff482b);
+}
+.services-explode__effect {
+  margin: 0 0 1.3rem;
+  font-size: clamp(0.78rem, 1vw, 0.9rem);
+  line-height: 1.58;
+  color: rgba(238, 237, 232, 0.58);
+}
+.services-explode__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+  transition: border-color 0.25s ease;
+}
+.services-explode__cta::after { content: "→"; }
+.services-explode__cta:hover,
+.services-explode__cta:focus-visible {
+  border-color: #fff;
+  outline: none;
+}
+
+@media (max-width: 720px) {
+  .services-explode__desc { padding: 14px; }
+  .services-explode__effect { display: none; }
+}
+
+html.reduce-motion .art-tile,
+html.reduce-motion .services-explode__desc {
+  transition: none !important;
+}

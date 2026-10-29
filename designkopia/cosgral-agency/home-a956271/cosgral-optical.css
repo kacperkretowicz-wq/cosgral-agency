@@ -1,0 +1,92 @@
+/* Optical cube revision: legible navigation, precise pointer, crisp WebGL. */
+.home-cube-portal { overflow: clip; contain: layout paint; }
+.home-cube-portal .home-hero__canvas { position:absolute; top:0; left:0; }
+.home-optical-dust { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+html.has-custom-cursor body.home-page,
+html.has-custom-cursor body.home-page * { cursor: none !important; }
+html .home-cursor {
+  display: block;
+  position: fixed;
+  z-index: 2147483646;
+  mix-blend-mode: normal;
+  opacity: 0;
+  pointer-events: none;
+}
+html .home-cursor__dot {
+  width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.85), 0 0 9px rgba(255,255,255,.28);
+}
+html .home-cursor__ring {
+  width: 32px; height: 32px; margin: -16px 0 0 -16px;
+  border-color: rgba(255,255,255,.65);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.32);
+}
+html .home-cursor.is-hover .home-cursor__ring {
+  width: 44px; height: 44px; margin: -22px 0 0 -22px;
+}
+body.is-nav-menu-open .home-cube-portal { filter: none; }
+body.is-nav-menu-open::before {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: radial-gradient(ellipse at center,rgba(0,0,0,.72),rgba(0,0,0,.91));
+}
+body.is-nav-menu-open.is-nav-services-expanded .home-cube-portal { filter: none; }
+.home-cube-portal.has-cube-fallback {
+  background: url('images/cosgral-agency/brand/cosgral-logo-cube-transparent.png') 50% 24% / clamp(140px,24vw,400px) auto no-repeat;
+}
+.nav-overlay__list { width: 86%; min-height: 75%; gap: 0; }
+.nav-overlay__list a {
+  font-size: clamp(13px,calc(var(--menu-face-size) * .061),52px);
+  padding: calc(var(--menu-face-size) * .012) 0;
+  line-height: 1.2;
+  letter-spacing: .075em;
+  transition: color 180ms ease, text-shadow 240ms ease, transform 240ms cubic-bezier(.2,.8,.2,1);
+}
+.nav-overlay__list a::after { display:none !important; }
+.nav-overlay__list a:hover,
+.nav-overlay__list a:focus-visible {
+  color:#fff;
+  text-shadow:0 0 10px rgba(255,255,255,.55),0 0 26px rgba(164,199,255,.45);
+  transform:scale(1.045);
+}
+.nav-overlay__list a:focus-visible { outline:1px solid rgba(255,255,255,.55); outline-offset:4px; border-radius:3px; }
+@media (prefers-reduced-motion:reduce) { .nav-overlay__list a {transition:none;} }
+html.is-nav-menu-open .nav-overlay__stage,
+html.is-nav-menu-open .nav-overlay.is-services-expanded .nav-overlay__stage {
+  transform: translate(-50%,-50%) !important;
+  min-height: var(--menu-face-size) !important;
+  height: var(--menu-face-size) !important;
+}
+/* Use inline projection values, including while the services submenu is open. */
+html.is-nav-menu-open .nav-overlay.is-services-expanded .nav-overlay__stage {
+  left: var(--projected-x,50%) !important;
+  top: var(--projected-y,50%) !important;
+  width: var(--projected-size,280px) !important;
+  --menu-face-size: var(--projected-size,280px) !important;
+}
+.nav-overlay.is-services-expanded .nav-overlay__list,
+.nav-overlay.is-services-expanded .nav-overlay__sublist,
+.nav-overlay.is-services-expanded .nav-overlay__item--services {
+  align-items: center; justify-content: center; text-align: center;
+}
+.nav-overlay.is-services-expanded .nav-overlay__sublist a {
+  font-size: clamp(12px,calc(var(--menu-face-size) * .050),24px);
+  padding: calc(var(--menu-face-size) * .011) 0;
+  letter-spacing: .015em;
+  white-space: normal;
+  text-align: center;
+}
+@media (max-width:900px) {
+  .nav-overlay__list a { font-size: max(13px,calc(var(--menu-face-size) * .064)); }
+  .nav-overlay.is-services-expanded .nav-overlay__list,
+  .nav-overlay.is-services-expanded .nav-overlay__sublist,
+  .nav-overlay.is-services-expanded .nav-overlay__item--services,
+  .nav-overlay.is-services-expanded .nav-overlay__sublist li {
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .nav-overlay.is-services-expanded .nav-overlay__list a[data-nav-services-toggle],
+  .nav-overlay.is-services-expanded .nav-overlay__sublist a {
+    text-align: center; width: 100%;
+  }
+}

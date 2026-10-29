@@ -1,0 +1,319 @@
+/**
+ * Shared pointer field — CSS vars + global state for ambient / tiles / 3D.
+ * Mobile: gyro tilt from device orientation (iOS needs a user gesture).
+ * Desktop: mouse.
+ * Works on home + all subpages that include this script.
+ */
+(function () {
+  "use strict";
+
+  if (document.documentElement.classList.contains("reduce-motion")) return;
+
+  var noGyroPages =
+    document.body.classList.contains("graphics-gallery-page") ||
+    document.body.classList.contains("reels-gallery-page");
+
+  var COARSE = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  var MOBILE =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  var GYRO_KEY = "cosgral-gyro";
+  var state = {
+    x: window.innerWidth * 0.5,
+    y: window.innerHeight * 0.5,
+    nx: 0,
+    ny: 0,
+    tx: window.innerWidth * 0.5,
+    ty: window.innerHeight * 0.5,
+    tnx: 0,
+    tny: 0,
+    fromOrientation: false,
+  };
+
+  var orient = {
+    listening: false,
+    active: false,
+    permission: "unknown",
+    baseBeta: null,
+    baseGamma: null,
+    tnx: 0,
+    tny: 0,
+  };
+
+  var ORIENT_GAMMA_RANGE = 22;
+  var ORIENT_BETA_RANGE = 18;
+  var gateEl = null;
+  var needsIosPermission =
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function";
+
+  window.cosgralPointer = state;
+  window.cosgralOrientation = orient;
+  var pointerRaf = 0;
+  function startPointerLoop() {
+    if (!pointerRaf && !document.hidden) pointerRaf = requestAnimationFrame(tick);
+  }
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function setTarget(clientX, clientY) {
+    state.tx = clientX;
+    state.ty = clientY;
+    if (!MOBILE && !orient.active) {
+      state.tnx = (clientX / window.innerWidth) * 2 - 1;
+      state.tny = -((clientY / window.innerHeight) * 2 - 1);
+    }
+    if (MOBILE && !orient.active) {
+      /* Touch fallback when gyro is unavailable / not yet granted */
+      state.tnx = (clientX / window.innerWidth) * 2 - 1;
+      state.tny = -((clientY / window.innerHeight) * 2 - 1);
+      state.fromOrientation = false;
+    }
+    if (COARSE) {
+      state.x = state.tx;
+      state.y = state.ty;
+      if (!orient.active) {
+        state.nx = state.tnx;
+        state.ny = state.tny;
+      }
+      applyPointer();
+    }
+    startPointerLoop();
+  }
+
+  function onDeviceOrientation(e) {
+    var gamma = e.gamma;
+    var beta = e.beta;
+    if (gamma == null || beta == null) return;
+    if (orient.baseBeta == null) {
+      orient.baseBeta = beta;
+      orient.baseGamma = gamma;
+    }
+    var dg = gamma - orient.baseGamma;
+    var db = beta - orient.baseBeta;
+    orient.tnx = clamp(dg / ORIENT_GAMMA_RANGE, -1, 1);
+    orient.tny = clamp(-db / ORIENT_BETA_RANGE, -1, 1);
+    orient.active = true;
+    startPointerLoop();
+    state.fromOrientation = true;
+    try {
+      sessionStorage.setItem(GYRO_KEY, "1");
+    } catch (err) {}
+    hideGate();
+  }
+
+  function enableOrientation() {
+    if (orient.listening) return;
+    orient.listening = true;
+    window.addEventListener("deviceorientation", onDeviceOrientation, true);
+    window.addEventListener("deviceorientationabsolute", onDeviceOrientation, true);
+  }
+
+  function hideGate() {
+    if (!gateEl) return;
+    gateEl.classList.add("is-done");
+    window.setTimeout(function () {
+      if (gateEl && gateEl.parentNode) gateEl.parentNode.removeChild(gateEl);
+      gateEl = null;
+    }, 420);
+  }
+
+  function showGate() {
+    if (!MOBILE || gateEl || orient.active) return;
+    if (orient.permission === "denied") return;
+    gateEl = document.createElement("button");
+    gateEl.type = "button";
+    gateEl.className = "gyro-enable";
+    gateEl.setAttribute("data-no-transition", "");
+    gateEl.setAttribute("data-i18n", "editorial.gyro_label");
+    gateEl.setAttribute("data-i18n-aria-label", "editorial.gyro_label");
+    var gyroLabel = window.cosgralI18n?.t("editorial.gyro_label") || "Włącz żyroskop";
+    gateEl.setAttribute("aria-label", gyroLabel);
+    gateEl.textContent = gyroLabel;
+    gateEl.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      requestOrientationAccess(true);
+    });
+    document.body.appendChild(gateEl);
+  }
+
+  function requestOrientationAccess(fromGesture) {
+    if (typeof DeviceOrientationEvent === "undefined") {
+      orient.permission = "unsupported";
+      hideGate();
+      return;
+    }
+
+    if (needsIosPermission) {
+      if (!fromGesture) {
+        showGate();
+        return;
+      }
+      DeviceOrientationEvent.requestPermission()
+        .then(function (result) {
+          orient.permission = result;
+          if (result === "granted") {
+            try {
+              sessionStorage.setItem(GYRO_KEY, "1");
+            } catch (err) {}
+            enableOrientation();
+            hideGate();
+          } else {
+            showGate();
+          }
+        })
+        .catch(function () {
+          orient.permission = "denied";
+          showGate();
+        });
+      return;
+    }
+
+    // Android / browsers without permission API
+    orient.permission = "granted";
+    try {
+      sessionStorage.setItem(GYRO_KEY, "1");
+    } catch (err) {}
+    enableOrientation();
+    hideGate();
+  }
+
+  document.addEventListener(
+    "mousemove",
+    function (e) {
+      setTarget(e.clientX, e.clientY);
+    },
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "touchmove",
+    function (e) {
+      if (!e.touches[0]) return;
+      setTarget(e.touches[0].clientX, e.touches[0].clientY);
+    },
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "touchstart",
+    function (e) {
+      if (!e.touches[0]) return;
+      setTarget(e.touches[0].clientX, e.touches[0].clientY);
+    },
+    { passive: true }
+  );
+
+  // Jedynym konsumentem pozycji kursora w CSS była poświata (.home-ambient__blur /
+  // .subpage-ambient__blur). Dawniej szła przez --pointer-x/y na <html>, co
+  // unieważniało styl całego dokumentu w każdej klatce, a warstwa z blur(52px)
+  // przemalowywała cały viewport. Teraz przesuwamy mały element transformem
+  // (compositor-only) i piszemy tylko, gdy pozycja realnie się zmieniła.
+  // Stan liczbowy dla skryptów (hero 3D, ambient, tilt) zostaje w window.cosgralPointer.
+  var veils = null;
+  var lastVeilX = null;
+  var lastVeilY = null;
+
+  function veilNodes() {
+    if (veils) return veils;
+    veils = Array.prototype.slice.call(
+      document.querySelectorAll(".home-ambient__blur, .subpage-ambient__blur")
+    );
+    return veils;
+  }
+
+  function applyPointer() {
+    var nodes = veilNodes();
+    if (!nodes.length) return;
+    var x = Math.round(state.x * 2) / 2;
+    var y = Math.round(state.y * 2) / 2;
+    if (x === lastVeilX && y === lastVeilY) return;
+    lastVeilX = x;
+    lastVeilY = y;
+    var tf = "translate3d(" + x + "px, " + y + "px, 0)";
+    for (var i = 0; i < nodes.length; i++) nodes[i].style.transform = tf;
+  }
+
+  function tick() {
+    pointerRaf = 0;
+    if (orient.active) {
+      state.tnx += (orient.tnx - state.tnx) * 0.22;
+      state.tny += (orient.tny - state.tny) * 0.22;
+      state.nx += (state.tnx - state.nx) * 0.22;
+      state.ny += (state.tny - state.ny) * 0.22;
+      state.x = (state.nx * 0.5 + 0.5) * window.innerWidth;
+      state.y = (-state.ny * 0.5 + 0.5) * window.innerHeight;
+      state.fromOrientation = true;
+    } else if (MOBILE) {
+      state.x += (state.tx - state.x) * 0.18;
+      state.y += (state.ty - state.y) * 0.18;
+      state.nx += (state.tnx - state.nx) * 0.18;
+      state.ny += (state.tny - state.ny) * 0.18;
+      state.fromOrientation = false;
+    } else {
+      state.x += (state.tx - state.x) * 0.20;
+      state.y += (state.ty - state.y) * 0.20;
+      state.nx += (state.tnx - state.nx) * 0.20;
+      state.ny += (state.tny - state.ny) * 0.20;
+      state.fromOrientation = false;
+    }
+    applyPointer();
+    var remaining = Math.abs(state.tx-state.x)+Math.abs(state.ty-state.y)+
+      1000*(Math.abs(state.tnx-state.nx)+Math.abs(state.tny-state.ny));
+    if (orient.active) remaining = 1000*(Math.abs(orient.tnx-state.nx)+Math.abs(orient.tny-state.ny));
+    if (remaining > 0.03) startPointerLoop();
+  }
+
+  function armMobileGyro() {
+    if (!MOBILE) return;
+
+    window.addEventListener("orientationchange", function () {
+      orient.baseBeta = null;
+      orient.baseGamma = null;
+    });
+
+    var remembered = false;
+    try {
+      remembered = sessionStorage.getItem(GYRO_KEY) === "1";
+    } catch (err) {}
+
+    if (remembered) {
+      // Po wcześniejszym TURN ON 3D — od razu nasłuchuj na każdej podstronie.
+      enableOrientation();
+      window.setTimeout(function () {
+        if (!orient.active && needsIosPermission) showGate();
+      }, 2200);
+      return;
+    }
+
+    if (needsIosPermission) {
+      var reveal = function () {
+        if (!orient.active) showGate();
+      };
+      if (document.body.classList.contains("is-ready")) reveal();
+      else {
+        window.addEventListener(
+          "load",
+          function () {
+            window.setTimeout(reveal, 700);
+          },
+          { once: true }
+        );
+        window.setTimeout(reveal, 4200);
+      }
+    } else {
+      requestOrientationAccess(false);
+    }
+  }
+
+  if (!noGyroPages) armMobileGyro();
+  applyPointer();
+  startPointerLoop();
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { cancelAnimationFrame(pointerRaf); pointerRaf=0; }
+    else startPointerLoop();
+  });
+})();
