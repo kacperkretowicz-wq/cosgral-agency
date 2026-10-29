@@ -137,6 +137,9 @@
         (g.items || []).forEach(function (item) {
           if (!item.poster) return;
           var img = new Image();
+          // Preview CDNs redirect binary assets to another origin. Request
+          // CORS before src so the poster canvas stays usable as a GL texture.
+          img.crossOrigin = "anonymous";
           img.decoding = "async";
           img.onload = function () { gridDirty = true; queue(); };
           img.src = item.poster;
