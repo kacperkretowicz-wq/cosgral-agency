@@ -12,6 +12,7 @@
   let W=1,H=1,GW=1,GH=1,height,previous,next,exposure,pixels;
   let visible=false,raf=0,last=0,moved=0,oldPointer=null,accumulator=0;
   const points=[];
+  let finger=null,suppressTapUntil=0;
   const reduced=document.documentElement.classList.contains('reduce-motion')||matchMedia('(prefers-reduced-motion: reduce)').matches;
   function shader(type,source){const sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error('water shader');return sh;}
   function initialize(){
@@ -68,8 +69,8 @@
     if(gl){gl.viewport(0,0,W,H);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,textures[0]);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,GW,GH,0,gl.RGBA,gl.UNSIGNED_BYTE,pixels);gl.uniform2f(uniforms.texel,1/GW,1/GH);}
     language();reset();sync();
   }
-  function disturb(x,y){
-    const radius=GW*.07,wr=GW*.022;
+  function disturb(x,y,touch){
+    const radius=GW*(touch?.12:.07),wr=GW*(touch?.032:.022);
     for(let j=Math.max(1,Math.floor(y-radius));j<Math.min(GH-1,y+radius);j++)for(let i=Math.max(1,Math.floor(x-radius));i<Math.min(GW-1,x+radius);i++){
       const d2=(i-x)*(i-x)+(j-y)*(j-y),k=j*GW+i;
       exposure[k]=Math.max(exposure[k],Math.exp(-d2/(radius*radius*.32)));
@@ -98,7 +99,7 @@
     raf=0;if(!visible)return;
     const dt=last?Math.min(50,now-last):16;last=now;
     for(const p of points.splice(0)){
-      if(oldPointer){const n=Math.max(1,Math.min(35,Math.ceil(Math.hypot(p.x-oldPointer.x,p.y-oldPointer.y)/2)));for(let k=1;k<=n;k++)disturb(oldPointer.x+(p.x-oldPointer.x)*k/n,oldPointer.y+(p.y-oldPointer.y)*k/n);}else disturb(p.x,p.y);
+      if(oldPointer){const n=Math.max(1,Math.min(35,Math.ceil(Math.hypot(p.x-oldPointer.x,p.y-oldPointer.y)/2)));for(let k=1;k<=n;k++)disturb(oldPointer.x+(p.x-oldPointer.x)*k/n,oldPointer.y+(p.y-oldPointer.y)*k/n,p.touch);}else disturb(p.x,p.y,p.touch);
       oldPointer=p;
     }
     accumulator+=dt;while(accumulator>=16.666){simulate();accumulator-=16.666;}
@@ -109,13 +110,53 @@
     const index=[...scroller.querySelectorAll('[data-portfolio-tile]')].indexOf(chapter);
     const settled=Math.abs(scroller.scrollLeft/Math.max(1,scroller.clientWidth)-index)<.0005&&horizon?.dataset.settledChapter===String(index);
     const value=settled&&!document.hidden&&!document.body.classList.contains('pf-wall-open')&&!document.documentElement.classList.contains('is-nav-menu-open');
-    if(value!==visible){visible=value;surface.hidden=!value;points.length=0;oldPointer=null;if(!value){cancelAnimationFrame(raf);raf=0;last=0;reset();}}
+    document.body.classList.toggle('pf-montage-water-active',value);
+    if(value!==visible){finger=null;visible=value;surface.hidden=!value;points.length=0;oldPointer=null;if(!value){cancelAnimationFrame(raf);raf=0;last=0;reset();}}
   }
-  window.addEventListener('pointermove',e=>{if(!visible||e.pointerType==='touch')return;points.push({x:e.clientX/innerWidth*GW,y:e.clientY/innerHeight*GH});if(points.length>8)points.shift();moved=performance.now();if(!raf)raf=requestAnimationFrame(frame);},{passive:true});
-  window.addEventListener('pointerout',e=>{if(!e.relatedTarget)oldPointer=null;});
+  function queuePoint(x,y,touch){
+    points.push({x:x/innerWidth*GW,y:y/innerHeight*GH,touch:!!touch});
+    if(points.length>8)points.shift();moved=performance.now();
+    if(!raf)raf=requestAnimationFrame(frame);
+  }
+  function controls(target){return !!target?.closest?.('.site-nav,.portfolio-chapters__pager,a,input,textarea,select,button:not([data-tile-expand-hit])');}
+  function endFinger(e,cancelled){
+    if(!finger)return;
+    const movedFinger=finger.moved;finger=null;oldPointer=null;
+    if(movedFinger&&!cancelled){
+      suppressTapUntil=performance.now()+750;
+      if(e.cancelable)e.preventDefault();
+    }
+    e.stopImmediatePropagation();
+  }
+  // Touch Events also cover embedded iOS browsers. Keep taps for opening the
+  // cube, but own a dragged finger until release so it cannot swipe chapters.
+  window.addEventListener('touchstart',e=>{
+    if(!visible||controls(e.target)||e.touches.length!==1)return;
+    const t=e.touches[0];suppressTapUntil=0;finger={id:t.identifier,x:t.clientX,y:t.clientY,moved:false};oldPointer=null;
+    queuePoint(t.clientX,t.clientY,true);e.stopImmediatePropagation();
+  },{capture:true,passive:true});
+  window.addEventListener('touchmove',e=>{
+    if(!visible||!finger)return;
+    if(e.touches.length!==1){endFinger(e,true);return;}
+    const t=Array.from(e.touches).find(t=>t.identifier===finger.id);if(!t)return;
+    if(Math.hypot(t.clientX-finger.x,t.clientY-finger.y)>8)finger.moved=true;
+    queuePoint(t.clientX,t.clientY,true);
+    if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();
+  },{capture:true,passive:false});
+  window.addEventListener('touchend',e=>endFinger(e,false),{capture:true,passive:false});
+  window.addEventListener('touchcancel',e=>endFinger(e,true),{capture:true,passive:true});
+  window.addEventListener('click',e=>{
+    if(performance.now()>=suppressTapUntil||controls(e.target))return;
+    if(e.target?.closest?.('#montaz')){e.preventDefault();e.stopImmediatePropagation();}
+  },true);
+  window.addEventListener('pointermove',e=>{
+    if(!visible||e.pointerType==='touch')return;queuePoint(e.clientX,e.clientY,false);
+  },{passive:true});
+  window.addEventListener('pointerout',e=>{if(!e.relatedTarget&&!finger)oldPointer=null;});
   window.addEventListener('pf-horizon-state',sync);scroller.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',resize,{passive:true});window.addEventListener('cosgral:langchange',language);window.addEventListener('pageshow',sync);document.addEventListener('visibilitychange',sync);
   new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();cancelAnimationFrame(raf);raf=0;surface.hidden=true;});
   canvas.addEventListener('webglcontextrestored',()=>{textures=[];try{initialize();resize();surface.hidden=!visible;}catch(_){surface.hidden=true;}});
   resize();
 })();
+

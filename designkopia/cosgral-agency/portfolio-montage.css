@@ -25,3 +25,7 @@ body.portfolio-page #montaz .pf-hit-label,
 body.portfolio-page #montaz .pf-ch-mark,
 body.portfolio-page #montaz::before,
 body.portfolio-page #montaz::after { display:none !important; }
+
+
+/* A drag on the settled montage paints water; arrows remain available. */
+body.pf-montage-water-active #montaz { touch-action:none; -webkit-user-select:none; user-select:none; }
