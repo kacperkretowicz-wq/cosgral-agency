@@ -1,0 +1,31 @@
+/* Local to the montage preview and its reel gallery. */
+.pf-montage-reveal { position:fixed; inset:0; z-index:1; pointer-events:none; background:#fff; overflow:hidden; }
+.pf-montage-reveal[hidden] { display:none; }
+.pf-montage-word,.pf-wall .pf-wall__intro { position:absolute; inset:0; display:grid; place-items:center; margin:0; color:#000; font-family:Arial,Helvetica,sans-serif; font-size:clamp(78px,17vw,270px); font-weight:700; line-height:.85; letter-spacing:-.075em; text-transform:uppercase; text-align:center; pointer-events:none; }
+.pf-montage-reveal canvas { position:absolute; inset:0; width:100%; height:100%; }
+.pf-wall { background:#fff; overflow:hidden; perspective:1100px; touch-action:none; }
+.pf-wall .pf-wall__intro { z-index:10; opacity:1; transition:opacity .65s ease; }
+.pf-wall .pf-wall__intro.is-fading { opacity:0; }
+.pf-wall .pf-wall__intro[hidden] { display:none; }
+.pf-wall__field { transform-style:preserve-3d; }
+.pf-wall .pf-wall__tile { transform-origin:0 0; will-change:transform,opacity; backface-visibility:hidden; }
+.pf-wall .pf-wall__tile img,.pf-wall .pf-wall__tile video { object-fit:cover; box-shadow:0 5px 16px rgb(0 0 0 / .08); border-radius:3px; }
+.pf-wall .pf-wall__tile video { opacity:0; transition:opacity .28s ease; }
+.pf-wall .pf-wall__tile.is-previewing video,.pf-wall .pf-wall__tile.is-active video { opacity:1; }
+.pf-wall .pf-wall__tile.is-previewing { z-index:8; }
+.pf-wall .pf-wall__tile.is-active { z-index:9; }
+.pf-wall .pf-wall__tile .pf-wall__cap { opacity:0; transition:opacity .2s ease; }
+.pf-wall .pf-wall__tile.is-hover .pf-wall__cap,.pf-wall .pf-wall__tile.is-active .pf-wall__cap { opacity:1; }
+body.pf-wall-open .pf-montage-reveal { display:none; }
+@media(prefers-reduced-motion:reduce) { .pf-wall .pf-wall__intro { transition-duration:.12s; } }
+
+/* Keep the montage teaser quiet; its only headline lives beneath the water. */
+body.portfolio-page #montaz .pf-ch-index,
+body.portfolio-page #montaz .pf-hit-label,
+body.portfolio-page #montaz .pf-ch-mark,
+body.portfolio-page #montaz::before,
+body.portfolio-page #montaz::after { display:none !important; }
+
+
+/* A drag on the settled montage paints water; arrows remain available. */
+body.pf-montage-water-active #montaz { touch-action:none; -webkit-user-select:none; user-select:none; }

@@ -1,11 +1,9 @@
 /* Realizacje: the grounds behind the chapters.
  * - Between paper and carbon chapters: the homepage thermal horizon, turned on
  *   its side. Carbon is transparent so the ambient lines show through.
- * - Montaż sits on true black water. It is entered by a shockwave: the cube
- *   taps the glass and an irregular front spreads from it until the screen is
- *   black. On that black, the pointer drags through the surface like a finger,
- *   and the wake uncovers a wall of every reel lying underneath.
- * Everything is one WebGL pass that redraws only while something moves.
+ * - The cube shockwave enters/leaves the black montage ground in both directions.
+ * The settled montage's interactive water is owned exclusively by
+ * portfolio-montage-reveal.js; this pass only draws chapter transitions.
  */
 (function () {
   "use strict";
@@ -124,143 +122,13 @@
     body.classList.toggle("pf-ground-abyss", deep);
   }
 
-  /* ——— The reel wall under the water ——— */
-  var gridCanvas = document.createElement("canvas");
-  var gridCtx = gridCanvas.getContext("2d");
-  var posters = [];
-  var gridDirty = true, postersRequested = false;
-  function loadPosters() {
-    if (postersRequested) return;
-    postersRequested = true;
-    fetch("portfolio-media/reels/manifest.json").then(function (r) { return r.json(); }).then(function (m) {
-      (m.groups || []).forEach(function (g) {
-        (g.items || []).forEach(function (item) {
-          if (!item.poster) return;
-          var img = new Image();
-          img.decoding = "async";
-          img.onload = function () { gridDirty = true; queue(); };
-          img.src = item.poster;
-          posters.push(img);
-        });
-      });
-    }).catch(function () {});
-  }
-  function paintGrid() {
-    gridDirty = false;
-    var scale = Math.min(1, 1400 / W);
-    var gw = Math.max(2, Math.round(W * scale)), gh = Math.max(2, Math.round(H * scale));
-    if (gridCanvas.width !== gw || gridCanvas.height !== gh) { gridCanvas.width = gw; gridCanvas.height = gh; }
-    /* The same white, client-ordered wall the cube uncovers */
-    gridCtx.fillStyle = "#f6f5f1";
-    gridCtx.fillRect(0, 0, gw, gh);
-    if (!window.__pfWallLayout) return;
-    var rects = window.__pfWallLayout(W, H, posters.length);
-    gridCtx.fillStyle = "#121417";
-    gridCtx.textAlign = "center";
-    gridCtx.textBaseline = "middle";
-    gridCtx.font = "700 " + Math.round(Math.max(20, Math.min(34, W * 0.022)) * scale) + "px Arial, Helvetica, sans-serif";
-    gridCtx.fillText(document.documentElement.lang === "en" ? "VIDEO EDITING" : "MONTAŻ WIDEO", gw / 2, gh / 2 - 8 * scale);
-    posters.forEach(function (img, k) {
-      if (!img.complete || !img.naturalWidth || !rects[k]) return;
-      var q = rects[k];
-      var x = q.x * scale, y = q.y * scale, tw = q.w * scale, th = q.h * scale;
-      var ir = img.naturalWidth / img.naturalHeight, tr = tw / th;
-      var sw = ir > tr ? img.naturalHeight * tr : img.naturalWidth;
-      var sh = ir > tr ? img.naturalHeight : img.naturalWidth / tr;
-      gridCtx.save();
-      gridCtx.beginPath();
-      if (gridCtx.roundRect) gridCtx.roundRect(x, y, tw, th, 3 * scale); else gridCtx.rect(x, y, tw, th);
-      gridCtx.clip();
-      gridCtx.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, x, y, tw, th);
-      gridCtx.restore();
-    });
-    if (gl && !lost && uniforms) {
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, gridTex);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, gridCanvas);
-    }
-  }
-
-  /* ——— A finger through black water: a fading wake plus spreading rings ——— */
-  var trail = document.createElement("canvas");
-  var trailCtx = trail.getContext("2d");
-  var TW = 320, TH = 200;
-  var wake = { x: -1, y: -1, lastRing: 0, moved: -1e9 };
-  var rings = [];
-  function sizeTrail() {
-    TW = W <= 900 ? 300 : 520;
-    TH = Math.max(80, Math.round(TW * H / W));
-    if (trail.width !== TW || trail.height !== TH) { trail.width = TW; trail.height = TH; }
-  }
-  function stamp(x, y, r, a) {
-    var g = trailCtx.createRadialGradient(x, y, 0, x, y, r);
-    g.addColorStop(0, "rgba(255,255,255," + a + ")");
-    g.addColorStop(0.55, "rgba(255,255,255," + a * 0.55 + ")");
-    g.addColorStop(1, "rgba(255,255,255,0)");
-    trailCtx.fillStyle = g;
-    trailCtx.beginPath();
-    trailCtx.arc(x, y, r, 0, Math.PI * 2);
-    trailCtx.fill();
-  }
-  window.addEventListener("pointermove", function (e) {
-    if (!body.classList.contains("pf-ground-abyss") || body.classList.contains("pf-wall-open") || reduced) return;
-    var x = e.clientX / W * TW, y = e.clientY / H * TH;
-    var now = performance.now();
-    trailCtx.globalCompositeOperation = "source-over";
-    if (wake.x >= 0) {
-      var dx = x - wake.x, dy = y - wake.y, dist = Math.hypot(dx, dy);
-      var steps = Math.min(60, Math.ceil(dist / 2));
-      var rad = TW * 0.048;
-      for (var k = 1; k <= steps; k++) stamp(wake.x + dx * k / steps, wake.y + dy * k / steps, rad, 0.2);
-      if (now - wake.lastRing > 110 && dist > 0.6) {
-        rings.push({ x: x, y: y, born: now });
-        wake.lastRing = now;
-      }
-    }
-    wake.x = x; wake.y = y; wake.moved = now;
-    queue();
-  }, { passive: true });
-  function stepTrail(now) {
-    trailCtx.globalCompositeOperation = "destination-out";
-    trailCtx.fillStyle = "rgba(0,0,0,0.014)";
-    trailCtx.fillRect(0, 0, TW, TH);
-    trailCtx.globalCompositeOperation = "source-over";
-    trailCtx.lineWidth = 2.2;
-    rings = rings.filter(function (r) {
-      var age = Math.max(0, (now - r.born) / 1000);
-      if (age > 1.6) return false;
-      var rr = TW * (0.02 + age * 0.13);
-      trailCtx.strokeStyle = "rgba(255,255,255," + (0.12 * (1 - age / 1.6)).toFixed(3) + ")";
-      trailCtx.beginPath();
-      trailCtx.ellipse(r.x, r.y, rr, rr * 0.92, 0, 0, Math.PI * 2);
-      trailCtx.stroke();
-      return true;
-    });
-    if (gl && !lost) {
-      gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, trailTex);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, trail);
-    }
-  }
-  function wakeAlive(now) { return rings.length > 0 || now - wake.moved < 5000; }
-
   /* ——— Shader ——— */
   var vertex = "attribute vec2 position;varying vec2 uv;void main(){uv=position*.5+.5;gl_Position=vec4(position,0.,1.);}";
   var fragment = [
     "precision highp float;varying vec2 uv;",
     "uniform vec2 viewport;uniform vec2 resolution;uniform float edge;uniform float arch;uniform float band;uniform float dir;",
     "uniform float mode;uniform float abyss;uniform float time;uniform vec4 shock;",
-    "uniform sampler2D grid;uniform sampler2D trail;uniform vec2 texel;",
-    "vec3 deep(vec2 t){",
-    "  float r=texture2D(trail,t).a;",
-    "  float gx=texture2D(trail,t+vec2(texel.x,0.)).a-texture2D(trail,t-vec2(texel.x,0.)).a;",
-    "  float gy=texture2D(trail,t+vec2(0.,texel.y)).a-texture2D(trail,t-vec2(0.,texel.y)).a;",
-    "  vec2 g=vec2(gx,gy);",
-    "  vec3 wall=texture2D(grid,clamp(t+g*.06,0.,1.)).rgb;",
-    "  vec3 c=wall*smoothstep(.17,.62,r)*.95;",
-    "  c+=vec3(.82,.9,1.)*min(1.,length(g)*1.8)*.28;",
-    "  return c;",
-    "}",
+    "vec3 deep(vec2 t){return vec3(0.);}",
     "void main(){",
     "  vec2 px=vec2(uv.x*viewport.x,(1.-uv.y)*viewport.y);",
     "  vec2 t=vec2(uv.x,1.-uv.y);",
@@ -298,18 +166,6 @@
     "}"
   ].join("\n");
 
-  var gridTex = null, trailTex = null;
-  function makeTex(unit) {
-    var tex = gl.createTexture();
-    gl.activeTexture(unit);
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-    return tex;
-  }
   function initGl() {
     gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, powerPreference: "low-power" });
     if (!gl) return false;
@@ -332,27 +188,26 @@
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     uniforms = {};
-    ["viewport", "resolution", "edge", "arch", "band", "dir", "mode", "abyss", "time", "shock", "grid", "trail", "texel"].forEach(function (n) {
+    ["viewport", "resolution", "edge", "arch", "band", "dir", "mode", "abyss", "time", "shock"].forEach(function (n) {
       uniforms[n] = gl.getUniformLocation(program, n);
     });
-    gridTex = makeTex(gl.TEXTURE0);
-    trailTex = makeTex(gl.TEXTURE1);
-    gl.uniform1i(uniforms.grid, 0);
-    gl.uniform1i(uniforms.trail, 1);
-    gridDirty = true;
     return true;
+  }
+
+  function publishGroundState(s) {
+    var raw = rawPos();
+    var settled = !sweep && smoothPos === raw && solidTone(s) !== -1;
+    var chapter = settled ? String(Math.round(raw)) : "";
+    if (canvas.dataset.settledChapter === chapter) return;
+    canvas.dataset.settledChapter = chapter;
+    window.dispatchEvent(new CustomEvent("pf-horizon-state"));
   }
 
   function draw() {
     var s = state();
+    publishGroundState(s);
     syncClasses(s);
     var solid = solidTone(s);
-    // Solid carbon/paper needs no shader. Build the thermal pass on the first
-    // changing boundary; request the reel wall only near its own chapter.
-    if (!postersRequested) {
-      var position = rawPos();
-      if (abyss.some(function (value, index) { return value && Math.abs(index - position) < 1; })) loadPosters();
-    }
     if (!gl && !lost && (solid === -1 || s.abyss)) {
       try {
         if (initGl()) { gl.viewport(0, 0, canvas.width, canvas.height); canvas.style.backgroundColor = 'transparent'; }
@@ -370,10 +225,8 @@
       gl.clear(gl.COLOR_BUFFER_BIT);
       return;
     }
-    if (gridDirty && (deepSolid || s.shock || s.abyss)) paintGrid();
     gl.uniform2f(uniforms.viewport, W, H);
     gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
-    gl.uniform2f(uniforms.texel, 1.5 / TW, 1.5 / TH);
     gl.uniform1f(uniforms.time, (performance.now() % 100000) / 1000);
     if (deepSolid) {
       gl.uniform1f(uniforms.mode, 2);
@@ -408,11 +261,9 @@
     smoothPos += smoothVel * dt;
     if (Math.abs(raw - smoothPos) < 0.0004 && Math.abs(smoothVel) < 0.002) { smoothPos = raw; smoothVel = 0; }
     var s = scrollState();
-    var deepVisible = s.abyss && !expanded();
-    if (deepVisible) stepTrail(now);
     draw();
     if (sweepDone) sweepDone();
-    if (smoothPos !== raw || s.shock || (sweep && sweep.animating) || (deepVisible && wakeAlive(now))) queue();
+    if (smoothPos !== raw || s.shock || (sweep && sweep.animating)) queue();
     else lastTick = 0;
   }
   function queue() { if (!raf && !document.hidden) raf = requestAnimationFrame(tick); }
@@ -426,8 +277,6 @@
     if (canvas.width !== bufferWidth) canvas.width = bufferWidth;
     if (canvas.height !== bufferHeight) canvas.height = bufferHeight;
     if (gl && !lost) gl.viewport(0, 0, canvas.width, canvas.height);
-    sizeTrail();
-    gridDirty = true;
     last = "";
     queue();
   }
@@ -438,7 +287,14 @@
     if (!lost) canvas.style.backgroundColor = 'transparent';
     resize();
   });
-  scroller.addEventListener("scroll", queue, { passive: true });
+  scroller.addEventListener("scroll", function () {
+    // The water layer must release the horizon from the first scroll frame.
+    if (canvas.dataset.settledChapter !== "") {
+      canvas.dataset.settledChapter = "";
+      window.dispatchEvent(new CustomEvent("pf-horizon-state"));
+    }
+    queue();
+  }, { passive: true });
   new ResizeObserver(resize).observe(scroller);
   new MutationObserver(queue).observe(body, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", resize, { passive: true });
@@ -449,3 +305,4 @@
   window.addEventListener("pageshow", queue);
   resize();
 })();
+
