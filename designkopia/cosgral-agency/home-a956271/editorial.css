@@ -392,7 +392,7 @@ html.has-hero-cube-frame .home-cube-poster {opacity:0;}
  .service-card-arrow{width:22px;height:22px}.service-card-arrow svg{width:12px;height:12px}
 }
 @media(max-width:430px){.services-art-grid{grid-template-columns:1fr}.art-tile{--tile-pad:20px;aspect-ratio:1}.art-tile__label{font-size:24px}.art-tile__top span:last-child{display:block}}
-@media(prefers-reduced-motion:reduce){.art-tile__art,.service-card-arrow{transition:none}.editorial-motion .service-illustration.kinetic-art{animation:none}}
+@media(prefers-reduced-motion:reduce){html:not(.force-motion) .art-tile__art,html:not(.force-motion) .service-card-arrow{transition:none}html:not(.force-motion) .editorial-motion .service-illustration.kinetic-art{animation:none}}
 html.reduce-motion .service-illustration.kinetic-art{animation:none}
 
 /* Static fine grain: tactile vermilion without adding animated paint work. */
@@ -406,12 +406,3 @@ html.reduce-motion .service-illustration.kinetic-art{animation:none}
 .art-tile__label{font-family:var(--font-display,Arial,Helvetica,sans-serif);font-synthesis:none}
 .art-tile__label>span{font:inherit;letter-spacing:inherit;text-transform:none}
 .art-tile--seo .art-tile__label>span{letter-spacing:-.055em}
-/* A local, scroll-driven continuation of the site's soft monochrome branches. */
-.ambient-bridge{position:relative;height:clamp(220px,32svh,360px);overflow:hidden;background:var(--carbon);pointer-events:none;isolation:isolate}
-.ambient-bridge__art{display:block;width:100%;height:100%;mask-image:linear-gradient(transparent,#000 20%,#000 75%,transparent)}
-.ambient-bridge__halo{stroke:#d9dde0;stroke-width:26;opacity:.5}
-.ambient-bridge__lines{stroke:#d9dde0;stroke-width:2;opacity:.44;filter:blur(.8px)}
-.ambient-bridge__flow{transform-origin:center}
-@media(max-width:600px){.ambient-bridge{height:220px}.ambient-bridge__art{width:150%;max-width:none;margin-left:-25%}}
-@media(prefers-reduced-motion:reduce){.ambient-bridge__art{opacity:.4}}
-html.reduce-motion .ambient-bridge__art{opacity:.4}

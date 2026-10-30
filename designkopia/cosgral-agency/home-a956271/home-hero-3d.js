@@ -14,7 +14,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
   const glassLook={glass:{transmission:1,metalness:0,roughness:.035,iridescence:.08,dispersion:.20,edgeGlow:.11,envMapIntensity:1.15,farSideDim:.4,thickness:.7},env:{power:1.5,sheen:.70,violetSheen:.55}};
   const clamp = THREE.MathUtils.clamp;
   const smooth = (a,b,x) => {const p=clamp((x-a)/(b-a),0,1);return p*p*(3-2*p);};
-  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced=!!window.cosgralMotion?.reduced;
   let renderer;
   try {
     renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});

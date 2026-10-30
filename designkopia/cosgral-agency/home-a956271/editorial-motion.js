@@ -1,8 +1,7 @@
 /* Native flow and artwork entrances that follow the scroll. */
 const root=document.documentElement, preference=matchMedia('(prefers-reduced-motion: reduce)');
-let force=new URLSearchParams(location.search).has('forceMotion');
-try{force||=localStorage.getItem('cosgral-force-motion')==='1';}catch(_){}
-const reduced=root.classList.contains('reduce-motion')||(preference.matches&&!force);
+const force=!!window.cosgralMotion?.force;
+const reduced=!!window.cosgralMotion?.reduced;
 const gsap=window.gsap, ScrollTrigger=window.ScrollTrigger;
 const gallery=document.querySelector('[data-project-gallery]');
 const clamp=v=>Math.max(0,Math.min(1,v));
@@ -53,21 +52,6 @@ if(animated){
     const media=art.querySelector('video,.foil-ribbon,.orbit-art');if(!media)return;
     animations.push(gsap.fromTo(media,{y:-12},{y:12,ease:'none',
       scrollTrigger:{trigger:art,start:'top bottom',end:'bottom top',scrub:.2}}));
-  });
-}
-// Local branch reveal: no continuous timer or extra WebGL canvas.
-const bridge=document.querySelector('.ambient-bridge');
-if(bridge&&animated){
-  const flow=bridge.querySelector('.ambient-bridge__flow');
-  animations.push(gsap.fromTo(flow,{y:90,opacity:.05},{y:-65,opacity:1,ease:'none',
-    scrollTrigger:{trigger:bridge,start:'top bottom',end:'bottom 35%',scrub:.35}}));
-  const ends=[.78,.96,.68,.87];
-  bridge.querySelectorAll('.ambient-bridge__lines use').forEach((line,index)=>{
-    const path=bridge.querySelector(line.getAttribute('href'));
-    const length=path.getTotalLength();
-    line.style.strokeDasharray=String(length);
-    animations.push(gsap.fromTo(line,{strokeDashoffset:length},{strokeDashoffset:0,ease:'none',
-      scrollTrigger:{trigger:bridge,start:`top ${98-index*3}%`,end:`bottom ${Math.round(ends[index]*55)}%`,scrub:.35}}));
   });
 }
 const playing=new Set();
@@ -170,10 +154,6 @@ preference.addEventListener('change',event=>{
   gsap?.ticker.remove(lightNavigation);
   animations.forEach(animation=>{animation.scrollTrigger?.kill();animation.kill();});
   pointerStops.forEach(stop=>stop());syncArtwork();
-  if(bridge){
-    bridge.querySelector('.ambient-bridge__flow').removeAttribute('style');
-    bridge.querySelectorAll('.ambient-bridge__lines use').forEach(line=>line.removeAttribute('style'));
-  }
   document.querySelectorAll('[data-editorial-reveal]').forEach(el=>{el.style.opacity='1';el.style.transform='none';});
   refresh();
 });

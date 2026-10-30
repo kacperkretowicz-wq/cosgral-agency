@@ -6,7 +6,7 @@ try{for(const reduced of [false,true]){
  const page=await browser.newPage();await page.setViewport({width:1440,height:1000});await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:reduced?'reduce':'no-preference'}]);
  await page.evaluateOnNewDocument(()=>{localStorage.removeItem("cosgral-force-motion");const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(t,...a){return /webgl/.test(t)?null:original.call(this,t,...a)}});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto((process.env.PREVIEW_URL||'http://127.0.0.1:8765/')+(reduced?'':'?forceMotion'),{waitUntil:'domcontentloaded'});
+ await page.goto((process.env.PREVIEW_URL||'http://127.0.0.1:8765/')+(reduced?'?reduceMotion':''),{waitUntil:'domcontentloaded'});
  await page.evaluate(()=>document.querySelector('.art-tile').scrollIntoView({block:'center',behavior:'instant'}));
  await page.waitForFunction(()=>document.querySelector('.art-tile').getBoundingClientRect().top<900);
  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.art-tile')).opacity==='1');

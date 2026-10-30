@@ -9,13 +9,13 @@ Illustrations are optimized WebP artwork extracted from the approved generated d
 
 [Mobile preview](services-mobile.png)
 
-## Transition after the white FAQ section
+## Chrome effects and media
 
-Soft monochrome branches draw and travel upward with scroll before the cooperation process. The effect uses local SVG and the existing scroll animation engine, with a static reduced-motion fallback. Service title fonts share the same family, size and weight; SEO has a small optical tracking adjustment.
+Desktop mouse/trackpad devices enable full motion by default, including when Windows requests reduced motion. `?forceMotion` explicitly enables the same mode on other devices; `?reduceMotion` always takes precedence and disables motion and automatic video playback. Touch devices otherwise follow the system preference.
 
-![Transition on desktop](transition-desktop.png)
+Cards gently enlarge and lift on hover/focus; existing entrance, parallax and click-to-expand behavior remains. Portfolio video is muted and inline, loads in view and pauses offscreen. If the browser denies autoplay, native playback controls appear and a user gesture retries it.
 
-[Mobile transition](transition-mobile.png)
+The decorative branch transition has been removed. SEO retains the shared service-title typography.
 
 ## Run and verify
 
@@ -30,7 +30,7 @@ In a second terminal:
 ```sh
 node scripts/check-service-cards.mjs
 node scripts/check-service-interactions.mjs
-node scripts/check-service-transition.mjs
+node scripts/check-chrome-effects.mjs
 ```
 
-These browser checks use the repository's existing Puppeteer package and `/usr/bin/chromium`. The interaction check uses the documented `forceMotion` option for the full-motion desktop case, then clears it for reduced motion. GPU effects are unavailable during these UI checks; the existing WebGL hero is outside this change.
+These browser checks use the repository's existing Puppeteer package and `/usr/bin/chromium`. They verify labels/layout, hover and pointer motion, expansion/Escape, all four videos actually decoding and advancing, and explicit reduced-motion behavior. They isolate the UI from GPU rendering. A separate Chromium run with SwiftShader also confirmed rendered frames from both the hero cube and ambient WebGL background; this is not a physical GPU performance measurement.
