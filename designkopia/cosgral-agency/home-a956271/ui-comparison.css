@@ -1,0 +1,60 @@
+/* Comparison variants retain the existing cube, shader and native mobile scroll. */
+.comparison-actions{display:flex;align-items:center;gap:28px;margin-top:32px;letter-spacing:0;text-transform:none}
+.comparison-actions a{min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-size:14px;line-height:1.3}
+.comparison-button{padding:14px 24px;background:var(--paper);color:#111;border:1px solid var(--paper);border-radius:2px}
+.comparison-contact{color:var(--paper);padding:12px 0}
+.comparison-contact svg{width:18px;height:18px}
+.comparison-actions a:hover{opacity:.75}
+.comparison-actions a:focus-visible,.comparison-project:focus-visible{outline:2px solid currentColor;outline-offset:6px}
+.editorial-hero .home-hero__title{letter-spacing:-.045em;padding:0;font-weight:400;font-size:clamp(64px,7.6vw,120px)}
+.editorial-hero .home-hero__tagline{font-size:clamp(17px,1.6vw,24px);text-transform:none;letter-spacing:-.015em;line-height:1.45;color:#c5c7ca;margin:24px 0 0;max-width:410px}
+.editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static),.tone-wipe:not(.tone-wipe--dark){height:96px;margin-top:0;background:transparent}
+.editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static) .tone-wipe__sticky,.tone-wipe:not(.tone-wipe--dark) .tone-wipe__sticky{height:96px;position:relative}
+.tone-wipe__copy{display:none}
+.editorial-motion .tone-wipe--dark:not(.is-static){height:calc(var(--stable-vh,1svh)*130)}
+.editorial-motion .tone-wipe--dark:not(.is-static) .tone-wipe__sticky{height:calc(var(--stable-vh,1svh)*100)}
+#realizacje{padding-top:64px;padding-bottom:72px}
+.section-index{margin-bottom:40px}
+.editorial-head{margin-bottom:40px}
+.comparison-projects{display:grid;grid-template-columns:1.4fr 1fr;gap:32px;align-items:start}
+.comparison-project{display:block;min-width:0;color:#111416;text-decoration:none}
+.comparison-project__visual{aspect-ratio:16/10;overflow:hidden;background:#d9d9d9;border:1px solid #d1d1d1}
+.comparison-project__visual video{display:block;width:100%;height:100%;object-fit:contain}
+.comparison-project__caption{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-top:20px}
+.comparison-project h3{font-size:clamp(23px,2.1vw,36px);font-weight:400;line-height:1.1;letter-spacing:-.04em;margin:0}
+.comparison-project p{font-size:14px;color:#555b61;margin:8px 0 0}
+.comparison-project__arrow{display:grid;place-items:center;width:44px;height:44px;flex-shrink:0;border:1px solid #999;border-radius:50%;transition:background .2s,color .2s}
+.comparison-project__arrow svg{width:20px;height:20px}
+.comparison-project:hover .comparison-project__arrow{background:#111;color:#ededed}
+.comparison-project__link{display:inline-block;margin-top:18px;padding-bottom:4px;border-bottom:1px solid #72777d;font-size:13px}
+.comparison-project:nth-child(2){margin-top:72px}
+.art-tile__label{font-size:clamp(17px,1.5vw,25px);letter-spacing:-.03em;line-height:1.15}
+@media(max-width:900px){
+ .comparison-actions{gap:20px;flex-wrap:wrap;margin-top:24px}
+ .comparison-actions a{min-height:48px;font-size:14px}
+ .editorial-hero .home-hero__title{font-size:clamp(44px,12vw,80px)}
+ .editorial-hero .home-hero__tagline{font-size:17px;max-width:310px;margin-top:18px}
+ .comparison-projects{grid-template-columns:1fr;gap:40px}
+ .comparison-project:nth-child(2){margin-top:0}
+ .comparison-project__caption{padding-top:16px}
+ #realizacje{padding:40px 6vw 56px}
+ .editorial-head h2{font-size:clamp(40px,8vw,70px)}
+ .section-index{margin-bottom:28px}
+ .editorial-head{margin-bottom:28px}
+}
+/* A — the cube remains the hero. */
+.editorial-hero .home-hero__content{inset:32% auto auto 5vw;text-align:left;width:48%;max-width:700px}
+.home-cube-poster{left:74%;top:42%;width:min(42vw,55svh)}
+@media(max-width:900px){
+ .editorial-hero .home-hero__content{inset:46% 6vw auto;text-align:left;width:auto}
+ .home-cube-poster{left:50%;top:23%;width:min(80vw,38svh)}
+ .comparison-button{flex:1}
+}
+@media(max-height:650px) and (max-width:900px){
+ .editorial-hero{min-height:680px}
+}
+.editorial-hero .home-hero__content{align-items:flex-start}
+.editorial-hero .home-hero__title,.editorial-hero .home-hero__tagline{text-align:left}
+.editorial-hero .home-hero__content{padding:0;justify-content:flex-start}
+.editorial-hero .home-hero__title{justify-content:flex-start;margin:0}
+.comparison-actions{pointer-events:auto}

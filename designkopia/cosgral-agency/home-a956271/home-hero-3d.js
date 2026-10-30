@@ -57,7 +57,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
   const exitPoint=new THREE.Vector3();
   const orbitPose={x:.5,y:.3,scale:1,phase:0};
   const cubeBounds={left:0,top:0,right:0,bottom:0};
-  const nextSection=document.getElementById('uslugi');
+  const nextSection=document.getElementById('realizacje');
   const profile=createFrameProfile(canvas);
   function requestFrame(){
     if(ready&&!frameRaf&&!document.hidden&&!contextLost)frameRaf=requestAnimationFrame(frame);
@@ -168,7 +168,10 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
     const reach=Math.max(0,Math.min(.24,(width-right-Math.max(20,width*.055))*.80/width));
     const exitX=-(Math.max(heroSize()*1.1,width*.23)+48)/width;
     sampleCubeOrbit(progress,reach,exitX,orbitPose);
-    screenPosition(width*orbitPose.x,height*(orbitPose.y+(mobile?.01:0)*(1-t)),.36,pose.position);
+    const introWeight=1-smooth(0,.65,t);
+    const introX=mobile?0:.24;
+    const introY=mobile?-.07:.12;
+    screenPosition(width*(orbitPose.x+introX*introWeight),height*(orbitPose.y+introY*introWeight),.36,pose.position);
     const studioBlend=1-smooth(0,.25,menuBlend);
     scene.environmentRotation.set(.025*bank*studioBlend,.12*Math.sin(t*Math.PI)*studioBlend,0);
   }
