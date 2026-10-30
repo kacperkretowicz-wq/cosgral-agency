@@ -41,13 +41,13 @@ document.querySelectorAll('[data-tone-wipe]').forEach(section=>{
   const state={progress:0};
   const first=!section.classList.contains('tone-wipe--dark');
   animations.push(gsap.to(state,{progress:1,ease:'none',onUpdate:()=>horizon.update(first?sampleHorizonProgress(state.progress):state.progress),
-    scrollTrigger:{trigger:section,start:'top top',end:'bottom bottom',scrub:first ? .65 : .5,invalidateOnRefresh:true}}));
+    scrollTrigger:{trigger:section,start:first?'top bottom':'top top',end:first?'bottom top':'bottom bottom',scrub:first ? .35 : .5,invalidateOnRefresh:true}}));
 });
 if(ScrollTrigger){
   ScrollTrigger.create({id:'shatter-beat',start:()=>innerHeight*.18,end:()=>innerHeight*1.32});
   ScrollTrigger.create({trigger:'[data-tone-wipe]',start:'bottom bottom',end:'max',
     onToggle:self=>root.classList.toggle('is-ambient-covered',self.isActive)});
-  ScrollTrigger.create({trigger:'#uslugi',start:'top 90%',end:'max',
+  ScrollTrigger.create({trigger:'#realizacje',start:'top 90%',end:'max',
     onToggle:self=>root.classList.toggle('is-gyro-outside-hero',self.isActive)});
 }
 // Entrances scrub in both directions, without restarting a timed fade on every scroll.

@@ -1386,5 +1386,31 @@
       "pl": "Włącz żyroskop",
       "en": "Enable gyroscope"
     }
+  },
+  "comparison": {
+    "hero_lead": {
+      "pl": "Strony, aplikacje i automatyzacje dla firm.",
+      "en": "Websites, applications and automation for businesses."
+    },
+    "projects": {
+      "pl": "Zobacz realizacje",
+      "en": "View projects"
+    },
+    "contact": {
+      "pl": "Porozmawiajmy",
+      "en": "Let’s talk"
+    },
+    "trove": {
+      "pl": "Sklep internetowy",
+      "en": "Online store"
+    },
+    "juicy-events": {
+      "pl": "Strona internetowa",
+      "en": "Website"
+    },
+    "view": {
+      "pl": "Zobacz projekt",
+      "en": "View project"
+    }
   }
 }
