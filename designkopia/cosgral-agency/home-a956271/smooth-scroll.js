@@ -5,14 +5,7 @@
 (function () {
   "use strict";
 
-  var DESKTOP_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var FORCE_MOTION =
-    new URLSearchParams(location.search).has("forceMotion") ||
-    DESKTOP_POINTER ||
-    (function () {
-      try { return localStorage.getItem("cosgral-force-motion") === "1"; } catch (e) { return false; }
-    })();
-  var REDUCED_MOTION = FORCE_MOTION ? false : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var REDUCED_MOTION = !!window.cosgralMotion?.reduced;
 
   var readyResolve;
   var ready = new Promise(function (resolve) { readyResolve = resolve; });

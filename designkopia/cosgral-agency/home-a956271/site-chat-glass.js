@@ -8,7 +8,7 @@ import { installGlassCube } from './cosgral-glass-cube.js?v=20261019editorial14'
 
 (async function () {
   const root = document.documentElement;
-  const reduced = root.classList.contains('reduce-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = root.classList.contains('reduce-motion') || (matchMedia('(prefers-reduced-motion: reduce)').matches && !window.cosgralMotion?.force);
   const HALF = 1.35;
   const glassLook = { glass: { iridescence: 0.32, dispersion: 0.45, edgeGlow: 0.2, envMapIntensity: 1.3, farSideDim: 0.38, thickness: 0.7, rainbow: 0.3, acrylic: 0.95 }, env: { power: 1.5, sheen: 0.4 } };
   const clamp = THREE.MathUtils.clamp;

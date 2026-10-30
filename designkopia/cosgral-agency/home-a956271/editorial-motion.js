@@ -1,8 +1,8 @@
+import {createHorizon} from './editorial-horizon.js?v=20261030visibility4';
 /* Native flow and artwork entrances that follow the scroll. */
 const root=document.documentElement, preference=matchMedia('(prefers-reduced-motion: reduce)');
-let force=new URLSearchParams(location.search).has('forceMotion');
-try{force||=localStorage.getItem('cosgral-force-motion')==='1';}catch(_){}
-const reduced=root.classList.contains('reduce-motion')||(preference.matches&&!force);
+const force=!!window.cosgralMotion?.force;
+const reduced=!!window.cosgralMotion?.reduced;
 const gsap=window.gsap, ScrollTrigger=window.ScrollTrigger;
 const gallery=document.querySelector('[data-project-gallery]');
 const clamp=v=>Math.max(0,Math.min(1,v));
@@ -28,9 +28,22 @@ document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('c
 if(!reduced&&gsap&&ScrollTrigger)root.classList.add('editorial-motion');
 const touchLayout=matchMedia('(max-width:900px), (pointer:coarse)').matches;
 let animated=root.classList.contains('editorial-motion');
-const animations=[],pointerStops=[];
+const animations=[],pointerStops=[],horizons=[],horizonTriggers=[];
+let lastLightScroll=NaN;
 let refreshTimer,layoutRevision=0,galleryAnimating=false;
 function refresh(){clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{if(!galleryAnimating)ScrollTrigger?.refresh();},120);}
+
+document.querySelectorAll('[data-tone-wipe]').forEach(section=>{
+  const horizon=createHorizon(section,!animated);horizons.push({section,horizon});
+  if(!animated)return;
+  const trigger=ScrollTrigger.create({
+    id:section.classList.contains('tone-wipe--dark')?'horizon-dark':'horizon-light',
+    trigger:section,start:'top 80%',end:'bottom bottom',invalidateOnRefresh:true,
+    onUpdate:self=>{horizon.update(self.progress);lastLightScroll=NaN;if(window.cosgralPageMotionReady)lightNavigation()},
+    onRefresh:self=>{horizon.update(self.progress);lastLightScroll=NaN;if(window.cosgralPageMotionReady)lightNavigation()}
+  });
+  horizonTriggers.push(trigger);
+});
 
 if(ScrollTrigger){
   ScrollTrigger.create({id:'shatter-beat',start:()=>innerHeight*.18,end:()=>innerHeight*1.32});
@@ -112,21 +125,39 @@ if(animated&&matchMedia('(hover: hover) and (pointer: fine)').matches){
 }
 // Measure real content, with no empty transition sections or canvas dependencies.
 const lightSections=[...document.querySelectorAll('.tone-light')];
-let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null;
+let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null,lastLogoLight=null;
+let navPoint={x:innerWidth*.9,y:48},logoPoint={x:48,y:48};
 function measureLightNavigation(){
+  lastLightScroll=NaN;
   const scroll=window.scrollY;
   lightGeometry=lightSections.map(el=>{
     const rect=el.getBoundingClientRect();
     return {top:rect.top+scroll,bottom:rect.bottom+scroll};
   });
+  for(const [selector,point] of [['.site-nav__actions',navPoint],['.site-nav__logo-img',logoPoint]]){
+    const box=document.querySelector(selector)?.getBoundingClientRect();
+    if(box){point.x=box.left+box.width/2;point.y=box.top+box.height/2}
+  }
   const chat=document.querySelector('.cg-chat-label');
   chatLine=chat?chat.getBoundingClientRect().top:innerHeight-45;
   lightNavigation();
 }
 function lightNavigation(){
   const scroll=window.scrollY;
-  const lightAt=y=>lightGeometry.some(rect=>rect.top<=scroll+y&&rect.bottom>scroll+y);
-  const navLight=lightAt(48),chatLight=lightAt(chatLine);
+  if(scroll===lastLightScroll)return;
+  lastLightScroll=scroll;
+  const lightAt=(x,y)=>{
+    for(const {section,horizon} of horizons){
+      const rect=section.getBoundingClientRect();
+      if(rect.top<=y&&rect.bottom>y){
+        const stage=section.querySelector('.tone-wipe__sticky').getBoundingClientRect();
+        return horizon.isLightAt(x/innerWidth,(y-stage.top)/stage.height);
+      }
+    }
+    return lightGeometry.some(rect=>rect.top<=scroll+y&&rect.bottom>scroll+y);
+  };
+  const navLight=lightAt(navPoint.x,navPoint.y),logoLight=lightAt(logoPoint.x,logoPoint.y),chatLight=lightAt(innerWidth*.5,chatLine);
+  if(logoLight!==lastLogoLight){lastLogoLight=logoLight;document.body.classList.toggle('has-light-logo',logoLight);}
   if(navLight!==lastNavLight){lastNavLight=navLight;document.body.classList.toggle('has-light-section',navLight);}
   if(chatLight!==lastChatLight){lastChatLight=chatLight;root.classList.toggle('has-light-chat',chatLight);}
   // Suspend the background only while opaque light content fills the view.
@@ -135,7 +166,6 @@ function lightNavigation(){
 }
 if(ScrollTrigger){
   ScrollTrigger.create({start:0,end:'max',onUpdate:lightNavigation,onRefresh:measureLightNavigation});
-  if(animated)gsap.ticker.add(lightNavigation);
   measureLightNavigation();
 }
 window.addEventListener('resize',measureLightNavigation,{passive:true});
@@ -152,9 +182,14 @@ ScrollTrigger?.refresh();
 preference.addEventListener('change',event=>{
   if(!event.matches||force)return;
   animated=false;root.classList.remove('editorial-motion');
-  gsap?.ticker.remove(lightNavigation);
   animations.forEach(animation=>{animation.scrollTrigger?.kill();animation.kill();});
   pointerStops.forEach(stop=>stop());syncArtwork();
+  horizonTriggers.forEach(trigger=>trigger.kill());
+  horizons.forEach(({horizon})=>horizon.destroy());
   document.querySelectorAll('[data-editorial-reveal]').forEach(el=>{el.style.opacity='1';el.style.transform='none';});
   refresh();
 });
+
+// Let the 3D scene prepare only after the visible page and scroll effects are wired.
+window.cosgralPageMotionReady=true;
+window.dispatchEvent(new Event('cosgral:motion-ready'));

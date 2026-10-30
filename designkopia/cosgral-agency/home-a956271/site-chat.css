@@ -540,8 +540,8 @@ body.is-nav-open .cg-chat-root,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cg-chat-root,
-  .cg-chat-root.is-chat-visible {
+  html:not(.force-motion) .cg-chat-root,
+  html:not(.force-motion) .cg-chat-root.is-chat-visible {
     transition-duration: 0.01ms !important;
     transform: translateX(-50%);
   }
