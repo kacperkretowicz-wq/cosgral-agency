@@ -33,7 +33,7 @@ try {
       assert.equal(new Set(cards.map(c=>c.font)).size,1,'Same title size');
       assert.equal(new Set(cards.map(c=>c.height)).size,1,'Aligned title areas');
       for(const card of cards){
-        assert.ok(parseFloat(card.font)>=17,card.title+' is too small');
+        assert.ok(parseFloat(card.font)>=(width>600?28:20),card.title+' is too small');
         assert.ok(card.overflow<=1,card.title+' overflows');
         assert.ok(card.overlap<=0,card.title+' overlaps its illustration');
         assert.ok(!card.clipped,card.title+' is clipped');

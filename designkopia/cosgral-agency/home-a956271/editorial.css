@@ -363,33 +363,42 @@ html.has-hero-cube-frame .home-cube-poster {opacity:0;}
 }
 
 /* Service illustrations share a frame; titles always occupy the same footer. */
-.art-tile--web{background:#e4e9ed;color:#131b20}
-.art-tile--apps{background:#10171c;color:#f0f3f5}
-.art-tile--seo{background:#ededed;color:#131b20}
-.art-tile--automation{background:#dbe3e5;color:#131b20}
+.art-tile--web{background:#dce5ee;color:#131b20}
+.art-tile--apps{background:radial-gradient(ellipse at 15% 0,#273254,transparent 70%),#10171c;color:#f0f3f5}
+.art-tile--seo{background:radial-gradient(circle,#5d769117 .65px,transparent 1.1px) 0 0/6px 6px,#edeee9;color:#131b20}
+.art-tile--automation{background:#ff482b url("assets/services/vermilion-grain.webp") center/768px 512px;color:#160a08}
 .art-tile--crm{background:#121a20;color:#f0f3f5}
-.art-tile--creative{background:#e7e4de;color:#131b20}
-.art-tile{--tile-pad:24px;--title-height:72px;border-color:#52616b55}
+.art-tile--creative{background:linear-gradient(135deg,#eee7dc,#d2c5b4);background-color:#e8dfd2;color:#131b20}
+.art-tile{--tile-pad:24px;--title-height:88px;border-color:#52616b55}
 .art-tile__top{inset:18px var(--tile-pad) auto;align-items:center;gap:8px;color:inherit;opacity:.85}
 .service-card-arrow{display:grid;place-items:center;width:32px;height:32px;border:1px solid currentColor;border-radius:50%;flex-shrink:0;transition:transform .25s}
 .service-card-arrow svg{width:16px;height:16px}
-.art-tile:hover .service-card-arrow{transform:translate(2px,-2px)}
+.art-tile:hover .service-card-arrow{transform:translateX(3px)}
 .art-tile:focus-visible{outline:2px solid var(--paper);outline-offset:5px}
 .art-tile__art{inset:60px var(--tile-pad) calc(var(--tile-pad) + var(--title-height) + 16px)}
 .service-illustration{display:block;width:100%;height:100%;object-fit:contain;filter:none;transform:none}
-.art-tile__label{inset:auto var(--tile-pad) var(--tile-pad);height:var(--title-height);align-items:flex-start;justify-content:flex-start;font:500 clamp(22px,1.8vw,30px)/1.2 Arial,Helvetica,sans-serif;letter-spacing:-.035em;gap:0}
+.art-tile__label{inset:auto var(--tile-pad) var(--tile-pad);height:var(--title-height);align-items:flex-start;justify-content:flex-start;font:500 clamp(28px,2.3vw,38px)/1.12 Arial,Helvetica,sans-serif;letter-spacing:-.035em;gap:0}
 .art-tile__label>span{display:block;width:100%;max-width:100%;overflow-wrap:normal}
 @media(max-width:900px){
- .art-tile{--tile-pad:20px;--title-height:64px}
- .art-tile__label{font-size:24px}
+ .art-tile{--tile-pad:20px;--title-height:80px}
+ .art-tile__label{font-size:30px}
 }
 @media(max-width:600px){
  .services-art-grid{gap:12px}
- .art-tile{--tile-pad:12px;--title-height:52px;aspect-ratio:.73}
- .art-tile__top{top:12px;font-size:8px;letter-spacing:.04em}
+ .art-tile{--tile-pad:12px;--title-height:64px;aspect-ratio:.73}
+ .art-tile__top{top:12px;font-size:9px;letter-spacing:.04em}
  .service-card-arrow{width:24px;height:24px}
  .service-card-arrow svg{width:13px;height:13px}
  .art-tile__art{top:48px;bottom:calc(var(--tile-pad) + var(--title-height) + 16px)}
- .art-tile__label{font-size:clamp(17px,4.6vw,20px);line-height:1.2;letter-spacing:-.035em}
+ .art-tile__label{font-size:clamp(20px,5.4vw,24px);line-height:1.12;letter-spacing:-.035em}
 }
 @media(prefers-reduced-motion:reduce){.service-card-arrow{transition:none}}
+
+/* Bigger labels take priority over squeezing two cards into a narrow phone. */
+@media(max-width:379px){
+ .services-art-grid{grid-template-columns:1fr}
+ .art-tile{--tile-pad:18px;aspect-ratio:1.12}
+ .art-tile__top{font-size:10px}
+ .art-tile__label{font-size:24px}
+ .art-tile__art{top:46px}
+}
