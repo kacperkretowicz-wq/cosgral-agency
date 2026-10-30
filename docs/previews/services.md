@@ -9,6 +9,14 @@ Illustrations are optimized WebP artwork extracted from the approved generated d
 
 [Mobile preview](services-mobile.png)
 
+## Transition after the white FAQ section
+
+Soft monochrome branches draw and travel upward with scroll before the cooperation process. The effect uses local SVG and the existing scroll animation engine, with a static reduced-motion fallback. Service title fonts share the same family, size and weight; SEO has a small optical tracking adjustment.
+
+![Transition on desktop](transition-desktop.png)
+
+[Mobile transition](transition-mobile.png)
+
 ## Run and verify
 
 From the repository root:
@@ -22,6 +30,7 @@ In a second terminal:
 ```sh
 node scripts/check-service-cards.mjs
 node scripts/check-service-interactions.mjs
+node scripts/check-service-transition.mjs
 ```
 
 These browser checks use the repository's existing Puppeteer package and `/usr/bin/chromium`. The interaction check uses the documented `forceMotion` option for the full-motion desktop case, then clears it for reduced motion. GPU effects are unavailable during these UI checks; the existing WebGL hero is outside this change.
