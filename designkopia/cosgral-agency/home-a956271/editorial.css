@@ -8,7 +8,7 @@ body.editorial-page {background:var(--carbon); color:var(--paper);line-height:1.
 .editorial-page .site-nav__actions {background:rgba(8,9,9,.85);border:1px solid #ffffff14;border-radius:40px;padding:9px 14px;}
 .editorial-page .site-nav__logo {background:transparent;border:0;border-radius:0;padding:3px 8px;box-shadow:none;}
 .editorial-page.has-light-section:not(.is-nav-menu-open) .site-nav__actions {background:rgba(238,237,232,.96);border-color:#11111116;}
-.editorial-page.has-light-section:not(.is-nav-menu-open) .site-nav__logo-img {filter:invert(1);}
+.editorial-page.has-light-logo:not(.is-nav-menu-open) .site-nav__logo-img {filter:invert(1);}
 .editorial-page.has-light-section:not(.is-nav-menu-open) .site-nav__toggle,
 .editorial-page.has-light-section:not(.is-nav-menu-open) .lang-switch button {color:#111;}
 .editorial-page.has-light-section:not(.is-nav-menu-open) .site-nav__toggle-bars span {background:#111;}
@@ -89,8 +89,6 @@ body.editorial-page {background:var(--carbon); color:var(--paper);line-height:1.
 .tone-wipe--dark {background:var(--carbon);}
 .tone-wipe--dark .tone-wipe__surface {background:var(--carbon);}
 .tone-wipe--dark .tone-wipe__copy {color:var(--paper);}
-.editorial-motion .tone-wipe:not(.is-static) {height:calc(var(--stable-vh, 1svh) * 220);}
-.editorial-motion .tone-wipe:not(.is-static) .tone-wipe__sticky {height:calc(var(--stable-vh, 1svh) * 100);position:sticky;top:0;}
 .tone-light {background:var(--paper);color:#111416;z-index:5;}
 .editorial-work {padding-top:90px;}
 .editorial-work .editorial-head p {color:#5e6267;}
@@ -223,7 +221,7 @@ html.is-gyro-outside-hero .editorial-page:not(.is-nav-menu-open) .gyro-enable {o
   .project-graphic-type {font-size:31px;}.project-system-type{font-size:40px;}
   .gallery-toolbar>.micro {max-width:100px;font-size:8px;}.gallery-switch button{font-size:10px;padding:9px 12px;}
   .portfolio-foot>.micro{display:none;}.editorial-link{font-size:16px;}
-  .editorial-motion .tone-wipe:not(.is-static) {height:calc(var(--stable-vh, 1svh) * 195);}.tone-wipe__copy strong {font-size:12vw;}.tone-wipe__copy .micro{font-size:8px;}
+  .tone-wipe__copy strong {font-size:12vw;}.tone-wipe__copy .micro{font-size:8px;}
   .editorial-faq h2 {font-size:54px;}.editorial-faq .faq-item__q {font-size:17px;}
   .editorial-process .home-process__step {grid-template-columns:35px 1fr;gap:12px;padding:28px 0;}
   .editorial-process .home-process__step>div {grid-template-columns:1fr;gap:14px;}
@@ -328,11 +326,7 @@ html.is-gyro-outside-hero .editorial-page:not(.is-nav-menu-open) .gyro-enable {o
 }
 @media(max-width:420px){.contact-footer .audit-form {grid-template-columns:minmax(0,1fr);}}
 
-/* The thermal surface begins underneath the final cards, with transparent ink. */
 .editorial-motion .editorial-services {padding-bottom:clamp(32px,4vw,64px);}
-.editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static) {height:calc(var(--stable-vh, 1svh) * 302);margin-top:-calc(var(--stable-vh, 1svh) * 82);background:transparent;}
-.editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static) .tone-wipe__surface {background:transparent;}
-@media(max-width:600px){.editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static) {height:calc(var(--stable-vh, 1svh) * 277);}}
 
 /* The identical rendered pose is visible while the interactive scene starts. */
 .editorial-page .editorial-runway {z-index:4;}
@@ -344,14 +338,6 @@ html.is-hero-cube-focus .cg-chat-root:not(:hover):not(:focus-within) .cg-chat-la
 html.has-hero-cube-frame .home-cube-poster {opacity:0;}
 @media(max-width:900px){.home-cube-poster {top:31%;width:min(90.256vw,calc(var(--stable-vh, 1svh) * 42.753));}}
 @media(prefers-reduced-motion:reduce){.home-cube-poster {transition:none;}}
-
-/* Touch screens: keep the artwork, shorten the empty transition runway. */
-@media (max-width: 900px), (pointer: coarse) {
-  .editorial-motion .tone-wipe:not(.is-static) {height:calc(var(--stable-vh, 1svh) * 150);}
-  .editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static) {
-    height:calc(var(--stable-vh, 1svh) * 230);
-  }
-}
 
 /* Keep the WebGL projection and background stable as phone browser chrome moves. */
 @media (max-width:900px), (pointer:coarse) {
@@ -420,3 +406,19 @@ html.reduce-motion .ambient-fallback{animation:none}
 html.has-ambient-fallback:not(.has-hero-cube-frame):not(.reduce-motion) .home-cube-poster img{animation:poster-drift 9s ease-in-out infinite alternate;animation-play-state:paused}
 html.fallback-hero-inview .home-cube-poster img{animation-play-state:running}
 @keyframes poster-drift{from{transform:translateY(0) scale(1)}to{transform:translateY(-6px) scale(1.01)}}
+
+/* Chrome visibility: branding is self-contained, and shader warmup never leaves a still hero. */
+.editorial-page .site-nav__logo-img{display:block;width:44px;height:auto;overflow:hidden;flex:none}
+html.force-motion:not(.has-hero-cube-frame) .home-cube-poster img{animation:poster-drift 6s ease-in-out infinite alternate;animation-play-state:running}
+html.force-motion .home-cube-poster{transition:opacity .25s ease}
+/* Restore the two real ink/paper crossings, independent of WebGL capability. */
+.editorial-motion .tone-wipe:not(.is-static),
+.editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static){height:calc(var(--stable-vh,1svh)*145);margin:0;background:var(--carbon)}
+.editorial-motion .tone-wipe--dark:not(.is-static){background:var(--paper)}
+.tone-wipe .tone-wipe__sticky{position:sticky;top:0;height:calc(var(--stable-vh,1svh)*100)}
+.tone-wipe .tone-wipe__field{overflow:visible;will-change:transform}
+.tone-wipe.is-static{height:0!important;overflow:hidden}
+@media(max-width:900px){
+ .editorial-page .site-nav__logo-img{width:36px}
+ .editorial-motion .tone-wipe:not(.is-static),.editorial-motion .tone-wipe:not(.tone-wipe--dark):not(.is-static){height:calc(var(--stable-vh,1svh)*125)}
+}

@@ -8,6 +8,15 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
 (async function () {
   const canvas = document.getElementById('hero-3d');
   if (!canvas || document.documentElement.classList.contains('reduce-motion')) return;
+  // Show branding and the animated poster, and wire transitions before GPU work.
+  if(document.querySelector('.editorial-page')&&!window.cosgralPageMotionReady){
+    await new Promise(resolve=>{
+      const done=()=>{clearTimeout(timer);window.removeEventListener('cosgral:motion-ready',done);resolve()};
+      const timer=setTimeout(done,1500);
+      window.addEventListener('cosgral:motion-ready',done,{once:true});
+    });
+  }
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   const HALF = 1.35;
   const nativeScroll=window.matchMedia('(max-width:900px), (pointer:coarse)').matches;
   const capturePoster=new URLSearchParams(location.search).has('captureCube');
@@ -44,7 +53,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
   let menuChangedAt=0;
   let effectPauseUntil=0;
   let introStart=performance.now(),introDone=true,contextLost=false;
-  let firstPaint=false,opaqueWarmMaterial=null,opaqueWarmReady=false;
+  let firstPaint=false,opaqueWarmMaterial=null,opaqueWarmReady=false,opaqueWarmPending=false;
+  let motionStart=null;
   let frameRaf=0,ready=false;
   let pointerX=0,pointerY=0;
   const pose={position:new THREE.Vector3(),quaternion:new THREE.Quaternion(),scale:1};
@@ -149,9 +159,10 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
   function buildScrollPose(time){
     sampleCubeOrbit(progress,.24,-.4,orbitPose);
     const t=orbitPose.phase,bank=Math.sin(t*Math.PI*2);
-    const drift=reduced?0:Math.sin(time*.34)*.006;
+    const drift=reduced?0:Math.sin(time*.45)*.028;
+    const turn=reduced?0:Math.sin(time*.32)*.065;
     euler.set(.48+drift-pointerY*.035+Math.sin(t*Math.PI)*.10,
-      -.67+pointerX*.055+t*Math.PI*.90,-bank*.10);
+      -.67+turn+pointerX*.055+t*Math.PI*.90,-bank*.10);
     pose.quaternion.setFromEuler(euler);
     pose.scale=screenScale(heroSize(),.36)*orbitPose.scale;
     screenPosition(width*.5,height*orbitPose.y,.36,pose.position);
@@ -295,7 +306,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
     menuBlend+=(menuTarget-menuBlend)*(1-Math.exp(-renderDt*(menuTarget?4.5:7)));
     if(Math.abs(menuTarget-menuBlend)<0.0001)menuBlend=menuTarget;
     if(capturePoster)pointerX=pointerY=0;
-    const time=capturePoster?0:now/1000;buildScrollPose(time);
+    if(motionStart===null)motionStart=now;
+    const time=capturePoster?0:(now-motionStart)/1000;buildScrollPose(time);
     if(menuBlend>0){
       const mb=smooth(0,1,menuBlend);screenPosition(width*0.5,height*0.49,0.36,v);
       const breathing=reduced?0:Math.sin(time*0.65);
@@ -354,10 +366,15 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
       window.dispatchEvent(new CustomEvent('cosgral:cube-intro-done'));
       if(capturePoster){
         canvas.setAttribute('data-cube-poster',canvas.toDataURL('image/png'));
-      }else{
-        const prepare=()=>warmMaterialPrograms().catch(error=>console.warn('COSGRAL: deferred chrome warmup',error));
-        if(window.requestIdleCallback)requestIdleCallback(prepare,{timeout:900});else setTimeout(prepare,80);
       }
+    }
+    // The opaque variant is needed later in the orbit, not during startup.
+    // Compile it only once the visitor starts that journey, keeping the first
+    // seconds free of a second shader compilation competing with live glass.
+    if(!capturePoster&&!opaqueWarmMaterial&&!opaqueWarmPending&&progress>.08&&progress<.6){
+      opaqueWarmPending=true;
+      const prepare=()=>warmMaterialPrograms().catch(error=>console.warn('COSGRAL: chrome warmup',error)).finally(()=>{opaqueWarmPending=false});
+      if(window.requestIdleCallback)requestIdleCallback(prepare,{timeout:1200});else setTimeout(prepare,80);
     }
     if(opaqueWarmReady&&opaqueWarmMaterial&&glass.material.transmission===0){opaqueWarmMaterial.dispose();opaqueWarmMaterial=null;opaqueWarmReady=false;}
     if (profile) profile.render(performance.now()-renderStart,now,activeMotion,qualityTier);

@@ -1,4 +1,4 @@
-/** Browser regression for empty transitions, mobile browser chrome and cube scroll lag.
+/** Browser regression for working transitions, mobile browser chrome and cube scroll lag.
  * Start the static site, then run: PREVIEW_URL=http://127.0.0.1:8765/ node scripts/check-home-scroll.mjs
  * Uses the repository's existing Puppeteer installation and system Chromium.
  */
@@ -27,7 +27,7 @@ try {
   await page.setViewport({width:390,height:760,isMobile:true,hasTouch:true});
   await new Promise(resolve=>setTimeout(resolve,400));
   const after=await sample();
-  assert.equal(after.transitions,0,'No empty transition sections');
+  assert.equal(after.transitions,2,'Both scroll transitions are present');
   assert.equal(after.portalHeight,before.portalHeight,'Stable cube projection height');
   assert.equal(after.backgroundHeight,before.backgroundHeight,'Stable background render size');
   assert.equal(after.aspect,before.aspect,'Stable cube camera aspect');
