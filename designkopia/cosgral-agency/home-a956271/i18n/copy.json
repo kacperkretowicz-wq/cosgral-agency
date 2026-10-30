@@ -309,6 +309,14 @@
     "explode_cta": {
       "pl": "Zacznijmy od bezpłatnego audytu",
       "en": "Let's start with a free audit"
+    },
+    "tile3": {
+      "pl": "SEO i GEO",
+      "en": "SEO & GEO"
+    },
+    "tile6": {
+      "pl": "Grafika i wideo",
+      "en": "Graphics & video"
     }
   },
   "process": {
