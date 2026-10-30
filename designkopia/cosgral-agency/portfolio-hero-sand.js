@@ -407,23 +407,45 @@ import { createShardGeometry } from "./cube-shape.js?v=20260918d";
     };
   }
 
-  layers.push(
-    buildLayer(backCanvas, Math.floor(COUNT * 0.52), {
-      seedOffset: 0,
-      sizeBase: 0.016,
-      sizeVar: 0.02,
-      alpha: 0.72,
-    })
-  );
-  layers.push(
-    buildLayer(frontCanvas, Math.ceil(COUNT * 0.48), {
-      seedOffset: 40000,
-      sizeBase: 0.016,
-      sizeVar: 0.02,
-      alpha: 0.88,
-      isFront: true,
-    })
-  );
+  // Both decorative layers must be available before animation/listeners start.
+  try {
+    layers.push(
+      buildLayer(backCanvas, Math.floor(COUNT * 0.52), {
+        seedOffset: 0,
+        sizeBase: 0.016,
+        sizeVar: 0.02,
+        alpha: 0.72,
+      })
+    );
+    layers.push(
+      buildLayer(frontCanvas, Math.ceil(COUNT * 0.48), {
+        seedOffset: 40000,
+        sizeBase: 0.016,
+        sizeVar: 0.02,
+        alpha: 0.88,
+        isFront: true,
+      })
+    );
+  } catch (error) {
+    layers.forEach(function (layer) {
+      layer.scene.traverse(function (object) {
+        object.geometry?.dispose();
+        if (Array.isArray(object.material)) {
+          object.material.forEach(function (material) { material.dispose(); });
+        } else {
+          object.material?.dispose();
+        }
+        object.dispose?.();
+      });
+      layer.renderer.dispose();
+    });
+    layers.length = 0;
+    backCanvas.hidden = frontCanvas.hidden = true;
+    backCanvas.style.display = frontCanvas.style.display = "none";
+    document.body.classList.remove("is-portfolio-sand-active", "is-grafiki-menu-sand");
+    console.warn("COSGRAL: decorative sand unavailable; continuing without it.", error);
+    return;
+  }
 
   function resize() {
     layers.forEach(function (layer) {

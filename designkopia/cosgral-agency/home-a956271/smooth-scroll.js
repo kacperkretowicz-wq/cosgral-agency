@@ -40,6 +40,12 @@
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
+  if (MOBILE) {
+    ScrollTrigger.config({ ignoreMobileResize: true });
+    readyResolve(null);
+    return;
+  }
+
   var lenis = new Lenis({
     /* Wolniejszy, gładszy krok kółka — dłuższy dwell w sekcji, bez ciężkiego lagu */
     lerp: MOBILE ? 0.25 : 0.22,

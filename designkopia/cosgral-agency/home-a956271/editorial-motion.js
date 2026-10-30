@@ -1,6 +1,6 @@
-import { createHorizon, sampleHorizonProgress } from './editorial-horizon.js?v=20261019editorial16';
+import { createHorizon, sampleHorizonProgress } from './editorial-horizon.js?v=20261030graphite1';
 
-/* Native flow, a thermal horizon, and artwork entrances that follow the scroll. */
+/* Native flow, a graphite horizon, and artwork entrances that follow the scroll. */
 const root=document.documentElement, preference=matchMedia('(prefers-reduced-motion: reduce)');
 let force=new URLSearchParams(location.search).has('forceMotion');
 try{force||=localStorage.getItem('cosgral-force-motion')==='1';}catch(_){}
@@ -28,6 +28,7 @@ document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('c
   else target.scrollIntoView({behavior:reduced?'instant':'smooth'});
 }));
 if(!reduced&&gsap&&ScrollTrigger)root.classList.add('editorial-motion');
+const touchLayout=matchMedia('(max-width:900px), (pointer:coarse)').matches;
 let animated=root.classList.contains('editorial-motion');
 const horizons=[],animations=[],pointerStops=[];
 let refreshTimer,layoutRevision=0,galleryAnimating=false;
@@ -58,10 +59,10 @@ if(animated){
       const index=isTile?[...element.parentElement.children].indexOf(element):0;
       return `top ${base-(index%columns)*4}%`;
     }
-    animations.push(gsap.fromTo(element,{opacity:0,y:element.matches('.art-tile,.project-card')?54:30},
-      {opacity:1,y:0,ease:'none',scrollTrigger:{trigger:element,start:()=>entranceLine(96),end:()=>entranceLine(72),scrub:.18,invalidateOnRefresh:true}}));
+    animations.push(gsap.fromTo(element,{opacity:0,y:touchLayout?0:(element.matches('.art-tile,.project-card')?54:30)},
+      {opacity:1,y:0,ease:'none',scrollTrigger:{trigger:element,start:()=>entranceLine(96),end:()=>entranceLine(72),scrub:touchLayout?true:.18,invalidateOnRefresh:true}}));
   });
-  document.querySelectorAll('.project-card__art').forEach(art=>{
+  if(!touchLayout)document.querySelectorAll('.project-card__art').forEach(art=>{
     const media=art.querySelector('video,.foil-ribbon,.orbit-art');if(!media)return;
     animations.push(gsap.fromTo(media,{y:-12},{y:12,ease:'none',
       scrollTrigger:{trigger:art,start:'top bottom',end:'bottom top',scrub:.2}}));
