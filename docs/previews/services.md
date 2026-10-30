@@ -11,18 +11,28 @@ Illustrations are optimized WebP artwork extracted from the approved generated d
 
 ## Chrome effects and media
 
-Desktop mouse/trackpad devices enable full motion by default, including when Windows requests reduced motion. `?forceMotion` explicitly enables the same mode on other devices; `?reduceMotion` always takes precedence and disables motion and automatic video playback. Touch devices otherwise follow the system preference.
+Full effects are enabled by default, regardless of pointer detection. `?reduceMotion` explicitly disables motion and autoplay, while `?respectMotion` follows the OS preference. Chrome without WebGL receives a lightweight animated SVG atmosphere and the original cube poster instead of a blank background or a fixed logo over content. A fallback is not the full 3D renderer.
 
-Cards gently enlarge and lift on hover/focus; existing entrance, parallax and click-to-expand behavior remains. Portfolio video is muted and inline, loads in view and pauses offscreen. If the browser denies autoplay, native playback controls appear and a user gesture retries it.
+Cards lift and enlarge on hover/focus. Open descriptions use the brand font, larger neutral high-contrast text and separated list rows without red dashes.
 
-The decorative branch transition has been removed. SEO retains the shared service-title typography.
+![Open service description](service-description.png)
+
+Portfolio videos have no native controls. They load shortly before reaching the viewport, play muted/inline and pause offscreen. Original MP4 files are untouched. Same-resolution, same-frame-rate VP9 WebM alternatives are used only if MP4 support is absent or fails. These are re-encoded compatibility alternatives, not lossless copies. Blocked autoplay retries on a user gesture without exposing a player bar.
+
+The decorative transition between sections remains removed.
+
+## Performance
+
+The local server now sends gzip-compressed text with ETag revalidation and supports byte-range media requests. A measured sample of Three.js, GSAP and the two main stylesheets transferred 225,249 bytes instead of 882,741 bytes (74.5% less), with identical decompressed contents. A video range request returned exactly 1,024 bytes with HTTP 206. These are transfer measurements, not a claim of a 74.5% faster page or a physical-device frame-rate benchmark.
+
+Redundant per-frame navigation updates and permanently promoted card layers were removed. Netlify caching headers were added for versioned vendor assets and portfolio media. Visual effects and original MP4 quality remain available.
 
 ## Run and verify
 
 From the repository root:
 
 ```sh
-python3 -m http.server 8765 --bind 127.0.0.1 --directory designkopia/cosgral-agency
+python3 scripts/serve-agency.py --port 8765
 ```
 
 In a second terminal:
@@ -31,6 +41,8 @@ In a second terminal:
 node scripts/check-service-cards.mjs
 node scripts/check-service-interactions.mjs
 node scripts/check-chrome-effects.mjs
+node scripts/check-media-fallbacks.mjs
+python3 scripts/check-preview-server.py
 ```
 
-These browser checks use the repository's existing Puppeteer package and `/usr/bin/chromium`. They verify labels/layout, hover and pointer motion, expansion/Escape, all four videos actually decoding and advancing, and explicit reduced-motion behavior. They isolate the UI from GPU rendering. A separate Chromium run with SwiftShader also confirmed rendered frames from both the hero cube and ambient WebGL background; this is not a physical GPU performance measurement.
+These browser checks use the repository's existing Puppeteer package and `/usr/bin/chromium`. They verify labels/layout, hover and pointer motion, expansion/Escape, all four videos actually decoding and advancing without controls, codec/network/autoplay fallbacks, and explicit reduced-motion behavior. They isolate the UI from GPU rendering. A separate Chromium run with SwiftShader also confirmed rendered frames from both the hero cube and ambient WebGL background; this is not a physical GPU performance measurement.

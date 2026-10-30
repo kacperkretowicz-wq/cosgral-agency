@@ -406,3 +406,17 @@ html.reduce-motion .service-illustration.kinetic-art{animation:none}
 .art-tile__label{font-family:var(--font-display,Arial,Helvetica,sans-serif);font-synthesis:none}
 .art-tile__label>span{font:inherit;letter-spacing:inherit;text-transform:none}
 .art-tile--seo .art-tile__label>span{letter-spacing:-.055em}
+
+/* Keep a moving atmosphere when Chrome cannot create a WebGL context. */
+.editorial-page .home-cube-portal.has-cube-fallback{background:none}
+.home-ambient.ambient-fallback{
+ background:#060707 url("assets/ambient/fallback.svg") center/cover no-repeat;
+ transform:scale(1.12);animation:ambient-drift 22s ease-in-out infinite alternate;
+}
+@keyframes ambient-drift{from{transform:scale(1.12) translate3d(-1%,-1%,0)}to{transform:scale(1.12) translate3d(1%,1%,0)}}
+html.is-ambient-covered .ambient-fallback,html.is-footer-covered .ambient-fallback{animation-play-state:paused;visibility:hidden}
+html.reduce-motion .ambient-fallback{animation:none}
+
+html.has-ambient-fallback:not(.has-hero-cube-frame):not(.reduce-motion) .home-cube-poster img{animation:poster-drift 9s ease-in-out infinite alternate;animation-play-state:paused}
+html.fallback-hero-inview .home-cube-poster img{animation-play-state:running}
+@keyframes poster-drift{from{transform:translateY(0) scale(1)}to{transform:translateY(-6px) scale(1.01)}}

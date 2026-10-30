@@ -112,7 +112,9 @@ if(animated&&matchMedia('(hover: hover) and (pointer: fine)').matches){
 // Measure real content, with no empty transition sections or canvas dependencies.
 const lightSections=[...document.querySelectorAll('.tone-light')];
 let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null;
+let lastLightScroll=NaN;
 function measureLightNavigation(){
+  lastLightScroll=NaN;
   const scroll=window.scrollY;
   lightGeometry=lightSections.map(el=>{
     const rect=el.getBoundingClientRect();
@@ -124,6 +126,8 @@ function measureLightNavigation(){
 }
 function lightNavigation(){
   const scroll=window.scrollY;
+  if(scroll===lastLightScroll)return;
+  lastLightScroll=scroll;
   const lightAt=y=>lightGeometry.some(rect=>rect.top<=scroll+y&&rect.bottom>scroll+y);
   const navLight=lightAt(48),chatLight=lightAt(chatLine);
   if(navLight!==lastNavLight){lastNavLight=navLight;document.body.classList.toggle('has-light-section',navLight);}

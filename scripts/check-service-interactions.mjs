@@ -17,6 +17,9 @@ try{for(const reduced of [false,true]){
  await card.click();await page.waitForSelector('.services-art-grid.is-exploded');
  assert.equal(await card.evaluate(e=>e.getAttribute('aria-expanded')),'true');
  assert.ok(await page.$eval('.services-explode__title',e=>e.textContent.trim()));
+ assert.ok(await page.$eval('.services-explode__lead',e=>parseFloat(getComputedStyle(e).fontSize)>=16));
+ assert.equal(await page.$eval('.services-explode__list li',e=>getComputedStyle(e,'::before').content),'none');
+ assert.equal(await page.$eval('.services-explode__lead',e=>getComputedStyle(e).color),'rgb(225, 228, 231)');
  await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.services-art-grid').classList.contains('is-exploded'));
  if(reduced){assert.equal(await page.$eval('.service-illustration',e=>getComputedStyle(e).animationName),'none');console.log('PASS reduced-motion artwork is static');}
  assert.deepEqual(errors,[]);console.log(`PASS open/close, Escape and no page errors (${reduced?'reduced':'normal'})`);await page.close();

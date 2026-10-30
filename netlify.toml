@@ -34,3 +34,14 @@
   for = "/portfolio/*"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+
+# Version-pinned vendor files can be reused across visits without revalidation.
+[[headers]]
+  for = "/home-a956271/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/portfolio-media/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"

@@ -11,6 +11,16 @@
   if (!canvas) return;
   if (document.documentElement.classList.contains("reduce-motion")) return;
 
+  function showFallback(){
+    const fallback=document.createElement('div');
+    fallback.className='home-ambient ambient-fallback';fallback.setAttribute('aria-hidden','true');
+    canvas.replaceWith(fallback);
+    document.documentElement.classList.add('has-ambient-fallback');
+    const hero=document.getElementById('top');
+    if(hero)new IntersectionObserver(entries=>{document.documentElement.classList.toggle('fallback-hero-inview',entries[0].isIntersecting)}).observe(hero);
+    document.addEventListener('visibilitychange',()=>{fallback.style.animationPlayState=document.hidden?'paused':''});
+  }
+
   var MOBILE =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
@@ -89,7 +99,7 @@
     canvas.getContext("experimental-webgl");
 
   if (!gl) {
-    canvas.remove();
+    showFallback();
     return;
   }
 
@@ -107,7 +117,7 @@
   var vs = compile(gl.VERTEX_SHADER, VERT);
   var fs = compile(gl.FRAGMENT_SHADER, FRAG);
   if (!vs || !fs) {
-    canvas.remove();
+    showFallback();
     return;
   }
 
@@ -116,7 +126,7 @@
   gl.attachShader(program, fs);
   gl.linkProgram(program);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    canvas.remove();
+    showFallback();
     return;
   }
   gl.useProgram(program);

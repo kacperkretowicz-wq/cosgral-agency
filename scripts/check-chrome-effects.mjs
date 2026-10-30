@@ -25,7 +25,7 @@ try {
    assert.ok(parseFloat(await card.evaluate(e=>getComputedStyle(e).scale))<=1||await card.evaluate(e=>getComputedStyle(e).scale)==='none');
    console.log('PASS explicit reduceMotion takes precedence over forceMotion');
   }
-  const videos=await page.$$('.home-work video');assert.equal(videos.length,4);
+  const videos=await page.$$('.home-work video');assert.equal(videos.length,4);assert.equal(await page.$$eval('video',es=>es.some(e=>e.controls)),false);
   for(let index=0;index<videos.length;index++){
    await page.evaluate(index=>{const e=document.querySelectorAll('.home-work video')[index],y=e.getBoundingClientRect().top+scrollY-innerHeight*.2;window.cosgralSmoothScroll?.lenis?.scrollTo(y,{immediate:true});window.scrollTo(0,y);window.ScrollTrigger.update()},index);
    if(!explicitReduce){
