@@ -1,8 +1,8 @@
+import { createHorizon, sampleHorizonProgress } from './editorial-horizon.js?v=20261030graphite1';
 /* Native flow and artwork entrances that follow the scroll. */
 const root=document.documentElement, preference=matchMedia('(prefers-reduced-motion: reduce)');
-let force=new URLSearchParams(location.search).has('forceMotion');
-try{force||=localStorage.getItem('cosgral-force-motion')==='1';}catch(_){}
-const reduced=root.classList.contains('reduce-motion')||(preference.matches&&!force);
+const force=!!window.cosgralMotion?.force;
+const reduced=!!window.cosgralMotion?.reduced;
 const gsap=window.gsap, ScrollTrigger=window.ScrollTrigger;
 const gallery=document.querySelector('[data-project-gallery]');
 const clamp=v=>Math.max(0,Math.min(1,v));
@@ -28,9 +28,21 @@ document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('c
 if(!reduced&&gsap&&ScrollTrigger)root.classList.add('editorial-motion');
 const touchLayout=matchMedia('(max-width:900px), (pointer:coarse)').matches;
 let animated=root.classList.contains('editorial-motion');
-const animations=[],pointerStops=[];
+const animations=[],pointerStops=[],horizons=[];
+const lightSections=[...document.querySelectorAll('.tone-light')];
+let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null;
 let refreshTimer,layoutRevision=0,galleryAnimating=false;
 function refresh(){clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{if(!galleryAnimating)ScrollTrigger?.refresh();},120);}
+
+window.addEventListener('cosgral:horizon-layout',refresh);
+document.querySelectorAll('[data-tone-wipe]').forEach(section=>{
+  const horizon=createHorizon(section,!animated);
+  horizons.push({section,horizon});
+  if(!animated||section.classList.contains('is-static'))return;
+  const state={progress:0}, first=!section.classList.contains('tone-wipe--dark');
+  animations.push(gsap.to(state,{progress:1,ease:'none',onUpdate:()=>{horizon.update(first?sampleHorizonProgress(state.progress):state.progress);lightNavigation();},
+    scrollTrigger:{trigger:section,start:'top top',end:'bottom bottom',scrub:first ? .65 : .5,invalidateOnRefresh:true}}));
+});
 
 if(ScrollTrigger){
   ScrollTrigger.create({id:'shatter-beat',start:()=>innerHeight*.18,end:()=>innerHeight*1.32});
@@ -111,8 +123,6 @@ if(animated&&matchMedia('(hover: hover) and (pointer: fine)').matches){
   });
 }
 // Measure real content, with no empty transition sections or canvas dependencies.
-const lightSections=[...document.querySelectorAll('.tone-light')];
-let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null;
 function measureLightNavigation(){
   const scroll=window.scrollY;
   lightGeometry=lightSections.map(el=>{
@@ -125,8 +135,18 @@ function measureLightNavigation(){
 }
 function lightNavigation(){
   const scroll=window.scrollY;
-  const lightAt=y=>lightGeometry.some(rect=>rect.top<=scroll+y&&rect.bottom>scroll+y);
-  const navLight=lightAt(48),chatLight=lightAt(chatLine);
+  const lightAt=(x,y)=>{
+    for(const {section,horizon} of horizons){
+      if(section.classList.contains('is-static'))continue;
+      const rect=section.getBoundingClientRect();
+      if(rect.top<=y&&rect.bottom>y){
+        const stage=section.querySelector('.tone-wipe__sticky').getBoundingClientRect();
+        return horizon.isLightAt(x/innerWidth,(y-stage.top)/stage.height);
+      }
+    }
+    return lightGeometry.some(rect=>rect.top<=scroll+y&&rect.bottom>scroll+y);
+  };
+  const navLight=lightAt(innerWidth*.06,48),chatLight=lightAt(innerWidth*.5,chatLine);
   if(navLight!==lastNavLight){lastNavLight=navLight;document.body.classList.toggle('has-light-section',navLight);}
   if(chatLight!==lastChatLight){lastChatLight=chatLight;root.classList.toggle('has-light-chat',chatLight);}
   // Suspend the background only while opaque light content fills the view.
@@ -155,6 +175,7 @@ preference.addEventListener('change',event=>{
   gsap?.ticker.remove(lightNavigation);
   animations.forEach(animation=>{animation.scrollTrigger?.kill();animation.kill();});
   pointerStops.forEach(stop=>stop());syncArtwork();
+  horizons.forEach(({horizon})=>horizon.destroy());
   document.querySelectorAll('[data-editorial-reveal]').forEach(el=>{el.style.opacity='1';el.style.transform='none';});
   refresh();
 });

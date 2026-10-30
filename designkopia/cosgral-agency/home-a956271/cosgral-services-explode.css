@@ -92,7 +92,7 @@
   top: 0.62em;
   width: 5px;
   height: 1px;
-  background: var(--hot, #ff482b);
+  background: #fff;
 }
 .services-explode__effect {
   margin: 0 0 1.3rem;
@@ -128,3 +128,21 @@ html.reduce-motion .art-tile,
 html.reduce-motion .services-explode__desc {
   transition: none !important;
 }
+
+/* Scale independently from the scroll entrance transform. */
+@media (hover:hover) and (pointer:fine) {
+ .services-art-grid:not(.is-exploded) .art-tile {transition:transform .75s cubic-bezier(.22,1,.36,1),scale .3s ease,translate .3s ease,box-shadow .3s ease,border-color .3s ease}
+ .services-art-grid:not(.is-exploded) .art-tile:is(:hover,:focus-visible) {border-color:#a7b5c0;box-shadow:0 18px 36px #0005;z-index:1}
+ html:not(.reduce-motion) .services-art-grid:not(.is-exploded) .art-tile:is(:hover,:focus-visible) {scale:1.018!important;translate:0 -4px!important}
+}
+
+/* On phones the six cards form a tall column; keep the opened description in view. */
+.services-explode__close {display:none}
+@media (max-width:600px) {
+ .services-art-grid .services-explode__desc {position:fixed;inset:76px 14px 18px;padding:0;z-index:10;place-items:center}
+ .services-explode__desc-inner {position:relative;box-sizing:border-box;width:100%;max-height:100%;padding:28px 24px 24px;background:rgba(8,9,9,.97);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 55px rgba(0,0,0,.6);overflow-y:auto;overscroll-behavior:contain}
+ .services-explode__close {display:grid;place-items:center;position:absolute;right:14px;top:12px;width:36px;height:36px;padding:0;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:transparent;color:#fff;font:300 24px/1 Arial,sans-serif;cursor:pointer}
+ .services-explode__tag {padding-right:42px}
+}
+
+html.reduce-motion .services-art-grid.is-exploded .art-tile {opacity:0!important;pointer-events:none}

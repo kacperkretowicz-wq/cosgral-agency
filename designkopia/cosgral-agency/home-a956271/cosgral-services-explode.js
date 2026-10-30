@@ -20,8 +20,11 @@
   var desc = document.createElement("div");
   desc.className = "services-explode__desc";
   desc.setAttribute("aria-live", "polite");
+  desc.setAttribute("aria-hidden", "true");
+  desc.inert = true;
   desc.innerHTML =
     '<div class="services-explode__desc-inner">' +
+    '<button type="button" class="services-explode__close" aria-label="Zamknij opis usługi">×</button>' +
     '<span class="micro services-explode__tag" data-role="tag"></span>' +
     '<h3 class="services-explode__title" data-role="title"></h3>' +
     '<p class="services-explode__lead" data-role="lead"></p>' +
@@ -120,6 +123,8 @@
     if (!reduced) computeLayout(tile);
     tiles.forEach(function (el) { el.classList.toggle("is-active", el === tile); });
     grid.classList.add("is-exploded");
+    desc.setAttribute("aria-hidden", "false");
+    desc.inert = false;
     tile.setAttribute("aria-expanded", "true");
   }
 
@@ -127,6 +132,9 @@
     if (!active) return;
     active.removeAttribute("aria-expanded");
     grid.classList.remove("is-exploded");
+    desc.setAttribute("aria-hidden", "true");
+    if (desc.contains(document.activeElement)) active.focus();
+    desc.inert = true;
     tiles.forEach(function (el) { el.classList.remove("is-active"); });
     active = null;
   }
@@ -142,6 +150,10 @@
     });
   });
 
+  desc.addEventListener("click", function (event) {
+    if (event.target.closest(".services-explode__close")) { event.stopPropagation(); close(); return; }
+    if (!event.target.closest(".services-explode__cta")) event.stopPropagation();
+  });
   document.addEventListener("click", function () { if (active) close(); });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && active) close();
