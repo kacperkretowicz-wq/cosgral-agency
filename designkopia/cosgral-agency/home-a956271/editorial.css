@@ -352,3 +352,12 @@ html.has-hero-cube-frame .home-cube-poster {opacity:0;}
     height:calc(var(--stable-vh, 1svh) * 230);
   }
 }
+
+/* Keep the WebGL projection and background stable as phone browser chrome moves. */
+@media (max-width:900px), (pointer:coarse) {
+  .editorial-page .home-cube-portal,
+  .editorial-page .home-ambient {
+    bottom:auto;
+    height:calc(var(--stable-vh,1svh)*100);
+  }
+}

@@ -1,6 +1,4 @@
-import { createHorizon, sampleHorizonProgress } from './editorial-horizon.js?v=20261030graphite1';
-
-/* Native flow, a graphite horizon, and artwork entrances that follow the scroll. */
+/* Native flow and artwork entrances that follow the scroll. */
 const root=document.documentElement, preference=matchMedia('(prefers-reduced-motion: reduce)');
 let force=new URLSearchParams(location.search).has('forceMotion');
 try{force||=localStorage.getItem('cosgral-force-motion')==='1';}catch(_){}
@@ -30,23 +28,12 @@ document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('c
 if(!reduced&&gsap&&ScrollTrigger)root.classList.add('editorial-motion');
 const touchLayout=matchMedia('(max-width:900px), (pointer:coarse)').matches;
 let animated=root.classList.contains('editorial-motion');
-const horizons=[],animations=[],pointerStops=[];
+const animations=[],pointerStops=[];
 let refreshTimer,layoutRevision=0,galleryAnimating=false;
 function refresh(){clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{if(!galleryAnimating)ScrollTrigger?.refresh();},120);}
-window.addEventListener('cosgral:horizon-layout',refresh);
 
-document.querySelectorAll('[data-tone-wipe]').forEach(section=>{
-  const horizon=createHorizon(section,!animated);horizons.push(horizon);
-  if(!animated||section.classList.contains('is-static'))return;
-  const state={progress:0};
-  const first=!section.classList.contains('tone-wipe--dark');
-  animations.push(gsap.to(state,{progress:1,ease:'none',onUpdate:()=>horizon.update(first?sampleHorizonProgress(state.progress):state.progress),
-    scrollTrigger:{trigger:section,start:'top top',end:'bottom bottom',scrub:first ? .65 : .5,invalidateOnRefresh:true}}));
-});
 if(ScrollTrigger){
   ScrollTrigger.create({id:'shatter-beat',start:()=>innerHeight*.18,end:()=>innerHeight*1.32});
-  ScrollTrigger.create({trigger:'[data-tone-wipe]',start:'bottom bottom',end:'max',
-    onToggle:self=>root.classList.toggle('is-ambient-covered',self.isActive)});
   ScrollTrigger.create({trigger:'#uslugi',start:'top 90%',end:'max',
     onToggle:self=>root.classList.toggle('is-gyro-outside-hero',self.isActive)});
 }
@@ -123,36 +110,28 @@ if(animated&&matchMedia('(hover: hover) and (pointer: fine)').matches){
     pointerStops.push(()=>{cancelAnimationFrame(raf);raf=0;tile.style.setProperty('--art-x','0px');tile.style.setProperty('--art-y','0px');});
   });
 }
-// Navigation changes tone when the moving boundary passes the fixed controls.
-const lightStart=document.querySelector('[data-tone-wipe]'),lightEnd=document.querySelector('.tone-wipe--dark');
+// Measure real content, with no empty transition sections or canvas dependencies.
+const lightSections=[...document.querySelectorAll('.tone-light')];
 let lightGeometry=[],chatLine=0,lastNavLight=null,lastChatLight=null;
 function measureLightNavigation(){
   const scroll=window.scrollY;
-  lightGeometry=[lightStart,lightEnd].map(el=>{
+  lightGeometry=lightSections.map(el=>{
     const rect=el.getBoundingClientRect();
-    return {top:rect.top+scroll,bottom:rect.bottom+scroll,height:el.querySelector('.tone-wipe__sticky').offsetHeight};
+    return {top:rect.top+scroll,bottom:rect.bottom+scroll};
   });
   const chat=document.querySelector('.cg-chat-label');
   chatLine=chat?chat.getBoundingClientRect().top:innerHeight-45;
   lightNavigation();
 }
 function lightNavigation(){
-  if(lightGeometry.length!==2)return;
-  const scroll=lenis?.scroll??window.scrollY;
-  function lightAt(x,y){
-    const docY=scroll+y;
-    for(let i=0;i<2;i++){
-      const rect=lightGeometry[i];
-      if(rect.top<=docY&&rect.bottom>docY){
-        const stickyTop=Math.max(rect.top-scroll,Math.min(0,rect.bottom-scroll-rect.height));
-        return horizons[i].isLightAt(x,(y-stickyTop)/rect.height);
-      }
-    }
-    return lightGeometry[0].bottom<=docY&&lightGeometry[1].top>docY;
-  }
-  const navLight=lightAt(.06,48),chatLight=lightAt(.5,chatLine);
+  const scroll=window.scrollY;
+  const lightAt=y=>lightGeometry.some(rect=>rect.top<=scroll+y&&rect.bottom>scroll+y);
+  const navLight=lightAt(48),chatLight=lightAt(chatLine);
   if(navLight!==lastNavLight){lastNavLight=navLight;document.body.classList.toggle('has-light-section',navLight);}
   if(chatLight!==lastChatLight){lastChatLight=chatLight;root.classList.toggle('has-light-chat',chatLight);}
+  // Suspend the background only while opaque light content fills the view.
+  const first=lightGeometry[0],last=lightGeometry[lightGeometry.length-1];
+  root.classList.toggle('is-ambient-covered',!!first&&scroll>=first.top&&scroll+innerHeight<=last.bottom);
 }
 if(ScrollTrigger){
   ScrollTrigger.create({start:0,end:'max',onUpdate:lightNavigation,onRefresh:measureLightNavigation});
@@ -177,5 +156,5 @@ preference.addEventListener('change',event=>{
   animations.forEach(animation=>{animation.scrollTrigger?.kill();animation.kill();});
   pointerStops.forEach(stop=>stop());syncArtwork();
   document.querySelectorAll('[data-editorial-reveal]').forEach(el=>{el.style.opacity='1';el.style.transform='none';});
-  horizons.forEach(horizon=>horizon.destroy());refresh();
+  refresh();
 });

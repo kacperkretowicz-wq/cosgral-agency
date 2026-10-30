@@ -9,6 +9,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
   const canvas = document.getElementById('hero-3d');
   if (!canvas || document.documentElement.classList.contains('reduce-motion')) return;
   const HALF = 1.35;
+  const nativeScroll=window.matchMedia('(max-width:900px), (pointer:coarse)').matches;
   const capturePoster=new URLSearchParams(location.search).has('captureCube');
   const glassLook={glass:{transmission:1,metalness:0,roughness:.035,iridescence:.08,dispersion:.20,edgeGlow:.11,envMapIntensity:1.15,farSideDim:.4,thickness:.7},env:{power:1.5,sheen:.70,violetSheen:.55}};
   const clamp = THREE.MathUtils.clamp;
@@ -283,7 +284,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
     if(heroExited&&Math.abs(nextProgress-progress)<.0001&&menuBlend===0&&menuTarget===0){syncAmbient(false);return;}
     requestFrame();
     const scrollMoving=Math.abs(nextProgress-progress)>0.0004;
-    progress+=(nextProgress-progress)*(1-Math.exp(-dt*8));
+    // Native touch scrolling already moves at the display rate; do not damp it twice.
+    progress=nativeScroll?nextProgress:progress+(nextProgress-progress)*(1-Math.exp(-dt*8));
     if(Math.abs(nextProgress-progress)<.0001)progress=nextProgress;
     const inputActive=!introDone||pointerMoving||scrollMoving||materialStudy.moving||Math.abs(menuTarget-menuBlend)>.001;
     const renderInterval=inputActive?(1000/(qualityTier===2?30:60)):1000/24;

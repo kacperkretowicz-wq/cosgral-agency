@@ -146,9 +146,11 @@
     var dpr = dprCap;
     var maxW = MOBILE ? 720 : 1280;
     var maxH = MOBILE ? 540 : 720;
-    dpr=Math.min(dpr,maxW/window.innerWidth,maxH/window.innerHeight);
-    var w = Math.min(maxW, Math.round(window.innerWidth * dpr));
-    var h = Math.min(maxH, Math.round(window.innerHeight * dpr));
+    var displayWidth=canvas.clientWidth||window.innerWidth;
+    var displayHeight=canvas.clientHeight||window.innerHeight;
+    dpr=Math.min(dpr,maxW/displayWidth,maxH/displayHeight);
+    var w = Math.min(maxW, Math.round(displayWidth * dpr));
+    var h = Math.min(maxH, Math.round(displayHeight * dpr));
     if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
       canvas.width = w;
       canvas.height = h;
