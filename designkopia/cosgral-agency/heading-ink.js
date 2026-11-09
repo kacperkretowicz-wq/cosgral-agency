@@ -1,6 +1,9 @@
 /**
- * Ink reveal for H1/H2: each letter grows out of its thickest strokes
- * (SVG erode → soft blur → alpha threshold), thin joins arrive last.
+ * Ink reveal for display text (headings and every large label, not body copy).
+ * Each letter grows out of its tall stems as rounded drops; thin horizontal
+ * strokes and joins arrive last. Rendered on a temporary canvas: glyphs are
+ * drawn once, an anisotropic distance map is computed once, and every frame is
+ * a threshold of that map, so the motion is continuous in every browser.
  */
 (function () {
   "use strict";
@@ -9,216 +12,384 @@
   if (root.classList.contains("reduce-motion")) return;
   if (!("IntersectionObserver" in window) || !window.requestAnimationFrame) return;
 
-  var SVG_NS = "http://www.w3.org/2000/svg";
   var SKIP = [
-    "[data-no-ink]", ".visually-hidden", ".home-hero__title", ".case-viz-tile__title",
-    "nav", "[role='dialog']", "[aria-hidden='true']", "[hidden]", ".faq-scroll__stage",
+    "script", "style", "noscript", "template", "svg", "canvas", "select", "textarea", "input", "option",
+    "nav", "[role='dialog']", "[hidden]", ".visually-hidden", "[data-no-ink]",
+    ".home-hero__title", ".faq-scroll__stage", ".pf-liq", ".pf-w",
     "[class*='site-chat']", "[class*='cookie']"
   ].join(",");
-  var coarse = window.matchMedia("(max-width: 700px), (pointer: coarse)").matches;
-  var DURATION = coarse ? 1300 : 1500;
-  // Vertical-only erosion: stems survive as short segments that grow from their centres,
-  // horizontal strokes (arches, bars, joins) only return at the end. Works for light and heavy faces.
-  var ERODE_Y_EM = 0.42;
-  var ERODE_X_STEM = 0.28;
-  var BLUR_STEM = 0.22;
-  var stemCache = {};
+  var MIN_PX = 24;
+  var MIN_HEADING_PX = 20;
+  var DURATION = 1700;
+  var MIN_ASPECT = 6;      // drops are at least 6x taller than wide
+  var MAX_PIXELS = 900000; // per canvas, keeps the one-off distance pass short on phones
+  var HAS_LETTER = /[A-Za-z0-9À-ɏЀ-ӿ]/;
 
-  function metrics(h) {
-    var cs = getComputedStyle(h);
-    var size = parseFloat(cs.fontSize) || 32;
-    var font = cs.fontStyle + " " + cs.fontWeight + " " + size + "px " + cs.fontFamily;
-    if (!stemCache[font]) stemCache[font] = { size: size, stem: measureStem(font, size) };
-    return stemCache[font];
-  }
-
-  function measureStem(font, size) {
-    var fallback = size * 0.12;
-    try {
-      var c = document.createElement("canvas");
-      var w = Math.ceil(size * 2), hh = Math.ceil(size * 2);
-      c.width = w; c.height = hh;
-      var ctx = c.getContext("2d");
-      ctx.font = font;
-      ctx.fillStyle = "#000";
-      ctx.textBaseline = "alphabetic";
-      ctx.fillText("l", size * 0.5, size * 1.5);
-      var row = Math.round(size * 1.5 - size * 0.35);
-      var data = ctx.getImageData(0, row, w, 1).data;
-      var run = 0, best = 0;
-      for (var x = 0; x < w; x++) {
-        if (data[x * 4 + 3] > 127) { run++; if (run > best) best = run; } else run = 0;
-      }
-      return best > 0 ? best : fallback;
-    } catch (e) {
-      return fallback;
-    }
-  }
-
-  var defs = null;
-  var filterId = 0;
   var managed = [];
+  var running = [];
+  var observing = false;
+  var rafId = 0;
 
-  function svgDefs() {
-    if (defs) return defs;
-    var svg = document.createElementNS(SVG_NS, "svg");
-    svg.setAttribute("aria-hidden", "true");
-    svg.setAttribute("focusable", "false");
-    svg.style.cssText = "position:absolute;width:0;height:0;overflow:hidden;pointer-events:none";
-    defs = document.createElementNS(SVG_NS, "defs");
-    svg.appendChild(defs);
-    document.body.appendChild(svg);
-    return defs;
+  /* ---------- discovery ---------- */
+
+  function blockOf(el) {
+    while (el && el !== document.body) {
+      var d = getComputedStyle(el).display;
+      if (d !== "inline" && d !== "contents") return el;
+      el = el.parentElement;
+    }
+    return null;
   }
 
-  function el(name, attrs) {
-    var node = document.createElementNS(SVG_NS, name);
-    for (var k in attrs) node.setAttribute(k, attrs[k]);
-    return node;
-  }
-
-  function makeFilter() {
-    var id = "ink-f" + (++filterId);
-    var f = el("filter", {
-      id: id, x: "-30%", y: "-40%", width: "160%", height: "180%",
-      "color-interpolation-filters": "sRGB"
-    });
-    var erode = el("feMorphology", { operator: "erode", radius: "0" });
-    var blur = el("feGaussianBlur", { stdDeviation: "0" });
-    var alpha = el("feColorMatrix", { type: "matrix", values: "" });
-    f.appendChild(erode);
-    f.appendChild(blur);
-    f.appendChild(alpha);
-    svgDefs().appendChild(f);
-    return { id: id, node: f, erode: erode, blur: blur, alpha: alpha };
-  }
-
-  function eligible(h) {
-    if (h.closest(SKIP)) return false;
-    // Portfolio chapter titles already run their own "poured liquid" reveal (portfolio-motion.js).
-    if (h.querySelector(".pf-liq, .pf-w")) return false;
-    if (!h.textContent.trim()) return false;
+  function drawable(cs) {
+    if (cs.visibility === "hidden") return false;
+    var fill = cs.webkitTextFillColor || cs.color;
+    if (fill === "transparent" || /rgba\([^)]*,\s*0\)$/.test(fill)) return false;
+    if (cs.backgroundClip === "text" || cs.webkitBackgroundClip === "text") return false;
     return true;
   }
 
-  function wrapText(h, perWord) {
-    var walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT, null);
-    var nodes = [];
-    while (walker.nextNode()) nodes.push(walker.currentNode);
+  function scan(scope) {
+    if (!scope || scope.nodeType !== 1) return;
+    var walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, null);
+    var order = [];
+    var byBlock = new Map();
+    var n;
+    while ((n = walker.nextNode())) {
+      if (!HAS_LETTER.test(n.nodeValue)) continue;
+      var el = n.parentElement;
+      if (!el || el.classList.contains("ink-c") || el.closest(SKIP)) continue;
+      var cs = getComputedStyle(el);
+      var fs = parseFloat(cs.fontSize) || 0;
+      var heading = el.closest("h1, h2, h3");
+      if (fs < MIN_PX && !(heading && fs >= MIN_HEADING_PX)) continue;
+      if (!drawable(cs)) continue;
+      var block = blockOf(el);
+      if (!block || block.__ink) continue;
+      var list = byBlock.get(block);
+      if (!list) { list = []; byBlock.set(block, list); order.push(block); }
+      list.push(n);
+    }
+    order.forEach(function (block) { adopt(block, byBlock.get(block)); });
+  }
+
+  function adopt(block, nodes) {
+    var item = { el: block, state: "pending", chars: [] };
+    block.__ink = item;
     nodes.forEach(function (node) {
-      var parts = node.nodeValue.split(/(\s+)/);
+      if (!node.parentNode) return;
       var frag = document.createDocumentFragment();
-      parts.forEach(function (part) {
-        if (!part) return;
-        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
-        var word = document.createElement("span");
-        word.className = "ink-w";
-        if (perWord) {
-          word.classList.add("ink-u");
-          word.textContent = part;
-        } else {
-          Array.from(part).forEach(function (ch) {
-            var c = document.createElement("span");
-            c.className = "ink-c ink-u";
-            c.textContent = ch;
-            word.appendChild(c);
-          });
-        }
-        frag.appendChild(word);
+      Array.from(node.nodeValue).forEach(function (ch) {
+        if (/\s/.test(ch)) { frag.appendChild(document.createTextNode(ch)); return; }
+        var c = document.createElement("span");
+        c.className = "ink-c ink-hide";
+        c.textContent = ch;
+        frag.appendChild(c);
+        item.chars.push(c);
       });
       node.parentNode.replaceChild(frag, node);
     });
+    if (!item.chars.length) { item.state = "done"; return; }
+    managed.push(item);
+    root.classList.add("ink-on");
+    if (observing) io.observe(block);
   }
 
-  function split(item) {
-    item.h.classList.add("ink-pending");
-    wrapText(item.h, coarse);
-    item.text = item.h.textContent;
+  /* ---------- rendering ---------- */
+
+  function transformCase(ch, cs, span) {
+    var tt = cs.textTransform;
+    if (tt === "uppercase") return ch.toUpperCase();
+    if (tt === "lowercase") return ch.toLowerCase();
+    if (tt === "capitalize") {
+      var prev = span.previousSibling;
+      if (!prev || (prev.nodeType === 3 && /\s$/.test(prev.nodeValue))) return ch.toUpperCase();
+    }
+    return ch;
   }
 
-  function easeOut(t) {
-    return 1 - Math.pow(1 - t, 1.7);
+  // Felzenszwalb 1-D squared distance transform; `w2` scales the axis (anisotropy).
+  function dt1d(f, n, w2, d, v, z) {
+    var k = 0;
+    v[0] = 0; z[0] = -Infinity; z[1] = Infinity;
+    for (var q = 1; q < n; q++) {
+      var p = v[k];
+      var s = ((f[q] + w2 * q * q) - (f[p] + w2 * p * p)) / (2 * w2 * (q - p));
+      while (s <= z[k]) {
+        k--;
+        p = v[k];
+        s = ((f[q] + w2 * q * q) - (f[p] + w2 * p * p)) / (2 * w2 * (q - p));
+      }
+      k++;
+      v[k] = q; z[k] = s; z[k + 1] = Infinity;
+    }
+    k = 0;
+    for (var x = 0; x < n; x++) {
+      while (z[k + 1] < x) k++;
+      var dx = x - v[k];
+      d[x] = w2 * dx * dx + f[v[k]];
+    }
   }
 
-  function setFrame(f, m, p) {
-    var e = easeOut(p);
-    var ry = m.size * ERODE_Y_EM * (1 - e);
-    var rx = m.stem * ERODE_X_STEM * (1 - e);
-    var b = m.stem * BLUR_STEM * (1 - e);
-    var gain = 1 + 11 * (1 - e);
-    var bias = -5 * (1 - e);
-    f.erode.setAttribute("radius", rx.toFixed(2) + " " + ry.toFixed(2));
-    f.blur.setAttribute("stdDeviation", b.toFixed(2));
-    f.alpha.setAttribute("values",
-      "1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 " + gain.toFixed(3) + " " + bias.toFixed(3));
+  // Median horizontal run of ink = stroke width in canvas pixels.
+  function strokeWidth(alpha, W, H) {
+    var runs = [];
+    for (var y = 0; y < H; y += 2) {
+      var run = 0;
+      for (var x = 0; x < W; x++) {
+        if (alpha[y * W + x] >= 110) run++;
+        else if (run) { runs.push(run); run = 0; }
+      }
+      if (run) runs.push(run);
+    }
+    if (!runs.length) return 1;
+    runs.sort(function (a, b) { return a - b; });
+    return runs[runs.length >> 1];
+  }
+
+  function distanceMap(alpha, W, H, aspect) {
+    var INF = 1e12;
+    var grid = new Float32Array(W * H);
+    for (var i = 0; i < W * H; i++) grid[i] = alpha[i] >= 110 ? INF : 0;
+    var len = Math.max(W, H);
+    var f = new Float64Array(len), d = new Float64Array(len);
+    var v = new Int32Array(len), z = new Float64Array(len + 1);
+    var x, y;
+    for (x = 0; x < W; x++) {
+      for (y = 0; y < H; y++) f[y] = grid[y * W + x];
+      dt1d(f, H, 1, d, v, z);
+      for (y = 0; y < H; y++) grid[y * W + x] = d[y];
+    }
+    var w2 = aspect * aspect;
+    for (y = 0; y < H; y++) {
+      var row = y * W;
+      for (x = 0; x < W; x++) f[x] = grid[row + x];
+      dt1d(f, W, w2, d, v, z);
+      for (x = 0; x < W; x++) grid[row + x] = Math.sqrt(d[x]);
+    }
+    return grid;
+  }
+
+  function hasAbsoluteChild(el) {
+    var kids = el.children;
+    for (var i = 0; i < kids.length; i++) {
+      var p = getComputedStyle(kids[i]).position;
+      if (p === "absolute" || p === "fixed") return true;
+    }
+    return false;
+  }
+
+  function prepare(item) {
+    var el = item.el;
+    var boxes = [];
+    item.chars.forEach(function (c) {
+      if (!c.isConnected) return;
+      var r = c.getClientRects()[0];
+      if (r && r.width) boxes.push({ c: c, r: r });
+    });
+    if (!boxes.length) return null;
+    if (getComputedStyle(el).position === "static" && hasAbsoluteChild(el)) return null;
+
+    var rect = el.getBoundingClientRect();
+    var scale = el.offsetWidth ? rect.width / el.offsetWidth : 1;
+    if (!(scale > 0.05)) scale = 1;
+
+    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, maxFs = 0;
+    boxes.forEach(function (b) {
+      minX = Math.min(minX, b.r.left); minY = Math.min(minY, b.r.top);
+      maxX = Math.max(maxX, b.r.right); maxY = Math.max(maxY, b.r.bottom);
+      b.cs = getComputedStyle(b.c);
+      b.fs = parseFloat(b.cs.fontSize) || 16;
+      maxFs = Math.max(maxFs, b.fs);
+    });
+    var pad = maxFs * 0.35 * scale;
+    minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+
+    var cssW = (maxX - minX) / scale, cssH = (maxY - minY) / scale;
+    var res = Math.min(2, window.devicePixelRatio || 1);
+    if (cssW * cssH * res * res > MAX_PIXELS) res = Math.sqrt(MAX_PIXELS / (cssW * cssH));
+    var W = Math.max(1, Math.ceil(cssW * res)), H = Math.max(1, Math.ceil(cssH * res));
+
+    var canvas = document.createElement("canvas");
+    canvas.className = "ink-canvas";
+    canvas.setAttribute("aria-hidden", "true");
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.setTransform(res, 0, 0, res, 0, 0);
+    ctx.textBaseline = "alphabetic";
+
+    var cells = [];
+    boxes.forEach(function (b, i) {
+      var cs = b.cs;
+      ctx.font = cs.fontStyle + " " + cs.fontWeight + " " + b.fs + "px " + cs.fontFamily;
+      ctx.fillStyle = cs.color;
+      var ch = transformCase(b.c.textContent, cs, b.c);
+      var m = ctx.measureText(ch);
+      var ascent = m.fontBoundingBoxAscent != null ? m.fontBoundingBoxAscent : b.fs * 0.8;
+      var x = (b.r.left - minX) / scale, top = (b.r.top - minY) / scale;
+      ctx.fillText(ch, x, top + ascent);
+      var w = b.r.width / scale, h = b.r.height / scale;
+      cells.push({
+        i: i,
+        x0: Math.floor((x - b.fs * 0.08) * res), x1: Math.ceil((x + w + b.fs * 0.08) * res),
+        y0: Math.floor((top - b.fs * 0.25) * res), y1: Math.ceil((top + h + b.fs * 0.25) * res)
+      });
+    });
+
+    var img;
+    try { img = ctx.getImageData(0, 0, W, H); } catch (e) { return null; }
+    var data = img.data;
+    var size = W * H;
+    var alpha = new Uint8Array(size);
+    var k;
+    for (k = 0; k < size; k++) alpha[k] = data[k * 4 + 3];
+
+    // Which letter owns each ink pixel, for the left-to-right stagger.
+    var owner = new Int16Array(size).fill(-1);
+    cells.forEach(function (c) {
+      for (var y = Math.max(0, c.y0); y < Math.min(H, c.y1); y++) {
+        for (var x = Math.max(0, c.x0); x < Math.min(W, c.x1); x++) {
+          var p = y * W + x;
+          if (alpha[p] && owner[p] < 0) owner[p] = c.i;
+        }
+      }
+    });
+
+    // Thin faces need taller drops, otherwise stems appear full-length at once.
+    var capHeight = maxFs * 0.7 * res;
+    var aspect = Math.max(MIN_ASPECT, 1.3 * capHeight / Math.max(1, strokeWidth(alpha, W, H)));
+    var dist = distanceMap(alpha, W, H, aspect);
+    var count = 0;
+    for (k = 0; k < size; k++) if (alpha[k]) count++;
+    var inkIdx = new Int32Array(count), inkOwner = new Int16Array(count);
+    var inkDist = new Float32Array(count), inkAlpha = new Uint8Array(count);
+    var letterMax = new Float32Array(boxes.length), j = 0;
+    for (var y = 0; y < H; y++) {
+      var last = 0;
+      for (var x = 0; x < W; x++) {
+        var p = y * W + x;
+        if (!alpha[p]) continue;
+        if (owner[p] < 0) owner[p] = last;
+        last = owner[p];
+        inkIdx[j] = p; inkOwner[j] = owner[p]; inkDist[j] = dist[p]; inkAlpha[j] = alpha[p];
+        if (dist[p] > letterMax[owner[p]]) letterMax[owner[p]] = dist[p];
+        j++;
+      }
+    }
+    for (k = 0; k < size; k++) data[k * 4 + 3] = 0;
+
+    canvas.style.cssText =
+      "position:absolute;pointer-events:none;margin:0;padding:0;border:0;max-width:none;" +
+      "left:" + ((minX - rect.left) / scale - el.clientLeft) + "px;" +
+      "top:" + ((minY - rect.top) / scale - el.clientTop) + "px;" +
+      "width:" + cssW + "px;height:" + cssH + "px;";
+
+    return {
+      canvas: canvas, ctx: ctx, img: img, data: data, count: boxes.length,
+      inkIdx: inkIdx, inkOwner: inkOwner, inkDist: inkDist, inkAlpha: inkAlpha,
+      letterMax: letterMax, // each letter starts from its own thickest stem, so order stays left to right
+      radius: new Float32Array(boxes.length), fade: new Float32Array(boxes.length)
+    };
+  }
+
+  function easeOut(t) { return 1 - (1 - t) * (1 - t); }
+  function smooth(a, b, v) { var t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); }
+
+  function drawFrame(item, now) {
+    var s = item.scene;
+    var t = now - item.start;
+    var radius = s.radius, fade = s.fade;
+    for (var i = 0; i < s.count; i++) {
+      var raw = (t - i * item.stagger) / DURATION;
+      var p = Math.max(0, Math.min(1, raw));
+      // Not started yet: fully hidden. Then the thickest stems surface as drops within a few frames.
+      radius[i] = raw <= 0 ? s.letterMax[i] + 1 : s.letterMax[i] * (1 - easeOut(p));
+      fade[i] = smooth(0.7, 1, p);
+    }
+    var data = s.data, idx = s.inkIdx, own = s.inkOwner, dist = s.inkDist, al = s.inkAlpha;
+    for (var k = 0; k < idx.length; k++) {
+      var o = own[k];
+      var vis = dist[k] - radius[o] + 0.5;
+      vis = vis <= 0 ? 0 : vis >= 1 ? 1 : vis;
+      if (fade[o] > vis) vis = fade[o];
+      data[idx[k] * 4 + 3] = al[k] * vis;
+    }
+    s.ctx.putImageData(s.img, 0, 0);
+    return t >= item.total;
+  }
+
+  function loop() {
+    rafId = 0;
+    var now = performance.now();
+    for (var i = running.length - 1; i >= 0; i--) {
+      var item = running[i];
+      if (item.state !== "running") { running.splice(i, 1); continue; }
+      // Another script rewrote the text (counters, language switch): show the live text.
+      if (!item.chars[0].isConnected || !item.chars[item.chars.length - 1].isConnected) {
+        finish(item); running.splice(i, 1); continue;
+      }
+      if (drawFrame(item, now)) { finish(item); running.splice(i, 1); }
+    }
+    if (running.length) rafId = requestAnimationFrame(loop);
   }
 
   function finish(item) {
     item.state = "done";
-    item.h.classList.remove("ink-pending", "ink-running");
-    item.h.classList.add("ink-done");
-    item.units.forEach(function (u) { u.style.filter = ""; });
-    item.filters.forEach(function (f) { if (f.node.parentNode) f.node.parentNode.removeChild(f.node); });
-    item.filters = [];
+    item.chars.forEach(function (c) { c.classList.remove("ink-hide"); });
+    if (item.scene && item.scene.canvas.parentNode) item.scene.canvas.parentNode.removeChild(item.scene.canvas);
+    if (item.restorePosition != null) item.el.style.position = item.restorePosition;
+    item.scene = null;
   }
 
   function play(item) {
     if (item.state !== "pending") return;
-    item.state = "running";
-    var units = Array.from(item.h.querySelectorAll(".ink-u"));
-    if (!units.length) { finish(item); return; }
-    var m = metrics(item.h);
-    var stagger = Math.min(110, 1200 / units.length);
-    item.units = units;
-    item.filters = units.map(function (u) {
-      var f = makeFilter();
-      setFrame(f, m, 0);
-      u.style.filter = "url(#" + f.id + ")";
-      return f;
-    });
-    item.h.classList.add("ink-running");
-    item.h.classList.remove("ink-pending");
-    var start = performance.now();
-    var total = DURATION + stagger * (units.length - 1);
-
-    function tick(now) {
-      if (item.state !== "running") return;
-      var t = now - start;
-      for (var i = 0; i < units.length; i++) {
-        var p = Math.max(0, Math.min(1, (t - i * stagger) / DURATION));
-        setFrame(item.filters[i], m, p);
-      }
-      if (t >= total) finish(item);
-      else requestAnimationFrame(tick);
+    var scene = null;
+    try { scene = prepare(item); } catch (e) { scene = null; }
+    if (!scene || !scene.inkIdx.length) { finish(item); return; }
+    var el = item.el;
+    if (getComputedStyle(el).position === "static") {
+      item.restorePosition = el.style.position;
+      el.style.position = "relative";
     }
-    requestAnimationFrame(tick);
+    el.appendChild(scene.canvas);
+    item.scene = scene;
+    item.state = "running";
+    item.stagger = Math.min(110, 1300 / scene.count);
+    item.total = DURATION + item.stagger * (scene.count - 1);
+    item.start = performance.now();
+    drawFrame(item, item.start);
+    running.push(item);
+    if (!rafId) rafId = requestAnimationFrame(loop);
   }
+
+  /* ---------- triggering ---------- */
 
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (!entry.isIntersecting) return;
       var tall = entry.boundingClientRect.height > window.innerHeight * 0.6;
-      if (entry.intersectionRatio < 0.35 && !tall) return;
+      // Text inside clipped tiles may never reach 35% visible; a large enough visible piece counts too.
+      var seen = entry.intersectionRect.width * entry.intersectionRect.height;
+      var big = seen >= window.innerWidth * window.innerHeight * 0.015;
+      if (entry.intersectionRatio < 0.35 && !tall && !big) return;
       var item = entry.target.__ink;
       if (!item) return;
       io.unobserve(entry.target);
       play(item);
     });
-  }, { threshold: [0, 0.35, 0.7], rootMargin: "0px 0px -10% 0px" });
+  }, { threshold: [0, 0.1, 0.2, 0.35, 0.7] });
 
-  function resplitAfterTextChange() {
-    managed.forEach(function (item) {
-      if (item.h.textContent === item.text && item.h.querySelector(".ink-u")) return;
-      if (item.state === "running") {
-        item.state = "done";
-        item.filters.forEach(function (f) { if (f.node.parentNode) f.node.parentNode.removeChild(f.node); });
-        item.filters = [];
-        item.h.classList.remove("ink-running");
-        item.h.classList.add("ink-done");
-      }
-      if (item.state === "pending") split(item);
-      else item.text = item.h.textContent;
+  // A language switch rewrites text: unrevealed blocks are rebuilt, the rest stay as plain text.
+  function afterTextChange() {
+    managed = managed.filter(function (item) {
+      var intact = item.chars.every(function (c) { return c.isConnected; });
+      if (intact) return true;
+      if (item.state === "running") finish(item);
+      if (item.state === "pending") { io.unobserve(item.el); item.el.__ink = null; return false; }
+      return true;
     });
+    scan(document.body);
   }
 
   function whenPageVisible(cb) {
@@ -227,52 +398,47 @@
     };
     if (!busy()) { cb(); return; }
     var done = false;
+    var mo;
     var go = function () { if (done) return; done = true; mo.disconnect(); setTimeout(cb, 80); };
-    var mo = new MutationObserver(function () { if (!busy()) go(); });
+    mo = new MutationObserver(function () { if (!busy()) go(); });
     mo.observe(root, { attributes: true, attributeFilter: ["class"] });
     setTimeout(go, 2500);
   }
 
-  var observing = false;
-
-  function adopt(h) {
-    if (h.__ink || !eligible(h)) return;
-    var item = { h: h, state: "pending", units: [], filters: [], text: "" };
-    h.__ink = item;
-    split(item);
-    managed.push(item);
-    root.classList.add("ink-on");
-    if (observing) io.observe(h);
-  }
-
-  function adoptWithin(node) {
-    if (node.nodeType !== 1) return;
-    if (node.matches("h1, h2")) adopt(node);
-    Array.from(node.querySelectorAll("h1, h2")).forEach(adopt);
-  }
-
   function init() {
-    var scope = document.body;
-    adoptWithin(scope);
-    // Galleries and expanded panels build their section titles after load.
+    scan(document.body);
+
+    // Galleries and expanded panels build their titles after load.
+    var queue = [], queued = false;
     new MutationObserver(function (records) {
-      records.forEach(function (r) { Array.from(r.addedNodes).forEach(adoptWithin); });
-    }).observe(scope, { childList: true, subtree: true });
+      records.forEach(function (r) {
+        Array.prototype.forEach.call(r.addedNodes, function (node) {
+          if (node.nodeType === 1 && (node.classList.contains("ink-c") || node.classList.contains("ink-canvas"))) return;
+          var target = node.nodeType === 3 ? node.parentElement : node;
+          if (target && target.nodeType === 1) queue.push(target);
+        });
+      });
+      if (queue.length && !queued) {
+        queued = true;
+        requestAnimationFrame(function () {
+          var list = queue; queue = []; queued = false;
+          list.forEach(function (node) { if (node.isConnected) scan(node); });
+        });
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+
     var start = function () {
       observing = true;
-      managed.forEach(function (item) { if (item.state === "pending") io.observe(item.h); });
+      managed.forEach(function (item) { if (item.state === "pending") io.observe(item.el); });
     };
     var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     fontsReady.then(function () { whenPageVisible(start); });
   }
 
-  window.addEventListener("cosgral:langchange", resplitAfterTextChange);
-  window.addEventListener("cosgral:i18n-ready", resplitAfterTextChange);
+  window.addEventListener("cosgral:langchange", afterTextChange);
+  window.addEventListener("cosgral:i18n-ready", afterTextChange);
 
-  // Loaded at the end of <body>: split before first paint so headings never flash.
-  if (document.readyState === "loading" && !document.querySelector("main")) {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+  // Loaded at the end of <body>: split before first paint so nothing flashes.
+  if (document.body) init();
+  else document.addEventListener("DOMContentLoaded", init);
 })();
