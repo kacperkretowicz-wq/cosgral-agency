@@ -1,0 +1,3 @@
+/* Ink reveal for H1/H2 (heading-ink.js). Letters stay inline so kerning is untouched. */
+html.ink-on .ink-pending .ink-u { opacity: 0; }
+.ink-running .ink-u { will-change: filter; }
