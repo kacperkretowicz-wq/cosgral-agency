@@ -1,0 +1,7 @@
+/* Complete cards cropped from the supplied artwork; keep live labels for accessibility and service interactions. */
+.art-tile.art-tile--uploaded{aspect-ratio:1;background:#090909;border:0;border-radius:0}
+.art-tile--uploaded .art-tile__art{inset:0;transform:none!important;transition:none}
+.art-tile--uploaded .service-illustration{width:100%;height:100%;object-fit:fill;mask-image:none;-webkit-mask-image:none;animation:none!important;transform:none!important}
+.art-tile--uploaded::before,.art-tile--uploaded::after{display:none!important}
+.art-tile--uploaded .art-tile__top,.art-tile--uploaded .art-tile__label{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+.art-tile--uploaded:focus-visible{outline:3px solid #ff512b;outline-offset:4px}
