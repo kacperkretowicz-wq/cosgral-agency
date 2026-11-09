@@ -1,3 +1,4 @@
-/* Ink reveal (heading-ink.js). Letters stay inline so kerning and fonts are untouched;
+/* Ink reveal + fade (heading-ink.js). Letters stay inline so kerning and fonts are untouched;
    while a block animates, its letters are drawn on a temporary canvas instead. */
 html.ink-on .ink-hide { opacity: 0; }
+html.fx-on .fx-wait { opacity: 0 !important; }

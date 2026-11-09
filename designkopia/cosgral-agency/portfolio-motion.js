@@ -3,7 +3,7 @@
  * spreads its layers across that one number: the outline numeral far behind,
  * the artwork in the middle, the copy in front; --ex makes the artwork flee
  * past the screen edges early in a slide and gather again as it lands.
- * Headings are poured: an outline first, then liquid rising inside the letters.
+ * Chapter titles are inked by heading-ink.js each time their chapter activates.
  */
 (function () {
   "use strict";
@@ -21,79 +21,7 @@
     mark.setAttribute("aria-hidden", "true");
     mark.textContent = (i < 9 ? "0" : "") + (i + 1);
     chapter.insertBefore(mark, chapter.firstChild);
-    splitTitle(chapter.querySelector(".portfolio-chapter__title"));
   });
-
-  /* Words in masks; re-split when the language switch rewrites the text */
-  function splitTitle(title) {
-    if (!title) return;
-    var busy = false;
-    function split() {
-      if (title.querySelector(".pf-w")) return;
-      var text = title.textContent.replace(/\s+/g, " ").trim();
-      if (!text) return;
-      busy = true;
-      title.setAttribute("aria-label", text);
-      title.textContent = "";
-      text.split(" ").forEach(function (word, i) {
-        if (i) title.appendChild(document.createTextNode(" "));
-        var outer = document.createElement("span");
-        outer.className = "pf-w";
-        outer.setAttribute("aria-hidden", "true");
-        var inner = document.createElement("span");
-        inner.className = "pf-w__i pf-liq";
-        inner.style.setProperty("--wi", i);
-        fillLiquid(inner, word);
-        outer.appendChild(inner);
-        title.appendChild(outer);
-      });
-      busy = false;
-    }
-    split();
-    new MutationObserver(function () { if (!busy) split(); }).observe(title, { childList: true, characterData: true, subtree: true });
-  }
-
-  function fillLiquid(host, text) {
-    host.textContent = "";
-    var outline = document.createElement("span");
-    outline.className = "pf-liq__o";
-    outline.textContent = text;
-    var fill = document.createElement("span");
-    fill.className = "pf-liq__f";
-    fill.setAttribute("aria-hidden", "true");
-    fill.textContent = text;
-    host.appendChild(outline);
-    host.appendChild(fill);
-  }
-
-  /* Headings built later (opened chapters, case copy) pour in once */
-  var POURED = ".expand-gallery__heading, .sys-fan__title, .expand-deck__name, .expand-web-panel__title, .portfolio-contact-cta h2";
-  function pour(el) {
-    if (el.querySelector(".pf-liq")) return;
-    var text = el.textContent.replace(/\s+/g, " ").trim();
-    if (!text) return;
-    var host = document.createElement("span");
-    host.className = "pf-liq pf-liq--block";
-    fillLiquid(host, text);
-    el.textContent = "";
-    el.appendChild(host);
-    if (reduced) { host.classList.add("is-poured"); return; }
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { host.classList.add("is-poured"); });
-    });
-  }
-  function scan(node) {
-    if (!node || node.nodeType !== 1) return;
-    if (node.matches && node.matches(POURED)) pour(node);
-    if (node.querySelectorAll) Array.prototype.forEach.call(node.querySelectorAll(POURED), pour);
-  }
-  scan(document.body);
-  new MutationObserver(function (records) {
-    records.forEach(function (r) {
-      if (r.target.nodeType === 1 && r.target.matches && r.target.matches(POURED)) pour(r.target);
-      Array.prototype.forEach.call(r.addedNodes, scan);
-    });
-  }).observe(document.body, { childList: true, subtree: true });
 
   function update() {
     raf = 0;

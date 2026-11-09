@@ -4,6 +4,7 @@
  * strokes and joins arrive last. Rendered on a temporary canvas: glyphs are
  * drawn once, an anisotropic distance map is computed once, and every frame is
  * a threshold of that map, so the motion is continuous in every browser.
+ * Everything else (smaller text, images, video) fades up as it enters.
  */
 (function () {
   "use strict";
@@ -15,12 +16,15 @@
   var SKIP = [
     "script", "style", "noscript", "template", "svg", "canvas", "select", "textarea", "input", "option",
     "nav", "[role='dialog']", "[hidden]", ".visually-hidden", "[data-no-ink]",
-    ".home-hero__title", ".faq-scroll__stage", ".pf-liq", ".pf-w",
+    ".home-hero__title", ".faq-scroll__stage",
     "[class*='site-chat']", "[class*='cookie']"
   ].join(",");
-  var MIN_PX = 24;
-  var MIN_HEADING_PX = 20;
-  var DURATION = 1700;
+  var narrow = window.matchMedia("(max-width: 700px)").matches;
+  // Body copy is 16-22px on desktop and 16-17px on phones; display text sits above that.
+  var MIN_PX = narrow ? 20 : 24;
+  var MIN_HEADING_PX = narrow ? 18 : 20;
+  var DURATION = 1150;
+  var CHAPTER_DELAY = 450; // Realizacje: let the chapter slide in before its title is inked
   var MIN_ASPECT = 6;      // drops are at least 6x taller than wide
   var MAX_PIXELS = 900000; // per canvas, keeps the one-off distance pass short on phones
   var HAS_LETTER = /[A-Za-z0-9À-ɏЀ-ӿ]/;
@@ -74,7 +78,7 @@
   }
 
   function adopt(block, nodes) {
-    var item = { el: block, state: "pending", chars: [] };
+    var item = { el: block, state: "pending", chars: [], chapter: block.closest(".portfolio-chapter") };
     block.__ink = item;
     nodes.forEach(function (node) {
       if (!node.parentNode) return;
@@ -92,7 +96,50 @@
     if (!item.chars.length) { item.state = "done"; return; }
     managed.push(item);
     root.classList.add("ink-on");
-    if (observing) io.observe(block);
+    if (item.chapter) watchChapter(item);
+    else if (observing) io.observe(block);
+  }
+
+  /* Realizacje chapters replay their title every time the chapter becomes active. */
+  var chapterObserver = null;
+  function watchChapter(item) {
+    var ch = item.chapter;
+    if (!ch.__inkItems) {
+      ch.__inkItems = [];
+      ch.__inkActive = ch.classList.contains("is-active");
+      if (!chapterObserver) {
+        chapterObserver = new MutationObserver(function (records) {
+          records.forEach(function (r) { chapterChanged(r.target); });
+        });
+      }
+      chapterObserver.observe(ch, { attributes: true, attributeFilter: ["class"] });
+    }
+    ch.__inkItems.push(item);
+    if (observing && ch.__inkActive) schedule(item, CHAPTER_DELAY);
+  }
+
+  function chapterChanged(ch) {
+    var active = ch.classList.contains("is-active");
+    if (active === ch.__inkActive) return;
+    ch.__inkActive = active;
+    ch.__inkItems.forEach(function (item) {
+      if (active) { if (observing) schedule(item, CHAPTER_DELAY); }
+      else reset(item);
+    });
+  }
+
+  function schedule(item, delay) {
+    clearTimeout(item.timer);
+    item.timer = setTimeout(function () { play(item); }, delay);
+  }
+
+  function reset(item) {
+    clearTimeout(item.timer);
+    if (item.scene && item.scene.canvas.parentNode) item.scene.canvas.parentNode.removeChild(item.scene.canvas);
+    if (item.restorePosition != null) { item.el.style.position = item.restorePosition; item.restorePosition = null; }
+    item.scene = null;
+    item.state = "pending";
+    item.chars.forEach(function (c) { c.classList.add("ink-hide"); });
   }
 
   /* ---------- rendering ---------- */
@@ -338,7 +385,7 @@
     item.state = "done";
     item.chars.forEach(function (c) { c.classList.remove("ink-hide"); });
     if (item.scene && item.scene.canvas.parentNode) item.scene.canvas.parentNode.removeChild(item.scene.canvas);
-    if (item.restorePosition != null) item.el.style.position = item.restorePosition;
+    if (item.restorePosition != null) { item.el.style.position = item.restorePosition; item.restorePosition = null; }
     item.scene = null;
   }
 
@@ -355,7 +402,7 @@
     el.appendChild(scene.canvas);
     item.scene = scene;
     item.state = "running";
-    item.stagger = Math.min(110, 1300 / scene.count);
+    item.stagger = Math.min(75, 850 / scene.count);
     item.total = DURATION + item.stagger * (scene.count - 1);
     item.start = performance.now();
     drawFrame(item, item.start);
@@ -386,7 +433,13 @@
       var intact = item.chars.every(function (c) { return c.isConnected; });
       if (intact) return true;
       if (item.state === "running") finish(item);
-      if (item.state === "pending") { io.unobserve(item.el); item.el.__ink = null; return false; }
+      if (item.state === "pending") {
+        io.unobserve(item.el); clearTimeout(item.timer); item.el.__ink = null;
+        if (item.chapter && item.chapter.__inkItems) {
+          item.chapter.__inkItems = item.chapter.__inkItems.filter(function (x) { return x !== item; });
+        }
+        return false;
+      }
       return true;
     });
     scan(document.body);
@@ -405,8 +458,104 @@
     setTimeout(go, 2500);
   }
 
+  /* ---------- fade for everything else ---------- */
+
+  var FADE_SKIP = SKIP + "," + [
+    "[data-editorial-reveal]", "[data-reveal]", "[data-chapters-scroller]",
+    ".case-viz-tile__stage", ".home-hero", "button", "[role='button']"
+  ].join(",");
+  var fades = [];
+  var fadeQueue = [];
+  var fadeQueued = false;
+
+  function scriptAnimated(el) {
+    // GSAP and friends leave inline opacity/transform on what they animate.
+    for (var a = el; a && a !== document.body; a = a.parentElement) {
+      var st = a.style;
+      if (st && (st.opacity || st.transform || st.translate || st.visibility)) return true;
+    }
+    return false;
+  }
+
+  function fixedAncestor(el) {
+    for (var a = el; a && a !== document.body; a = a.parentElement) {
+      var pos = getComputedStyle(a).position;
+      if (pos === "fixed") return true;
+    }
+    return false;
+  }
+
+  function fadeScan(scope) {
+    if (!scope || scope.nodeType !== 1) return;
+    var found = [];
+    var walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, null);
+    var n;
+    while ((n = walker.nextNode())) {
+      if (!HAS_LETTER.test(n.nodeValue)) continue;
+      var el = n.parentElement;
+      if (!el || el.closest(".ink-c")) continue;
+      var block = blockOf(el);
+      if (block && found.indexOf(block) < 0) found.push(block);
+    }
+    Array.prototype.forEach.call(scope.querySelectorAll("img, video"), function (m) {
+      var host = m.parentElement && m.parentElement.tagName === "PICTURE" ? m.parentElement : m;
+      if (found.indexOf(host) < 0) found.push(host);
+    });
+    if (scope.matches && scope.matches("img, video") && found.indexOf(scope) < 0) found.push(scope);
+
+    var units = found.filter(function (el) {
+      if (el.__fx || el.__ink || el.closest(FADE_SKIP)) return false;
+      if (el.querySelector(".ink-c, h1, h2, h3")) return false;
+      var r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return false;
+      if ((el.tagName === "IMG" || el.tagName === "VIDEO") && r.width < 40 && r.height < 40) return false;
+      return !scriptAnimated(el) && !fixedAncestor(el);
+    });
+    // Only the innermost unit fades, so nothing is faded twice.
+    units = units.filter(function (el) {
+      return !units.some(function (other) { return other !== el && el.contains(other); });
+    });
+    units.forEach(function (el) {
+      el.__fx = true;
+      el.classList.add("fx-wait");
+      fades.push(el);
+      if (observing) fadeIO.observe(el);
+    });
+    if (units.length) root.classList.add("fx-on");
+  }
+
+  function reveal(el, delay) {
+    el.classList.remove("fx-wait");
+    if (!el.animate) return;
+    el.animate(
+      [{ opacity: 0, translate: "0 18px" }, { opacity: 1, translate: "0 0" }],
+      { duration: 700, delay: delay, easing: "cubic-bezier(.22,1,.36,1)", fill: "backwards" }
+    );
+  }
+
+  var fadeIO = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var seen = entry.intersectionRect.width * entry.intersectionRect.height;
+      if (entry.intersectionRatio < 0.2 && seen < window.innerWidth * window.innerHeight * 0.02) return;
+      fadeIO.unobserve(entry.target);
+      fadeQueue.push(entry.target);
+    });
+    if (fadeQueue.length && !fadeQueued) {
+      fadeQueued = true;
+      requestAnimationFrame(function () {
+        var batch = fadeQueue; fadeQueue = []; fadeQueued = false;
+        batch.sort(function (a, b) {
+          return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+        });
+        batch.forEach(function (el, i) { reveal(el, Math.min(i * 60, 420)); });
+      });
+    }
+  }, { threshold: [0, 0.2, 0.5] });
+
   function init() {
     scan(document.body);
+    fadeScan(document.body);
 
     // Galleries and expanded panels build their titles after load.
     var queue = [], queued = false;
@@ -414,6 +563,7 @@
       records.forEach(function (r) {
         Array.prototype.forEach.call(r.addedNodes, function (node) {
           if (node.nodeType === 1 && (node.classList.contains("ink-c") || node.classList.contains("ink-canvas"))) return;
+          if (node.nodeType === 3 && node.parentElement && node.parentElement.classList.contains("ink-c")) return;
           var target = node.nodeType === 3 ? node.parentElement : node;
           if (target && target.nodeType === 1) queue.push(target);
         });
@@ -422,14 +572,19 @@
         queued = true;
         requestAnimationFrame(function () {
           var list = queue; queue = []; queued = false;
-          list.forEach(function (node) { if (node.isConnected) scan(node); });
+          list.forEach(function (node) { if (node.isConnected) { scan(node); fadeScan(node); } });
         });
       }
     }).observe(document.body, { childList: true, subtree: true });
 
     var start = function () {
       observing = true;
-      managed.forEach(function (item) { if (item.state === "pending") io.observe(item.el); });
+      managed.forEach(function (item) {
+        if (item.state !== "pending") return;
+        if (item.chapter) { if (item.chapter.__inkActive) schedule(item, CHAPTER_DELAY); }
+        else io.observe(item.el);
+      });
+      fades.forEach(function (el) { fadeIO.observe(el); });
     };
     var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     fontsReady.then(function () { whenPageVisible(start); });
