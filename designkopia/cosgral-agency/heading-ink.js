@@ -16,7 +16,7 @@
   var SKIP = [
     "script", "style", "noscript", "template", "svg", "canvas", "select", "textarea", "input", "option",
     "nav", "[role='dialog']", "[hidden]", ".visually-hidden", "[data-no-ink]",
-    ".home-hero__title", ".faq-scroll__stage",
+    ".faq-scroll__stage",
     "[class*='site-chat']", "[class*='cookie']"
   ].join(",");
   var narrow = window.matchMedia("(max-width: 700px)").matches;
@@ -30,6 +30,8 @@
   var HAS_LETTER = /[A-Za-z0-9À-ɏЀ-ӿ]/;
 
   var managed = [];
+  // Home hero: COSGRAL is inked when the flying cube is nearly in place (cosgral:hero-title).
+  var heroItems = [], heroFx = [], heroStarted = false;
   var ownChars = typeof WeakSet === "function" ? new WeakSet() : null;
   var running = [];
   var observing = false;
@@ -79,7 +81,7 @@
   }
 
   function adopt(block, nodes) {
-    var item = { el: block, state: "pending", chars: [], chapter: block.closest(".portfolio-chapter") };
+    var item = { el: block, state: "pending", chars: [], chapter: block.closest(".portfolio-chapter"), hero: !!block.closest(".home-hero") };
     block.__ink = item;
     nodes.forEach(function (node) {
       if (!node.parentNode) return;
@@ -99,6 +101,7 @@
     managed.push(item);
     root.classList.add("ink-on");
     if (item.chapter) watchChapter(item);
+    else if (item.hero) { heroItems.push(item); if (heroStarted) play(item); }
     else if (observing) io.observe(block);
   }
 
@@ -473,7 +476,7 @@
   var FADE_SKIP = [
     "script", "style", "noscript", "template", "svg", "canvas", "select", "textarea", "input", "option",
     ".visually-hidden", "[data-no-ink]", "[class*='site-chat']", "[class*='cookie']", ".faq-scroll__stage",
-    ".portfolio-chapter__lead", ".portfolio-chapter__more"
+    ".portfolio-chapter__lead", ".portfolio-chapter__more", ".home-cube-poster"
   ].join(",");
   var fades = [];
   var menuUnits = [];
@@ -537,6 +540,7 @@
       el.classList.add("fx-wait");
       var chapter = el.closest(".portfolio-chapter");
       if (el.closest(".nav-overlay")) { menuUnits.push(el); return; }
+      if (el.closest(".home-hero")) { heroFx.push(el); if (heroStarted) reveal(el, 600); return; }
       if (chapter) {
         trackChapter(chapter);
         chapter.__fxUnits.push(el);
@@ -633,6 +637,20 @@
     });
   }
 
+  function heroGo() {
+    if (heroStarted) return;
+    heroStarted = true;
+    heroItems.forEach(function (item) { if (item.state === "pending") play(item); });
+    setTimeout(function () { revealAll(heroFx, 120); }, 600);
+  }
+
+  function startHero() {
+    var waitForCube = root.classList.contains("cube-fly") && document.getElementById("hero-3d") && !window.cosgralHeroTitle;
+    if (!waitForCube) { heroGo(); return; }
+    window.addEventListener("cosgral:hero-title", heroGo, { once: true });
+    setTimeout(heroGo, 5000);
+  }
+
   function init() {
     scan(document.body);
     fadeScan(document.body);
@@ -666,6 +684,7 @@
         else io.observe(item.el);
       });
       fades.forEach(function (el) { fadeIO.observe(el); });
+      startHero();
       document.querySelectorAll(".portfolio-chapter").forEach(function (ch) {
         if (ch.__fxUnits && ch.__inkActive) revealAll(ch.__fxUnits, 60);
       });

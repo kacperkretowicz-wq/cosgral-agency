@@ -20,6 +20,8 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
     renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
   } catch(error) {
     canvas.parentElement.classList.add('has-cube-fallback');
+    document.documentElement.classList.remove('cube-fly');window.cosgralHeroTitle=true;
+    window.dispatchEvent(new CustomEvent('cosgral:hero-title'));
     console.warn('COSGRAL: WebGL unavailable',error);
     window.dispatchEvent(new CustomEvent('cosgral:cube-intro-done'));
     return;
@@ -44,6 +46,10 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
   let menuChangedAt=0;
   let effectPauseUntil=0;
   let introStart=performance.now(),introDone=true,contextLost=false;
+  // Arrival: one slow arc from just outside the top-right corner to the resting pose.
+  const FLIGHT_MS=3400,flightTumble=new THREE.Quaternion().setFromEuler(new THREE.Euler(.9,-1.6,.4));
+  const flightQ=new THREE.Quaternion();
+  let flightState='idle',flightStart=0,heroTitleSent=false;
   let firstPaint=false,opaqueWarmMaterial=null,opaqueWarmReady=false;
   let frameRaf=0,ready=false;
   let pointerX=0,pointerY=0;
@@ -221,6 +227,21 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
     return{x:(left+right)/2,y:(top+bottom)/2,size:Math.min(right-left,bottom-top)};
   }
   function beginIntro(){if(introStart===null)introStart=performance.now();}
+  function sendHeroTitle(){
+    if(heroTitleSent)return;heroTitleSent=true;window.cosgralHeroTitle=true;
+    window.dispatchEvent(new CustomEvent('cosgral:hero-title'));
+  }
+  function showPosterFallback(){document.documentElement.classList.remove('cube-fly');sendHeroTitle();}
+  function applyFlight(k){
+    v.copy(pose.position).project(fullCamera);
+    const ex=(v.x*.5+.5)*width,ey=(-v.y*.5+.5)*height;
+    const sx=width*1.15,sy=-height*.2,cx=width,cy=height*.58;
+    const e=1-Math.pow(1-k,3),u=1-e;
+    screenPosition(u*u*sx+2*u*e*cx+e*e*ex,u*u*sy+2*u*e*cy+e*e*ey,.36,pose.position);
+    pose.scale*=.55+.45*e;
+    flightQ.copy(pose.quaternion).multiply(flightTumble).slerp(pose.quaternion,1-Math.pow(1-k,2.2));
+    pose.quaternion.copy(flightQ);
+  }
   window.cosgralCube={
     group,debug:{renderer,scene,camera,renderFrame:()=>renderer.render(scene,camera),fxaa:false,
       get chrome(){return {progress,metalness:glass?.material.metalness,roughness:glass?.material.roughness,
@@ -254,7 +275,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
       tileWidth=0;resize.deviceRatio=0;queueResize();
       canvas.parentElement.classList.remove('has-cube-fallback');contextLost=false;syncAmbient(true);requestFrame();
     } catch(error) {
-      canvas.parentElement.classList.add('has-cube-fallback');
+      canvas.parentElement.classList.add('has-cube-fallback');showPosterFallback();
       console.warn('COSGRAL: glass recovery failed',error);
     }
   });
@@ -266,7 +287,7 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
     syncAmbient(true);ready=true;
     requestAnimationFrame(()=>window.ScrollTrigger?.refresh());
   }catch(error){
-    canvas.parentElement.classList.add('has-cube-fallback');
+    canvas.parentElement.classList.add('has-cube-fallback');showPosterFallback();
     console.error('COSGRAL glass model could not load',error);introDone=true;
     window.dispatchEvent(new CustomEvent('cosgral:cube-intro-done'));return;
   }
@@ -296,6 +317,16 @@ import { createCubeMaterialStudy } from './home-cube-materials.js?v=20261019perf
     if(Math.abs(menuTarget-menuBlend)<0.0001)menuBlend=menuTarget;
     if(capturePoster)pointerX=pointerY=0;
     const time=capturePoster?0:now/1000;buildScrollPose(time);
+    if(flightState==='idle'){
+      // Only a fresh load at the top flies in; if the poster is already showing, take its place.
+      const fly=!capturePoster&&progress<.05&&!menuTarget&&document.documentElement.classList.contains('cube-fly');
+      if(fly){flightState='flying';flightStart=now;introDone=false;}else{flightState='done';sendHeroTitle();}
+    }
+    if(flightState==='flying'){
+      const k=menuTarget?1:clamp((now-flightStart)/FLIGHT_MS,0,1);
+      if(k>=.55)sendHeroTitle();
+      if(k<1)applyFlight(k);else{flightState='done';introDone=true;sendHeroTitle();}
+    }
     if(menuBlend>0){
       const mb=smooth(0,1,menuBlend);screenPosition(width*0.5,height*0.49,0.36,v);
       const breathing=reduced?0:Math.sin(time*0.65);

@@ -343,6 +343,8 @@ html.is-hero-cube-focus .cg-chat-root:not(:hover):not(:focus-within) .cg-chat-la
 .home-cube-poster {position:absolute;left:50%;top:30%;width:min(47.006vw,calc(var(--stable-vh, 1svh) * 51.555));transform:translate(-50%,-50%);display:block;pointer-events:none;opacity:1;transition:opacity .12s linear;}
 .home-cube-poster img {display:block;width:100%;height:auto;}
 html.has-hero-cube-frame .home-cube-poster {opacity:0;}
+/* The cube flies in on load (home-hero-3d.js), so the resting poster stays hidden unless WebGL fails. */
+html.cube-fly .home-cube-poster {opacity:0;transition:none;}
 @media(max-width:900px){.home-cube-poster {top:31%;width:min(90.256vw,calc(var(--stable-vh, 1svh) * 42.753));}}
 @media(prefers-reduced-motion:reduce){.home-cube-poster {transition:none;}}
 
