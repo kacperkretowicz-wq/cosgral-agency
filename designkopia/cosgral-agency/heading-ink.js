@@ -30,6 +30,7 @@
   var HAS_LETTER = /[A-Za-z0-9À-ɏЀ-ӿ]/;
 
   var managed = [];
+  var ownChars = typeof WeakSet === "function" ? new WeakSet() : null;
   var running = [];
   var observing = false;
   var rafId = 0;
@@ -88,6 +89,7 @@
         var c = document.createElement("span");
         c.className = "ink-c ink-hide";
         c.textContent = ch;
+        if (ownChars) ownChars.add(c);
         frag.appendChild(c);
         item.chars.push(c);
       });
@@ -102,18 +104,22 @@
 
   /* Realizacje chapters replay their title every time the chapter becomes active. */
   var chapterObserver = null;
+  function trackChapter(ch) {
+    if (ch.__inkItems) return;
+    ch.__inkItems = [];
+    ch.__fxUnits = [];
+    ch.__inkActive = ch.classList.contains("is-active");
+    if (!chapterObserver) {
+      chapterObserver = new MutationObserver(function (records) {
+        records.forEach(function (r) { chapterChanged(r.target); });
+      });
+    }
+    chapterObserver.observe(ch, { attributes: true, attributeFilter: ["class"] });
+  }
+
   function watchChapter(item) {
     var ch = item.chapter;
-    if (!ch.__inkItems) {
-      ch.__inkItems = [];
-      ch.__inkActive = ch.classList.contains("is-active");
-      if (!chapterObserver) {
-        chapterObserver = new MutationObserver(function (records) {
-          records.forEach(function (r) { chapterChanged(r.target); });
-        });
-      }
-      chapterObserver.observe(ch, { attributes: true, attributeFilter: ["class"] });
-    }
+    trackChapter(ch);
     ch.__inkItems.push(item);
     if (observing && ch.__inkActive) schedule(item, CHAPTER_DELAY);
   }
@@ -126,6 +132,9 @@
       if (active) { if (observing) schedule(item, CHAPTER_DELAY); }
       else reset(item);
     });
+    clearTimeout(ch.__fxTimer);
+    if (active) { if (observing) ch.__fxTimer = setTimeout(function () { revealAll(ch.__fxUnits, 60); }, CHAPTER_DELAY); }
+    else ch.__fxUnits.forEach(hideUnit);
   }
 
   function schedule(item, delay) {
@@ -460,29 +469,20 @@
 
   /* ---------- fade for everything else ---------- */
 
-  var FADE_SKIP = SKIP + "," + [
-    "[data-editorial-reveal]", "[data-reveal]", "[data-chapters-scroller]",
-    ".case-viz-tile__stage", ".home-hero", "button", "[role='button']"
+  // Only things that are not visible page text, plus the two chapter blocks that already fade with CSS.
+  var FADE_SKIP = [
+    "script", "style", "noscript", "template", "svg", "canvas", "select", "textarea", "input", "option",
+    ".visually-hidden", "[data-no-ink]", "[class*='site-chat']", "[class*='cookie']", ".faq-scroll__stage",
+    ".portfolio-chapter__lead", ".portfolio-chapter__more"
   ].join(",");
   var fades = [];
+  var menuUnits = [];
   var fadeQueue = [];
   var fadeQueued = false;
 
+  // Another script already drives this element's own opacity (GSAP leaves it inline).
   function scriptAnimated(el) {
-    // GSAP and friends leave inline opacity/transform on what they animate.
-    for (var a = el; a && a !== document.body; a = a.parentElement) {
-      var st = a.style;
-      if (st && (st.opacity || st.transform || st.translate || st.visibility)) return true;
-    }
-    return false;
-  }
-
-  function fixedAncestor(el) {
-    for (var a = el; a && a !== document.body; a = a.parentElement) {
-      var pos = getComputedStyle(a).position;
-      if (pos === "fixed") return true;
-    }
-    return false;
+    return !!(el.style && (el.style.opacity || el.style.visibility));
   }
 
   function fadeScan(scope) {
@@ -494,8 +494,20 @@
       if (!HAS_LETTER.test(n.nodeValue)) continue;
       var el = n.parentElement;
       if (!el || el.closest(".ink-c")) continue;
+      if (el.classList.contains("fx-in")) { if (found.indexOf(el) < 0) found.push(el); continue; }
       var block = blockOf(el);
-      if (block && found.indexOf(block) < 0) found.push(block);
+      if (!block) continue;
+      // Small text inside an inked block (e.g. "01" next to a big name) fades on its own.
+      if (block.__ink) {
+        if (el.closest(FADE_SKIP)) continue;
+        var wrap = document.createElement("span");
+        wrap.className = "fx-in";
+        n.parentNode.insertBefore(wrap, n);
+        wrap.appendChild(n);
+        found.push(wrap);
+        continue;
+      }
+      if (found.indexOf(block) < 0) found.push(block);
     }
     Array.prototype.forEach.call(scope.querySelectorAll("img, video"), function (m) {
       var host = m.parentElement && m.parentElement.tagName === "PICTURE" ? m.parentElement : m;
@@ -506,32 +518,90 @@
     var units = found.filter(function (el) {
       if (el.__fx || el.__ink || el.closest(FADE_SKIP)) return false;
       if (el.querySelector(".ink-c, h1, h2, h3")) return false;
+      // Hidden-at-load content (accordions, panels, menu) is adopted too and fades when it appears.
       var r = el.getBoundingClientRect();
-      if (!r.width || !r.height) return false;
-      if ((el.tagName === "IMG" || el.tagName === "VIDEO") && r.width < 40 && r.height < 40) return false;
-      return !scriptAnimated(el) && !fixedAncestor(el);
+      if ((el.tagName === "IMG" || el.tagName === "VIDEO") && r.width && r.width < 40 && r.height < 40) return false;
+      return !scriptAnimated(el);
     });
-    // Only the innermost unit fades, so nothing is faded twice.
+    // Only the innermost unit fades, so nothing is faded twice. A container dropped for that
+    // reason may still hold loose text of its own (e.g. "01" beside a <b> name): wrap it.
+    var loose = [];
     units = units.filter(function (el) {
-      return !units.some(function (other) { return other !== el && el.contains(other); });
+      var inner = units.some(function (other) { return other !== el && el.contains(other); });
+      if (inner) looseText(el, units).forEach(function (w) { loose.push(w); });
+      return !inner;
     });
+    units = units.concat(loose);
     units.forEach(function (el) {
       el.__fx = true;
       el.classList.add("fx-wait");
+      var chapter = el.closest(".portfolio-chapter");
+      if (el.closest(".nav-overlay")) { menuUnits.push(el); return; }
+      if (chapter) {
+        trackChapter(chapter);
+        chapter.__fxUnits.push(el);
+        if (observing && chapter.__inkActive) {
+          clearTimeout(chapter.__fxTimer);
+          chapter.__fxTimer = setTimeout(function () { revealAll(chapter.__fxUnits, 60); }, CHAPTER_DELAY);
+        }
+        return;
+      }
       fades.push(el);
       if (observing) fadeIO.observe(el);
     });
     if (units.length) root.classList.add("fx-on");
   }
 
+  function looseText(container, units) {
+    var out = [];
+    var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
+    var nodes = [];
+    var n;
+    while ((n = walker.nextNode())) {
+      if (!HAS_LETTER.test(n.nodeValue)) continue;
+      var el = n.parentElement;
+      if (!el || el.closest(".ink-c, .fx-in")) continue;
+      if (blockOf(el) !== container) continue;
+      if (units.some(function (u) { return u !== container && u.contains(n); })) continue;
+      nodes.push(n);
+    }
+    nodes.forEach(function (node) {
+      var wrap = document.createElement("span");
+      wrap.className = "fx-in";
+      node.parentNode.insertBefore(wrap, node);
+      wrap.appendChild(node);
+      out.push(wrap);
+    });
+    return out;
+  }
+
   function reveal(el, delay) {
+    if (el.__fxAnim) el.__fxAnim.cancel();
     el.classList.remove("fx-wait");
     if (!el.animate) return;
-    el.animate(
+    el.__fxAnim = el.animate(
       [{ opacity: 0, translate: "0 18px" }, { opacity: 1, translate: "0 0" }],
       { duration: 700, delay: delay, easing: "cubic-bezier(.22,1,.36,1)", fill: "backwards" }
     );
   }
+
+  function hideUnit(el) {
+    if (el.__fxAnim) { el.__fxAnim.cancel(); el.__fxAnim = null; }
+    el.classList.add("fx-wait");
+  }
+
+  function revealAll(list, step) {
+    list.filter(function (el) { return el.isConnected; }).forEach(function (el, i) {
+      reveal(el, Math.min(i * step, 500));
+    });
+  }
+
+  // The menu is not scrolled into view: its items fade in on every open.
+  window.addEventListener("cosgral:menu-state", function (e) {
+    if (!e.detail || !e.detail.open || !menuUnits.length) return;
+    menuUnits.forEach(hideUnit);
+    setTimeout(function () { revealAll(menuUnits, 50); }, 120);
+  });
 
   var fadeIO = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
@@ -553,6 +623,16 @@
     }
   }, { threshold: [0, 0.2, 0.5] });
 
+  // Galleries clone their items: copies of hidden letters or blocks are not tracked, so show them.
+  function releaseClones(node) {
+    var list = Array.prototype.slice.call(node.querySelectorAll(".fx-wait, .ink-hide"));
+    if (node.matches(".fx-wait, .ink-hide")) list.push(node);
+    list.forEach(function (el) {
+      if (el.classList.contains("fx-wait") && !el.__fx) el.classList.remove("fx-wait");
+      if (el.classList.contains("ink-hide") && ownChars && !ownChars.has(el)) el.classList.remove("ink-hide");
+    });
+  }
+
   function init() {
     scan(document.body);
     fadeScan(document.body);
@@ -562,7 +642,8 @@
     new MutationObserver(function (records) {
       records.forEach(function (r) {
         Array.prototype.forEach.call(r.addedNodes, function (node) {
-          if (node.nodeType === 1 && (node.classList.contains("ink-c") || node.classList.contains("ink-canvas"))) return;
+          if (node.nodeType === 1 && (node.classList.contains("ink-c") || node.classList.contains("ink-canvas") || node.classList.contains("fx-in"))) return;
+          if (node.nodeType === 1) releaseClones(node);
           if (node.nodeType === 3 && node.parentElement && node.parentElement.classList.contains("ink-c")) return;
           var target = node.nodeType === 3 ? node.parentElement : node;
           if (target && target.nodeType === 1) queue.push(target);
@@ -585,6 +666,11 @@
         else io.observe(item.el);
       });
       fades.forEach(function (el) { fadeIO.observe(el); });
+      document.querySelectorAll(".portfolio-chapter").forEach(function (ch) {
+        if (ch.__fxUnits && ch.__inkActive) revealAll(ch.__fxUnits, 60);
+      });
+      // Closed menu items stay revealed when not open, so nothing is left hidden if the event never fires.
+      if (!root.classList.contains("is-nav-menu-open")) menuUnits.forEach(function (el) { el.classList.remove("fx-wait"); });
     };
     var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     fontsReady.then(function () { whenPageVisible(start); });
