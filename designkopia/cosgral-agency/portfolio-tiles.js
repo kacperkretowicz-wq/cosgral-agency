@@ -23,6 +23,7 @@
   var pendingTheme = null;
   var expandedKey = null;
   var wheelLock = 0;
+  var SLIDE_MS = 2400, snapHold = null;
   var scrollRaf = 0;
   var scrollAnim = 0;
   var loopsPaused = false;
@@ -443,6 +444,7 @@
     if (scrollAnim) {
       cancelAnimationFrame(scrollAnim);
       scrollAnim = 0;
+      releaseSnap();
     }
     setActive(index, { force: true });
     if (behavior === "auto" || REDUCED) {
@@ -452,10 +454,13 @@
     var from = scroller.scrollLeft;
     var dist = left - from;
     if (Math.abs(dist) < 2) return;
-    var prevBehavior = scroller.style.scrollBehavior;
+    // Mandatory snapping pulls every programmatic step back to the nearest chapter,
+    // so the slide would jump at its midpoint: hold snapping off until it lands.
+    snapHold = { behavior: scroller.style.scrollBehavior, snap: scroller.style.scrollSnapType };
     scroller.style.scrollBehavior = "auto";
+    scroller.style.scrollSnapType = "none";
     var t0 = performance.now();
-    var dur = 1700;
+    var dur = SLIDE_MS;
     function tick(now) {
       var p = Math.min(1, (now - t0) / dur);
       var e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
@@ -464,10 +469,17 @@
         scrollAnim = requestAnimationFrame(tick);
       } else {
         scrollAnim = 0;
-        scroller.style.scrollBehavior = prevBehavior;
+        releaseSnap();
       }
     }
     scrollAnim = requestAnimationFrame(tick);
+  }
+
+  function releaseSnap() {
+    if (!snapHold) return;
+    scroller.style.scrollBehavior = snapHold.behavior;
+    scroller.style.scrollSnapType = snapHold.snap;
+    snapHold = null;
   }
 
   function pauseChapterLoops() {
@@ -621,7 +633,7 @@
       if (Math.abs(delta) < 8) return;
       e.preventDefault();
       var now = Date.now();
-      if (now - wheelLock < 1500) return;
+      if (now - wheelLock < SLIDE_MS) return;
       wheelLock = now;
       scrollToIndex(activeIndex + (delta > 0 ? 1 : -1));
     },

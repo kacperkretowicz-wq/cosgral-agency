@@ -39,9 +39,10 @@
     var ad = Math.abs(d), dir = d < 0 ? -1 : 1;
     chapter.__fly.forEach(function (el, k) {
       // A scrambled but stable cue per piece, so they leave and land in a mixed order.
-      var cue = ((k * 0.618034 + 0.17) % 1) * 0.34;
-      var reach = 1.1 + ((k * 0.414214) % 1) * 0.3;
-      var t = Math.max(0, Math.min(1, (ad - cue) / 0.5));
+      // Spread over most of the slide so each piece is seen travelling, not just gone.
+      var cue = ((k * 0.618034 + 0.17) % 1) * 0.3;
+      var reach = 0.75 + ((k * 0.414214) % 1) * 0.35;
+      var t = Math.max(0, Math.min(1, (ad - cue) / 0.7));
       var x = reduced || ad === 0 ? 0 : dir * w * reach * flyEase(t);
       el.style.translate = x ? x.toFixed(1) + "px 0" : "";
     });
