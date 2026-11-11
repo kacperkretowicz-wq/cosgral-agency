@@ -2,7 +2,7 @@
    The only sampled artwork is our own title canvas, so no poster can taint it. */
 (function () {
   'use strict';
-  const chapter=document.getElementById('montaz'), scroller=document.querySelector('[data-chapters-scroller]'), horizon=document.querySelector('[data-pf-horizon]');
+  const chapter=document.getElementById('montaz'), scroller=document.querySelector('[data-chapters-scroller]');
   if(!chapter||!scroller)return;
   const surface=document.createElement('div');surface.className='pf-montage-reveal';surface.hidden=true;surface.setAttribute('aria-hidden','true');
   const title=document.createElement('strong');title.className='pf-montage-word';
@@ -10,7 +10,7 @@
   const artwork=document.createElement('canvas'), ink=artwork.getContext('2d');
   let gl=null,ctx=null,program,uniforms,textures=[];
   let W=1,H=1,GW=1,GH=1,height,previous,next,exposure,pixels;
-  let visible=false,raf=0,last=0,moved=0,oldPointer=null,accumulator=0;
+  let visible=false,raf=0,last=0,oldPointer=null,accumulator=0,nextDrop=0;
   const points=[];
   let finger=null,suppressTapUntil=0;
   const reduced=document.documentElement.classList.contains('reduce-motion')||matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -69,13 +69,19 @@
     if(gl){gl.viewport(0,0,W,H);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,textures[0]);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,GW,GH,0,gl.RGBA,gl.UNSIGNED_BYTE,pixels);gl.uniform2f(uniforms.texel,1/GW,1/GH);}
     language();reset();sync();
   }
-  function disturb(x,y,touch){
+  function disturb(x,y,touch,wave=1,expose=1){
     const radius=GW*(touch?.12:.07),wr=GW*(touch?.032:.022);
     for(let j=Math.max(1,Math.floor(y-radius));j<Math.min(GH-1,y+radius);j++)for(let i=Math.max(1,Math.floor(x-radius));i<Math.min(GW-1,x+radius);i++){
       const d2=(i-x)*(i-x)+(j-y)*(j-y),k=j*GW+i;
-      exposure[k]=Math.max(exposure[k],Math.exp(-d2/(radius*radius*.32)));
-      if(!reduced)height[k]=Math.max(-.9,height[k]-.22*Math.exp(-d2/(wr*wr*.5)));
+      exposure[k]=Math.max(exposure[k],expose*Math.exp(-d2/(radius*radius*.32)));
+      if(!reduced)height[k]=Math.max(-.9,height[k]-.22*wave*Math.exp(-d2/(wr*wr*.5)));
     }
+  }
+  // The water is never still: small drops keep landing, and the word shimmers faintly through them.
+  function ambient(now){
+    if(reduced||now<nextDrop)return;
+    nextDrop=now+350+Math.random()*450;
+    disturb(GW*(.08+Math.random()*.84),GH*(.1+Math.random()*.8),false,.6,.1);
   }
   function simulate(){
     for(let y=1;y<GH-1;y++)for(let x=1;x<GW-1;x++){
@@ -102,20 +108,26 @@
       if(oldPointer){const n=Math.max(1,Math.min(35,Math.ceil(Math.hypot(p.x-oldPointer.x,p.y-oldPointer.y)/2)));for(let k=1;k<=n;k++)disturb(oldPointer.x+(p.x-oldPointer.x)*k/n,oldPointer.y+(p.y-oldPointer.y)*k/n,p.touch);}else disturb(p.x,p.y,p.touch);
       oldPointer=p;
     }
+    ambient(now);
     accumulator+=dt;while(accumulator>=16.666){simulate();accumulator-=16.666;}
     draw();
-    if(now-moved<7500)raf=requestAnimationFrame(frame);else{last=0;reset();}
+    raf=requestAnimationFrame(frame);
   }
   function sync(){
     const index=[...scroller.querySelectorAll('[data-portfolio-tile]')].indexOf(chapter);
-    const settled=Math.abs(scroller.scrollLeft/Math.max(1,scroller.clientWidth)-index)<.0005&&horizon?.dataset.settledChapter===String(index);
-    const value=settled&&!document.hidden&&!document.body.classList.contains('pf-wall-open')&&!document.documentElement.classList.contains('is-nav-menu-open');
+    // On as soon as the slide reaches the chapter; the ground's spring may still be settling behind it.
+    const arrived=index>=0&&Math.abs(scroller.scrollLeft/Math.max(1,scroller.clientWidth)-index)<.01;
+    const value=arrived&&!document.hidden&&!document.body.classList.contains('pf-wall-open')&&!document.documentElement.classList.contains('is-nav-menu-open');
     document.body.classList.toggle('pf-montage-water-active',value);
-    if(value!==visible){finger=null;visible=value;surface.hidden=!value;points.length=0;oldPointer=null;if(!value){cancelAnimationFrame(raf);raf=0;last=0;reset();}}
+    if(value!==visible){
+      finger=null;visible=value;surface.hidden=!value;points.length=0;oldPointer=null;
+      if(!value){cancelAnimationFrame(raf);raf=0;last=0;reset();}
+      else if(!raf){nextDrop=0;raf=requestAnimationFrame(frame);}
+    }
   }
   function queuePoint(x,y,touch){
     points.push({x:x/innerWidth*GW,y:y/innerHeight*GH,touch:!!touch});
-    if(points.length>8)points.shift();moved=performance.now();
+    if(points.length>8)points.shift();
     if(!raf)raf=requestAnimationFrame(frame);
   }
   function controls(target){return !!target?.closest?.('.site-nav,.portfolio-chapters__pager,a,input,textarea,select,button:not([data-tile-expand-hit])');}

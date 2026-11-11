@@ -14,7 +14,7 @@ function setup(){
  function fire(type,touches=[],t=target){const e={touches,target:t,cancelable:true,prevented:false,stopped:false,preventDefault(){this.prevented=true},stopImmediatePropagation(){this.stopped=true}};for(const fn of events[type]||[]){fn(e);if(e.stopped)break;}return e;}
  function frame(){const f=[...frames.values()];frames.clear();time+=17;f.forEach(fn=>fn(time));}
  const finger=(x,y)=>({identifier:1,clientX:x,clientY:y});
- return {fire,frame,finger,body,horizon,get revealed(){return revealed}};
+ return {fire,frame,finger,body,horizon,scroller,frames,get revealed(){return revealed}};
 }
 test('a finger paints the actual reveal, owns the drag and does not open the cube on release',()=>{
  const p=setup();assert.ok(p.body.classList.contains('pf-montage-water-active'));
@@ -27,9 +27,19 @@ test('a finger paints the actual reveal, owns the drag and does not open the cub
 test('navigation controls and transitions are not captured by the reveal',()=>{
  const p=setup(),control={closest:q=>q==='#montaz'?null:{}};
  assert.equal(p.fire('touchstart',[p.finger(20,800)],control).stopped,false);
- p.horizon.dataset.settledChapter='';p.fire('pf-horizon-state');
+ // Mid-slide the water is released, whatever the ground's spring is doing.
+ p.scroller.scrollLeft=600;p.fire('pf-horizon-state');
  assert.equal(p.body.classList.contains('pf-montage-water-active'),false);
  assert.equal(p.fire('touchstart',[p.finger(150,300)]).stopped,false);
+ // Back on the chapter it is on at once, without waiting for the ground to settle.
+ p.scroller.scrollLeft=780;p.horizon.dataset.settledChapter='';p.fire('pf-horizon-state');
+ assert.ok(p.body.classList.contains('pf-montage-water-active'));
+});
+test('the water keeps moving without any input',()=>{
+ const p=setup();assert.ok(p.frames.size>0,'the loop starts as soon as the water is shown');
+ for(let i=0;i<600;i++)p.frame();
+ assert.ok(p.frames.size>0,'still animating after ten seconds without a pointer');
+ assert.ok(p.revealed>0,'ambient drops reach the surface');
 });
 test('cancelled and multi-finger gestures release the input without a ghost click block',()=>{
  const p=setup();p.fire('touchstart',[p.finger(140,300)]);p.fire('touchmove',[p.finger(250,420)]);
