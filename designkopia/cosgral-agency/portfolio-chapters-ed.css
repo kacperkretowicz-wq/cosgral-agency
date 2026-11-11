@@ -980,7 +980,6 @@ body.portfolio-page--tiles .portfolio-chapter { --d: 0; --ad: 0; }
   pointer-events: none;
   user-select: none;
   translate: calc(var(--d) * -58vw) calc(var(--ad) * 8vh);
-  opacity: calc(1 - var(--ad) * 0.6);
   will-change: translate;
 }
 .portfolio-chapter[data-ground="light"] .pf-ch-mark {
@@ -990,36 +989,27 @@ body.portfolio-page--tiles .portfolio-chapter { --d: 0; --ad: 0; }
 html.pf-motion body.portfolio-page--tiles .portfolio-chapter__bg {
   translate: calc(var(--d) * -24vw) 0;
   scale: calc(1 + var(--ad) * 0.14);
-  opacity: calc(1 - var(--ad) * 0.5);
   transform-origin: 50% 50%;
   will-change: translate, scale;
 }
-/* Artwork flees past the screen edges as its chapter leaves, and gathers
-   back in from beyond them as the next one lands (--ex eases 0 → 1 over the
-   first part of a slide). Each piece leaves along its own bearing. */
-html.pf-motion .chapter-lux__shot {
-  translate: calc(var(--lux-x) * var(--ex) * 2.6) calc(var(--lux-y) * var(--ex) * 2.6 + var(--ex) * 6vh);
-  rotate: calc(var(--d) * -9deg);
+/* Photo tiles and copy fly out sideways on their own cues (portfolio-motion.js
+   writes each piece's translate): no dimming, nothing vanishes mid-slide. */
+html.pf-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-lux,
+html.pf-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-os,
+html.pf-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-montaz,
+html.pf-motion .portfolio-chapter__bg .portfolio-tile__media > .chapter-show {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: none;
 }
-html.pf-motion .chapter-show__tile {
-  translate: calc(var(--sh-x) * var(--ex) * 2.8 + var(--d) * 12vw) calc(var(--sh-y) * var(--ex) * 2.8 - var(--ex) * 18vh);
-  rotate: calc(var(--d) * 12deg);
-}
+html.pf-motion body.portfolio-page .portfolio-chapter .portfolio-chapter__copy > *,
+html.pf-motion .pf-ch-index,
+html.pf-motion .chapter-lux__shot,
+html.pf-motion .chapter-show__stage > *,
+html.pf-motion .sys-fan__arc,
 html.pf-motion .chapter-montaz__belt {
-  translate: calc(var(--d) * 16vw) calc(var(--ex) * 92vh);
-  rotate: calc(var(--d) * -6deg);
-}
-/* The systems row lifts away over the top edge and drops back in */
-html.pf-motion .portfolio-chapter .sys-fan--catalog .sys-fan__arc {
-  translate: calc(var(--d) * 30vw) calc(var(--ex) * -78vh + 5vh);
-}
-
-/* Copy rides in front, faster than the frame */
-html.pf-motion body.portfolio-page .portfolio-chapter .portfolio-chapter__copy {
-  translate: calc(var(--d) * 20vw) 0;
-}
-html.pf-motion .pf-ch-index {
-  translate: calc(var(--d) * 10vw) 0;
+  will-change: translate;
 }
 
 /* Titles: each word rises out of its own mask, and sinks back on leaving */
@@ -1049,24 +1039,18 @@ html.pf-motion body.portfolio-page .portfolio-chapter.is-active .portfolio-chapt
 }
 
 /* Lead: comes into focus */
-html.pf-motion body.portfolio-page .portfolio-chapter .portfolio-chapter__lead {
-  filter: blur(10px);
-  transition: opacity 0.5s ease, transform 0.6s var(--ed-ease), filter 0.5s ease;
-}
-html.pf-motion body.portfolio-page .portfolio-chapter.is-active .portfolio-chapter__lead {
-  filter: blur(0);
-  transition: opacity 1.2s ease 0.85s, transform 1.4s var(--ed-ease) 0.85s, filter 1.2s ease 0.85s;
+html.pf-motion body.portfolio-page .portfolio-chapter .portfolio-chapter__lead,
+html.pf-motion body.portfolio-page .portfolio-chapter .portfolio-chapter__more {
+  opacity: 1;
+  transform: none;
+  filter: none;
 }
 
 /* Link: the underline draws itself */
 html.pf-motion body.portfolio-page .portfolio-chapter .portfolio-chapter__more {
   border-bottom: 0;
-  background: linear-gradient(currentColor, currentColor) 0 100% / 0% 1px no-repeat;
-  transition: opacity 0.5s ease, transform 0.6s var(--ed-ease), background-size 0.5s ease;
-}
-html.pf-motion body.portfolio-page .portfolio-chapter.is-active .portfolio-chapter__more {
-  background-size: 100% 1px;
-  transition: opacity 1s ease 1s, transform 1.3s var(--ed-ease) 1s, background-size 1.1s var(--ed-ease) 1.15s;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+  transition: none;
 }
 
 /* Index: the hairline draws from the left, then its labels slide up */
@@ -1084,27 +1068,9 @@ html.pf-motion .pf-ch-index::before {
   top: 0;
   height: 1px;
   background: currentColor;
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  transition: transform 0.6s cubic-bezier(0.55, 0, 0.75, 0.2);
 }
 html.pf-motion .pf-ch-index span {
   display: inline-block;
-  opacity: 0;
-  transform: translate3d(0, 10px, 0);
-  transition: opacity 0.4s ease, transform 0.5s var(--ed-ease);
-}
-html.pf-motion .portfolio-chapter.is-active .pf-ch-index::before {
-  transform: scaleX(1);
-  transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
-}
-html.pf-motion .portfolio-chapter.is-active .pf-ch-index span {
-  opacity: 1;
-  transform: none;
-  transition: opacity 0.9s ease 0.9s, transform 1.1s var(--ed-ease) 0.9s;
-}
-html.pf-motion .portfolio-chapter.is-active .pf-ch-index span:last-child {
-  transition-delay: 1.05s;
 }
 
 @media (max-width: 900px) {

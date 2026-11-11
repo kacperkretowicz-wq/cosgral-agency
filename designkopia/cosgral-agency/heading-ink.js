@@ -131,13 +131,33 @@
     var active = ch.classList.contains("is-active");
     if (active === ch.__inkActive) return;
     ch.__inkActive = active;
-    ch.__inkItems.forEach(function (item) {
-      if (active) { if (observing) schedule(item, CHAPTER_DELAY); }
-      else reset(item);
-    });
     clearTimeout(ch.__fxTimer);
-    if (active) { if (observing) ch.__fxTimer = setTimeout(function () { revealAll(ch.__fxUnits, 60); }, CHAPTER_DELAY); }
-    else ch.__fxUnits.forEach(hideUnit);
+    if (active) {
+      if (!observing) return;
+      ch.__inkItems.forEach(function (item) { schedule(item, CHAPTER_DELAY); });
+      ch.__fxTimer = setTimeout(function () { revealHidden(ch.__fxUnits); }, 120);
+      return;
+    }
+    // The leaving chapter's text flies out with it (portfolio-motion.js); it is re-armed
+    // only once the chapter is fully off screen, so nothing vanishes mid-slide.
+    whenOffscreen(ch, function () {
+      ch.__inkItems.forEach(reset);
+      ch.__fxUnits.forEach(hideUnit);
+    });
+  }
+
+  function whenOffscreen(ch, cb) {
+    cancelAnimationFrame(ch.__offRaf);
+    (function check() {
+      if (ch.__inkActive) return;
+      var r = ch.getBoundingClientRect();
+      if (r.right <= 0 || r.left >= window.innerWidth) { cb(); return; }
+      ch.__offRaf = requestAnimationFrame(check);
+    })();
+  }
+
+  function revealHidden(list) {
+    revealAll(list.filter(function (el) { return el.classList.contains("fx-wait"); }), 60);
   }
 
   function schedule(item, delay) {
@@ -476,7 +496,9 @@
   var FADE_SKIP = [
     "script", "style", "noscript", "template", "svg", "canvas", "select", "textarea", "input", "option",
     ".visually-hidden", "[data-no-ink]", "[class*='site-chat']", "[class*='cookie']", ".faq-scroll__stage",
-    ".portfolio-chapter__lead", ".portfolio-chapter__more", ".home-cube-poster"
+    ".home-cube-poster",
+    // Realizacje chapter copy and tiles fly in and out with the slide instead (portfolio-motion.js).
+    ".portfolio-chapter"
   ].join(",");
   var fades = [];
   var menuUnits = [];
@@ -546,7 +568,7 @@
         chapter.__fxUnits.push(el);
         if (observing && chapter.__inkActive) {
           clearTimeout(chapter.__fxTimer);
-          chapter.__fxTimer = setTimeout(function () { revealAll(chapter.__fxUnits, 60); }, CHAPTER_DELAY);
+          chapter.__fxTimer = setTimeout(function () { revealHidden(chapter.__fxUnits); }, 120);
         }
         return;
       }
@@ -686,7 +708,7 @@
       fades.forEach(function (el) { fadeIO.observe(el); });
       startHero();
       document.querySelectorAll(".portfolio-chapter").forEach(function (ch) {
-        if (ch.__fxUnits && ch.__inkActive) revealAll(ch.__fxUnits, 60);
+        if (ch.__fxUnits && ch.__inkActive) revealHidden(ch.__fxUnits);
       });
       // Closed menu items stay revealed when not open, so nothing is left hidden if the event never fires.
       if (!root.classList.contains("is-nav-menu-open")) menuUnits.forEach(function (el) { el.classList.remove("fx-wait"); });
