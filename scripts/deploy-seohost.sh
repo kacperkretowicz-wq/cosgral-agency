@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/designkopia/cosgral-agency"
-HOST="${COSGRAL_FTP_HOST:-h86.seohost.pl}"
+HOST="${COSGRAL_FTP_HOST:-h109.seohost.pl}"
 USER="${COSGRAL_FTP_USER:-srv118385}"
 PASS="${COSGRAL_FTP_PASS:-${FTP_PASSWORD:-}}"
 REMOTE="${COSGRAL_FTP_REMOTE:-/domains/cosgral.pl/public_html/}"
